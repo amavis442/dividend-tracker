@@ -25,7 +25,7 @@
                 <td>{{ payment.exDividendDate ? payment.exDividendDate|date('d-m-Y') : '' }}</td>
                 <td>{{ payment.recordDate ? payment.recordDate|date('d-m-Y') : '' }}</td>
                 <td>{{ payment.payDate ? payment.payDate|date('d-m-Y') : '' }}</td>
-                <td>${{ payment.dividend|format_number({fraction_digit: 2}) }}</td>
+                <td>${{ (payment.dividend/100)|format_number({fraction_digit: 2}) }}</td>
                 <td>
                     <a href="{{ path('payment_show', {'id': payment.id}) }}">show</a>
                     <a href="{{ path('payment_edit', {'id': payment.id}) }}">edit</a>

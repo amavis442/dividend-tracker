@@ -54,9 +54,9 @@ class Position
         return $this->id;
     }
 
-    public function getPrice(): ?float
+    public function getPrice(): ?int
     {
-        return $this->price ? $this->price / 100 : null;
+        return $this->price;
     }
 
     public function setPrice(int $price): self
@@ -66,9 +66,9 @@ class Position
         return $this;
     }
 
-    public function getAmount(): ?float
+    public function getAmount(): ?int
     {
-        return $this->amount ? $this->amount / 100: null;
+        return $this->amount;
     }
 
     public function setAmount(int $amount): self

@@ -84,9 +84,9 @@ class Payment
         return $this;
     }
 
-    public function getDividend(): ?float
+    public function getDividend(): ?int
     {
-        return $this->dividend ? $this->dividend / 100 : null;
+        return $this->dividend;
     }
 
     public function setDividend(int $dividend): self
