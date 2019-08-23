@@ -44,6 +44,16 @@ class Position
      */
     private $buy_date;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $closed;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $close_date;
+
     public function __construct()
     {
         $this->payments = new ArrayCollection();
@@ -129,6 +139,30 @@ class Position
     public function setBuyDate(\DateTimeInterface $buy_date): self
     {
         $this->buy_date = $buy_date;
+
+        return $this;
+    }
+
+    public function getClosed(): ?bool
+    {
+        return $this->closed;
+    }
+
+    public function setClosed(?bool $closed): self
+    {
+        $this->closed = $closed;
+
+        return $this;
+    }
+
+    public function getCloseDate(): ?\DateTimeInterface
+    {
+        return $this->close_date;
+    }
+
+    public function setCloseDate(?\DateTimeInterface $close_date): self
+    {
+        $this->close_date = $close_date;
 
         return $this;
     }
