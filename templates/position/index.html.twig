@@ -9,6 +9,7 @@
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Ticker</th>
                 <th>Buy date</th>
                 <th>Price</th>
                 <th>Amount</th>
@@ -19,6 +20,7 @@
         {% for position in positions %}
             <tr>
                 <td>{{ position.id }}</td>
+                <td>{{ position.ticker.ticker }}</td>
                 <td>{{ position.buyDate|date("d-m-Y") }}</td>
                 <td>{{ position.price|format_number({fraction_digit: 2}) }}</td>
                 <td>{{ position.amount|format_number({fraction_digit: 2}) }}</td>
