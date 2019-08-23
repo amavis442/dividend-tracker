@@ -59,6 +59,11 @@ class Position
      */
     private $close_price;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $profit;
+
     public function __construct()
     {
         $this->payments = new ArrayCollection();
@@ -182,5 +187,14 @@ class Position
         $this->close_price = $close_price;
 
         return $this;
+    }
+
+    public function getProfit(): ?float
+    {
+        if ($this->closed == 1){
+            return (($this->close_price - $this->price) * $this->amount) / 10000;
+        }
+
+        return $this->profit;
     }
 }

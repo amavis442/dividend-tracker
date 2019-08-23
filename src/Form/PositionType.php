@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 class PositionType extends AbstractType
 {
@@ -28,6 +29,16 @@ class PositionType extends AbstractType
             ])
             ->add('amount')
             ->add('price')
+            ->add('closed', CheckboxType::class, [
+                'label'    => 'Position closed?',
+                'required' => false,
+            ])
+            ->add('closeDate',DateType::class, [
+                // renders it as a single text box
+                'widget' => 'single_text',
+                'required' => false
+            ])
+            ->add('closePrice')
         ;
     }
 

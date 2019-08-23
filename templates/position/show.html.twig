@@ -12,12 +12,36 @@
                 <td>{{ position.id }}</td>
             </tr>
             <tr>
-                <th>Price</th>
-                <td>{{ position.price }}</td>
+                <th>Ticker</th>
+                <td>{{ position.ticker.ticker }}</td>
+            </tr>
+            <tr>
+                <th>Buydate</th>
+                <td>{{ position.buyDate|date("d-m-Y") }}</td>
             </tr>
             <tr>
                 <th>Amount</th>
-                <td>{{ position.amount }}</td>
+                <td>{{ position.amount/100 }}</td>
+            </tr>
+            <tr>
+                <th>Price</th>
+                <td>${{ position.price/100 }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ position.closed ? 'Closed' : 'Open' }}</td>
+            </tr>
+            <tr>
+                <th>Closedate</th>
+                <td>{{ position.closeDate|date("d-m-Y") }}</td>
+            </tr>
+            <tr>
+                <th>Close price</th>
+                <td>${{ position.closePrice/100 }}</td>
+            </tr>
+            <tr>
+                <th>Profit / Loss</th>
+                <td>${{ position.profit|format_number({fraction_digit: 2}) }}</td>
             </tr>
         </tbody>
     </table>
@@ -25,6 +49,4 @@
     <a href="{{ path('position_index') }}">back to list</a>
 
     <a href="{{ path('position_edit', {'id': position.id}) }}">edit</a>
-
-    {{ include('position/_delete_form.html.twig') }}
 {% endblock %}
