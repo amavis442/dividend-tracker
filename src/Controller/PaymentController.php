@@ -20,8 +20,12 @@ class PaymentController extends AbstractController
      */
     public function index(PaymentRepository $paymentRepository): Response
     {
+        $payments = $paymentRepository->findAll();
+        $totalDividend = $paymentRepository->getTotalDividend();
+
         return $this->render('payment/index.html.twig', [
-            'payments' => $paymentRepository->findAll(),
+            'payments' => $payments,
+            'dividends' => $totalDividend
         ]);
     }
 

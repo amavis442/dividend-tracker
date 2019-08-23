@@ -47,4 +47,14 @@ class PaymentRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function getTotalDividend(): ?float
+    {
+        $result = $this->createQueryBuilder('p')
+            ->select('SUM(p.dividend) total')    
+            ->getQuery()
+            ->getResult()
+        ;
+        return $result[0]['total'] / 100;
+    }
 }
