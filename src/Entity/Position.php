@@ -54,6 +54,11 @@ class Position
      */
     private $close_date;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $close_price;
+
     public function __construct()
     {
         $this->payments = new ArrayCollection();
@@ -163,6 +168,18 @@ class Position
     public function setCloseDate(?\DateTimeInterface $close_date): self
     {
         $this->close_date = $close_date;
+
+        return $this;
+    }
+
+    public function getClosePrice(): ?int
+    {
+        return $this->close_price;
+    }
+
+    public function setClosePrice(int $close_price): self
+    {
+        $this->close_price = $close_price;
 
         return $this;
     }
