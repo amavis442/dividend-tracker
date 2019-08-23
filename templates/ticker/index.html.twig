@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ticker index{% endblock %}
+
+{% block body %}
+    <h1>Ticker index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Ticker</th>
+                <th>Fullname</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ticker in tickers %}
+            <tr>
+                <td>{{ ticker.id }}</td>
+                <td>{{ ticker.ticker }}</td>
+                <td>{{ ticker.fullname }}</td>
+                <td>
+                    <a href="{{ path('ticker_show', {'id': ticker.id}) }}">show</a>
+                    <a href="{{ path('ticker_edit', {'id': ticker.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('ticker_new') }}">Create new</a>
+{% endblock %}

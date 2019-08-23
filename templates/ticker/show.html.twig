@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ticker{% endblock %}
+
+{% block body %}
+    <h1>Ticker</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ ticker.id }}</td>
+            </tr>
+            <tr>
+                <th>Ticker</th>
+                <td>{{ ticker.ticker }}</td>
+            </tr>
+            <tr>
+                <th>Fullname</th>
+                <td>{{ ticker.fullname }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('ticker_index') }}">back to list</a>
+
+    <a href="{{ path('ticker_edit', {'id': ticker.id}) }}">edit</a>
+
+    {{ include('ticker/_delete_form.html.twig') }}
+{% endblock %}

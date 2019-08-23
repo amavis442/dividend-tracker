@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Form;
+
+use App\Entity\Payment;
+use App\Entity\Position;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+
+class PaymentType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
+            ->add('ex_dividend_date',DateType::class, [
+                // renders it as a single text box
+                'widget' => 'single_text',
+            ])
+            ->add('record_date',DateType::class, [
+                // renders it as a single text box
+                'widget' => 'single_text',
+                'required' => false,
+            ])
+            ->add('pay_date',DateType::class, [
+                // renders it as a single text box
+                'widget' => 'single_text',
+            ])
+            ->add('dividend')
+            ->add('position', EntityType::class, [
+                'class' => Position::class,
+                'choice_label' => function ($position) {
+                    return $position->getTicker()->getTicker(). ' '. $position->getAmount(). ' '.$position->getPrice();
+                },
+                'required' => true,
+                'placeholder' => 'Please choose a position',
+                'empty_data' => null,
+            ])
+        ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'data_class' => Payment::class,
+        ]);
+    }
+}

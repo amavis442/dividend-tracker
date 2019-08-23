@@ -2,48 +2,134 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Position
- *
- * @ORM\Table(name="position", indexes={@ORM\Index(name="ticker_id", columns={"ticker_id"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\PositionRepository")
  */
 class Position
 {
     /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
-     * @var string|null
-     *
-     * @ORM\Column(name="price", type="decimal", precision=10, scale=2, nullable=true, options={"default"="0.00"})
+     * @ORM\Column(type="integer")
      */
-    private $price = '0.00';
+    private $price;
 
     /**
-     * @var string|null
-     *
-     * @ORM\Column(name="amount", type="decimal", precision=10, scale=2, nullable=true, options={"default"="0.00"})
+     * @ORM\Column(type="integer")
      */
-    private $amount = '0.00';
+    private $amount;
 
     /**
-     * @var \App\Entity\Ticker
-     *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Ticker")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="ticker_id", referencedColumnName="id")
-     * })
+     * @ORM\ManyToOne(targetEntity="App\Entity\Ticker", inversedBy="positions")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $ticker;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Payment", mappedBy="position")
+     */
+    private $payments;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $buy_date;
+
+    public function __construct()
+    {
+        $this->payments = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getPrice(): ?float
+    {
+        return $this->price ? $this->price / 100 : null;
+    }
+
+    public function setPrice(int $price): self
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
+    public function getAmount(): ?float
+    {
+        return $this->amount ? $this->amount / 100: null;
+    }
+
+    public function setAmount(int $amount): self
+    {
+        $this->amount = $amount;
+
+        return $this;
+    }
+
+    public function getTicker(): ?Ticker
+    {
+        return $this->ticker;
+    }
+
+    public function setTicker(?Ticker $ticker): self
+    {
+        $this->ticker = $ticker;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Payment[]
+     */
+    public function getPayments(): Collection
+    {
+        return $this->payments;
+    }
+
+    public function addPayment(Payment $payment): self
+    {
+        if (!$this->payments->contains($payment)) {
+            $this->payments[] = $payment;
+            $payment->setPosition($this);
+        }
+
+        return $this;
+    }
+
+    public function removePayment(Payment $payment): self
+    {
+        if ($this->payments->contains($payment)) {
+            $this->payments->removeElement($payment);
+            // set the owning side to null (unless already changed)
+            if ($payment->getPosition() === $this) {
+                $payment->setPosition(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getBuyDate(): ?\DateTimeInterface
+    {
+        return $this->buy_date;
+    }
+
+    public function setBuyDate(\DateTimeInterface $buy_date): self
+    {
+        $this->buy_date = $buy_date;
+
+        return $this;
+    }
 }

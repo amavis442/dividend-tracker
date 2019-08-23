@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Ticker{% endblock %}
+
+{% block body %}
+    <h1>Edit Ticker</h1>
+
+    {{ include('ticker/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('ticker_index') }}">back to list</a>
+
+    {{ include('ticker/_delete_form.html.twig') }}
+{% endblock %}
