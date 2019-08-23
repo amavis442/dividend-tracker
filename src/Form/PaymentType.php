@@ -18,7 +18,7 @@ class PaymentType extends AbstractType
             ->add('position', EntityType::class, [
                 'class' => Position::class,
                 'choice_label' => function ($position) {
-                    return  '#'.$position->getId().' '.$position->getTicker()->getTicker(). ' ['. $position->getAmount(). ' - '.$position->getPrice().']';
+                    return  '#'.$position->getId().' '.$position->getTicker()->getTicker(). ' ['. ($position->getAmount()/100). ' X  $'.($position->getPrice()/100).']';
                 },
                 'required' => true,
                 'placeholder' => 'Please choose a position',

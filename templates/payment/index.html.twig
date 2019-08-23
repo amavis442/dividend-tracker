@@ -21,7 +21,7 @@
         {% for payment in payments %}
             <tr>
                 <td>{{ payment.id }}</td>
-                 <td>#{{ payment.position.id }} {{ payment.position.ticker.ticker }} [{{ payment.position.amount }} - ${{ payment.position.price }}] </td>
+                 <td>#{{ payment.position.id }} {{ payment.position.ticker.ticker }} [{{ payment.position.amount/100 }} X ${{ payment.position.price/100 }}] </td>
                 <td>{{ payment.exDividendDate ? payment.exDividendDate|date('d-m-Y') : '' }}</td>
                 <td>{{ payment.recordDate ? payment.recordDate|date('d-m-Y') : '' }}</td>
                 <td>{{ payment.payDate ? payment.payDate|date('d-m-Y') : '' }}</td>
