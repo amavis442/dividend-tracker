@@ -161,6 +161,9 @@ class Position
     public function setClosed(?bool $closed): self
     {
         $this->closed = $closed;
+        if ($this->closed === true) {
+            $this->profit = round((($this->close_price - $this->price) * $this->amount) / 100);
+        }
 
         return $this;
     }
