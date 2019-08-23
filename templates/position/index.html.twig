@@ -14,6 +14,7 @@
                 <th>Amount</th>
                 <th>Price</th>
                 <th>Closed</th>
+                <th>Profit / Loss </th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -26,6 +27,7 @@
                 <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
                 <td>${{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
                 <td>{{ position.closed ? 'Yes' :'No' }}</td>
+                 <td>${{ position.profit|format_number({fraction_digit: 2}) }}</td>
                 <td>
                     <a href="{{ path('position_show', {'id': position.id}) }}">show</a>
                     <a href="{{ path('position_edit', {'id': position.id}) }}">edit</a>
