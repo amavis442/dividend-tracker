@@ -55,7 +55,7 @@ class Position
     private $close_date;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $close_price;
 
