@@ -15,20 +15,6 @@ class PaymentType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('ex_dividend_date',DateType::class, [
-                // renders it as a single text box
-                'widget' => 'single_text',
-            ])
-            ->add('record_date',DateType::class, [
-                // renders it as a single text box
-                'widget' => 'single_text',
-                'required' => false,
-            ])
-            ->add('pay_date',DateType::class, [
-                // renders it as a single text box
-                'widget' => 'single_text',
-            ])
-            ->add('dividend')
             ->add('position', EntityType::class, [
                 'class' => Position::class,
                 'choice_label' => function ($position) {
@@ -37,6 +23,20 @@ class PaymentType extends AbstractType
                 'required' => true,
                 'placeholder' => 'Please choose a position',
                 'empty_data' => null,
+            ])
+            ->add('ex_dividend_date',DateType::class, [
+                // renders it as a single text box
+                'widget' => 'single_text',
+            ])
+            ->add('pay_date',DateType::class, [
+                // renders it as a single text box
+                'widget' => 'single_text',
+            ])
+            ->add('dividend')
+            ->add('record_date',DateType::class, [
+                // renders it as a single text box
+                'widget' => 'single_text',
+                'required' => false,
             ])
         ;
     }

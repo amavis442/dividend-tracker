@@ -9,10 +9,10 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Ticker</th>
                 <th>Buy date</th>
-                <th>Price</th>
+                <th>Ticker</th>
                 <th>Amount</th>
+                <th>Price</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -20,10 +20,10 @@
         {% for position in positions %}
             <tr>
                 <td>{{ position.id }}</td>
-                <td>{{ position.ticker.ticker }}</td>
                 <td>{{ position.buyDate|date("d-m-Y") }}</td>
-                <td>{{ position.price|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ position.ticker.ticker }}</td>
                 <td>{{ position.amount|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ position.price|format_number({fraction_digit: 2}) }}</td>
                 <td>
                     <a href="{{ path('position_show', {'id': position.id}) }}">show</a>
                     <a href="{{ path('position_edit', {'id': position.id}) }}">edit</a>
