@@ -56,7 +56,7 @@ class Ticker
 
     public function setTicker(string $ticker): self
     {
-        $this->ticker = $ticker;
+        $this->ticker = strtoupper($ticker);
 
         return $this;
     }
