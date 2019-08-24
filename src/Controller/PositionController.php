@@ -18,12 +18,18 @@ use DateTime;
 class PositionController extends AbstractController
 {
     /**
-     * @Route("/{page<\d+>?1}", name="position_index", methods={"GET"})
+     * @Route("/{page}/{orderBy}/{sort}", name="position_index", methods={"GET"})
      */
-    public function index(PositionRepository $positionRepository, int $page = 1): Response
+    public function index(PositionRepository $positionRepository, int $page = 1, string $orderBy = 'buy_date', string $sort = 'asc'): Response
     {
+        if (!in_array($orderBy, ['buy_date','profit','ticker'])) {
+            $orderBy = 'buy_date';
+        }
+        if (!in_array($sort, ['asc','desc','ASC','DESC'])) {
+            $sort = 'asc';
+        }
         //$positionRepository->findAll()
-        $items = $positionRepository->getAll($page);
+        $items = $positionRepository->getAll($page, 10, $orderBy,$sort);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
@@ -33,6 +39,8 @@ class PositionController extends AbstractController
             'limit' => $limit,
             'maxPages' => $maxPages,
             'thisPage' => $thisPage,
+            'order' => $orderBy,
+            'sort' => $sort,
             'routeName' => 'position_index',
         ]);
     }

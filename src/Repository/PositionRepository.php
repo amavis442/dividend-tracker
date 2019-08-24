@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Position;
+use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -22,13 +23,18 @@ class PositionRepository extends ServiceEntityRepository
         parent::__construct($registry, Position::class);
     }
 
-    public function getAll(int $page = 1, int $limit = 10): Paginator
+    public function getAll(int $page = 1, int $limit = 10, string $orderBy = 'buy_date', string $sort = 'ASC'): Paginator
     {
+        $order = 'p.'.$orderBy;
+        if ($orderBy === 'ticker'){
+            $order = 't.ticker';
+        }
         // Create our query
         $query = $this->createQueryBuilder('p')
-        ->orderBy('p.buy_date', 'DESC')
+        ->select('p')
+        ->innerJoin('p.ticker', 't')
+        ->orderBy($order, $sort)
         ->getQuery();
-
         $paginator = $this->paginate($query, $page, $limit);
 
         return $paginator;

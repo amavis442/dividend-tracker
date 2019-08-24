@@ -26,7 +26,7 @@ class TickerRepository extends ServiceEntityRepository
     {
         // Create our query
         $query = $this->createQueryBuilder('t')
-        ->orderBy('t.ticker', 'DESC')
+        ->orderBy('t.ticker', 'ASC')
         ->getQuery();
 
         $paginator = $this->paginate($query, $page, $limit);

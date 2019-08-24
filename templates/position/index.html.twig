@@ -9,12 +9,12 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Buy date</th>
-                <th>Ticker</th>
+                <th><a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'buy_date', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Buy date</a></th>
+                <th><a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a></th>
                 <th>Amount</th>
                 <th>Price</th>
                 <th>Closed</th>
-                <th>Profit / Loss </th>
+                <th><a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'profit', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Profit / Loss</a></th>
                 <th>actions</th>
             </tr>
         </thead>

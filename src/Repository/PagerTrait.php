@@ -6,7 +6,7 @@ trait PagerTrait
 {
     public function paginate($dql, $page = 1, $limit = 10): Paginator
     {
-        $paginator = new Paginator($dql);
+        $paginator = new Paginator($dql, $fetchJoinCollection = true);
 
         $paginator->getQuery()
             ->setFirstResult($limit * ($page - 1)) // Offset
