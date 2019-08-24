@@ -18,7 +18,7 @@ use DateTime;
 class PositionController extends AbstractController
 {
     /**
-     * @Route("/{page}/{orderBy}/{sort}", name="position_index", methods={"GET"})
+     * @Route("/list/{page}/{orderBy}/{sort}", name="position_index", methods={"GET"})
      */
     public function index(PositionRepository $positionRepository, int $page = 1, string $orderBy = 'buy_date', string $sort = 'asc'): Response
     {
@@ -46,9 +46,9 @@ class PositionController extends AbstractController
     }
 
     /**
-     * @Route("/new/{tickerId<\d+>?0}", name="position_new", methods={"GET","POST"})
+     * @Route("/new/{tickerId}", name="position_new", methods={"GET","POST"})
      */
-    public function new(Request $request, TickerRepository $tickerRepository, ?int $tickerId ): Response
+    public function new(Request $request, TickerRepository $tickerRepository, int $tickerId = 0 ): Response
     {
         $position = new Position();
 

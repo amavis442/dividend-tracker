@@ -11,12 +11,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/")
+ * @Route("/ticker")
  */
 class TickerController extends AbstractController
 {
     /**
-     * @Route("/{page<\d+>?1}", name="ticker_index", methods={"GET"})
+     * @Route("/list/{page<\d+>?1}", name="ticker_index", methods={"GET"})
      */
     public function index(TickerRepository $tickerRepository, int $page = 1): Response
     {

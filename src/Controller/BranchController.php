@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class BranchController extends AbstractController
 {
     /**
-     * @Route("/{page<\d+>?1}", name="branch_index", methods={"GET"})
+     * @Route("/list/{page<\d+>?1}", name="branch_index", methods={"GET"})
      */
     public function index(BranchRepository $branchRepository, int $page = 1): Response
     {

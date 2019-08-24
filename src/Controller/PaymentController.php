@@ -18,7 +18,7 @@ use DateTime;
 class PaymentController extends AbstractController
 {
     /**
-     * @Route("/{page<\d+>?1}", name="payment_index", methods={"GET"})
+     * @Route("/list/{page<\d+>?1}", name="payment_index", methods={"GET"})
      */
     public function index(PaymentRepository $paymentRepository, int $page = 1): Response
     {
