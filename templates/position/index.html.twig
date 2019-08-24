@@ -11,6 +11,7 @@
             <li class="list-group-item">Tickers: <span class="badge badge-primary">{{ numTickers}}</span></li>
             <li class="list-group-item">Dividend: <span class="badge badge-primary">${{ totalDividend }}</span></li>
             <li class="list-group-item">Profit w/o dividend: <span class="badge badge-primary">${{ (profit / 100)|format_number({fraction_digit: 2})}}</span></li>
+        <li class="list-group-item">Allocated: <span class="badge badge-primary">${{ (allocated / 10000)|format_number({fraction_digit: 2}) }}</span></li>
         </ul>
     </div>
 <br/>
@@ -24,6 +25,8 @@
                 <th><a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a></th>
                 <th>Amount</th>
                 <th>Price</th>
+                <th>Allocated</th>
+                <th>Allocated %</th>
                 <th>Closed</th>
                 <th><a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'profit', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Profit / Loss</a></th>
                 <th>actions</th>
@@ -37,6 +40,8 @@
                 <td>{{ position.ticker.ticker }}</td>
                 <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
                 <td>${{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>${{ position.getAllocated|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ ((position.getAllocated / (allocated / 10000)) * 100)|round(2, 'floor') }}%</td>
                 <td>{{ position.closed ? 'Yes' :'No' }}</td>
                  <td>${{ position.profit|format_number({fraction_digit: 2}) }}</td>
                 <td>

@@ -200,4 +200,9 @@ class Position
 
         return $this->profit;
     }
+
+    public function getAllocated():int
+    {
+        return round(($this->amount * $this->price) / 10000);
+    }
 }

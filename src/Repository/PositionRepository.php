@@ -34,6 +34,7 @@ class PositionRepository extends ServiceEntityRepository
         ->select('p')
         ->innerJoin('p.ticker', 't')
         ->orderBy($order, $sort)
+        ->where('p.closed <> 1 or p.closed is null')
         ->getQuery();
         $paginator = $this->paginate($query, $page, $limit);
 
@@ -46,7 +47,7 @@ class PositionRepository extends ServiceEntityRepository
     {
         $count = $this->createQueryBuilder('p')
             ->select('COUNT(p.id)')
-            ->where('p.closed <> 1')
+            ->where('p.closed <> 1  or p.closed is null')
             ->getQuery()
             ->getSingleScalarResult();
         return $count;
@@ -56,7 +57,7 @@ class PositionRepository extends ServiceEntityRepository
     {
         $count = $this->createQueryBuilder('p')
         ->select('COUNT(DISTINCT p.ticker)')
-        ->where('p.closed <> 1')
+        ->where('p.closed <> 1  or p.closed is null')
         ->getQuery()
         ->getSingleScalarResult();
         return $count;
@@ -72,6 +73,15 @@ class PositionRepository extends ServiceEntityRepository
         return $profit;
     }
 
+    public function getSumAllocated(): int
+    {
+        $allocated = $this->createQueryBuilder('p')
+        ->select('SUM(p.amount * p.price)')
+        ->where('p.closed <> 1 or p.closed is null')
+        ->getQuery()
+        ->getSingleScalarResult();
+        return $allocated;
+    }
 
 
     // /**

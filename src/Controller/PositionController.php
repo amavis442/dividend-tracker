@@ -34,6 +34,8 @@ class PositionController extends AbstractController
         $numTickers = $positionRepository->getTotalTickers();
         $profit = $positionRepository->getProfit();
         $totalDividend = $paymentRepository->getTotalDividend();
+        $allocated = $positionRepository->getSumAllocated();
+
 
         //$positionRepository->findAll()
         $items = $positionRepository->getAll($page, 10, $orderBy,$sort);
@@ -52,6 +54,7 @@ class PositionController extends AbstractController
             'numTickers' => $numTickers,
             'profit' => $profit,
             'totalDividend' => $totalDividend,
+            'allocated' => $allocated,
             'routeName' => 'position_index',
         ]);
     }
