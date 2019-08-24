@@ -41,6 +41,39 @@ class PositionRepository extends ServiceEntityRepository
 
     }
 
+
+    public function getTotalPositions():int
+    {
+        $count = $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->where('p.closed <> 1')
+            ->getQuery()
+            ->getSingleScalarResult();
+        return $count;
+    }
+
+    public function getTotalTickers(): int
+    {
+        $count = $this->createQueryBuilder('p')
+        ->select('COUNT(DISTINCT p.ticker)')
+        ->where('p.closed <> 1')
+        ->getQuery()
+        ->getSingleScalarResult();
+        return $count;
+    }
+
+    public function getProfit(): int
+    {
+        $profit = $this->createQueryBuilder('p')
+        ->select('SUM(p.profit)')
+        ->where('p.closed = 1')
+        ->getQuery()
+        ->getSingleScalarResult();
+        return $profit;
+    }
+
+
+
     // /**
     //  * @return Position[] Returns an array of Position objects
     //  */

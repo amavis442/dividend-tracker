@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\TickerRepository;
 use DateTime;
+use App\Repository\PaymentRepository;
 
 /**
  * @Route("/position")
@@ -20,7 +21,7 @@ class PositionController extends AbstractController
     /**
      * @Route("/list/{page}/{orderBy}/{sort}", name="position_index", methods={"GET"})
      */
-    public function index(PositionRepository $positionRepository, int $page = 1, string $orderBy = 'buy_date', string $sort = 'asc'): Response
+    public function index(PositionRepository $positionRepository,PaymentRepository $paymentRepository, int $page = 1, string $orderBy = 'buy_date', string $sort = 'asc'): Response
     {
         if (!in_array($orderBy, ['buy_date','profit','ticker'])) {
             $orderBy = 'buy_date';
@@ -28,6 +29,12 @@ class PositionController extends AbstractController
         if (!in_array($sort, ['asc','desc','ASC','DESC'])) {
             $sort = 'asc';
         }
+        
+        $numActivePosition = $positionRepository->getTotalPositions();
+        $numTickers = $positionRepository->getTotalTickers();
+        $profit = $positionRepository->getProfit();
+        $totalDividend = $paymentRepository->getTotalDividend();
+
         //$positionRepository->findAll()
         $items = $positionRepository->getAll($page, 10, $orderBy,$sort);
         $limit = 10;
@@ -41,6 +48,10 @@ class PositionController extends AbstractController
             'thisPage' => $thisPage,
             'order' => $orderBy,
             'sort' => $sort,
+            'numActivePosition'=> $numActivePosition,
+            'numTickers' => $numTickers,
+            'profit' => $profit,
+            'totalDividend' => $totalDividend,
             'routeName' => 'position_index',
         ]);
     }
