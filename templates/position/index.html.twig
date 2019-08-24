@@ -27,8 +27,6 @@
                 <th>Price</th>
                 <th>Allocated</th>
                 <th>Allocated %</th>
-                <th>Closed</th>
-                <th><a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'profit', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Profit / Loss</a></th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -42,8 +40,6 @@
                 <td>${{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
                 <td>${{ position.getAllocated|format_number({fraction_digit: 2}) }}</td>
                 <td>{{ ((position.getAllocated / (allocated / 10000)) * 100)|round(2, 'floor') }}%</td>
-                <td>{{ position.closed ? 'Yes' :'No' }}</td>
-                 <td>${{ position.profit|format_number({fraction_digit: 2}) }}</td>
                 <td>
                     <a class="btn btn-secondary" href="{{ path('payment_new', {'positionId': position.id}) }}">add payment</a>
                     <a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id, 'closed': true}) }}">close</a>
