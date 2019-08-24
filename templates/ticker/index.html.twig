@@ -21,6 +21,8 @@
                 <td>{{ ticker.ticker }}</td>
                 <td>{{ ticker.fullname }}</td>
                 <td>
+                    <a  class="btn btn-secondary" href="{{ path('position_new', {'tickerId': ticker.id}) }}">add position</a>
+
                     <a href="{{ path('ticker_show', {'id': ticker.id}) }}">show</a>
                     <a href="{{ path('ticker_edit', {'id': ticker.id}) }}">edit</a>
                 </td>

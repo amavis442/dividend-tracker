@@ -9,6 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\PositionRepository;
+use DateTime;
 
 /**
  * @Route("/payment")
@@ -38,11 +40,19 @@ class PaymentController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="payment_new", methods={"GET","POST"})
+     * @Route("/new/{positionId<\d+>?0}", name="payment_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function new(Request $request, ?int $positionId, PositionRepository $positionRepository): Response
     {
         $payment = new Payment();
+        if ($positionId) {
+            $position = $positionRepository->find($positionId);
+            $payment->setPosition($position);
+        }
+        $currentDate = new DateTime();
+        $payment->setExDividendDate($currentDate);
+        $payment->setPayDate($currentDate);
+
         $form = $this->createForm(PaymentType::class, $payment);
         $form->handleRequest($request);
 

@@ -9,6 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\TickerRepository;
+use DateTime;
 
 /**
  * @Route("/position")
@@ -36,11 +38,19 @@ class PositionController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="position_new", methods={"GET","POST"})
+     * @Route("/new/{tickerId<\d+>?0}", name="position_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function new(Request $request, TickerRepository $tickerRepository, ?int $tickerId ): Response
     {
         $position = new Position();
+
+        if ($tickerId) {
+            $ticker = $tickerRepository->find($tickerId);
+            $position->setTicker($ticker);
+        }
+        $currentDate = new DateTime();
+        $position->setBuyDate($currentDate);
+
         $form = $this->createForm(PositionType::class, $position);
         $form->handleRequest($request);
 
@@ -69,10 +79,15 @@ class PositionController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/edit", name="position_edit", methods={"GET","POST"})
+     * @Route("/{id}/edit/{closed<\d+>?0}", name="position_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Position $position): Response
+    public function edit(Request $request, Position $position, ?int $closed): Response
     {
+        if ($closed){
+            $position->setClosed(true);
+            $position->setCloseDate(new DateTime());
+        }
+
         $form = $this->createForm(PositionType::class, $position);
         $form->handleRequest($request);
 
@@ -81,7 +96,7 @@ class PositionController extends AbstractController
 
             return $this->redirectToRoute('position_index');
         }
-
+      
         return $this->render('position/edit.html.twig', [
             'position' => $position,
             'form' => $form->createView(),

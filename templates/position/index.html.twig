@@ -29,6 +29,8 @@
                 <td>{{ position.closed ? 'Yes' :'No' }}</td>
                  <td>${{ position.profit|format_number({fraction_digit: 2}) }}</td>
                 <td>
+                    <a class="btn btn-secondary" href="{{ path('payment_new', {'positionId': position.id}) }}">add payment</a>
+                    <a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id, 'closed': true}) }}">close</a>
                     <a href="{{ path('position_show', {'id': position.id}) }}">show</a>
                     <a href="{{ path('position_edit', {'id': position.id}) }}">edit</a>
                 </td>
