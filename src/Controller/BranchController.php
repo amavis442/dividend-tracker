@@ -16,12 +16,21 @@ use Symfony\Component\Routing\Annotation\Route;
 class BranchController extends AbstractController
 {
     /**
-     * @Route("/", name="branch_index", methods={"GET"})
+     * @Route("/{page<\d+>?1}", name="branch_index", methods={"GET"})
      */
-    public function index(BranchRepository $branchRepository): Response
+    public function index(BranchRepository $branchRepository, int $page = 1): Response
     {
+        $items = $branchRepository->getAll($page);
+        $limit = 10;
+        $maxPages = ceil($items->count() / $limit);
+        $thisPage = $page;
+
         return $this->render('branch/index.html.twig', [
-            'branches' => $branchRepository->findAll(),
+            'branches' => $items->getIterator(),
+            'limit' => $limit,
+            'maxPages' => $maxPages,
+            'thisPage' => $thisPage,
+            'routeName' => 'branch_index',
         ]);
     }
 

@@ -16,12 +16,22 @@ use Symfony\Component\Routing\Annotation\Route;
 class PositionController extends AbstractController
 {
     /**
-     * @Route("/", name="position_index", methods={"GET"})
+     * @Route("/{page<\d+>?1}", name="position_index", methods={"GET"})
      */
-    public function index(PositionRepository $positionRepository): Response
+    public function index(PositionRepository $positionRepository, int $page = 1): Response
     {
+        //$positionRepository->findAll()
+        $items = $positionRepository->getAll($page);
+        $limit = 10;
+        $maxPages = ceil($items->count() / $limit);
+        $thisPage = $page;
+
         return $this->render('position/index.html.twig', [
-            'positions' => $positionRepository->findAll(),
+            'positions' => $items->getIterator(),
+            'limit' => $limit,
+            'maxPages' => $maxPages,
+            'thisPage' => $thisPage,
+            'routeName' => 'position_index',
         ]);
     }
 

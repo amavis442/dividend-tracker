@@ -16,16 +16,24 @@ use Symfony\Component\Routing\Annotation\Route;
 class PaymentController extends AbstractController
 {
     /**
-     * @Route("/", name="payment_index", methods={"GET"})
+     * @Route("/{page<\d+>?1}", name="payment_index", methods={"GET"})
      */
-    public function index(PaymentRepository $paymentRepository): Response
+    public function index(PaymentRepository $paymentRepository, int $page = 1): Response
     {
-        $payments = $paymentRepository->findAll();
         $totalDividend = $paymentRepository->getTotalDividend();
 
+        $items = $paymentRepository->getAll($page);
+        $limit = 10;
+        $maxPages = ceil($items->count() / $limit);
+        $thisPage = $page;
+
         return $this->render('payment/index.html.twig', [
-            'payments' => $payments,
-            'dividends' => $totalDividend
+            'payments' => $items->getIterator(),
+            'dividends' => $totalDividend,
+            'limit' => $limit,
+            'maxPages' => $maxPages,
+            'thisPage' => $thisPage,
+            'routeName' => 'payment_index',
         ]);
     }
 

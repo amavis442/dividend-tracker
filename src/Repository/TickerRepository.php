@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * @method Ticker|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,9 +15,24 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  */
 class TickerRepository extends ServiceEntityRepository
 {
+    use PagerTrait;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Ticker::class);
+    }
+    
+    public function getAll(int $page = 1, int $limit = 10): Paginator
+    {
+        // Create our query
+        $query = $this->createQueryBuilder('t')
+        ->orderBy('t.ticker', 'DESC')
+        ->getQuery();
+
+        $paginator = $this->paginate($query, $page, $limit);
+
+        return $paginator;
+
     }
 
     // /**

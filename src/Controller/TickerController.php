@@ -16,12 +16,21 @@ use Symfony\Component\Routing\Annotation\Route;
 class TickerController extends AbstractController
 {
     /**
-     * @Route("/", name="ticker_index", methods={"GET"})
+     * @Route("/{page<\d+>?1}", name="ticker_index", methods={"GET"})
      */
-    public function index(TickerRepository $tickerRepository): Response
+    public function index(TickerRepository $tickerRepository, int $page = 1): Response
     {
+        $items = $tickerRepository->getAll($page);
+        $limit = 10;
+        $maxPages = ceil($items->count() / $limit);
+        $thisPage = $page;
+
         return $this->render('ticker/index.html.twig', [
-            'tickers' => $tickerRepository->findAll(),
+            'tickers' => $items->getIterator(),
+            'limit' => $limit,
+            'maxPages' => $maxPages,
+            'thisPage' => $thisPage,
+            'routeName' => 'ticker_index',
         ]);
     }
 

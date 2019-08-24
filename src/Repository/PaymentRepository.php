@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Payment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * @method Payment|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,11 +15,26 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  */
 class PaymentRepository extends ServiceEntityRepository
 {
+    use PagerTrait;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Payment::class);
     }
 
+    public function getAll(int $page = 1, int $limit = 10): Paginator
+    {
+        // Create our query
+        $query = $this->createQueryBuilder('p')
+        ->orderBy('p.ex_dividend_date', 'DESC')
+        ->getQuery();
+
+        $paginator = $this->paginate($query, $page, $limit);
+
+        return $paginator;
+
+    }
+    
     // /**
     //  * @return Payment[] Returns an array of Payment objects
     //  */
