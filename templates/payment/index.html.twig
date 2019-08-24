@@ -10,6 +10,9 @@
             <tr>
                 <th>Id</th>
                 <th>Position</th>
+                <th>Ticker</th>
+                <th>Amount</th>
+                <th>Buy price</th>
                 <th>Ex-dividend date</th>
                 <th>Record date</th>
                 <th>Pay date</th>
@@ -21,7 +24,10 @@
         {% for payment in payments %}
             <tr>
                 <td>{{ payment.id }}</td>
-                 <td>#{{ payment.position.id }} {{ payment.position.ticker.ticker }} [{{ payment.position.amount/100 }} X ${{ payment.position.price/100 }}] </td>
+                <td>#{{ payment.position.id }}</td>
+                <td>{{ payment.position.ticker.ticker }}</td>
+                <td>{{ payment.position.amount/100 }}</td>
+                <td>${{ payment.position.price/100 }}</td>
                 <td>{{ payment.exDividendDate ? payment.exDividendDate|date('d-m-Y') : '' }}</td>
                 <td>{{ payment.recordDate ? payment.recordDate|date('d-m-Y') : '' }}</td>
                 <td>{{ payment.payDate ? payment.payDate|date('d-m-Y') : '' }}</td>
@@ -33,11 +39,11 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="7">no records found</td>
+                <td colspan="10">no records found</td>
             </tr>
         {% endfor %}
             <tr>
-                <td colspan="4"></td>
+                <td colspan="7"></td>
                 <td><span style="font-weight:bold">Total dividend</span></td>
                  <td>${{ dividends }}</td>
             </tr>
