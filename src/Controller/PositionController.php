@@ -68,50 +68,6 @@ class PositionController extends AbstractController
             'routeName' => 'position_index',
         ]);
     }
-    
-    public function executeIndex(
-        PositionRepository $positionRepository,
-        PaymentRepository $paymentRepository, 
-        int $page = 1, 
-        string $orderBy = 'buy_date', 
-        string $sort = 'asc',
-        string $criteria
-    ): Response
-    {
-        if (!in_array($orderBy, ['buy_date','profit','ticker'])) {
-            $orderBy = 'buy_date';
-        }
-        if (!in_array($sort, ['asc','desc','ASC','DESC'])) {
-            $sort = 'asc';
-        }
-        
-        $numActivePosition = $positionRepository->getTotalPositions();
-        $numTickers = $positionRepository->getTotalTickers();
-        $profit = $positionRepository->getProfit();
-        $totalDividend = $paymentRepository->getTotalDividend();
-        $allocated = $positionRepository->getSumAllocated();
-
-        $items = $positionRepository->getAll($page, 10, $orderBy, $sort);
-        $limit = 10;
-        $maxPages = ceil($items->count() / $limit);
-        $thisPage = $page;
-
-        return $this->render('position/index.html.twig', [
-            'positions' => $items->getIterator(),
-            'limit' => $limit,
-            'maxPages' => $maxPages,
-            'thisPage' => $thisPage,
-            'order' => $orderBy,
-            'sort' => $sort,
-            'numActivePosition'=> $numActivePosition,
-            'numTickers' => $numTickers,
-            'profit' => $profit,
-            'totalDividend' => $totalDividend,
-            'allocated' => $allocated,
-            'search' => $criteria,
-            'routeName' => 'position_index',
-        ]);
-    }
 
     /**
      * @Route("/new/{tickerId}", name="position_new", methods={"GET","POST"})

@@ -82,7 +82,7 @@ class PositionRepository extends ServiceEntityRepository
     public function getSumAllocated(): int
     {
         $allocated = $this->createQueryBuilder('p')
-        ->select('SUM(p.amount * p.price)')
+        ->select('SUM(p.allocation)')
         ->where('p.closed <> 1 or p.closed is null')
         ->getQuery()
         ->getSingleScalarResult();

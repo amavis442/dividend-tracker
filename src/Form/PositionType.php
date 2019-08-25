@@ -11,6 +11,8 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\CallbackTransformer;
 
 class PositionType extends AbstractType
 {
@@ -28,12 +30,13 @@ class PositionType extends AbstractType
                         ->orderBy('t.ticker', 'ASC');
                 },
             ])
-            ->add('buyDate',DateType::class, [
+            ->add('buyDate', DateType::class, [
                 // renders it as a single text box
                 'widget' => 'single_text',
             ])
-            ->add('amount')
-            ->add('price')
+            ->add('amount', TextType::class, ['help' =>'If amount is 0.34 then fill in 34'])
+            ->add('price', TextType::class, ['help' =>'If amount is 0.34 then fill in 34'])
+            ->add('allocation')
             ->add('closed', CheckboxType::class, [
                 'label'    => 'Position closed?',
                 'required' => false,
@@ -45,6 +48,21 @@ class PositionType extends AbstractType
             ])
             ->add('closePrice')
         ;
+
+        $callbackTransformer = new CallbackTransformer(
+            function ($inputAsFloat) {
+                return round($inputAsFloat / 100, 2);
+            },
+            function ($outputAsInt) {
+                return (int)($outputAsInt * 100);
+            }
+        );
+
+        $builder->get('amount')->addModelTransformer($callbackTransformer);
+        $builder->get('price')->addModelTransformer($callbackTransformer);
+        $builder->get('allocation')->addModelTransformer($callbackTransformer);
+        $builder->get('closePrice')->addModelTransformer($callbackTransformer);
+
     }
 
     public function configureOptions(OptionsResolver $resolver)

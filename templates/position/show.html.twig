@@ -16,16 +16,28 @@
                 <td>{{ position.ticker.ticker }}</td>
             </tr>
             <tr>
+                <th>Name</th>
+                <td>{{ position.ticker.fullname }}</td>
+            </tr>
+            <tr>
+                <th>Industry</th>
+                <td>{{ position.ticker.branch.label }}</td>
+            </tr>
+            <tr>
                 <th>Buydate</th>
                 <td>{{ position.buyDate|date("d-m-Y") }}</td>
             </tr>
             <tr>
                 <th>Amount</th>
-                <td>{{ position.amount/100 }}</td>
+                <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
             </tr>
             <tr>
                 <th>Price</th>
-                <td>${{ position.price/100 }}</td>
+                <td>${{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
+            </tr>
+            <tr>
+                <th>Allocation</th>
+                <td>${{ (position.allocation/100)|format_number({fraction_digit: 2}) }}</td>
             </tr>
             <tr>
                 <th>Status</th>
@@ -68,7 +80,9 @@
             <tr>
                 <td colspan="1"></td>
                 <td><span style="font-weight:bold">Total dividend</span></td>
-                <td>${{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>${{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}
+                ({{ position.getDividendYield|format_number({fraction_digit: 2}) }}%)
+                </td>
             </tr>
         </tbody>
     </table>

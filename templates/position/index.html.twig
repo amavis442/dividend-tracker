@@ -42,8 +42,8 @@
                 
                 <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
                 <td>${{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
-                <td>${{ position.getAllocated|format_number({fraction_digit: 2}) }}</td>
-                <td>{{ ((position.getAllocated / (allocated / 10000)) * 100)|round(2, 'floor') }}%</td>
+                <td>${{ (position.getAllocation/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ ((position.getAllocation / allocated ) * 100)|round(2, 'floor')|format_number({fraction_digit: 2}) }}%</td>
                 <td>${{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}</td>
                 <td>
                     <a class="btn btn-secondary" href="{{ path('payment_new', {'positionId': position.id}) }}">add payment</a>

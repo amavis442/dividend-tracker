@@ -64,6 +64,14 @@ class Position
      */
     private $profit;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $allocation;
+
+    /** @var int */
+    private $dividend = 0;
+
     public function __construct()
     {
         $this->payments = new ArrayCollection();
@@ -212,6 +220,28 @@ class Position
         foreach ($this->payments as $payment){
             $result += $payment->getDividend();
         }
+        $this->dividend = $result;
         return $result;
+    }
+
+    public function getDividendYield(): float
+    {
+        $result = 0;
+        if ($this->dividend > 0 && $this->allocation > 0){
+            $result = ($this->dividend / $this->allocation) * 100;
+        }
+        return $result;
+    }
+
+    public function getAllocation(): ?int
+    {
+        return $this->allocation;
+    }
+
+    public function setAllocation(?int $allocation): self
+    {
+        $this->allocation = $allocation;
+
+        return $this;
     }
 }
