@@ -33,6 +33,7 @@ class PositionRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('p')
         ->select('p')
         ->innerJoin('p.ticker', 't')
+        ->leftJoin('p.payments', 'pa')
         ->orderBy($order, $sort)
         ->where('p.closed <> 1 or p.closed is null');
         if (!empty($search)) {

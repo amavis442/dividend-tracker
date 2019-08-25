@@ -205,4 +205,13 @@ class Position
     {
         return round(($this->amount * $this->price) / 10000);
     }
+
+    public function getDividend(): int
+    {
+        $result = 0;
+        foreach ($this->payments as $payment){
+            $result += $payment->getDividend();
+        }
+        return $result;
+    }
 }
