@@ -3,7 +3,7 @@
 {% block title %}Position index{% endblock %}
 
 {% block body %}
-    <h1>Position index</h1>
+    <h1>Position index {{ searchCriteria ?? 'KUT' }}</h1>
     
     <div class="container" style="height:1.5em; display:block">
         <ul class="list-group  list-group-horizontal">
@@ -16,7 +16,7 @@
     </div>
 <br/>
 <br/>
-
+ {% include 'position/_search_form.html.twig' with {'searchCriteria' : searchCriteria} %}
     <table class="table">
         <thead>
             <tr>
@@ -54,6 +54,7 @@
         {% endfor %}
         </tbody>
     </table>
+   
     {% include 'paginator.html.twig' %}
     <a class="btn btn-primary" href="{{ path('position_new') }}">Create new</a>
 {% endblock %}

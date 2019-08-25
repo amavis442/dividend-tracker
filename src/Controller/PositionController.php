@@ -12,6 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\TickerRepository;
 use DateTime;
 use App\Repository\PaymentRepository;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * @Route("/position")
@@ -21,7 +22,14 @@ class PositionController extends AbstractController
     /**
      * @Route("/list/{page}/{orderBy}/{sort}", name="position_index", methods={"GET"})
      */
-    public function index(PositionRepository $positionRepository,PaymentRepository $paymentRepository, int $page = 1, string $orderBy = 'buy_date', string $sort = 'asc'): Response
+    public function index(
+        PositionRepository $positionRepository,
+        PaymentRepository $paymentRepository, 
+        SessionInterface $session,
+        int $page = 1, 
+        string $orderBy = 'buy_date', 
+        string $sort = 'asc'
+    ): Response
     {
         if (!in_array($orderBy, ['buy_date','profit','ticker'])) {
             $orderBy = 'buy_date';
@@ -36,9 +44,54 @@ class PositionController extends AbstractController
         $totalDividend = $paymentRepository->getTotalDividend();
         $allocated = $positionRepository->getSumAllocated();
 
+        $searchCriteria = $session->get('searchCriteria', '');
+        $items = $positionRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
+        $limit = 10;
+        $maxPages = ceil($items->count() / $limit);
+        $thisPage = $page;
 
-        //$positionRepository->findAll()
-        $items = $positionRepository->getAll($page, 10, $orderBy,$sort);
+        
+
+        return $this->render('position/index.html.twig', [
+            'positions' => $items->getIterator(),
+            'limit' => $limit,
+            'maxPages' => $maxPages,
+            'thisPage' => $thisPage,
+            'order' => $orderBy,
+            'sort' => $sort,
+            'numActivePosition'=> $numActivePosition,
+            'numTickers' => $numTickers,
+            'profit' => $profit,
+            'totalDividend' => $totalDividend,
+            'allocated' => $allocated,
+            'searchCriteria' => $searchCriteria ?? '',
+            'routeName' => 'position_index',
+        ]);
+    }
+    
+    public function executeIndex(
+        PositionRepository $positionRepository,
+        PaymentRepository $paymentRepository, 
+        int $page = 1, 
+        string $orderBy = 'buy_date', 
+        string $sort = 'asc',
+        string $criteria
+    ): Response
+    {
+        if (!in_array($orderBy, ['buy_date','profit','ticker'])) {
+            $orderBy = 'buy_date';
+        }
+        if (!in_array($sort, ['asc','desc','ASC','DESC'])) {
+            $sort = 'asc';
+        }
+        
+        $numActivePosition = $positionRepository->getTotalPositions();
+        $numTickers = $positionRepository->getTotalTickers();
+        $profit = $positionRepository->getProfit();
+        $totalDividend = $paymentRepository->getTotalDividend();
+        $allocated = $positionRepository->getSumAllocated();
+
+        $items = $positionRepository->getAll($page, 10, $orderBy, $sort);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
@@ -55,6 +108,7 @@ class PositionController extends AbstractController
             'profit' => $profit,
             'totalDividend' => $totalDividend,
             'allocated' => $allocated,
+            'search' => $criteria,
             'routeName' => 'position_index',
         ]);
     }
@@ -135,6 +189,17 @@ class PositionController extends AbstractController
             $entityManager->remove($position);
             $entityManager->flush();
         }
+
+        return $this->redirectToRoute('position_index');
+    }
+    
+    /**
+     * @Route("/search", name="position_search", methods={"POST"})
+     */
+    public function search(Request $request, SessionInterface $session): Response
+    {
+        $searchCriteria = $request->request->get('searchCriteria');
+        $session->set('searchCriteria', $searchCriteria);
 
         return $this->redirectToRoute('position_index');
     }
