@@ -30,6 +30,6 @@
         {% endfor %}
         </tbody>
     </table>
-
+    {% include 'paginator.html.twig' %}
     <a class="btn btn-primary" href="{{ path('branch_new') }}">Create new</a>
 {% endblock %}
