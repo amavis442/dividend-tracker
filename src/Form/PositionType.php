@@ -34,9 +34,9 @@ class PositionType extends AbstractType
                 // renders it as a single text box
                 'widget' => 'single_text',
             ])
-            ->add('amount', TextType::class, ['help' =>'If amount is 0.34 then fill in 34'])
-            ->add('price', TextType::class, ['help' =>'If amount is 0.34 then fill in 34'])
-            ->add('allocation')
+            ->add('amount', TextType::class, ['help' =>'use decimal point if you a a fraction of a stock'])
+            ->add('price', TextType::class, ['label' =>'Price($)'])
+            ->add('allocation', TextType::class, ['label' =>'Allocation($)'])
             ->add('closed', CheckboxType::class, [
                 'label'    => 'Position closed?',
                 'required' => false,
@@ -46,7 +46,7 @@ class PositionType extends AbstractType
                 'widget' => 'single_text',
                 'required' => false
             ])
-            ->add('closePrice')
+            ->add('closePrice', TextType::class, ['label' =>'Close Price($)','help' => 'stockprice when you closed the position'])
         ;
 
         $callbackTransformer = new CallbackTransformer(
