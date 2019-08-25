@@ -37,7 +37,7 @@ class PositionRepository extends ServiceEntityRepository
         ->where('p.closed <> 1 or p.closed is null');
         if (!empty($search)) {
             $queryBuilder->where('t.ticker LIKE :search');
-            $queryBuilder->setParameter('search', $search);
+            $queryBuilder->setParameter('search', $search.'%');
         }
 
         $query = $queryBuilder->getQuery();
