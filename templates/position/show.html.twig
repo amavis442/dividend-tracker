@@ -45,8 +45,30 @@
             </tr>
         </tbody>
     </table>
-
-    <a class="btn btn-primary" shref="{{ path('position_index') }}">back to list</a>
-
     <a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id}) }}">edit</a>
+<br/>
+<br/>
+    <h4>Dividend received</h4>
+    <table  class="table">
+        <thead>
+            <th>Id</th>
+            <th>Date</th>
+            <th>Dvididend</th>
+        </thead>
+        <tbody>
+        {% for payment in position.payments %}
+            <td>{{ payment.id }}</td>
+            <td>{{ payment.getPayDate|date("d-m-Y")}}</td>
+            <td>${{ (payment.getDividend/100)|format_number({fraction_digit: 2}) }}</td>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a class="btn btn-primary" href="{{ path('position_index') }}">back to list</a>
+
+    
 {% endblock %}
