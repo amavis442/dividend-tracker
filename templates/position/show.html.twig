@@ -65,6 +65,11 @@
                 <td colspan="3">no records found</td>
             </tr>
         {% endfor %}
+            <tr>
+                <td colspan="1"></td>
+                <td><span style="font-weight:bold">Total dividend</span></td>
+                <td>${{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}</td>
+            </tr>
         </tbody>
     </table>
 
