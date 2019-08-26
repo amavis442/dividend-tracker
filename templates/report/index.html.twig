@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello ReportController!{% endblock %}
+
+{% block body %}
+ <table class="table">
+        <thead>
+            <tr>
+                <th>Industry</th>
+                <th># Tickers</th>
+                <th>Allocation(%)</th>
+                <th>Dividend($)</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for label,item in data %}
+            <tr>
+                <td>{{ label }}</td>
+                <td>{{ item.tickers }}</td>
+                <td>{{ item.allocationPercentage|format_number({fraction_digit: 2})  }}%</td>
+                <td>${{ (item.dividend/100)|format_number({fraction_digit: 2}) }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
