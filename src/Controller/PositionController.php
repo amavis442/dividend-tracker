@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class PositionController extends AbstractController
 {
+    public const SEARCH_KEY = 'position_searchCriteria';
+
     /**
      * @Route("/list/{page}/{orderBy}/{sort}", name="position_index", methods={"GET"})
      */
@@ -44,13 +46,11 @@ class PositionController extends AbstractController
         $totalDividend = $paymentRepository->getTotalDividend();
         $allocated = $positionRepository->getSumAllocated();
 
-        $searchCriteria = $session->get('searchCriteria', '');
+        $searchCriteria = $session->get(self::SEARCH_KEY, '');
         $items = $positionRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
-
-        
 
         return $this->render('position/index.html.twig', [
             'positions' => $items->getIterator(),
@@ -155,7 +155,7 @@ class PositionController extends AbstractController
     public function search(Request $request, SessionInterface $session): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');
-        $session->set('searchCriteria', $searchCriteria);
+        $session->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('position_index');
     }

@@ -9,18 +9,28 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * @Route("/ticker")
  */
 class TickerController extends AbstractController
 {
+    public const SEARCH_KEY = 'ticker_searchCriteria';
+
     /**
      * @Route("/list/{page<\d+>?1}", name="ticker_index", methods={"GET"})
      */
-    public function index(TickerRepository $tickerRepository, int $page = 1): Response
+    public function index(
+        TickerRepository $tickerRepository, 
+        SessionInterface $session, 
+        int $page = 1, 
+        string $orderBy = 'ticker', 
+        string $sort = 'asc'
+    ): Response
     {
-        $items = $tickerRepository->getAll($page);
+        $searchCriteria = $session->get(self::SEARCH_KEY, '');
+        $items = $tickerRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
@@ -30,6 +40,7 @@ class TickerController extends AbstractController
             'limit' => $limit,
             'maxPages' => $maxPages,
             'thisPage' => $thisPage,
+            'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'ticker_index',
         ]);
     }
@@ -97,6 +108,17 @@ class TickerController extends AbstractController
             $entityManager->remove($ticker);
             $entityManager->flush();
         }
+
+        return $this->redirectToRoute('ticker_index');
+    }
+
+    /**
+     * @Route("/search", name="ticker_search", methods={"POST"})
+     */
+    public function search(Request $request, SessionInterface $session): Response
+    {
+        $searchCriteria = $request->request->get('searchCriteria');
+        $session->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('ticker_index');
     }

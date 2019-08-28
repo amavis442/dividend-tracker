@@ -22,12 +22,22 @@ class TickerRepository extends ServiceEntityRepository
         parent::__construct($registry, Ticker::class);
     }
     
-    public function getAll(int $page = 1, int $limit = 10): Paginator
+    public function getAll(int $page = 1, int $limit = 10, string $orderBy = 'ticker', string $sort = 'ASC', string $search = ''): Paginator
     {
+        $order = 't.'.$orderBy;
+        /* if ($orderBy === 'ticker'){
+            $order = 't.ticker';
+        } */
+
         // Create our query
-        $query = $this->createQueryBuilder('t')
-        ->orderBy('t.ticker', 'ASC')
-        ->getQuery();
+        $queryBuilder = $this->createQueryBuilder('t')
+        ->orderBy($order, $sort);
+
+        if (!empty($search)) {
+            $queryBuilder->where('t.ticker LIKE :search');
+            $queryBuilder->setParameter('search', $search.'%');
+        }
+        $query = $queryBuilder->getQuery();
 
         $paginator = $this->paginate($query, $page, $limit);
 
