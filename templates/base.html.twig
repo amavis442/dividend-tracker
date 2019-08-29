@@ -8,14 +8,17 @@
         {% block stylesheets %}
             {# 'app' must match the first argument to addEntry() in webpack.config.js #}
             {{ encore_entry_link_tags('app') }}
-
+            {{ encore_entry_link_tags('webfonts') }}
             <!-- Renders a link tag (if your module requires any CSS)
                  <link rel="stylesheet" href="/build/app.css"> -->
         {% endblock %}
     </head>
     <body>
+        <div class="container-fluid">
+            {% include 'menu.html.twig' %}
+        </div> 
+        
         <div class="container">
-            {% include 'menu.html.twig' %} 
             {% block body %}{% endblock %}
         </div>
         {% block javascripts %}
