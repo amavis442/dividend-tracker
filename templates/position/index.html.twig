@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Position index{% endblock %}
+{% block title %}Positions{% endblock %}
 
 {% block body %}
-    <h1>Position index {{ searchCriteria ?? '' }}</h1>
+    <h1>Open positions</h1>
     
     <div class="container" style="height:1.5em; display:block">
         <ul class="list-group  list-group-horizontal">
@@ -36,7 +36,12 @@
             {% set currentExDividendData = position.ticker.getRecentDividendDate %}
             {% set dividendDaysLeft = currentExDividendData ? currentExDividendData.getDaysLeft : -1 %}
             <tr>
-                <td>{{ position.buyDate|date("d-m-Y") }}</td>
+                <td>
+                    {{ position.buyDate|date("d-m-Y") }}
+                    {% if position.closed %}
+                        <br/><span class="badge badge-warning"><i class="fas fa-exclamation-triangle"></i> Closed on {{ position.closeDate|date("d-m-Y")}} </span> 
+                    {% endif %}
+                </td>
                 <td>
                     {{ position.ticker.ticker }}
                 </td>
@@ -69,7 +74,9 @@
                     <a class="btn btn-secondary" href="{{ path('payment_new', {'positionId': position.id}) }}"  data-toggle="tooltip" data-placement="top" title="Add dividend payment"><span class="fas fa-money-bill-alt" /></a>
                     <a href="{{ path('position_show', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details position"><span class="fas fa-book-open" /></a>
                     <a href="{{ path('position_edit', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit position"><span class="fas fa-edit" /></a>
-                    <a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id, 'closed': true}) }}" data-toggle="tooltip" data-placement="top" title="Close position"><span class="fas fa-folder-minus" /></a>
+                     {% if not position.closed %}
+                        <a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id, 'closed': true}) }}" data-toggle="tooltip" data-placement="top" title="Close position"><span class="fas fa-folder-minus" /></a>
+                    {% endif %}
                 </td>
             </tr>
         {% else %}
