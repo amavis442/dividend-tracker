@@ -39,9 +39,15 @@ class Ticker
      */
     private $positions;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Calendar", mappedBy="ticker_id")
+     */
+    private $calendars;
+
     public function __construct()
     {
         $this->positions = new ArrayCollection();
+        $this->calendars = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -110,6 +116,37 @@ class Ticker
             // set the owning side to null (unless already changed)
             if ($position->getTicker() === $this) {
                 $position->setTicker(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Calendar[]
+     */
+    public function getCalendars(): Collection
+    {
+        return $this->calendars;
+    }
+
+    public function addCalendar(Calendar $calendar): self
+    {
+        if (!$this->calendars->contains($calendar)) {
+            $this->calendars[] = $calendar;
+            $calendar->setTickerId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCalendar(Calendar $calendar): self
+    {
+        if ($this->calendars->contains($calendar)) {
+            $this->calendars->removeElement($calendar);
+            // set the owning side to null (unless already changed)
+            if ($calendar->getTickerId() === $this) {
+                $calendar->setTickerId(null);
             }
         }
 

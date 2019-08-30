@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Calendar index{% endblock %}
+
+{% block body %}
+    <h1>Calendar index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ticker</th>
+                <th>Ex_dividend_date</th>
+                <th>Record_date</th>
+                <th>Payment_date</th>
+                <th>Cash amount</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for calendar in calendars %}
+            <tr>
+                <td>{{ calendar.ticker.ticker }}</td>
+                <td>{{ calendar.exDividendDate ? calendar.exDividendDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ calendar.recordDate ? calendar.recordDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ calendar.paymentDate ? calendar.paymentDate|date('Y-m-d H:i:s') : '' }}</td>
+                 <td>${{ (calendar.cashAmount/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>
+                    <a href="{{ path('calendar_show', {'id': calendar.id}) }}">show</a>
+                    <a href="{{ path('calendar_edit', {'id': calendar.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+    <a class="btn btn-primary" href="{{ path('calendar_new') }}"><span class="fas fa-plus" /></a>
+{% endblock %}

@@ -10,6 +10,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use App\Form\Factory\CallbackTransformerFactory;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class PaymentType extends AbstractType
 {
@@ -37,13 +39,16 @@ class PaymentType extends AbstractType
                 // renders it as a single text box
                 'widget' => 'single_text',
             ])
-            ->add('dividend')
+            ->add('dividend', TextType::class)
             ->add('record_date',DateType::class, [
                 // renders it as a single text box
                 'widget' => 'single_text',
                 'required' => false,
             ])
         ;
+
+        $callbackTransformer = CallbackTransformerFactory::create();
+        $builder->get('dividend')->addModelTransformer($callbackTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver)
