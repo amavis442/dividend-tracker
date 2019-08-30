@@ -12,7 +12,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\CallbackTransformer;
+use App\Form\Factory\CallbackTransformerFactory;
 
 class PositionType extends AbstractType
 {
@@ -49,14 +49,7 @@ class PositionType extends AbstractType
             ->add('closePrice', TextType::class, ['label' =>'Close Price($)','help' => 'stockprice when you closed the position'])
         ;
 
-        $callbackTransformer = new CallbackTransformer(
-            function ($inputAsFloat) {
-                return round($inputAsFloat / 100, 2);
-            },
-            function ($outputAsInt) {
-                return (int)($outputAsInt * 100);
-            }
-        );
+        $callbackTransformer = CallbackTransformerFactory::create();
 
         $builder->get('amount')->addModelTransformer($callbackTransformer);
         $builder->get('price')->addModelTransformer($callbackTransformer);
