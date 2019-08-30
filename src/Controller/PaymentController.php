@@ -58,6 +58,9 @@ class PaymentController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
+            $position = $payment->getPosition();    
+            $payment->setTicker($position->getTicker());
+
             $entityManager->persist($payment);
             $entityManager->flush();
 
@@ -89,6 +92,8 @@ class PaymentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $position = $payment->getPosition();    
+            $payment->setTicker($position->getTicker());
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('payment_index');

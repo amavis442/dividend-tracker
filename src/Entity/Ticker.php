@@ -46,10 +46,16 @@ class Ticker
      */
     private $calendars;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Payment", mappedBy="ticker", orphanRemoval=true)
+     */
+    private $payments;
+
     public function __construct()
     {
         $this->positions = new ArrayCollection();
         $this->calendars = new ArrayCollection();
+        $this->payments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -160,5 +166,36 @@ class Ticker
             return null;
         } 
         return $this->calendars[0];
+    }
+
+    /**
+     * @return Collection|Payment[]
+     */
+    public function getPayments(): Collection
+    {
+        return $this->payments;
+    }
+
+    public function addPayment(Payment $payment): self
+    {
+        if (!$this->payments->contains($payment)) {
+            $this->payments[] = $payment;
+            $payment->setTicker($this);
+        }
+
+        return $this;
+    }
+
+    public function removePayment(Payment $payment): self
+    {
+        if ($this->payments->contains($payment)) {
+            $this->payments->removeElement($payment);
+            // set the owning side to null (unless already changed)
+            if ($payment->getTicker() === $this) {
+                $payment->setTicker(null);
+            }
+        }
+
+        return $this;
     }
 }

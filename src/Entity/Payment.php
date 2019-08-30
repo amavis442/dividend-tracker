@@ -41,6 +41,12 @@ class Payment
      */
     private $position;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Ticker", inversedBy="payments")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $ticker;
+
 
 
     public function getId(): ?int
@@ -104,6 +110,18 @@ class Payment
     public function setPosition(?Position $position): self
     {
         $this->position = $position;
+
+        return $this;
+    }
+
+    public function getTicker(): ?Ticker
+    {
+        return $this->ticker;
+    }
+
+    public function setTicker(?Ticker $ticker): self
+    {
+        $this->ticker = $ticker;
 
         return $this;
     }

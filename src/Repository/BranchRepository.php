@@ -25,14 +25,25 @@ class BranchRepository extends ServiceEntityRepository
     public function getAll(int $page = 1, int $limit = 10): Paginator
     {
         // Create our query
-        $query = $this->createQueryBuilder('p')
-        ->orderBy('p.label', 'DESC')
+        $query = $this->createQueryBuilder('i')
+        ->orderBy('i.label', 'DESC')
         ->getQuery();
 
         $paginator = $this->paginate($query, $page, $limit);
 
         return $paginator;
 
+    }
+
+    public function getReport(): ?array
+    {
+        $query = $this->createQueryBuilder('i')
+            ->join('i.ticker','t')
+            ->join('i.ticker.position','p')
+            ->join('i.ticker.payment','d')
+
+        ->orderBy('p.label', 'DESC')
+        ->getQuery(); 
     }
 
     // /**
