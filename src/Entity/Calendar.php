@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use DateTime;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CalendarRepository")
@@ -105,5 +106,13 @@ class Calendar
         $this->cash_amount = $cash_amount;
 
         return $this;
+    }
+
+    public function getDaysLeft(): ?int
+    {
+        if ($this->ex_dividend_date instanceof DateTime){
+            return (int)(new DateTime())->diff($this->ex_dividend_date)->format('%d');
+        }
+        return null;
     }
 }

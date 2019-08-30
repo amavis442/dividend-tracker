@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use DateTime;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TickerRepository")
@@ -40,7 +41,8 @@ class Ticker
     private $positions;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Calendar", mappedBy="ticker_id")
+     * @ORM\OneToMany(targetEntity="App\Entity\Calendar", mappedBy="ticker")
+     * @ORM\OrderBy({"ex_dividend_date" = "DESC"})
      */
     private $calendars;
 
@@ -134,7 +136,7 @@ class Ticker
     {
         if (!$this->calendars->contains($calendar)) {
             $this->calendars[] = $calendar;
-            $calendar->setTickerId($this);
+            $calendar->setTicker($this);
         }
 
         return $this;
@@ -145,11 +147,18 @@ class Ticker
         if ($this->calendars->contains($calendar)) {
             $this->calendars->removeElement($calendar);
             // set the owning side to null (unless already changed)
-            if ($calendar->getTickerId() === $this) {
-                $calendar->setTickerId(null);
+            if ($calendar->getTicker() === $this) {
+                $calendar->setTicker(null);
             }
         }
 
         return $this;
+    }
+    public function getRecentDividendDate(): ?Calendar
+    {
+        if ($this->calendars->count() < 1) {
+            return null;
+        } 
+        return $this->calendars[0];
     }
 }

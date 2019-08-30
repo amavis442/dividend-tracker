@@ -22,6 +22,7 @@
             <tr>
                 <th><a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'buy_date', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Buy date</a></th>
                 <th><a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a></th>
+                <th>Ex div date</th>
                 <th>Industry</th>
                 <th>Amount</th>
                 <th>Price</th>
@@ -32,9 +33,28 @@
         </thead>
         <tbody>
         {% for position in positions %}
+            {% set currentExDividendData = position.ticker.getRecentDividendDate %}
+            {% set dividendDaysLeft = currentExDividendData ? currentExDividendData.getDaysLeft : -1 %}
             <tr>
                 <td>{{ position.buyDate|date("d-m-Y") }}</td>
-                <td>{{ position.ticker.ticker }}</td>
+                <td>
+                    {{ position.ticker.ticker }}
+                </td>
+                <td>
+                    {% if dividendDaysLeft > -1 %}
+                        {{ currentExDividendData ? currentExDividendData.getExDividendDate|date("d-m-Y"): '' }}
+                        {% set badgeColor = 'info' %}
+                        {% if dividendDaysLeft > -1 and dividendDaysLeft < 2  %}
+                            {% set badgeColor = 'danger' %}
+                        {% endif %}
+                        {% if dividendDaysLeft > 1 and dividendDaysLeft < 3  %}
+                            {% set badgeColor = 'warning' %}
+                        {% endif %}
+                        <span class="badge badge-{{ badgeColor }}">
+                            {{ dividendDaysLeft }}
+                        </span>
+                    {% endif %}    
+                </td>
                 <td>{{ position.ticker.branch.label }}</td>
                 
                 <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
