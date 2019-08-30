@@ -110,7 +110,8 @@ class Calendar
 
     public function getDaysLeft(): ?int
     {
-        if ($this->ex_dividend_date instanceof DateTime){
+        $current = new DateTime();
+        if ($this->ex_dividend_date instanceof DateTime && $this->ex_dividend_date >= $current){
             return (int)(new DateTime())->diff($this->ex_dividend_date)->format('%d');
         }
         return null;
