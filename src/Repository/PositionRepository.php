@@ -45,9 +45,33 @@ class PositionRepository extends ServiceEntityRepository
         $paginator = $this->paginate($query, $page, $limit);
 
         return $paginator;
-
     }
 
+    public function getSummary(int $page = 1, int $limit = 60, string $orderBy = 'ticker', string $sort = 'ASC', string $search = ''): ?array
+    {
+        $order = 'p.'.$orderBy;
+        if ($orderBy === 'ticker'){
+            $order = 't.ticker';
+        }
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->select(['t.ticker', 
+                    'COUNT(p) as totalPositions',
+                    'SUM(p.allocation) sumAllocation', 
+                    'SUM(p.amount) sumAmount', 
+                    'AVG(p.price) avgPrice', 
+                    'SUM(pa.dividend) sumDividend'
+                    ])
+            ->innerJoin('p.ticker', 't')
+            ->leftJoin('p.payments', 'pa')
+            ->groupBy('t.ticker')
+            ->orderBy($order, $sort)
+            ->where('p.closed <> 1 or p.closed is null');
+        if (!empty($search)) {
+            $queryBuilder->andWhere('t.ticker LIKE :search');
+            $queryBuilder->setParameter('search', $search.'%');
+        }    
+        return $queryBuilder->getQuery()->getResult();
+    }
 
     public function getTotalPositions():int
     {

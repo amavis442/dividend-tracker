@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class PositionController extends AbstractController
 {
     public const SEARCH_KEY = 'position_searchCriteria';
+    public const SEARCH_KEY_SUMMARY = 'position_summary_searchCriteria';
 
     /**
      * @Route("/list/{page}/{orderBy}/{sort}", name="position_index", methods={"GET"})
@@ -68,7 +69,53 @@ class PositionController extends AbstractController
             'routeName' => 'position_index',
         ]);
     }
+    
+    /**
+     * @Route("/summary/{page}/{orderBy}/{sort}", name="position_summary", methods={"GET"})
+     */
+    public function summary(
+        PositionRepository $positionRepository,
+        PaymentRepository $paymentRepository, 
+        SessionInterface $session,
+        int $page = 1, 
+        string $orderBy = 'buy_date', 
+        string $sort = 'asc'
+    ): Response
+    {
+        if (!in_array($orderBy, ['buy_date','profit','ticker'])) {
+            $orderBy = 'buy_date';
+        }
+        if (!in_array($sort, ['asc','desc','ASC','DESC'])) {
+            $sort = 'asc';
+        }
+        
+        $numActivePosition = $positionRepository->getTotalPositions();
+        $numTickers = $positionRepository->getTotalTickers();
+        $profit = $positionRepository->getProfit();
+        $totalDividend = $paymentRepository->getTotalDividend();
+        $allocated = $positionRepository->getSumAllocated();
 
+        $searchCriteria = $session->get(self::SEARCH_KEY_SUMMARY, '');
+        $items = $positionRepository->getSummary($page, 10, $orderBy, $sort, $searchCriteria);
+        $limit = 60;
+        $thisPage = $page;
+
+        return $this->render('position/summary.html.twig', [
+            'positions' => $items,
+            'limit' => $limit,
+            'thisPage' => $thisPage,
+            'order' => $orderBy,
+            'sort' => $sort,
+            'numActivePosition'=> $numActivePosition,
+            'numTickers' => $numTickers,
+            'profit' => $profit,
+            'totalDividend' => $totalDividend,
+            'allocated' => $allocated,
+            'searchCriteria' => $searchCriteria ?? '',
+            'routeName' => 'position_summary',
+            'searchPath' => 'position_summary_search'
+        ]);
+    }
     /**
      * @Route("/new/{tickerId}", name="position_new", methods={"GET","POST"})
      */
@@ -158,5 +205,16 @@ class PositionController extends AbstractController
         $session->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('position_index');
+    }
+
+    /**
+     * @Route("/searchsummary", name="position_summary_search", methods={"POST"})
+     */
+    public function searchSummary(Request $request, SessionInterface $session): Response
+    {
+        $searchCriteria = $request->request->get('searchCriteria');
+        $session->set(self::SEARCH_KEY_SUMMARY, $searchCriteria);
+
+        return $this->redirectToRoute('position_summary');
     }
 }
