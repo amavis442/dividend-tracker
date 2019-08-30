@@ -176,6 +176,65 @@ class Ticker
         return $this->payments;
     }
 
+    public function getSumDividend(): ?int
+    {
+        if ($this->payments->count() < 1) {
+            return null;
+        }
+        $result = 0;
+        foreach ($this->payments as $payment) {
+            $result += $payment->getDividend();
+        }
+        return $result;
+    }
+
+    public function getSumAllocation(): ?int
+    {
+        if ($this->positions->count() < 1) {
+            return null;
+        }
+        $result = 0;
+        foreach ($this->positions as $position) {
+            if ($position->getClosed() <> 1) {
+                $result += $position->getAllocation();
+            }
+        }
+        return $result;
+    }
+
+    public function getSummary(): ?array
+    {
+        $allocation = 0;
+        $units = 0;
+        $dividends = 0;
+        $positions = 0;
+        $price = 0;
+
+        if (($positions = $this->positions->count()) > 0) {
+            foreach ($this->positions as $position) {
+                if ($position->getClosed() <> 1) {
+                    $allocation += $position->getAllocation();
+                    $units += $position->getAmount();
+                    $price += $position->getPrice();
+                }
+            }
+            $price = $price / $positions;
+        }
+        if ($this->payments->count() > 0) {
+            foreach($this->payments as $payment) {
+                $dividends += $payment->getDividend();
+            }
+        }
+        return [
+            'dividend' => $dividends,
+            'positions' => $positions,
+            'units' => $units,
+            'allocation' => $allocation,
+            'price' => $price
+        ];
+    }
+
+
     public function addPayment(Payment $payment): self
     {
         if (!$this->payments->contains($payment)) {
