@@ -4,7 +4,7 @@
 
 {% block body %}
     <h1>Calendar index</h1>
-
+    {% include '_search_form.html.twig' with {'searchPath': searchPath, 'searchCriteria' : searchCriteria} %}
     <table class="table">
         <thead>
             <tr>
@@ -20,9 +20,9 @@
         {% for calendar in calendars %}
             <tr>
                 <td>{{ calendar.ticker.ticker }}</td>
-                <td>{{ calendar.exDividendDate ? calendar.exDividendDate|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ calendar.recordDate ? calendar.recordDate|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ calendar.paymentDate ? calendar.paymentDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ calendar.exDividendDate ? calendar.exDividendDate|date('d-m-Y') : '' }}</td>
+                <td>{{ calendar.recordDate ? calendar.recordDate|date('d-m-Y') : '' }}</td>
+                <td>{{ calendar.paymentDate ? calendar.paymentDate|date('d-m-Y') : '' }}</td>
                  <td>${{ (calendar.cashAmount/100)|format_number({fraction_digit: 2}) }}</td>
                 <td>
                     <a href="{{ path('calendar_show', {'id': calendar.id}) }}">show</a>
@@ -37,6 +37,6 @@
         </tbody>
     </table>
 
-
+    {% include 'paginator.html.twig' %}
     <a class="btn btn-primary" href="{{ path('calendar_new') }}"><span class="fas fa-plus" /></a>
 {% endblock %}

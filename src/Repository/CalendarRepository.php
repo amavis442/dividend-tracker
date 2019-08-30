@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Calendar;
+use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * @method Calendar|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,10 +16,36 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  */
 class CalendarRepository extends ServiceEntityRepository
 {
+    use PagerTrait;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Calendar::class);
     }
+
+    public function getAll(int $page = 1, int $limit = 10, string $orderBy = 'ex_dividend_date', string $sort = 'DESC', string $search = ''): Paginator
+    {
+        $order = 'c.'.$orderBy;
+        if ($orderBy === 'ticker'){
+            $order = 't.ticker';
+        }
+        // Create our query
+        $queryBuilder = $this->createQueryBuilder('c')
+        ->select('c')
+        ->innerJoin('c.ticker', 't')
+        ->orderBy($order, $sort);
+        if (!empty($search)) {
+            $queryBuilder->where('t.ticker LIKE :search');
+            $queryBuilder->setParameter('search', $search.'%');
+        }
+
+        $query = $queryBuilder->getQuery();
+        $paginator = $this->paginate($query, $page, $limit);
+
+        return $paginator;
+
+    }
+
 
     // /**
     //  * @return Calendar[] Returns an array of Calendar objects
