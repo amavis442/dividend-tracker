@@ -8,10 +8,10 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Ticker</th>
-                <th>Ex_dividend_date</th>
+            <th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a></th>
+                <th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ex_dividend_date', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ex_dividend_date</a></th>
                 <th>Record_date</th>
-                <th>Payment_date</th>
+                <th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'payment_date', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Payment_date</a></th>
                 <th>Cash amount</th>
                 <th>actions</th>
             </tr>
@@ -19,6 +19,7 @@
         <tbody>
         {% for calendar in calendars %}
             <tr>
+                
                 <td>{{ calendar.ticker.ticker }}</td>
                 <td>{{ calendar.exDividendDate ? calendar.exDividendDate|date('d-m-Y') : '' }}</td>
                 <td>{{ calendar.recordDate ? calendar.recordDate|date('d-m-Y') : '' }}</td>

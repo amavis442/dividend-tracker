@@ -26,14 +26,14 @@ class CalendarController extends AbstractController
         SessionInterface $session,
         int $page = 1, 
         string $orderBy = 'ex_dividend_date', 
-        string $sort = 'asc'
+        string $sort = 'DESC'
     ): Response
     {
-        if (!in_array($orderBy, ['ex_dividend_date','ticker'])) {
+        if (!in_array($orderBy, ['ex_dividend_date','ticker','payment_date'])) {
             $orderBy = 'ex_dividend_date';
         }
         if (!in_array($sort, ['asc','desc','ASC','DESC'])) {
-            $sort = 'asc';
+            $sort = 'DESC';
         }
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
         $items = $calendarRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
