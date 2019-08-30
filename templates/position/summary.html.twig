@@ -24,11 +24,11 @@
                     <a href="{{ path('position_summary', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">
                     Ticker</a>
                 </th>
-                <th>Positions</th>
+                <th>Avg Price</th>
                 <th>Units</th>
                 <th>Allocation</th>
-                <th>Avg Price</th>
                 <th>Dividend</th>
+                <th>#Positions</th>
             </tr>
         </thead>
         <tbody>
@@ -36,10 +36,10 @@
              <tr>
                 <td>
                     {{ position.ticker }}
-                </td> 
+                </td>
                 <td>
-                    {{ position.totalPositions }}
-                </td>   
+                    ${{ (position.avgPrice/100)|format_number({fraction_digit: 2}) }}
+                </td> 
                 <td>
                     {{ (position.sumAmount/100)|format_number({fraction_digit: 2}) }}
                 </td>
@@ -47,11 +47,11 @@
                     ${{ (position.sumAllocation/100)|format_number({fraction_digit: 2}) }}
                 </td>   
                 <td>
-                    ${{ (position.avgPrice/100)|format_number({fraction_digit: 2}) }}
-                </td>
-                <td>
                     ${{ position.sumDividend/100|format_number({fraction_digit: 2}) }}
                 </td>
+                <td>
+                    {{ position.totalPositions }}
+                </td>  
             </tr>
         {% else %}
             <tr>
