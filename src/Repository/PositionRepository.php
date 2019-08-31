@@ -38,11 +38,13 @@ class PositionRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('p')
             ->innerJoin('p.ticker', 't')
+            ->innerJoin('t.branch','i')
             ->leftJoin('p.payments', 'pa')
             ->orderBy($order, $sort)
             ->where('p.closed <> 1 or p.closed is null');
         if (!empty($search)) {
             $queryBuilder->where('t.ticker LIKE :search');
+            $queryBuilder->orWhere('i.label LIKE :search');
             $queryBuilder->setParameter('search', $search . '%');
         }
 
