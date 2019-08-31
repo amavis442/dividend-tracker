@@ -18,9 +18,11 @@
         </tbody>
     </table>
 
-    <a href="{{ path('branch_index') }}">back to list</a>
+    
 
-    <a href="{{ path('branch_edit', {'id': branch.id}) }}">edit</a>
-
+    
+    <a href="{{ path('branch_index') }}" class="btn btn-primary"><i class="fas fa-angle-double-left"></i> back to list</a> | 
+    <a href="{{ path('branch_edit', {'id': branch.id}) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
+    <hr/>
     {{ include('branch/_delete_form.html.twig') }}
 {% endblock %}

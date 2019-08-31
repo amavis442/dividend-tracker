@@ -6,8 +6,8 @@
     <h1>Edit Ticker</h1>
 
     {{ include('ticker/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('ticker_index') }}">back to list</a>
-
+    <br/>
+    <a href="{{ path('ticker_index') }}" class="btn btn-primary"><i class="fas fa-angle-double-left"></i> back to list</a>
+    <hr/>
     {{ include('ticker/_delete_form.html.twig') }}
 {% endblock %}

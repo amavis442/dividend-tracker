@@ -26,8 +26,8 @@
                 <td>{{ calendar.paymentDate ? calendar.paymentDate|date('d-m-Y') : '' }}</td>
                  <td>${{ (calendar.cashAmount/100)|format_number({fraction_digit: 2}) }}</td>
                 <td>
-                    <a href="{{ path('calendar_show', {'id': calendar.id}) }}">show</a>
-                    <a href="{{ path('calendar_edit', {'id': calendar.id}) }}">edit</a>
+                    <a href="{{ path('calendar_show', {'id': calendar.id}) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
+                    <a href="{{ path('calendar_edit', {'id': calendar.id}) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
                 </td>
             </tr>
         {% else %}
@@ -39,5 +39,5 @@
     </table>
 
     {% include 'paginator.html.twig' %}
-    <a class="btn btn-primary" href="{{ path('calendar_new') }}"><span class="fas fa-plus" /></a>
+    <a class="btn btn-primary" href="{{ path('calendar_new') }}"><i class="fas fa-plus"></i></i></a>
 {% endblock %}

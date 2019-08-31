@@ -19,8 +19,8 @@
                 <td>{{ branch.id }}</td>
                 <td>{{ branch.label }}</td>
                 <td>
-                    <a href="{{ path('branch_show', {'id': branch.id}) }}">show</a>
-                    <a href="{{ path('branch_edit', {'id': branch.id}) }}">edit</a>
+                    <a href="{{ path('branch_show', {'id': branch.id}) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
+                    <a href="{{ path('branch_edit', {'id': branch.id}) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
                 </td>
             </tr>
         {% else %}
@@ -31,5 +31,5 @@
         </tbody>
     </table>
     {% include 'paginator.html.twig' %}
-    <a class="btn btn-primary" href="{{ path('branch_new') }}">Create new</a>
+    <a class="btn btn-primary" href="{{ path('branch_new') }}"><i class="fas fa-plus"></i></i></a>
 {% endblock %}
