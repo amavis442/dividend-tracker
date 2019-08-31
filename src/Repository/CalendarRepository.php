@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Calendar;
-use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -23,56 +22,30 @@ class CalendarRepository extends ServiceEntityRepository
         parent::__construct($registry, Calendar::class);
     }
 
-    public function getAll(int $page = 1, int $limit = 10, string $orderBy = 'ex_dividend_date', string $sort = 'DESC', string $search = ''): Paginator
-    {
-        $order = 'c.'.$orderBy;
-        if ($orderBy === 'ticker'){
+    public function getAll(
+        int $page = 1,
+        int $limit = 10,
+        string $orderBy = 'exDividendDate',
+        string $sort = 'DESC',
+        string $search = ''
+    ): Paginator {
+        $order = 'c.' . $orderBy;
+        if ($orderBy === 'ticker') {
             $order = 't.ticker';
         }
         // Create our query
         $queryBuilder = $this->createQueryBuilder('c')
-        ->select('c')
-        ->innerJoin('c.ticker', 't')
-        ->orderBy($order, $sort);
+            ->select('c')
+            ->innerJoin('c.ticker', 't')
+            ->orderBy($order, $sort);
         if (!empty($search)) {
             $queryBuilder->where('t.ticker LIKE :search');
-            $queryBuilder->setParameter('search', $search.'%');
+            $queryBuilder->setParameter('search', $search . '%');
         }
 
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);
 
         return $paginator;
-
     }
-
-
-    // /**
-    //  * @return Calendar[] Returns an array of Calendar objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Calendar
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

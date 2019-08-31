@@ -22,55 +22,40 @@ class PaymentRepository extends ServiceEntityRepository
         parent::__construct($registry, Payment::class);
     }
 
-    public function getAll(int $page = 1, int $limit = 10): Paginator
-    {
+    public function getAll(
+        int $page = 1,
+        int $limit = 10,
+        string $orderBy = 'exDividendDate',
+        string $sort = 'DESC',
+        string $search = ''
+    ): Paginator {
+        $order = 'p.' . $orderBy;
+        if ($orderBy === 'ticker') {
+            $order = 't.ticker';
+        }
+
         // Create our query
-        $query = $this->createQueryBuilder('p')
-        ->orderBy('p.ex_dividend_date', 'DESC')
-        ->getQuery();
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->join('p.ticker', 't')
+            ->orderBy($order, $sort);
+        if (!empty($search)) {
+            $queryBuilder->where('t.ticker LIKE :search');
+            $queryBuilder->setParameter('search', $search . '%');
+        }
+        $query = $queryBuilder->getQuery();
 
         $paginator = $this->paginate($query, $page, $limit);
 
         return $paginator;
-
     }
-    
-    // /**
-    //  * @return Payment[] Returns an array of Payment objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Payment
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 
     public function getTotalDividend(): ?float
     {
         $result = $this->createQueryBuilder('p')
-            ->select('SUM(p.dividend) total')    
+            ->select('SUM(p.dividend) total')
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
+
         return $result[0]['total'] / 100;
     }
 }

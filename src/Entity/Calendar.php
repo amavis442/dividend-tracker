@@ -24,24 +24,24 @@ class Calendar
     private $ticker;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="date", name="ex_dividend_date")
      */
-    private $ex_dividend_date;
+    private $exDividendDate;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="date", name="record_date")
      */
-    private $record_date;
+    private $recordDate;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="date", name="payment_date")
      */
-    private $payment_date;
+    private $paymentDate;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", name="cash_amount")
      */
-    private $cash_amount;
+    private $cashAmount;
 
     public function getId(): ?int
     {
@@ -62,48 +62,48 @@ class Calendar
 
     public function getExDividendDate(): ?\DateTimeInterface
     {
-        return $this->ex_dividend_date;
+        return $this->exDividendDate;
     }
 
-    public function setExDividendDate(\DateTimeInterface $ex_dividend_date): self
+    public function setExDividendDate(\DateTimeInterface $exDividendDate): self
     {
-        $this->ex_dividend_date = $ex_dividend_date;
+        $this->exDividendDate = $exDividendDate;
 
         return $this;
     }
 
     public function getRecordDate(): ?\DateTimeInterface
     {
-        return $this->record_date;
+        return $this->recordDate;
     }
 
-    public function setRecordDate(\DateTimeInterface $record_date): self
+    public function setRecordDate(\DateTimeInterface $recordDate): self
     {
-        $this->record_date = $record_date;
+        $this->recordDate = $recordDate;
 
         return $this;
     }
 
     public function getPaymentDate(): ?\DateTimeInterface
     {
-        return $this->payment_date;
+        return $this->paymentDate;
     }
 
-    public function setPaymentDate(\DateTimeInterface $payment_date): self
+    public function setPaymentDate(\DateTimeInterface $paymentDate): self
     {
-        $this->payment_date = $payment_date;
+        $this->paymentDate = $paymentDate;
 
         return $this;
     }
 
     public function getCashAmount(): ?int
     {
-        return $this->cash_amount;
+        return $this->cashAmount;
     }
 
-    public function setCashAmount(int $cash_amount): self
+    public function setCashAmount(int $cashAmount): self
     {
-        $this->cash_amount = $cash_amount;
+        $this->cashAmount = $cashAmount;
 
         return $this;
     }
@@ -111,8 +111,8 @@ class Calendar
     public function getDaysLeft(): ?int
     {
         $current = new DateTime();
-        if ($this->ex_dividend_date instanceof DateTime && $this->ex_dividend_date >= $current){
-            return (int)(new DateTime())->diff($this->ex_dividend_date)->format('%d');
+        if ($this->exDividendDate instanceof DateTime && $this->exDividendDate >= $current) {
+            return (int) (new DateTime())->diff($this->exDividendDate)->format('%d');
         }
         return null;
     }

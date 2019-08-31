@@ -8,7 +8,6 @@ use App\Repository\BranchRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Repository\PositionRepository;
-use App\Repository\PaymentRepository;
 
 /**
  * @Route("/report")
@@ -19,17 +18,12 @@ class ReportController extends AbstractController
      * @Route("/report", name="report_index")
      */
     public function index(
-        BranchRepository $branchRepository, 
-        PositionRepository $positionRepository,
-        PaymentRepository $paymentRepository
-    ): Response
-    {
-        $profit = $positionRepository->getProfit();
-        $totalDividend = $paymentRepository->getTotalDividend();
+        BranchRepository $branchRepository,
+        PositionRepository $positionRepository
+    ): Response {
         $allocated = $positionRepository->getSumAllocated();
-        
         $branches = $branchRepository->findAll();
-        
+
         $data = [];
         foreach ($branches as $branch) {
             $data[$branch->getLabel()] = [
@@ -39,8 +33,8 @@ class ReportController extends AbstractController
                 'tickers' => 0,
             ];
             $tickers = $branch->getTickers();
-            foreach ($tickers as $tickers){
-                $data[$branch->getLabel()]['tickers'] += 1;    
+            foreach ($tickers as $tickers) {
+                $data[$branch->getLabel()]['tickers'] += 1;
                 foreach ($tickers->getPositions() as $position) {
                     $data[$branch->getLabel()]['allocation'] += $position->getAllocation();
                     $data[$branch->getLabel()]['dividend'] += $position->getDividend();
@@ -48,7 +42,6 @@ class ReportController extends AbstractController
             }
             $data[$branch->getLabel()]['allocationPercentage'] = ($data[$branch->getLabel()]['allocation'] / $allocated) * 100;
         }
-
 
         return $this->render('report/index.html.twig', [
             'data' => $data,

@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Positions{% endblock %}
+{% block title %}Summary{% endblock %}
 
 {% block body %}
-    <h1>Open positions summary</h1>
+    <h1>Summary tickers</h1>
     
     <div class="container" style="height:1.5em; display:block">
         <ul class="list-group  list-group-horizontal">
@@ -16,12 +16,12 @@
     </div>
 <br/>
 <br/>
- {% include '_search_form.html.twig' with {'searchPath': searchPath, 'searchCriteria' : searchCriteria} %}
+ {% include '_search_form.html.twig' %}
     <table class="table">
         <thead>
             <tr>
                 <th>
-                    <a href="{{ path('position_summary', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">
+                    <a href="{{ path('summary_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">
                     Ticker</a>
                 </th>
                 <th>Avg Price</th>

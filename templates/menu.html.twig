@@ -1,7 +1,16 @@
 {% block menu %}
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item"><a href="{{ url('ticker_index', parameters = [], schemeRelative = false) }}" class="nav-link">Ticker</a></li>
+           <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Markets
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a href="{{ url('branch_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Industry</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{{ url('ticker_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Tickers</a>
+                </div>
+            </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Position
@@ -9,13 +18,29 @@
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a href="{{ url('position_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Open positions</a>
                     <div class="dropdown-divider"></div>
-                    <a href="{{ url('position_summary', parameters = [], schemeRelative = false) }}" class="dropdown-item">Position Summary</a>
+                    <a href="{{ url('position_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Closed positions</a>
                 </div>
             </li>
-            <li class="nav-item"><a href="{{ url('payment_index', parameters = [], schemeRelative = false) }}" class="nav-link">Dividends</a></li>
-            <li class="nav-item"><a href="{{ url('branch_index', parameters = [], schemeRelative = false) }}" class="nav-link">Industry</a></li>
-            <li class="nav-item"><a href="{{ url('calendar_index', parameters = [], schemeRelative = false) }}" class="nav-link">Dividend calendar</a></li>
-            <li class="nav-item"><a href="{{ url('report_index', parameters = [], schemeRelative = false) }}" class="nav-link">Report</a></li>
+           <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Dividend
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a href="{{ url('payment_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Payments</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{{ url('calendar_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Calendar</a>
+                </div>
+            </li>
+           <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Reports
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a href="{{ url('report_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Report</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{{ url('summary_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Summary Tickers</a>
+                </div>
+            </li>
         </ul>
     </nav>
 {% endblock %}

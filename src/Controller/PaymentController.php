@@ -11,20 +11,36 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\PositionRepository;
 use DateTime;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * @Route("/payment")
  */
 class PaymentController extends AbstractController
 {
+    public const SEARCH_KEY = 'payment_searchCriteria';
+
     /**
-     * @Route("/list/{page<\d+>?1}", name="payment_index", methods={"GET"})
+     * @Route("/list/{page}/{orderBy}/{sort}", name="payment_index", methods={"GET"})
      */
-    public function index(PaymentRepository $paymentRepository, int $page = 1): Response
-    {
+    public function index(
+        PaymentRepository $paymentRepository,
+        SessionInterface $session,
+        int $page = 1,
+        string $orderBy = 'exDividendDate',
+        string $sort = 'DESC'
+    ): Response {
+        if (!in_array($orderBy, ['exDividendDate', 'payDate', 'ticker'])) {
+            $orderBy = 'exDividendDate';
+        }
+        if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
+            $sort = 'DESC';
+        }
+
         $totalDividend = $paymentRepository->getTotalDividend();
 
-        $items = $paymentRepository->getAll($page);
+        $searchCriteria = $session->get(self::SEARCH_KEY, '');
+        $items = $paymentRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
@@ -35,7 +51,11 @@ class PaymentController extends AbstractController
             'limit' => $limit,
             'maxPages' => $maxPages,
             'thisPage' => $thisPage,
+            'order' => $orderBy,
+            'sort' => $sort,
+            'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'payment_index',
+            'searchPath' => 'payment_search'
         ]);
     }
 
@@ -58,7 +78,7 @@ class PaymentController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
-            $position = $payment->getPosition();    
+            $position = $payment->getPosition();
             $payment->setTicker($position->getTicker());
 
             $entityManager->persist($payment);
@@ -92,7 +112,7 @@ class PaymentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $position = $payment->getPosition();    
+            $position = $payment->getPosition();
             $payment->setTicker($position->getTicker());
             $this->getDoctrine()->getManager()->flush();
 
@@ -110,11 +130,22 @@ class PaymentController extends AbstractController
      */
     public function delete(Request $request, Payment $payment): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$payment->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $payment->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($payment);
             $entityManager->flush();
         }
+
+        return $this->redirectToRoute('payment_index');
+    }
+
+    /**
+     * @Route("/search", name="payment_search", methods={"POST"})
+     */
+    public function search(Request $request, SessionInterface $session): Response
+    {
+        $searchCriteria = $request->request->get('searchCriteria');
+        $session->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('payment_index');
     }

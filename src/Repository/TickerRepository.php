@@ -21,56 +21,27 @@ class TickerRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Ticker::class);
     }
-    
-    public function getAll(int $page = 1, int $limit = 10, string $orderBy = 'ticker', string $sort = 'ASC', string $search = ''): Paginator
-    {
-        $order = 't.'.$orderBy;
-        /* if ($orderBy === 'ticker'){
-            $order = 't.ticker';
-        } */
 
+    public function getAll(
+        int $page = 1,
+        int $limit = 10,
+        string $orderBy = 'ticker',
+        string $sort = 'ASC',
+        string $search = ''
+    ): Paginator {
+        $order = 't.' . $orderBy;
         // Create our query
         $queryBuilder = $this->createQueryBuilder('t')
-        ->orderBy($order, $sort);
+            ->orderBy($order, $sort);
 
         if (!empty($search)) {
             $queryBuilder->where('t.ticker LIKE :search');
-            $queryBuilder->setParameter('search', $search.'%');
+            $queryBuilder->setParameter('search', $search . '%');
         }
         $query = $queryBuilder->getQuery();
 
         $paginator = $this->paginate($query, $page, $limit);
 
         return $paginator;
-
     }
-
-    // /**
-    //  * @return Ticker[] Returns an array of Ticker objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('t.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Ticker
-    {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
-}
+ }

@@ -25,12 +25,12 @@ class CalendarController extends AbstractController
         CalendarRepository $calendarRepository,
         SessionInterface $session,
         int $page = 1, 
-        string $orderBy = 'ex_dividend_date', 
+        string $orderBy = 'exDividendDate', 
         string $sort = 'DESC'
     ): Response
     {
-        if (!in_array($orderBy, ['ex_dividend_date','ticker','payment_date'])) {
-            $orderBy = 'ex_dividend_date';
+        if (!in_array($orderBy, ['exDividendDate','ticker','paymentDate'])) {
+            $orderBy = 'exDividendDate';
         }
         if (!in_array($sort, ['asc','desc','ASC','DESC'])) {
             $sort = 'DESC';

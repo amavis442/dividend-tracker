@@ -12,16 +12,20 @@
                 <td>{{ calendar.id }}</td>
             </tr>
             <tr>
-                <th>Ex_dividend_date</th>
+                <th>Ex-dividend date</th>
                 <td>{{ calendar.exDividendDate ? calendar.exDividendDate|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
             <tr>
-                <th>Record_date</th>
+                <th>Record date</th>
                 <td>{{ calendar.recordDate ? calendar.recordDate|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
             <tr>
-                <th>Payment_date</th>
+                <th>Payment date</th>
                 <td>{{ calendar.paymentDate ? calendar.paymentDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Cash amount</th>
+                <td>{{ calendar.cashAmount|format_number({fraction_digit: 2}) }}</td>
             </tr>
         </tbody>
     </table>

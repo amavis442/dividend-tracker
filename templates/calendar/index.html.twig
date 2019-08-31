@@ -3,15 +3,15 @@
 {% block title %}Calendar index{% endblock %}
 
 {% block body %}
-    <h1>Calendar index</h1>
-    {% include '_search_form.html.twig' with {'searchPath': searchPath, 'searchCriteria' : searchCriteria} %}
+    <h1>Calendar</h1>
+    {% include '_search_form.html.twig' %}
     <table class="table">
         <thead>
             <tr>
             <th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a></th>
-                <th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ex_dividend_date', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ex_dividend_date</a></th>
+                <th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'exDividendDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ex-dividend date</a></th>
                 <th>Record_date</th>
-                <th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'payment_date', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Payment_date</a></th>
+                <th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'paymentDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Payment date</a></th>
                 <th>Cash amount</th>
                 <th>actions</th>
             </tr>

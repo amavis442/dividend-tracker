@@ -34,44 +34,4 @@ class BranchRepository extends ServiceEntityRepository
         return $paginator;
 
     }
-
-    public function getReport(): ?array
-    {
-        $query = $this->createQueryBuilder('i')
-            ->join('i.ticker','t')
-            ->join('i.ticker.position','p')
-            ->join('i.ticker.payment','d')
-
-        ->orderBy('p.label', 'DESC')
-        ->getQuery(); 
-    }
-
-    // /**
-    //  * @return Branch[] Returns an array of Branch objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('b')
-            ->andWhere('b.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('b.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Branch
-    {
-        return $this->createQueryBuilder('b')
-            ->andWhere('b.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

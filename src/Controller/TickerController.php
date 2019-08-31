@@ -42,6 +42,7 @@ class TickerController extends AbstractController
             'thisPage' => $thisPage,
             'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'ticker_index',
+            'searchPath' => 'ticker_search'
         ]);
     }
 

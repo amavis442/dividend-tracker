@@ -17,19 +17,19 @@ class Payment
     private $id;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", name = "ex_dividend_date" )
      */
-    private $ex_dividend_date;
+    private $exDividendDate;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="datetime", name = "record_date", nullable=true)
      */
-    private $record_date;
+    private $recordDate;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", name = "pay_date")
      */
-    private $pay_date;
+    private $payDate;
 
     /**
      * @ORM\Column(type="integer")
@@ -47,8 +47,6 @@ class Payment
      */
     private $ticker;
 
-
-
     public function getId(): ?int
     {
         return $this->id;
@@ -56,36 +54,36 @@ class Payment
 
     public function getExDividendDate(): ?\DateTimeInterface
     {
-        return $this->ex_dividend_date;
+        return $this->exDividendDate;
     }
 
-    public function setExDividendDate(\DateTimeInterface $ex_dividend_date): self
+    public function setExDividendDate(\DateTimeInterface $exDividendDate): self
     {
-        $this->ex_dividend_date = $ex_dividend_date;
+        $this->exDividendDate = $exDividendDate;
 
         return $this;
     }
 
     public function getRecordDate(): ?\DateTimeInterface
     {
-        return $this->record_date;
+        return $this->recordDate;
     }
 
-    public function setRecordDate(?\DateTimeInterface $record_date): self
+    public function setRecordDate(?\DateTimeInterface $recordDate): self
     {
-        $this->record_date = $record_date;
+        $this->recordDate = $recordDate;
 
         return $this;
     }
 
     public function getPayDate(): ?\DateTimeInterface
     {
-        return $this->pay_date;
+        return $this->payDate;
     }
 
-    public function setPayDate(\DateTimeInterface $pay_date): self
+    public function setPayDate(\DateTimeInterface $payDate): self
     {
-        $this->pay_date = $pay_date;
+        $this->payDate = $payDate;
 
         return $this;
     }

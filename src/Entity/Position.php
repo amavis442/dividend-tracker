@@ -40,9 +40,9 @@ class Position
     private $payments;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", name="buy_date")
      */
-    private $buy_date;
+    private $buyDate;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
@@ -50,14 +50,14 @@ class Position
     private $closed;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="datetime", nullable=true, name="close_date")
      */
-    private $close_date;
+    private $closeDate;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="integer", nullable=true, name="close_price")
      */
-    private $close_price;
+    private $closePrice;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
@@ -151,12 +151,12 @@ class Position
 
     public function getBuyDate(): ?\DateTimeInterface
     {
-        return $this->buy_date;
+        return $this->buyDate;
     }
 
-    public function setBuyDate(\DateTimeInterface $buy_date): self
+    public function setBuyDate(\DateTimeInterface $buyDate): self
     {
-        $this->buy_date = $buy_date;
+        $this->buyDate = $buyDate;
 
         return $this;
     }
@@ -174,34 +174,34 @@ class Position
 
     public function getCloseDate(): ?\DateTimeInterface
     {
-        return $this->close_date;
+        return $this->closeDate;
     }
 
-    public function setCloseDate(?\DateTimeInterface $close_date): self
+    public function setCloseDate(?\DateTimeInterface $closeDate): self
     {
-        $this->close_date = $close_date;
+        $this->closeDate = $closeDate;
 
         return $this;
     }
 
     public function getClosePrice(): ?int
     {
-        return $this->close_price;
+        return $this->closePrice;
     }
 
-    public function setClosePrice(int $close_price): self
+    public function setClosePrice(int $closePrice): self
     {
-        $this->close_price = $close_price;
-        if ($this->close_price > 0) {
-            $this->profit = round((($this->close_price - $this->price) * $this->amount) / 100);
+        $this->closePrice = $closePrice;
+        if ($this->closePrice > 0) {
+            $this->profit = round((($this->closePrice - $this->price) * $this->amount) / 100);
         }
         return $this;
     }
 
     public function getProfit(): ?float
     {
-        if ($this->closed == 1){
-            return (($this->close_price - $this->price) * $this->amount) / 10000;
+        if ($this->closed == 1) {
+            return (($this->closePrice - $this->price) * $this->amount) / 10000;
         }
 
         return $this->profit;
@@ -209,21 +209,21 @@ class Position
 
     public function getProfitPercentage(): ?float
     {
-        if ($this->closed == 1){
-            return ((($this->close_price - $this->price) * $this->amount) / $this->allocation);
+        if ($this->closed == 1) {
+            return ((($this->closePrice - $this->price) * $this->amount) / $this->allocation);
         }
         return null;
     }
 
-    public function getAllocated():int
+    public function getAllocated(): int
     {
-        return round(($this->amount * $this->price) / 10000);
+        return (int) round(($this->amount * $this->price) / 10000);
     }
 
     public function getDividend(): int
     {
         $result = 0;
-        foreach ($this->payments as $payment){
+        foreach ($this->payments as $payment) {
             $result += $payment->getDividend();
         }
         $this->dividend = $result;
@@ -233,7 +233,7 @@ class Position
     public function getDividendYield(): float
     {
         $result = 0;
-        if ($this->dividend > 0 && $this->allocation > 0){
+        if ($this->dividend > 0 && $this->allocation > 0) {
             $result = ($this->dividend / $this->allocation) * 100;
         }
         return $result;
