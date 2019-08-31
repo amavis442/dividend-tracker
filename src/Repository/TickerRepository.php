@@ -32,10 +32,12 @@ class TickerRepository extends ServiceEntityRepository
         $order = 't.' . $orderBy;
         // Create our query
         $queryBuilder = $this->createQueryBuilder('t')
+            ->join('t.branch','i')
             ->orderBy($order, $sort);
 
         if (!empty($search)) {
             $queryBuilder->where('t.ticker LIKE :search');
+            $queryBuilder->orWhere('i.label LIKE :search');
             $queryBuilder->setParameter('search', $search . '%');
         }
         $query = $queryBuilder->getQuery();
