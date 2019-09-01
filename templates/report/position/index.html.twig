@@ -35,6 +35,9 @@
                     <a href="{{ path('report_closed_positions_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'buyDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Buy date</a>
                 </th>
                 <th>
+                    <a href="{{ path('report_closed_positions_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'closeDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Closed on</a>
+                </th>
+                <th>
                     <a href="{{ path('report_closed_positions_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a>
                 </th>
                 <th>Industry</th>
@@ -43,9 +46,7 @@
                 <th>Allocated</th>
                 <th>Profit / Loss</th>
                 <th>Dividend</th>
-                <th>
-                    <a href="{{ path('report_closed_positions_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'closeDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Closed on</a>
-                </th>
+
             </tr>
         </thead>
         <tbody>
@@ -53,6 +54,9 @@
                 <tr>
                     <td>
                         {{ position.buyDate|date("d-m-Y") }}
+                    </td>
+                    <td>
+                        {{ position.closeDate|date("d-m-Y") }}
                     </td>
                     <td>
                         {{ position.ticker.ticker }}
@@ -67,12 +71,8 @@
                     <td>${{ (position.getProfit)|format_number({fraction_digit: 2}) }}<br/>
                         <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Profit/loss on allocation %">{{ position.getProfitPercentage|format_number({fraction_digit: 2}) }}%</span>
                     </td>
-                    
                     <td>${{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}<br/>
                         <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Dividend yield based on allocation not purchase price">{{ position.getDividendYield|format_number({fraction_digit: 2}) }}%</span>
-                    </td>
-                    <td>
-                        {{ position.closeDate|date("d-m-Y") }}
                     </td>
                 </tr>
             {% else %}
