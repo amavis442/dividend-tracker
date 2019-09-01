@@ -7,13 +7,30 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use App\Form\Factory\CallbackTransformerFactory;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use App\Repository\BranchRepository;
 
 class BranchType extends AbstractType
 {
+    private $doctrine;
+
+    public function __construct(RegistryInterface $doctrine)
+    {
+        $this->doctrine = $doctrine;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        //$maxAssetAllocation = 100 - (int)($branchRepository->getSumAssetAllocation() / 100);
+
         $builder
             ->add('label')
+            ->add('assetAllocation', NumberType::class,[
+                'html5' => true,
+                'attr' => ['min' =>0, 'max' => $options['maxAssetAllocation']]
+            ])
             ->add('parent', EntityType::class, [
                 'class' => Branch::class,
                 'choice_label' => 'label',
@@ -21,12 +38,17 @@ class BranchType extends AbstractType
                 'placeholder' => 'Please choose a branch',
                 'empty_data' => null,
             ]);
+
+        $callbackTransformer = CallbackTransformerFactory::create();
+
+        $builder->get('assetAllocation')->addModelTransformer($callbackTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class' => Branch::class,
+            'maxAssetAllocation' => 100
         ]);
     }
 }

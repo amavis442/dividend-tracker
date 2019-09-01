@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Industry{% endblock %}
+{% block title %}Industry
+{% endblock %}
 
 {% block body %}
     <h1>Industry</h1>
@@ -10,26 +11,40 @@
             <tr>
                 <th>Id</th>
                 <th>Label</th>
+                <th>Target asset allocation(%)</th>
                 <th>actions</th>
             </tr>
         </thead>
         <tbody>
-        {% for branch in branches %}
+            {% for branch in branches %}
+                <tr>
+                    <td>{{ branch.id }}</td>
+                    <td>{{ branch.label }}</td>
+                    <td>{{ (branch.assetAllocation/100)|format_number({fraction_digit: 2}) }}%</td>
+                    <td>
+                        <a href="{{ path('branch_show', {'id': branch.id}) }}" class="btn btn-primary">
+                            <i class="fas fa-book-open"></i>
+                        </a>
+                        <a href="{{ path('branch_edit', {'id': branch.id}) }}" class="btn btn-primary">
+                            <i class="far fa-edit"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">no records found</td>
+                </tr>
+            {% endfor %}
             <tr>
-                <td>{{ branch.id }}</td>
-                <td>{{ branch.label }}</td>
-                <td>
-                    <a href="{{ path('branch_show', {'id': branch.id}) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
-                    <a href="{{ path('branch_edit', {'id': branch.id}) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
+                <td colspan="2"></td>
+                <td colspan="2">
+                    {{ (sumAssetAllocation/100)|format_number({fraction_digit: 2}) }}%
                 </td>
             </tr>
-        {% else %}
-            <tr>
-                <td colspan="3">no records found</td>
-            </tr>
-        {% endfor %}
         </tbody>
     </table>
     {% include 'paginator.html.twig' %}
-    <a class="btn btn-primary" href="{{ path('branch_new') }}"><i class="fas fa-plus"></i></i></a>
-{% endblock %}
+    <a class="btn btn-primary" href="{{ path('branch_new') }}">
+        <i class="fas fa-plus"></i>
+    </i>
+</a>{% endblock %}

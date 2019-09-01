@@ -32,6 +32,13 @@ class BranchRepository extends ServiceEntityRepository
         $paginator = $this->paginate($query, $page, $limit);
 
         return $paginator;
+    }
 
+    public function getSumAssetAllocation() :int
+    {
+        return $this->createQueryBuilder('i')
+        ->select('SUM(i.assetAllocation)')
+        ->getQuery()
+        ->getSingleScalarResult();
     }
 }

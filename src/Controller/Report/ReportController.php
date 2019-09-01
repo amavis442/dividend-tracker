@@ -26,22 +26,28 @@ class ReportController extends AbstractController
 
         $data = [];
         foreach ($branches as $branch) {
-            $data[$branch->getLabel()] = [
+            $item = [
+                'industry' => $branch->getLabel(),
                 'allocation' => 0,
                 'allocationPercentage' => 0,
+                'targetAllocationPercentage' => $branch->getAssetAllocation() / 100,
                 'dividend' => 0,
                 'tickers' => 0,
             ];
+
             $tickers = $branch->getTickers();
             foreach ($tickers as $tickers) {
-                $data[$branch->getLabel()]['tickers'] += 1;
+                $item['tickers'] += 1;
                 foreach ($tickers->getPositions() as $position) {
-                    $data[$branch->getLabel()]['allocation'] += $position->getAllocation();
-                    $data[$branch->getLabel()]['dividend'] += $position->getDividend();
+                    $item['allocation'] += $position->getAllocation();
+                    $item['dividend'] += $position->getDividend();
                 }
             }
-            $data[$branch->getLabel()]['allocationPercentage'] = ($data[$branch->getLabel()]['allocation'] / $allocated) * 100;
+            $item['allocationPercentage'] = ((int) $item['allocation'] / (int) $allocated) * 100;
+            $data[$item['allocation']] = $item;
         }
+
+        krsort($data);
 
         return $this->render('report/index.html.twig', [
             'data' => $data,

@@ -38,6 +38,11 @@ class Branch
      */
     private $tickers;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true, name="asset_allocation")
+     */
+    private $assetAllocation;
+
     public function __construct()
     {
         $this->branches = new ArrayCollection();
@@ -131,6 +136,18 @@ class Branch
                 $ticker->setBranch(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAssetAllocation(): ?int
+    {
+        return $this->assetAllocation;
+    }
+
+    public function setAssetAllocation(?int $assetAllocation): self
+    {
+        $this->assetAllocation = $assetAllocation;
 
         return $this;
     }

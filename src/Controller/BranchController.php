@@ -21,12 +21,15 @@ class BranchController extends AbstractController
     public function index(BranchRepository $branchRepository, int $page = 1): Response
     {
         $items = $branchRepository->getAll($page);
+        $sumAssetAllocation = $branchRepository->getSumAssetAllocation();
+
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
-
+         
         return $this->render('branch/index.html.twig', [
             'branches' => $items->getIterator(),
+            'sumAssetAllocation' => $sumAssetAllocation,
             'limit' => $limit,
             'maxPages' => $maxPages,
             'thisPage' => $thisPage,
@@ -37,10 +40,11 @@ class BranchController extends AbstractController
     /**
      * @Route("/new", name="branch_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function new(Request $request, BranchRepository $branchRepository): Response
     {
+        $maxAssetAllocation = 100 - (int)(($branchRepository->getSumAssetAllocation() - $branch->getAssetAllocation()) / 100);
         $branch = new Branch();
-        $form = $this->createForm(BranchType::class, $branch);
+        $form = $this->createForm(BranchType::class, $branch,['maxAssetAllocation' => $maxAssetAllocation]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -70,9 +74,10 @@ class BranchController extends AbstractController
     /**
      * @Route("/{id}/edit", name="branch_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Branch $branch): Response
+    public function edit(Request $request, Branch $branch, BranchRepository $branchRepository): Response
     {
-        $form = $this->createForm(BranchType::class, $branch);
+        $maxAssetAllocation = 100 - (int)(($branchRepository->getSumAssetAllocation() - $branch->getAssetAllocation()) / 100);
+        $form = $this->createForm(BranchType::class, $branch,['maxAssetAllocation' => $maxAssetAllocation]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
