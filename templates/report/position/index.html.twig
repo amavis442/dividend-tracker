@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Closed positions
+{% endblock %}
+
+{% block body %}
+    <h1>Closed positions</h1>
+
+    <div class="container" style="height:1.5em; display:block">
+        <ul class="list-group  list-group-horizontal">
+            <li class="list-group-item">Positions:
+                <span class="badge badge-primary">{{ numActivePosition }}</span>
+            </li>
+            <li class="list-group-item">Tickers:
+                <span class="badge badge-primary">{{ numTickers}}</span>
+            </li>
+            <li class="list-group-item">Dividend:
+                <span class="badge badge-primary">${{ totalDividend }}</span>
+            </li>
+            <li class="list-group-item">Profit w/o dividend:
+                <span class="badge badge-primary">${{ (profit / 100)|format_number({fraction_digit: 2})}}</span>
+            </li>
+            <li class="list-group-item">Allocated:
+                <span class="badge badge-primary">${{ (allocated / 100)|format_number({fraction_digit: 2}) }}</span>
+            </li>
+        </ul>
+    </div>
+    <br/>
+    <br/>
+    {% include '_search_form.html.twig' %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    <a href="{{ path('report_closed_positions_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'buyDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Buy date</a>
+                </th>
+                <th>
+                    <a href="{{ path('report_closed_positions_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a>
+                </th>
+                <th>Industry</th>
+                <th>Amount</th>
+                <th>Price</th>
+                <th>Allocated</th>
+                <th>Profit / Loss</th>
+                <th>Dividend</th>
+                <th>
+                    <a href="{{ path('report_closed_positions_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'closeDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Closed on</a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for position in positions %}
+                <tr>
+                    <td>
+                        {{ position.buyDate|date("d-m-Y") }}
+                    </td>
+                    <td>
+                        {{ position.ticker.ticker }}
+                    </td>
+                    <td>{{ position.ticker.branch.label }}</td>
+
+                    <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
+                    <td>${{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
+                    <td>${{ (position.getAllocation/100)|format_number({fraction_digit: 2}) }}<br/>
+                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Allocation % based on total allocated amount">{{ ((position.getAllocation / allocated ) * 100)|round(2, 'floor')|format_number({fraction_digit: 2}) }}%</span>
+                    </td>
+                    <td>${{ (position.getProfit)|format_number({fraction_digit: 2}) }}<br/>
+                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Profit/loss on allocation %">{{ position.getProfitPercentage|format_number({fraction_digit: 2}) }}%</span>
+                    </td>
+                    
+                    <td>${{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}<br/>
+                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Dividend yield based on allocation not purchase price">{{ position.getDividendYield|format_number({fraction_digit: 2}) }}%</span>
+                    </td>
+                    <td>
+                        {{ position.closeDate|date("d-m-Y") }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="7">no records found</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% include 'paginator.html.twig' %}
+{% endblock %}

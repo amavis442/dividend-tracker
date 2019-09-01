@@ -47,7 +47,7 @@
                 </td>
                 <td>
                     {% if dividendDaysLeft > -1 %}
-                        {{ currentExDividendData ? currentExDividendData.getExDividendDate|date("d-m-Y"): '' }}
+                        {{ currentExDividendData ? currentExDividendData.getExDividendDate|date("d-m-Y"): '' }}<br/>
                         {% set badgeColor = 'info' %}
                         {% if dividendDaysLeft > -1 and dividendDaysLeft < 2  %}
                             {% set badgeColor = 'danger' %}
@@ -56,7 +56,7 @@
                             {% set badgeColor = 'warning' %}
                         {% endif %}
                         <span class="badge badge-{{ badgeColor }}">
-                            {{ dividendDaysLeft }}
+                            {{ dividendDaysLeft }} days left, cash amount ${{ (currentExDividendData.cashAmount/100)|format_number({fraction_digit: 2})  }}
                         </span>
                     {% endif %}    
                 </td>

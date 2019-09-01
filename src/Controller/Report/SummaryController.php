@@ -1,16 +1,12 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Report;
 
-use App\Entity\Position;
-use App\Form\PositionType;
 use App\Repository\PositionRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use App\Repository\TickerRepository;
-use DateTime;
 use App\Repository\PaymentRepository;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 

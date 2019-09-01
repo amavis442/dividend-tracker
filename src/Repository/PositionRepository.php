@@ -3,9 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Position;
-use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
@@ -34,24 +34,68 @@ class PositionRepository extends ServiceEntityRepository
         if ($orderBy === 'ticker') {
             $order = 't.ticker';
         }
-        // Create our query
-        $queryBuilder = $this->createQueryBuilder('p')
-            ->select('p')
-            ->innerJoin('p.ticker', 't')
-            ->innerJoin('t.branch','i')
-            ->leftJoin('p.payments', 'pa')
-            ->orderBy($order, $sort)
-            ->where('p.closed <> 1 or p.closed is null');
-        if (!empty($search)) {
-            $queryBuilder->where('t.ticker LIKE :search');
-            $queryBuilder->orWhere('i.label LIKE :search');
-            $queryBuilder->setParameter('search', $search . '%');
+        if ($orderBy === 'dividend') {
+            $order = 'c.exDividendDate';
         }
 
+
+        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
+        $queryBuilder->leftJoin('t.calendars' ,'c');
+        $queryBuilder->andWhere('p.closed <> 1 or p.closed is null');
+        //Todo: Order by exDividendDate
+        //$queryBuilder->andWhere('c = (SELECT c1 FROM App\Entity\Calendar c1 WHERE c1.exDividendDate = MAX(c1.exDividendDate) AND c1.ticker = t GROUP BY c1.id)');
+        
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);
 
         return $paginator;
+    }
+
+    public function getAllClosed(
+        int $page = 1,
+        int $limit = 10,
+        string $orderBy = 'buyDate',
+        string $sort = 'ASC',
+        string $search = ''
+    ): Paginator {
+        $order = 'p.' . $orderBy;
+        if ($orderBy === 'ticker') {
+            $order = 't.ticker';
+        }
+        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
+        $queryBuilder->andWhere('p.closed = 1');
+        $query = $queryBuilder->getQuery();
+        $paginator = $this->paginate($query, $page, $limit);
+
+        return $paginator;
+    }
+
+    private function getQueryBuilder(
+        string $orderBy = 'buyDate',
+        string $sort = 'ASC',
+        string $search = ''
+    ): QueryBuilder {
+        $order = 'p.' . $orderBy;
+        if ($orderBy === 'ticker') {
+            $order = 't.ticker';
+        }
+
+        // Create our query
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->select('p')
+            ->innerJoin('p.ticker', 't')
+            ->innerJoin('t.branch', 'i')
+            ->leftJoin('p.payments', 'pa')
+            ->orderBy($order, $sort);
+
+        if (!empty($search)) {
+            $queryBuilder->andWhere($queryBuilder->expr()->orX(
+                $queryBuilder->expr()->like('t.ticker', ':search'),
+                $queryBuilder->expr()->like('i.label', ':search')
+            ));
+            $queryBuilder->setParameter('search', $search . '%');
+        }
+        return $queryBuilder;
     }
 
     public function getSummary(
