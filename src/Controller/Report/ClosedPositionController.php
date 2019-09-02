@@ -39,10 +39,10 @@ class ClosedPositionController extends AbstractController
             $sort = 'asc';
         }
 
-        $numActivePosition = $positionRepository->getTotalPositions();
-        $numTickers = $positionRepository->getTotalTickers();
+        $numClosedPosition = $positionRepository->getTotalClosedPositions();
+        $numTickers = $positionRepository->getTotalClosedTickers();
         $profit = $positionRepository->getProfit();
-        $totalDividend = $paymentRepository->getTotalDividend();
+        $totalDividend = $paymentRepository->getTotalDividendClosed();
         $allocated = $positionRepository->getSumAllocated();
 
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
@@ -58,7 +58,7 @@ class ClosedPositionController extends AbstractController
             'thisPage' => $thisPage,
             'order' => $orderBy,
             'sort' => $sort,
-            'numActivePosition' => $numActivePosition,
+            'numPosition' => $numClosedPosition,
             'numTickers' => $numTickers,
             'profit' => $profit,
             'totalDividend' => $totalDividend,

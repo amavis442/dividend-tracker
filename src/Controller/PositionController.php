@@ -59,6 +59,7 @@ class PositionController extends AbstractController
             'order' => $orderBy,
             'sort' => $sort,
             'numActivePosition' => $numActivePosition,
+            'numPosition' => $numActivePosition,
             'numTickers' => $numTickers,
             'profit' => $profit,
             'totalDividend' => $totalDividend,

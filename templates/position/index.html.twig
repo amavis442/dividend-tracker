@@ -1,27 +1,25 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Positions{% endblock %}
+{% block title %}Positions
+{% endblock %}
 
 {% block body %}
     <h1>Open positions</h1>
-    
-    <div class="container" style="height:1.5em; display:block">
-        <ul class="list-group  list-group-horizontal">
-            <li class="list-group-item">Positions:  <span class="badge badge-primary">{{ numActivePosition }}</span></li>
-            <li class="list-group-item">Tickers: <span class="badge badge-primary">{{ numTickers}}</span></li>
-            <li class="list-group-item">Dividend: <span class="badge badge-primary">${{ totalDividend }}</span></li>
-            <li class="list-group-item">Profit w/o dividend: <span class="badge badge-primary">${{ (profit / 100)|format_number({fraction_digit: 2})}}</span></li>
-        <li class="list-group-item">Allocated: <span class="badge badge-primary">${{ (allocated / 100)|format_number({fraction_digit: 2}) }}</span></li>
-        </ul>
-    </div>
-<br/>
-<br/>
- {% include '_search_form.html.twig' %}
+
+    {% include '_summary.html.twig' %}
+
+    <br/>
+    <br/>
+    {% include '_search_form.html.twig' %}
     <table class="table">
         <thead>
             <tr>
-                <th><a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'buy_date', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Buy date</a></th>
-                <th><a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a></th>
+                <th>
+                    <a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'buy_date', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Buy date</a>
+                </th>
+                <th>
+                    <a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a>
+                </th>
                 <th>Ex div date</th>
                 <th>Industry</th>
                 <th>Amount</th>
@@ -32,61 +30,72 @@
             </tr>
         </thead>
         <tbody>
-        {% for position in positions %}
-            {% set currentExDividendData = position.ticker.getRecentDividendDate %}
-            {% set dividendDaysLeft = currentExDividendData ? currentExDividendData.getDaysLeft : -1 %}
-            <tr>
-                <td>
-                    {{ position.buyDate|date("d-m-Y") }}
-                    {% if position.closed %}
-                        <br/><span class="badge badge-warning"><i class="fas fa-exclamation-triangle"></i> Closed on {{ position.closeDate|date("d-m-Y")}} </span> 
-                    {% endif %}
-                </td>
-                <td>
-                    {{ position.ticker.ticker }}
-                </td>
-                <td>
-                    {% if dividendDaysLeft > -1 %}
-                        {{ currentExDividendData ? currentExDividendData.getExDividendDate|date("d-m-Y"): '' }}<br/>
-                        {% set badgeColor = 'info' %}
-                        {% if dividendDaysLeft > -1 and dividendDaysLeft < 2  %}
-                            {% set badgeColor = 'danger' %}
+            {% for position in positions %}
+                {% set currentExDividendData = position.ticker.getRecentDividendDate %}
+                {% set dividendDaysLeft = currentExDividendData ? currentExDividendData.getDaysLeft : -1 %}
+                <tr>
+                    <td>
+                        {{ position.buyDate|date("d-m-Y") }}
+                        {% if position.closed %}
+                            <br/><span class="badge badge-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Closed on
+                                {{ position.closeDate|date("d-m-Y")}}
+                            </span>
                         {% endif %}
-                        {% if dividendDaysLeft > 1 and dividendDaysLeft < 3  %}
-                            {% set badgeColor = 'warning' %}
+                    </td>
+                    <td>
+                        {{ position.ticker.ticker }}
+                    </td>
+                    <td>
+                        {% if dividendDaysLeft > -1 %}
+                            {{ currentExDividendData ? currentExDividendData.getExDividendDate|date("d-m-Y"): '' }}<br/>
+                            {% set badgeColor = 'info' %}
+                            {% if dividendDaysLeft > -1 and dividendDaysLeft < 2  %}
+                                {% set badgeColor = 'danger' %}
+                            {% endif %}
+                            {% if dividendDaysLeft > 1 and dividendDaysLeft < 3  %}
+                                {% set badgeColor = 'warning' %}
+                            {% endif %}
+                            <span class="badge badge-{{ badgeColor }}">
+                                {{ dividendDaysLeft }}
+                                days left, cash amount ${{ (currentExDividendData.cashAmount/100)|format_number({fraction_digit: 2})  }}
+                            </span>
                         {% endif %}
-                        <span class="badge badge-{{ badgeColor }}">
-                            {{ dividendDaysLeft }} days left, cash amount ${{ (currentExDividendData.cashAmount/100)|format_number({fraction_digit: 2})  }}
-                        </span>
-                    {% endif %}    
-                </td>
-                <td>{{ position.ticker.branch.label }}</td>
-                
-                <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
-                <td>${{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
-                <td>${{ (position.getAllocation/100)|format_number({fraction_digit: 2}) }}<br/>
-                    <span class="badge badge-secondary"  data-toggle="tooltip" data-placement="top" title="Allocation % based on total allocated amount">{{ ((position.getAllocation / allocated ) * 100)|round(2, 'floor')|format_number({fraction_digit: 2}) }}%</span>
-                </td>
-                <td>${{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}<br/>
-                    <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Dividend yield based on allocation not purchase price">{{ position.getDividendYield|format_number({fraction_digit: 2}) }}%</span>
-                </td>
-                <td>
-                    <a class="btn btn-secondary" href="{{ path('payment_new', {'positionId': position.id}) }}"  data-toggle="tooltip" data-placement="top" title="Add dividend payment"><span class="fas fa-money-bill-alt" /></a>
-                    <a href="{{ path('position_show', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details position"><i class="fas fa-book-open"></i></a>
-                    <a href="{{ path('position_edit', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit position"><i class="far fa-edit"></i></a>
-                     {% if not position.closed %}
-                        <a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id, 'closed': true}) }}" data-toggle="tooltip" data-placement="top" title="Close position"><span class="fas fa-folder-minus" /></a>
-                    {% endif %}
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="11">no records found</td>
-            </tr>
-        {% endfor %}
+                    </td>
+                    <td>{{ position.ticker.branch.label }}</td>
+
+                    <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
+                    <td>${{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
+                    <td>${{ (position.getAllocation/100)|format_number({fraction_digit: 2}) }}<br/>
+                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Allocation % based on total allocated amount">{{ ((position.getAllocation / allocated ) * 100)|round(2, 'floor')|format_number({fraction_digit: 2}) }}%</span>
+                    </td>
+                    <td>${{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}<br/>
+                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Dividend yield based on allocation not purchase price">{{ position.getDividendYield|format_number({fraction_digit: 2}) }}%</span>
+                    </td>
+                    <td>
+                        <a class="btn btn-secondary" href="{{ path('payment_new', {'positionId': position.id}) }}" data-toggle="tooltip" data-placement="top" title="Add dividend payment"><span class="fas fa-money-bill-alt"/></a>
+                        <a href="{{ path('position_show', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details position">
+                            <i class="fas fa-book-open"></i>
+                        </a>
+                        <a href="{{ path('position_edit', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit position">
+                            <i class="far fa-edit"></i>
+                        </a>
+                        {% if not position.closed %}
+                            <a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id, 'closed': true}) }}" data-toggle="tooltip" data-placement="top" title="Close position"><span class="fas fa-folder-minus"/></a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="11">no records found</td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
-   
+
     {% include 'paginator.html.twig' %}
-    <a class="btn btn-primary" href="{{ path('position_new') }}"><i class="fas fa-plus"></i></i></a>
-{% endblock %}
+    <a class="btn btn-primary" href="{{ path('position_new') }}">
+        <i class="fas fa-plus"></i>
+    </i>
+</a>{% endblock %}

@@ -1,0 +1,19 @@
+<div class="container" style="height:1.5em; display:block">
+    <ul class="list-group  list-group-horizontal">
+        <li class="list-group-item">Positions:
+            <span class="badge badge-primary">{{ numPosition }}</span>
+        </li>
+        <li class="list-group-item">Tickers:
+            <span class="badge badge-primary">{{ numTickers}}</span>
+        </li>
+        <li class="list-group-item">Dividend:
+            <span class="badge badge-primary">${{ totalDividend }}</span>
+        </li>
+        <li class="list-group-item">Profit w/o dividend:
+            <span class="badge badge-primary">${{ (profit / 100)|format_number({fraction_digit: 2})}}</span>
+        </li>
+        <li class="list-group-item">Allocated:
+            <span class="badge badge-primary">${{ (allocated / 100)|format_number({fraction_digit: 2}) }}</span>
+        </li>
+    </ul>
+</div>
