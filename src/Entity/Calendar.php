@@ -112,7 +112,7 @@ class Calendar
     {
         $current = new DateTime();
         if ($this->exDividendDate instanceof DateTime && $this->exDividendDate >= $current) {
-            return (int) (new DateTime())->diff($this->exDividendDate)->format('%d');
+            return (int) (new DateTime())->diff($this->exDividendDate)->format('%d') + 1;
         }
         return null;
     }
