@@ -18,7 +18,18 @@
         </thead>
         <tbody>
         {% for calendar in calendars %}
-            <tr>
+            {% set dividendDaysLeft = calendar.getDaysLeft ?? -1 %}
+            <tr  {% if dividendDaysLeft > -1 %}
+                            
+                            {% set badgeColor = 'info' %}
+                            {% if dividendDaysLeft > -1 and dividendDaysLeft < 2  %}
+                                {% set badgeColor = 'danger' %}
+                            {% endif %}
+                            {% if dividendDaysLeft > 1 and dividendDaysLeft < 3  %}
+                                {% set badgeColor = 'warning' %}
+                            {% endif %}
+                            class="table-{{badgeColor}}"
+                        {% endif %}>
                 
                 <td>{{ calendar.ticker.ticker }}</td>
                 <td>{{ calendar.exDividendDate ? calendar.exDividendDate|date('d-m-Y') : '' }}</td>

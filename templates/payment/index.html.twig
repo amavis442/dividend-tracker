@@ -28,8 +28,8 @@
                 <td>{{ payment.position.ticker.ticker }}</td>
                 <td>{{ payment.position.amount/100 }}</td>
                 <td>${{ payment.position.price/100 }}</td>
-                <td>{{ payment.exDividendDate ? payment.exDividendDate|date('d-m-Y') : '' }}</td>
-                <td>{{ payment.recordDate ? payment.recordDate|date('d-m-Y') : '' }}</td>
+                <td>{{ payment.calendar ? payment.calendar.exDividendDate|date('d-m-Y') : '' }}</td>
+                <td>{{ payment.calendar ? payment.calendar.recordDate|date('d-m-Y') : '' }}</td>
                 <td>{{ payment.payDate ? payment.payDate|date('d-m-Y') : '' }}</td>
                 <td>${{ (payment.dividend/100)|format_number({fraction_digit: 2}) }}</td>
                 <td>

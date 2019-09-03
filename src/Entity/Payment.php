@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -16,17 +18,7 @@ class Payment
      */
     private $id;
 
-    /**
-     * @ORM\Column(type="datetime", name = "ex_dividend_date" )
-     */
-    private $exDividendDate;
-
-    /**
-     * @ORM\Column(type="datetime", name = "record_date", nullable=true)
-     */
-    private $recordDate;
-
-    /**
+   /**
      * @ORM\Column(type="datetime", name = "pay_date")
      */
     private $payDate;
@@ -47,35 +39,17 @@ class Payment
      */
     private $ticker;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Calendar", inversedBy="payments")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $calendar;
+
     public function getId(): ?int
     {
         return $this->id;
     }
-
-    public function getExDividendDate(): ?\DateTimeInterface
-    {
-        return $this->exDividendDate;
-    }
-
-    public function setExDividendDate(\DateTimeInterface $exDividendDate): self
-    {
-        $this->exDividendDate = $exDividendDate;
-
-        return $this;
-    }
-
-    public function getRecordDate(): ?\DateTimeInterface
-    {
-        return $this->recordDate;
-    }
-
-    public function setRecordDate(?\DateTimeInterface $recordDate): self
-    {
-        $this->recordDate = $recordDate;
-
-        return $this;
-    }
-
+    
     public function getPayDate(): ?\DateTimeInterface
     {
         return $this->payDate;
@@ -120,6 +94,21 @@ class Payment
     public function setTicker(?Ticker $ticker): self
     {
         $this->ticker = $ticker;
+
+        return $this;
+    }
+
+    /**
+     * @return Calendar
+     */
+    public function getCalendar(): ?Calendar
+    {
+        return $this->calendar;
+    }
+
+    public function setCalendar(?Calendar $calendar = null): self
+    {
+        $this->calendar = $calendar;
 
         return $this;
     }

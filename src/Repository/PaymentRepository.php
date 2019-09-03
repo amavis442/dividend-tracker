@@ -33,10 +33,14 @@ class PaymentRepository extends ServiceEntityRepository
         if ($orderBy === 'ticker') {
             $order = 't.ticker';
         }
+        if ($orderBy === 'exDividendDate') {
+            $order = 'c.exDividendDate';
+        }
 
         // Create our query
         $queryBuilder = $this->createQueryBuilder('p')
             ->join('p.ticker', 't')
+            ->leftJoin('p.calendar','c')
             ->orderBy($order, $sort);
         if (!empty($search)) {
             $queryBuilder->where('t.ticker LIKE :search');

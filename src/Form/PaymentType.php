@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Payment;
 use App\Entity\Position;
+use App\Entity\Calendar;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -12,13 +13,35 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use App\Form\Factory\CallbackTransformerFactory;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use DateTime;
 
 class PaymentType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $tickerId = (int)$options['tickerId'];
         $builder
-            ->add('position', EntityType::class, [
+        ->add('Calendar', EntityType::class, [
+            'class' => Calendar::class,
+            'choice_label' => function ($calendar) {
+                return  $calendar->getTicker()->getTicker().'::'.$calendar->getExDividendDate()->format('Y-m-d') ;
+            },
+            'query_builder' => function (EntityRepository $er) use ($tickerId) {
+                $query = $er->createQueryBuilder('c')
+                ->where('c.exDividendDate <= :currentDate')
+                ->orderBy('c.exDividendDate', 'DESC')
+                ->setParameter('currentDate', (new DateTime())->format('Y-m-d'));
+                if ($tickerId > 0) {
+                    $query->andWhere('c.ticker = :tickerId')
+                          ->setParameter('tickerId', $tickerId);
+                };
+                return $query;
+            },
+            'required' => true,
+            'placeholder' => 'Please choose a ex div date',
+            'empty_data' => null,
+        ])
+        ->add('position', EntityType::class, [
                 'class' => Position::class,
                 'choice_label' => function ($position) {
                     return  '#'.$position->getId().' '.$position->getTicker()->getTicker(). ' ['. ($position->getAmount()/100). ' X  $'.($position->getPrice()/100).']';
@@ -31,20 +54,11 @@ class PaymentType extends AbstractType
                 'placeholder' => 'Please choose a position',
                 'empty_data' => null,
             ])
-            ->add('ex_dividend_date',DateType::class, [
-                // renders it as a single text box
-                'widget' => 'single_text',
-            ])
             ->add('pay_date',DateType::class, [
                 // renders it as a single text box
                 'widget' => 'single_text',
             ])
             ->add('dividend', TextType::class)
-            ->add('record_date',DateType::class, [
-                // renders it as a single text box
-                'widget' => 'single_text',
-                'required' => false,
-            ])
         ;
 
         $callbackTransformer = CallbackTransformerFactory::create();
@@ -55,6 +69,7 @@ class PaymentType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Payment::class,
+            'tickerId' => 0
         ]);
     }
 }

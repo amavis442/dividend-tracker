@@ -27,10 +27,10 @@ class PaymentController extends AbstractController
         PaymentRepository $paymentRepository,
         SessionInterface $session,
         int $page = 1,
-        string $orderBy = 'exDividendDate',
+        string $orderBy = 'payDate',
         string $sort = 'DESC'
     ): Response {
-        if (!in_array($orderBy, ['exDividendDate', 'payDate', 'ticker'])) {
+        if (!in_array($orderBy, [ 'payDate', 'ticker'])) {
             $orderBy = 'exDividendDate';
         }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
@@ -64,16 +64,15 @@ class PaymentController extends AbstractController
      */
     public function new(Request $request, ?int $positionId, PositionRepository $positionRepository): Response
     {
+        $tickerId = 0;
         $payment = new Payment();
         if ($positionId) {
             $position = $positionRepository->find($positionId);
             $payment->setPosition($position);
+            $tickerId = $position->getTicker()->getId();
         }
-        $currentDate = new DateTime();
-        $payment->setExDividendDate($currentDate);
-        $payment->setPayDate($currentDate);
-
-        $form = $this->createForm(PaymentType::class, $payment);
+       
+        $form = $this->createForm(PaymentType::class, $payment, ['tickerId' => $tickerId]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
