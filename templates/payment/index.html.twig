@@ -1,9 +1,29 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Payment index{% endblock %}
+{% block title %}Payments
+{% endblock %}
 
 {% block body %}
-    <h1>Payment index</h1>
+    <h1>Payments</h1>
+
+    <ul class="nav nav-pills">
+        <li class="nav-item">
+            <a href="{{ path('payment_index', {'interval': 0}) }}" class="nav-link {{ interval == 0? 'active' : ''}}">All</a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ path('payment_index', {'interval': 1}) }}" class="nav-link {{ interval == 1? 'active' : ''}}">Year</a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ path('payment_index', {'interval': 2}) }}" class="nav-link {{ interval == 2? 'active' : ''}}">Month</a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ path('payment_index', {'interval': 3}) }}" class="nav-link {{ interval == 3? 'active' : ''}}">Week</a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ path('payment_index', {'interval': 4}) }}" class="nav-link {{ interval == 4? 'active' : ''}}">Quater</a>
+        </li>
+    </ul>
+    <br/>
     {% include '_search_form.html.twig' %}
     <table class="table">
         <thead>
@@ -21,36 +41,42 @@
             </tr>
         </thead>
         <tbody>
-        {% for payment in payments %}
-            <tr>
-                <td>{{ payment.id }}</td>
-                <td>#{{ payment.position.id }}</td>
-                <td>{{ payment.position.ticker.ticker }}</td>
-                <td>{{ payment.position.amount/100 }}</td>
-                <td>${{ payment.position.price/100 }}</td>
-                <td>{{ payment.calendar ? payment.calendar.exDividendDate|date('d-m-Y') : '' }}</td>
-                <td>{{ payment.calendar ? payment.calendar.recordDate|date('d-m-Y') : '' }}</td>
-                <td>{{ payment.payDate ? payment.payDate|date('d-m-Y') : '' }}</td>
-                <td>${{ (payment.dividend/100)|format_number({fraction_digit: 2}) }}</td>
-                <td>
-                    <a href="{{ path('payment_show', {'id': payment.id}) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
-                    <a href="{{ path('payment_edit', {'id': payment.id}) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="10">no records found</td>
-            </tr>
-        {% endfor %}
+            {% for payment in payments %}
+                <tr>
+                    <td>{{ payment.id }}</td>
+                    <td>#{{ payment.position.id }}</td>
+                    <td>{{ payment.position.ticker.ticker }}</td>
+                    <td>{{ payment.position.amount/100 }}</td>
+                    <td>${{ payment.position.price/100 }}</td>
+                    <td>{{ payment.calendar ? payment.calendar.exDividendDate|date('d-m-Y') : '' }}</td>
+                    <td>{{ payment.calendar ? payment.calendar.recordDate|date('d-m-Y') : '' }}</td>
+                    <td>{{ payment.payDate ? payment.payDate|date('d-m-Y') : '' }}</td>
+                    <td>${{ (payment.dividend/100)|format_number({fraction_digit: 2}) }}</td>
+                    <td>
+                        <a href="{{ path('payment_show', {'id': payment.id}) }}" class="btn btn-primary">
+                            <i class="fas fa-book-open"></i>
+                        </a>
+                        <a href="{{ path('payment_edit', {'id': payment.id}) }}" class="btn btn-primary">
+                            <i class="far fa-edit"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="10">no records found</td>
+                </tr>
+            {% endfor %}
             <tr>
                 <td colspan="7"></td>
-                <td><span style="font-weight:bold">Total dividend</span></td>
-                 <td>${{ dividends }}</td>
+                <td>
+                    <span style="font-weight:bold">Total dividend</span>
+                </td>
+                <td>${{ dividends }}</td>
             </tr>
         </tbody>
     </table>
     {% include 'paginator.html.twig' %}
-    <a class="btn btn-primary" href="{{ path('payment_new') }}"><i class="fas fa-plus"></i></i></a>
-
-    
-{% endblock %}
+    <a class="btn btn-primary" href="{{ path('payment_new') }}">
+        <i class="fas fa-plus"></i>
+    </i>
+</a>{% endblock %}

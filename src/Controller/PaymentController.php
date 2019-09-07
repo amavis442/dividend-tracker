@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\PositionRepository;
-use DateTime;
+use App\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
@@ -19,32 +19,46 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class PaymentController extends AbstractController
 {
     public const SEARCH_KEY = 'payment_searchCriteria';
+    public const INTERVAL_KEY = 'payment_interval';
 
     /**
-     * @Route("/list/{page}/{orderBy}/{sort}", name="payment_index", methods={"GET"})
+     * @Route("/list/{page}/{orderBy}/{sort}/{interval}", name="payment_index", methods={"GET"})
      */
     public function index(
         PaymentRepository $paymentRepository,
         SessionInterface $session,
         int $page = 1,
         string $orderBy = 'payDate',
-        string $sort = 'DESC'
+        string $sort = 'DESC',
+        int $interval = 0
     ): Response {
-        if (!in_array($orderBy, [ 'payDate', 'ticker'])) {
+        if (!in_array($orderBy, ['payDate', 'ticker'])) {
             $orderBy = 'exDividendDate';
         }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'DESC';
         }
 
-        $totalDividend = $paymentRepository->getTotalDividend();
+        $totalDividend = $paymentRepository->getTotalDividend($interval);
 
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
-        $items = $paymentRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
+        $items = $paymentRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria, $interval);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
 
+        if ($page > 1) {
+            $interval = $session->get(self::INTERVAL_KEY, $interval);
+        }
+        if ($page == 1) {
+            $session->set(self::INTERVAL_KEY, $interval);
+        }
+        [$startDate, $endDate] = (new DateHelper())->getInterval($interval);
+        if ($interval === 0)
+        {
+            $startDate = null;
+        } 
+        
         return $this->render('payment/index.html.twig', [
             'payments' => $items->getIterator(),
             'dividends' => $totalDividend,
@@ -55,7 +69,10 @@ class PaymentController extends AbstractController
             'sort' => $sort,
             'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'payment_index',
-            'searchPath' => 'payment_search'
+            'searchPath' => 'payment_search',
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'interval' => $interval,
         ]);
     }
 
@@ -71,7 +88,7 @@ class PaymentController extends AbstractController
             $payment->setPosition($position);
             $tickerId = $position->getTicker()->getId();
         }
-       
+
         $form = $this->createForm(PaymentType::class, $payment, ['tickerId' => $tickerId]);
         $form->handleRequest($request);
 
