@@ -39,6 +39,11 @@ localhost()
     ->set('deploy_path', '~/Sites/live/{{application}}');
 
 // Tasks
+desc('Yarn install'); // For encore and stuff
+task('yarn:install', function(){
+    run('cd ' . get('release_path') . ' && {{yarn}} install');
+});
+
 desc('Yarn build');
 task('yarn:build', function(){
     run('cd ' . get('release_path') . ' && {{yarn}} run encore prod');
@@ -58,6 +63,7 @@ task('php-fpm:reload', function () {
 desc('Runs yarn, migrates the database and install the assets');
 task('deploy:dividend', [
     'database:migrate',
+    'yarn:install',
     'yarn:build'
 ]);
 
