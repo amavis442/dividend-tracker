@@ -21,7 +21,7 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a href="{{ url('position_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Open positions</a>
                         <div class="dropdown-divider"></div>
-
+                        <a href="{{ url('upcomming_position_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Upcomming dividends</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -50,9 +50,9 @@
 
         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
             <div class="my-2 my-lg-0">
-            <span class="navbar-text">Email:
-            {{ app.user.email }}</span>
-            <a href="{{ path('app_logout') }}" class="btn btn-primary">Logout</a>
+                <span class="navbar-text">Email:
+                    {{ app.user.email }}</span>
+                <a href="{{ path('app_logout') }}" class="btn btn-primary">Logout</a>
             </div>
         {% else %}
             <a href="{{ path('app_login') }}" class="btn btn-primary">Login</a>

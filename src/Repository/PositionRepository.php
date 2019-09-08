@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use DateTime;
 
 /**
  * @method Position|null find($id, $lockMode = null, $lockVersion = null)
@@ -186,5 +187,17 @@ class PositionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
         return $allocated;
+    }
+
+    public function getUpcommingDividend()
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.ticker', 't')
+            ->join('t.calendars','c')
+            ->where('c.exDividendDate > :currentDate')
+            ->orderBy('c.exDividendDate')
+            ->setParameter('currentDate', (new DateTime())->format('Y-m-d'))
+            ->getQuery()
+            ->getResult();
     }
 }
