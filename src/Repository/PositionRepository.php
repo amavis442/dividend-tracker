@@ -194,7 +194,7 @@ class PositionRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->join('p.ticker', 't')
             ->join('t.calendars','c')
-            ->where('c.exDividendDate > :currentDate')
+            ->where('c.exDividendDate >= :currentDate')
             ->orderBy('c.exDividendDate')
             ->setParameter('currentDate', (new DateTime())->format('Y-m-d'))
             ->getQuery()
