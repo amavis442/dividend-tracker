@@ -136,7 +136,7 @@ class Calendar
             if ($current->format('Ymd') === $this->exDividendDate->format('Ymd')) {
                 return 0;
             }
-            return (int) $current->diff($this->exDividendDate)->format('%d') + 1;
+            return (int) $current->diff($this->exDividendDate)->format('%a') + 1;
         }
         return null;
     }
