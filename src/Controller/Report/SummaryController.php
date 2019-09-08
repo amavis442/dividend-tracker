@@ -11,7 +11,7 @@ use App\Repository\PaymentRepository;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
- * @Route("/summary")
+ * @Route("/dashboard/summary")
  */
 class SummaryController extends AbstractController
 {

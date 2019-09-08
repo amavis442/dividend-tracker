@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
- * @Route("/ticker")
+ * @Route("/dashboard/ticker")
  */
 class TickerController extends AbstractController
 {

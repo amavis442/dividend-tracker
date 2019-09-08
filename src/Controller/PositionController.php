@@ -15,7 +15,7 @@ use App\Repository\PaymentRepository;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
- * @Route("/position")
+ * @Route("/dashboard/position")
  */
 class PositionController extends AbstractController
 {

@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Repository\PositionRepository;
 
 /**
- * @Route("/report")
+ * @Route("/dashboard/report")
  */
 class ReportController extends AbstractController
 {

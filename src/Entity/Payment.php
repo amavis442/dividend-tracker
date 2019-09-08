@@ -45,6 +45,12 @@ class Payment
      */
     private $calendar;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="payments")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -109,6 +115,18 @@ class Payment
     public function setCalendar(?Calendar $calendar = null): self
     {
         $this->calendar = $calendar;
+
+        return $this;
+    }
+
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    public function setUser(User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

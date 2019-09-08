@@ -15,7 +15,7 @@ use App\Form\PositionType;
 
 
 /**
- * @Route("/report")
+ * @Route("/dashboard/report")
  */
 class ClosedPositionController extends AbstractController
 {

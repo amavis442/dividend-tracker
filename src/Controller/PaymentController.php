@@ -14,7 +14,7 @@ use App\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
- * @Route("/payment")
+ * @Route("/dashboard/payment")
  */
 class PaymentController extends AbstractController
 {

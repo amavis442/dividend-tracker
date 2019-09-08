@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/branch")
+ * @Route("/dashboard/branch")
  */
 class BranchController extends AbstractController
 {
