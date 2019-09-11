@@ -195,6 +195,7 @@ class PositionRepository extends ServiceEntityRepository
             ->join('p.ticker', 't')
             ->join('t.calendars','c')
             ->where('c.exDividendDate >= :currentDate')
+            ->andWhere('p.closed <> 1')
             ->orderBy('c.exDividendDate')
             ->setParameter('currentDate', (new DateTime())->format('Y-m-d'))
             ->getQuery()
