@@ -74,16 +74,23 @@
                         <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Dividend yield based on allocation not purchase price">{{ position.getDividendYield|format_number({fraction_digit: 2}) }}%</span>
                     </td>
                     <td>
-                        <a class="btn btn-secondary" href="{{ path('payment_new', {'positionId': position.id}) }}" data-toggle="tooltip" data-placement="top" title="Add dividend payment"><span class="fas fa-money-bill-alt"/></a>
-                        <a href="{{ path('position_show', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details position">
-                            <i class="fas fa-book-open"></i>
-                        </a>
-                        <a href="{{ path('position_edit', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit position">
-                            <i class="far fa-edit"></i>
-                        </a>
-                        {% if not position.closed %}
-                            <a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id, 'closed': true}) }}" data-toggle="tooltip" data-placement="top" title="Close position"><span class="fas fa-folder-minus"/></a>
-                        {% endif %}
+                        <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                            <div class="btn-group mr-2" role="group" aria-label="First group">
+                                <a class="btn btn-secondary" href="{{ path('payment_new', {'positionId': position.id}) }}" data-toggle="tooltip" data-placement="top" title="Add dividend payment"><span class="fas fa-money-bill-alt"/></a>
+                                <a href="{{ path('position_show', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details position">
+                                    <i class="fas fa-book-open"></i>
+                                </a>
+                                <a href="{{ path('position_edit', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit position">
+                                    <i class="far fa-edit"></i>
+                                </a>
+                                {% if not position.closed %}
+                                    <a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id, 'closed': true}) }}" data-toggle="tooltip" data-placement="top" title="Close position"><span class="fas fa-folder-minus"/></a>
+                                {% endif %}
+                                <a class="btn btn-secondary" href="{{ path('position_new', {'tickerId': position.ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add new position">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             {% else %}
@@ -97,5 +104,5 @@
     {% include 'paginator.html.twig' %}
     <a class="btn btn-primary" href="{{ path('position_new') }}">
         <i class="fas fa-plus"></i>
-    </i>
-</a>{% endblock %}
+    </a>
+{% endblock %}

@@ -24,9 +24,10 @@
                 <td>{{ ticker.branch.label}}</td>
                 <td>
                     <a  class="btn btn-secondary" href="{{ path('position_new', {'tickerId': ticker.id}) }}">add position</a>
-
                     <a href="{{ path('ticker_show', {'id': ticker.id}) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
                     <a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
+                    <a  class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': ticker.id}) }}">add dividend date</a>
+
                 </td>
             </tr>
         {% else %}

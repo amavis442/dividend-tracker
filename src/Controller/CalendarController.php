@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Entity\Ticker;
 
 /**
  * @Route("/dashboard/calendar")
@@ -56,11 +57,12 @@ class CalendarController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="calendar_new", methods={"GET","POST"})
+     * @Route("/new/{ticker}", name="calendar_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function new(Request $request, ?Ticker $ticker = null): Response
     {
         $calendar = new Calendar();
+        $calendar->setTicker($ticker);
         $form = $this->createForm(CalendarType::class, $calendar);
         $form->handleRequest($request);
 
