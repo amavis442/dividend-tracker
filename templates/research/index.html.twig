@@ -21,7 +21,7 @@
                 <td>{{ research.id }}</td>
                 <td>{{ research.ticker.ticker }}</td>
                 <td>{{ research.title }}</td>
-                <td>{{ research.info }}</td>
+                <td>{{ research.info|raw }}</td>
                 <td>
                     <a href="{{ path('research_show', {'id': research.id}) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
                     <a href="{{ path('research_edit', {'id': research.id}) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>

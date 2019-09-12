@@ -5,6 +5,7 @@ const $ = require('jquery');
 import 'popper.js';
 import 'tooltip.js';
 import 'bootstrap';
+import 'summernote/dist/summernote-bs4.min.js';
 
 require('../css/app.css');
 require('../css/global.scss');
@@ -16,4 +17,5 @@ require('../css/global.scss');
 $(document).ready(function() {
     $('[data-toggle="popover"]').popover();
     $('[data-toggle="tooltip"]').tooltip();
+    $('.summernote').summernote();
 });

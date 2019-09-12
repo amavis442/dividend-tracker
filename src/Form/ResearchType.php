@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class ResearchType extends AbstractType
 {
@@ -25,7 +26,7 @@ class ResearchType extends AbstractType
         $builder
             ->add('ticker', HiddenType::class, ['data' => $research->getTicker()->getId()])    
             ->add('title')
-            ->add('info')
+            ->add('info', TextareaType::class, ['attr' => ['class' => 'summernote', 'style' => 'display:none;']])
             
         ;
 
