@@ -10,19 +10,48 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
- * @Route("/research")
+ * @Route("/dashboard/research")
  */
 class ResearchController extends AbstractController
 {
+    public const SEARCH_KEY = 'research_searchCriteria';
+    
     /**
-     * @Route("/", name="research_index", methods={"GET"})
+     * @Route("/list/{page}/{orderBy}/{sort}", name="research_index", methods={"GET"})
      */
-    public function index(ResearchRepository $researchRepository): Response
-    {
+    public function index(
+        ResearchRepository $researchRepository,
+        SessionInterface $session,
+        int $page = 1,
+        string $orderBy = 'id',
+        string $sort = 'asc'
+    ): Response {
+        if (!in_array($orderBy, ['id','ticker'])) {
+            $orderBy = 'id';
+        }
+        if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
+            $sort = 'asc';
+        }
+
+        $searchCriteria = $session->get(self::SEARCH_KEY, '');
+        $items = $researchRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
+        $limit = 10;
+        $maxPages = ceil($items->count() / $limit);
+        $thisPage = $page;
+
         return $this->render('research/index.html.twig', [
-            'researches' => $researchRepository->findAll(),
+            'researches' => $items->getIterator(),
+            'limit' => $limit,
+            'maxPages' => $maxPages,
+            'thisPage' => $thisPage,
+            'order' => $orderBy,
+            'sort' => $sort,
+            'searchCriteria' => $searchCriteria ?? '',
+            'routeName' => 'research_index',
+            'searchPath' => 'research_search'
         ]);
     }
 
@@ -87,11 +116,22 @@ class ResearchController extends AbstractController
      */
     public function delete(Request $request, Research $research): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$research->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $research->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($research);
             $entityManager->flush();
         }
+
+        return $this->redirectToRoute('research_index');
+    }
+
+    /**
+     * @Route("/search", name="research_search", methods={"POST"})
+     */
+    public function search(Request $request, SessionInterface $session): Response
+    {
+        $searchCriteria = $request->request->get('searchCriteria');
+        $session->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('research_index');
     }

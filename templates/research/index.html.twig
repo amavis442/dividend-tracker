@@ -4,7 +4,7 @@
 
 {% block body %}
     <h1>Research index</h1>
-
+{% include '_search_form.html.twig' %}
     <table class="table">
         <thead>
             <tr>
@@ -34,4 +34,5 @@
         {% endfor %}
         </tbody>
     </table>
+    {% include 'paginator.html.twig' %}
 {% endblock %}
