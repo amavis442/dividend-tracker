@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ticker{% endblock %}
+{% block title %}Ticker
+{% endblock %}
 
 {% block body %}
     <h1>Ticker</h1>
@@ -19,12 +20,38 @@
                 <th>Fullname</th>
                 <td>{{ ticker.fullname }}</td>
             </tr>
+            <tr>
+                <th>Research info</th>
+                <td>
+                    {% for research in ticker.researches %}
+
+                        <p>
+                            <div class="card" style="width: 18rem;">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        {{ research.title }}</h5>
+                                    <p class="card-text">{{ research.info }}</p>
+                                    <a href="{{ path('research_edit', {'id': research.id}) }}" class="card-link">
+                                        <i class="far fa-edit"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </p>
+                    {% else %}
+                        no records found
+                    {% endfor %}
+                </td>
+            </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('ticker_index') }}" class="btn btn-primary"><i class="fas fa-angle-double-left"></i>  back to list</a>
+    <a href="{{ path('ticker_index') }}" class="btn btn-primary">
+        <i class="fas fa-angle-double-left"></i>
+        back to list</a>
 
-    <a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
-
+    <a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="btn btn-primary">
+        <i class="far fa-edit"></i>
+    </a>
+    <hr/>
     {{ include('ticker/_delete_form.html.twig') }}
 {% endblock %}

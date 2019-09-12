@@ -86,7 +86,7 @@
                                 {% if not position.closed %}
                                     <a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id, 'closed': true}) }}" data-toggle="tooltip" data-placement="top" title="Close position"><span class="fas fa-folder-minus"/></a>
                                 {% endif %}
-                                <a class="btn btn-secondary" href="{{ path('position_new', {'tickerId': position.ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add new position">
+                                <a class="btn btn-secondary" href="{{ path('position_new', {'ticker': position.ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add new position">
                                     <i class="fas fa-plus"></i>
                                 </a>
                             </div>

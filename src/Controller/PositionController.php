@@ -3,13 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Position;
+use App\Entity\Ticker;
 use App\Form\PositionType;
 use App\Repository\PositionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Repository\TickerRepository;
 use DateTime;
 use App\Repository\PaymentRepository;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -72,14 +72,13 @@ class PositionController extends AbstractController
 
 
     /**
-     * @Route("/new/{tickerId}", name="position_new", methods={"GET","POST"})
+     * @Route("/new/{ticker}", name="position_new", methods={"GET","POST"})
      */
-    public function new(Request $request, TickerRepository $tickerRepository, int $tickerId = 0): Response
+    public function new(Request $request, ?Ticker $ticker = null): Response
     {
         $position = new Position();
 
-        if ($tickerId > 0) {
-            $ticker = $tickerRepository->find($tickerId);
+        if ($ticker instanceof Ticker) {
             $position->setTicker($ticker);
         }
         $currentDate = new DateTime();

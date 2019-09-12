@@ -57,11 +57,17 @@ class Ticker
      */
     private $user;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Research", mappedBy="ticker")
+     */
+    private $researches;
+
     public function __construct()
     {
         $this->positions = new ArrayCollection();
         $this->calendars = new ArrayCollection();
         $this->payments = new ArrayCollection();
+        $this->researches = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -272,6 +278,37 @@ class Ticker
     public function setUser(User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Research[]
+     */
+    public function getResearches(): Collection
+    {
+        return $this->researches;
+    }
+
+    public function addResearch(Research $research): self
+    {
+        if (!$this->researches->contains($research)) {
+            $this->researches[] = $research;
+            $research->setTicker($this);
+        }
+
+        return $this;
+    }
+
+    public function removeResearch(Research $research): self
+    {
+        if ($this->researches->contains($research)) {
+            $this->researches->removeElement($research);
+            // set the owning side to null (unless already changed)
+            if ($research->getTicker() === $this) {
+                $research->setTicker(null);
+            }
+        }
 
         return $this;
     }

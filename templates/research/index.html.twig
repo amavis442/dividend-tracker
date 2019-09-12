@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Research index{% endblock %}
+
+{% block body %}
+    <h1>Research index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Ticker</th>
+                <th>Title</th>
+                <th>Info</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for research in researches %}
+            <tr>
+                <td>{{ research.id }}</td>
+                <td>{{ research.ticker.ticker }}</td>
+                <td>{{ research.title }}</td>
+                <td>{{ research.info }}</td>
+                <td>
+                    <a href="{{ path('research_show', {'id': research.id}) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
+                    <a href="{{ path('research_edit', {'id': research.id}) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
