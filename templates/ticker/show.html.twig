@@ -30,7 +30,7 @@
                                 <div class="card-body">
                                     <h5 class="card-title">
                                         {{ research.title }}</h5>
-                                    <p class="card-text">{{ research.info }}</p>
+                                    <p class="card-text">{{ research.info|raw }}</p>
                                     <a href="{{ path('research_edit', {'id': research.id}) }}" class="card-link">
                                         <i class="far fa-edit"></i>
                                     </a>
