@@ -3,16 +3,17 @@
 namespace App\Controller;
 
 use App\Entity\Payment;
+use App\Entity\Position;
 use App\Form\PaymentType;
 use App\Repository\PaymentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Repository\PositionRepository;
 use App\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use DateTime;
+use App\Repository\CalendarRepository;
 
 /**
  * @Route("/dashboard/payment")
@@ -78,18 +79,22 @@ class PaymentController extends AbstractController
     }
 
     /**
-     * @Route("/new/{positionId<\d+>?0}", name="payment_new", methods={"GET","POST"})
+     * @Route("/new/{position}", name="payment_new", methods={"GET","POST"})
      */
-    public function new(Request $request, ?int $positionId, PositionRepository $positionRepository): Response
+    public function new(Request $request, CalendarRepository $calendarRepository, ?Position $position = null): Response
     {
         $tickerId = 0;
         $payment = new Payment();
-        if ($positionId) {
-            $position = $positionRepository->find($positionId);
+        if ($position instanceof Position) {
             $payment->setPosition($position);
             $tickerId = $position->getTicker()->getId();
+            $calendar = $calendarRepository->getLastDividend($position);
+            $payment->setCalendar($calendar);
+            $payment->setTicker($position->getTicker());
+            $payment->setDividend($calendar->getCashAmount());
         }
         $payment->setPayDate(new DateTime());
+        
 
         $form = $this->createForm(PaymentType::class, $payment, ['tickerId' => $tickerId]);
         $form->handleRequest($request);

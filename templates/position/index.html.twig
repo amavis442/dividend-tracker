@@ -76,7 +76,7 @@
                     <td>
                         <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                             <div class="btn-group mr-2" role="group" aria-label="First group">
-                                <a class="btn btn-secondary" href="{{ path('payment_new', {'positionId': position.id}) }}" data-toggle="tooltip" data-placement="top" title="Add dividend payment"><span class="fas fa-money-bill-alt"/></a>
+                                <a class="btn btn-secondary" href="{{ path('payment_new', {'position': position.id}) }}" data-toggle="tooltip" data-placement="top" title="Add dividend payment"><span class="fas fa-money-bill-alt"/></a>
                                 <a href="{{ path('position_show', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details position">
                                     <i class="fas fa-book-open"></i>
                                 </a>
