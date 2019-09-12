@@ -17,5 +17,10 @@ require('../css/global.scss');
 $(document).ready(function() {
     $('[data-toggle="popover"]').popover();
     $('[data-toggle="tooltip"]').tooltip();
-    $('.summernote').summernote();
+    $('.summernote').summernote({
+        height: 250,   //set editable area's height
+        codemirror: { // codemirror options
+          theme: 'monokai'
+        }
+      });
 });
