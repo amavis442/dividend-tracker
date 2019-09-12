@@ -12,6 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\PositionRepository;
 use App\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use DateTime;
 
 /**
  * @Route("/dashboard/payment")
@@ -88,6 +89,7 @@ class PaymentController extends AbstractController
             $payment->setPosition($position);
             $tickerId = $position->getTicker()->getId();
         }
+        $payment->setPayDate(new DateTime());
 
         $form = $this->createForm(PaymentType::class, $payment, ['tickerId' => $tickerId]);
         $form->handleRequest($request);
