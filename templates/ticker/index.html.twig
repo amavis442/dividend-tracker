@@ -12,6 +12,8 @@
                 <th>Ticker</th>
                 <th>Fullname</th>
                 <th>Industry</th>
+                <th>Research</th>
+                <th>Files</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -22,6 +24,9 @@
                 <td>{{ ticker.ticker }}</td>
                 <td>{{ ticker.fullname }}</td>
                 <td>{{ ticker.branch.label}}</td>
+                <td>{{ ticker.hasResearch ? 'Y' : 'N'}}</td>
+                <td>{{ ticker.branch.label}}</td>
+                
                 <td>
                     <a  class="btn btn-secondary" href="{{ path('position_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add new position"><i class="fas fa-plus"></i></a>
                     <a href="{{ path('ticker_show', {'id': ticker.id}) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>

@@ -312,4 +312,9 @@ class Ticker
 
         return $this;
     }
+
+    public function hasResearch(): bool
+    {
+        return $this->researches->count() > 0;
+    }
 }

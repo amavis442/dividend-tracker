@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Service\FileUploader;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * @Route("/dashboard/research")
@@ -18,7 +21,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class ResearchController extends AbstractController
 {
     public const SEARCH_KEY = 'research_searchCriteria';
-    
+
     /**
      * @Route("/list/{page}/{orderBy}/{sort}", name="research_index", methods={"GET"})
      */
@@ -29,7 +32,7 @@ class ResearchController extends AbstractController
         string $orderBy = 'id',
         string $sort = 'asc'
     ): Response {
-        if (!in_array($orderBy, ['id','ticker'])) {
+        if (!in_array($orderBy, ['id', 'ticker'])) {
             $orderBy = 'id';
         }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
@@ -58,7 +61,7 @@ class ResearchController extends AbstractController
     /**
      * @Route("/new/{ticker?}", name="research_new", methods={"GET","POST"})
      */
-    public function new(Request $request, ?Ticker $ticker): Response
+    public function new(Request $request, ?Ticker $ticker, FileUploader $fileUploader): Response
     {
         $research = new Research();
         if ($ticker instanceof Ticker) {
@@ -68,6 +71,18 @@ class ResearchController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $attachments = $form->get('files')->getData();
+            if ($attachments) {
+                foreach ($attachments as $attachment) {
+
+                    $brochureFileName = $fileUploader->upload($attachment->getFile());
+                    $attachment->setFilename($brochureFileName);
+                    //$attachment->setPath($fileUploader->getTargetDirectory());
+                    $attachment->setFilename($brochureFileName);
+                    $research->addFile($attachment);
+                }
+            }
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($research);
             $entityManager->flush();
@@ -94,12 +109,33 @@ class ResearchController extends AbstractController
     /**
      * @Route("/{id}/edit", name="research_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Research $research): Response
+    public function edit(Request $request, Research $research, FileUploader $fileUploader): Response
     {
+        if ($request->getMethod() == 'GET') {
+            $files = $research->getFiles();
+            $storedFiles = new ArrayCollection();
+            foreach ($files as $document) {
+                $document->setFile(new File($this->getParameter('brochures_directory') . '/' . $document->getFilename()));
+                $storedFiles->add($document);
+            }
+            $research->setFiles($storedFiles);
+        }
+
         $form = $this->createForm(ResearchType::class, $research);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $attachments = $form->get('files')->getData();
+            if ($attachments) {
+                foreach ($attachments as $attachment) {
+                    $brochureFileName = $fileUploader->upload($attachment->getFile());
+                    $attachment->setFilename($brochureFileName);
+                    //$attachment->setPath($fileUploader->getTargetDirectory());
+                    $attachment->setFilename($brochureFileName);
+                    $research->addFile($attachment);
+                }
+            }
+
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('research_index');

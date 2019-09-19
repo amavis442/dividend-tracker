@@ -1,4 +1,47 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-   <button type="submit" class="btn btn-primary"><i class="far fa-save"></i></button>
+{{ form_widget(form) }}
+{{ form_widget(form.files.vars.prototype) }}
+<div class="form-group">
+    <div class="col col-xs-12" id="filesBox">
+        {% if research.files.count > 0 %}
+            <div class="row">
+                <div class="col col-xs-12" id="filesBox">
+                    {% set pos = 0 %}
+                    {% for doc in form.files %}
+
+                        <div class="row">
+                            <div class="col col-xs-1" id="jsRemove{{ pos }}" style="">
+                                <button type="button" class="btn btn-danger" onclick="removeFile($(this));">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <div class="col col-xs-11" id="jsPreview{{ pos }}">{{ doc.vars.value.filename }}</div>
+
+                            <div style="display:none">
+                                {{ form_widget(doc) }}
+                            </div>
+                        </div>
+
+                        {% set pos = pos + 1 %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+<button type="submit" class="btn btn-primary">
+    <i class="far fa-save"></i>
+</button>
 {{ form_end(form) }}
+
+
+{% block javascripts %}
+    <script>
+        var fileCount = '{{ form.files|length }}';
+        var removeButton = "<button type='button' class='btn btn-danger btn-xs' onclick='removeFile($(this));'><i class='fa fa-times' aria-hidden='true'></i></button>";
+        function removeFile(ob) {
+            ob.parent().parent().remove();
+        }
+    </script>
+    {{ encore_entry_script_tags('fileupload') }}
+{% endblock %}
