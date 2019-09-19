@@ -186,7 +186,7 @@ class PositionRepository extends ServiceEntityRepository
             ->where('p.closed <> 1 or p.closed is null')
             ->getQuery()
             ->getSingleScalarResult();
-        return $allocated;
+        return $allocated ?? 0;
     }
 
     public function getUpcommingDividend()
