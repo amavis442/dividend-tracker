@@ -62,12 +62,19 @@ class Ticker
      */
     private $researches;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\DividendMonth", inversedBy="tickers")
+     */
+    private $DividendMonths;
+
     public function __construct()
     {
         $this->positions = new ArrayCollection();
         $this->calendars = new ArrayCollection();
         $this->payments = new ArrayCollection();
         $this->researches = new ArrayCollection();
+        $this->dividendMonths = new ArrayCollection();
+        $this->DividendMonths = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -308,6 +315,32 @@ class Ticker
             if ($research->getTicker() === $this) {
                 $research->setTicker(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|DividendMonth[]
+     */
+    public function getDividendMonths(): Collection
+    {
+        return $this->DividendMonths;
+    }
+
+    public function addDividendMonth(DividendMonth $dividendMonth): self
+    {
+        if (!$this->DividendMonths->contains($dividendMonth)) {
+            $this->DividendMonths[] = $dividendMonth;
+        }
+
+        return $this;
+    }
+
+    public function removeDividendMonth(DividendMonth $dividendMonth): self
+    {
+        if ($this->DividendMonths->contains($dividendMonth)) {
+            $this->DividendMonths->removeElement($dividendMonth);
         }
 
         return $this;

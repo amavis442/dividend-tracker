@@ -1,0 +1,12 @@
+<div class="col-sm-4">
+    <div class="card">
+        <div class="card-header">
+            {{ m.dividendMonth }}
+        </div>
+        <div class="card-body">
+            {% for t in m.tickers %}
+                <p class="card-text">{{ t.ticker }}</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
