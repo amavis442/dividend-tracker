@@ -25,7 +25,6 @@
                 <td>{{ ticker.fullname }}</td>
                 <td>{{ ticker.branch.label}}</td>
                 <td>{{ ticker.hasResearch ? 'Y' : 'N'}}</td>
-                <td>{{ ticker.branch.label}}</td>
                 <td>{% for m in ticker.dividendMonths %}
                         {{ m.dividendMonth }},
                     {% endfor %}
@@ -41,7 +40,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="4">no records found</td>
+                <td colspan="7">no records found</td>
             </tr>
         {% endfor %}
         </tbody>
