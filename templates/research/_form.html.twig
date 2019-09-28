@@ -11,7 +11,7 @@
 
                         <div class="row">
                             <div class="col col-xs-1" id="jsRemove{{ pos }}" style="">
-                                <button type="button" class="btn btn-danger" onclick="removeFile($(this));">
+                                <button type="button" class="btn btn-danger" onclick="removeFile($(this), {{ doc.vars.value.id }});">
                                     <i class="fa fa-times" aria-hidden="true"></i>
                                 </button>
                             </div>
@@ -37,10 +37,20 @@
 
 {% block javascripts %}
     <script>
-        var fileCount = '{{ form.files|length }}';
-        var removeButton = "<button type='button' class='btn btn-danger btn-xs' onclick='removeFile($(this));'><i class='fa fa-times' aria-hidden='true'></i></button>";
-        function removeFile(ob) {
-            ob.parent().parent().remove();
+        var fileCount = {{ form.files|length  > 0 ? form.files|length : 0 }};
+        var removeButton = "<button type='button' class='btn btn-danger btn-xs' onclick='removeFile($(this),0);'><i class='fa fa-times' aria-hidden='true'></i></button>";
+        function removeFile(ob, fileId) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                $.post('{{ path('research_deletefile', {'id': research.id}) }}', {
+                    'files_id': fileId,
+                    '_token': '{{ csrf_token('deletefile' ~ research.id) }}'
+                }).done(function () {
+                    ob.parent().parent().remove();
+                }).fail(function (data) {
+                    alert("error while deleting file");
+                });
+            }
+
         }
     </script>
     {{ encore_entry_script_tags('fileupload') }}

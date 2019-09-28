@@ -90,6 +90,10 @@ class Research
         return $this;
     }
 
+    public function hasFiles():bool
+    {
+        return $this->files->count() > 0;
+    }
     /**
      * @return Collection|Files[]
      */

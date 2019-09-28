@@ -25,7 +25,7 @@
                 <td>{{ research.info|raw }}</td>
                 <td>
                     {% for customfile in research.files %}
-                        <a href="{{ asset('uploads/brochures/' ~ customfile.filename) }}">View brochure (PDF)</a><br/>
+                        <a href="{{ asset('uploads/documents/' ~ customfile.filename) }}" target='_blank'>View document</a><br/>
                     {% else %}
                         no records found
                     {% endfor %}             

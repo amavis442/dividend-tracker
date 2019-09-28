@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Research;
 use App\Entity\Ticker;
+use App\Entity\Files;
 use App\Form\ResearchType;
 use App\Repository\ResearchRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,6 +15,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Service\FileUploader;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * @Route("/dashboard/research")
@@ -74,11 +76,9 @@ class ResearchController extends AbstractController
             $attachments = $form->get('files')->getData();
             if ($attachments) {
                 foreach ($attachments as $attachment) {
-
-                    $brochureFileName = $fileUploader->upload($attachment->getFile());
-                    $attachment->setFilename($brochureFileName);
-                    //$attachment->setPath($fileUploader->getTargetDirectory());
-                    $attachment->setFilename($brochureFileName);
+                    $documentFileName = $fileUploader->upload($attachment->getFile());
+                    $attachment->setFilename($documentFileName);
+                    $attachment->setFilename($documentFileName);
                     $research->addFile($attachment);
                 }
             }
@@ -111,16 +111,6 @@ class ResearchController extends AbstractController
      */
     public function edit(Request $request, Research $research, FileUploader $fileUploader): Response
     {
-        if ($request->getMethod() == 'GET') {
-            $files = $research->getFiles();
-            $storedFiles = new ArrayCollection();
-            foreach ($files as $document) {
-                $document->setFile(new File($this->getParameter('brochures_directory') . '/' . $document->getFilename()));
-                $storedFiles->add($document);
-            }
-            $research->setFiles($storedFiles);
-        }
-
         $form = $this->createForm(ResearchType::class, $research);
         $form->handleRequest($request);
 
@@ -128,11 +118,12 @@ class ResearchController extends AbstractController
             $attachments = $form->get('files')->getData();
             if ($attachments) {
                 foreach ($attachments as $attachment) {
-                    $brochureFileName = $fileUploader->upload($attachment->getFile());
-                    $attachment->setFilename($brochureFileName);
-                    //$attachment->setPath($fileUploader->getTargetDirectory());
-                    $attachment->setFilename($brochureFileName);
-                    $research->addFile($attachment);
+                    if ($attachment->getFile()) {
+                        $documentFileName = $fileUploader->upload($attachment->getFile());
+                        $attachment->setFilename($documentFileName);
+                        $attachment->setFilename($documentFileName);
+                        $research->addFile($attachment);
+                    }
                 }
             }
 
@@ -154,6 +145,14 @@ class ResearchController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete' . $research->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
+            if ($research->hasFiles()) {
+                foreach ($research->getFiles() as $doc) {
+                    $filePath = $this->getParameter('documents_directory') . '/' . $doc->getFilename();
+                    if (\file_exists($filePath)) {
+                        unlink($filePath);
+                    }
+                }
+            }
             $entityManager->remove($research);
             $entityManager->flush();
         }
@@ -170,5 +169,27 @@ class ResearchController extends AbstractController
         $session->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('research_index');
+    }
+
+    /**
+     * @Route("/deletefile/{id?}", name="research_deletefile", methods={"POST"})
+     */
+    public function deleteFile(Request $request, Research $research): JsonResponse
+    {
+        $filesId = $request->request->get('files_id');
+        if ($this->isCsrfTokenValid('deletefile' . $research->getId(), $request->request->get('_token'))) {
+            $entityManager = $this->getDoctrine()->getManager();
+            $file = $entityManager->find(Files::class, $filesId);
+            $filePath = $this->getParameter('documents_directory') . '/' . $file->getFilename();
+            if (\file_exists($filePath)) {
+                unlink($filePath);
+            }
+            $research->removeFile($file);
+            $entityManager->persist($research);
+            $entityManager->flush();
+
+            return $this->json(['result' => 'ok']);
+        }
+        return $this->json(['result' => 'failed', 'msg' => 'Failed to remove file']);
     }
 }

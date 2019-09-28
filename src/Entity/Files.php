@@ -44,7 +44,7 @@ class Files
     public function setFilename(string $filename): self
     {
         $this->filename = $filename;
-
+        
         return $this;
     }
 

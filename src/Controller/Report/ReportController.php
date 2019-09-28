@@ -43,7 +43,10 @@ class ReportController extends AbstractController
                     $item['dividend'] += $position->getDividend();
                 }
             }
-            $item['allocationPercentage'] = ((int) $item['allocation'] / (int) $allocated) * 100;
+            $item['allocationPercentage'] = 0;
+            if ($allocated > 0) {
+                $item['allocationPercentage'] = ((int) $item['allocation'] / (int) $allocated) * 100;
+            }
             $data[$item['allocation']] = $item;
         }
 

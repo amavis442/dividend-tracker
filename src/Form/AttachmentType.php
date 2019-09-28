@@ -30,8 +30,6 @@ class AttachmentType extends AbstractType
                     new File(),
                 ),
             ));
-
-            $builder->get('file')->addModelTransformer($this->transformer);
     }
 
     public function configureOptions(OptionsResolver $resolver)

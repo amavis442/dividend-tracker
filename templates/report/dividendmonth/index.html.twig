@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tickers per month dividendschema!
+{% endblock %}
+
+{% block body %}
+    <h1>Tickers per month dividendschema</h1>
+
+    {% set rowColumns = 4 %}
+    {% set numColumns = 0 %}
+
+    {% for m in data %}
+            {% if numColumns in [0] %}
+                <div class="row">
+            {% endif %}
+
+            {% include 'report/dividendmonth/_card.html.twig' %}
+
+            {% set numColumns = numColumns + 1 %}
+            
+            {% if numColumns in [rowColumns] %}
+            </div>
+            <br/>
+            {% set numColumns = 0 %}
+        {% endif %}
+    {% endfor %}
+
+
+{% endblock %}

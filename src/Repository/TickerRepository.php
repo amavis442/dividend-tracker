@@ -32,7 +32,7 @@ class TickerRepository extends ServiceEntityRepository
         $order = 't.' . $orderBy;
         // Create our query
         $queryBuilder = $this->createQueryBuilder('t')
-            ->join('t.branch','i')
+            ->join('t.branch', 'i')
             ->orderBy($order, $sort);
 
         if (!empty($search)) {
@@ -48,4 +48,6 @@ class TickerRepository extends ServiceEntityRepository
 
         return $paginator;
     }
- }
+
+
+}
