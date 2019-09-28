@@ -12,6 +12,7 @@
                 <th>Ticker</th>
                 <th>Fullname</th>
                 <th>Industry</th>
+                <th>Research</th>
                 <th>Dividend months</th>
                 <th>actions</th>
             </tr>
@@ -22,6 +23,8 @@
                 <td>{{ ticker.id }}</td>
                 <td>{{ ticker.ticker }}</td>
                 <td>{{ ticker.fullname }}</td>
+                <td>{{ ticker.branch.label}}</td>
+                <td>{{ ticker.hasResearch ? 'Y' : 'N'}}</td>
                 <td>{{ ticker.branch.label}}</td>
                 <td>{% for m in ticker.dividendMonths %}
                         {{ m.dividendMonth }},

@@ -13,7 +13,7 @@ Encore
     .setPublicPath('/build')
     // only needed for CDN's or sub-directory deploy
     //.setManifestKeyPrefix('build/')
-
+    .autoProvidejQuery()
     /*
      * ENTRY CONFIG
      *
@@ -25,7 +25,7 @@ Encore
      */
     .addEntry('app', './assets/js/app.js')
     //.addEntry('webfonts', './assets/js/webfonts.js')
-    //.addEntry('page2', './assets/js/page2.js')
+    .addEntry('fileupload', './assets/js/fileupload.js')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()

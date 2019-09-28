@@ -35,7 +35,12 @@ class Research
     private $info;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\File", mappedBy="research", orphanRemoval=true)
+     * Many Research have Many Files.
+     * @ORM\ManyToMany(targetEntity="Files",cascade={"persist"})
+     * @ORM\JoinTable(name="research_files",
+     *      joinColumns={@ORM\JoinColumn(name="research_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="files_id", referencedColumnName="id", unique=true)}
+     *      )
      */
     private $files;
 
@@ -85,32 +90,37 @@ class Research
         return $this;
     }
 
+    public function hasFiles():bool
+    {
+        return $this->files->count() > 0;
+    }
     /**
-     * @return Collection|File[]
+     * @return Collection|Files[]
      */
     public function getFiles(): Collection
     {
         return $this->files;
     }
 
-    public function addFile(File $file): self
+    public function setFiles(Collection $files): self
+    {
+        $this->files = $files;
+        return $this;
+    }
+
+    public function addFile(Files $file): self
     {
         if (!$this->files->contains($file)) {
             $this->files[] = $file;
-            $file->setResearch($this);
         }
 
         return $this;
     }
 
-    public function removeFile(File $file): self
+    public function removeFile(Files $file): self
     {
         if ($this->files->contains($file)) {
             $this->files->removeElement($file);
-            // set the owning side to null (unless already changed)
-            if ($file->getResearch() === $this) {
-                $file->setResearch(null);
-            }
         }
 
         return $this;
