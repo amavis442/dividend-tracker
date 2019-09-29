@@ -118,6 +118,19 @@ class Ticker
         return $this;
     }
 
+    public function hasOpenPositions(): bool
+    {
+        if ($this->positions->count()) {
+            foreach ($this->positions as $position) {
+                if ($position->getClosed() !== true) {
+                    //dd($position->getClosed());
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * @return Collection|Position[]
      */
