@@ -6,7 +6,7 @@
         <div class="card-body">
             {% for t in m.tickers %}
                 {% if t.hasOpenPositions %}
-                    <p class="card-text">{{ t.ticker }}, {{ t.positions.count }}</p>
+                    <p class="card-text">{{ t.ticker }}</p>
                 {% endif %}
             {% endfor %}
         </div>

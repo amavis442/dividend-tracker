@@ -123,7 +123,6 @@ class Ticker
         if ($this->positions->count()) {
             foreach ($this->positions as $position) {
                 if ($position->getClosed() !== true) {
-                    //dd($position->getClosed());
                     return true;
                 }
             }
