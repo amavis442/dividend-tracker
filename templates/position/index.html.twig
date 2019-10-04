@@ -66,9 +66,9 @@
                     <td>{{ position.ticker.branch.label }}</td>
 
                     <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
-                    <td>${{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
+                    <td>{{ position.currency == 1 ? '$' : '&euro;'}}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
                     <td>${{ (position.getAllocation/100)|format_number({fraction_digit: 2}) }}<br/>
-                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Allocation % based on total allocated amount">{{ ((position.getAllocation / allocated ) * 100)|round(2, 'floor')|format_number({fraction_digit: 2}) }}%</span>
+                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Allocation % based on total allocated amount">{{ allocated == 0? 0 : ((position.getAllocation / allocated ) * 100)|round(2, 'floor')|format_number({fraction_digit: 2}) }}%</span>
                     </td>
                     <td>${{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}<br/>
                         <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Dividend yield based on allocation not purchase price">{{ position.getDividendYield|format_number({fraction_digit: 2}) }}%</span>
@@ -86,7 +86,7 @@
                                 {% if not position.closed %}
                                     <a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id, 'closed': true}) }}" data-toggle="tooltip" data-placement="top" title="Close position"><span class="fas fa-folder-minus"/></a>
                                 {% endif %}
-                                
+
                                 <a  class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': position.ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend date"><i class="far fa-calendar-alt"></i></a>
 
                                 <a class="btn btn-secondary" href="{{ path('position_new', {'ticker': position.ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add new position">

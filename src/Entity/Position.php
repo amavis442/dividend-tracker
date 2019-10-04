@@ -78,6 +78,11 @@ class Position
      */
     private $user;
 
+    /**
+     * @ORM\Column(type="integer",  options={"default" : 1})
+     */
+    private $currency;
+
     public function __construct()
     {
         $this->payments = new ArrayCollection();
@@ -265,6 +270,18 @@ class Position
     public function setUser(User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getCurrency(): ?int
+    {
+        return $this->currency;
+    }
+
+    public function setCurrency(int $currency): self
+    {
+        $this->currency = $currency;
 
         return $this;
     }

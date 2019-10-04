@@ -27,7 +27,7 @@
                 <th>Allocated</th>
                 <th>Open price</th>
                 <th>Close price</th>
-                
+
                 <th>Profit / Loss</th>
                 <th>Dividend</th>
 
@@ -48,7 +48,7 @@
                     <td>{{ position.ticker.branch.label }}</td>
                     <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
                     <td>${{ (position.getAllocation/100)|format_number({fraction_digit: 2}) }}<br/>
-                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Allocation % based on total allocated amount">{{ ((position.getAllocation / allocated ) * 100)|round(2, 'floor')|format_number({fraction_digit: 2}) }}%</span>
+                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Allocation % based on total allocated amount">{{ allocated == 0? 0:((position.getAllocation / allocated ) * 100)|round(2, 'floor')|format_number({fraction_digit: 2}) }}%</span>
                     </td>
                     <td>${{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
                     <td>${{ (position.closePrice/100)|format_number({fraction_digit: 2}) }}</td>

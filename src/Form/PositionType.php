@@ -12,6 +12,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Form\Factory\CallbackTransformerFactory;
 
 class PositionType extends AbstractType
@@ -35,7 +36,13 @@ class PositionType extends AbstractType
                 'widget' => 'single_text',
             ])
             ->add('amount', TextType::class, ['help' =>'use decimal point if you a a fraction of a stock'])
-            ->add('price', TextType::class, ['label' =>'Price($)'])
+            ->add('price', TextType::class, ['label' =>'Price'])
+            ->add('currency', ChoiceType::class,[
+              'choices'  => [
+                  '$' => 1,
+                  'Euro' => 2,
+                ],
+            ])
             ->add('allocation', TextType::class, ['label' =>'Allocation($)'])
             ->add('closed', CheckboxType::class, [
                 'label'    => 'Position closed?',
