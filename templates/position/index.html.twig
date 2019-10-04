@@ -17,10 +17,10 @@
                 <th>
                     <a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'buy_date', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Buy date</a>
                 </th>
+                <th>Broker</th>
                 <th>
                     <a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a>
                 </th>
-                <th>Broker</th>
                 <th>Ex div date</th>
                 <th>Industry</th>
                 <th>Amount</th>
@@ -45,10 +45,10 @@
                             </span>
                         {% endif %}
                     </td>
+                    <td>{{ position.broker }}</td>
                     <td>
                         {{ position.ticker.ticker }}
                     </td>
-                    <td>{{ position.broker }}</td>
                     <td>
                         {% if dividendDaysLeft > -1 %}
                             {{ currentExDividendData ? currentExDividendData.getExDividendDate|date("d-m-Y"): '' }}<br/>
