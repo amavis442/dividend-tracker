@@ -31,15 +31,6 @@ class PositionRepository extends ServiceEntityRepository
         string $sort = 'ASC',
         string $search = ''
     ): Paginator {
-        $order = 'p.' . $orderBy;
-        if ($orderBy === 'ticker') {
-            $order = 't.ticker';
-        }
-        if ($orderBy === 'dividend') {
-            $order = 'c.exDividendDate';
-        }
-
-
         $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
         $queryBuilder->leftJoin('t.calendars' ,'c');
         $queryBuilder->andWhere('p.closed <> 1 or p.closed is null');
@@ -62,6 +53,10 @@ class PositionRepository extends ServiceEntityRepository
         $order = 'p.' . $orderBy;
         if ($orderBy === 'ticker') {
             $order = 't.ticker';
+        }
+
+        if ($orderBy === 'dividend') {
+            $order = 'c.exDividendDate';
         }
         $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
         $queryBuilder->andWhere('p.closed = 1');
@@ -138,7 +133,7 @@ class PositionRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
         return $count;
     }
-    
+
     public function getTotalClosedPositions(): int
     {
         $count = $this->createQueryBuilder('p')

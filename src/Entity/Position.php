@@ -83,6 +83,11 @@ class Position
      */
     private $currency;
 
+    /**
+     * @ORM\Column(type="string", length=255,  options={"default" : "Trading212"})
+     */
+    private $broker;
+
     public function __construct()
     {
         $this->payments = new ArrayCollection();
@@ -282,6 +287,18 @@ class Position
     public function setCurrency(int $currency): self
     {
         $this->currency = $currency;
+
+        return $this;
+    }
+
+    public function getBroker(): ?string
+    {
+        return $this->broker;
+    }
+
+    public function setBroker(string $broker): self
+    {
+        $this->broker = $broker;
 
         return $this;
     }
