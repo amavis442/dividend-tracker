@@ -21,7 +21,7 @@
                 <th>
                     <a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a>
                 </th>
-                <th>Ex div date</th>
+                <th>Payment date</th>
                 <th>Industry</th>
                 <th>Amount</th>
                 <th>Price</th>
@@ -32,8 +32,8 @@
         </thead>
         <tbody>
             {% for position in positions %}
-                {% set currentExDividendData = position.ticker.getRecentDividendDate %}
-                {% set dividendDaysLeft = currentExDividendData ? currentExDividendData.getDaysLeft : -1 %}
+                {% set currentDividendData = position.ticker.getRecentDividendDate %}
+                {% set dividendDaysLeft = currentDividendData ? currentDividendData.getDaysLeft : -1 %}
                 <tr>
                     <td>
                         {{ position.buyDate|date("d-m-Y") }}
@@ -51,7 +51,7 @@
                     </td>
                     <td>
                         {% if dividendDaysLeft > -1 %}
-                            {{ currentExDividendData ? currentExDividendData.getExDividendDate|date("d-m-Y"): '' }}<br/>
+                            {{ currentDividendData ? currentDividendData.getPaymentDate|date("d-m-Y"): '' }}<br/>
                             {% set badgeColor = 'info' %}
                             {% if dividendDaysLeft > -1 and dividendDaysLeft < 2  %}
                                 {% set badgeColor = 'danger' %}
@@ -61,7 +61,7 @@
                             {% endif %}
                             <span class="badge badge-{{ badgeColor }}">
                                 {{ dividendDaysLeft }}
-                                days left, cash amount ${{ (currentExDividendData.cashAmount/100)|format_number({fraction_digit: 2})  }}
+                                days left, cash amount ${{ (currentDividendData.cashAmount/100)|format_number({fraction_digit: 2})  }}
                             </span>
                         {% endif %}
                     </td>
@@ -70,7 +70,7 @@
                     <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
                     <td>{{ position.currency == 1 ? '$' : '&euro;'}}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
                     <td>${{ (position.getAllocation/100)|format_number({fraction_digit: 2}) }}<br/>
-                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Allocation % based on total allocated amount">{{ allocated == 0? 0 : ((position.getAllocation / allocated ) * 100)|round(2, 'floor')|format_number({fraction_digit: 2}) }}%</span>
+                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Allocation % based on total allocated amount">{{ allocated ? ((position.getAllocation / allocated ) * 100)|round(2, 'floor')|format_number({fraction_digit: 2}): 0 }}%</span>
                     </td>
                     <td>${{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}<br/>
                         <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Dividend yield based on allocation not purchase price">{{ position.getDividendYield|format_number({fraction_digit: 2}) }}%</span>

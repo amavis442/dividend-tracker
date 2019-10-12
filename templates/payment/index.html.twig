@@ -29,6 +29,7 @@
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Broker</th>
                 <th>Position</th>
                 <th>Ticker</th>
                 <th>Amount</th>
@@ -44,6 +45,7 @@
             {% for payment in payments %}
                 <tr>
                     <td>{{ payment.id }}</td>
+                    <td>{{ payment.position.broker }}</td>
                     <td>#{{ payment.position.id }}</td>
                     <td>{{ payment.position.ticker.ticker }}</td>
                     <td>{{ payment.position.amount/100 }}</td>

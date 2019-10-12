@@ -8,6 +8,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use DateTime;
+use Doctrine\ORM\Mapping\JoinColumn;
 
 /**
  * @method Position|null find($id, $lockMode = null, $lockVersion = null)
@@ -34,9 +35,6 @@ class PositionRepository extends ServiceEntityRepository
         $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
         $queryBuilder->leftJoin('t.calendars' ,'c');
         $queryBuilder->andWhere('p.closed <> 1 or p.closed is null');
-        //Todo: Order by exDividendDate
-        //$queryBuilder->andWhere('c = (SELECT c1 FROM App\Entity\Calendar c1 WHERE c1.exDividendDate = MAX(c1.exDividendDate) AND c1.ticker = t GROUP BY c1.id)');
-        
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);
 
