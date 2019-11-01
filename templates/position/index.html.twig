@@ -68,7 +68,7 @@
                     <td>{{ position.ticker.branch.label }}</td>
 
                     <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
-                    <td>{{ position.currency == 1 ? '$' : '&euro;'}}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
+                    <td>{{ position.currency.symbol == 'USD' ? '$' : '&euro;'}}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
                     <td>${{ (position.getAllocation/100)|format_number({fraction_digit: 2}) }}<br/>
                         <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Allocation % based on total allocated amount">{{ allocated ? ((position.getAllocation / allocated ) * 100)|round(2, 'floor')|format_number({fraction_digit: 2}): 0 }}%</span>
                     </td>

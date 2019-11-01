@@ -79,7 +79,8 @@ class Position
     private $user;
 
     /**
-     * @ORM\Column(type="integer",  options={"default" : 1})
+     * @ORM\ManyToOne(targetEntity="App\Entity\Currency")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $currency;
 
@@ -279,12 +280,12 @@ class Position
         return $this;
     }
 
-    public function getCurrency(): ?int
+    public function getCurrency(): ?Currency
     {
         return $this->currency;
     }
 
-    public function setCurrency(int $currency): self
+    public function setCurrency(?Currency $currency): self
     {
         $this->currency = $currency;
 

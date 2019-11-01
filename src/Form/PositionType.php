@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Position;
 use App\Entity\Ticker;
+use App\Entity\Currency;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -42,13 +43,15 @@ class PositionType extends AbstractType
                 // renders it as a single text box
                 'widget' => 'single_text',
             ])
-            ->add('amount', TextType::class, ['help' =>'use decimal point if you a a fraction of a stock'])
+            ->add('amount', TextType::class, ['help' =>'use decimal point if you hava a fraction of a stock'])
             ->add('price', TextType::class, ['label' =>'Price'])
-            ->add('currency', ChoiceType::class,[
-              'choices'  => [
-                  '$' => 1,
-                  'Euro' => 2,
-                ],
+            ->add('currency', EntityType::class, [
+                'class' => Currency::class,
+                'choice_label' => function ($currency) {
+                    return  $currency->getSymbol();
+                },
+                'required' => true,
+                'empty_data' => 'USD'
             ])
             ->add('allocation', TextType::class, ['label' =>'Allocation($)'])
             ->add('closed', CheckboxType::class, [

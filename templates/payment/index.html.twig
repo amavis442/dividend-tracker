@@ -30,12 +30,10 @@
             <tr>
                 <th>Id</th>
                 <th>Broker</th>
-                <th>Position</th>
                 <th>Ticker</th>
+                <th>Industry</th>
                 <th>Amount</th>
                 <th>Buy price</th>
-                <th>Ex-dividend date</th>
-                <th>Record date</th>
                 <th>Pay date</th>
                 <th>Dividend($)</th>
                 <th>actions</th>
@@ -46,14 +44,12 @@
                 <tr>
                     <td>{{ payment.id }}</td>
                     <td>{{ payment.position.broker }}</td>
-                    <td>#{{ payment.position.id }}</td>
-                    <td>{{ payment.position.ticker.ticker }}</td>
-                    <td>{{ payment.position.amount/100 }}</td>
+                    <td>{{ payment.position.ticker.fullname }} ({{ payment.position.ticker.ticker }})</td>
+                    <td>{{ payment.position.ticker.branch.label }}</td>
+                    <td>{{ payment.stocks/100|format_number({fraction_digit: 2}) }}</td>
                     <td>${{ payment.position.price/100 }}</td>
-                    <td>{{ payment.calendar ? payment.calendar.exDividendDate|date('d-m-Y') : '' }}</td>
-                    <td>{{ payment.calendar ? payment.calendar.recordDate|date('d-m-Y') : '' }}</td>
                     <td>{{ payment.payDate ? payment.payDate|date('d-m-Y') : '' }}</td>
-                    <td>${{ (payment.dividend/100)|format_number({fraction_digit: 2}) }}</td>
+                    <td>{{ payment.currency ? payment.currency.symbol : '$' }} {{ (payment.dividend/100)|format_number({fraction_digit: 2}) }}</td>
                     <td>
                         <a href="{{ path('payment_show', {'id': payment.id}) }}" class="btn btn-primary">
                             <i class="fas fa-book-open"></i>
@@ -69,7 +65,7 @@
                 </tr>
             {% endfor %}
             <tr>
-                <td colspan="7"></td>
+                <td colspan="6"></td>
                 <td>
                     <span style="font-weight:bold">Total dividend</span>
                 </td>

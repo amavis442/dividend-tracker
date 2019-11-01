@@ -87,14 +87,16 @@ class PaymentController extends AbstractController
         $payment = new Payment();
         if ($position instanceof Position) {
             $payment->setPosition($position);
+            $payment->setStocks($position->getAmount());
             $tickerId = $position->getTicker()->getId();
             $calendar = $calendarRepository->getLastDividend($position);
-            $payment->setCalendar($calendar);
             $payment->setTicker($position->getTicker());
-            $payment->setDividend($calendar->getCashAmount());
+            if ($calendar) {
+                $payment->setCalendar($calendar);
+                $payment->setDividend($calendar->getCashAmount());
+            }
         }
         $payment->setPayDate(new DateTime());
-        
 
         $form = $this->createForm(PaymentType::class, $payment, ['tickerId' => $tickerId]);
         $form->handleRequest($request);

@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Payment;
 use App\Entity\Position;
 use App\Entity\Calendar;
+use App\Entity\Currency;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -37,7 +38,7 @@ class PaymentType extends AbstractType
                 };
                 return $query;
             },
-            'required' => true,
+            'required' => false,
             'placeholder' => 'Please choose a ex div date',
             'empty_data' => null,
         ])
@@ -58,11 +59,21 @@ class PaymentType extends AbstractType
                 // renders it as a single text box
                 'widget' => 'single_text',
             ])
+            ->add('stocks', TextType::class)
             ->add('dividend', TextType::class)
+            ->add('currency', EntityType::class, [
+                'class' => Currency::class,
+                'choice_label' => function ($currency) {
+                    return  $currency->getSymbol();
+                },
+                'required' => true,
+                'empty_data' => 'USD'
+            ])
         ;
 
         $callbackTransformer = CallbackTransformerFactory::create();
         $builder->get('dividend')->addModelTransformer($callbackTransformer);
+        $builder->get('stocks')->addModelTransformer($callbackTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver)

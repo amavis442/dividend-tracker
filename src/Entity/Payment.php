@@ -51,6 +51,17 @@ class Payment
      */
     private $user;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Currency")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $currency;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $stocks;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -127,6 +138,40 @@ class Payment
     public function setUser(User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getCurrency(): ?Currency
+    {
+        return $this->currency;
+    }
+
+    public function setCurrency(?Currency $currency): self
+    {
+        $this->currency = $currency;
+
+        return $this;
+    }
+
+    public function hasexDividendDate(): bool
+    {
+        return $this->calendar !== null;
+    }
+    
+    public function hasrecordDate(): bool
+    {
+        return $this->calendar !== null;
+    }
+
+    public function getStocks(): ?int
+    {
+        return $this->stocks;
+    }
+
+    public function setStocks(?int $stocks): self
+    {
+        $this->stocks = $stocks;
 
         return $this;
     }
