@@ -42,8 +42,8 @@ class BranchController extends AbstractController
      */
     public function new(Request $request, BranchRepository $branchRepository): Response
     {
-        $maxAssetAllocation = 100 - (int)(($branchRepository->getSumAssetAllocation() - $branch->getAssetAllocation()) / 100);
         $branch = new Branch();
+        $maxAssetAllocation = 100 - (int)(($branchRepository->getSumAssetAllocation() - $branch->getAssetAllocation()) / 100);
         $form = $this->createForm(BranchType::class, $branch,['maxAssetAllocation' => $maxAssetAllocation]);
         $form->handleRequest($request);
 

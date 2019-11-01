@@ -58,6 +58,7 @@ class CalendarRepository extends ServiceEntityRepository
             ->where('t = :ticker')
             ->setParameter('ticker', $position->getTicker())
             ->orderBy('c.exDividendDate', 'DESC')
+            ->setMaxResults(1)
             ->getQuery();
 
         return $queryBuilder->getOneOrNullResult();
