@@ -23,7 +23,7 @@
                 </th>
                 <th>Industry</th>
                 <th>Amount</th>
-                <th>Payment date</th>
+                <th>Payment</th>
                 <th>Dividend</th>
                 <th style="width:20%">actions</th>
             </tr>
@@ -66,8 +66,7 @@
                             </span>
                         {% endif %}
                     </td>
-                    <td>{{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}<br/>
-                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Dividend yield based on allocation not purchase price">{{ position.getDividendYield|format_number({fraction_digit: 2}) }}%</span>
+                    <td>{{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}
                     </td>
                     <td>
                         <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
