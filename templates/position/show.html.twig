@@ -67,13 +67,11 @@
     <h4>Dividend received</h4>
     <table  class="table">
         <thead>
-            <th>Id</th>
             <th>Date</th>
             <th>Dividend</th>
         </thead>
         <tbody>
         {% for payment in position.payments %}
-            <td>{{ payment.id }}</td>
             <td>{{ payment.getPayDate|date("d-m-Y")}}</td>
             <td>${{ (payment.getDividend/100)|format_number({fraction_digit: 2}) }}</td>
         {% else %}
@@ -82,7 +80,6 @@
             </tr>
         {% endfor %}
             <tr>
-                <td colspan="1"></td>
                 <td><span style="font-weight:bold">Total dividend</span></td>
                 <td>${{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}
                 ({{ position.getDividendYield|format_number({fraction_digit: 2}) }}%)

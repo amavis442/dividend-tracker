@@ -86,7 +86,7 @@ class Calendar
     public function setExDividendDate(\DateTimeInterface $exDividendDate): self
     {
         $this->exDividendDate = $exDividendDate;
-
+        $this->recordDate = $exDividendDate;
         return $this;
     }
 

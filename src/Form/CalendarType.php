@@ -27,10 +27,6 @@ class CalendarType extends AbstractType
                 // renders it as a single text box
                 'widget' => 'single_text',
             ])
-            ->add('record_date', DateType::class, [
-                // renders it as a single text box
-                'widget' => 'single_text',
-            ])
             ->add('payment_date', DateType::class, [
                 // renders it as a single text box
                 'widget' => 'single_text',

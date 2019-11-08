@@ -21,11 +21,9 @@
                 <th>
                     <a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a>
                 </th>
-                <th>Payment date</th>
                 <th>Industry</th>
                 <th>Amount</th>
-                <th>Price</th>
-                <th>Allocated</th>
+                <th>Payment date</th>
                 <th>Dividend</th>
                 <th style="width:20%">actions</th>
             </tr>
@@ -49,6 +47,9 @@
                     <td>
                         {{ position.ticker.ticker }}
                     </td>
+                    <td>{{ position.ticker.branch.label }}</td>
+                    <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
+
                     <td>
                         {% if dividendDaysLeft > -1 %}
                             {{ currentDividendData ? currentDividendData.getPaymentDate|date("d-m-Y"): '' }}<br/>
@@ -65,14 +66,7 @@
                             </span>
                         {% endif %}
                     </td>
-                    <td>{{ position.ticker.branch.label }}</td>
-
-                    <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
-                    <td>{{ position.currency.symbol == 'USD' ? '$' : '&euro;'}}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
-                    <td>${{ (position.getAllocation/100)|format_number({fraction_digit: 2}) }}<br/>
-                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Allocation % based on total allocated amount">{{ allocated ? ((position.getAllocation / allocated ) * 100)|round(2, 'floor')|format_number({fraction_digit: 2}): 0 }}%</span>
-                    </td>
-                    <td>${{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}<br/>
+                    <td>{{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}<br/>
                         <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Dividend yield based on allocation not purchase price">{{ position.getDividendYield|format_number({fraction_digit: 2}) }}%</span>
                     </td>
                     <td>
