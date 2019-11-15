@@ -89,6 +89,16 @@ class Position
      */
     private $broker;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Currency")
+     */
+    private $allocationCurrency;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Currency")
+     */
+    private $closedCurrency;
+
     public function __construct()
     {
         $this->payments = new ArrayCollection();
@@ -300,6 +310,30 @@ class Position
     public function setBroker(string $broker): self
     {
         $this->broker = $broker;
+
+        return $this;
+    }
+
+    public function getAllocationCurrency(): ?Currency
+    {
+        return $this->allocationCurrency;
+    }
+
+    public function setAllocationCurrency(?Currency $allocationCurrency): self
+    {
+        $this->allocationCurrency = $allocationCurrency;
+
+        return $this;
+    }
+
+    public function getClosedCurrency(): ?Currency
+    {
+        return $this->closedCurrency;
+    }
+
+    public function setClosedCurrency(?Currency $closedCurrency): self
+    {
+        $this->closedCurrency = $closedCurrency;
 
         return $this;
     }

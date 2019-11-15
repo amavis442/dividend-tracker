@@ -8,10 +8,6 @@
     <table class="table">
         <tbody>
             <tr>
-                <th>Id</th>
-                <td>{{ position.id }}</td>
-            </tr>
-            <tr>
                 <th>Ticker</th>
                 <td>{{ position.ticker.ticker }}</td>
             </tr>
@@ -28,16 +24,16 @@
                 <td>{{ position.buyDate|date("d-m-Y") }}</td>
             </tr>
             <tr>
-                <th>Amount</th>
+                <th>Units</th>
                 <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
             </tr>
             <tr>
                 <th>Price</th>
-                <td>${{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ position.currency.symbol}} {{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
             </tr>
             <tr>
                 <th>Allocation</th>
-                <td>${{ (position.allocation/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ position.allocationCurrency.symbol}} {{ (position.allocation/100)|format_number({fraction_digit: 2}) }}</td>
             </tr>
             <tr>
                 <th>Status</th>
@@ -49,7 +45,7 @@
             </tr>
             <tr>
                 <th>Close price</th>
-                <td>${{ position.closePrice/100 }}</td>
+                <td>{{ position.closedCurrency.symbol}} {{ position.closePrice/100 }}</td>
             </tr>
             <tr>
                 <th>Profit / Loss</th>
@@ -81,7 +77,7 @@
         {% endfor %}
             <tr>
                 <td><span style="font-weight:bold">Total dividend</span></td>
-                <td>${{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}
+                <td>$ {{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}
                 ({{ position.getDividendYield|format_number({fraction_digit: 2}) }}%)
                 </td>
             </tr>

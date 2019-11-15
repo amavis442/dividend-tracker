@@ -43,8 +43,8 @@ class PositionType extends AbstractType
                 // renders it as a single text box
                 'widget' => 'single_text',
             ])
-            ->add('amount', TextType::class, ['help' =>'use decimal point if you hava a fraction of a stock'])
-            ->add('price', TextType::class, ['label' =>'Price'])
+            ->add('amount', TextType::class, ['help' =>'use decimal point if you hava a fraction of a stock','label' =>'Units'])
+            ->add('price', TextType::class, ['label' =>'Price','help' =>'use decimal point if you hava a fraction of a stock'])
             ->add('currency', EntityType::class, [
                 'class' => Currency::class,
                 'choice_label' => function ($currency) {
@@ -53,10 +53,26 @@ class PositionType extends AbstractType
                 'required' => true,
                 'empty_data' => 'USD'
             ])
-            ->add('allocation', TextType::class, ['label' =>'Allocation($)'])
+            ->add('allocation', TextType::class, ['label' =>'Allocation'])
+            ->add('allocation_currency', EntityType::class, [
+                'class' => Currency::class,
+                'choice_label' => function ($currency) {
+                    return  $currency->getSymbol();
+                },
+                'required' => true,
+                'empty_data' => 'USD'
+            ])
             ->add('closed', CheckboxType::class, [
                 'label'    => 'Position closed?',
                 'required' => false,
+            ])
+            ->add('closed_currency', EntityType::class, [
+                'class' => Currency::class,
+                'choice_label' => function ($currency) {
+                    return  $currency->getSymbol();
+                },
+                'required' => true,
+                'empty_data' => 'USD'
             ])
             ->add('closeDate',DateType::class, [
                 // renders it as a single text box
