@@ -31,6 +31,14 @@ class CalendarType extends AbstractType
                 // renders it as a single text box
                 'widget' => 'single_text',
             ])
+            ->add('currency', EntityType::class, [
+                'class' => Currency::class,
+                'choice_label' => function ($currency) {
+                    return  $currency->getSymbol();
+                },
+                'required' => true,
+                'empty_data' => 'USD'
+            ])
             ->add(
                 'cash_amount', TextType::class
             )

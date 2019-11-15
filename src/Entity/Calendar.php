@@ -56,6 +56,11 @@ class Calendar
      */
     private $user;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Currency")
+     */
+    private $currency;
+
     public function __construct()
     {
         $this->payments = new ArrayCollection();
@@ -180,6 +185,18 @@ class Calendar
     public function setUser(User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getCurrency(): ?Currency
+    {
+        return $this->currency;
+    }
+
+    public function setCurrency(?Currency $currency): self
+    {
+        $this->currency = $currency;
 
         return $this;
     }

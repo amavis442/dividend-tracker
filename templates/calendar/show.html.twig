@@ -8,24 +8,20 @@
     <table class="table">
         <tbody>
             <tr>
-                <th>Id</th>
-                <td>{{ calendar.id }}</td>
-            </tr>
-            <tr>
                 <th>Ex-dividend date</th>
-                <td>{{ calendar.exDividendDate ? calendar.exDividendDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ calendar.exDividendDate ? calendar.exDividendDate|date('d-m-Y') : '' }}</td>
             </tr>
             <tr>
                 <th>Record date</th>
-                <td>{{ calendar.recordDate ? calendar.recordDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ calendar.recordDate ? calendar.recordDate|date('d-m-Y') : '' }}</td>
             </tr>
             <tr>
                 <th>Payment date</th>
-                <td>{{ calendar.paymentDate ? calendar.paymentDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ calendar.paymentDate ? calendar.paymentDate|date('d-m-Y') : '' }}</td>
             </tr>
             <tr>
                 <th>Cash amount</th>
-                <td>{{ calendar.cashAmount|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ calendar.currency.sign|raw }}{{ calendar.cashAmount|format_number({fraction_digit: 2}) }}</td>
             </tr>
         </tbody>
     </table>
