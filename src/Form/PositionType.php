@@ -44,7 +44,7 @@ class PositionType extends AbstractType
                 'widget' => 'single_text',
             ])
             ->add('amount', TextType::class, ['help' =>'use decimal point if you hava a fraction of a stock','label' =>'Units'])
-            ->add('price', TextType::class, ['label' =>'Price','help' =>'use decimal point if you hava a fraction of a stock'])
+            ->add('price', TextType::class, ['label' =>'Price'])
             ->add('currency', EntityType::class, [
                 'class' => Currency::class,
                 'choice_label' => function ($currency) {

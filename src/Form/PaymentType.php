@@ -62,7 +62,7 @@ class PaymentType extends AbstractType
                 // renders it as a single text box
                 'widget' => 'single_text',
             ])
-            ->add('stocks', TextType::class)
+            ->add('stocks', TextType::class, ['label'=>'Units'])
             ->add('dividend', TextType::class)
             ->add('currency', EntityType::class, [
                 'class' => Currency::class,

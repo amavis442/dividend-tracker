@@ -26,6 +26,11 @@ class Currency
      */
     private $description;
 
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $sign;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -51,6 +56,18 @@ class Currency
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getSign(): ?string
+    {
+        return $this->sign;
+    }
+
+    public function setSign(string $sign): self
+    {
+        $this->sign = $sign;
 
         return $this;
     }
