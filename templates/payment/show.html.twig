@@ -21,12 +21,12 @@
             </tr>
 
             <tr>
-                <th>#Stocks</th>
+                <th>Units</th>
                 <td>{{ payment.stocks/100|format_number({fraction_digit: 2})  }}</td>
             </tr>
             <tr>
                 <th>Total dividend</th>
-                <td>{{ payment.currency.symbol }} {{ payment.dividend/100|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ payment.currency.sign }} {{ payment.dividend/100|format_number({fraction_digit: 2}) }}</td>
             </tr>
         </tbody>
     </table>

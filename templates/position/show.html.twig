@@ -29,11 +29,11 @@
             </tr>
             <tr>
                 <th>Price</th>
-                <td>{{ position.currency.symbol}} {{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ position.currency.sign|raw }} {{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
             </tr>
             <tr>
                 <th>Allocation</th>
-                <td>{{ position.allocationCurrency.symbol}} {{ (position.allocation/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ position.allocationCurrency.sign|raw }} {{ (position.allocation/100)|format_number({fraction_digit: 2}) }}</td>
             </tr>
             <tr>
                 <th>Status</th>
@@ -45,7 +45,7 @@
             </tr>
             <tr>
                 <th>Close price</th>
-                <td>{{ position.closedCurrency.symbol}} {{ position.closePrice/100 }}</td>
+                <td>{{ position.closedCurrency.sign|raw }} {{ position.closePrice/100 }}</td>
             </tr>
             <tr>
                 <th>Profit / Loss</th>
@@ -69,7 +69,7 @@
         <tbody>
         {% for payment in position.payments %}
             <td>{{ payment.getPayDate|date("d-m-Y")}}</td>
-            <td>${{ (payment.getDividend/100)|format_number({fraction_digit: 2}) }}</td>
+            <td>{{ payment.currency.sign|raw }}{{ (payment.getDividend/100)|format_number({fraction_digit: 2}) }}</td>
         {% else %}
             <tr>
                 <td colspan="3">no records found</td>
@@ -77,7 +77,7 @@
         {% endfor %}
             <tr>
                 <td><span style="font-weight:bold">Total dividend</span></td>
-                <td>$ {{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}
+                <td>&euro;{{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}
                 ({{ position.getDividendYield|format_number({fraction_digit: 2}) }}%)
                 </td>
             </tr>
