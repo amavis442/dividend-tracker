@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Calendar;
 use App\Entity\Ticker;
+use App\Entity\Currency;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
