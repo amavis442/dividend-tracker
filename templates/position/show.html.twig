@@ -29,11 +29,11 @@
             </tr>
             <tr>
                 <th>Price</th>
-                <td>{{ position.currency.sign|raw }} {{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ position.currency.sign|raw }}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
             </tr>
             <tr>
                 <th>Allocation</th>
-                <td>{{ position.allocationCurrency.sign|raw }} {{ (position.allocation/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ position.allocationCurrency.sign|raw }}{{ (position.allocation/100)|format_number({fraction_digit: 2}) }}</td>
             </tr>
             <tr>
                 <th>Status</th>
@@ -41,19 +41,19 @@
             </tr>
             <tr>
                 <th>Closedate</th>
-                <td>{{ position.closeDate|date("d-m-Y") }}</td>
+                <td>{{ position.closeDate ? position.closeDate|date("d-m-Y") : '' }}</td>
             </tr>
             <tr>
                 <th>Close price</th>
-                <td>{{ position.closedCurrency.sign|raw }} {{ position.closePrice/100 }}</td>
+                <td>{% if position.closePrice %}{{ position.closedCurrency ? position.closedCurrency.sign|raw : '' }}{{ position.closePrice/100 }}{% endif %}</td>
             </tr>
             <tr>
                 <th>Profit / Loss</th>
-                <td>${{ position.profit|format_number({fraction_digit: 2}) }}</td>
+                <td>{% if position.profit %}${{ position.profit|format_number({fraction_digit: 2}) }}{% endif %}</td>
             </tr>
             <tr>
                 <th>Profit / Loss (%)</th>
-                <td>{{ position.getProfitPercentage|format_number({fraction_digit: 2}) }}%</td>
+                <td>{% if position.closePrice %}{{ position.getProfitPercentage|format_number({fraction_digit: 2}) }}%{% endif %}</td>
             </tr>
         </tbody>
     </table>
