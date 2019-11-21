@@ -11,6 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Position
 {
+    public const BROKERS = ['eToro', 'Trading212', 'Flatex'];
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

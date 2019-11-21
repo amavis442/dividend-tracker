@@ -22,13 +22,14 @@ class PositionController extends AbstractController
     public const SEARCH_KEY = 'position_searchCriteria';
 
     /**
-     * @Route("/list/{page}/{orderBy}/{sort}", name="position_index", methods={"GET"})
+     * @Route("/list/{page}/{tab}/{orderBy}/{sort}", name="position_index", methods={"GET"})
      */
     public function index(
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
         SessionInterface $session,
         int $page = 1,
+        string $tab = 'All',
         string $orderBy = 'buyDate',
         string $sort = 'asc'
     ): Response {
@@ -46,10 +47,11 @@ class PositionController extends AbstractController
         $allocated = $positionRepository->getSumAllocated();
 
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
-        $items = $positionRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
+        $items = $positionRepository->getAll($page, $tab, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
+        $brokers = array_merge(['All'], Position::BROKERS);
 
         return $this->render('position/index.html.twig', [
             'positions' => $items->getIterator(),
@@ -66,7 +68,9 @@ class PositionController extends AbstractController
             'allocated' => $allocated,
             'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'position_index',
-            'searchPath' => 'position_search'
+            'searchPath' => 'position_search',
+            'brokers' => $brokers,
+            'tab' => $tab
         ]);
     }
 
