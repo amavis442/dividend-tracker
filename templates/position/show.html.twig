@@ -57,34 +57,9 @@
             </tr>
         </tbody>
     </table>
-    <a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id}) }}"><i class="far fa-edit"></i></a>
-<br/>
-<br/>
-    <h4>Dividend received</h4>
-    <table  class="table">
-        <thead>
-            <th>Date</th>
-            <th>Dividend</th>
-        </thead>
-        <tbody>
-        {% for payment in position.payments %}
-            <td>{{ payment.getPayDate|date("d-m-Y")}}</td>
-            <td>{{ payment.currency.sign|raw }}{{ (payment.getDividend/100)|format_number({fraction_digit: 2}) }}</td>
-        {% else %}
-            <tr>
-                <td colspan="3">no records found</td>
-            </tr>
-        {% endfor %}
-            <tr>
-                <td><span style="font-weight:bold">Total dividend</span></td>
-                <td>&euro;{{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}
-                ({{ position.getDividendYield|format_number({fraction_digit: 2}) }}%)
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id}) }}"><i class="far fa-edit"></i></a> | 
 
     <a class="btn btn-primary" href="{{ path('position_index') }}"><i class="fas fa-angle-double-left"></i> back to list</a>
-
+    <hr/>
     
 {% endblock %}

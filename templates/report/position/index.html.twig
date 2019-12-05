@@ -30,8 +30,6 @@
                 <th>Close price</th>
 
                 <th>Profit / Loss</th>
-                <th>Dividend</th>
-
             </tr>
         </thead>
         <tbody>
@@ -56,9 +54,6 @@
                     <td>${{ (position.closePrice/100)|format_number({fraction_digit: 2}) }}</td>
                     <td>${{ (position.getProfit)|format_number({fraction_digit: 2}) }}<br/>
                         <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Profit/loss on allocation %">{{ position.getProfitPercentage|format_number({fraction_digit: 2}) }}%</span>
-                    </td>
-                    <td>${{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}<br/>
-                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Dividend yield based on allocation not purchase price">{{ position.getDividendYield|format_number({fraction_digit: 2}) }}%</span>
                     </td>
                 </tr>
             {% else %}

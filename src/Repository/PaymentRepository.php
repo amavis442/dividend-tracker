@@ -81,16 +81,4 @@ class PaymentRepository extends ServiceEntityRepository
 
         return $result[0]['total'] / 100;
     }
-
-    public function getTotalDividendClosed(): ?float
-    {
-        $result = $this->createQueryBuilder('p')
-            ->select('SUM(p.dividend) total')
-            ->innerJoin('p.position', 'po')
-            ->where('po.closed = 1')
-            ->getQuery()
-            ->getResult();
-
-        return $result[0]['total'] / 100;
-    }
 }

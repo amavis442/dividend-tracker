@@ -14,13 +14,15 @@
                 <th>Industry</th>
                 <th>Research</th>
                 <th>Dividend months</th>
+                <th>Units</th>
+                <th>Dividends</th>
                 <th>actions</th>
             </tr>
         </thead>
         <tbody>
         {% for ticker in tickers %}
             <tr>
-                <td>{{ ticker.id }}</td>
+                <td>{{ ticker.id }} </td>
                 <td>{{ ticker.ticker }}</td>
                 <td>{{ ticker.fullname }}</td>
                 <td>{{ ticker.branch.label}}</td>
@@ -28,14 +30,20 @@
                 <td>{% for m in ticker.dividendMonths %}
                         {{ m.dividendMonth }},
                     {% endfor %}
-                    </td>
+                </td>
+                <td>{{ (ticker.getActiveUnits/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>&euro;{{ (ticker.getSumDividend/100)|format_number({fraction_digit: 2}) }}</td>
                 <td>
-                    <a  class="btn btn-secondary" href="{{ path('position_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add new position"><i class="fas fa-plus"></i></a>
-                    <a href="{{ path('ticker_show', {'id': ticker.id}) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
-                    <a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
-                    <a  class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend date"><i class="far fa-calendar-alt"></i></a>
-                    <a  class="btn btn-secondary" href="{{ path('research_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add/edit research"><i class="fab fa-searchengin"></i></a>
-                
+                    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                        <div class="btn-group mr-2" role="group" aria-label="First group">
+                            <a  class="btn btn-secondary" href="{{ path('position_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add new position"><i class="fas fa-plus"></i></a>
+                            <a href="{{ path('ticker_show', {'id': ticker.id}) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
+                            <a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
+                            <a  class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend date"><i class="far fa-calendar-alt"></i></a>
+                            <a  class="btn btn-success" href="{{ path('payment_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment"><i class="far fa-money-bill-alt"></i></a>
+                            <a  class="btn btn-secondary" href="{{ path('research_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add/edit research"><i class="fab fa-searchengin"></i></a>
+                        </div>
+                    </div>
                 </td>
             </tr>
         {% else %}

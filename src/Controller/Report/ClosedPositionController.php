@@ -42,8 +42,8 @@ class ClosedPositionController extends AbstractController
         $numClosedPosition = $positionRepository->getTotalClosedPositions();
         $numTickers = $positionRepository->getTotalClosedTickers();
         $profit = $positionRepository->getProfit();
-        $totalDividend = $paymentRepository->getTotalDividendClosed();
         $allocated = $positionRepository->getSumAllocated();
+        $totalDividend = $paymentRepository->getTotalDividend();
 
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
         $items = $positionRepository->getAllClosed($page, 10, $orderBy, $sort, $searchCriteria);
@@ -61,8 +61,8 @@ class ClosedPositionController extends AbstractController
             'numPosition' => $numClosedPosition,
             'numTickers' => $numTickers,
             'profit' => $profit,
-            'totalDividend' => $totalDividend,
             'allocated' => $allocated,
+            'totalDividend' => $totalDividend,
             'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'report_closed_positions_index',
             'searchPath' => 'report_closed_positions_search'

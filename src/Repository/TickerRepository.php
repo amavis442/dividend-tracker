@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
@@ -32,7 +33,14 @@ class TickerRepository extends ServiceEntityRepository
         $order = 't.' . $orderBy;
         // Create our query
         $queryBuilder = $this->createQueryBuilder('t')
+            ->select('t')
             ->join('t.branch', 'i')
+            ->leftJoin('t.positions','p')
+            ->leftJoin('t.researches','r')
+            ->leftJoin('t.DividendMonths','d')
+            ->leftJoin('t.payments','pa')
+            ->leftJoin('t.calendars', 'c')
+            ->groupBy('t.id')
             ->orderBy($order, $sort);
 
         if (!empty($search)) {
@@ -43,11 +51,24 @@ class TickerRepository extends ServiceEntityRepository
             $queryBuilder->setParameter('search', $search . '%');
         }
         $query = $queryBuilder->getQuery();
-
+       
         $paginator = $this->paginate($query, $page, $limit);
 
         return $paginator;
     }
 
+    public function getActiveUnits(Ticker $ticker): int
+    {
+        $queryBuilder = $this->createQueryBuilder('t')
+            ->leftJoin('t.positions','p')
+            ->select('SUM(p.amount) as units')
+            ->where('t.id = :tickerId')
+            ->andWhere('p.closed <> 1')
+            ->setParameter('tickerId', $ticker->getId())
+            ->getQuery();
+        $result = $queryBuilder->getScalarResult();
+        
+        return $result[0]['units'] ?? 0;
+    }
 
 }

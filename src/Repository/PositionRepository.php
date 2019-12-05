@@ -81,7 +81,7 @@ class PositionRepository extends ServiceEntityRepository
             ->select('p')
             ->innerJoin('p.ticker', 't')
             ->innerJoin('t.branch', 'i')
-            ->leftJoin('p.payments', 'pa')
+            ->leftJoin('t.payments', 'pa')
             ->orderBy($order, $sort);
         if ($broker <> 'All') {
             $queryBuilder->andWhere('p.broker = :broker')
@@ -118,7 +118,7 @@ class PositionRepository extends ServiceEntityRepository
                 'SUM(pa.dividend) sumDividend'
             ])
             ->innerJoin('p.ticker', 't')
-            ->leftJoin('p.payments', 'pa')
+            ->leftJoin('t.payments', 'pa')
             ->groupBy('t.ticker')
             ->orderBy($order, $sort)
             ->where('p.closed <> 1 or p.closed is null');

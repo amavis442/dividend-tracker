@@ -3,7 +3,6 @@
 namespace App\Form;
 
 use App\Entity\Payment;
-use App\Entity\Position;
 use App\Entity\Calendar;
 use App\Entity\Currency;
 use Symfony\Component\Form\AbstractType;
@@ -20,7 +19,12 @@ class PaymentType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $tickerId = (int)$options['tickerId'];
+        $payment = $options['data'];
+        $tickerId = null;
+        if ($payment instanceof Payment){
+            $tickerId = $payment->getTicker()->getId();
+        }    
+
         $builder
         ->add('Calendar', EntityType::class, [
             'class' => Calendar::class,
@@ -42,36 +46,20 @@ class PaymentType extends AbstractType
             'placeholder' => 'Please choose a ex div date',
             'empty_data' => null,
         ])
-        ->add('position', EntityType::class, [
-                'class' => Position::class,
-                'choice_label' => function ($position) {
-                    return  $position->getTicker()->getFullname().' ('.$position->getTicker()->getTicker(). ')';
-                },
-                'group_by' => function($choice, $key, $value) {
-                    return $choice->getBroker();
-                },
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('p')
-                    ->andWhere('p.closed IS null OR p.closed = 0');
-                },
-                'required' => true,
-                'placeholder' => 'Please choose a position',
-                'empty_data' => null,
-            ])
-            ->add('pay_date',DateType::class, [
-                // renders it as a single text box
-                'widget' => 'single_text',
-            ])
-            ->add('stocks', TextType::class, ['label'=>'Units'])
-            ->add('dividend', TextType::class)
-            ->add('currency', EntityType::class, [
-                'class' => Currency::class,
-                'choice_label' => function ($currency) {
-                    return  $currency->getSymbol();
-                },
-                'required' => true,
-                'empty_data' => 'USD'
-            ])
+        ->add('pay_date',DateType::class, [
+            // renders it as a single text box
+            'widget' => 'single_text',
+        ])
+        ->add('stocks', TextType::class, ['label'=>'Units'])
+        ->add('dividend', TextType::class)
+        ->add('currency', EntityType::class, [
+            'class' => Currency::class,
+            'choice_label' => function ($currency) {
+                return  $currency->getSymbol();
+            },
+            'required' => true,
+            'empty_data' => 'USD'
+        ])
         ;
 
         $callbackTransformer = CallbackTransformerFactory::create();
@@ -82,8 +70,7 @@ class PaymentType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Payment::class,
-            'tickerId' => 0
+            'data_class' => Payment::class
         ]);
     }
 }

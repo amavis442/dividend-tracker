@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Calendar;
-use App\Entity\Position;
+use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -50,13 +50,13 @@ class CalendarRepository extends ServiceEntityRepository
         return $paginator;
     }
 
-    public function getLastDividend(Position $position)
+    public function getLastDividend(Ticker $ticker)
     {
         $queryBuilder = $this->createQueryBuilder('c')
             ->select('c')
             ->innerJoin('c.ticker', 't')
             ->where('t = :ticker')
-            ->setParameter('ticker', $position->getTicker())
+            ->setParameter('ticker', $ticker)
             ->orderBy('c.exDividendDate', 'DESC')
             ->setMaxResults(1)
             ->getQuery();
