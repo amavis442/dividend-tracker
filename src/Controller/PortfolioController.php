@@ -14,14 +14,14 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
- * @Route("/dashboard/currentticker")
+ * @Route("/dashboard/portfolio")
  */
-class CurrentTickersController extends AbstractController
+class PortfolioController extends AbstractController
 {
-    public const SEARCH_KEY = 'currentticker_searchCriteria';
+    public const SEARCH_KEY = 'portfolio_searchCriteria';
 
     /**
-     * @Route("/list/{page<\d+>?1}", name="currenttickers_index", methods={"GET"})
+     * @Route("/list/{page<\d+>?1}", name="portfolio_index", methods={"GET"})
      */
     public function index(
         Summary $summary,
@@ -46,7 +46,7 @@ class CurrentTickersController extends AbstractController
         //[$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
         $posData = $positionRepository->test($tickerIds);
 
-        return $this->render('currenttickers/index.html.twig', [
+        return $this->render('portfolio/index.html.twig', [
             'tickers' => $items->getIterator(),
             'dividends' => $dividends,
             'positions' => $posData,
@@ -54,8 +54,8 @@ class CurrentTickersController extends AbstractController
             'maxPages' => $maxPages,
             'thisPage' => $thisPage,
             'searchCriteria' => $searchCriteria ?? '',
-            'routeName' => 'currenttickers_index',
-            'searchPath' => 'currenttickers_search',
+            'routeName' => 'portfolio_index',
+            'searchPath' => 'portfolio_search',
             /* 'numActivePosition' => $numActivePosition,
             'numPosition' => $numActivePosition,
             'numTickers' => $numTickers,
@@ -66,23 +66,23 @@ class CurrentTickersController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="currenttickers_show", methods={"GET"})
+     * @Route("/{id}", name="portfolio_show", methods={"GET"})
      */
     public function show(Ticker $ticker): Response
     {
-        return $this->render('currenttickers/show.html.twig', [
+        return $this->render('portfolio/show.html.twig', [
             'ticker' => $ticker,
         ]);
     }
 
     /**
-     * @Route("/search", name="currenttickers_search", methods={"POST"})
+     * @Route("/search", name="portfolio_search", methods={"POST"})
      */
     public function search(Request $request, SessionInterface $session): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');
         $session->set(self::SEARCH_KEY, $searchCriteria);
 
-        return $this->redirectToRoute('currenttickers_index');
+        return $this->redirectToRoute('portfolio_index');
     }
 }
