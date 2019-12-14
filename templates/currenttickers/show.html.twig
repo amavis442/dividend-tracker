@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ticker
+{% endblock %}
+
+{% block body %}
+    <h1>Ticker</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ ticker.id }}</td>
+            </tr>
+            <tr>
+                <th>Ticker</th>
+                <td>{{ ticker.ticker }}</td>
+            </tr>
+            <tr>
+                <th>Fullname</th>
+                <td>{{ ticker.fullname }}</td>
+            </tr>
+            <tr>
+                <th>Research info</th>
+                <td>
+                    {% for research in ticker.researches %}
+
+                        <p>
+                            <div class="card" style="width: 100%;">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        {{ research.title }}</h5>
+                                    <p class="card-text">{{ research.info|raw }}</p>
+                                    {% if research.hasFiles %}
+                                        <p>
+                                            {% for doc in research.files %}
+                                                <a href="{{ asset('uploads/documents/' ~ doc.filename) }}" target='_blank'>View document</a><br/>
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
+                                    <hr/>
+                                    <a href="{{ path('research_edit', {'id': research.id}) }}" class="card-link">
+                                        <i class="far fa-edit"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </p>
+                    {% else %}
+                        no records found
+                    {% endfor %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+        <div class="btn-group mr-2" role="group" aria-label="First group">
+            <a href="{{ path('currenttickers_index') }}" class="btn btn-secondary">
+                <i class="fas fa-angle-double-left"></i>
+                back to list</a>
+        </div>
+        <div class="btn-group mr-2" role="group" aria-label="Second group">
+            <a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit ticker">
+                <i class="far fa-edit"></i>
+            </a>
+            <a class="btn btn-primary" href="{{ path('research_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add research">
+                <i class="fab fa-searchengin"></i>
+            </a>
+        </div>
+    </div>
+    <hr/>
+    {{ include('ticker/_delete_form.html.twig') }}
+{% endblock %}

@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use DateTime;
-use App\Repository\PaymentRepository;
+use App\Service\Summary;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
@@ -25,8 +25,8 @@ class PositionController extends AbstractController
      * @Route("/list/{page}/{tab}/{orderBy}/{sort}", name="position_index", methods={"GET"})
      */
     public function index(
+        Summary $summary,
         PositionRepository $positionRepository,
-        PaymentRepository $paymentRepository,
         SessionInterface $session,
         int $page = 1,
         string $tab = 'All',
@@ -40,11 +40,7 @@ class PositionController extends AbstractController
             $sort = 'asc';
         }
 
-        $numActivePosition = $positionRepository->getTotalPositions();
-        $numTickers = $positionRepository->getTotalTickers();
-        $profit = $positionRepository->getProfit();
-        $totalDividend = $paymentRepository->getTotalDividend();
-        $allocated = $positionRepository->getSumAllocated();
+        [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
 
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
         $items = $positionRepository->getAll($page, $tab, 10, $orderBy, $sort, $searchCriteria);
@@ -60,17 +56,17 @@ class PositionController extends AbstractController
             'thisPage' => $thisPage,
             'order' => $orderBy,
             'sort' => $sort,
+            'searchCriteria' => $searchCriteria ?? '',
+            'routeName' => 'position_index',
+            'searchPath' => 'position_search',
+            'brokers' => $brokers,
+            'tab' => $tab,
             'numActivePosition' => $numActivePosition,
             'numPosition' => $numActivePosition,
             'numTickers' => $numTickers,
             'profit' => $profit,
             'totalDividend' => $totalDividend,
             'allocated' => $allocated,
-            'searchCriteria' => $searchCriteria ?? '',
-            'routeName' => 'position_index',
-            'searchPath' => 'position_search',
-            'brokers' => $brokers,
-            'tab' => $tab
         ]);
     }
 

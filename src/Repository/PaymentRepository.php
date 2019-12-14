@@ -81,4 +81,25 @@ class PaymentRepository extends ServiceEntityRepository
 
         return $result[0]['total'] / 100;
     }
+
+    public function getSumDividends(array $tickerIds)
+    {
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->select('SUM(p.dividend) total')
+            ->addSelect('t.id')
+            ->join('p.ticker','t')
+            ->where('t IN (:tickerIds)')
+            ->groupBy('p.ticker')
+            ->setParameter('tickerIds', $tickerIds)
+            ;
+
+        $result = $queryBuilder->getQuery()
+            ->getArrayResult(); 
+        $output = [];
+        foreach ($result as $item){
+            $output[$item['id']] = $item['total'];
+        }
+
+        return $output;
+    }
 }

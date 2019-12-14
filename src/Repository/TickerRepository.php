@@ -35,11 +35,9 @@ class TickerRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('t')
             ->select('t')
             ->join('t.branch', 'i')
-            ->leftJoin('t.positions','p')
             ->leftJoin('t.researches','r')
             ->leftJoin('t.DividendMonths','d')
             ->leftJoin('t.payments','pa')
-            ->leftJoin('t.calendars', 'c')
             ->groupBy('t.id')
             ->orderBy($order, $sort);
 
@@ -54,6 +52,40 @@ class TickerRepository extends ServiceEntityRepository
        
         $paginator = $this->paginate($query, $page, $limit);
 
+            
+
+        return $paginator;
+    }
+    
+    public function getCurrent(
+        int $page = 1,
+        int $limit = 10,
+        string $orderBy = 'ticker',
+        string $sort = 'ASC',
+        string $search = ''
+    ): Paginator {
+        $order = 't.' . $orderBy;
+        // Create our query
+        $queryBuilder = $this->createQueryBuilder('t','t')
+            ->select('t')
+            ->addSelect('i.label')
+            ->addSelect('SUM(p.amount) as units')
+            ->join('t.branch', 'i')
+            ->join('t.positions','p')
+            ->where('p.closed <> 1')
+            ->groupBy('t.id')
+            ->orderBy($order, $sort);
+
+        if (!empty($search)) {
+            $queryBuilder->where('t.ticker LIKE :search');
+            $queryBuilder->orWhere('i.label LIKE :search');
+            $queryBuilder->orWhere('t.fullname LIKE :search');
+            $queryBuilder->groupBy('t.ticker');
+            $queryBuilder->setParameter('search', $search . '%');
+        }
+        $query = $queryBuilder->getQuery();
+
+        $paginator = $this->paginate($query, $page, $limit);
         return $paginator;
     }
 
