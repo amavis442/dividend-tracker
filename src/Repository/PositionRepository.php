@@ -196,7 +196,8 @@ class PositionRepository extends ServiceEntityRepository
             ->join('t.calendars','c')
             ->where('c.paymentDate >= :currentDate')
             ->andWhere('p.closed <> 1')
-            ->orderBy('c.paymentDate')
+            ->groupBy('t')
+            ->orderBy('c.paymentDate', 'DESC')
             ->setParameter('currentDate', (new DateTime())->format('Y-m-d'))
             ->getQuery()
             ->getResult();

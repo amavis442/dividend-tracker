@@ -10,13 +10,10 @@
         <thead>
             <tr>
                 <th>Payment date</th>
-                
-                <th>Broker</th>
                 <th>
                     Ticker
                 </th>
                 <th>Industry</th>
-                <th>Units</th>
                 <th>
                     Buy date
                 </th>
@@ -45,13 +42,10 @@
                             </span>
                         {% endif %}
                     </td>
-                   
-                    <td>{{ position.broker }}</td>
                     <td>
                         {{ position.ticker.ticker }}
                     </td>
                     <td>{{ position.ticker.branch.label }}</td>
-                    <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
                     <td>
                         {{ position.buyDate|date("d-m-Y") }}
                         {% if position.closed %}
