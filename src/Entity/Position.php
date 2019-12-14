@@ -37,11 +37,6 @@ class Position
     private $ticker;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Payment", mappedBy="position")
-     */
-    private $payments;
-
-    /**
      * @ORM\Column(type="datetime", name="buy_date")
      */
     private $buyDate;
@@ -70,9 +65,6 @@ class Position
      * @ORM\Column(type="integer", nullable=true)
      */
     private $allocation;
-
-    /** @var int */
-    private $dividend = 0;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="positions")
@@ -146,38 +138,7 @@ class Position
 
         return $this;
     }
-
-    /**
-     * @return Collection|Payment[]
-     */
-    public function getPayments(): Collection
-    {
-        return $this->payments;
-    }
-
-    public function addPayment(Payment $payment): self
-    {
-        if (!$this->payments->contains($payment)) {
-            $this->payments[] = $payment;
-            $payment->setPosition($this);
-        }
-
-        return $this;
-    }
-
-    public function removePayment(Payment $payment): self
-    {
-        if ($this->payments->contains($payment)) {
-            $this->payments->removeElement($payment);
-            // set the owning side to null (unless already changed)
-            if ($payment->getPosition() === $this) {
-                $payment->setPosition(null);
-            }
-        }
-
-        return $this;
-    }
-
+  
     public function getBuyDate(): ?\DateTimeInterface
     {
         return $this->buyDate;
@@ -247,25 +208,6 @@ class Position
     public function getAllocated(): int
     {
         return (int) round(($this->amount * $this->price) / 10000);
-    }
-
-    public function getDividend(): int
-    {
-        $result = 0;
-        foreach ($this->payments as $payment) {
-            $result += $payment->getDividend();
-        }
-        $this->dividend = $result;
-        return $result;
-    }
-
-    public function getDividendYield(): float
-    {
-        $result = 0;
-        if ($this->dividend > 0 && $this->allocation > 0) {
-            $result = ($this->dividend / $this->allocation) * 100;
-        }
-        return $result;
     }
 
     public function getAllocation(): ?int

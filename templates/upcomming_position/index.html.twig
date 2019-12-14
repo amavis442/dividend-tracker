@@ -9,19 +9,14 @@
     <table class="table">
         <thead>
             <tr>
-                <th>
-                    Buy date
-                </th>
-                <th>Broker</th>
+                <th>Payment date</th>
                 <th>
                     Ticker
                 </th>
-                <th>Payment date</th>
                 <th>Industry</th>
-                <th>Amount</th>
-                <th>Price</th>
-                <th>Allocated</th>
-                <th>Dividend</th>
+                <th>
+                    Buy date
+                </th>
                 <th style="width:20%">actions</th>
             </tr>
         </thead>
@@ -31,20 +26,6 @@
                 {% set currentDividendData = position.ticker.getRecentDividendDate %}
                 {% set dividendDaysLeft = currentDividendData ? currentDividendData.getDaysLeft : -1 %}
                 <tr>
-                    <td>
-                        {{ position.buyDate|date("d-m-Y") }}
-                        {% if position.closed %}
-                            <br/><span class="badge badge-warning">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                Closed on
-                                {{ position.closeDate|date("d-m-Y")}}
-                            </span>
-                        {% endif %}
-                    </td>
-                    <td>{{ position.broker }}</td>
-                    <td>
-                        {{ position.ticker.ticker }}
-                    </td>
                     <td>
                         {% if dividendDaysLeft > -1 %}
                             {{ currentDividendData ? currentDividendData.getPaymentDate|date("d-m-Y"): '' }}<br/>
@@ -61,18 +42,22 @@
                             </span>
                         {% endif %}
                     </td>
-                    <td>{{ position.ticker.branch.label }}</td>
-
-                    <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
-                    <td>${{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
-                    <td>${{ (position.getAllocation/100)|format_number({fraction_digit: 2}) }}<br/>
-                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Allocation % based on total allocated amount">{{ allocated ? ((position.getAllocation / allocated ) * 100)|round(2, 'floor')|format_number({fraction_digit: 2}) : 0 }}%</span>
-                    </td>
-                    <td>${{ (position.getDividend/100)|format_number({fraction_digit: 2}) }}<br/>
-                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Dividend yield based on allocation not purchase price">{{ position.getDividendYield|format_number({fraction_digit: 2}) }}%</span>
-                    </td>
                     <td>
-                        <a class="btn btn-secondary" href="{{ path('payment_new', {'position': position.id}) }}" data-toggle="tooltip" data-placement="top" title="Add dividend payment"><span class="fas fa-money-bill-alt"/></a>
+                        {{ position.ticker.ticker }}
+                    </td>
+                    <td>{{ position.ticker.branch.label }}</td>
+                    <td>
+                        {{ position.buyDate|date("d-m-Y") }}
+                        {% if position.closed %}
+                            <br/><span class="badge badge-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Closed on
+                                {{ position.closeDate|date("d-m-Y")}}
+                            </span>
+                        {% endif %}
+                    </td>                    
+                    <td>
+                        <a class="btn btn-secondary" href="{{ path('payment_new', {'ticker': position.ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="Add dividend payment"><span class="fas fa-money-bill-alt"/></a>
                         <a href="{{ path('position_show', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details position">
                             <i class="fas fa-book-open"></i>
                         </a>

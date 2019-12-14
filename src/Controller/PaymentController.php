@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Payment;
-use App\Entity\Position;
+use App\Entity\Ticker;
 use App\Form\PaymentType;
 use App\Repository\PaymentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,6 +14,7 @@ use App\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use DateTime;
 use App\Repository\CalendarRepository;
+use App\Repository\TickerRepository;
 
 /**
  * @Route("/dashboard/payment")
@@ -79,32 +80,28 @@ class PaymentController extends AbstractController
     }
 
     /**
-     * @Route("/new/{position}", name="payment_new", methods={"GET","POST"})
+     * @Route("/new/{ticker}", name="payment_new", methods={"GET","POST"})
      */
-    public function new(Request $request, CalendarRepository $calendarRepository, ?Position $position = null): Response
+    public function new(Request $request, CalendarRepository $calendarRepository, TickerRepository $tickerRepository, Ticker $ticker): Response
     {
-        $tickerId = 0;
+        $units  = $tickerRepository->getActiveUnits($ticker);
+        
         $payment = new Payment();
-        if ($position instanceof Position) {
-            $payment->setPosition($position);
-            $payment->setStocks($position->getAmount());
-            $tickerId = $position->getTicker()->getId();
-            $calendar = $calendarRepository->getLastDividend($position);
-            $payment->setTicker($position->getTicker());
-            if ($calendar) {
-                $payment->setCalendar($calendar);
-                $payment->setDividend($calendar->getCashAmount());
-            }
+        $payment->setTicker($ticker);
+        $payment->setStocks($units);
+        $calendar = $calendarRepository->getLastDividend($ticker);
+        if ($calendar) {
+            $payment->setCalendar($calendar);
+            $payment->setDividend($calendar->getCashAmount());
         }
-        $payment->setPayDate(new DateTime());
+       $payment->setPayDate(new DateTime());
 
-        $form = $this->createForm(PaymentType::class, $payment, ['tickerId' => $tickerId]);
+        $form = $this->createForm(PaymentType::class, $payment);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
-            $position = $payment->getPosition();
-            $payment->setTicker($position->getTicker());
+            $payment->setTicker($ticker);
 
             $entityManager->persist($payment);
             $entityManager->flush();
@@ -137,10 +134,7 @@ class PaymentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $position = $payment->getPosition();
-            $payment->setTicker($position->getTicker());
             $this->getDoctrine()->getManager()->flush();
-
             return $this->redirectToRoute('payment_index');
         }
 

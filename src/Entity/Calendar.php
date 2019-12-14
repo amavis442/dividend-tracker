@@ -2,8 +2,6 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
 
@@ -46,9 +44,10 @@ class Calendar
     private $cashAmount;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Payment", mappedBy="calendar")
+     * @ORM\OneToOne(targetEntity="App\Entity\Payment", mappedBy="calendar")
+     * @ORM\JoinColumn(nullable=true)
      */
-    private $payments;
+    private $payment;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="calendars")
@@ -60,11 +59,6 @@ class Calendar
      * @ORM\ManyToOne(targetEntity="App\Entity\Currency")
      */
     private $currency;
-
-    public function __construct()
-    {
-        $this->payments = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -147,32 +141,17 @@ class Calendar
     }
 
     /**
-     * @return Collection|Payment[]
+     * @return null|Payment
      */
-    public function getPayments(): Collection
+    public function getPayment(): ?Payment
     {
-        return $this->payments;
+        return $this->payment;
     }
 
-    public function addPayment(Payment $payment): self
+    public function setPayment(Payment $payment): self
     {
-        if (!$this->payments->contains($payment)) {
-            $this->payments[] = $payment;
-            $payment->setCalendar($this);
-        }
-
-        return $this;
-    }
-
-    public function removePayment(Payment $payment): self
-    {
-        if ($this->payments->contains($payment)) {
-            $this->payments->removeElement($payment);
-            // set the owning side to null (unless already changed)
-            if ($payment->getCalendar() === $this) {
-                $payment->setCalendar(null);
-            }
-        }
+        $this->payment = $payment;
+        $payment->setCalendar($this);
 
         return $this;
     }

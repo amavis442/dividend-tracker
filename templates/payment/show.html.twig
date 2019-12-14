@@ -8,18 +8,17 @@
     <table class="table">
         <tbody>
             <tr>
-                <th>Position</th>
-                <td>{{ payment.position.ticker.fullname }} ({{ payment.position.ticker.ticker }})</td>
+                <th>Ticker</th>
+                <td>{{ payment.ticker.fullname }} ({{ payment.ticker.ticker }})</td>
+            </tr>
+            <tr>
+                <th>Industry</th>
+                <td>{{ payment.ticker.branch.label }}</td>
             </tr>
             <tr>
                 <th>Payment date</th>
                 <td>{{ payment.payDate ? payment.payDate|date('Y-m-d') : '' }}</td>
             </tr>
-            <tr>
-                <th>Industry</th>
-                <td>{{ payment.position.ticker.branch.label }}</td>
-            </tr>
-
             <tr>
                 <th>Units</th>
                 <td>{{ payment.stocks/100|format_number({fraction_digit: 2})  }}</td>

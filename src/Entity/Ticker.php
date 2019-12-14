@@ -362,4 +362,21 @@ class Ticker
 
         return $this;
     }
+
+    
+    public function getActiveUnits(): int
+    {
+        $units = 0;
+        if ($this->positions) {
+            foreach ($this->positions as $position)
+            {
+                if ($position->getClosed() === 1) {
+                    continue;   
+                }
+                $units += $position->getAmount();
+            }
+        }
+        return $units;
+    }
+    
 }

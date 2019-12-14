@@ -29,18 +29,13 @@ class Payment
     private $dividend;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Position", inversedBy="payments")
-     */
-    private $position;
-
-    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Ticker", inversedBy="payments")
      * @ORM\JoinColumn(nullable=false)
      */
     private $ticker;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Calendar", inversedBy="payments")
+     * @ORM\OneToOne(targetEntity="App\Entity\Calendar", inversedBy="payment")
      * @ORM\JoinColumn(nullable=true)
      */
     private $calendar;
@@ -87,18 +82,6 @@ class Payment
     public function setDividend(int $dividend): self
     {
         $this->dividend = $dividend;
-
-        return $this;
-    }
-
-    public function getPosition(): ?Position
-    {
-        return $this->position;
-    }
-
-    public function setPosition(?Position $position): self
-    {
-        $this->position = $position;
 
         return $this;
     }

@@ -28,12 +28,9 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Broker</th>
                 <th>Ticker</th>
                 <th>Industry</th>
                 <th>Units</th>
-                <th>Buy price</th>
                 <th>Pay date</th>
                 <th>Dividend($)</th>
                 <th>actions</th>
@@ -42,12 +39,9 @@
         <tbody>
             {% for payment in payments %}
                 <tr>
-                    <td>{{ payment.id }}</td>
-                    <td>{{ payment.position.broker }}</td>
-                    <td>{{ payment.position.ticker.fullname }} ({{ payment.position.ticker.ticker }})</td>
-                    <td>{{ payment.position.ticker.branch.label }}</td>
+                    <td>{{ payment.ticker.fullname }} ({{ payment.ticker.ticker }})</td>
+                    <td>{{ payment.ticker.branch.label }}</td>
                     <td>{{ payment.stocks/100|format_number({fraction_digit: 2}) }}</td>
-                    <td>{{ payment.position.currency.sign|raw }}{{ payment.position.price/100 }}</td>
                     <td>{{ payment.payDate ? payment.payDate|date('d-m-Y') : '' }}</td>
                     <td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend/100)|format_number({fraction_digit: 2}) }}</td>
                     <td>
@@ -61,20 +55,18 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="10">no records found</td>
+                    <td colspan="7">no records found</td>
                 </tr>
             {% endfor %}
             <tr>
-                <td colspan="6"></td>
+                <td colspan="3"></td>
                 <td>
                     <span style="font-weight:bold">Total dividend</span>
                 </td>
                 <td>&euro; {{ dividends }}</td>
+                <td></td>
             </tr>
         </tbody>
     </table>
     {% include 'paginator.html.twig' %}
-    <a class="btn btn-primary" href="{{ path('payment_new') }}">
-        <i class="fas fa-plus"></i>
-    </i>
-</a>{% endblock %}
+    {% endblock %}

@@ -81,7 +81,7 @@ class PositionRepository extends ServiceEntityRepository
             ->select('p')
             ->innerJoin('p.ticker', 't')
             ->innerJoin('t.branch', 'i')
-            ->leftJoin('p.payments', 'pa')
+            ->leftJoin('t.payments', 'pa')
             ->orderBy($order, $sort);
         if ($broker <> 'All') {
             $queryBuilder->andWhere('p.broker = :broker')
@@ -118,7 +118,7 @@ class PositionRepository extends ServiceEntityRepository
                 'SUM(pa.dividend) sumDividend'
             ])
             ->innerJoin('p.ticker', 't')
-            ->leftJoin('p.payments', 'pa')
+            ->leftJoin('t.payments', 'pa')
             ->groupBy('t.ticker')
             ->orderBy($order, $sort)
             ->where('p.closed <> 1 or p.closed is null');
@@ -196,9 +196,42 @@ class PositionRepository extends ServiceEntityRepository
             ->join('t.calendars','c')
             ->where('c.paymentDate >= :currentDate')
             ->andWhere('p.closed <> 1')
-            ->orderBy('c.paymentDate')
+            ->groupBy('t')
+            ->orderBy('c.paymentDate', 'DESC')
             ->setParameter('currentDate', (new DateTime())->format('Y-m-d'))
             ->getQuery()
             ->getResult();
+    }
+
+    public function test(array $tickerIds): array
+    {
+        $result =  $this->createQueryBuilder('p')
+            ->select([
+                'p.price',
+                'p.amount',
+                'IDENTITY(p.ticker) as tickerId'
+                ])
+            
+            ->where('p.closed <> 1')
+            ->join("p.ticker",'t')
+            ->andWhere('t IN (:tickerIds)')
+            ->setParameter('tickerIds', $tickerIds)
+            ->getQuery()->getArrayResult();
+            
+            $output = [];
+            foreach ($result as $item){
+                if (!isset($output[$item['tickerId']])) {
+                    $output[$item['tickerId']] = [];
+                    $output[$item['tickerId']]['allocation'] = 0;
+                    $output[$item['tickerId']]['units'] = 0;
+                }
+                $price = $item['price'] / 100;
+                $units = $item['amount'] / 100;   
+
+                $allocation = $price * $units;
+                $output[$item['tickerId']]['allocation'] += $allocation;
+                $output[$item['tickerId']]['units'] += $units;
+            }
+            return $output;
     }
 }
