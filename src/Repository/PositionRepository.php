@@ -205,17 +205,31 @@ class PositionRepository extends ServiceEntityRepository
     public function test(array $tickerIds): array
     {
         $result =  $this->createQueryBuilder('p')
-            ->select('t.id, AVG(p.price) as buy, SUM((p.amount /100) * p.price) as allocation, p.allocation as alli')
+            ->select([
+                'p.price',
+                'p.amount',
+                'IDENTITY(p.ticker) as tickerId'
+                ])
+            
             ->where('p.closed <> 1')
             ->join("p.ticker",'t')
             ->andWhere('t IN (:tickerIds)')
             ->setParameter('tickerIds', $tickerIds)
-            ->groupBy('p.ticker')
             ->getQuery()->getArrayResult();
             
             $output = [];
             foreach ($result as $item){
-                $output[$item['id']] = $item;
+                if (!isset($output[$item['tickerId']])) {
+                    $output[$item['tickerId']] = [];
+                    $output[$item['tickerId']]['allocation'] = 0;
+                    $output[$item['tickerId']]['units'] = 0;
+                }
+                $price = $item['price'] / 100;
+                $units = $item['amount'] / 100;   
+
+                $allocation = $price * $units;
+                $output[$item['tickerId']]['allocation'] += $allocation;
+                $output[$item['tickerId']]['units'] += $units;
             }
             return $output;
     }

@@ -5,8 +5,6 @@
 {% block body %}
     <h1>Portfolio</h1>
     
-    <br/>
-    <br/>
     {% include '_search_form.html.twig' %}
 
     <table class="table">
@@ -31,14 +29,16 @@
             {% set units = tickerData.units %}
             {% set dividend = dividends[tickerId] ?? 0 %}
             {% set posData = positions[tickerId] %}
+            {% set avgPrice = posData.allocation / posData.units %}
+            
             <tr>
                 <td>{{ ticker.id }}</td>
                 <td>{{ ticker.ticker }}</td>
                 <td>{{ ticker.fullname }}</td>
                 <td>{{ branchLabel}}</td>
                 <td>{{ (units/100)|format_number({fraction_digit: 2}) }}</td>
-                <td>{{ posData.buy/100|format_number({fraction_digit: 2}) }}</td>
-                <td>{{ posData.allocation/100|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ avgPrice|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ posData.allocation|format_number({fraction_digit: 2}) }}</td>
                 <td>&euro;{{ (dividend/100)|format_number({fraction_digit: 2}) }}</td>
                 <td>
                     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
