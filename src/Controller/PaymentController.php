@@ -49,14 +49,7 @@ class PaymentController extends AbstractController
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
-        /*
-        if ($page > 1) {
-            $tab = $session->get(self::INTERVAL_KEY, $tab);
-        }
-        if ($page == 1) {
-            $session->set(self::INTERVAL_KEY, $tab);
-        }
-        */
+
         [$startDate, $endDate] = (new DateHelper())->getInterval($tab);
         if ($tab === 'All') {
             $startDate = null;

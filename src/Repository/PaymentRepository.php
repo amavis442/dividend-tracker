@@ -103,4 +103,50 @@ class PaymentRepository extends ServiceEntityRepository
 
         return $output;
     }
+
+    public function getDividendsPerInterval(string $interval = 'Month'): array
+    {
+        $con = $this->getEntityManager()->getConnection();
+        
+        $sql = 'SELECT YEAR(p.pay_date) periodYear, MONTH(p.pay_date) as periodMonth, SUM(p.dividend) dividend from payment p GROUP BY YEAR(p.pay_date), MONTH(p.pay_date)';
+        
+        $result = $con->fetchAll($sql);
+
+        $sql = 'SELECT YEAR(MIN(p.pay_date)) as startdate from payment p GROUP BY YEAR(p.pay_date) LIMIT 1';
+        $years = $con->fetchAll($sql);
+        $currentYear = date('Y');
+        $startYear = $years[0]['startdate'] ?? $currentYear;
+
+        $output = [];
+        $accumulative = 0;
+        foreach ($result as $item) {
+            $period = $item['periodYear'].sprintf('%02d',$item['periodMonth']);
+            $output[$period]['dividend'] = (int)$item['dividend'];
+            $accumulative += $item['dividend'];
+            $output[$period]['accumulative'] = $accumulative;
+        }
+
+        for ($year = (int)$startYear; $year < (int)$currentYear + 1; $year++) {
+            for ($i = 1; $i < 13;$i++) {
+                $period = $year.sprintf('%02d',$i);
+                if (!isset($output[$period])){
+                    $output[$period]['dividend'] = 0;
+                    $output[$period]['accumulative'] = 0;
+                }
+
+                if ($output[$period]['accumulative'] === 0) {
+                    $previousPeriod = $period;
+                    if ($i > 1) { 
+                        $previousPeriod = $year.sprintf('%02d',($i-1));
+                    }
+                    if ($year > (int)$startYear && $i === 1){
+                        $previousPeriod = ($year-1).'12';
+                    }
+                    $output[$period]['accumulative'] = $output[$previousPeriod]['accumulative'];
+                }
+            }
+        }
+        ksort($output);
+        return $output; 
+    }
 }

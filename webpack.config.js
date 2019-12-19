@@ -26,6 +26,7 @@ Encore
     .addEntry('app', './assets/js/app.js')
     //.addEntry('webfonts', './assets/js/webfonts.js')
     .addEntry('fileupload', './assets/js/fileupload.js')
+    .addEntry('chart', './assets/js/chart.js')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
