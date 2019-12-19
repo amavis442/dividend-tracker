@@ -24,7 +24,7 @@ class PaymentRepository extends ServiceEntityRepository
         parent::__construct($registry, Payment::class);
     }
 
-    private function getInterval(QueryBuilder $queryBuilder, int $interval)
+    private function getInterval(QueryBuilder $queryBuilder, string $interval)
     {
         [$startDate, $endDate] = (new DateHelper())->getInterval($interval);
         $queryBuilder->andWhere('p.payDate >= :startDate and p.payDate <= :endDate');
@@ -33,11 +33,11 @@ class PaymentRepository extends ServiceEntityRepository
 
     public function getAll(
         int $page = 1,
+        string $interval = 'All',
         int $limit = 10,
         string $orderBy = 'exDividendDate',
         string $sort = 'DESC',
-        string $search = '',
-        int $interval = 0
+        string $search = ''
     ): Paginator {
         $order = 'p.' . $orderBy;
         if ($orderBy === 'ticker') {
@@ -53,7 +53,7 @@ class PaymentRepository extends ServiceEntityRepository
             ->leftJoin('p.calendar', 'c')
             ->orderBy($order, $sort);
 
-        if ($interval > 0) {
+        if ($interval !== 'All') {
             $this->getInterval($queryBuilder, $interval);
         }
         if (!empty($search)) {
@@ -67,12 +67,13 @@ class PaymentRepository extends ServiceEntityRepository
         return $paginator;
     }
 
-    public function getTotalDividend(int $interval = 0): ?float
+    public function getTotalDividend(string $interval = 'All'): ?float
     {
+
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('SUM(p.dividend) total');
 
-        if ($interval > 0) {
+        if ($interval !== 'All') {
             $this->getInterval($queryBuilder, $interval);
         }
 

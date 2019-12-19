@@ -15,7 +15,7 @@
     <ul class="nav nav-tabs">
         {% for broker in brokers %}
         <li class="nav-item">
-            <a class="nav-link {% if broker == tab %}active{% endif %}" href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'tab': broker, 'orderBy': order, 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ broker }}</a>
+            <a class="nav-link {% if broker == tab %}active{% endif %}" href="{{ path('position_index', {'page': 1, 'tab': broker, 'orderBy': order, 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ broker }}</a>
         </li>
         {% endfor %}
     </ul>

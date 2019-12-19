@@ -6,23 +6,23 @@ use DateTime;
 
 class DateHelper
 {
-    public function getInterval(int $interval): array
+    public function getInterval(string $interval): array
     {
         $currentDate = new DateTime();
         $startDate = new DateTime();
         $endDate = new DateTime();
         switch ($interval) {
-            case 1: // year
+            case 'Year': // year
                 $startDate = new DateTime($currentDate->format('Y') . '-01-01');
                 break;
-            case 2: // month
+            case 'Month': // month
                 $startDate->modify('last day of previous month');
                 $startDate->modify('+1 day');
                 break;
-            case 3: // week
+            case 'Week': // week
                 $startDate->modify('monday this week');
                 break;
-            case 4: // quaterly
+            case 'Quator': // quaterly
                 $startDate = $this->lastQuater($currentDate);
                 break;
         }

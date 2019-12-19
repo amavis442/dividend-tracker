@@ -25,7 +25,7 @@ class PaymentController extends AbstractController
     public const INTERVAL_KEY = 'payment_interval';
 
     /**
-     * @Route("/list/{page}/{orderBy}/{sort}/{interval}", name="payment_index", methods={"GET"})
+     * @Route("/list/{page}/{tab}/{orderBy}/{sort}", name="payment_index", methods={"GET"})
      */
     public function index(
         PaymentRepository $paymentRepository,
@@ -33,7 +33,7 @@ class PaymentController extends AbstractController
         int $page = 1,
         string $orderBy = 'payDate',
         string $sort = 'DESC',
-        int $interval = 0
+        string $tab = 'All'
     ): Response {
         if (!in_array($orderBy, ['payDate', 'ticker'])) {
             $orderBy = 'exDividendDate';
@@ -42,23 +42,23 @@ class PaymentController extends AbstractController
             $sort = 'DESC';
         }
 
-        $totalDividend = $paymentRepository->getTotalDividend($interval);
+        $totalDividend = $paymentRepository->getTotalDividend($tab);
 
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
-        $items = $paymentRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria, $interval);
+        $items = $paymentRepository->getAll($page, $tab, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
-
+        /*
         if ($page > 1) {
-            $interval = $session->get(self::INTERVAL_KEY, $interval);
+            $tab = $session->get(self::INTERVAL_KEY, $tab);
         }
         if ($page == 1) {
-            $session->set(self::INTERVAL_KEY, $interval);
+            $session->set(self::INTERVAL_KEY, $tab);
         }
-        [$startDate, $endDate] = (new DateHelper())->getInterval($interval);
-        if ($interval === 0)
-        {
+        */
+        [$startDate, $endDate] = (new DateHelper())->getInterval($tab);
+        if ($tab === 'All') {
             $startDate = null;
         } 
         
@@ -70,12 +70,12 @@ class PaymentController extends AbstractController
             'thisPage' => $thisPage,
             'order' => $orderBy,
             'sort' => $sort,
+            'tab' => $tab,
             'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'payment_index',
             'searchPath' => 'payment_search',
             'startDate' => $startDate,
-            'endDate' => $endDate,
-            'interval' => $interval,
+            'endDate' => $endDate
         ]);
     }
 

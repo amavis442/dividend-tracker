@@ -8,19 +8,19 @@
 
     <ul class="nav nav-pills">
         <li class="nav-item">
-            <a href="{{ path('payment_index', {'interval': 0}) }}" class="nav-link {{ interval == 0? 'active' : ''}}">All</a>
+            <a href="{{ path('payment_index', {'tab': 'All'}) }}" class="nav-link {{ tab == 'All'? 'active' : ''}}">All</a>
         </li>
         <li class="nav-item">
-            <a href="{{ path('payment_index', {'interval': 1}) }}" class="nav-link {{ interval == 1? 'active' : ''}}">Year</a>
+            <a href="{{ path('payment_index', {'tab': 'Year'}) }}" class="nav-link {{ tab == 'Year'? 'active' : ''}}">Year</a>
         </li>
         <li class="nav-item">
-            <a href="{{ path('payment_index', {'interval': 2}) }}" class="nav-link {{ interval == 2? 'active' : ''}}">Month</a>
+            <a href="{{ path('payment_index', {'tab': 'Month'}) }}" class="nav-link {{ tab == 'Month'? 'active' : ''}}">Month</a>
         </li>
         <li class="nav-item">
-            <a href="{{ path('payment_index', {'interval': 3}) }}" class="nav-link {{ interval == 3? 'active' : ''}}">Week</a>
+            <a href="{{ path('payment_index', {'tab': 'Week'}) }}" class="nav-link {{ tab == 'Week'? 'active' : ''}}">Week</a>
         </li>
         <li class="nav-item">
-            <a href="{{ path('payment_index', {'interval': 4}) }}" class="nav-link {{ interval == 4? 'active' : ''}}">Quater</a>
+            <a href="{{ path('payment_index', {'tab': 'Quator'}) }}" class="nav-link {{ tab == 'Quator'? 'active' : ''}}">Quater</a>
         </li>
     </ul>
     <br/>
@@ -61,7 +61,7 @@
             <tr>
                 <td colspan="3"></td>
                 <td>
-                    <span style="font-weight:bold">Total dividend</span>
+                    <span style="font-weight:bold">Total dividend {% if tab > 'All' %}this {{ tab }} {% endif %}</span>
                 </td>
                 <td>&euro; {{ dividends }}</td>
                 <td></td>
