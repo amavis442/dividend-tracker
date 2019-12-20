@@ -3,51 +3,27 @@
 {% block title %}Tickers per month dividendschema!
 {% endblock %}
 
-
-
 {% block body %}
-    <div style='width:900px;height:600px' class="col col-xs-12">
-        <canvas id="myChart" ></canvas>
-    </div>
-{% endblock %}
+    <h1>Tickers per month dividendschema</h1>
 
-{% block javascripts %}
-    {{ encore_entry_script_tags('chart') }}
-    {{ encore_entry_script_tags('app') }}
-<script>
-var ctx = document.getElementById('myChart').getContext('2d');
-var myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: {{ labels }},
-        datasets: [{
-            label: 'Dividend',
-            data: {{ dividends }},
-            borderColor: 'rgba(255, 99, 132, 0.2)'
-        }, {
-            label: 'Accumulative',
-            data: {{ accumulative}},
-            borderColor: 'rgba(54, 162, 235, 0.2)'
-        }]
-    },
-    options: {
-       title: {
-            display: true,
-            fontSize: 24,
-            text: 'Dividends received in euro'
-        },
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true,
-                    callback: function(value, index, values) {
-                        return '€' + value;
-                    }
-                }
-            }]
-        }
-    }
-});
-</script>
+    {% set rowColumns = 4 %}
+    {% set numColumns = 0 %}
+
+    {% for m in data %}
+            {% if numColumns in [0] %}
+                <div class="row">
+            {% endif %}
+
+            {% include 'report/dividendmonth/_card.html.twig' %}
+
+            {% set numColumns = numColumns + 1 %}
+            
+            {% if numColumns in [rowColumns] %}
+            </div>
+            <br/>
+            {% set numColumns = 0 %}
+        {% endif %}
+    {% endfor %}
+
 
 {% endblock %}
