@@ -6,7 +6,7 @@
         <div class="card-body">
             {% for t in m.tickers %}
                 {% if t.hasOpenPositions %}
-                    <p class="card-text">{{ t.ticker }}</p>
+                    <p class="card-text"><a href="{{ path('calendar_new', {'ticker': t.id}) }}"><i class="far fa-calendar-alt"></i> {{ t.ticker }}</a></p>
                 {% endif %}
             {% endfor %}
         </div>
