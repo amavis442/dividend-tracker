@@ -57,11 +57,10 @@ class PaymentRepository extends ServiceEntityRepository
             $this->getInterval($queryBuilder, $interval);
         }
         if (!empty($search)) {
-            $queryBuilder->where('t.ticker LIKE :search');
+            $queryBuilder->andWhere('t.ticker LIKE :search');
             $queryBuilder->setParameter('search', $search . '%');
         }
         $query = $queryBuilder->getQuery();
-
         $paginator = $this->paginate($query, $page, $limit);
 
         return $paginator;
