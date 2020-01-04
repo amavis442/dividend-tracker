@@ -21,19 +21,24 @@ class PortfolioController extends AbstractController
     public const SEARCH_KEY = 'portfolio_searchCriteria';
 
     /**
-     * @Route("/list/{page<\d+>?1}", name="portfolio_index", methods={"GET"})
+     * @Route("/list/{page<\d+>?1}/{orderBy}/{sort}", name="portfolio_index", methods={"GET"})
      */
     public function index(
-        Summary $summary,
         TickerRepository $tickerRepository, 
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
         SessionInterface $session, 
         int $page = 1, 
-        string $orderBy = 'ticker', 
+        string $orderBy = 'branch.label', 
         string $sort = 'asc'
     ): Response
     {
+        if (!in_array($orderBy, ['ticker.ticker','ticker.fullname','branch.label'])) {
+            $orderBy = 'branch.label';
+        }
+        if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
+            $sort = 'asc';
+        }
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
         $items = $tickerRepository->getCurrent($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
@@ -44,7 +49,7 @@ class PortfolioController extends AbstractController
         $tickerIds = array_keys($iter->getArrayCopy());
         $dividends = $paymentRepository->getSumDividends($tickerIds);
         //[$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
-        $posData = $positionRepository->test($tickerIds);
+        $posData = $positionRepository->getAllocationsAndUnits($tickerIds);
 
         return $this->render('portfolio/index.html.twig', [
             'tickers' => $items->getIterator(),
@@ -53,6 +58,8 @@ class PortfolioController extends AbstractController
             'limit' => $limit,
             'maxPages' => $maxPages,
             'thisPage' => $thisPage,
+            'order' => $orderBy,
+            'sort' => $sort,
             'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'portfolio_index',
             'searchPath' => 'portfolio_search',

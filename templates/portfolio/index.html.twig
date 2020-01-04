@@ -10,10 +10,10 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Ticker</th>
-                <th>Fullname</th>
+                <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker.ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a></th>
+                <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker.fullname', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Fullname</a></th>
                 <th>Units</th>
-                <th>Industry</th>
+                <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'branch.label', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Industry</a></th>
                 <th>Average price</th>
                 <th>Allocation</th>
                 <th>Dividends</th>

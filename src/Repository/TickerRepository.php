@@ -60,11 +60,19 @@ class TickerRepository extends ServiceEntityRepository
     public function getCurrent(
         int $page = 1,
         int $limit = 10,
-        string $orderBy = 'ticker',
+        string $orderBy = 'branch.label',
         string $sort = 'ASC',
         string $search = ''
     ): Paginator {
-        $order = 't.' . $orderBy;
+        [$orderTable, $orderColumn]  = explode('.',$orderBy);
+
+        if ($orderTable == 'ticker') {
+            $order = 't.' . $orderColumn;
+        }
+        if ($orderTable == 'branch'){
+            $order = 'i.'. $orderColumn;
+        }
+
         // Create our query
         $queryBuilder = $this->createQueryBuilder('t','t')
             ->select('t')

@@ -203,7 +203,7 @@ class PositionRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function test(array $tickerIds): array
+    public function getAllocationsAndUnits(array $tickerIds): array
     {
         $result =  $this->createQueryBuilder('p')
             ->select([
