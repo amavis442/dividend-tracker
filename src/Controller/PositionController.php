@@ -74,7 +74,7 @@ class PositionController extends AbstractController
     /**
      * @Route("/new/{ticker}", name="position_new", methods={"GET","POST"})
      */
-    public function new(Request $request, ?Ticker $ticker = null): Response
+    public function new(Request $request, ?Ticker $ticker = null, SessionInterface $session): Response
     {
         $position = new Position();
 
@@ -91,8 +91,9 @@ class PositionController extends AbstractController
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($position);
             $entityManager->flush();
-
-            return $this->redirectToRoute('position_index');
+            $session->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
+            $session->set(PortfolioController::SEARCH_KEY, $position->getTicker()->getTicker());
+            return $this->redirectToRoute('portfolio_index');
         }
 
         return $this->render('position/new.html.twig', [
@@ -114,7 +115,7 @@ class PositionController extends AbstractController
     /**
      * @Route("/{id}/edit/{closed<\d+>?0}", name="position_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Position $position, ?int $closed): Response
+    public function edit(Request $request, Position $position, ?int $closed, SessionInterface $session): Response
     {
         if ($closed === 1) {
             $position->setClosed(true);
@@ -126,7 +127,7 @@ class PositionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
-
+            $session->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
             return $this->redirectToRoute('position_index');
         }
 
