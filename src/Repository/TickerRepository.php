@@ -85,9 +85,13 @@ class TickerRepository extends ServiceEntityRepository
             ->orderBy($order, $sort);
 
         if (!empty($search)) {
-            $queryBuilder->where('t.ticker LIKE :search');
-            $queryBuilder->orWhere('i.label LIKE :search');
-            $queryBuilder->orWhere('t.fullname LIKE :search');
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->orX(
+                    't.ticker LIKE :search',
+                    'i.label LIKE :search',
+                    't.fullname LIKE :search'
+                    )
+                );        
             $queryBuilder->groupBy('t.ticker');
             $queryBuilder->setParameter('search', $search . '%');
         }
