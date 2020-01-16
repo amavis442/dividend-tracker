@@ -44,7 +44,7 @@ class PositionType extends AbstractType
                 'widget' => 'single_text',
             ])
             ->add('amount', TextType::class, ['help' =>'use decimal point if you hava a fraction of a stock','label' =>'Units'])
-            ->add('price', TextType::class, ['label' =>'Price'])
+            ->add('price', TextType::class, ['label' =>'Price','help' =>'What was the stock price and not what you paid'])
             ->add('currency', EntityType::class, [
                 'class' => Currency::class,
                 'choice_label' => function ($currency) {
@@ -53,7 +53,7 @@ class PositionType extends AbstractType
                 'required' => true,
                 'empty_data' => 'USD'
             ])
-            ->add('allocation', TextType::class, ['label' =>'Allocation'])
+            ->add('allocation', TextType::class, ['label' =>'Allocation','help' =>'What was what you paid in total for this position'])
             ->add('allocation_currency', EntityType::class, [
                 'class' => Currency::class,
                 'choice_label' => function ($currency) {
