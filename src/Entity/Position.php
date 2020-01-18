@@ -109,6 +109,12 @@ class Position
                 ->atPath('price')
                 ->addViolation();
         }
+
+        if (empty($this->amount) || $this->amount === 0) {
+            $context->buildViolation('Amount can not be empty or zero!')
+                ->atPath('amount')
+                ->addViolation();
+        }
     }
     public function getId(): ?int
     {
