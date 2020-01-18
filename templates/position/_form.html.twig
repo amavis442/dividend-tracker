@@ -1,95 +1,103 @@
 {{ form_start(form) }}
-    {{ form_errors(form) }}
+{{ form_errors(form) }}
 <div class="accordion" id="accordionPosition">
-    <div class="card">
-        <div class="card-header" id="headingOne">
-            <h2 class="mb-0">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                Position
-                </button>
-            </h2>
-        </div>
-        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionPosition">
-            <div class="card-body">
+	<div class="card">
+		<div class="card-header" id="headingOne">
+			<h2 class="mb-0">
+				<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+					Position
+				</button>
+			</h2>
+		</div>
+		<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionPosition">
+			<div class="card-body">
 
-                <div class="row">
-                    <div class="col">
-                        {{ form_row(form.ticker) }}
-                    </div>
-                    <div class="col">
-                        {{ form_row(form.broker) }}
-                    </div>
-                </div>
+				<div class="row">
+					<div class="col">
+						{{ form_row(form.ticker) }}
+					</div>
+					<div class="col">
+						{{ form_row(form.broker) }}
+					</div>
+				</div>
 
-                <div class="row">
-                    <div class="col">
-                        {{ form_row(form.buyDate) }}
-                    </div>
-                    <div class="col">
-                        {{ form_row(form.amount) }}
-                    </div>
-                </div>
+				<div class="row">
+					<div class="col">
+						{{ form_row(form.buyDate) }}
+					</div>
+					<div class="col">
+						{{ form_row(form.amount) }}
+					</div>
+				</div>
 
-                <div class="row">
-                    <div class="col">
-                        {{ form_label(form.price) }} 
-                        <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    {{ form_widget(form.currency) }}
-                                </div>
-                                {{ form_widget(form.price) }}
-                        </div>
-                    </div>
-                </div>
+				<div class="row">
+					<div class="col">
+						{{ form_label(form.price) }}
+						<div class="input-group mb-3">
+							<div class="input-group-prepend">
+								{{ form_widget(form.currency) }}
+							</div>
+							<div class="form-group">
+								{{ form_widget(form.price) }}
+								{{ form_help(form.price)}}
+							</div>
+						</div>
+					</div>
+				</div>
 
-                <div class="row">
-                    <div class="col">
-                        {{ form_label(form.allocation) }} 
-                        <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    {{ form_widget(form.allocation_currency) }}
-                                </div>
-                                {{ form_widget(form.allocation) }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="card">
-        <div class="card-header" id="headingTwo">
-            <h2 class="mb-0">
-                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                    Close position?
-                </button>
-            </h2>
-        </div>
-        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionPosition">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col">
-                        {{ form_row(form.closed) }}
-                    </div>
-                    <div class="col">
-                        {{ form_row(form.closeDate) }}
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col">
-                        {{ form_label(form.closePrice) }} 
-                        <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    {{ form_widget(form.closed_currency) }}
-                                </div>
-                                {{ form_widget(form.closePrice) }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+				<div class="row">
+					<div class="col">
+						{{ form_label(form.allocation) }}
+						<div class="input-group mb-3">
+							<div class="input-group-prepend">
+								{{ form_widget(form.allocation_currency) }}
+							</div>
+                            <div class="form-group">
+							{{ form_widget(form.allocation) }}
+                            {{ form_help(form.allocation)}}
+                            </div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="card">
+		<div class="card-header" id="headingTwo">
+			<h2 class="mb-0">
+				<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+					Close position?
+				</button>
+			</h2>
+		</div>
+		<div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionPosition">
+			<div class="card-body">
+				<div class="row">
+					<div class="col">
+						{{ form_row(form.closed) }}
+					</div>
+					<div class="col">
+						{{ form_row(form.closeDate) }}
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col">
+						{{ form_label(form.closePrice) }}
+						<div class="input-group mb-3">
+							<div class="input-group-prepend">
+								{{ form_widget(form.closed_currency) }}
+							</div>
+							{{ form_widget(form.closePrice) }}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
-    <br/>
-    <button type="submit" class="btn btn-primary"><i class="far fa-save"></i></button>
+<br/>
+<button type="submit" class="btn btn-primary">
+	<i class="far fa-save"></i>
+</button>
 {{ form_end(form) }}

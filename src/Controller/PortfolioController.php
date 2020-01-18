@@ -28,6 +28,7 @@ class PortfolioController extends AbstractController
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
         SessionInterface $session, 
+        Summary $summary,
         int $page = 1, 
         string $orderBy = 'branch.label', 
         string $sort = 'asc'
@@ -39,6 +40,7 @@ class PortfolioController extends AbstractController
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
         }
+        [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
         $items = $tickerRepository->getCurrent($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
@@ -63,12 +65,12 @@ class PortfolioController extends AbstractController
             'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'portfolio_index',
             'searchPath' => 'portfolio_search',
-            /* 'numActivePosition' => $numActivePosition,
+            'numActivePosition' => $numActivePosition,
             'numPosition' => $numActivePosition,
             'numTickers' => $numTickers,
             'profit' => $profit,
             'totalDividend' => $totalDividend,
-            'allocated' => $allocated, */
+            'totalInvested' => $allocated,
         ]);
     }
 

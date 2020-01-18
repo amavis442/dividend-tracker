@@ -66,7 +66,7 @@ class PositionController extends AbstractController
             'numTickers' => $numTickers,
             'profit' => $profit,
             'totalDividend' => $totalDividend,
-            'allocated' => $allocated,
+            'totalInvested' => $allocated,
         ]);
     }
 

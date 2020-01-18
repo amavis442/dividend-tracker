@@ -3,8 +3,9 @@
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PositionRepository")
@@ -21,7 +22,7 @@ class Position
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $price;
 
@@ -98,6 +99,17 @@ class Position
         $this->payments = new ArrayCollection();
     }
 
+     /**
+     * @Assert\Callback
+     */
+    public function validate(ExecutionContextInterface $context, $payload)
+    {
+        if (empty($this->getPrice()) && empty($this->getAllocation())) {
+            $context->buildViolation('Price and/or allocation should be filled!')
+                ->atPath('price')
+                ->addViolation();
+        }
+    }
     public function getId(): ?int
     {
         return $this->id;
@@ -108,10 +120,14 @@ class Position
         return $this->price;
     }
 
-    public function setPrice(int $price): self
+    public function setPrice(?int $price): self
     {
-        $this->price = $price;
-
+        if ($price) {
+            $this->price = $price;
+            if (empty($this->allocation) || $this->allocation === 0) {
+                $this->allocation = ($this->amount / 100) * $this->price;
+            }
+        }
         return $this;
     }
 
@@ -217,8 +233,12 @@ class Position
 
     public function setAllocation(?int $allocation): self
     {
-        $this->allocation = $allocation;
-
+        if ($allocation) {
+            $this->allocation = $allocation;
+            if (empty($this->price)) {
+                $this->price = $this->allocation / ($this->amount / 100);
+            }
+        } 
         return $this;
     }
 
