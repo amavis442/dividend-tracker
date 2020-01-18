@@ -122,12 +122,7 @@ class Position
 
     public function setPrice(?int $price): self
     {
-        if ($price) {
-            $this->price = $price;
-            if (empty($this->allocation) || $this->allocation === 0) {
-                $this->allocation = ($this->amount / 100) * $this->price;
-            }
-        }
+        $this->price = $price;
         return $this;
     }
 
@@ -233,12 +228,7 @@ class Position
 
     public function setAllocation(?int $allocation): self
     {
-        if ($allocation) {
-            $this->allocation = $allocation;
-            if (empty($this->price)) {
-                $this->price = $this->allocation / ($this->amount / 100);
-            }
-        } 
+        $this->allocation = $allocation;
         return $this;
     }
 

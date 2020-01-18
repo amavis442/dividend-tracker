@@ -70,6 +70,17 @@ class PositionController extends AbstractController
         ]);
     }
 
+    private function presetMetrics(Position $position)
+    {
+        if ($position->getAllocation() && empty($position->getPrice())) {
+            $position->setPrice($position->getAllocation() / ($position->getAmount() / 100));
+            $position->setCurrency($position->getAllocationCurrency());
+        }
+        if ($position->getPrice() && empty($position->getAllocation())) {
+            $position->setAllocation($position->getPrice() * ($position->getAmount() / 100));
+            $position->setAllocationCurrency($position->getCurrency());
+        }
+    }
 
     /**
      * @Route("/new/{ticker}", name="position_new", methods={"GET","POST"})
@@ -88,6 +99,7 @@ class PositionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->presetMetrics($position);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($position);
             $entityManager->flush();
@@ -126,6 +138,7 @@ class PositionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->presetMetrics($position);
             $this->getDoctrine()->getManager()->flush();
             $session->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
             return $this->redirectToRoute('position_index');
