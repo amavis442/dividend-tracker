@@ -78,6 +78,7 @@ class TickerRepository extends ServiceEntityRepository
             ->select('t')
             ->addSelect('i.label')
             ->addSelect('SUM(p.amount) as units')
+            ->addSelect('SUM(p.allocation) as invested')
             ->join('t.branch', 'i')
             ->join('t.positions','p')
             ->where('p.closed <> 1')

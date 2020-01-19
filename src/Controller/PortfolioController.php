@@ -40,7 +40,7 @@ class PortfolioController extends AbstractController
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
         }
-        [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
+        
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
         $items = $tickerRepository->getCurrent($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
@@ -50,7 +50,7 @@ class PortfolioController extends AbstractController
         $iter = $items->getIterator();
         $tickerIds = array_keys($iter->getArrayCopy());
         $dividends = $paymentRepository->getSumDividends($tickerIds);
-        //[$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
+        [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
         $posData = $positionRepository->getAllocationsAndUnits($tickerIds);
 
         return $this->render('portfolio/index.html.twig', [
