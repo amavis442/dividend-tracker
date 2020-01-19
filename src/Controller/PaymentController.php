@@ -159,6 +159,6 @@ class PaymentController extends AbstractController
         $searchCriteria = $request->request->get('searchCriteria');
         $session->set(self::SEARCH_KEY, $searchCriteria);
 
-        return $this->redirectToRoute('payment_index');
+        return $this->redirectToRoute('payment_index',['orderBy' => 'payDate','sort' => 'desc']);
     }
 }

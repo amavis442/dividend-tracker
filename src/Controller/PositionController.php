@@ -172,6 +172,6 @@ class PositionController extends AbstractController
         $searchCriteria = $request->request->get('searchCriteria');
         $session->set(self::SEARCH_KEY, $searchCriteria);
 
-        return $this->redirectToRoute('position_index');
+        return $this->redirectToRoute('position_index',['orderBy' => 'buyDate','sort'=>'desc']);
     }
 }
