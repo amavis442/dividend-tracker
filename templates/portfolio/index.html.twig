@@ -14,11 +14,11 @@
                 <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker.ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a></th>
                 <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker.fullname', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Fullname</a></th>
                 <th>Units</th>
-                <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'branch.label', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Industry</a></th>
                 <th>Average price</th>
                 <th>Allocation</th>
                 <th>Allocation%</th>
                 <th>Dividends</th>
+                <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'branch.label', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Industry</a></th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -37,11 +37,11 @@
                 <td>{{ ticker.ticker }}</td>
                 <td>{{ ticker.fullname }}</td>
                 <td>{{ (units/100)|format_number({fraction_digit: 2}) }}</td>
-                <td>{{ branchLabel}}</td>
                 <td>&euro;{{ avgPrice|format_number({fraction_digit: 2}) }}</td>
                 <td>&euro;{{ posData.allocation|format_number({fraction_digit: 2}) }}</td>
                 <td> {{percentageAllocation|format_number({fraction_digit: 2}) }}%</td>
                 <td>&euro;{{ (dividend/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ branchLabel}}</td>
                 <td>
                     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                         <div class="btn-group mr-2" role="group" aria-label="First group">

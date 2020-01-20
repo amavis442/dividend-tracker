@@ -77,10 +77,12 @@ class PortfolioController extends AbstractController
     /**
      * @Route("/{id}", name="portfolio_show", methods={"GET"})
      */
-    public function show(Ticker $ticker): Response
+    public function show(Ticker $ticker, PositionRepository $positionRepository): Response
     {
+        $items = $positionRepository->getForTicker($ticker);
         return $this->render('portfolio/show.html.twig', [
             'ticker' => $ticker,
+            'positions' => $items
         ]);
     }
 

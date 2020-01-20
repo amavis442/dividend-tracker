@@ -3,11 +3,13 @@
 namespace App\Repository;
 
 use App\Entity\Position;
+use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use DateTime;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\JoinColumn;
 
 /**
@@ -34,12 +36,27 @@ class PositionRepository extends ServiceEntityRepository
         string $search = ''
     ): Paginator {
         $queryBuilder = $this->getQueryBuilder($broker, $orderBy, $sort, $search);
-        $queryBuilder->leftJoin('t.calendars' ,'c');
+        $queryBuilder->leftJoin('t.calendars', 'c');
         $queryBuilder->andWhere('p.closed <> 1 or p.closed is null');
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);
 
         return $paginator;
+    }
+
+    public function getForTicker(Ticker $ticker): ?array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p')
+            ->innerJoin('p.ticker', 't')
+            ->innerJoin('t.branch', 'i')
+            ->leftJoin('t.payments', 'pa')
+            ->orderBy('p.buyDate', 'DESC')
+            ->where('t = :ticker')
+            ->andWhere('p.closed <> 1 or p.closed is null')
+            ->setParameter('ticker', $ticker)
+            ->getQuery()
+            ->getResult();
     }
 
     public function getAllClosed(
@@ -85,7 +102,7 @@ class PositionRepository extends ServiceEntityRepository
             ->orderBy($order, $sort);
         if ($broker <> 'All') {
             $queryBuilder->andWhere('p.broker = :broker')
-            ->setParameter('broker' , $broker);
+                ->setParameter('broker', $broker);
         }
 
 
@@ -187,9 +204,9 @@ class PositionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
 
-            if ($allocated) {
-                return $allocated / 100;
-            }
+        if ($allocated) {
+            return $allocated / 100;
+        }
         return 0;
     }
 
@@ -197,7 +214,7 @@ class PositionRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('p')
             ->join('p.ticker', 't')
-            ->join('t.calendars','c')
+            ->join('t.calendars', 'c')
             ->where('c.paymentDate >= :currentDate')
             ->andWhere('p.closed <> 1')
             ->groupBy('t')
@@ -214,28 +231,28 @@ class PositionRepository extends ServiceEntityRepository
                 'p.price',
                 'p.amount',
                 'IDENTITY(p.ticker) as tickerId'
-                ])
-            
+            ])
+
             ->where('p.closed <> 1')
-            ->join("p.ticker",'t')
+            ->join("p.ticker", 't')
             ->andWhere('t IN (:tickerIds)')
             ->setParameter('tickerIds', $tickerIds)
             ->getQuery()->getArrayResult();
-            
-            $output = [];
-            foreach ($result as $item){
-                if (!isset($output[$item['tickerId']])) {
-                    $output[$item['tickerId']] = [];
-                    $output[$item['tickerId']]['allocation'] = 0;
-                    $output[$item['tickerId']]['units'] = 0;
-                }
-                $price = $item['price'] / 100;
-                $units = $item['amount'] / 100;   
 
-                $allocation = $price * $units;
-                $output[$item['tickerId']]['allocation'] += $allocation;
-                $output[$item['tickerId']]['units'] += $units;
+        $output = [];
+        foreach ($result as $item) {
+            if (!isset($output[$item['tickerId']])) {
+                $output[$item['tickerId']] = [];
+                $output[$item['tickerId']]['allocation'] = 0;
+                $output[$item['tickerId']]['units'] = 0;
             }
-            return $output;
+            $price = $item['price'] / 100;
+            $units = $item['amount'] / 100;
+
+            $allocation = $price * $units;
+            $output[$item['tickerId']]['allocation'] += $allocation;
+            $output[$item['tickerId']]['units'] += $units;
+        }
+        return $output;
     }
 }
