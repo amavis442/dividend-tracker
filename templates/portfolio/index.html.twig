@@ -35,7 +35,7 @@
           
             <tr>
                 <td>{{ ticker.ticker }}</td>
-                <td>{{ ticker.fullname }}</td>
+                <td><a href="{{ path('portfolio_show', {'id': ticker.id}) }}">{{ ticker.fullname }}</a></td>
                 <td>{{ (units/100)|format_number({fraction_digit: 2}) }}</td>
                 <td>&euro;{{ avgPrice|format_number({fraction_digit: 2}) }}</td>
                 <td>&euro;{{ posData.allocation|format_number({fraction_digit: 2}) }}</td>
