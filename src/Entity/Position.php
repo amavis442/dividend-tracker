@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -94,12 +95,18 @@ class Position
      */
     private $closedCurrency;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="position")
+     */
+    private $transactions;
+
     public function __construct()
     {
         $this->payments = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
     }
 
-     /**
+    /**
      * @Assert\Callback
      */
     public function validate(ExecutionContextInterface $context, $payload)
@@ -155,7 +162,7 @@ class Position
 
         return $this;
     }
-  
+
     public function getBuyDate(): ?\DateTimeInterface
     {
         return $this->buyDate;
@@ -294,6 +301,37 @@ class Position
     public function setClosedCurrency(?Currency $closedCurrency): self
     {
         $this->closedCurrency = $closedCurrency;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Order[]
+     */
+    public function getOrders(): Collection
+    {
+        return $this->orders;
+    }
+
+    public function addTransaction(Transaction $transaction): self
+    {
+        if (!$this->transactions->contains($transaction)) {
+            $this->transactions[] = $transaction;
+            $transaction->setPosition($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrder(Transaction $transaction): self
+    {
+        if ($this->transactions->contains($transaction)) {
+            $this->transactions->removeElement($transaction);
+            // set the owning side to null (unless already changed)
+            if ($transaction->getPosition() === $this) {
+                $transaction->setPosition(null);
+            }
+        }
 
         return $this;
     }
