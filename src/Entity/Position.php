@@ -306,11 +306,11 @@ class Position
     }
 
     /**
-     * @return Collection|Order[]
+     * @return Collection|Transaction[]
      */
-    public function getOrders(): Collection
+    public function getTransactions(): Collection
     {
-        return $this->orders;
+        return $this->transactions;
     }
 
     public function addTransaction(Transaction $transaction): self
@@ -323,7 +323,7 @@ class Position
         return $this;
     }
 
-    public function removeOrder(Transaction $transaction): self
+    public function removeTransaction(Transaction $transaction): self
     {
         if ($this->transactions->contains($transaction)) {
             $this->transactions->removeElement($transaction);

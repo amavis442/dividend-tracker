@@ -20,17 +20,6 @@ class TransactionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('ticker', EntityType::class, [
-                'class' => Ticker::class,
-                'choice_label' => 'ticker',
-                'required' => true,
-                'placeholder' => 'Please choose a ticker',
-                'empty_data' => null,
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('t')
-                        ->orderBy('t.ticker', 'ASC');
-                },
-            ])
             ->add('broker', ChoiceType::class, [
                 'choices'  => [
                     'Trading212' => 'Trading212',

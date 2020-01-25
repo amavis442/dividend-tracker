@@ -23,24 +23,52 @@
 			<tr>
 				<th>Positions</th>
 				<td>
-					<table class="table">
+					<table class="table table-striped">
 						<thead>
 							<tr>
+								<th></th>
 								<th>Units</th>
 								<th>Price</th>
 								<th>Allocation</th>
-								<th>Buy date</th>
+								<th>Transaction date</th>
 								<th>Broker</th>
+								<th>Actions</th>
 						</tr>
 						</thead>
 						{% for position in positions %}
-							<tr>
+							<tr class="table-primary">
+								<td><strong>Summary</strong></td>
 								<td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
 								<td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
 								<td>{{ (position.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ (position.allocation/100)|format_number({fraction_digit: 2}) }}</td>
-								<td>{{ position.buyDate|date("d-m-Y") }}</td>
-								<td>{{ position.broker }}</td>
+								<td></td>
+								<td></td>
+								<td></td>
 							</tr>
+							{% for transaction in position.transactions %}
+							{% set side = (transaction.side == 1 ? 'Buy' : 'Sell') %}
+							<tr>
+								<td>
+									<span class="badge badge-{% if transaction.side == 1 %}success{% else %}danger{% endif %}">
+										{{ side }}
+									</span>
+								</td>
+								<td>{{ (transaction.amount/100)|format_number({fraction_digit: 2}) }}</td>
+								<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.price/100)|format_number({fraction_digit: 2}) }}</td>
+								<td>{{ (transaction.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ (transaction.allocation/100)|format_number({fraction_digit: 2}) }}</td>
+								<td>{{ transaction.transactionDate|date("d-m-Y") }}</td>
+								<td>{{ transaction.broker }}</td>
+								<td>
+									<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                            			<div class="btn-group mr-2" role="group" aria-label="First group">
+                                			<a href="{{ path('transaction_edit', {'id': transaction.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit transaction">
+                                    			<i class="far fa-edit"></i>
+                                			</a>
+                                   		</div>
+                        			</div>
+								</td>
+							</tr>
+							{% endfor %}
 						{% else %}
 							no records found
 						{% endfor %}

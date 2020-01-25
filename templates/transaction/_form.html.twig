@@ -4,9 +4,8 @@
 	<div class="card">
 		<div class="card-header" id="headingOne">
 			<h2 class="mb-0">
-				<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-					Transaction
-				</button>
+				Transaction::
+				<strong>{{ transaction.ticker.fullname}}({{ transaction.ticker.ticker}})</strong>
 			</h2>
 		</div>
 		<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionPosition">
@@ -14,7 +13,7 @@
 
 				<div class="row">
 					<div class="col">
-						{{ form_row(form.ticker) }}
+						{{ form_row(form.side) }}
 					</div>
 					<div class="col">
 						{{ form_row(form.broker) }}
@@ -27,9 +26,7 @@
 					<div class="col"></div>
 				</div>
 				<div class="row">
-					<div class="col">
-						{{ form_row(form.side) }}
-					</div>
+
 					<div class="col">
 						{{ form_row(form.amount) }}
 					</div>

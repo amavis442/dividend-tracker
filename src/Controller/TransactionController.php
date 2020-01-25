@@ -2,9 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Currency;
+use App\Entity\Position;
 use App\Entity\Transaction;
 use App\Entity\Ticker;
 use App\Form\TransactionType;
+use App\Repository\CurrencyRepository;
 use App\Repository\TransactionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +32,7 @@ class TransactionController extends AbstractController
         int $page = 1,
         string $tab = 'All',
         string $orderBy = 'transactionDate',
-        string $sort = 'asc'
+        string $sort = 'desc'
     ): Response {
         if (!in_array($orderBy, ['transactionDate', 'ticker'])) {
             $orderBy = 'transactionDate';
@@ -73,9 +76,9 @@ class TransactionController extends AbstractController
     }
 
     /**
-     * @Route("/new/{ticker}", name="transaction_new", methods={"GET","POST"})
+     * @Route("/new/{ticker}/{position}/{side}", name="transaction_new", methods={"GET","POST"})
      */
-    public function new(Request $request, ?Ticker $ticker = null, SessionInterface $session): Response
+    public function new(Request $request, Ticker $ticker, Position $position, int $side, SessionInterface $session, CurrencyRepository $currencyRepository): Response
     {
         $transaction = new Transaction();
 
@@ -84,12 +87,25 @@ class TransactionController extends AbstractController
         }
         $currentDate = new DateTime();
         $transaction->setTransactionDate($currentDate);
-
+        $transaction->setSide($side);
+        $transaction->setTicker($ticker);
+        $transaction->setPosition($position);
+        $currency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
+        $transaction->setAllocationCurrency($currency);
         $form = $this->createForm(TransactionType::class, $transaction);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->presetMetrics($transaction);
+            $amount = $transaction->getPosition()->getAmount();
+            if ($transaction->getSide() == Transaction::BUY) {
+                $amount += $transaction->getAmount();
+            }    
+            if ($transaction->getSide() == Transaction::SELL) {
+                $amount -= $transaction->getAmount();
+            }    
+            $transaction->getPosition()->setAmount($amount);
+            
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($transaction);
             $entityManager->flush();
