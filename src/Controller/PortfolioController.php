@@ -41,12 +41,18 @@ class PortfolioController extends AbstractController
         }
         
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
-        $items = $positionRepository->getAll($page, 'All', 10, $orderBy, $sort, $searchCriteria);
+        $items = $positionRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
         $iter = $items->getIterator();
-        $tickerIds = array_keys($iter->getArrayCopy());
+        $tickerIds = [];
+        foreach ($iter as $position) {
+            $id = $position->getTicker()->getId();
+            if (!in_array($id, $tickerIds )){ 
+                $tickerIds[] = $position->getTicker()->getId();
+            }
+        }
         $dividends = $paymentRepository->getSumDividends($tickerIds);
         [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
         $posData = $positionRepository->getAllocationsAndUnits($tickerIds);

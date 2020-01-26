@@ -29,13 +29,14 @@ class PositionRepository extends ServiceEntityRepository
 
     public function getAll(
         int $page = 1,
-        string $broker = 'Trading212',
         int $limit = 10,
         string $orderBy = 'buyDate',
         string $sort = 'ASC',
         string $search = ''
     ): Paginator {
-        $queryBuilder = $this->getQueryBuilder($broker, $orderBy, $sort, $search);
+
+        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
+        //dd('eeeeee', $queryBuilder->getQuery()->getDql());
         $queryBuilder->leftJoin('t.calendars', 'c');
         $queryBuilder->andWhere('p.closed <> 1 or p.closed is null');
         $query = $queryBuilder->getQuery();
@@ -75,7 +76,7 @@ class PositionRepository extends ServiceEntityRepository
         if ($orderBy === 'dividend') {
             $order = 'c.exDividendDate';
         }
-        $queryBuilder = $this->getQueryBuilder('All', $orderBy, $sort, $search);
+        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
         $queryBuilder->andWhere('p.closed = 1');
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);
@@ -84,17 +85,13 @@ class PositionRepository extends ServiceEntityRepository
     }
 
     private function getQueryBuilder(
-        string $broker = 'All',
         string $orderBy = 'buyDate',
         string $sort = 'ASC',
         string $search = ''
     ): QueryBuilder {
         $order = 'p.' . $orderBy;
-        if ($orderBy === 'ticker') {
-            $order = 't.ticker';
-        }
-        if ($orderBy === 'i.label') {
-            $order = 'i.label';
+        if (in_array($orderBy, ['t.ticker', 't.fullname', 'i.label'])) {
+            $order = $orderBy;
         }
         // Create our query
         $queryBuilder = $this->createQueryBuilder('p')
@@ -103,10 +100,6 @@ class PositionRepository extends ServiceEntityRepository
             ->innerJoin('t.branch', 'i')
             ->leftJoin('t.payments', 'pa')
             ->orderBy($order, $sort);
-        if ($broker <> 'All') {
-            $queryBuilder->andWhere('p.broker = :broker')
-                ->setParameter('broker', $broker);
-        }
 
         if (!empty($search)) {
             $queryBuilder->andWhere($queryBuilder->expr()->orX(

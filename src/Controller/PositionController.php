@@ -43,7 +43,7 @@ class PositionController extends AbstractController
         [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
 
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
-        $items = $positionRepository->getAll($page, $tab, 10, $orderBy, $sort, $searchCriteria);
+        $items = $positionRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
