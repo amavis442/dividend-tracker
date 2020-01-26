@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -94,12 +95,18 @@ class Position
      */
     private $closedCurrency;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="position")
+     */
+    private $transactions;
+
     public function __construct()
     {
         $this->payments = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
     }
 
-     /**
+    /**
      * @Assert\Callback
      */
     public function validate(ExecutionContextInterface $context, $payload)
@@ -155,7 +162,7 @@ class Position
 
         return $this;
     }
-  
+
     public function getBuyDate(): ?\DateTimeInterface
     {
         return $this->buyDate;
@@ -207,11 +214,13 @@ class Position
 
     public function getProfit(): ?float
     {
-        if ($this->closed == 1) {
-            return (($this->closePrice - $this->price) * $this->amount) / 10000;
-        }
+        return $this->profit / 100;
+    }
 
-        return $this->profit;
+    public function setProfit(int $profit): self
+    {
+        $this->profit = $profit;
+        return $this;
     }
 
     public function getProfitPercentage(): ?float
@@ -294,6 +303,37 @@ class Position
     public function setClosedCurrency(?Currency $closedCurrency): self
     {
         $this->closedCurrency = $closedCurrency;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Transaction[]
+     */
+    public function getTransactions(): Collection
+    {
+        return $this->transactions;
+    }
+
+    public function addTransaction(Transaction $transaction): self
+    {
+        if (!$this->transactions->contains($transaction)) {
+            $this->transactions[] = $transaction;
+            $transaction->setPosition($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransaction(Transaction $transaction): self
+    {
+        if ($this->transactions->contains($transaction)) {
+            $this->transactions->removeElement($transaction);
+            // set the owning side to null (unless already changed)
+            if ($transaction->getPosition() === $this) {
+                $transaction->setPosition(null);
+            }
+        }
 
         return $this;
     }

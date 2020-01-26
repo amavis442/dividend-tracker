@@ -24,29 +24,27 @@ class PortfolioController extends AbstractController
      * @Route("/list/{page<\d+>?1}/{orderBy}/{sort}", name="portfolio_index", methods={"GET"})
      */
     public function index(
-        TickerRepository $tickerRepository, 
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
         SessionInterface $session, 
         Summary $summary,
         int $page = 1, 
-        string $orderBy = 'branch.label', 
+        string $orderBy = 'i.label', 
         string $sort = 'asc'
     ): Response
     {
-        if (!in_array($orderBy, ['ticker.ticker','ticker.fullname','branch.label'])) {
-            $orderBy = 'branch.label';
+        if (!in_array($orderBy, ['t.ticker','t.fullname','i.label'])) {
+            $orderBy = 'i.label';
         }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
         }
         
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
-        $items = $tickerRepository->getCurrent($page, 10, $orderBy, $sort, $searchCriteria);
+        $items = $positionRepository->getAll($page, 'All', 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
-        
         $iter = $items->getIterator();
         $tickerIds = array_keys($iter->getArrayCopy());
         $dividends = $paymentRepository->getSumDividends($tickerIds);
@@ -54,9 +52,8 @@ class PortfolioController extends AbstractController
         $posData = $positionRepository->getAllocationsAndUnits($tickerIds);
 
         return $this->render('portfolio/index.html.twig', [
-            'tickers' => $items->getIterator(),
+            'positions' => $items->getIterator(),
             'dividends' => $dividends,
-            'positions' => $posData,
             'limit' => $limit,
             'maxPages' => $maxPages,
             'thisPage' => $thisPage,

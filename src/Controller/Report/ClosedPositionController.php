@@ -62,6 +62,7 @@ class ClosedPositionController extends AbstractController
             'numTickers' => $numTickers,
             'profit' => $profit,
             'allocated' => $allocated,
+            'totalInvested' => $allocated,
             'totalDividend' => $totalDividend,
             'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'report_closed_positions_index',

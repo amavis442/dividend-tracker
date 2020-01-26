@@ -77,11 +77,11 @@ class TickerRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('t','t')
             ->select('t')
             ->addSelect('i.label')
-            ->addSelect('SUM(p.amount) as units')
-            ->addSelect('SUM(p.allocation) as invested')
+            ->addSelect('p.amount as units')
+            ->addSelect('p.allocation as invested')
             ->join('t.branch', 'i')
             ->join('t.positions','p')
-            ->where('p.closed <> 1')
+            ->where('p.closed <> 1 OR p.closed is null')
             ->groupBy('t.id')
             ->orderBy($order, $sort);
 

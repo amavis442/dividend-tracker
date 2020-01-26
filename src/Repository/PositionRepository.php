@@ -47,13 +47,14 @@ class PositionRepository extends ServiceEntityRepository
     public function getForTicker(Ticker $ticker): ?array
     {
         return $this->createQueryBuilder('p')
-            ->select('p')
+            ->select('p, tr')
             ->innerJoin('p.ticker', 't')
             ->innerJoin('t.branch', 'i')
+            ->innerJoin('p.transactions', 'tr')
             ->leftJoin('t.payments', 'pa')
-            ->orderBy('p.buyDate', 'DESC')
             ->where('t = :ticker')
             ->andWhere('p.closed <> 1 or p.closed is null')
+            ->orderBy('tr.transactionDate', 'DESC')
             ->setParameter('ticker', $ticker)
             ->getQuery()
             ->getResult();
@@ -92,10 +93,12 @@ class PositionRepository extends ServiceEntityRepository
         if ($orderBy === 'ticker') {
             $order = 't.ticker';
         }
-
+        if ($orderBy === 'i.label') {
+            $order = 'i.label';
+        }
         // Create our query
         $queryBuilder = $this->createQueryBuilder('p')
-            ->select('p')
+            ->select('p, t, i, pa')
             ->innerJoin('p.ticker', 't')
             ->innerJoin('t.branch', 'i')
             ->leftJoin('t.payments', 'pa')
@@ -104,7 +107,6 @@ class PositionRepository extends ServiceEntityRepository
             $queryBuilder->andWhere('p.broker = :broker')
                 ->setParameter('broker', $broker);
         }
-
 
         if (!empty($search)) {
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
@@ -193,7 +195,7 @@ class PositionRepository extends ServiceEntityRepository
             ->where('p.closed = 1')
             ->getQuery()
             ->getSingleScalarResult();
-        return $profit;
+        return $profit ?? 0;
     }
 
     public function getSumAllocated(): int

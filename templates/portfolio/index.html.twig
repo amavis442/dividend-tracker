@@ -23,33 +23,34 @@
             </tr>
         </thead>
         <tbody>
-        {% for tickerData in tickers %}
-            {% set ticker = tickerData.0 %}
-            {% set branchLabel = tickerData.label %}
-            {% set tickerId = ticker.id|int %}
-            {% set units = tickerData.units %}
+        {% for position in positions %}
+            {% set ticker = position.ticker %}
+            {% set branchLabel = position.ticker.branch.label %}
+            {% set tickerId = position.ticker.id|int %}
+            {% set units = position.amount %}
             {% set dividend = dividends[tickerId] ?? 0 %}
-            {% set posData = positions[tickerId] %}
-            {% set avgPrice = posData.allocation / posData.units %}
-            {% set percentageAllocation = ((tickerData.invested / 100) / totalInvested) * 100 %}
+            {% set avgPrice = position.price / 100 %}
+            {% set allocation = position.allocation / 100 %}
+            {% set percentageAllocation = (allocation / totalInvested) * 100 %}
           
             <tr>
                 <td>{{ ticker.ticker }}</td>
                 <td><a href="{{ path('portfolio_show', {'id': ticker.id}) }}">{{ ticker.fullname }}</a></td>
                 <td>{{ (units/100)|format_number({fraction_digit: 2}) }}</td>
                 <td>&euro;{{ avgPrice|format_number({fraction_digit: 2}) }}</td>
-                <td>&euro;{{ posData.allocation|format_number({fraction_digit: 2}) }}</td>
+                <td>&euro;{{ allocation|format_number({fraction_digit: 2}) }}</td>
                 <td> {{percentageAllocation|format_number({fraction_digit: 2}) }}%</td>
                 <td>&euro;{{ (dividend/100)|format_number({fraction_digit: 2}) }}</td>
                 <td>{{ branchLabel}}</td>
                 <td>
                     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                         <div class="btn-group mr-2" role="group" aria-label="First group">
-                            <a  class="btn btn-secondary" href="{{ path('position_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add new position"><i class="fas fa-plus"></i></a>
+                            <a class="btn btn-success" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id,'side': 1, }) }}" data-toggle="tooltip" data-placement="top" title="Buy"><i class="fas fa-plus"></i></a>
                             <a href="{{ path('portfolio_show', {'id': ticker.id}) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
-                            <a  class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend date"><i class="far fa-calendar-alt"></i></a>
-                            <a  class="btn btn-success" href="{{ path('payment_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment"><i class="far fa-money-bill-alt"></i></a>
-                            <a  class="btn btn-secondary" href="{{ path('research_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add/edit research"><i class="fab fa-searchengin"></i></a>
+                            <a class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend date"><i class="far fa-calendar-alt"></i></a>
+                            <a class="btn btn-success" href="{{ path('payment_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment"><i class="far fa-money-bill-alt"></i></a>
+                            <a class="btn btn-secondary" href="{{ path('research_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add/edit research"><i class="fab fa-searchengin"></i></a>
+                            <a class="btn btn-danger" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id, 'side': 2}) }}" data-toggle="tooltip" data-placement="top" title="Sell"><i class="fas fa-minus"></i></a>
                         </div>
                     </div>
                 </td>
