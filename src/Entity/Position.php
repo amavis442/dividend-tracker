@@ -214,11 +214,13 @@ class Position
 
     public function getProfit(): ?float
     {
-        if ($this->closed == 1) {
-            return (($this->closePrice - $this->price) * $this->amount) / 10000;
-        }
+        return $this->profit / 100;
+    }
 
-        return $this->profit;
+    public function setProfit(int $profit): self
+    {
+        $this->profit = $profit;
+        return $this;
     }
 
     public function getProfitPercentage(): ?float

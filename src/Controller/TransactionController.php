@@ -96,16 +96,33 @@ class TransactionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $newAvgPrice = 0;
+            $newAllocation = 0;
+            $newAmount = 0;
+
             $this->presetMetrics($transaction);
             $amount = $transaction->getPosition()->getAmount();
+            $allocation = $position->getAllocation();
+            $avgPrice = $position->getPrice();
             if ($transaction->getSide() == Transaction::BUY) {
-                $amount += $transaction->getAmount();
+                $newAmount = $amount + $transaction->getAmount();
+                $newAllocation = $allocation + $transaction->getAllocation();
             }    
+
             if ($transaction->getSide() == Transaction::SELL) {
-                $amount -= $transaction->getAmount();
-            }    
-            $transaction->getPosition()->setAmount($amount);
-            
+                $profit = $transaction->getAllocation() -  ($transaction->getAmount() * $avgPrice) / 100;
+                $transaction->getPosition()->setProfit($profit + $transaction->getPosition()->getProfit());
+                $transaction->setProfit(floor($profit));
+                $preTransactionAllocation = $transaction->getAmount() * $avgPrice;
+                $newAmount = $amount - $transaction->getAmount();
+                $newAllocation = $allocation - $preTransactionAllocation/100;
+            }   
+
+            $newAvgPrice = (int)floor(($newAllocation / $newAmount) * 100);
+            $transaction->getPosition()->setPrice($newAvgPrice); 
+            $transaction->getPosition()->setAllocation($newAllocation); 
+            $transaction->getPosition()->setAmount($newAmount);
+           
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($transaction);
             $entityManager->flush();

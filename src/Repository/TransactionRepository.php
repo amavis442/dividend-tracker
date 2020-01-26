@@ -71,7 +71,6 @@ class TransactionRepository extends ServiceEntityRepository
         return $paginator;
     }
 
-
     // /**
     //  * @return Transaction[] Returns an array of Transaction objects
     //  */

@@ -184,7 +184,13 @@ class Transaction
 
     public function getProfit(): ?float
     {
-        return $this->profit;
+        return $this->profit / 100;
+    }
+
+    public function setProfit(int $profit): self
+    {
+        $this->profit = $profit;
+        return $this;
     }
 
     public function getAllocated(): int

@@ -47,14 +47,14 @@ class PositionRepository extends ServiceEntityRepository
     public function getForTicker(Ticker $ticker): ?array
     {
         return $this->createQueryBuilder('p')
-            ->select('p')
+            ->select('p, tr')
             ->innerJoin('p.ticker', 't')
             ->innerJoin('t.branch', 'i')
             ->innerJoin('p.transactions', 'tr')
             ->leftJoin('t.payments', 'pa')
-            ->orderBy('p.buyDate', 'DESC')
             ->where('t = :ticker')
             ->andWhere('p.closed <> 1 or p.closed is null')
+            ->orderBy('tr.transactionDate', 'DESC')
             ->setParameter('ticker', $ticker)
             ->getQuery()
             ->getResult();
