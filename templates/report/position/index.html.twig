@@ -16,7 +16,6 @@
                 <th>
                     <a href="{{ path('report_closed_positions_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'buyDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Buy date</a>
                 </th>
-                <th>Broker</th>
                 <th>
                     <a href="{{ path('report_closed_positions_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'closeDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Closed on</a>
                 </th>
@@ -24,11 +23,6 @@
                     <a href="{{ path('report_closed_positions_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a>
                 </th>
                 <th>Industry</th>
-                <th>Units</th>
-                <th>Allocated</th>
-                <th>Open price</th>
-                <th>Close price</th>
-
                 <th>Profit / Loss</th>
             </tr>
         </thead>
@@ -38,7 +32,6 @@
                     <td>
                         {{ position.buyDate|date("d-m-Y") }}
                     </td>
-                    <td>{{ position.broker }}</td>
                     <td>
                         {{ position.closeDate|date("d-m-Y") }}
                     </td>
@@ -46,12 +39,6 @@
                         {{ position.ticker.ticker }}
                     </td>
                     <td>{{ position.ticker.branch.label }}</td>
-                    <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
-                    <td>${{ (position.getAllocation/100)|format_number({fraction_digit: 2}) }}<br/>
-                        <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Allocation % based on total allocated amount">{{ allocated ? ((position.getAllocation / allocated ) * 100)|round(2, 'floor')|format_number({fraction_digit: 2}): 0 }}%</span>
-                    </td>
-                    <td>${{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
-                    <td>${{ (position.closePrice/100)|format_number({fraction_digit: 2}) }}</td>
                     <td>${{ (position.getProfit)|format_number({fraction_digit: 2}) }}<br/>
                         <span class="badge badge-secondary" data-toggle="tooltip" data-placement="top" title="Profit/loss on allocation %">{{ position.getProfitPercentage|format_number({fraction_digit: 2}) }}%</span>
                     </td>

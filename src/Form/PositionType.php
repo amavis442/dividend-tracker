@@ -32,23 +32,23 @@ class PositionType extends AbstractType
                         ->orderBy('t.ticker', 'ASC');
                 },
             ])
-            ->add('broker', ChoiceType::class,[
-              'choices'  => [
-                  'Trading212' => 'Trading212',
-                  'Flatex' =>  'Flatex',
-                  'eToro' =>  'eToro',
+            ->add('broker', ChoiceType::class, [
+                'choices'  => [
+                    'Trading212' => 'Trading212',
+                    'Flatex' =>  'Flatex',
+                    'eToro' =>  'eToro',
                 ],
             ])
             ->add('buyDate', DateType::class, [
                 // renders it as a single text box
                 'widget' => 'single_text',
             ])
-            ->add('amount', TextType::class, ['help' =>'use decimal point if you have a fraction of a stock','label' =>'Units'])
+            ->add('amount', TextType::class, ['help' => 'use decimal point if you have a fraction of a stock', 'label' => 'Units'])
             ->add('price', TextType::class, [
-                'label' =>'Price',
+                'label' => 'Price',
                 'required' => false,
-                'help' =>'What was the stock price and not what you paid'
-                ])
+                'help' => 'What was the stock price and not what you paid'
+            ])
             ->add('currency', EntityType::class, [
                 'class' => Currency::class,
                 'choice_label' => function ($currency) {
@@ -58,10 +58,10 @@ class PositionType extends AbstractType
                 'empty_data' => 'EUR',
             ])
             ->add('allocation', TextType::class, [
-                'label' =>'Allocation',
+                'label' => 'Allocation',
                 'required' => false,
-                'help' =>'What was what you paid in total for this position'
-                ])
+                'help' => 'What was what you paid in total for this position'
+            ])
             ->add('allocation_currency', EntityType::class, [
                 'class' => Currency::class,
                 'choice_label' => function ($currency) {
@@ -73,30 +73,13 @@ class PositionType extends AbstractType
             ->add('closed', CheckboxType::class, [
                 'label'    => 'Position closed?',
                 'required' => false,
-            ])
-            ->add('closed_currency', EntityType::class, [
-                'class' => Currency::class,
-                'choice_label' => function ($currency) {
-                    return  $currency->getSymbol();
-                },
-                'required' => true,
-                'empty_data' => 'EUR'
-            ])
-            ->add('closeDate',DateType::class, [
-                // renders it as a single text box
-                'widget' => 'single_text',
-                'required' => false
-            ])
-            ->add('closePrice', TextType::class, ['label' =>'Close Price($)','help' => 'stockprice when you closed the position'])
-        ;
+            ]);
 
         $callbackTransformer = CallbackTransformerFactory::create();
 
         $builder->get('amount')->addModelTransformer($callbackTransformer);
         $builder->get('price')->addModelTransformer($callbackTransformer);
         $builder->get('allocation')->addModelTransformer($callbackTransformer);
-        $builder->get('closePrice')->addModelTransformer($callbackTransformer);
-
     }
 
     public function configureOptions(OptionsResolver $resolver)

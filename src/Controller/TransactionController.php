@@ -116,10 +116,15 @@ class TransactionController extends AbstractController
                 $preTransactionAllocation = $transaction->getAmount() * $avgPrice;
                 $newAmount = $amount - $transaction->getAmount();
                 $newAllocation = $allocation - $preTransactionAllocation/100;
-            }   
+            }  
 
-            $newAvgPrice = (int)floor(($newAllocation / $newAmount) * 100);
-            $transaction->getPosition()->setPrice($newAvgPrice); 
+            if ($newAmount == 0) {
+                $transaction->getPosition()->setClosed(1);
+            } 
+            if ($newAmount > 0) {
+                $newAvgPrice = (int)floor(($newAllocation / $newAmount) * 100);
+                $transaction->getPosition()->setPrice($newAvgPrice);
+            } 
             $transaction->getPosition()->setAllocation($newAllocation); 
             $transaction->getPosition()->setAmount($newAmount);
            
