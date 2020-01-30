@@ -251,19 +251,18 @@ class PositionRepository extends ServiceEntityRepository
         return $output;
     }
 
-    public function getAllocationData(): array
+    public function getAllocationDataPerSector(): array
     {
         return $this->createQueryBuilder('p')
         ->select([
-            't.fullname',
+            'b.label as industry',
             'SUM(p.amount) amount',
             'p.price',
-            'SUM(p.allocation) allocation',
-            'b.label as industry'
+            'SUM(p.allocation) allocation'
         ])
         ->join('p.ticker', 't')
         ->join('t.branch','b')
-        ->where('p.closed <> 1')
+        ->where('p.closed is null OR p.closed = 0')
         ->groupBy('t.branch')
         ->getQuery()
         ->getArrayResult();

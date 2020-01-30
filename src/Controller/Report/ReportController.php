@@ -81,7 +81,8 @@ class ReportController extends AbstractController
 
         $totalAllocated = $positionRepository->getSumAllocated();
        
-        $allocationData = $positionRepository->getAllocationData();
+        $allocationData = $positionRepository->getAllocationDataPerSector();
+        //dd($allocationData);
         $allocationLabels = '[';
         $allocatedPercentage = '[';
         foreach ($allocationData as $allocationItem) {
