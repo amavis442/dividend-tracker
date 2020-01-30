@@ -95,43 +95,6 @@ var config = {
         
 var ctxAllocation = document.getElementById('myChartAllocation').getContext('2d');
 window.myPie = new Chart(ctxAllocation, config);
-/*
-var myChartAllocation = new Chart(ctxAllocation, {
-    type: 'pie',
-    data: {
-        labels: {{ allocationLabels|raw }},
-        datasets: [{
-            label: 'Dividend',
-            data: {{ allocatedPercentage|raw }},
-            borderColor: 'rgba(255, 99, 132, 0.2)',
-            backgroundColor: [
-						window.chartColors.red,
-						window.chartColors.orange,
-						window.chartColors.yellow,
-						window.chartColors.green,
-						window.chartColors.blue,
-					],
-        }]
-    },
-    options: {
-       title: {
-            display: true,
-            fontSize: 24,
-            text: 'Dividends received in euro'
-        },
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true,
-                    callback: function(value, index, values) {
-                        return '€' + value;
-                    }
-                }
-            }]
-        }
-    }
-});
-*/
 </script>
 
 {% endblock %}
