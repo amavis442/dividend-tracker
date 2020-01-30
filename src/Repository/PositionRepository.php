@@ -263,6 +263,7 @@ class PositionRepository extends ServiceEntityRepository
         ])
         ->join('p.ticker', 't')
         ->join('t.branch','b')
+        ->where('p.closed <> 1')
         ->groupBy('t.branch')
         ->getQuery()
         ->getArrayResult();
