@@ -100,6 +100,7 @@ class PositionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->presetMetrics($position);
+            $position->setClosed(0);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($position);
             $entityManager->flush();
