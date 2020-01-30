@@ -63,7 +63,8 @@ class ReportController extends AbstractController
      * @Route("/chart", name="report_chart")
      */
     public function chart(
-        PaymentRepository $paymentRepository
+        PaymentRepository $paymentRepository,
+        PositionRepository $positionRepository
     ): Response {
         
         $data = $paymentRepository->getDividendsPerInterval();
@@ -77,11 +78,27 @@ class ReportController extends AbstractController
         }
         $dividends .= ']';
         $accumulative .= ']';
+
+        $totalAllocated = $positionRepository->getSumAllocated();
+       
+        $allocationData = $positionRepository->getAllocationData();
+        $allocationLabels = '[';
+        $allocatedPercentage = '[';
+        foreach ($allocationData as $allocationItem) {
+            $allocationLabels .= "'".$allocationItem['industry']."',";
+            $allocation = $allocationItem['allocation'] / 100;
+            $allocatedPercentage .= round(($allocation/$totalAllocated) * 100,2).',';
+        }
+        $allocationLabels = trim($allocationLabels,','). ']';
+        $allocatedPercentage =  trim($allocatedPercentage,',').']';
+
         return $this->render('report/chart/index.html.twig', [
             'data' => $data,
             'labels' => $labels,
             'dividends' => $dividends,
             'accumulative' => $accumulative,
+            'allocationLabels' => $allocationLabels,
+            'allocatedPercentage' => $allocatedPercentage,
             'controller_name' => 'ReportController',
         ]);
     }

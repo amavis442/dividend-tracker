@@ -250,4 +250,21 @@ class PositionRepository extends ServiceEntityRepository
         }
         return $output;
     }
+
+    public function getAllocationData(): array
+    {
+        return $this->createQueryBuilder('p')
+        ->select([
+            't.fullname',
+            'SUM(p.amount) amount',
+            'p.price',
+            'SUM(p.allocation) allocation',
+            'b.label as industry'
+        ])
+        ->join('p.ticker', 't')
+        ->join('t.branch','b')
+        ->groupBy('t.branch')
+        ->getQuery()
+        ->getArrayResult();
+    }
 }
