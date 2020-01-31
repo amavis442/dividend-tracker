@@ -104,10 +104,11 @@ class PositionController extends AbstractController
 
             $transaction = new Transaction();
             $transaction->setSide(Transaction::BUY)
+                ->setTicker($position->getTicker())
                 ->setAmount($position->getAmount())
                 ->setPrice($position->getPrice())
                 ->setCurrency($position->getCurrency())
-                ->setAllocationCurrency($position->getAllocation())
+                ->setAllocation($position->getAllocation())
                 ->setAllocationCurrency($position->getAllocationCurrency())
                 ->setTransactionDate($position->getBuyDate())
                 ->setBroker($position->getBroker());
@@ -116,6 +117,7 @@ class PositionController extends AbstractController
             
             $position->setClosed(0);
             $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($transaction);
             $entityManager->persist($position);
             $entityManager->flush();
             $session->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
