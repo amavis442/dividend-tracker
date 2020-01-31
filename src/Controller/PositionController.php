@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Position;
+use App\Entity\Transaction;
 use App\Entity\Ticker;
 use App\Form\PositionType;
 use App\Repository\PositionRepository;
@@ -100,6 +101,19 @@ class PositionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->presetMetrics($position);
+
+            $transaction = new Transaction();
+            $transaction->setSide(Transaction::BUY)
+                ->setAmount($position->getAmount())
+                ->setPrice($position->getPrice())
+                ->setCurrency($position->getCurrency())
+                ->setAllocationCurrency($position->getAllocation())
+                ->setAllocationCurrency($position->getAllocationCurrency())
+                ->setTransactionDate($position->getBuyDate())
+                ->setBroker($position->getBroker());
+
+            $position->addTransaction($transaction);
+            
             $position->setClosed(0);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($position);
