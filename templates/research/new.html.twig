@@ -9,3 +9,8 @@
     <hr/>
     <a href="{{ path('research_index') }}" class="btn btn-primary"><i class="fas fa-angle-double-left"></i> back to list</a>
 {% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+{%  include 'research/_fileupload.html.twig' %}
+{% endblock %}

@@ -1,57 +1,59 @@
-{{ form_start(form) }}
-{{ form_widget(form) }}
-{{ form_widget(form.files.vars.prototype) }}
-<div class="form-group">
-    <div class="col col-xs-12" id="filesBox">
-        {% if research.files.count > 0 %}
-            <div class="row">
-                <div class="col col-xs-12" id="filesBox">
-                    {% set pos = 0 %}
-                    {% for doc in form.files %}
+{% import _self as formMacros %}
 
-                        <div class="row">
-                            <div class="col col-xs-1" id="jsRemove{{ pos }}" style="">
-                                <button type="button" class="btn btn-danger" onclick="removeFile($(this), {{ doc.vars.value.id }});">
-                                    <i class="fa fa-times" aria-hidden="true"></i>
-                                </button>
-                            </div>
-                            <div class="col col-xs-11" id="jsPreview{{ pos }}">{{ doc.vars.value.filename }}</div>
-
-                            <div style="display:none">
-                                {{ form_widget(doc) }}
-                            </div>
-                        </div>
-
-                        {% set pos = pos + 1 %}
-                    {% endfor %}
-                </div>
-            </div>
-        {% endif %}
-    </div>
+{% macro printGenusScientistRow(genusScientistForm) %}
+<a href="#" class="js-remove-scientist pull-right">
+    <span class="fa fa-close"></span>
+</a>
+{{ form_errors(genusScientistForm) }}
+<div class="col-sm-4">
 </div>
-<button type="submit" class="btn btn-primary">
-    <i class="far fa-save"></i>
-</button>
-{{ form_end(form) }}
+<div class="col-sm-4">
+    {{ form_widget(genusScientistForm.label) }}
+</div>
+<div class="col-sm-4">
+    <button id="btnUpload__name__" class="btn btn-info">upload</button>
+</div>
+<div style="display:none">
+{{ form_widget(genusScientistForm.attachmentFile) }}
+</div>
+{% endmacro %}
+    
 
+{{ form_start(form, { 'attr': {'autocomplete': 'off'} }) }}
+    {{ form_row(form.ticker) }}
+    {{ form_row(form.title) }}
+    {{ form_row(form.info) }}
+    <hr/>
+    <ul class="attachments list-group" style="list-style: none;" 
+    data-prototype="{{ formMacros.printGenusScientistRow(form.attachments.vars.prototype)|e('html_attr') }}"
+    data-index="{{ form.attachments|length }}" >
+    {% for attachmentForm in form.attachments %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="col-sm-4">
+                <button type="button" class="btn btn-danger" onclick="removeFile($(this), {{ attachmentForm.vars.value.id }});">
+                <i class="fa fa-minus"></i></button>
+            </div>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" name="attachment_labels[{{ attachmentForm.vars.value.id}}]" value="{{ attachmentForm.vars.value.label }}"/>
+            </div>
 
-{% block javascripts %}
-    <script>
-        var fileCount = {{ form.files|length  > 0 ? form.files|length : 0 }};
-        var removeButton = "<button type='button' class='btn btn-danger btn-xs' onclick='removeFile($(this),0);'><i class='fa fa-times' aria-hidden='true'></i></button>";
-        function removeFile(ob, fileId) {
-            if (confirm('Are you sure you want to delete this item?')) {
-                $.post('{{ path('research_deletefile', {'id': research.id}) }}', {
-                    'files_id': fileId,
-                    '_token': '{{ csrf_token('deletefile' ~ research.id) }}'
-                }).done(function () {
-                    ob.parent().parent().remove();
-                }).fail(function (data) {
-                    alert("error while deleting file");
-                });
-            }
-
-        }
-    </script>
-    {{ encore_entry_script_tags('fileupload') }}
-{% endblock %}
+            <input type="hidden" name="attachments[{{ attachmentForm.vars.value.id}}]" value="{{ attachmentForm.vars.value.id}}"> 
+            <div class="col-sm-4">
+                <a href="{{ asset('uploads/documents/' ~ attachmentForm.vars.value.attachmentName) }}" target='_blank'>
+                {% if attachmentForm.vars.value.label %}
+                    {{ attachmentForm.vars.value.label }}
+                {% else %}
+                {{ attachmentForm.vars.value.attachmentName }}
+                {% endif %}
+                </a>
+            </div>
+        </li>
+    {% endfor %}
+    <li>
+        <button id="addTagButton" type="button" class="btn btn-warning"><span class="fa fa-plus-circle"></span> Add a attachment</button>
+    </li>
+    </ul>
+    <br/>
+    <button type="submit" class="btn btn-primary"><i class="far fa-save"></i></button>
+    {{ form_widget(form._token) }}
+</form>

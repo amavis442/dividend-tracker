@@ -110,10 +110,10 @@
 				<div class="card-body">
 					<h5 class="card-title">{{ research.title }}</h5>
 					<p class="card-text">{{ research.info|raw }}</p>
-					{% if research.hasFiles %}
+					{% if research.attachments %}
 						<p>
-							{% for doc in research.files %}
-								<a href="{{ asset('uploads/documents/' ~ doc.filename) }}" target='_blank'>View document</a><br/>
+							{% for doc in research.attachments %}
+								<a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}" target='_blank'>View {{ doc.label }}</a><br/>
 							{% endfor %}
 						</p>
 					{% endif %}

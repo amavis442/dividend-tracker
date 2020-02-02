@@ -12,3 +12,8 @@
     <hr/>
     {{ include('research/_delete_form.html.twig') }}
 {% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+{%  include 'research/_fileupload.html.twig' %}
+{% endblock %}

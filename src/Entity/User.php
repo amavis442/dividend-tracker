@@ -191,4 +191,119 @@ class User implements UserInterface
     {
         return $this->calendars;
     }
+
+    public function addBranch(Branch $branch): self
+    {
+        if (!$this->branches->contains($branch)) {
+            $this->branches[] = $branch;
+            $branch->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBranch(Branch $branch): self
+    {
+        if ($this->branches->contains($branch)) {
+            $this->branches->removeElement($branch);
+            // set the owning side to null (unless already changed)
+            if ($branch->getUser() === $this) {
+                $branch->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function addTicker(Ticker $ticker): self
+    {
+        if (!$this->tickers->contains($ticker)) {
+            $this->tickers[] = $ticker;
+            $ticker->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTicker(Ticker $ticker): self
+    {
+        if ($this->tickers->contains($ticker)) {
+            $this->tickers->removeElement($ticker);
+            // set the owning side to null (unless already changed)
+            if ($ticker->getUser() === $this) {
+                $ticker->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function addPosition(Position $position): self
+    {
+        if (!$this->positions->contains($position)) {
+            $this->positions[] = $position;
+            $position->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePosition(Position $position): self
+    {
+        if ($this->positions->contains($position)) {
+            $this->positions->removeElement($position);
+            // set the owning side to null (unless already changed)
+            if ($position->getUser() === $this) {
+                $position->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function addPayment(Payment $payment): self
+    {
+        if (!$this->payments->contains($payment)) {
+            $this->payments[] = $payment;
+            $payment->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePayment(Payment $payment): self
+    {
+        if ($this->payments->contains($payment)) {
+            $this->payments->removeElement($payment);
+            // set the owning side to null (unless already changed)
+            if ($payment->getUser() === $this) {
+                $payment->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function addCalendar(Calendar $calendar): self
+    {
+        if (!$this->calendars->contains($calendar)) {
+            $this->calendars[] = $calendar;
+            $calendar->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCalendar(Calendar $calendar): self
+    {
+        if ($this->calendars->contains($calendar)) {
+            $this->calendars->removeElement($calendar);
+            // set the owning side to null (unless already changed)
+            if ($calendar->getUser() === $this) {
+                $calendar->setUser(null);
+            }
+        }
+
+        return $this;
+    }
 }
