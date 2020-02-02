@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ResearchRepository")
+ * 
  */
 class Research
 {
@@ -35,18 +36,13 @@ class Research
     private $info;
 
     /**
-     * Many Research have Many Files.
-     * @ORM\ManyToMany(targetEntity="Files",cascade={"persist"})
-     * @ORM\JoinTable(name="research_files",
-     *      joinColumns={@ORM\JoinColumn(name="research_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="files_id", referencedColumnName="id", unique=true)}
-     *      )
+     * @ORM\OneToMany(targetEntity="App\Entity\Attachment", mappedBy="research", cascade={"persist"})
      */
-    private $files;
+    private $attachments;
 
     public function __construct()
     {
-        $this->files = new ArrayCollection();
+        $this->attachments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -54,7 +50,7 @@ class Research
         return $this->id;
     }
 
-    public function getTicker(): Ticker
+    public function getTicker(): ?Ticker
     {
         return $this->ticker;
     }
@@ -90,37 +86,32 @@ class Research
         return $this;
     }
 
-    public function hasFiles():bool
-    {
-        return $this->files->count() > 0;
-    }
     /**
-     * @return Collection|Files[]
+     * @return Collection|Attachment[]
      */
-    public function getFiles(): Collection
+    public function getAttachments(): Collection
     {
-        return $this->files;
+        return $this->attachments;
     }
 
-    public function setFiles(Collection $files): self
+    public function addAttachment(Attachment $attachment): self
     {
-        $this->files = $files;
-        return $this;
-    }
-
-    public function addFile(Files $file): self
-    {
-        if (!$this->files->contains($file)) {
-            $this->files[] = $file;
+        if (!$this->attachments->contains($attachment)) {
+            $this->attachments[] = $attachment;
+            $attachment->setResearch($this);
         }
 
         return $this;
     }
 
-    public function removeFile(Files $file): self
+    public function removeAttachment(Attachment $attachment): self
     {
-        if ($this->files->contains($file)) {
-            $this->files->removeElement($file);
+        if ($this->attachments->contains($attachment)) {
+            $this->attachments->removeElement($attachment);
+            // set the owning side to null (unless already changed)
+            if ($attachment->getResearch() === $this) {
+                $attachment->setResearch(null);
+            }
         }
 
         return $this;

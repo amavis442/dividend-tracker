@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class FileUploader
 {
     private $targetDirectory;
+    private $file;
 
     public function __construct(string $targetDirectory)
     {
@@ -25,8 +26,15 @@ class FileUploader
             // ... handle exception if something happens during file upload
         }
 
+        $this->file = $file;
         return $fileName;
     }
+    
+    public function getFile()
+    {
+        return $this->file;
+    } 
+
 
     public function getTargetDirectory()
     {

@@ -12,6 +12,9 @@ use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use App\Form\AttachmentType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+
 class ResearchType extends AbstractType
 {
     private $tickerRepository;
@@ -24,12 +27,14 @@ class ResearchType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        //$builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSubmit']);
+
         $research = $options['data'];
         $builder
             ->add('ticker', HiddenType::class, ['data' => $research->getTicker()->getId()])
             ->add('title')
             ->add('info', TextareaType::class, ['attr' => ['class' => 'summernote', 'style' => 'display:none;']])
-            ->add('files', CollectionType::class, [
+            ->add('attachments', CollectionType::class, [
                 'entry_type' => AttachmentType::class,
                 'required' => false,
                 'label' => false,
@@ -37,7 +42,7 @@ class ResearchType extends AbstractType
                 'allow_delete'	=> true,
                 'prototype' => true,
                 'by_reference' => false,
-                'attr' => ['style' => 'display:none'],
+                //'attr' => ['style' => 'display:none'],
             ]);
   
         $builder->get("ticker")->addModelTransformer(new CallbackTransformer(
@@ -55,5 +60,12 @@ class ResearchType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Research::class
         ]);
+    }
+
+    public function onPreSubmit(FormEvent $event)
+    {
+        $data = $event->getData();
+        $data['attachments'] = array_values($data['attachments']);
+        $event->setData($data);
     }
 }

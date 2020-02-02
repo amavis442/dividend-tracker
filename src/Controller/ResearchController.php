@@ -5,8 +5,10 @@ namespace App\Controller;
 use App\Entity\Research;
 use App\Entity\Ticker;
 use App\Entity\Files;
+use App\Entity\Attachment;
 use App\Form\ResearchType;
 use App\Repository\ResearchRepository;
+use App\Repository\AttachmentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +17,10 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Service\FileUploader;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @Route("/dashboard/research")
@@ -73,16 +78,20 @@ class ResearchController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $attachments = $form->get('files')->getData();
+           // $attachments = $form->get('attachments')->getData();
+           $attachments = $research->getAttachments();
             if ($attachments) {
-                foreach ($attachments as $attachment) {
-                    $documentFileName = $fileUploader->upload($attachment->getFile());
-                    $attachment->setFilename($documentFileName);
-                    $attachment->setFilename($documentFileName);
-                    $research->addFile($attachment);
+                foreach ($attachments as $attachment) {  
+                    if ($attachment->getAttachmentFile()) {
+                        $attachmentFile = $attachment->getAttachmentFile();
+                        $attachment->setAttachmentSize($attachmentFile->getSize());
+                        $attachmentName = $fileUploader->upload($attachmentFile);
+                        $attachment->setAttachmentName($attachmentName);
+                        
+                        $research->addAttachment($attachment);
+                    }
                 }
             }
-
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($research);
             $entityManager->flush();
@@ -109,24 +118,53 @@ class ResearchController extends AbstractController
     /**
      * @Route("/{id}/edit", name="research_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Research $research, FileUploader $fileUploader): Response
+            
+    public function edit(Request $request, Research $research, FileUploader $fileUploader, AttachmentRepository $attachmentRepository): Response
     {
         $form = $this->createForm(ResearchType::class, $research);
         $form->handleRequest($request);
+        $documentDirectory = $this->getParameter('documents_directory');
 
+        $oldAttachments = $request->get('attachments');
+        $oldAttachmentLabels = $request->get('attachment_labels');
+    
         if ($form->isSubmitted() && $form->isValid()) {
-            $attachments = $form->get('files')->getData();
-            if ($attachments) {
-                foreach ($attachments as $attachment) {
-                    if ($attachment->getFile()) {
-                        $documentFileName = $fileUploader->upload($attachment->getFile());
-                        $attachment->setFilename($documentFileName);
-                        $attachment->setFilename($documentFileName);
-                        $research->addFile($attachment);
+            $existingAttachments = $attachmentRepository->findBy(['research' => $research->getId()]);
+                
+            if ($existingAttachments){
+                $filesystem = new Filesystem();
+                // Keep old attachments
+                /** @var Attachment $existingAttachment */
+                foreach ($existingAttachments as $existingAttachment) {
+                    if ($oldAttachments && in_array($existingAttachment->getId(), $oldAttachments)){
+                        $label = $oldAttachmentLabels[$existingAttachment->getId()];
+                        $existingAttachment->setLabel($label);
+                        $research->addAttachment($existingAttachment);
+                    } else {
+                        $research->removeAttachment($existingAttachment);
+                        $this->getDoctrine()->getManager()->remove($existingAttachment);
+                        $fileOnDisk = $documentDirectory . '/'.$existingAttachment->getAttachmentName();
+                        if ($filesystem->exists($fileOnDisk)) {
+                            $filesystem->remove([$fileOnDisk]);
+                        }
                     }
                 }
             }
 
+            // add new attachments
+            $attachments = $research->getAttachments();
+            if ($attachments) {
+                foreach ($attachments as $attachment) {  
+                    if ($attachment->getAttachmentFile()) {
+                        $attachmentFile = $attachment->getAttachmentFile();
+                        $attachment->setAttachmentSize($attachmentFile->getSize());
+                        $attachmentName = $fileUploader->upload($attachmentFile);
+                        $attachment->setAttachmentName($attachmentName);
+                        
+                        $research->addAttachment($attachment);
+                    }
+                }
+            }
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('research_index');
