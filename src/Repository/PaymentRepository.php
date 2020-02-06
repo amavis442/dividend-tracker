@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Payment;
+use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
@@ -64,6 +65,17 @@ class PaymentRepository extends ServiceEntityRepository
         $paginator = $this->paginate($query, $page, $limit);
 
         return $paginator;
+    }
+
+    public function getForTicker(Ticker $ticker): ?array
+    {
+        return $this->createQueryBuilder('p')
+        ->join('p.ticker', 't')
+        ->where('t = :ticker')
+        ->orderBy('p.payDate', 'DESC')
+        ->setParameter('ticker', $ticker)
+        ->getQuery()
+        ->getResult();
     }
 
     public function getTotalDividend(string $interval = 'All'): ?float

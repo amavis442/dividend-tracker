@@ -45,7 +45,7 @@ class PositionRepository extends ServiceEntityRepository
         return $paginator;
     }
 
-    public function getForTicker(Ticker $ticker): ?array
+    public function getForTicker(Ticker $ticker): ?Position
     {
         return $this->createQueryBuilder('p')
             ->select('p, tr')
@@ -58,7 +58,7 @@ class PositionRepository extends ServiceEntityRepository
             ->orderBy('tr.transactionDate', 'DESC')
             ->setParameter('ticker', $ticker)
             ->getQuery()
-            ->getResult();
+            ->getOneOrNullResult();
     }
 
     public function getAllClosed(

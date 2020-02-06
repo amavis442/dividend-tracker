@@ -26,20 +26,19 @@ class PortfolioController extends AbstractController
     public function index(
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
-        SessionInterface $session, 
+        SessionInterface $session,
         Summary $summary,
-        int $page = 1, 
-        string $orderBy = 'i.label', 
+        int $page = 1,
+        string $orderBy = 'i.label',
         string $sort = 'asc'
-    ): Response
-    {
-        if (!in_array($orderBy, ['t.ticker','t.fullname','i.label'])) {
+    ): Response {
+        if (!in_array($orderBy, ['t.ticker', 't.fullname', 'i.label'])) {
             $orderBy = 'i.label';
         }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
         }
-        
+
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
         $items = $positionRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
@@ -49,7 +48,7 @@ class PortfolioController extends AbstractController
         $tickerIds = [];
         foreach ($iter as $position) {
             $id = $position->getTicker()->getId();
-            if (!in_array($id, $tickerIds )){ 
+            if (!in_array($id, $tickerIds)) {
                 $tickerIds[] = $position->getTicker()->getId();
             }
         }
@@ -80,12 +79,14 @@ class PortfolioController extends AbstractController
     /**
      * @Route("/{id}", name="portfolio_show", methods={"GET"})
      */
-    public function show(Ticker $ticker, PositionRepository $positionRepository): Response
+    public function show(Ticker $ticker, PositionRepository $positionRepository, PaymentRepository $paymentRepository): Response
     {
-        $items = $positionRepository->getForTicker($ticker);
+        $position = $positionRepository->getForTicker($ticker);
+        $payments = $paymentRepository->getForTicker($ticker);
         return $this->render('portfolio/show.html.twig', [
             'ticker' => $ticker,
-            'positions' => $items
+            'position' => $position,
+            'payments' => $payments
         ]);
     }
 
