@@ -103,10 +103,10 @@
 				<thead>
 					<tr>
 						<th></th>
+						<th>Transaction date</th>
 						<th>Units</th>
 						<th>Price</th>
 						<th>Allocation</th>
-						<th>Transaction date</th>
 						<th>Broker</th>
 						<th>Actions</th>
 					</tr>
@@ -121,10 +121,10 @@
 										{{ side }}
 									</span>
 								</td>
+								<td>{{ transaction.transactionDate|date("d-m-Y") }}</td>
 								<td>{{ (transaction.amount/100)|format_number({fraction_digit: 2}) }}</td>
 								<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.price/100)|format_number({fraction_digit: 2}) }}</td>
 								<td>{{ (transaction.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ (transaction.allocation/100)|format_number({fraction_digit: 2}) }}</td>
-								<td>{{ transaction.transactionDate|date("d-m-Y") }}</td>
 								<td>{{ transaction.broker }}</td>
 								<td>
 									<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
