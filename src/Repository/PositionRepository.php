@@ -30,7 +30,7 @@ class PositionRepository extends ServiceEntityRepository
     public function getAll(
         int $page = 1,
         int $limit = 10,
-        string $orderBy = 'buyDate',
+        string $orderBy = 'p.buyDate',
         string $sort = 'ASC',
         string $search = ''
     ): Paginator {
@@ -68,13 +68,9 @@ class PositionRepository extends ServiceEntityRepository
         string $sort = 'ASC',
         string $search = ''
     ): Paginator {
-        $order = 'p.' . $orderBy;
-        if ($orderBy === 'ticker') {
-            $order = 't.ticker';
-        }
-
-        if ($orderBy === 'dividend') {
-            $order = 'c.exDividendDate';
+        $order = $orderBy;
+        if (in_array($orderBy, ['t.ticker','c.exDividendDate'])) {
+            $order = $orderBy;
         }
         $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
         $queryBuilder->andWhere('p.closed = 1');
@@ -89,7 +85,7 @@ class PositionRepository extends ServiceEntityRepository
         string $sort = 'ASC',
         string $search = ''
     ): QueryBuilder {
-        $order = 'p.' . $orderBy;
+        $order = $orderBy;
         if (in_array($orderBy, ['t.ticker', 't.fullname', 'i.label'])) {
             $order = $orderBy;
         }

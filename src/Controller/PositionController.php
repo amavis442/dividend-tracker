@@ -31,12 +31,16 @@ class PositionController extends AbstractController
         SessionInterface $session,
         int $page = 1,
         string $tab = 'All',
-        string $orderBy = 'buyDate',
+        string $orderBy = 'p.buyDate',
         string $sort = 'asc'
     ): Response {
-        if (!in_array($orderBy, ['buyDate', 'profit', 'ticker'])) {
-            $orderBy = 'buyDate';
+        if (!in_array($orderBy, ['buyDate', 'profit'])) {
+            $orderBy = 'p.' . $orderBy;
         }
+        if (!in_array($orderBy, ['ticker'])) {
+            $orderBy = 't.ticker';
+        }
+
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
         }
@@ -114,7 +118,7 @@ class PositionController extends AbstractController
                 ->setBroker($position->getBroker());
 
             $position->addTransaction($transaction);
-            
+
             $position->setClosed(0);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($transaction);
@@ -189,6 +193,6 @@ class PositionController extends AbstractController
         $searchCriteria = $request->request->get('searchCriteria');
         $session->set(self::SEARCH_KEY, $searchCriteria);
 
-        return $this->redirectToRoute('position_index',['orderBy' => 'buyDate','sort'=>'desc']);
+        return $this->redirectToRoute('position_index', ['orderBy' => 'buyDate', 'sort' => 'desc']);
     }
 }
