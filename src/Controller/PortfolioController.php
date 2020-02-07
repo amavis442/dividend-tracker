@@ -29,11 +29,14 @@ class PortfolioController extends AbstractController
         SessionInterface $session,
         Summary $summary,
         int $page = 1,
-        string $orderBy = 'i.label',
+        string $orderBy = 'industry',
         string $sort = 'asc'
     ): Response {
-        if (!in_array($orderBy, ['t.ticker', 't.fullname', 'i.label'])) {
+        if (in_array($orderBy, ['industry'])) {
             $orderBy = 'i.label';
+        }
+        if (in_array($orderBy, ['ticker', 'fullname'])) {
+            $orderBy = 't.'. $orderBy;
         }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';

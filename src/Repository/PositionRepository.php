@@ -81,14 +81,15 @@ class PositionRepository extends ServiceEntityRepository
     }
 
     private function getQueryBuilder(
-        string $orderBy = 'buyDate',
+        string $orderBy = 'p.buyDate',
         string $sort = 'ASC',
         string $search = ''
     ): QueryBuilder {
-        $order = $orderBy;
+        $order = 'p.buyDate';
         if (in_array($orderBy, ['t.ticker', 't.fullname', 'i.label'])) {
             $order = $orderBy;
         }
+
         // Create our query
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('p, t, i, pa')

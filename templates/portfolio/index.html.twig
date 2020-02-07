@@ -11,14 +11,14 @@
     <table class="table">
         <thead>
             <tr>
-                <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 't.ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a></th>
-                <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 't.fullname', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Fullname</a></th>
+                <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a></th>
+                <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'fullname', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Fullname</a></th>
                 <th>Units</th>
                 <th>Average price</th>
                 <th>Allocation</th>
                 <th>Allocation%</th>
                 <th>Dividends</th>
-                <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'i.label', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Industry</a></th>
+                <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'industry', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Industry</a></th>
                 <th>actions</th>
             </tr>
         </thead>
