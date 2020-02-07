@@ -57,8 +57,7 @@ class PortfolioController extends AbstractController
         }
         $dividends = $paymentRepository->getSumDividends($tickerIds);
         [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
-        $posData = $positionRepository->getAllocationsAndUnits($tickerIds);
-
+       
         return $this->render('portfolio/index.html.twig', [
             'positions' => $items->getIterator(),
             'dividends' => $dividends,

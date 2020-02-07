@@ -42,6 +42,14 @@
 						<th>Industry</th>
 						<td>{{ ticker.branch.label }}</td>
 					</tr>
+					<tr>
+						<th>Dividend payment months</th>
+						<td>
+							{% for month in ticker.dividendMonths %}
+								{{ month.getDividendMonthName}},
+							{% endfor %}
+						</td>
+					</tr>
 				</tbody>
 			</table>
 
