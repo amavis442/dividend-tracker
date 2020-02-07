@@ -12,24 +12,13 @@
     <br/>
     {% include '_search_form.html.twig' %}
 
-    <ul class="nav nav-tabs">
-        {% for broker in brokers %}
-        <li class="nav-item">
-            <a class="nav-link {% if broker == tab %}active{% endif %}" href="{{ path('position_index', {'page': 1, 'tab': broker, 'orderBy': order, 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ broker }}</a>
-        </li>
-        {% endfor %}
-    </ul>
-
     <table class="table">
         <thead>
             <tr>
                 <th>
-                    <a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'tab': tab, 'orderBy': 'buyDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Buy date</a>
-                </th>
-                <th>Broker</th>
-                <th>
                     <a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'tab': tab, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a>
                 </th>
+                <th>Name</th>
                 <th>Industry</th>
                 <th>Units</th>
                 <th>Price</th>
@@ -43,18 +32,10 @@
                 {% set dividendDaysLeft = currentDividendData ? currentDividendData.getDaysLeft : -1 %}
                 <tr>
                     <td>
-                        {{ position.buyDate|date("d-m-Y") }}
-                        {% if position.closed %}
-                            <br/><span class="badge badge-warning">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                Closed on
-                                {{ position.closeDate|date("d-m-Y")}}
-                            </span>
-                        {% endif %}
-                    </td>
-                    <td>{{ position.broker }}</td>
-                    <td>
                         {{ position.ticker.ticker }}
+                    </td>
+                    <td>
+                        {{ position.ticker.fullname }}
                     </td>
                     <td>{{ position.ticker.branch.label }}</td>
                     <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
