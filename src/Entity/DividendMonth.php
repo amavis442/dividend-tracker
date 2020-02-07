@@ -48,8 +48,7 @@ class DividendMonth
         if ($this->dividendMonth < 0 || $this->dividendMonth > 12) {
             return '';
         }
-        $dateObj   = \DateTime::createFromFormat('!m', $this->dividendMonth);
-        return $dateObj->format('F'); // March
+        return date("F", strtotime(date("Y")."-".$this->dividendMonth."-10"));
     }
 
     public function setDividendMonth(int $dividendMonth): self
