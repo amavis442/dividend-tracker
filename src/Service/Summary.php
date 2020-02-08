@@ -28,4 +28,9 @@ class Summary
             $allocated
         ];
     }
+
+    public function getTotalAllocated(): int
+    {
+        return $this->positionRepository->getSumAllocated(); 
+    }
 }

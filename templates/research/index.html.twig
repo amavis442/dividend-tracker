@@ -24,8 +24,8 @@
                 <td>{{ research.title }}</td>
                 <td>{{ research.info|raw }}</td>
                 <td>
-                    {% for customfile in research.attachments %}
-                        <a href="{{ asset('uploads/documents/' ~ customfile.attachmentName) }}" target='_blank'>View document</a><br/>
+                    {% for doc in research.attachments %}
+                        <a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}" target='_blank'><i class="fa fa-download"></i> {{ doc.label }}</a><br/>
                     {% else %}
                         no records found
                     {% endfor %}             

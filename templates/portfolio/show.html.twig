@@ -3,16 +3,18 @@
 {% block title %}Position
 {% endblock %}
 
+{% set allocationSign = (position.allocationCurrency ? position.allocationCurrency.sign : '$') %}
+
 {% block body %}
 	<h1 class="display-4">Instrument:
 		{{ ticker.fullname }}</h1>
 
 	<ul class="nav nav-tabs" id="myTab" role="tablist">
 		<li class="nav-item">
-			<a class="nav-link" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true">Info</a>
+			<a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true">Info</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link active" id="position-tab" data-toggle="tab" href="#position" role="tab" aria-controls="position" aria-selected="true">Position</a>
+			<a class="nav-link" id="position-tab" data-toggle="tab" href="#position" role="tab" aria-controls="position" aria-selected="true">Position</a>
 		</li>
 		<li class="nav-item">
 			<a class="nav-link" id="transactions-tab" data-toggle="tab" href="#transactions" role="tab" aria-controls="transactions" aria-selected="true">Transactions</a>
@@ -25,9 +27,9 @@
 		</li>
 	</ul>
 	<div class="tab-content" id="myTabContent">
-		<div class="tab-pane fade" id="info" role="tabpanel" aria-labelledby="info-tab">
+		<div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
 			<br/>
-			<h3 >Info</h3>
+			<h3>Info</h3>
 			<table class="table">
 				<tbody>
 					<tr>
@@ -48,13 +50,40 @@
 							{% for month in ticker.dividendMonths %}
 								{{ month.getDividendMonthName}},
 							{% endfor %}
+							<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="Edit months">
+								<i class="far fa-edit"></i>
+							</a>
 						</td>
+					</tr>
+					<tr>
+						<th>Total dividend</th>
+						<td>
+							<span class="alert alert-primary" role="alert">
+								<strong>&euro;{{ dividend|format_number({fraction_digit: 2}) }}</string>
+							</span>
+						</td>
+					</tr>
+					<tr>
+						<th>Quantity</th>
+						<td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
+					</tr>
+					<tr>
+						<th>Average price</th>
+						<td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
+					</tr>
+					<tr>
+						<th>Allocation</th>
+						<td>{{ allocationSign|raw }}{{ (position.allocation/100)|format_number({fraction_digit: 2}) }}</td>
+					</tr>
+					<tr>
+						<th>Allocation(%)</th>
+						<td>{{ percentageAllocated|format_number({fraction_digit: 2}) }}%</td>
 					</tr>
 				</tbody>
 			</table>
 
 		</div>
-		<div class="tab-pane fade show active" id="position" role="tabpanel" aria-labelledby="position-tab">
+		<div class="tab-pane fade" id="position" role="tabpanel" aria-labelledby="position-tab">
 			<br/>
 			<h3>Position</h3>
 			<table class="table">
@@ -70,7 +99,7 @@
 				</thead>
 				<tbody>
 					{% if position %}
-						{% set allocationSign = (position.allocationCurrency ? position.allocationCurrency.sign : '$') %}
+
 
 						<tr class="table-success">
 							<td>
@@ -204,8 +233,8 @@
 							{% if research.attachments %}
 								<p>
 									{% for doc in research.attachments %}
-										<a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}" target='_blank'>View
-											{{ doc.label }}</a><br/>
+										<a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}" target='_blank'>
+										<i class="fa fa-download"></i> {{ doc.label }}</a><br/>
 									{% endfor %}
 								</p>
 							{% endif %}
@@ -219,6 +248,13 @@
 			{% else %}
 				no records found
 			{% endfor %}
+			<hr/>
+			<div class="btn-group mr-2" role="group" aria-label="Second group">
+				<a class="btn btn-primary" href="{{ path('research_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add research">
+					<i class="fab fa-searchengin"></i>
+				</a>
+			</div>
+			<hr/>
 		</div>
 	</div>
 
@@ -228,14 +264,5 @@
 			<a href="{{ path('portfolio_index') }}" class="btn btn-secondary">
 				<i class="fas fa-angle-double-left"></i>back to list</a>
 		</div>
-		<div class="btn-group mr-2" role="group" aria-label="Second group">
-			<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit ticker">
-				<i class="far fa-edit"></i>
-			</a>
-			<a class="btn btn-primary" href="{{ path('research_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add research">
-				<i class="fab fa-searchengin"></i>
-			</a>
-		</div>
 	</div>
-	<hr/>
 {% endblock %}

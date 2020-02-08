@@ -36,7 +36,7 @@ class PortfolioController extends AbstractController
             $orderBy = 'i.label';
         }
         if (in_array($orderBy, ['ticker', 'fullname'])) {
-            $orderBy = 't.'. $orderBy;
+            $orderBy = 't.' . $orderBy;
         }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
@@ -57,7 +57,7 @@ class PortfolioController extends AbstractController
         }
         $dividends = $paymentRepository->getSumDividends($tickerIds);
         [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
-       
+
         return $this->render('portfolio/index.html.twig', [
             'positions' => $items->getIterator(),
             'dividends' => $dividends,
@@ -81,14 +81,33 @@ class PortfolioController extends AbstractController
     /**
      * @Route("/{id}", name="portfolio_show", methods={"GET"})
      */
-    public function show(Ticker $ticker, PositionRepository $positionRepository, PaymentRepository $paymentRepository): Response
-    {
+    public function show(
+        Ticker $ticker,
+        PositionRepository $positionRepository,
+        PaymentRepository $paymentRepository,
+        Summary $summary
+    ): Response {
         $position = $positionRepository->getForTicker($ticker);
         $payments = $paymentRepository->getForTicker($ticker);
+        $dividends = $paymentRepository->getSumDividends([$ticker->getId()]);
+        $dividend = 0;
+        if (!empty($dividends)) {
+            $dividend = $dividends[$ticker->getId()] / 100;
+        }
+
+        $allocated = $summary->getTotalAllocated();
+        $percentageAllocation = 0;
+        if ($allocated > 0) {
+            $percentageAllocation = ($position->getAllocation() / $allocated);
+        }
+
         return $this->render('portfolio/show.html.twig', [
             'ticker' => $ticker,
             'position' => $position,
-            'payments' => $payments
+            'payments' => $payments,
+            'dividend' => $dividend,
+            'totalInvested' => $allocated,
+            'percentageAllocated' => $percentageAllocation,
         ]);
     }
 
