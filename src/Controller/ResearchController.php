@@ -15,12 +15,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Service\FileUploader;
-use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use App\Service\Referer;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
+
 
 /**
  * @Route("/dashboard/research")
@@ -68,7 +66,7 @@ class ResearchController extends AbstractController
     /**
      * @Route("/new/{ticker?}", name="research_new", methods={"GET","POST"})
      */
-    public function new(Request $request, ?Ticker $ticker, FileUploader $fileUploader): Response
+    public function new(Request $request, ?Ticker $ticker, FileUploader $fileUploader, Referer $referer): Response
     {
         $research = new Research();
         if ($ticker instanceof Ticker) {
@@ -78,16 +76,16 @@ class ResearchController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-           // $attachments = $form->get('attachments')->getData();
-           $attachments = $research->getAttachments();
+            // $attachments = $form->get('attachments')->getData();
+            $attachments = $research->getAttachments();
             if ($attachments) {
-                foreach ($attachments as $attachment) {  
+                foreach ($attachments as $attachment) {
                     if ($attachment->getAttachmentFile()) {
                         $attachmentFile = $attachment->getAttachmentFile();
                         $attachment->setAttachmentSize($attachmentFile->getSize());
                         $attachmentName = $fileUploader->upload($attachmentFile);
                         $attachment->setAttachmentName($attachmentName);
-                        
+
                         $research->addAttachment($attachment);
                     }
                 }
@@ -96,8 +94,13 @@ class ResearchController extends AbstractController
             $entityManager->persist($research);
             $entityManager->flush();
 
+            if ($referer->get()) {
+                return $this->redirect($referer->get());
+            }
             return $this->redirectToRoute('research_index');
         }
+
+        $referer->set();
 
         return $this->render('research/new.html.twig', [
             'research' => $research,
@@ -118,8 +121,8 @@ class ResearchController extends AbstractController
     /**
      * @Route("/{id}/edit", name="research_edit", methods={"GET","POST"})
      */
-            
-    public function edit(Request $request, Research $research, FileUploader $fileUploader, AttachmentRepository $attachmentRepository): Response
+
+    public function edit(Request $request, Research $research, FileUploader $fileUploader, AttachmentRepository $attachmentRepository, Referer $referer): Response
     {
         $form = $this->createForm(ResearchType::class, $research);
         $form->handleRequest($request);
@@ -127,23 +130,23 @@ class ResearchController extends AbstractController
 
         $oldAttachments = $request->get('attachments');
         $oldAttachmentLabels = $request->get('attachment_labels');
-    
+
         if ($form->isSubmitted() && $form->isValid()) {
             $existingAttachments = $attachmentRepository->findBy(['research' => $research->getId()]);
-                
-            if ($existingAttachments){
+
+            if ($existingAttachments) {
                 $filesystem = new Filesystem();
                 // Keep old attachments
                 /** @var Attachment $existingAttachment */
                 foreach ($existingAttachments as $existingAttachment) {
-                    if ($oldAttachments && in_array($existingAttachment->getId(), $oldAttachments)){
+                    if ($oldAttachments && in_array($existingAttachment->getId(), $oldAttachments)) {
                         $label = $oldAttachmentLabels[$existingAttachment->getId()];
                         $existingAttachment->setLabel($label);
                         $research->addAttachment($existingAttachment);
                     } else {
                         $research->removeAttachment($existingAttachment);
                         $this->getDoctrine()->getManager()->remove($existingAttachment);
-                        $fileOnDisk = $documentDirectory . '/'.$existingAttachment->getAttachmentName();
+                        $fileOnDisk = $documentDirectory . '/' . $existingAttachment->getAttachmentName();
                         if ($filesystem->exists($fileOnDisk)) {
                             $filesystem->remove([$fileOnDisk]);
                         }
@@ -154,21 +157,25 @@ class ResearchController extends AbstractController
             // add new attachments
             $attachments = $research->getAttachments();
             if ($attachments) {
-                foreach ($attachments as $attachment) {  
+                foreach ($attachments as $attachment) {
                     if ($attachment->getAttachmentFile()) {
                         $attachmentFile = $attachment->getAttachmentFile();
                         $attachment->setAttachmentSize($attachmentFile->getSize());
                         $attachmentName = $fileUploader->upload($attachmentFile);
                         $attachment->setAttachmentName($attachmentName);
-                        
+
                         $research->addAttachment($attachment);
                     }
                 }
             }
             $this->getDoctrine()->getManager()->flush();
-
+            if ($referer->get()) {
+                return $this->redirect($referer->get());
+            }
             return $this->redirectToRoute('research_index');
         }
+
+        $referer->set();
 
         return $this->render('research/edit.html.twig', [
             'research' => $research,
