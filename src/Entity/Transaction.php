@@ -70,12 +70,6 @@ class Transaction
     private $broker;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Ticker", inversedBy="positions")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $ticker;
-
-    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Position", inversedBy="transactions")
      * @ORM\JoinColumn(nullable=true)
      */
@@ -86,6 +80,12 @@ class Transaction
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Ticker", inversedBy="transactions")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $ticker;
 
     /**
      * @Assert\Callback
@@ -154,18 +154,6 @@ class Transaction
     public function setAmount(int $amount): self
     {
         $this->amount = $amount;
-
-        return $this;
-    }
-
-    public function getTicker(): ?Ticker
-    {
-        return $this->ticker;
-    }
-
-    public function setTicker(?Ticker $ticker): self
-    {
-        $this->ticker = $ticker;
 
         return $this;
     }
@@ -253,6 +241,18 @@ class Transaction
     public function setPosition(?Position $position): self
     {
         $this->position = $position;
+
+        return $this;
+    }
+
+    public function getTicker(): ?Ticker
+    {
+        return $this->ticker;
+    }
+
+    public function setTicker(?Ticker $ticker): self
+    {
+        $this->ticker = $ticker;
 
         return $this;
     }

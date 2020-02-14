@@ -5,6 +5,7 @@ namespace App\Controller\Report;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\BranchRepository;
+use App\Repository\CalendarRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Repository\PositionRepository;
@@ -64,7 +65,8 @@ class ReportController extends AbstractController
      */
     public function chart(
         PaymentRepository $paymentRepository,
-        PositionRepository $positionRepository
+        PositionRepository $positionRepository,
+        CalendarRepository $calendarRepository
     ): Response {
         
         $data = $paymentRepository->getDividendsPerInterval();
@@ -82,7 +84,6 @@ class ReportController extends AbstractController
         $totalAllocated = $positionRepository->getSumAllocated();
        
         $allocationData = $positionRepository->getAllocationDataPerSector();
-        //dd($allocationData);
         $allocationLabels = '[';
         $allocatedPercentage = '[';
         foreach ($allocationData as $allocationItem) {
@@ -92,6 +93,18 @@ class ReportController extends AbstractController
         }
         $allocationLabels = trim($allocationLabels,','). ']';
         $allocatedPercentage =  trim($allocatedPercentage,',').']';
+        
+        $dividendEstimateLabels = '[';
+        $dividendEstimateData = '[';
+        $dividendEstimate = $calendarRepository->getDividendEstimate();
+        foreach ($dividendEstimate as $date => $estimate) {
+            $d = strftime('%B %Y',strtotime($date.'01'));
+            $dividendEstimateLabels .= "'".$d."',";
+            $payout = ($estimate['totaldividend'] * 0.85) / 1.1;
+            $dividendEstimateData .= round($payout, 2).',';
+        }
+        $dividendEstimateLabels = trim($dividendEstimateLabels,','). ']';
+        $dividendEstimateData =  trim($dividendEstimateData,',').']';
 
         return $this->render('report/chart/index.html.twig', [
             'data' => $data,
@@ -100,6 +113,9 @@ class ReportController extends AbstractController
             'accumulative' => $accumulative,
             'allocationLabels' => $allocationLabels,
             'allocatedPercentage' => $allocatedPercentage,
+            'dividendEstimateLabels' => $dividendEstimateLabels,
+            'dividendEstimateData' => $dividendEstimateData,
+
             'controller_name' => 'ReportController',
         ]);
     }

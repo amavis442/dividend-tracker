@@ -67,6 +67,11 @@ class Ticker
      */
     private $DividendMonths;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="ticker")
+     */
+    private $transactions;
+
     public function __construct()
     {
         $this->positions = new ArrayCollection();
@@ -75,6 +80,7 @@ class Ticker
         $this->researches = new ArrayCollection();
         $this->dividendMonths = new ArrayCollection();
         $this->DividendMonths = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -377,6 +383,37 @@ class Ticker
             }
         }
         return $units;
+    }
+
+    /**
+     * @return Collection|Transaction[]
+     */
+    public function getTransactions(): Collection
+    {
+        return $this->transactions;
+    }
+
+    public function addTransaction(Transaction $transaction): self
+    {
+        if (!$this->transactions->contains($transaction)) {
+            $this->transactions[] = $transaction;
+            $transaction->setTicker($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransaction(Transaction $transaction): self
+    {
+        if ($this->transactions->contains($transaction)) {
+            $this->transactions->removeElement($transaction);
+            // set the owning side to null (unless already changed)
+            if ($transaction->getTicker() === $this) {
+                $transaction->setTicker(null);
+            }
+        }
+
+        return $this;
     }
     
 }
