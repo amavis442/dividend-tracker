@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Projection
+{% endblock %}
+
+{% block body %}
+    <div style='width:900px;height:600px' class="col col-xs-12">
+        <canvas id="myChart" ></canvas>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('chart') }}
+    {{ encore_entry_script_tags('app') }}
+    {% include "report/_colors.html.twig" %}
+<script>
+var config = {
+			type: 'bar',
+			data: {
+				datasets: [{
+					data: {{ data|raw }},
+					backgroundColor: [
+						window.chartColors.red,
+						window.chartColors.orange,
+						window.chartColors.yellow,
+						window.chartColors.green,
+                        window.chartColors.blue,
+                        window.chartColors.purple,
+                        window.chartColors.beige,
+                        window.chartColors.lightgreen,
+                        window.chartColors.grey,
+					],
+					label: 'Projection'
+				}],
+				labels: {{ labels|raw }}
+			},
+			options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    fontSize: 24,
+                    text: 'Dividend projection'
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            callback: function(value, index, values) {
+                               return '€' + value;
+                            }
+                        }
+                    }]
+                }
+			}
+        };
+var ctx = document.getElementById('myChart').getContext('2d');
+window.myBar = new Chart(ctx, config);
+</script>
+
+{% endblock %}

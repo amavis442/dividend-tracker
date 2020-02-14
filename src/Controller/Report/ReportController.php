@@ -61,12 +61,10 @@ class ReportController extends AbstractController
     }
 
     /**
-     * @Route("/chart", name="report_chart")
+     * @Route("/payout", name="report_payout")
      */
-    public function chart(
-        PaymentRepository $paymentRepository,
-        PositionRepository $positionRepository,
-        CalendarRepository $calendarRepository
+    public function payouts(
+        PaymentRepository $paymentRepository
     ): Response {
         
         $data = $paymentRepository->getDividendsPerInterval();
@@ -81,41 +79,63 @@ class ReportController extends AbstractController
         $dividends .= ']';
         $accumulative .= ']';
 
-        $totalAllocated = $positionRepository->getSumAllocated();
-       
-        $allocationData = $positionRepository->getAllocationDataPerSector();
-        $allocationLabels = '[';
-        $allocatedPercentage = '[';
-        foreach ($allocationData as $allocationItem) {
-            $allocationLabels .= "'".$allocationItem['industry']."',";
-            $allocation = $allocationItem['allocation'] / 100;
-            $allocatedPercentage .= round(($allocation/$totalAllocated) * 100,2).',';
-        }
-        $allocationLabels = trim($allocationLabels,','). ']';
-        $allocatedPercentage =  trim($allocatedPercentage,',').']';
-        
-        $dividendEstimateLabels = '[';
-        $dividendEstimateData = '[';
-        $dividendEstimate = $calendarRepository->getDividendEstimate();
-        foreach ($dividendEstimate as $date => $estimate) {
-            $d = strftime('%B %Y',strtotime($date.'01'));
-            $dividendEstimateLabels .= "'".$d."',";
-            $payout = ($estimate['totaldividend'] * 0.85) / 1.1;
-            $dividendEstimateData .= round($payout, 2).',';
-        }
-        $dividendEstimateLabels = trim($dividendEstimateLabels,','). ']';
-        $dividendEstimateData =  trim($dividendEstimateData,',').']';
-
-        return $this->render('report/chart/index.html.twig', [
+        return $this->render('report/payout/index.html.twig', [
             'data' => $data,
             'labels' => $labels,
             'dividends' => $dividends,
             'accumulative' => $accumulative,
-            'allocationLabels' => $allocationLabels,
-            'allocatedPercentage' => $allocatedPercentage,
-            'dividendEstimateLabels' => $dividendEstimateLabels,
-            'dividendEstimateData' => $dividendEstimateData,
+            'controller_name' => 'ReportController',
+        ]);
+    }
 
+    /**
+     * @Route("/allocation", name="report_allocation")
+     */
+    public function allocation(PositionRepository $positionRepository)
+    {
+        $totalAllocated = $positionRepository->getSumAllocated();
+       
+        $allocationData = $positionRepository->getAllocationDataPerSector();
+        $labels = '[';
+        $data = '[';
+        foreach ($allocationData as $allocationItem) {
+            $labels .= "'".$allocationItem['industry']."',";
+            $allocation = $allocationItem['allocation'] / 100;
+            $data .= round(($allocation/$totalAllocated) * 100,2).',';
+        }
+        $labels = trim($labels,','). ']';
+        $data =  trim($data,',').']';
+
+        return $this->render('report/allocation/index.html.twig', [
+            'data' => $data,
+            'labels' => $labels,
+            'controller_name' => 'ReportController',
+        ]);
+    }
+
+
+    /**
+     * @Route("/projection", name="report_projection")
+     */
+    public function projection(
+        CalendarRepository $calendarRepository
+    ): Response {
+        $dividendEstimate = $calendarRepository->getDividendEstimate();
+
+        $labels = '[';
+        $data = '[';
+        foreach ($dividendEstimate as $date => $estimate) {
+            $d = strftime('%B %Y',strtotime($date.'01'));
+            $labels .= "'".$d."',";
+            $payout = ($estimate['totaldividend'] * 0.85) / 1.1;
+            $data .= round($payout, 2).',';
+        }
+        $labels = trim($labels,','). ']';
+        $data =  trim($data,',').']';
+
+        return $this->render('report/projection/index.html.twig', [
+            'data' => $data,
+            'labels' => $labels,
             'controller_name' => 'ReportController',
         ]);
     }

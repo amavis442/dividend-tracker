@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Allocation
+{% endblock %}
+
+{% block body %}
+    <div style='width:900px;height:600px' class="col col-xs-12">
+        <canvas id="myChartAllocation" ></canvas>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('chart') }}
+    {{ encore_entry_script_tags('app') }}
+    {% include "report/_colors.html.twig" %}    
+<script>
+var config = {
+			type: 'pie',
+			data: {
+				datasets: [{
+					data: {{ data|raw }},
+					backgroundColor: [
+						window.chartColors.red,
+						window.chartColors.orange,
+						window.chartColors.yellow,
+						window.chartColors.green,
+                        window.chartColors.blue,
+                        window.chartColors.purple,
+                        window.chartColors.beige,
+                        window.chartColors.lightgreen,
+                        window.chartColors.grey,
+					],
+					label: 'Allocation'
+				}],
+				labels: {{ labels|raw }}
+			},
+			options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    fontSize: 24,
+                    text: 'Allocation per sector'
+                }
+			}
+        };
+        
+var ctxAllocation = document.getElementById('myChartAllocation').getContext('2d');
+window.myPie = new Chart(ctxAllocation, config);
+</script>
+
+{% endblock %}
