@@ -68,8 +68,15 @@ class ReportController extends AbstractController
     ): Response {
         
         $data = $paymentRepository->getDividendsPerInterval();
+        
+        $labels = '[';
+        $dates = array_keys($data);
+        foreach ($dates as $date)
+        {
+            $labels .= "'".strftime('%b %Y',strtotime($date.'01'))."',";
+        }
+        $labels = trim($labels,','). ']';
 
-        $labels = '['.implode(',',array_keys($data)).']';
         $accumulative = '[';
         $dividends = '[';
         foreach ($data as $item) {
