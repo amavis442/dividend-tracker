@@ -63,4 +63,55 @@ class CalendarRepository extends ServiceEntityRepository
 
         return $queryBuilder->getOneOrNullResult();
     }
+
+    public function getDividendEstimate(): array
+    {
+        $result = $this->createQueryBuilder('c')
+            ->select(['c', 't', 'a'])
+            ->innerJoin('c.ticker', 't')
+            ->innerJoin('t.positions', 'p')
+            ->innerJoin('t.transactions', 'a')
+            ->where('a.transactionDate < c.exDividendDate')
+            ->andWhere('p.closed <> 1 or p.closed is null')
+            ->getQuery()
+            ->getResult();
+        $output = [];
+        foreach ($result as $item) {
+            $paydate = $item->getPaymentDate()->format('Ym');
+            if (!isset($output[$paydate])) {
+                $output[$paydate] = [];
+            }
+            $ticker = $item->getTicker();
+            $transactions = $ticker->getTransactions();
+            $units = 0;
+
+            foreach ($transactions as $transaction) {
+                $amount = $transaction->getAmount();
+                if ($transaction->getSide() === 1) {
+                    $units += $amount;
+                }
+                if ($transaction->getSide() === 2) {
+                    $units -= $amount;
+                }
+            }
+            $units = $units / 100;
+            if (!isset($output[$paydate][$ticker->getTicker()])) {
+                $output[$paydate]['tickers'][$ticker->getTicker()] = [];
+                
+            }
+            if (!isset($output[$paydate]['totaldividend'])){
+                $output[$paydate]['totaldividend'] = 0;
+            }
+            
+            $dividend = $item->getCashAmount() / 100;
+            $output[$paydate]['tickers'][$ticker->getTicker()] = [
+                'units' => $units,
+                'dividend' => $dividend
+            ];
+            $payout = $units * $dividend;
+            $output[$paydate]['totaldividend'] +=  $payout;
+        }
+        ksort($output);
+        return $output;
+    }
 }

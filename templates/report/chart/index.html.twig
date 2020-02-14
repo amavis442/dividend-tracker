@@ -12,6 +12,9 @@
     <div style='width:900px;height:600px' class="col col-xs-12">
         <canvas id="myChartAllocation" ></canvas>
     </div>
+    <div style='width:900px;height:600px' class="col col-xs-12">
+        <canvas id="myChartDividendProjection" ></canvas>
+    </div>
 {% endblock %}
 
 {% block javascripts %}
@@ -95,6 +98,49 @@ var config = {
         
 var ctxAllocation = document.getElementById('myChartAllocation').getContext('2d');
 window.myPie = new Chart(ctxAllocation, config);
+
+
+var configEstimate = {
+			type: 'bar',
+			data: {
+				datasets: [{
+					data: {{ dividendEstimateData|raw }},
+					backgroundColor: [
+						window.chartColors.red,
+						window.chartColors.orange,
+						window.chartColors.yellow,
+						window.chartColors.green,
+                        window.chartColors.blue,
+                        window.chartColors.purple,
+                        window.chartColors.beige,
+                        window.chartColors.lightgreen,
+                        window.chartColors.grey,
+					],
+					label: 'Projection'
+				}],
+				labels: {{ dividendEstimateLabels|raw }}
+			},
+			options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    fontSize: 24,
+                    text: 'Dividend projection'
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            callback: function(value, index, values) {
+                               return '€' + value;
+                            }
+                        }
+                    }]
+                }
+			}
+        };
+var ctxProjection = document.getElementById('myChartDividendProjection').getContext('2d');
+window.myBar = new Chart(ctxProjection, configEstimate);
 </script>
 
 {% endblock %}

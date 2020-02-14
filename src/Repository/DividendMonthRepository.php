@@ -22,9 +22,10 @@ class DividendMonthRepository extends ServiceEntityRepository
     public function getAll(): array
     {
         $result = $this->createQueryBuilder('d')
-            ->orderBy('d.dividendMonth')
-            ->leftJoin('d.tickers', 't')
-            ->getQuery()->getResult();
+            ->innerJoin('d.tickers', 't')
+            ->orderBy('d.dividendMonth','ASC')
+            ->getQuery()
+            ->getResult();
         return $result;
     }
 

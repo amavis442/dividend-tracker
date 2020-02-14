@@ -7,7 +7,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Repository\TickerRepository;
 
 /**
  * @Route("/dashboard/report")
@@ -20,7 +19,6 @@ class DividendMonthController extends AbstractController
     public function index(
         DividendMonthRepository $dividendMonthRepository
     ): Response {
-   
 
         return $this->render('report/dividendmonth/index.html.twig', [
             'data' => $dividendMonthRepository->getAll(),
