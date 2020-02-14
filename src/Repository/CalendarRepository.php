@@ -73,6 +73,8 @@ class CalendarRepository extends ServiceEntityRepository
             ->innerJoin('t.transactions', 'a')
             ->where('a.transactionDate < c.exDividendDate')
             ->andWhere('p.closed <> 1 or p.closed is null')
+            ->andWhere('YEAR(c.paymentDate) = :year')
+            ->setParameter('year', date('Y'))
             ->getQuery()
             ->getResult();
         $output = [];

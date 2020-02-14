@@ -24,3 +24,8 @@ doctrine:
             user_filter: 
                 class: App\Repository\Filter\UserFilter
                 enabled: false
+        dql:
+            datetime_functions:
+                DAY: DoctrineExtensions\Query\Mysql\Day
+                MONTH: DoctrineExtensions\Query\Mysql\Month
+                YEAR: DoctrineExtensions\Query\Mysql\Year        
