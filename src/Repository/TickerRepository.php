@@ -115,5 +115,4 @@ class TickerRepository extends ServiceEntityRepository
         
         return $result[0]['units'] ?? 0;
     }
-
 }

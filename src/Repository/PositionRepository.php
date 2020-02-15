@@ -252,6 +252,7 @@ class PositionRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('p')
         ->select([
+            'b.id',
             'b.label as industry',
             'SUM(p.amount) amount',
             'p.price',

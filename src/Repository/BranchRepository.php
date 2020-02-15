@@ -41,4 +41,55 @@ class BranchRepository extends ServiceEntityRepository
         ->getQuery()
         ->getSingleScalarResult();
     }
+
+    public function getAllocationPerSector()
+    {
+        $result = $this->createQueryBuilder('s')
+            ->select('s, t, p')
+            ->innerJoin('s.tickers', 't')
+            ->innerJoin('t.positions','p')
+            ->where('p.closed is null OR p.closed = 0')
+            ->getQuery()
+            ->getArrayResult();
+
+        $output = [];
+        $totalAllocation = 0;
+        foreach ($result as $sector){
+            if (!isset($output[$sector['label']])){
+                $output[$sector['label']] = [
+                    'sectorTargetAllocation' => round($sector['assetAllocation'] / 100, 2) , 
+                    'sectorAllocation' => 0, 
+                    'sectorPositions' => []
+                ];
+            }
+            $sectorAllocation = 0;
+            foreach ($sector['tickers'] as $ticker) {
+                $positionData = [];
+                $positionData['positionSymbol'] = $ticker['ticker'];
+                $positionData['positionLabel'] = $ticker['fullname'];
+                $positionData['positionAmount'] = 0;
+                $positionData['positionAllocation'] = 0;
+                $positionData['positionProfit'] = 0;
+                foreach ($ticker['positions'] as $position) {
+                    $positionData['positionAmount'] += $position['amount'];
+                    $positionData['positionAllocation'] += $position['allocation'];
+                    $positionData['positionProfit'] += $position['profit'];
+                    $sectorAllocation += $position['allocation'];
+                    $totalAllocation += $position['allocation'];
+                }
+                $output[$sector['label']]['sectorPositions'][] = $positionData;
+                $output[$sector['label']]['sectorAllocation'] = $sectorAllocation;
+                
+            }
+        }
+
+        foreach ($output as &$sector) {
+            $sector['sectorAllocationPercentage'] = round(($sector['sectorAllocation'] / $totalAllocation) * 100, 2);
+            foreach ($sector['sectorPositions'] as &$position) {
+                $position['positionAllocationPercentage'] = round(($position['positionAllocation'] / $sector['sectorAllocation']) * 100, 2);
+            }
+        }
+        
+        return $output;
+    }
 }
