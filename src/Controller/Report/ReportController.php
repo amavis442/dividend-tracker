@@ -98,8 +98,9 @@ class ReportController extends AbstractController
     /**
      * @Route("/allocation", name="report_allocation")
      */
-    public function allocation(PositionRepository $positionRepository)
+    public function allocation(PositionRepository $positionRepository, BranchRepository $branchRepository)
     {
+        $sectors = $branchRepository->getAllocationPerSector();
         $totalAllocated = $positionRepository->getSumAllocated();
        
         $allocationData = $positionRepository->getAllocationDataPerSector();
@@ -116,6 +117,7 @@ class ReportController extends AbstractController
         return $this->render('report/allocation/index.html.twig', [
             'data' => $data,
             'labels' => $labels,
+            'sectors' => $sectors,
             'controller_name' => 'ReportController',
         ]);
     }
