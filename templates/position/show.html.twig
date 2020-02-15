@@ -20,15 +20,11 @@
                 <td>{{ position.ticker.branch.label }}</td>
             </tr>
             <tr>
-                <th>Buydate</th>
-                <td>{{ position.buyDate|date("d-m-Y") }}</td>
-            </tr>
-            <tr>
                 <th>Units</th>
                 <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
             </tr>
             <tr>
-                <th>Price</th>
+                <th>Average price</th>
                 <td>{{ position.currency.sign|raw }}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
             </tr>
             <tr>
@@ -40,20 +36,8 @@
                 <td>{{ position.closed ? 'Closed' : 'Open' }}</td>
             </tr>
             <tr>
-                <th>Closedate</th>
-                <td>{{ position.closeDate ? position.closeDate|date("d-m-Y") : '' }}</td>
-            </tr>
-            <tr>
-                <th>Close price</th>
-                <td>{% if position.closePrice %}{{ position.closedCurrency ? position.closedCurrency.sign|raw : '' }}{{ position.closePrice/100 }}{% endif %}</td>
-            </tr>
-            <tr>
                 <th>Profit / Loss</th>
                 <td>{% if position.profit %}${{ position.profit|format_number({fraction_digit: 2}) }}{% endif %}</td>
-            </tr>
-            <tr>
-                <th>Profit / Loss (%)</th>
-                <td>{% if position.closePrice %}{{ position.getProfitPercentage|format_number({fraction_digit: 2}) }}%{% endif %}</td>
             </tr>
         </tbody>
     </table>

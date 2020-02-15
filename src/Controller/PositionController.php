@@ -31,10 +31,10 @@ class PositionController extends AbstractController
         SessionInterface $session,
         int $page = 1,
         string $tab = 'All',
-        string $orderBy = 'p.buyDate',
+        string $orderBy = 'ticker',
         string $sort = 'asc'
     ): Response {
-        if (!in_array($orderBy, ['buyDate', 'profit'])) {
+        if (!in_array($orderBy, ['profit'])) {
             $orderBy = 'p.' . $orderBy;
         }
         if (!in_array($orderBy, ['ticker'])) {
@@ -98,8 +98,6 @@ class PositionController extends AbstractController
             $position->setTicker($ticker);
         }
         $currentDate = new DateTime();
-        $position->setBuyDate($currentDate);
-
         $form = $this->createForm(PositionType::class, $position);
         $form->handleRequest($request);
 
@@ -114,8 +112,8 @@ class PositionController extends AbstractController
                 ->setCurrency($position->getCurrency())
                 ->setAllocation($position->getAllocation())
                 ->setAllocationCurrency($position->getAllocationCurrency())
-                ->setTransactionDate($position->getBuyDate())
-                ->setBroker($position->getBroker());
+                ->setTransactionDate($currentDate)
+                ->setBroker($form->get('broker')->getData());
 
             $position->addTransaction($transaction);
 
@@ -152,7 +150,6 @@ class PositionController extends AbstractController
     {
         if ($closed === 1) {
             $position->setClosed(true);
-            $position->setCloseDate(new DateTime());
         }
 
         $form = $this->createForm(PositionType::class, $position);

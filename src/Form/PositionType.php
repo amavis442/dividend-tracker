@@ -32,22 +32,11 @@ class PositionType extends AbstractType
                         ->orderBy('t.ticker', 'ASC');
                 },
             ])
-            ->add('broker', ChoiceType::class, [
-                'choices'  => [
-                    'Trading212' => 'Trading212',
-                    'Flatex' =>  'Flatex',
-                    'eToro' =>  'eToro',
-                ],
-            ])
-            ->add('buyDate', DateType::class, [
-                // renders it as a single text box
-                'widget' => 'single_text',
-            ])
             ->add('amount', TextType::class, ['help' => 'use decimal point if you have a fraction of a stock', 'label' => 'Units'])
             ->add('price', TextType::class, [
-                'label' => 'Price',
+                'label' => 'Average price',
                 'required' => false,
-                'help' => 'What was the stock price and not what you paid'
+                'help' => 'Adjusment if automatic calculation is wrong'
             ])
             ->add('currency', EntityType::class, [
                 'class' => Currency::class,
@@ -60,7 +49,7 @@ class PositionType extends AbstractType
             ->add('allocation', TextType::class, [
                 'label' => 'Allocation',
                 'required' => false,
-                'help' => 'What was what you paid in total for this position'
+                'help' => 'Adjusment if automatic calculation is wrong'
             ])
             ->add('allocation_currency', EntityType::class, [
                 'class' => Currency::class,
@@ -70,9 +59,17 @@ class PositionType extends AbstractType
                 'required' => true,
                 'empty_data' => 'EUR'
             ])
-            ->add('closed', CheckboxType::class, [
-                'label'    => 'Position closed?',
+            ->add('profit', TextType::class, [
+                'label' => 'Profit',
                 'required' => false,
+            ])
+            ->add('broker', ChoiceType::class, [
+                'mapped' => false,
+                'choices'  => [
+                    'Trading212' => 'Trading212',
+                    'Flatex' =>  'Flatex',
+                    'eToro' =>  'eToro',
+                ],
             ]);
 
         $callbackTransformer = CallbackTransformerFactory::create();

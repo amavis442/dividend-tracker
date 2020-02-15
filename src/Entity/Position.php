@@ -39,24 +39,9 @@ class Position
     private $ticker;
 
     /**
-     * @ORM\Column(type="datetime", name="buy_date")
-     */
-    private $buyDate;
-
-    /**
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $closed;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true, name="close_date")
-     */
-    private $closeDate;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true, name="close_price")
-     */
-    private $closePrice;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
@@ -81,19 +66,9 @@ class Position
     private $currency;
 
     /**
-     * @ORM\Column(type="string", length=255,  options={"default" : "Trading212"})
-     */
-    private $broker;
-
-    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Currency")
      */
     private $allocationCurrency;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Currency")
-     */
-    private $closedCurrency;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="position")
@@ -102,7 +77,6 @@ class Position
 
     public function __construct()
     {
-        $this->payments = new ArrayCollection();
         $this->transactions = new ArrayCollection();
     }
 
@@ -123,6 +97,7 @@ class Position
                 ->addViolation();
         }
     }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -163,18 +138,6 @@ class Position
         return $this;
     }
 
-    public function getBuyDate(): ?\DateTimeInterface
-    {
-        return $this->buyDate;
-    }
-
-    public function setBuyDate(\DateTimeInterface $buyDate): self
-    {
-        $this->buyDate = $buyDate;
-
-        return $this;
-    }
-
     public function getClosed(): ?bool
     {
         return $this->closed;
@@ -183,32 +146,6 @@ class Position
     public function setClosed(?bool $closed): self
     {
         $this->closed = $closed;
-        return $this;
-    }
-
-    public function getCloseDate(): ?\DateTimeInterface
-    {
-        return $this->closeDate;
-    }
-
-    public function setCloseDate(?\DateTimeInterface $closeDate): self
-    {
-        $this->closeDate = $closeDate;
-
-        return $this;
-    }
-
-    public function getClosePrice(): ?int
-    {
-        return $this->closePrice;
-    }
-
-    public function setClosePrice(int $closePrice): self
-    {
-        $this->closePrice = $closePrice;
-        if ($this->closePrice > 0) {
-            $this->profit = round((($this->closePrice - $this->price) * $this->amount) / 100);
-        }
         return $this;
     }
 
@@ -271,18 +208,6 @@ class Position
         return $this;
     }
 
-    public function getBroker(): ?string
-    {
-        return $this->broker;
-    }
-
-    public function setBroker(string $broker): self
-    {
-        $this->broker = $broker;
-
-        return $this;
-    }
-
     public function getAllocationCurrency(): ?Currency
     {
         return $this->allocationCurrency;
@@ -291,18 +216,6 @@ class Position
     public function setAllocationCurrency(?Currency $allocationCurrency): self
     {
         $this->allocationCurrency = $allocationCurrency;
-
-        return $this;
-    }
-
-    public function getClosedCurrency(): ?Currency
-    {
-        return $this->closedCurrency;
-    }
-
-    public function setClosedCurrency(?Currency $closedCurrency): self
-    {
-        $this->closedCurrency = $closedCurrency;
 
         return $this;
     }

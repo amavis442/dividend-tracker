@@ -29,11 +29,11 @@ class ClosedPositionController extends AbstractController
         PaymentRepository $paymentRepository,
         SessionInterface $session,
         int $page = 1,
-        string $orderBy = 'buyDate',
+        string $orderBy = 'ticker',
         string $sort = 'asc'
     ): Response {
-        if (!in_array($orderBy, ['buyDate', 'closeDate','profit', 'ticker'])) {
-            $orderBy = 'buyDate';
+        if (!in_array($orderBy, ['profit', 'ticker'])) {
+            $orderBy = 'ticker';
         }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';

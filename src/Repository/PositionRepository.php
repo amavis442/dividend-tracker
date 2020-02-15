@@ -30,13 +30,12 @@ class PositionRepository extends ServiceEntityRepository
     public function getAll(
         int $page = 1,
         int $limit = 10,
-        string $orderBy = 'p.buyDate',
+        string $orderBy = 't.ticker',
         string $sort = 'ASC',
         string $search = ''
     ): Paginator {
 
         $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
-        //dd('eeeeee', $queryBuilder->getQuery()->getDql());
         $queryBuilder->leftJoin('t.calendars', 'c');
         $queryBuilder->andWhere('p.closed <> 1 or p.closed is null');
         $query = $queryBuilder->getQuery();
@@ -64,7 +63,7 @@ class PositionRepository extends ServiceEntityRepository
     public function getAllClosed(
         int $page = 1,
         int $limit = 10,
-        string $orderBy = 'buyDate',
+        string $orderBy = 't.ticker',
         string $sort = 'ASC',
         string $search = ''
     ): Paginator {
@@ -81,11 +80,11 @@ class PositionRepository extends ServiceEntityRepository
     }
 
     private function getQueryBuilder(
-        string $orderBy = 'p.buyDate',
+        string $orderBy = 't.ticker',
         string $sort = 'ASC',
         string $search = ''
     ): QueryBuilder {
-        $order = 'p.buyDate';
+        $order = 't.ticker';
         if (in_array($orderBy, ['t.ticker', 't.fullname', 'i.label'])) {
             $order = $orderBy;
         }

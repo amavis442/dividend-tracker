@@ -21,7 +21,7 @@
                 <th>Name</th>
                 <th>Industry</th>
                 <th>Units</th>
-                <th>Price</th>
+                <th>Average price</th>
                 <th>Allocation</th>
                 <th style="width:20%">actions</th>
             </tr>
@@ -68,7 +68,4 @@
     </table>
 
     {% include 'paginator.html.twig' %}
-    <a class="btn btn-primary" href="{{ path('position_new') }}">
-        <i class="fas fa-plus"></i>
-    </a>
 {% endblock %}

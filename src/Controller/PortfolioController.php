@@ -6,7 +6,6 @@ use App\Entity\Ticker;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
 use App\Service\Summary;
-use App\Repository\TickerRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

@@ -22,12 +22,6 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
                         <a href="{{ url('portfolio_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Portfolio</a>
-                        <div class="dropdown-divider"></div>
-                        <a href="{{ url('position_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Positions</a>
-                        <div class="dropdown-divider"></div>
-                        <a href="{{ url('upcomming_position_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Upcomming dividends</a>
-                        <div class="dropdown-divider"></div>
-                        <a href="{{ url('report_closed_positions_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Closed positions</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -38,9 +32,7 @@
                         <a href="{{ url('payment_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Payments</a>
                         <div class="dropdown-divider"></div>
                         <a href="{{ url('calendar_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Calendar</a>
-                        <div class="dropdown-divider"></div>
-                        <a href="{{ url('dividend_month_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Dividend month Tickers</a>
-                    </div>
+                   </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown4" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -52,7 +44,9 @@
                         <a href="{{ url('report_allocation', parameters = [], schemeRelative = false) }}" class="dropdown-item">Allocation</a>
                         <div class="dropdown-divider"></div>
                         <a href="{{ url('report_projection', parameters = [], schemeRelative = false) }}" class="dropdown-item">Projection</a>
-                    </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url('dividend_month_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Dividend month Tickers</a>
+                      </div>
                 </li>
             {% endif %}
         </ul>
