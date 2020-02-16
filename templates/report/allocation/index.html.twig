@@ -18,6 +18,7 @@
                     <div class="item"><button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ collapseId }}" aria-expanded="true" aria-controls="collapse{{ collapseId }}">{{ label }}</button></div>
                     <div class="item">&euro;{{ (sector.sectorAllocation/100)|format_number({fraction_digit: 2}) }}</div>
                     <div class="item">{{ sector.sectorAllocationPercentage }}%</div>
+					<div class="item"><span class="badge badge-info">{{ sector.sectorTargetAllocation }}%</span></div>
                 </div>
 			</div>
 
