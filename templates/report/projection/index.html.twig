@@ -7,6 +7,51 @@
     <div style='width:900px;height:600px' class="col col-xs-12">
         <canvas id="myChart" ></canvas>
     </div>
+
+    <div class="accordion" id="accordionExample">
+	{% set collapseId = 0 %}
+	{% for label, item in datasource %}
+		{% set collapseId = collapseId + 1  %}
+		<div class="card">
+			<div class="card-header" id="heading{{ collapseId }}">
+				<div class="d-flex flex-row bd-highlight">
+                    <div class="item"><button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ collapseId }}" aria-expanded="true" aria-controls="collapse{{ collapseId }}">{{ item.normaldate }}</button></div>
+                    <div class="item">${{ (item.totaldividend)|format_number({fraction_digit: 2}) }}</div>
+                    <div class="item">&euro;{{ item.payout|format_number({fraction_digit: 2}) }}</div>
+                </div>
+			</div>
+
+			<div id="collapse{{ collapseId }}" class="collapse" aria-labelledby="heading{{ collapseId }}" data-parent="#accordionExample">
+				<div class="card-body">
+					<table class="table">
+						<thead class="thead-dark">
+							<tr>
+								<th>Company</th>
+								<th>Units</th>
+								<th>dividend</th>
+                                <th>Total dividend</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for positionLabel, position in item.tickers %}
+								<tr>
+									<td>{{ positionLabel }}</td>
+									<td>{{ position.units }}</td>
+									<td>${{ position.dividend }}</td>
+									<td>&euro;{{ position.payout }}</td>
+								</tr>
+								<tr>
+								{% endfor %}
+							</tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	{% endfor %}
+</div>
+
+
 {% endblock %}
 
 {% block javascripts %}

@@ -130,14 +130,15 @@ class ReportController extends AbstractController
         CalendarRepository $calendarRepository
     ): Response {
         $dividendEstimate = $calendarRepository->getDividendEstimate();
-
         $labels = '[';
         $data = '[';
-        foreach ($dividendEstimate as $date => $estimate) {
+        foreach ($dividendEstimate as $date => &$estimate) {
             $d = strftime('%B %Y',strtotime($date.'01'));
             $labels .= "'".$d."',";
             $payout = ($estimate['totaldividend'] * 0.85) / 1.1;
             $data .= round($payout, 2).',';
+            $estimate['payout'] = $payout;
+            $estimate['normaldate'] = $d;
         }
         $labels = trim($labels,','). ']';
         $data =  trim($data,',').']';
@@ -145,6 +146,7 @@ class ReportController extends AbstractController
         return $this->render('report/projection/index.html.twig', [
             'data' => $data,
             'labels' => $labels,
+            'datasource' => $dividendEstimate,
             'controller_name' => 'ReportController',
         ]);
     }

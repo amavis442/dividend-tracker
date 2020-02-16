@@ -104,11 +104,13 @@ class CalendarRepository extends ServiceEntityRepository
             if (!isset($output[$paydate]['totaldividend'])){
                 $output[$paydate]['totaldividend'] = 0;
             }
-            
+
             $dividend = $item->getCashAmount() / 100;
+            $payoutPosition = round(($units * $dividend * 0.85) / 1.1, 2);
             $output[$paydate]['tickers'][$ticker->getTicker()] = [
                 'units' => $units,
-                'dividend' => $dividend
+                'dividend' => $dividend,
+                'payout' => $payoutPosition
             ];
             $payout = $units * $dividend;
             $output[$paydate]['totaldividend'] +=  $payout;
