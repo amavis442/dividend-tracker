@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Repository\PositionRepository;
 use App\Repository\PaymentRepository;
+use App\Service\Summary;
 
 /**
  * @Route("/dashboard/report")
@@ -98,8 +99,10 @@ class ReportController extends AbstractController
     /**
      * @Route("/allocation", name="report_allocation")
      */
-    public function allocation(PositionRepository $positionRepository, BranchRepository $branchRepository)
+    public function allocation(PositionRepository $positionRepository, BranchRepository $branchRepository, Summary $summary)
     {
+        [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
+
         $sectors = $branchRepository->getAllocationPerSector();
         $totalAllocated = $positionRepository->getSumAllocated();
        
@@ -118,6 +121,12 @@ class ReportController extends AbstractController
             'data' => $data,
             'labels' => $labels,
             'sectors' => $sectors,
+            'numActivePosition' => $numActivePosition,
+            'numPosition' => $numActivePosition,
+            'numTickers' => $numTickers,
+            'profit' => $profit,
+            'totalDividend' => $totalDividend,
+            'totalInvested' => $allocated,
             'controller_name' => 'ReportController',
         ]);
     }
