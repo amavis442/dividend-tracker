@@ -30,6 +30,7 @@
 								<th>Units</th>
 								<th>dividend</th>
                                 <th>Total dividend</th>
+								<th>Exdiv / Pay date</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -39,6 +40,7 @@
 									<td>{{ position.units }}</td>
 									<td>${{ position.dividend }}</td>
 									<td>&euro;{{ position.payout }}</td>
+									<td><span class="badge badge-warning">{{ position.exdividend }}</span> / <span class="badge badge-success">{{ position.payoutdate }}</span></td>
 								</tr>
 								<tr>
 								{% endfor %}
