@@ -109,25 +109,25 @@ class TransactionController extends AbstractController
                 $newAllocation = $allocation + $transaction->getAllocation();
             }    
 
+            // Todo: fix for when we have a loss and the effects on the average price then
             if ($transaction->getSide() == Transaction::SELL) {
                 $profit = $transaction->getAllocation() -  ($transaction->getAmount() * $avgPrice) / 100;
-                $transaction->getPosition()->setProfit($profit + $transaction->getPosition()->getProfit());
-                $transaction->setProfit(floor($profit));
-                $preTransactionAllocation = $transaction->getAmount() * $avgPrice;
+                $position = $transaction->getPosition();
+                $oldProfit = $position->getProfit();
+                $newProfit = $oldProfit + (int)round($profit);
                 $newAmount = $amount - $transaction->getAmount();
-                $newAllocation = $allocation - $preTransactionAllocation/100;
+                $newAllocation = ($avgPrice * $newAmount)/100;
+                $transaction->getPosition()->setProfit($newProfit);
+                $transaction->setAvgprice($avgPrice);
+                $transaction->setProfit($profit);
             }  
 
             if ($newAmount == 0) {
                 $transaction->getPosition()->setClosed(1);
             } 
-            if ($newAmount > 0) {
-                $newAvgPrice = (int)floor(($newAllocation / $newAmount) * 100);
-                $transaction->getPosition()->setPrice($newAvgPrice);
-            } 
             $transaction->getPosition()->setAllocation($newAllocation); 
             $transaction->getPosition()->setAmount($newAmount);
-           
+       
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($transaction);
             $entityManager->flush();

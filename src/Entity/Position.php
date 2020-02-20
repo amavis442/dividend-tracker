@@ -72,6 +72,7 @@ class Position
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="position")
+     * ORM\OrderBy({"transactionDate" = "ASC"})
      */
     private $transactions;
 
@@ -151,7 +152,7 @@ class Position
 
     public function getProfit(): ?float
     {
-        return $this->profit / 100;
+        return $this->profit;
     }
 
     public function setProfit(int $profit): self

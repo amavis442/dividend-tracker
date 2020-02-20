@@ -11,6 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Form\Factory\CallbackTransformerFactory;
@@ -27,7 +28,7 @@ class TransactionType extends AbstractType
                     'eToro' =>  'eToro',
                 ],
             ])
-            ->add('transactionDate', DateType::class, [
+            ->add('transactionDate', DateTimeType::class, [
                 // renders it as a single text box
                 'widget' => 'single_text',
             ])

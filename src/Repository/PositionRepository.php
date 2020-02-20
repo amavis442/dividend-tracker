@@ -181,7 +181,6 @@ class PositionRepository extends ServiceEntityRepository
     {
         $profit = $this->createQueryBuilder('p')
             ->select('SUM(p.profit)')
-            ->where('p.closed = 1')
             ->getQuery()
             ->getSingleScalarResult();
         return $profit ?? 0;

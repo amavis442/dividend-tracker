@@ -115,4 +115,14 @@ class TickerRepository extends ServiceEntityRepository
         
         return $result[0]['units'] ?? 0;
     }
+
+    public function getActive()
+    {
+        return $this->createQueryBuilder('t')
+            ->select('t,p')
+            ->innerJoin('t.positions', 'p')
+            ->where('p.closed = 0 or p.closed is null')
+            ->getQuery()
+            ->getResult();
+    }
 }

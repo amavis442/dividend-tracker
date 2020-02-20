@@ -68,7 +68,7 @@
 						<td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
 					</tr>
 					<tr>
-						<th>Average price</th>
+						<th>Weighted average price</th>
 						<td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
 					</tr>
 					<tr>
@@ -91,7 +91,7 @@
 					<tr>
 						<th></th>
 						<th>Units</th>
-						<th>Average price</th>
+						<th>Weighted average price</th>
 						<th>Allocation</th>
 						<th>Profit / Loss</th>
 						<th>Actions</th>
@@ -108,7 +108,7 @@
 							<td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
 							<td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
 							<td>{{ allocationSign|raw }}{{ (position.allocation/100)|format_number({fraction_digit: 2}) }}</td>
-							<td>{{ allocationSign|raw }}{{ position.profit|format_number({fraction_digit: 2})}}</td>
+							<td>{{ allocationSign|raw }}{{ (position.profit/100)|format_number({fraction_digit: 2})}}</td>
 							<td>
 								<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 									<div class="btn-group mr-2" role="group" aria-label="First group">
@@ -144,6 +144,8 @@
 						<th>Units</th>
 						<th>Price</th>
 						<th>Allocation</th>
+						<th>avgPrice</th>
+						<th>Profit/Loss</th>
 						<th>Broker</th>
 						<th>Actions</th>
 					</tr>
@@ -162,6 +164,8 @@
 								<td>{{ (transaction.amount/100)|format_number({fraction_digit: 2}) }}</td>
 								<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.price/100)|format_number({fraction_digit: 2}) }}</td>
 								<td>{{ (transaction.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ (transaction.allocation/100)|format_number({fraction_digit: 2}) }}</td>
+								<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.avgprice/100)|format_number({fraction_digit: 2}) }}</td>
+								<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}<span class="badge badge-{% if transaction.profit > 0 %}success{% else %}danger{% endif %}">{{ transaction.profit }}</span></td>
 								<td>{{ transaction.broker }}</td>
 								<td>
 									<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">

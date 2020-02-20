@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use App\Entity\Ticker;
 
 /**
  * @method Transaction|null find($id, $lockMode = null, $lockVersion = null)
@@ -71,6 +72,17 @@ class TransactionRepository extends ServiceEntityRepository
         return $paginator;
     }
 
+    public function getByTicker(Ticker $ticker)
+    {
+        return $this->createQueryBuilder('t')
+            ->innerJoin('t.position', 'p')
+            ->where('t.ticker = :ticker')
+            ->orderBy('t.transactionDate, t.id', 'asc')
+            ->andWhere('p.closed = 0 or p.closed is null')
+            ->setParameter('ticker', $ticker)
+            ->getQuery()
+            ->getResult();
+    }
     // /**
     //  * @return Transaction[] Returns an array of Transaction objects
     //  */

@@ -6,6 +6,9 @@
         <li class="list-group-item">Total invested:
             <span class="badge badge-primary">&euro; {{ totalInvested|format_number({fraction_digit: 2}) }}</span>
         </li>
+        <li class="list-group-item">Total return:
+            <span class="badge badge-primary">&euro; {{ (profit/100)|format_number({fraction_digit: 2}) }}</span>
+        </li>
         <li class="list-group-item">Total dividend:
             <span class="badge badge-primary">&euro; {{ totalDividend|format_number({fraction_digit: 2}) }}</span>
         </li>

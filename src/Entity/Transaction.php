@@ -88,6 +88,11 @@ class Transaction
     private $ticker;
 
     /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $avgprice;
+
+    /**
      * @Assert\Callback
      */
     public function validate(ExecutionContextInterface $context, $payload)
@@ -253,6 +258,18 @@ class Transaction
     public function setTicker(?Ticker $ticker): self
     {
         $this->ticker = $ticker;
+
+        return $this;
+    }
+
+    public function getAvgprice(): ?int
+    {
+        return $this->avgprice;
+    }
+
+    public function setAvgprice(?int $avgprice): self
+    {
+        $this->avgprice = $avgprice;
 
         return $this;
     }
