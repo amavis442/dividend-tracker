@@ -71,7 +71,7 @@ class Position
     private $allocationCurrency;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="position")
+     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="position", cascade={"persist"})
      * ORM\OrderBy({"transactionDate" = "ASC"})
      */
     private $transactions;

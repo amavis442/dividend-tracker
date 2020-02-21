@@ -9,6 +9,7 @@ use App\Entity\Ticker;
 use App\Form\TransactionType;
 use App\Repository\CurrencyRepository;
 use App\Repository\TransactionRepository;
+use App\Service\WeightedAverage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -78,8 +79,15 @@ class TransactionController extends AbstractController
     /**
      * @Route("/new/{ticker}/{position}/{side}", name="transaction_new", methods={"GET","POST"})
      */
-    public function new(Request $request, Ticker $ticker, Position $position, int $side, SessionInterface $session, CurrencyRepository $currencyRepository): Response
-    {
+    public function new(
+        Request $request,
+        Ticker $ticker,
+        Position $position,
+        int $side,
+        SessionInterface $session,
+        CurrencyRepository $currencyRepository,
+        WeightedAverage $weightedAverage
+    ): Response {
         $transaction = new Transaction();
 
         if ($ticker instanceof Ticker) {
@@ -96,41 +104,13 @@ class TransactionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $newAvgPrice = 0;
-            $newAllocation = 0;
-            $newAmount = 0;
-
             $this->presetMetrics($transaction);
-            $amount = $transaction->getPosition()->getAmount();
-            $allocation = $position->getAllocation();
-            $avgPrice = $position->getPrice();
-            if ($transaction->getSide() == Transaction::BUY) {
-                $newAmount = $amount + $transaction->getAmount();
-                $newAllocation = $allocation + $transaction->getAllocation();
-            }    
-
-            // Todo: fix for when we have a loss and the effects on the average price then
-            if ($transaction->getSide() == Transaction::SELL) {
-                $profit = $transaction->getAllocation() -  ($transaction->getAmount() * $avgPrice) / 100;
-                $position = $transaction->getPosition();
-                $oldProfit = $position->getProfit();
-                $newProfit = $oldProfit + (int)round($profit);
-                $newAmount = $amount - $transaction->getAmount();
-                $newAllocation = ($avgPrice * $newAmount)/100;
-                $transaction->getPosition()->setProfit($newProfit);
-                $transaction->setAvgprice($avgPrice);
-                $transaction->setProfit($profit);
-            }  
-
-            if ($newAmount == 0) {
-                $transaction->getPosition()->setClosed(1);
-            } 
-            $transaction->getPosition()->setAllocation($newAllocation); 
-            $transaction->getPosition()->setAmount($newAmount);
-       
+            $position->addTransaction($transaction);
+            $weightedAverage->calc($position);
             $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($transaction);
+            $entityManager->persist($position);
             $entityManager->flush();
+
             $session->set(self::SEARCH_KEY, $transaction->getTicker()->getTicker());
             $session->set(PortfolioController::SEARCH_KEY, $transaction->getTicker()->getTicker());
             return $this->redirectToRoute('portfolio_index');
@@ -155,13 +135,19 @@ class TransactionController extends AbstractController
     /**
      * @Route("/{id}/edit/{closed<\d+>?0}", name="transaction_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Transaction $transaction, SessionInterface $session): Response
-    {
+    public function edit(
+        Request $request,
+        Transaction $transaction,
+        SessionInterface $session,
+        WeightedAverage $weightedAverage
+    ): Response {
         $form = $this->createForm(TransactionType::class, $transaction);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->presetMetrics($transaction);
+            $position = $transaction->getPosition();
+            $weightedAverage->calc($position);
             $this->getDoctrine()->getManager()->flush();
             $session->set(self::SEARCH_KEY, $transaction->getTicker()->getTicker());
             return $this->redirectToRoute('transaction_index');
@@ -195,6 +181,6 @@ class TransactionController extends AbstractController
         $searchCriteria = $request->request->get('searchCriteria');
         $session->set(self::SEARCH_KEY, $searchCriteria);
 
-        return $this->redirectToRoute('transaction_index',['orderBy' => 'transactionDate','sort'=>'desc']);
+        return $this->redirectToRoute('transaction_index', ['orderBy' => 'transactionDate', 'sort' => 'desc']);
     }
 }
