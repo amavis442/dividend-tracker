@@ -148,6 +148,9 @@ class TransactionController extends AbstractController
             $this->presetMetrics($transaction);
             $position = $transaction->getPosition();
             $weightedAverage->calc($position);
+            if ($position->getAmount() === 0) {
+                $position->setClosed(1);
+            }
             $this->getDoctrine()->getManager()->flush();
             $session->set(self::SEARCH_KEY, $transaction->getTicker()->getTicker());
             return $this->redirectToRoute('transaction_index');
