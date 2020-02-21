@@ -107,6 +107,10 @@ class TransactionController extends AbstractController
             $this->presetMetrics($transaction);
             $position->addTransaction($transaction);
             $weightedAverage->calc($position);
+    
+            if ($position->getAmount() === 0) {
+                $position->setClosed(1);
+            }
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($position);
             $entityManager->flush();
