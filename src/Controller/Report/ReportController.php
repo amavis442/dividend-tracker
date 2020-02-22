@@ -184,7 +184,6 @@ class ReportController extends AbstractController
             $lastCalendarEntry = $payCalendars->last();
 
             if ($firstCalendarEntry) {
-                //dump($ticker->getFullname(), count($payCalendars), $firstCalendarEntry->getPaymentdate()->format('Y-m-d'), $lastCalendarEntry->getPaymentdate()->format('Y-m-d'));
                 $lastCash = $lastCalendarEntry->getCashAmount();
             }
 

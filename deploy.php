@@ -57,7 +57,7 @@ task('yarn:build', function(){
 
 desc('Reload php-fpm config');
 task('php-fpm:reload', function () {
-    run('sudo /bin/systemctl reload php7.3-fpm');
+    run('sudo /bin/systemctl reload php7.4-fpm');
 });
 
 desc('Runs yarn, migrates the database and install the assets');
