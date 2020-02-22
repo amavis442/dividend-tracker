@@ -48,6 +48,7 @@ class Ticker
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Payment", mappedBy="ticker", orphanRemoval=true)
+     * @ORM\OrderBy({"payDate" = "DESC"})
      */
     private $payments;
 

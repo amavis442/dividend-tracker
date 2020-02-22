@@ -125,4 +125,16 @@ class TickerRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    
+    public function getActiveForDividendYield()
+    {
+        return $this->createQueryBuilder('t')
+            ->select('t, p, c, dm')
+            ->innerJoin('t.positions', 'p')
+            ->leftJoin('t.DividendMonths', 'dm')
+            ->leftJoin('t.calendars', 'c')
+            ->where('p.closed = 0 or p.closed is null')
+            ->getQuery()
+            ->getResult();
+    }
 }

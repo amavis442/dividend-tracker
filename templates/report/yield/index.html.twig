@@ -1,0 +1,121 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dividend Yield
+{% endblock %}
+
+{% block body %}
+    <div style='width:900px;height:600px' class="col col-xs-12">
+        <canvas id="myChart" ></canvas>
+    </div>
+
+	<div>
+		<table class="table">
+			<thead class="thead-dark">
+			<tr>
+				<th>Ticker</th>
+				<th>Share</th>
+				<th>Yield</th>
+				<th>Dividend</th>
+				<th>avgPrice</th>
+			</tr>
+			</thead>
+			<tbody>
+				{% for item in datasource %}
+				<tr>
+					<td>{{ item.ticker }}</td>
+					<td>{{ item.label }}</td>
+					<td>{{ item.yield }}%</td>
+					<td>${{ (item.payout/100)|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ (item.avgPrice/100)|format_number({fraction_digit: 2}) }}</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('chart') }}
+    {{ encore_entry_script_tags('app') }}
+    {% include "report/_colors.html.twig" %}
+<script>
+var config = {
+			type: 'bar',
+			data: {
+				datasets: [{
+					data: {{ data|raw }},
+					backgroundColor: [
+						"#0074D9", 
+						"#FF4136", 
+						"#2ECC40", 
+						"#FF851B", 
+						"#7FDBFF", 
+						"#B10DC9", 
+						"#FFDC00", 
+						"#001f3f", 
+						"#39CCCC", 
+						"#01FF70", 
+						"#85144b", 
+						"#F012BE", 
+						"#3D9970", 
+						"#111111", 
+						"#AAAAAA",
+						"#0074D9", 
+						"#FF4136", 
+						"#2ECC40", 
+						"#FF851B", 
+						"#7FDBFF", 
+						"#B10DC9", 
+						"#FFDC00", 
+						"#001f3f", 
+						"#39CCCC", 
+						"#01FF70", 
+						"#85144b", 
+						"#F012BE", 
+						"#3D9970", 
+						"#111111", 
+						"#AAAAAA",
+						"#0074D9", 
+						"#FF4136", 
+						"#2ECC40", 
+						"#FF851B", 
+						"#7FDBFF", 
+						"#B10DC9", 
+						"#FFDC00", 
+						"#001f3f", 
+						"#39CCCC", 
+						"#01FF70", 
+						"#85144b", 
+						"#F012BE", 
+						"#3D9970", 
+						"#111111", 
+						"#AAAAAA"
+					],
+					label: 'Yield'
+				}],
+				labels: {{ labels|raw }}
+			},
+			options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    fontSize: 24,
+                    text: 'Dividend yield'
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            callback: function(value, index, values) {
+                               return value + '%';
+                            }
+                        }
+                    }]
+                }
+			}
+        };
+var ctx = document.getElementById('myChart').getContext('2d');
+window.myBar = new Chart(ctx, config);
+</script>
+
+{% endblock %}

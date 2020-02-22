@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Repository\PositionRepository;
 use App\Repository\PaymentRepository;
+use App\Repository\TickerRepository;
 use App\Service\Summary;
 
 /**
@@ -67,22 +68,21 @@ class ReportController extends AbstractController
     public function payouts(
         PaymentRepository $paymentRepository
     ): Response {
-        
+
         $data = $paymentRepository->getDividendsPerInterval();
-        
+
         $labels = '[';
         $dates = array_keys($data);
-        foreach ($dates as $date)
-        {
-            $labels .= "'".strftime('%b %Y',strtotime($date.'01'))."',";
+        foreach ($dates as $date) {
+            $labels .= "'" . strftime('%b %Y', strtotime($date . '01')) . "',";
         }
-        $labels = trim($labels,','). ']';
+        $labels = trim($labels, ',') . ']';
 
         $accumulative = '[';
         $dividends = '[';
         foreach ($data as $item) {
-            $dividends .= ($item['dividend']/100).',';
-            $accumulative .= ($item['accumulative']/100).',';
+            $dividends .= ($item['dividend'] / 100) . ',';
+            $accumulative .= ($item['accumulative'] / 100) . ',';
         }
         $dividends .= ']';
         $accumulative .= ']';
@@ -105,17 +105,17 @@ class ReportController extends AbstractController
 
         $sectors = $branchRepository->getAllocationPerSector();
         $totalAllocated = $positionRepository->getSumAllocated();
-       
+
         $allocationData = $positionRepository->getAllocationDataPerSector();
         $labels = '[';
         $data = '[';
         foreach ($allocationData as $allocationItem) {
-            $labels .= "'".$allocationItem['industry']."',";
+            $labels .= "'" . $allocationItem['industry'] . "',";
             $allocation = $allocationItem['allocation'] / 100;
-            $data .= round(($allocation/$totalAllocated) * 100,2).',';
+            $data .= round(($allocation / $totalAllocated) * 100, 2) . ',';
         }
-        $labels = trim($labels,','). ']';
-        $data =  trim($data,',').']';
+        $labels = trim($labels, ',') . ']';
+        $data =  trim($data, ',') . ']';
 
         return $this->render('report/allocation/index.html.twig', [
             'data' => $data,
@@ -142,20 +142,72 @@ class ReportController extends AbstractController
         $labels = '[';
         $data = '[';
         foreach ($dividendEstimate as $date => &$estimate) {
-            $d = strftime('%B %Y',strtotime($date.'01'));
-            $labels .= "'".$d."',";
+            $d = strftime('%B %Y', strtotime($date . '01'));
+            $labels .= "'" . $d . "',";
             $payout = ($estimate['totaldividend'] * 0.85) / 1.1;
-            $data .= round($payout, 2).',';
+            $data .= round($payout, 2) . ',';
             $estimate['payout'] = $payout;
             $estimate['normaldate'] = $d;
         }
-        $labels = trim($labels,','). ']';
-        $data =  trim($data,',').']';
+        $labels = trim($labels, ',') . ']';
+        $data =  trim($data, ',') . ']';
 
         return $this->render('report/projection/index.html.twig', [
             'data' => $data,
             'labels' => $labels,
             'datasource' => $dividendEstimate,
+            'controller_name' => 'ReportController',
+        ]);
+    }
+
+    /**
+     * @Route("/yield", name="report_dividend_yield")
+     */
+    public function yield(TickerRepository $tickerRepository)
+    {
+        $labels = '[';
+        $data = '[';
+        $dataSource = [];
+
+        $tickers = $tickerRepository->getActiveForDividendYield();
+        foreach ($tickers as $ticker) {
+            $positions = $ticker->getPositions();
+            $position = $positions[0];
+            $price = $position->getPrice();
+
+            $scheduleCalendar = $ticker->getDividendMonths();
+            $numPayoutsPerYear = count($scheduleCalendar);
+            $lastCash = 0;
+            $payCalendars = $ticker->getCalendars();
+
+            $firstCalendarEntry = $payCalendars->first();
+            $lastCalendarEntry = $payCalendars->last();
+
+            if ($firstCalendarEntry) {
+                //dump($ticker->getFullname(), count($payCalendars), $firstCalendarEntry->getPaymentdate()->format('Y-m-d'), $lastCalendarEntry->getPaymentdate()->format('Y-m-d'));
+                $lastCash = $lastCalendarEntry->getCashAmount();
+            }
+
+            $dividendPerYear = $numPayoutsPerYear * $lastCash;
+
+            $dividendYield = round(($dividendPerYear / $price) * 100, 2);
+            $labels .= sprintf("'%s (%s)',", substr(addslashes($ticker->getFullname()), 0, 8), $ticker->getTicker());
+            $data .= $dividendYield . ',';
+            $dataSource[] = [
+                'ticker' => $ticker->getTicker(), 
+                'label' => $ticker->getFullname(), 
+                'yield' => $dividendYield,
+                'payout' => $dividendPerYear,
+                'avgPrice' => $price,
+            ];
+        }
+        $labels = trim($labels, ',') . ']';
+        $data =  trim($data, ',') . ']';
+
+        return $this->render('report/yield/index.html.twig', [
+            'data' => $data,
+            'labels' => $labels,
+            'datasource' => $dataSource,
             'controller_name' => 'ReportController',
         ]);
     }
