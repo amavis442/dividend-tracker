@@ -134,6 +134,7 @@ class TickerRepository extends ServiceEntityRepository
             ->leftJoin('t.DividendMonths', 'dm')
             ->leftJoin('t.calendars', 'c')
             ->where('p.closed = 0 or p.closed is null')
+            ->orderBy('t.ticker')
             ->getQuery()
             ->getResult();
     }
