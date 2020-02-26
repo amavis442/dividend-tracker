@@ -18,11 +18,11 @@ class WeightedAverage
         ]; 
     }
 
-    public function addTransaction(Transaction $transaction)
+    public function addTransaction(Transaction $transaction, int $index)
     {
         $timeStamp = (int)$transaction->getTransactionDate()->format('YmdHis');
         if (isset($this->transactions[$timeStamp])) {
-            $timeStamp += 1;
+            $timeStamp += $index;
         }
         $this->transactions[$timeStamp] = $transaction;
     }
@@ -30,8 +30,10 @@ class WeightedAverage
     public function calc(Position $position): void
     {
         $transactions = $position->getTransactions();
+        $n = 1;
         foreach ($transactions as $transaction) {
-            $this->addTransaction($transaction);
+            $this->addTransaction($transaction, $n);
+            $n++;
         }
 
         if (count($this->transactions) === 0) {
@@ -72,7 +74,7 @@ class WeightedAverage
         }
         
         $position->setAllocation((int) round($totalAllocation))
-            ->setAmount((int) round($totalAmount))
+            ->setAmount($totalAmount)
             ->setPrice($aPrice)
             ->setProfit((int) round($totalProfit));
     }
