@@ -6,15 +6,13 @@
         <div class="card-body">
             <ul class="list-group">
             {% for t in m.tickers %}
-                {% if t.hasOpenPositions %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <strong>{{ t.ticker }}:</strong>
-                        <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-                        <a class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': t.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend date"><i class="far fa-calendar-alt"></i></a>
-                        <a class="btn btn-success" href="{{ path('payment_new', {'ticker': t.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment"><i class="far fa-money-bill-alt"></i></a>
-                        </div>
-                    </li>    
-                {% endif %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <strong>{{ t.ticker }}:</strong>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                    <a class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': t.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend date"><i class="far fa-calendar-alt"></i></a>
+                    <a class="btn btn-success" href="{{ path('payment_new', {'ticker': t.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment"><i class="far fa-money-bill-alt"></i></a>
+                    </div>
+                </li>    
             {% endfor %}
             </ul>
         </div>

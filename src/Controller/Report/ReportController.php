@@ -166,15 +166,13 @@ class ReportController extends AbstractController
                 $dataSource[$paydate]['normaldate'] = $normalDate;
                 $dataSource[$paydate]['tickers'] = [];
                 foreach ($dividendMonth->getTickers() as $ticker) {
-                    if ($ticker->hasOpenPositions()) {
-                        $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
-                            'units' => 0,
-                            'dividend' => 0,
-                            'payout' => 0,
-                            'payoutdate' => '',
-                            'exdividend' => ''
-                        ];
-                    }
+                    $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
+                        'units' => 0,
+                        'dividend' => 0,
+                        'payout' => 0,
+                        'payoutdate' => '',
+                        'exdividend' => ''
+                    ];
                 }
             }
             if (isset($dividendEstimate[$paydate])) {
@@ -189,16 +187,14 @@ class ReportController extends AbstractController
                         $dataSource[$paydate]['tickers'][$ticker->getTicker()] = $tickerData;
                     }
 
-                    if ($ticker->hasOpenPositions()) {
-                        if (!isset($item['tickers'][$ticker->getTicker()])) {
-                            $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
-                                'units' => 0,
-                                'dividend' => 0,
-                                'payout' => 0,
-                                'payoutdate' => '',
-                                'exdividend' => ''
-                            ];
-                        }
+                    if (!isset($item['tickers'][$ticker->getTicker()])) {
+                        $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
+                            'units' => 0,
+                            'dividend' => 0,
+                            'payout' => 0,
+                            'payoutdate' => '',
+                            'exdividend' => ''
+                        ];
                     }
                 }
             }
