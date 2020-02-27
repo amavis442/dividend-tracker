@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Repository\PositionRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\TickerRepository;
+use App\Repository\DividendMonthRepository;
 use App\Service\Summary;
 
 /**
@@ -136,7 +137,8 @@ class ReportController extends AbstractController
      * @Route("/projection", name="report_projection")
      */
     public function projection(
-        CalendarRepository $calendarRepository
+        CalendarRepository $calendarRepository,
+        DividendMonthRepository $dividendMonthRepository
     ): Response {
         $dividendEstimate = $calendarRepository->getDividendEstimate();
         $labels = '[';
@@ -152,10 +154,56 @@ class ReportController extends AbstractController
         $labels = trim($labels, ',') . ']';
         $data =  trim($data, ',') . ']';
 
+        $dataSource = [];
+        $d = $dividendMonthRepository->getAll();
+        foreach ($d as $month => $dividendMonth){
+            $paydate = sprintf("%4d%02d",date('Y'),$month);
+            $normalDate = strftime('%B %Y', strtotime($paydate.'01'));
+            $dataSource[$paydate] = [];
+            if (!isset($dividendEstimate[$paydate])) {
+                $dataSource[$paydate]['totaldividend'] = 0;
+                $dataSource[$paydate]['payout'] = 0;
+                $dataSource[$paydate]['normaldate'] = $normalDate;
+                $dataSource[$paydate]['tickers'] = [];
+                foreach ($dividendMonth->getTickers() as $ticker) {
+                    $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
+                        'units' => 0,
+                        'dividend' => 0,
+                        'payout' => 0,
+                        'payoutdate' => '',
+                        'exdividend' => ''
+                    ];
+                }
+            }
+            if (isset($dividendEstimate[$paydate])) {
+                $item = $dividendEstimate[$paydate];
+                $dataSource[$paydate]['totaldividend'] = $item['totaldividend'];
+                $dataSource[$paydate]['payout'] = $item['payout'];
+                $dataSource[$paydate]['normaldate'] = $normalDate;
+                $dataSource[$paydate]['tickers'] = [];
+                foreach ($dividendMonth->getTickers() as $ticker) {
+                    if (isset($item['tickers'][$ticker->getTicker()])) {
+                        $tickerData = $item['tickers'][$ticker->getTicker()];
+                        $dataSource[$paydate]['tickers'][$ticker->getTicker()] = $tickerData;
+                    }
+                    
+                    if (!isset($item['tickers'][$ticker->getTicker()])) {
+                        $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
+                        'units' => 0,
+                        'dividend' => 0,
+                        'payout' => 0,
+                        'payoutdate' => '',
+                        'exdividend' => ''
+                        ];
+                    }
+                }
+            }
+        }
+
         return $this->render('report/projection/index.html.twig', [
             'data' => $data,
             'labels' => $labels,
-            'datasource' => $dividendEstimate,
+            'datasource' => $dataSource,//$dividendEstimate,
             'controller_name' => 'ReportController',
         ]);
     }
