@@ -156,9 +156,9 @@ class ReportController extends AbstractController
 
         $dataSource = [];
         $d = $dividendMonthRepository->getAll();
-        foreach ($d as $month => $dividendMonth){
-            $paydate = sprintf("%4d%02d",date('Y'),$month);
-            $normalDate = strftime('%B %Y', strtotime($paydate.'01'));
+        foreach ($d as $month => $dividendMonth) {
+            $paydate = sprintf("%4d%02d", date('Y'), $month);
+            $normalDate = strftime('%B %Y', strtotime($paydate . '01'));
             $dataSource[$paydate] = [];
             if (!isset($dividendEstimate[$paydate])) {
                 $dataSource[$paydate]['totaldividend'] = 0;
@@ -166,13 +166,15 @@ class ReportController extends AbstractController
                 $dataSource[$paydate]['normaldate'] = $normalDate;
                 $dataSource[$paydate]['tickers'] = [];
                 foreach ($dividendMonth->getTickers() as $ticker) {
-                    $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
-                        'units' => 0,
-                        'dividend' => 0,
-                        'payout' => 0,
-                        'payoutdate' => '',
-                        'exdividend' => ''
-                    ];
+                    if ($ticker->hasOpenPositions()) {
+                        $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
+                            'units' => 0,
+                            'dividend' => 0,
+                            'payout' => 0,
+                            'payoutdate' => '',
+                            'exdividend' => ''
+                        ];
+                    }
                 }
             }
             if (isset($dividendEstimate[$paydate])) {
@@ -186,15 +188,17 @@ class ReportController extends AbstractController
                         $tickerData = $item['tickers'][$ticker->getTicker()];
                         $dataSource[$paydate]['tickers'][$ticker->getTicker()] = $tickerData;
                     }
-                    
-                    if (!isset($item['tickers'][$ticker->getTicker()])) {
-                        $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
-                        'units' => 0,
-                        'dividend' => 0,
-                        'payout' => 0,
-                        'payoutdate' => '',
-                        'exdividend' => ''
-                        ];
+
+                    if ($ticker->hasOpenPositions()) {
+                        if (!isset($item['tickers'][$ticker->getTicker()])) {
+                            $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
+                                'units' => 0,
+                                'dividend' => 0,
+                                'payout' => 0,
+                                'payoutdate' => '',
+                                'exdividend' => ''
+                            ];
+                        }
                     }
                 }
             }
@@ -203,7 +207,7 @@ class ReportController extends AbstractController
         return $this->render('report/projection/index.html.twig', [
             'data' => $data,
             'labels' => $labels,
-            'datasource' => $dataSource,//$dividendEstimate,
+            'datasource' => $dataSource, //$dividendEstimate,
             'controller_name' => 'ReportController',
         ]);
     }
@@ -241,8 +245,8 @@ class ReportController extends AbstractController
             $labels .= sprintf("'%s (%s)',", substr(addslashes($ticker->getFullname()), 0, 8), $ticker->getTicker());
             $data .= $dividendYield . ',';
             $dataSource[] = [
-                'ticker' => $ticker->getTicker(), 
-                'label' => $ticker->getFullname(), 
+                'ticker' => $ticker->getTicker(),
+                'label' => $ticker->getFullname(),
                 'yield' => $dividendYield,
                 'payout' => $dividendPerYear,
                 'avgPrice' => $price,

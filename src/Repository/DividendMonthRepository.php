@@ -23,10 +23,10 @@ class DividendMonthRepository extends ServiceEntityRepository
     {
         $result = $this->createQueryBuilder('d', 'd.dividendMonth')
             ->select('d,t')
-            ->innerJoin('d.tickers', 't',null,null, 't.ticker')
-            ->orderBy('d.dividendMonth, t.ticker','ASC')
+            ->innerJoin('d.tickers', 't', null, null, 't.ticker')
+            ->orderBy('d.dividendMonth, t.ticker', 'ASC')
             ->getQuery()
-            ->getResult();   
+            ->getResult();
         return $result;
     }
 
