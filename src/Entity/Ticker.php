@@ -5,7 +5,6 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use DateTime;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TickerRepository")
@@ -123,18 +122,6 @@ class Ticker
         $this->branch = $branch;
 
         return $this;
-    }
-
-    public function hasOpenPositions(): bool
-    {
-        if ($this->positions->count()) {
-            foreach ($this->positions as $position) {
-                if ($position->getClosed() !== true) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     /**
@@ -369,7 +356,6 @@ class Ticker
 
         return $this;
     }
-
     
     public function getActiveUnits(): int
     {

@@ -6,57 +6,64 @@
 {% block body %}
 	<p class="h1">Allocation information</p>
 	{% include '_summary.html.twig' %}
-    <br/>
-    <br/>
-	
+	<br/>
+	<br/>
+
 	<div style='width:900px;height:600px' class="col col-xs-12">
 		<canvas id="myChartAllocation"></canvas>
 	</div>
 
-<div class="accordion" id="accordionExample">
-	{% set collapseId = 0 %}
-	{% for label, sector in sectors %}
-		{% set collapseId = collapseId + 1  %}
-		<div class="card">
-			<div class="card-header" id="heading{{ collapseId }}">
-				<div class="d-flex flex-row bd-highlight">
-                    <div class="item"><button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ collapseId }}" aria-expanded="true" aria-controls="collapse{{ collapseId }}">{{ label }}</button></div>
-                    <div class="item">&euro;{{ (sector.sectorAllocation/100)|format_number({fraction_digit: 2}) }}</div>
-                    <div class="item">{{ sector.sectorAllocationPercentage }}%</div>
-					<div class="item"><span class="badge badge-info">{{ sector.sectorTargetAllocation }}%</span></div>
-                </div>
-			</div>
+	<div style='width:900px;height:600px' class="col col-xs-12">
+		<canvas id="myChartAllocationPosition"></canvas>
+	</div>
 
-			<div id="collapse{{ collapseId }}" class="collapse" aria-labelledby="heading{{ collapseId }}" data-parent="#accordionExample">
-				<div class="card-body">
-					<table class="table">
-						<thead class="thead-dark">
-							<tr>
-								<th>Company</th>
-								<th>Units</th>
-								<th>Allocation</th>
-								<th>Sector Allocation(%)</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for position in sector.sectorPositions %}
+	<div class="accordion" id="accordionExample">
+		{% set collapseId = 0 %}
+		{% for label, sector in sectors %}
+			{% set collapseId = collapseId + 1  %}
+			<div class="card">
+				<div class="card-header" id="heading{{ collapseId }}">
+					<div class="d-flex flex-row bd-highlight">
+						<div class="item">
+							<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ collapseId }}" aria-expanded="true" aria-controls="collapse{{ collapseId }}">{{ label }}</button>
+						</div>
+						<div class="item">&euro;{{ (sector.sectorAllocation/100)|format_number({fraction_digit: 2}) }}</div>
+						<div class="item">{{ sector.sectorAllocationPercentage }}%</div>
+						<div class="item">
+							<span class="badge badge-info">{{ sector.sectorTargetAllocation }}%</span>
+						</div>
+					</div>
+				</div>
+
+				<div id="collapse{{ collapseId }}" class="collapse" aria-labelledby="heading{{ collapseId }}" data-parent="#accordionExample">
+					<div class="card-body">
+						<table class="table">
+							<thead class="thead-dark">
 								<tr>
-									<td>{{ position.positionLabel }}</td>
-									<td>{{ (position.positionAmount/100)|format_number({fraction_digit: 2}) }}</td>
-									<td>&euro;{{ (position.positionAllocation/100)|format_number({fraction_digit: 2}) }}</td>
-									<td>{{ position.positionAllocationPercentage }}%</td>
+									<th>Company</th>
+									<th>Units</th>
+									<th>Allocation</th>
+									<th>Sector Allocation(%)</th>
 								</tr>
-								<tr>
-								{% endfor %}
+							</thead>
+							<tbody>
+								{% for position in sector.sectorPositions %}
+									<tr>
+										<td>{{ position.positionLabel }}</td>
+										<td>{{ (position.positionAmount/100)|format_number({fraction_digit: 2}) }}</td>
+										<td>&euro;{{ (position.positionAllocation/100)|format_number({fraction_digit: 2}) }}</td>
+										<td>{{ position.positionAllocationPercentage }}%</td>
+									</tr>
+									<tr>
+									{% endfor %}
+								</tbody>
 							</tbody>
-						</tbody>
-					</table>
+						</table>
+					</div>
 				</div>
 			</div>
-		</div>
-	{% endfor %}
-</div>
-
+		{% endfor %}
+	</div>
 
 
 {% endblock %}
@@ -65,38 +72,114 @@
 	{{ encore_entry_script_tags('chart') }}
 	{{ encore_entry_script_tags('app') }}
 	{% include "report/_colors.html.twig" %}
-	<script>
-		var config = {
-            type: 'pie',
-            data: {
-                datasets: [{
-                        data: {{ data|raw }},
-                        backgroundColor: [
-                            window.chartColors.red,
-                            window.chartColors.orange,
-                            window.chartColors.yellow,
-                            window.chartColors.green,
-                            window.chartColors.blue,
-                            window.chartColors.purple,
-                            window.chartColors.beige,
-                            window.chartColors.lightgreen,
-                            window.chartColors.grey,
-                        ],
-                        label: 'Allocation'
-                    }],
-                    labels: {{ labels|raw }}
-                },
-                options: {
-                    responsive: true,
-                    title: {
-                    display: true,
-                    fontSize: 24,
-                    text: 'Allocation per sector'
-                }
-            }
-        };
+<script type="text/javascript">
+	var config = {
+	type: 'pie',
+	data: {
+	datasets: [
+	{
+	data: {{ data|raw }},
+	backgroundColor: [
+	window.chartColors.red,
+	window.chartColors.orange,
+	window.chartColors.yellow,
+	window.chartColors.green,
+	window.chartColors.blue,
+	window.chartColors.purple,
+	window.chartColors.beige,
+	window.chartColors.lightgreen,
+	window.chartColors.grey,
+	],
+	label: 'Allocation'
+	}
+	],
+	labels: {{ labels|raw }}
+	},
+	options: {
+	responsive: true,
+	title: {
+	display: true,
+	fontSize: 24,
+	text: 'Allocation per sector'
+	}
+	}
+	};
 
-        var ctxAllocation = document.getElementById('myChartAllocation').getContext('2d');
-        window.myPie = new Chart(ctxAllocation, config);
+
+		var configPosition = {
+type: 'pie',
+data: {
+datasets: [
+{
+data: {{ positionData|raw }},
+backgroundColor: [
+						"#0074D9", 
+						"#FF4136", 
+						"#2ECC40", 
+						"#FF851B", 
+						"#7FDBFF", 
+						"#B10DC9", 
+						"#FFDC00", 
+						"#001f3f", 
+						"#39CCCC", 
+						"#01FF70", 
+						"#85144b", 
+						"#F012BE", 
+						"#3D9970", 
+						"#111111", 
+						"#AAAAAA",
+						"#0074D9", 
+						"#FF4136", 
+						"#2ECC40", 
+						"#FF851B", 
+						"#7FDBFF", 
+						"#B10DC9", 
+						"#FFDC00", 
+						"#001f3f", 
+						"#39CCCC", 
+						"#01FF70", 
+						"#85144b", 
+						"#F012BE", 
+						"#3D9970", 
+						"#111111", 
+						"#AAAAAA",
+						"#0074D9", 
+						"#FF4136", 
+						"#2ECC40", 
+						"#FF851B", 
+						"#7FDBFF", 
+						"#B10DC9", 
+						"#FFDC00", 
+						"#001f3f", 
+						"#39CCCC", 
+						"#01FF70", 
+						"#85144b", 
+						"#F012BE", 
+						"#3D9970", 
+						"#111111", 
+						"#AAAAAA"
+
+],
+label: 'Allocation'
+}
+],
+labels: {{ positionLabels|raw }}
+},
+options: {
+responsive: true,
+title: {
+display: true,
+fontSize: 24,
+text: 'Allocation per Position'
+}
+}
+};
+
+var ctxAllocation = document.getElementById('myChartAllocation').getContext('2d');
+window.myPie = new Chart(ctxAllocation, config);
+
+var ctxAllocationPosition = document.getElementById('myChartAllocationPosition').getContext('2d');
+window.myPie = new Chart(ctxAllocationPosition, configPosition);
+
 	</script>
 {% endblock %}

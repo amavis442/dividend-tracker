@@ -118,9 +118,22 @@ class ReportController extends AbstractController
         $labels = trim($labels, ',') . ']';
         $data =  trim($data, ',') . ']';
 
+        $allocationDataPosition = $positionRepository->getAllocationDataPerPosition();
+        $positionLabels = '[';
+        $positionData = '[';
+        foreach ($allocationDataPosition as $allocationItem) {
+            $positionLabels .= "'" . $allocationItem['ticker'] . "',";
+            $allocation = $allocationItem['allocation'] / 100;
+            $positionData .= round(($allocation / $totalAllocated) * 100, 2). ',';
+        }
+        $positionLabels = trim($positionLabels, ',') . ']';
+        $positionData =  trim($positionData, ',') . ']';
+
         return $this->render('report/allocation/index.html.twig', [
             'data' => $data,
             'labels' => $labels,
+            'positionData' => $positionData,
+            'positionLabels' => $positionLabels,
             'sectors' => $sectors,
             'numActivePosition' => $numActivePosition,
             'numPosition' => $numActivePosition,

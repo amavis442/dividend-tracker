@@ -68,7 +68,7 @@ class PositionRepository extends ServiceEntityRepository
         string $search = ''
     ): Paginator {
         $order = $orderBy;
-        if (in_array($orderBy, ['t.ticker','c.exDividendDate'])) {
+        if (in_array($orderBy, ['t.ticker', 'c.exDividendDate'])) {
             $order = $orderBy;
         }
         $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
@@ -249,17 +249,30 @@ class PositionRepository extends ServiceEntityRepository
     public function getAllocationDataPerSector(): array
     {
         return $this->createQueryBuilder('p')
+            ->select([
+                'b.id',
+                'b.label as industry',
+                'SUM(p.amount) amount',
+                'p.price',
+                'SUM(p.allocation) allocation'
+            ])
+            ->join('p.ticker', 't')
+            ->join('t.branch', 'b')
+            ->where('p.closed is null OR p.closed = 0')
+            ->groupBy('t.branch')
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+    public function getAllocationDataPerPosition(): array
+    {
+        return $this->createQueryBuilder('p')
         ->select([
-            'b.id',
-            'b.label as industry',
-            'SUM(p.amount) amount',
-            'p.price',
-            'SUM(p.allocation) allocation'
+            't.ticker',
+            'p.allocation'
         ])
-        ->join('p.ticker', 't')
-        ->join('t.branch','b')
+        ->innerJoin('p.ticker', 't')
         ->where('p.closed is null OR p.closed = 0')
-        ->groupBy('t.branch')
         ->getQuery()
         ->getArrayResult();
     }
