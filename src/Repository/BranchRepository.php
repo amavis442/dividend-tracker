@@ -89,7 +89,18 @@ class BranchRepository extends ServiceEntityRepository
                 $position['positionAllocationPercentage'] = round(($position['positionAllocation'] / $sector['sectorAllocation']) * 100, 2);
             }
         }
-        ksort($output);
+       
+        uasort($output, function($a , $b) {
+            $a1 = $a['sectorTargetAllocation'];
+            $b1 = $b['sectorTargetAllocation'];
+           
+            if ($a1 == $b1) {
+                return 0;
+            }
+            return ($a1 > $b1) ? -1 : 1;
+        });
+        
+        //ksort($output);
         return $output;
     }
 }
