@@ -13,10 +13,6 @@
 		<canvas id="myChartAllocation"></canvas>
 	</div>
 
-	<div style='width:900px;height:600px' class="col col-xs-12">
-		<canvas id="myChartAllocationPosition"></canvas>
-	</div>
-
 	<div class="accordion" id="accordionExample">
 		{% set collapseId = 0 %}
 		{% for label, sector in sectors %}
@@ -105,81 +101,7 @@
 	}
 	};
 
-
-		var configPosition = {
-type: 'pie',
-data: {
-datasets: [
-{
-data: {{ positionData|raw }},
-backgroundColor: [
-						"#0074D9", 
-						"#FF4136", 
-						"#2ECC40", 
-						"#FF851B", 
-						"#7FDBFF", 
-						"#B10DC9", 
-						"#FFDC00", 
-						"#001f3f", 
-						"#39CCCC", 
-						"#01FF70", 
-						"#85144b", 
-						"#F012BE", 
-						"#3D9970", 
-						"#111111", 
-						"#AAAAAA",
-						"#0074D9", 
-						"#FF4136", 
-						"#2ECC40", 
-						"#FF851B", 
-						"#7FDBFF", 
-						"#B10DC9", 
-						"#FFDC00", 
-						"#001f3f", 
-						"#39CCCC", 
-						"#01FF70", 
-						"#85144b", 
-						"#F012BE", 
-						"#3D9970", 
-						"#111111", 
-						"#AAAAAA",
-						"#0074D9", 
-						"#FF4136", 
-						"#2ECC40", 
-						"#FF851B", 
-						"#7FDBFF", 
-						"#B10DC9", 
-						"#FFDC00", 
-						"#001f3f", 
-						"#39CCCC", 
-						"#01FF70", 
-						"#85144b", 
-						"#F012BE", 
-						"#3D9970", 
-						"#111111", 
-						"#AAAAAA"
-
-],
-label: 'Allocation'
-}
-],
-labels: {{ positionLabels|raw }}
-},
-options: {
-responsive: true,
-title: {
-display: true,
-fontSize: 24,
-text: 'Allocation per Position'
-}
-}
-};
-
 var ctxAllocation = document.getElementById('myChartAllocation').getContext('2d');
 window.myPie = new Chart(ctxAllocation, config);
-
-var ctxAllocationPosition = document.getElementById('myChartAllocationPosition').getContext('2d');
-window.myPie = new Chart(ctxAllocationPosition, configPosition);
-
 	</script>
 {% endblock %}

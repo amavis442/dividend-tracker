@@ -98,7 +98,7 @@ class ReportController extends AbstractController
     }
 
     /**
-     * @Route("/allocation", name="report_allocation")
+     * @Route("/allocation/sector", name="report_allocation_sector")
      */
     public function allocation(PositionRepository $positionRepository, BranchRepository $branchRepository, Summary $summary)
     {
@@ -118,22 +118,9 @@ class ReportController extends AbstractController
         $labels = trim($labels, ',') . ']';
         $data =  trim($data, ',') . ']';
 
-        $allocationDataPosition = $positionRepository->getAllocationDataPerPosition();
-        $positionLabels = '[';
-        $positionData = '[';
-        foreach ($allocationDataPosition as $allocationItem) {
-            $positionLabels .= "'" . $allocationItem['ticker'] . "',";
-            $allocation = $allocationItem['allocation'] / 100;
-            $positionData .= round(($allocation / $totalAllocated) * 100, 2). ',';
-        }
-        $positionLabels = trim($positionLabels, ',') . ']';
-        $positionData =  trim($positionData, ',') . ']';
-
         return $this->render('report/allocation/index.html.twig', [
             'data' => $data,
             'labels' => $labels,
-            'positionData' => $positionData,
-            'positionLabels' => $positionLabels,
             'sectors' => $sectors,
             'numActivePosition' => $numActivePosition,
             'numPosition' => $numActivePosition,
@@ -145,6 +132,39 @@ class ReportController extends AbstractController
         ]);
     }
 
+
+   /**
+     * @Route("/allocation/position", name="report_allocation_position")
+     */
+    public function allocationPerPosition(PositionRepository $positionRepository, BranchRepository $branchRepository, Summary $summary)
+    {
+        [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
+
+        $totalAllocated = $positionRepository->getSumAllocated();
+
+        $allocationData = $positionRepository->getAllocationDataPerPosition();
+        $labels = '[';
+        $data = '[';
+        foreach ($allocationData as $allocationItem) {
+            $labels .= "'" . $allocationItem['ticker'] . "',";
+            $allocation = $allocationItem['allocation'] / 100;
+            $data .= round(($allocation / $totalAllocated) * 100, 2). ',';
+        }
+        $labels = trim($labels, ',') . ']';
+        $data =  trim($data, ',') . ']';
+
+        return $this->render('report/allocation/position.html.twig', [
+            'data' => $data,
+            'labels' => $labels,
+            'numActivePosition' => $numActivePosition,
+            'numPosition' => $numActivePosition,
+            'numTickers' => $numTickers,
+            'profit' => $profit,
+            'totalDividend' => $totalDividend,
+            'totalInvested' => $allocated,
+            'controller_name' => 'ReportController',
+        ]);
+    }
 
     /**
      * @Route("/projection", name="report_projection")
