@@ -6,7 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\BranchRepository;
 use App\Repository\CalendarRepository;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Repository\PositionRepository;
 use App\Repository\PaymentRepository;
@@ -132,8 +131,7 @@ class ReportController extends AbstractController
         ]);
     }
 
-
-   /**
+    /**
      * @Route("/allocation/position", name="report_allocation_position")
      */
     public function allocationPerPosition(PositionRepository $positionRepository, BranchRepository $branchRepository, Summary $summary)
@@ -148,7 +146,7 @@ class ReportController extends AbstractController
         foreach ($allocationData as $allocationItem) {
             $labels .= "'" . $allocationItem['ticker'] . "',";
             $allocation = $allocationItem['allocation'] / 100;
-            $data .= round(($allocation / $totalAllocated) * 100, 2). ',';
+            $data .= round(($allocation / $totalAllocated) * 100, 2) . ',';
         }
         $labels = trim($labels, ',') . ']';
         $data =  trim($data, ',') . ']';
