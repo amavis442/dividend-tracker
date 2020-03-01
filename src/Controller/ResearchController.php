@@ -66,8 +66,12 @@ class ResearchController extends AbstractController
     /**
      * @Route("/new/{ticker?}", name="research_new", methods={"GET","POST"})
      */
-    public function new(Request $request, ?Ticker $ticker, FileUploader $fileUploader, Referer $referer): Response
-    {
+    public function new(
+        Request $request,
+        ?Ticker $ticker,
+        FileUploader $fileUploader,
+        Referer $referer
+    ): Response {
         $research = new Research();
         if ($ticker instanceof Ticker) {
             $research->setTicker($ticker);
@@ -122,8 +126,13 @@ class ResearchController extends AbstractController
      * @Route("/{id}/edit", name="research_edit", methods={"GET","POST"})
      */
 
-    public function edit(Request $request, Research $research, FileUploader $fileUploader, AttachmentRepository $attachmentRepository, Referer $referer): Response
-    {
+    public function edit(
+        Request $request,
+        Research $research,
+        FileUploader $fileUploader,
+        AttachmentRepository $attachmentRepository,
+        Referer $referer
+    ): Response {
         $form = $this->createForm(ResearchType::class, $research);
         $form->handleRequest($request);
         $documentDirectory = $this->getParameter('documents_directory');
@@ -186,20 +195,19 @@ class ResearchController extends AbstractController
     /**
      * @Route("/{id}", name="research_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Research $research): Response
-    {
+    public function delete(
+        Request $request,
+        Research $research,
+        Referer $referer
+    ): Response {
         if ($this->isCsrfTokenValid('delete' . $research->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
-            if ($research->hasFiles()) {
-                foreach ($research->getFiles() as $doc) {
-                    $filePath = $this->getParameter('documents_directory') . '/' . $doc->getFilename();
-                    if (\file_exists($filePath)) {
-                        unlink($filePath);
-                    }
-                }
-            }
             $entityManager->remove($research);
             $entityManager->flush();
+        }
+
+        if ($referer->get()) {
+            return $this->redirect($referer->get());
         }
 
         return $this->redirectToRoute('research_index');
@@ -208,33 +216,13 @@ class ResearchController extends AbstractController
     /**
      * @Route("/search", name="research_search", methods={"POST"})
      */
-    public function search(Request $request, SessionInterface $session): Response
-    {
+    public function search(
+        Request $request,
+        SessionInterface $session
+    ): Response {
         $searchCriteria = $request->request->get('searchCriteria');
         $session->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('research_index');
-    }
-
-    /**
-     * @Route("/deletefile/{id?}", name="research_deletefile", methods={"POST"})
-     */
-    public function deleteFile(Request $request, Research $research): JsonResponse
-    {
-        $filesId = $request->request->get('files_id');
-        if ($this->isCsrfTokenValid('deletefile' . $research->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $file = $entityManager->find(Files::class, $filesId);
-            $filePath = $this->getParameter('documents_directory') . '/' . $file->getFilename();
-            if (\file_exists($filePath)) {
-                unlink($filePath);
-            }
-            $research->removeFile($file);
-            $entityManager->persist($research);
-            $entityManager->flush();
-
-            return $this->json(['result' => 'ok']);
-        }
-        return $this->json(['result' => 'failed', 'msg' => 'Failed to remove file']);
     }
 }

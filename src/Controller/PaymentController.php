@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use DateTime;
 use App\Repository\CalendarRepository;
 use App\Repository\TickerRepository;
+use App\Service\Referer;
 
 /**
  * @Route("/dashboard/payment")
@@ -53,8 +54,8 @@ class PaymentController extends AbstractController
         [$startDate, $endDate] = (new DateHelper())->getInterval($tab);
         if ($tab === 'All') {
             $startDate = null;
-        } 
-        
+        }
+
         return $this->render('payment/index.html.twig', [
             'payments' => $items->getIterator(),
             'dividends' => $totalDividend,
@@ -75,10 +76,15 @@ class PaymentController extends AbstractController
     /**
      * @Route("/new/{ticker}", name="payment_new", methods={"GET","POST"})
      */
-    public function new(Request $request, Ticker $ticker, CalendarRepository $calendarRepository, TickerRepository $tickerRepository ): Response
-    {
+    public function new(
+        Request $request,
+        Ticker $ticker,
+        CalendarRepository $calendarRepository,
+        TickerRepository $tickerRepository,
+        Referer $referer
+    ): Response {
         $units  = $tickerRepository->getActiveUnits($ticker);
-        
+
         $payment = new Payment();
         $payment->setTicker($ticker);
         $payment->setStocks($units);
@@ -87,7 +93,7 @@ class PaymentController extends AbstractController
             $payment->setCalendar($calendar);
             $payment->setDividend($calendar->getCashAmount());
         }
-       $payment->setPayDate(new DateTime());
+        $payment->setPayDate(new DateTime());
 
         $form = $this->createForm(PaymentType::class, $payment);
         $form->handleRequest($request);
@@ -99,6 +105,9 @@ class PaymentController extends AbstractController
             $entityManager->persist($payment);
             $entityManager->flush();
 
+            if ($referer->get()) {
+                return $this->redirect($referer->get());
+            }
             return $this->redirectToRoute('payment_index');
         }
 
@@ -121,13 +130,19 @@ class PaymentController extends AbstractController
     /**
      * @Route("/{id}/edit", name="payment_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Payment $payment): Response
-    {
+    public function edit(
+        Request $request,
+        Payment $payment,
+        Referer $referer
+    ): Response {
         $form = $this->createForm(PaymentType::class, $payment);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
+            if ($referer->get()) {
+                return $this->redirect($referer->get());
+            }
             return $this->redirectToRoute('payment_index');
         }
 
@@ -140,14 +155,20 @@ class PaymentController extends AbstractController
     /**
      * @Route("/{id}", name="payment_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Payment $payment): Response
-    {
+    public function delete(
+        Request $request,
+        Payment $payment,
+        Referer $referer
+    ): Response {
         if ($this->isCsrfTokenValid('delete' . $payment->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($payment);
             $entityManager->flush();
         }
 
+        if ($referer->get()) {
+            return $this->redirect($referer->get());
+        }
         return $this->redirectToRoute('payment_index');
     }
 
@@ -159,6 +180,6 @@ class PaymentController extends AbstractController
         $searchCriteria = $request->request->get('searchCriteria');
         $session->set(self::SEARCH_KEY, $searchCriteria);
 
-        return $this->redirectToRoute('payment_index',['orderBy' => 'payDate','sort' => 'desc']);
+        return $this->redirectToRoute('payment_index', ['orderBy' => 'payDate', 'sort' => 'desc']);
     }
 }

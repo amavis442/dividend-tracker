@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Entity\Ticker;
+use App\Service\Referer;
 
 /**
  * @Route("/dashboard/calendar")
@@ -25,15 +26,14 @@ class CalendarController extends AbstractController
     public function index(
         CalendarRepository $calendarRepository,
         SessionInterface $session,
-        int $page = 1, 
-        string $orderBy = 'paymentDate', 
+        int $page = 1,
+        string $orderBy = 'paymentDate',
         string $sort = 'DESC'
-    ): Response
-    {
-        if (!in_array($orderBy, ['paymentDate','ticker','exDividendDate'])) {
+    ): Response {
+        if (!in_array($orderBy, ['paymentDate', 'ticker', 'exDividendDate'])) {
             $orderBy = 'paymentDate';
         }
-        if (!in_array($sort, ['asc','desc','ASC','DESC'])) {
+        if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'DESC';
         }
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
@@ -59,7 +59,7 @@ class CalendarController extends AbstractController
     /**
      * @Route("/new/{ticker}", name="calendar_new", methods={"GET","POST"})
      */
-    public function new(Request $request, ?Ticker $ticker = null): Response
+    public function new(Request $request, ?Ticker $ticker = null, Referer $referer): Response
     {
         $calendar = new Calendar();
         $calendar->setTicker($ticker);
@@ -71,6 +71,9 @@ class CalendarController extends AbstractController
             $entityManager->persist($calendar);
             $entityManager->flush();
 
+            if ($referer->get()) {
+                return $this->redirect($referer->get());
+            }
             return $this->redirectToRoute('calendar_index');
         }
 
@@ -93,7 +96,7 @@ class CalendarController extends AbstractController
     /**
      * @Route("/{id}/edit", name="calendar_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Calendar $calendar): Response
+    public function edit(Request $request, Calendar $calendar, Referer $referer): Response
     {
         $form = $this->createForm(CalendarType::class, $calendar);
         $form->handleRequest($request);
@@ -101,6 +104,9 @@ class CalendarController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
+            if ($referer->get()) {
+                return $this->redirect($referer->get());
+            }
             return $this->redirectToRoute('calendar_index');
         }
 
@@ -113,18 +119,21 @@ class CalendarController extends AbstractController
     /**
      * @Route("/{id}", name="calendar_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Calendar $calendar): Response
+    public function delete(Request $request, Calendar $calendar, Referer $referer): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$calendar->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $calendar->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($calendar);
             $entityManager->flush();
         }
 
+        if ($referer->get()) {
+            return $this->redirect($referer->get());
+        }
         return $this->redirectToRoute('calendar_index');
     }
 
-        /**
+    /**
      * @Route("/search", name="calendar_search", methods={"POST"})
      */
     public function search(Request $request, SessionInterface $session): Response

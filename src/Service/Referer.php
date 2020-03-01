@@ -15,9 +15,13 @@ class Referer
         $this->session = $session;
     }
 
-    public function set(): void
+    public function set(?string $url = null): void
     {
         $referer = $this->request->headers->get('referer');
+        if ($url) {
+            $referer = $url;
+        }
+        
         $this->session->set('referer', $referer);
     }
 

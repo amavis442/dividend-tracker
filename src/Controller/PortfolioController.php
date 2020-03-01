@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use App\Service\Referer;
 
 /**
  * @Route("/dashboard/portfolio")
@@ -29,7 +31,8 @@ class PortfolioController extends AbstractController
         Summary $summary,
         int $page = 1,
         string $orderBy = 'industry',
-        string $sort = 'asc'
+        string $sort = 'asc',
+        Referer $referer
     ): Response {
         if (in_array($orderBy, ['industry'])) {
             $orderBy = 'i.label';
@@ -56,6 +59,8 @@ class PortfolioController extends AbstractController
         }
         $dividends = $paymentRepository->getSumDividends($tickerIds);
         [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
+
+        $referer->set();
 
         return $this->render('portfolio/index.html.twig', [
             'positions' => $items->getIterator(),
@@ -84,7 +89,8 @@ class PortfolioController extends AbstractController
         Ticker $ticker,
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
-        Summary $summary
+        Summary $summary,
+        Referer $referer
     ): Response {
         $position = $positionRepository->getForTicker($ticker);
         $payments = $paymentRepository->getForTicker($ticker);
@@ -101,6 +107,9 @@ class PortfolioController extends AbstractController
         }
 
         $calendar = $ticker->getCalendars();
+
+        $url = $this->generateUrl('portfolio_show',['id' => $ticker->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $referer->set($url);
 
         return $this->render('portfolio/show.html.twig', [
             'ticker' => $ticker,

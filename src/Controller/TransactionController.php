@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use DateTime;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Service\Referer;
 
 /**
  * @Route("/dashboard/transaction")
@@ -86,7 +87,8 @@ class TransactionController extends AbstractController
         int $side,
         SessionInterface $session,
         CurrencyRepository $currencyRepository,
-        WeightedAverage $weightedAverage
+        WeightedAverage $weightedAverage,
+        Referer $referer
     ): Response {
         $transaction = new Transaction();
 
@@ -107,7 +109,7 @@ class TransactionController extends AbstractController
             $this->presetMetrics($transaction);
             $position->addTransaction($transaction);
             $weightedAverage->calc($position);
-    
+
             if ($position->getAmount() === 0) {
                 $position->setClosed(1);
             }
@@ -117,6 +119,10 @@ class TransactionController extends AbstractController
 
             $session->set(self::SEARCH_KEY, $transaction->getTicker()->getTicker());
             $session->set(PortfolioController::SEARCH_KEY, $transaction->getTicker()->getTicker());
+
+            if ($referer->get()) {
+                return $this->redirect($referer->get());
+            }
             return $this->redirectToRoute('portfolio_index');
         }
 
@@ -143,7 +149,8 @@ class TransactionController extends AbstractController
         Request $request,
         Transaction $transaction,
         SessionInterface $session,
-        WeightedAverage $weightedAverage
+        WeightedAverage $weightedAverage,
+        Referer $referer
     ): Response {
         $form = $this->createForm(TransactionType::class, $transaction);
         $form->handleRequest($request);
@@ -157,6 +164,11 @@ class TransactionController extends AbstractController
             }
             $this->getDoctrine()->getManager()->flush();
             $session->set(self::SEARCH_KEY, $transaction->getTicker()->getTicker());
+
+            if ($referer->get()) {
+                return $this->redirect($referer->get());
+            }
+
             return $this->redirectToRoute('transaction_index');
         }
 
@@ -169,14 +181,20 @@ class TransactionController extends AbstractController
     /**
      * @Route("/{id}", name="transaction_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Transaction $transaction): Response
-    {
+    public function delete(
+        Request $request,
+        Transaction $transaction,
+        Referer $referer
+    ): Response {
         if ($this->isCsrfTokenValid('delete' . $transaction->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($transaction);
             $entityManager->flush();
         }
 
+        if ($referer->get()) {
+            return $this->redirect($referer->get());
+        }
         return $this->redirectToRoute('transaction_index');
     }
 
