@@ -29,12 +29,12 @@ class PaymentType extends AbstractType
         ->add('Calendar', EntityType::class, [
             'class' => Calendar::class,
             'choice_label' => function ($calendar) {
-                return  $calendar->getTicker()->getTicker().'::'.$calendar->getExDividendDate()->format('Y-m-d') ;
+                return  $calendar->getTicker()->getTicker().'::'.$calendar->getPaymentDate()->format('Y-m-d') ;
             },
             'query_builder' => function (EntityRepository $er) use ($tickerId) {
                 $query = $er->createQueryBuilder('c')
-                ->where('c.exDividendDate <= :currentDate')
-                ->orderBy('c.exDividendDate', 'DESC')
+                ->where('c.paymentDate <= :currentDate')
+                ->orderBy('c.paymentDate', 'DESC')
                 ->setParameter('currentDate', (new DateTime())->format('Y-m-d'));
                 if ($tickerId > 0) {
                     $query->andWhere('c.ticker = :tickerId')

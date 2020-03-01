@@ -1,0 +1,52 @@
+<h3>Info</h3>
+<table class="table">
+	<tbody>
+		<tr>
+			<th>Instrument</th>
+			<td>
+				<strong>{{ ticker.fullname }}
+					({{ ticker.ticker }})
+				</strong>
+			</td>
+		</tr>
+		<tr>
+			<th>Industry</th>
+			<td>{{ ticker.branch.label }}</td>
+		</tr>
+		<tr>
+			<th>Dividend payment months</th>
+			<td>
+				{% for month in ticker.dividendMonths %}
+					{{ month.getDividendMonthName}},
+				{% endfor %}
+				<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="Edit months">
+					<i class="far fa-edit"></i>
+				</a>
+			</td>
+		</tr>
+		<tr>
+			<th>Total dividend</th>
+			<td>
+				<span class="alert alert-primary" role="alert">
+					<strong>&euro;{{ dividend|format_number({fraction_digit: 2}) }}</string>
+				</span>
+			</td>
+		</tr>
+		<tr>
+			<th>Quantity</th>
+			<td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
+		</tr>
+		<tr>
+			<th>Weighted average price</th>
+			<td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
+		</tr>
+		<tr>
+			<th>Allocation</th>
+			<td>{{ allocationSign|raw }}{{ (position.allocation/100)|format_number({fraction_digit: 2}) }}</td>
+		</tr>
+		<tr>
+			<th>Allocation(%)</th>
+			<td>{{ percentageAllocated|format_number({fraction_digit: 2}) }}%</td>
+		</tr>
+	</tbody>
+</table>

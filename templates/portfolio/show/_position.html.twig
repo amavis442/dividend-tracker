@@ -1,0 +1,47 @@
+<h3>Position</h3>
+<table class="table">
+	<thead>
+		<tr>
+			<th></th>
+			<th>Units</th>
+			<th>Weighted average price</th>
+			<th>Allocation</th>
+			<th>Profit / Loss</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% if position %}
+
+
+			<tr class="table-success">
+				<td>
+					<strong>Summary</strong>
+				</td>
+				<td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
+				<td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
+				<td>{{ allocationSign|raw }}{{ (position.allocation/100)|format_number({fraction_digit: 2}) }}</td>
+				<td>{{ allocationSign|raw }}{{ (position.profit/100)|format_number({fraction_digit: 2})}}</td>
+				<td>
+					<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+						<div class="btn-group mr-2" role="group" aria-label="First group">
+							<a class="btn btn-success" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id,'side': 1, }) }}" data-toggle="tooltip" data-placement="top" title="Buy">
+								<i class="fas fa-plus"></i>
+							</a>
+							<a href="{{ path('position_edit', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit position">
+								<i class="far fa-edit"></i>
+							</a>
+							<a class="btn btn-danger" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id, 'side': 2}) }}" data-toggle="tooltip" data-placement="top" title="Sell">
+								<i class="fas fa-minus"></i>
+							</a>
+						</div>
+					</div>
+				</td>
+			</tr>
+		{% else %}
+			<tr class="table-success" colspan="6">
+				<td colspan="6">no records found</td>
+			</tr>
+		{% endif %}
+	</tbody>
+</table>

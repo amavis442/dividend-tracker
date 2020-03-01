@@ -1,0 +1,32 @@
+<h2>Research info</h2>
+{% for research in ticker.researches %}
+	<p>
+		<div class="card" style="width: 100%;">
+			<div class="card-body">
+				<h5 class="card-title">{{ research.title }}</h5>
+				<p class="card-text">{{ research.info|raw }}</p>
+				{% if research.attachments %}
+					<p>
+						{% for doc in research.attachments %}
+							<a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}" target='_blank'>
+								<i class="fa fa-download"></i>
+								{{ doc.label }}</a><br/>
+						{% endfor %}
+					</p>
+				{% endif %}
+				<hr/>
+				<a href="{{ path('research_edit', {'id': research.id}) }}" class="card-link">
+					<i class="far fa-edit"></i>
+				</a>
+			</div>
+		</div>
+	</p>
+{% else %}
+	no records found
+{% endfor %}
+<hr/>
+<div class="btn-group mr-2" role="group" aria-label="Second group">
+	<a class="btn btn-primary" href="{{ path('research_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add research">
+		<i class="fab fa-searchengin"></i>
+	</a>
+</div>

@@ -75,7 +75,7 @@ class PaymentController extends AbstractController
     /**
      * @Route("/new/{ticker}", name="payment_new", methods={"GET","POST"})
      */
-    public function new(Request $request, CalendarRepository $calendarRepository, TickerRepository $tickerRepository, Ticker $ticker): Response
+    public function new(Request $request, Ticker $ticker, CalendarRepository $calendarRepository, TickerRepository $tickerRepository ): Response
     {
         $units  = $tickerRepository->getActiveUnits($ticker);
         

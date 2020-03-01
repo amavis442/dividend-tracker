@@ -100,11 +100,14 @@ class PortfolioController extends AbstractController
             $percentageAllocation = ($position->getAllocation() / $allocated);
         }
 
+        $calendar = $ticker->getCalendars();
+
         return $this->render('portfolio/show.html.twig', [
             'ticker' => $ticker,
             'position' => $position,
             'payments' => $payments,
             'dividend' => $dividend,
+            'calendars' => $calendar,
             'totalInvested' => $allocated,
             'percentageAllocated' => $percentageAllocation,
         ]);

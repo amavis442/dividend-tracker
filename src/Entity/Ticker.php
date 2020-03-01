@@ -41,7 +41,7 @@ class Ticker
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Calendar", mappedBy="ticker")
-     * @ORM\OrderBy({"exDividendDate" = "DESC"})
+     * @ORM\OrderBy({"paymentDate" = "DESC"})
      */
     private $calendars;
 

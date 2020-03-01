@@ -1,0 +1,52 @@
+<h3>Transactions</h3>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th></th>
+			<th>Transaction date</th>
+			<th>Units</th>
+			<th>Price</th>
+			<th>Allocation</th>
+			<th>avgPrice</th>
+			<th>Profit/Loss</th>
+			<th>Broker</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% if position and position.transactions %}
+			{% for transaction in position.transactions %}
+				{% set side = (transaction.side == 1 ? 'Buy' : 'Sell') %}
+				<tr>
+					<td>
+						<span class="badge badge-{% if transaction.side == 1 %}success{% else %}danger{% endif %}">
+							{{ side }}
+						</span>
+					</td>
+					<td>{{ transaction.transactionDate|date("d-m-Y") }}</td>
+					<td>{{ (transaction.amount/100)|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.price/100)|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ (transaction.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ (transaction.allocation/100)|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.avgprice/100)|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}<span class="badge badge-{% if transaction.profit > 0 %}success{% else %}danger{% endif %}">{{ transaction.profit }}</span>
+					</td>
+					<td>{{ transaction.broker }}</td>
+					<td>
+						<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+							<div class="btn-group mr-2" role="group" aria-label="First group">
+								<a href="{{ path('transaction_edit', {'id': transaction.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit transaction">
+									<i class="far fa-edit"></i>
+								</a>
+							</div>
+						</div>
+					</td>
+				</tr>
+			{% endfor %}
+
+		{% else %}
+			<tr>
+				<td colspan="7">no records found</td>
+			</tr>
+		{% endif %}
+	</tbody>
+</table>

@@ -20,8 +20,15 @@
 			<a class="nav-link" id="transactions-tab" data-toggle="tab" href="#transactions" role="tab" aria-controls="transactions" aria-selected="true">Transactions</a>
 		</li>
 		<li class="nav-item">
+			<a class="nav-link" id="payout-tab" data-toggle="tab" href="#payout" role="tab" aria-controls="payout" aria-selected="false">Payout</a>
+		</li>
+		<li class="nav-item">
 			<a class="nav-link" id="dividend-tab" data-toggle="tab" href="#dividend" role="tab" aria-controls="dividend" aria-selected="false">Dividend</a>
 		</li>
+		<li class="nav-item">
+			<a class="nav-link" id="fundamental-tab" data-toggle="tab" href="#fundamental" role="tab" aria-controls="fundamental" aria-selected="false">Fundamental</a>
+		</li>
+		
 		<li class="nav-item">
 			<a class="nav-link" id="research-tab" data-toggle="tab" href="#research" role="tab" aria-controls="research" aria-selected="false">Research</a>
 		</li>
@@ -29,235 +36,31 @@
 	<div class="tab-content" id="myTabContent">
 		<div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
 			<br/>
-			<h3>Info</h3>
-			<table class="table">
-				<tbody>
-					<tr>
-						<th>Instrument</th>
-						<td>
-							<strong>{{ ticker.fullname }}
-								({{ ticker.ticker }})
-							</strong>
-						</td>
-					</tr>
-					<tr>
-						<th>Industry</th>
-						<td>{{ ticker.branch.label }}</td>
-					</tr>
-					<tr>
-						<th>Dividend payment months</th>
-						<td>
-							{% for month in ticker.dividendMonths %}
-								{{ month.getDividendMonthName}},
-							{% endfor %}
-							<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="Edit months">
-								<i class="far fa-edit"></i>
-							</a>
-						</td>
-					</tr>
-					<tr>
-						<th>Total dividend</th>
-						<td>
-							<span class="alert alert-primary" role="alert">
-								<strong>&euro;{{ dividend|format_number({fraction_digit: 2}) }}</string>
-							</span>
-						</td>
-					</tr>
-					<tr>
-						<th>Quantity</th>
-						<td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
-					</tr>
-					<tr>
-						<th>Weighted average price</th>
-						<td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
-					</tr>
-					<tr>
-						<th>Allocation</th>
-						<td>{{ allocationSign|raw }}{{ (position.allocation/100)|format_number({fraction_digit: 2}) }}</td>
-					</tr>
-					<tr>
-						<th>Allocation(%)</th>
-						<td>{{ percentageAllocated|format_number({fraction_digit: 2}) }}%</td>
-					</tr>
-				</tbody>
-			</table>
-
+			{% include 'portfolio/show/_info.html.twig' %}
 		</div>
 		<div class="tab-pane fade" id="position" role="tabpanel" aria-labelledby="position-tab">
 			<br/>
-			<h3>Position</h3>
-			<table class="table">
-				<thead>
-					<tr>
-						<th></th>
-						<th>Units</th>
-						<th>Weighted average price</th>
-						<th>Allocation</th>
-						<th>Profit / Loss</th>
-						<th>Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% if position %}
-
-
-						<tr class="table-success">
-							<td>
-								<strong>Summary</strong>
-							</td>
-							<td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
-							<td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
-							<td>{{ allocationSign|raw }}{{ (position.allocation/100)|format_number({fraction_digit: 2}) }}</td>
-							<td>{{ allocationSign|raw }}{{ (position.profit/100)|format_number({fraction_digit: 2})}}</td>
-							<td>
-								<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-									<div class="btn-group mr-2" role="group" aria-label="First group">
-										<a class="btn btn-success" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id,'side': 1, }) }}" data-toggle="tooltip" data-placement="top" title="Buy">
-											<i class="fas fa-plus"></i>
-										</a>
-										<a href="{{ path('position_edit', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit position">
-											<i class="far fa-edit"></i>
-										</a>
-										<a class="btn btn-danger" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id, 'side': 2}) }}" data-toggle="tooltip" data-placement="top" title="Sell">
-											<i class="fas fa-minus"></i>
-										</a>
-									</div>
-								</div>
-							</td>
-						</tr>
-					{% else %}
-						<tr class="table-success" colspan="6">
-							<td colspan="6">no records found</td>
-						</tr>
-					{% endif %}
-				</tbody>
-			</table>
+			{% include 'portfolio/show/_position.html.twig' %}
 		</div>
 		<div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="transactions-tab">
 			<br/>
-			<h3>Transactions</h3>
-			<table class="table table-striped">
-				<thead>
-					<tr>
-						<th></th>
-						<th>Transaction date</th>
-						<th>Units</th>
-						<th>Price</th>
-						<th>Allocation</th>
-						<th>avgPrice</th>
-						<th>Profit/Loss</th>
-						<th>Broker</th>
-						<th>Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% if position and position.transactions %}
-						{% for transaction in position.transactions %}
-							{% set side = (transaction.side == 1 ? 'Buy' : 'Sell') %}
-							<tr>
-								<td>
-									<span class="badge badge-{% if transaction.side == 1 %}success{% else %}danger{% endif %}">
-										{{ side }}
-									</span>
-								</td>
-								<td>{{ transaction.transactionDate|date("d-m-Y") }}</td>
-								<td>{{ (transaction.amount/100)|format_number({fraction_digit: 2}) }}</td>
-								<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.price/100)|format_number({fraction_digit: 2}) }}</td>
-								<td>{{ (transaction.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ (transaction.allocation/100)|format_number({fraction_digit: 2}) }}</td>
-								<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.avgprice/100)|format_number({fraction_digit: 2}) }}</td>
-								<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}<span class="badge badge-{% if transaction.profit > 0 %}success{% else %}danger{% endif %}">{{ transaction.profit }}</span></td>
-								<td>{{ transaction.broker }}</td>
-								<td>
-									<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-										<div class="btn-group mr-2" role="group" aria-label="First group">
-											<a href="{{ path('transaction_edit', {'id': transaction.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit transaction">
-												<i class="far fa-edit"></i>
-											</a>
-										</div>
-									</div>
-								</td>
-							</tr>
-						{% endfor %}
-
-					{% else %}
-						<tr>
-							<td colspan="7">no records found</td>
-						</tr>
-					{% endif %}
-				</tbody>
-			</table>
+			{% include 'portfolio/show/_transaction.html.twig' %}
+		</div>
+		<div class="tab-pane fade" id="payout" role="tabpanel" aria-labelledby="payout-tab">
+			<br/>
+			{% include 'portfolio/show/_payout.html.twig' %}
 		</div>
 		<div class="tab-pane fade" id="dividend" role="tabpanel" aria-labelledby="dividend-tab">
 			<br/>
-			<h2>Dividend</h2>
-			<table class="table table-striped">
-				<thead>
-					<tr>
-						<th></th>
-						<th>Date</th>
-						<th>Units</th>
-						<th>Dividend</th>
-						<th>Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for payment in payments %}
-						<tr>
-							<td></td>
-							<td>{{ payment.payDate|date("d-m-Y") }}</td>
-							<td>{{ (payment.stocks/100)|format_number({fraction_digit: 2})}}</td>
-							<td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend/100)|format_number({fraction_digit: 2})}}</td>
-							<td>
-								<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-									<div class="btn-group mr-2" role="group" aria-label="First group">
-										<a href="{{ path('payment_edit', {'id': payment.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit payment">
-											<i class="far fa-edit"></i>
-										</a>
-									</div>
-								</div>
-							</td>
-						</tr>
-					{% else %}
-						<tr>
-							<td colspan="4">no records found</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
+			{% include 'portfolio/show/_dividend.html.twig' %}
+		</div>
+		<div class="tab-pane fade" id="fundamental" role="tabpanel" aria-labelledby="fundamental-tab">
+			<br/>
+			{% include 'portfolio/show/_fundamental.html.twig' %}
 		</div>
 		<div class="tab-pane fade" id="research" role="tabpanel" aria-labelledby="research-tab">
 			<br/>
-			<h2>Research info</h2>
-			{% for research in ticker.researches %}
-				<p>
-					<div class="card" style="width: 100%;">
-						<div class="card-body">
-							<h5 class="card-title">{{ research.title }}</h5>
-							<p class="card-text">{{ research.info|raw }}</p>
-							{% if research.attachments %}
-								<p>
-									{% for doc in research.attachments %}
-										<a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}" target='_blank'>
-										<i class="fa fa-download"></i> {{ doc.label }}</a><br/>
-									{% endfor %}
-								</p>
-							{% endif %}
-							<hr/>
-							<a href="{{ path('research_edit', {'id': research.id}) }}" class="card-link">
-								<i class="far fa-edit"></i>
-							</a>
-						</div>
-					</div>
-				</p>
-			{% else %}
-				no records found
-			{% endfor %}
-			<hr/>
-			<div class="btn-group mr-2" role="group" aria-label="Second group">
-				<a class="btn btn-primary" href="{{ path('research_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add research">
-					<i class="fab fa-searchengin"></i>
-				</a>
-			</div>
+			{% include 'portfolio/show/_research.html.twig' %}
 			<hr/>
 		</div>
 	</div>
