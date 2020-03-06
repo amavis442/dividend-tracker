@@ -87,19 +87,23 @@ class CalendarRepository extends ServiceEntityRepository
 
     public function getDividendEstimate(): array
     {
-        $result = $this->createQueryBuilder('c')
-            ->select(['c', 't', 'a'])
+        $qb = $this->createQueryBuilder('c')
+            ->select(['c', 't', 'a', 'pa'])
             ->innerJoin('c.ticker', 't')
             ->innerJoin('t.positions', 'p')
             ->innerJoin('t.transactions', 'a')
+            ->leftJoin('c.payment','pa', 'WITH', 'pa.calendar = c' )
             ->andWhere('p.closed <> 1 or p.closed is null')
             ->andWhere('YEAR(c.paymentDate) = :year')
             ->setParameter('year', date('Y'))
-            ->getQuery()
-            ->getResult();
+            ->getQuery();
+        $result = $qb->getResult();
         $output = [];
 
         foreach ($result as $item) {
+            if ($item === null) {
+                continue;
+            }
             $paydate = $item->getPaymentDate()->format('Ym');
             if (!isset($output[$paydate])) {
                 $output[$paydate] = [];
@@ -124,7 +128,9 @@ class CalendarRepository extends ServiceEntityRepository
                 'dividend' => $dividend,
                 'payout' => $payoutPosition,
                 'payoutdate' => $item->getPaymentDate()->format('d-m-Y'),
-                'exdividend' => $item->getExdividendDate()->format('d-m-Y')
+                'exdividend' => $item->getExdividendDate()->format('d-m-Y'),
+                'ticker' => $ticker,
+                'payment' => $item->getPayment()
             ];
             $payout = $units * $dividend;
             $output[$paydate]['totaldividend'] +=  $payout;

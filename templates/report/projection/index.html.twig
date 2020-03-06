@@ -4,57 +4,79 @@
 {% endblock %}
 
 {% block body %}
-    <div style='width:900px;height:600px' class="col col-xs-12">
-        <canvas id="myChart" ></canvas>
-    </div>
+	<div style='width:900px;height:600px' class="col col-xs-12">
+		<canvas id="myChart"></canvas>
+	</div>
 
-    <div class="accordion" id="accordionExample">
-	{% set collapseId = 0 %}
-	{% for label, item in datasource %}
-		{% set collapseId = collapseId + 1  %}
-		<div class="card">
-			<div class="card-header" id="heading{{ collapseId }}">
-				<div class="d-flex flex-row bd-highlight">
-                    <div class="item"><button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ collapseId }}" aria-expanded="true" aria-controls="collapse{{ collapseId }}">{{ item.normaldate }}</button></div>
-                    <div class="item">${{ (item.totaldividend)|format_number({fraction_digit: 2}) }}</div>
-                    <div class="item">&euro;{{ item.payout|format_number({fraction_digit: 2}) }}</div>
-                </div>
-			</div>
+	<div class="accordion" id="accordionExample">
+		{% set collapseId = 0 %}
+		{% for label, item in datasource %}
+			{% set collapseId = collapseId + 1  %}
+			<div class="card">
+				<div class="card-header" id="heading{{ collapseId }}">
+					<div class="d-flex flex-row bd-highlight">
+						<div class="item">
+							<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ collapseId }}" aria-expanded="true" aria-controls="collapse{{ collapseId }}">{{ item.normaldate }}</button>
+						</div>
+						<div class="item">${{ (item.totaldividend)|format_number({fraction_digit: 2}) }}</div>
+						<div class="item">&euro;{{ item.payout|format_number({fraction_digit: 2}) }}</div>
+					</div>
+				</div>
 
-			<div id="collapse{{ collapseId }}" class="collapse" aria-labelledby="heading{{ collapseId }}" data-parent="#accordionExample">
-				<div class="card-body">
-					<table class="table">
-						<thead class="thead-dark">
-							<tr>
-								<th>Company</th>
-								<th>Units</th>
-								<th>Dividend</th>
-                                <th>Total dividend</th>
-								<th>Exdiv / Pay date</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for positionLabel, position in item.tickers %}
+				<div id="collapse{{ collapseId }}" class="collapse" aria-labelledby="heading{{ collapseId }}" data-parent="#accordionExample">
+					<div class="card-body">
+						<table class="table">
+							<thead class="thead-dark">
 								<tr>
-									<td>{{ positionLabel }}</td>
-									<td>{{ position.units }}</td>
-									<td>${{ position.dividend }}</td>
-									<td>&euro;{{ position.payout }}</td>
-									<td><span class="badge badge-warning">{{ position.exdividend }}</span> / <span class="badge badge-success">{{ position.payoutdate }}</span></td>
+									<th>Company</th>
+									<th>Units</th>
+									<th>Dividend</th>
+									<th>Projected dividend / Actual payout</th>
+									<th>Exdiv / Pay date</th>
+									<th>Actions</th>
 								</tr>
-								<tr>
-								{% endfor %}
+							</thead>
+							<tbody>
+								{% for positionLabel, position in item.tickers %}
+								{% set ticker = position.ticker %}
+								{% set payment = position.payment %}
+									<tr class="{% if payment %}table-success{% else %}table-light{%endif%}" >
+										<td>{{ positionLabel }}</td>
+										<td>{{ position.units }}</td>
+										<td>${{ position.dividend }} </td>
+										<td>&euro;{{ position.payout }} / &euro;{{ payment ? (payment.dividend/100)|format_number({fraction_digit: 2}) : '0' }}</td>
+										<td>
+											<span class="badge badge-warning">{{ position.exdividend }}</span>
+											/
+											<span class="badge badge-success">{{ position.payoutdate }}</span>
+										</td>
+										<td>
+											<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+												<div class="btn-group mr-2" role="group" aria-label="First group">
+													<a href="{{ path('portfolio_show', {'id': ticker.id}) }}" class="btn btn-primary">
+														<i class="fas fa-book-open"></i>
+													</a>
+													<a class="btn btn-success" href="{{ path('payment_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment">
+														<i class="far fa-money-bill-alt"></i>
+													</a>
+												</div>
+											</div>
+										</td>
+									</tr>
+									<tr>
+									{% endfor %}
+								</tbody>
 							</tbody>
-						</tbody>
-					</table>
+						</table>
+					</div>
 				</div>
 			</div>
-		</div>
-	{% endfor %}
-</div>
+		{% endfor %}
+	</div>
 
 
 {% endblock %}
+
 
 {% block javascripts %}
     {{ encore_entry_script_tags('chart') }}

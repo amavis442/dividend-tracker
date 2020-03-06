@@ -34,7 +34,8 @@ class PaymentController extends AbstractController
         int $page = 1,
         string $orderBy = 'payDate',
         string $sort = 'DESC',
-        string $tab = 'All'
+        string $tab = 'All',
+        Referer $referer
     ): Response {
         if (!in_array($orderBy, ['payDate', 'ticker'])) {
             $orderBy = 'exDividendDate';
@@ -55,6 +56,8 @@ class PaymentController extends AbstractController
         if ($tab === 'All') {
             $startDate = null;
         }
+
+        $referer->set('payment_index', ['page' => $page, 'tab' => $tab,'orderBy' => $orderBy, 'sort' => $sort]);
 
         return $this->render('payment/index.html.twig', [
             'payments' => $items->getIterator(),
@@ -101,7 +104,11 @@ class PaymentController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
             $payment->setTicker($ticker);
-
+            
+            if ($calendar = $payment->getCalendar()) {
+                $calendar->setPayment($payment);
+            }
+            
             $entityManager->persist($payment);
             $entityManager->flush();
 
@@ -139,6 +146,10 @@ class PaymentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($calendar = $payment->getCalendar()) {
+                $calendar->setPayment($payment);
+            }
+
             $this->getDoctrine()->getManager()->flush();
             if ($referer->get()) {
                 return $this->redirect($referer->get());

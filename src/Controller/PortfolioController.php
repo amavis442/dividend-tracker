@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use App\Service\Referer;
 
 /**
@@ -108,8 +107,7 @@ class PortfolioController extends AbstractController
 
         $calendar = $ticker->getCalendars();
 
-        $url = $this->generateUrl('portfolio_show',['id' => $ticker->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $referer->set($url);
+        $referer->set('portfolio_show',['id' => $ticker->getId()]);
 
         return $this->render('portfolio/show.html.twig', [
             'ticker' => $ticker,

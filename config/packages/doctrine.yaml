@@ -28,4 +28,6 @@ doctrine:
             datetime_functions:
                 DAY: DoctrineExtensions\Query\Mysql\Day
                 MONTH: DoctrineExtensions\Query\Mysql\Month
-                YEAR: DoctrineExtensions\Query\Mysql\Year        
+                YEAR: DoctrineExtensions\Query\Mysql\Year   
+                DATEADD: DoctrineExtensions\Query\Mysql\DateAdd  
+                DATESUB: DoctrineExtensions\Query\Mysql\DateSub     

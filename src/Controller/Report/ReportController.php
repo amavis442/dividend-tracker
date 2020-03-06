@@ -2,6 +2,7 @@
 
 namespace App\Controller\Report;
 
+use App\Entity\Payment;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\BranchRepository;
@@ -12,6 +13,8 @@ use App\Repository\PaymentRepository;
 use App\Repository\TickerRepository;
 use App\Repository\DividendMonthRepository;
 use App\Service\Summary;
+use App\Service\Referer;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @Route("/dashboard/report")
@@ -169,7 +172,8 @@ class ReportController extends AbstractController
      */
     public function projection(
         CalendarRepository $calendarRepository,
-        DividendMonthRepository $dividendMonthRepository
+        DividendMonthRepository $dividendMonthRepository,
+        Referer $referer
     ): Response {
         $dividendEstimate = $calendarRepository->getDividendEstimate();
         $labels = '[';
@@ -196,13 +200,15 @@ class ReportController extends AbstractController
                 $dataSource[$paydate]['payout'] = 0;
                 $dataSource[$paydate]['normaldate'] = $normalDate;
                 $dataSource[$paydate]['tickers'] = [];
-                foreach ($dividendMonth->getTickers() as $ticker) {
+                foreach ($dividendMonth->getTickers() as $ticker) {                    
                     $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
                         'units' => 0,
                         'dividend' => 0,
                         'payout' => 0,
                         'payoutdate' => '',
-                        'exdividend' => ''
+                        'exdividend' => '',
+                        'ticker' => $ticker,
+                        'payment' => null
                     ];
                 }
             }
@@ -224,12 +230,16 @@ class ReportController extends AbstractController
                             'dividend' => 0,
                             'payout' => 0,
                             'payoutdate' => '',
-                            'exdividend' => ''
+                            'exdividend' => '',
+                            'ticker' => $ticker,
+                            'payment' => null
                         ];
                     }
                 }
             }
         }
+
+        $referer->set('report_projection');
 
         return $this->render('report/projection/index.html.twig', [
             'data' => $data,
