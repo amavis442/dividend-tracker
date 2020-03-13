@@ -208,6 +208,7 @@ class ReportController extends AbstractController
                         'payoutdate' => '',
                         'exdividend' => '',
                         'ticker' => $ticker,
+                        'calendar' => null,
                         'payment' => null
                     ];
                 }
@@ -232,6 +233,7 @@ class ReportController extends AbstractController
                             'payoutdate' => '',
                             'exdividend' => '',
                             'ticker' => $ticker,
+                            'calendar' => null,
                             'payment' => null
                         ];
                     }

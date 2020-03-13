@@ -59,6 +59,15 @@
 													<a class="btn btn-success" href="{{ path('payment_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment">
 														<i class="far fa-money-bill-alt"></i>
 													</a>
+													{% if not position.calendar %}	
+													<a class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend date">
+														<i class="far fa-calendar-alt"></i>
+													</a>
+													{% else %}
+													<a class="btn btn-secondary" href="{{ path('calendar_edit', {'id': position.calendar.id}) }}" data-toggle="tooltip" data-placement="top" title="edit dividend date">
+														<i class="far fa-edit"></i>
+													</a>
+													{% endif %}
 												</div>
 											</div>
 										</td>

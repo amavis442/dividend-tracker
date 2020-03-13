@@ -100,15 +100,15 @@ class CalendarRepository extends ServiceEntityRepository
         $result = $qb->getResult();
         $output = [];
 
-        foreach ($result as $item) {
-            if ($item === null) {
+        foreach ($result as $calendar) {
+            if ($calendar === null) {
                 continue;
             }
-            $paydate = $item->getPaymentDate()->format('Ym');
+            $paydate = $calendar->getPaymentDate()->format('Ym');
             if (!isset($output[$paydate])) {
                 $output[$paydate] = [];
             }
-            $ticker = $item->getTicker();
+            $ticker = $calendar->getTicker();
             $transactions = $ticker->getTransactions();
             
             if (!isset($output[$paydate][$ticker->getTicker()])) {
@@ -118,19 +118,20 @@ class CalendarRepository extends ServiceEntityRepository
                 $output[$paydate]['totaldividend'] = 0;
             }
             
-            $units = $this->getPositionSize($transactions, $item);
+            $units = $this->getPositionSize($transactions, $calendar);
             $units = $units / 100;
             
-            $dividend = $item->getCashAmount() / 100;
+            $dividend = $calendar->getCashAmount() / 100;
             $payoutPosition = round(($units * $dividend * 0.85) / 1.1, 2);
             $output[$paydate]['tickers'][$ticker->getTicker()] = [
                 'units' => $units,
                 'dividend' => $dividend,
                 'payout' => $payoutPosition,
-                'payoutdate' => $item->getPaymentDate()->format('d-m-Y'),
-                'exdividend' => $item->getExdividendDate()->format('d-m-Y'),
+                'payoutdate' => $calendar->getPaymentDate()->format('d-m-Y'),
+                'exdividend' => $calendar->getExdividendDate()->format('d-m-Y'),
                 'ticker' => $ticker,
-                'payment' => $item->getPayment()
+                'payment' => $calendar->getPayment(),
+                'calendar' => $calendar
             ];
             $payout = $units * $dividend;
             $output[$paydate]['totaldividend'] +=  $payout;
