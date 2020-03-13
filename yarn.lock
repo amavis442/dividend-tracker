@@ -3181,7 +3181,7 @@ filefetcher@0.0.1:
   resolved "https://registry.yarnpkg.com/filefetcher/-/filefetcher-0.0.1.tgz#e1b1d0501ac80b4b8448b8de699e78670c5794a5"
   integrity sha1-4bHQUBrIC0uESLjeaZ54ZwxXlKU=
 
-filefetcher@0.0.8:
+filefetcher@^0.0.8:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/filefetcher/-/filefetcher-0.0.8.tgz#622cb49c3d1f10c75c76cfc4b0a7a51f7439b128"
   integrity sha1-Yiy0nD0fEMdcds/EsKelH3Q5sSg=
