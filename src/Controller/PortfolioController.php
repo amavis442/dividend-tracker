@@ -59,7 +59,7 @@ class PortfolioController extends AbstractController
         $dividends = $paymentRepository->getSumDividends($tickerIds);
         [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
 
-        $referer->set();
+        $referer->set('portfolio_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
 
         return $this->render('portfolio/index.html.twig', [
             'positions' => $items->getIterator(),
