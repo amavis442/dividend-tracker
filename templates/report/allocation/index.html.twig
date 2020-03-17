@@ -51,10 +51,10 @@
 										<td>{{ position.positionAllocationPercentage }}%</td>
 									</tr>
 									<tr>
-									{% endfor %}
-								</tbody>
+								{% endfor %}
 							</tbody>
 						</table>
+						{% include 'report/allocation/_chart_per_sector.html.twig' %}
 					</div>
 				</div>
 			</div>

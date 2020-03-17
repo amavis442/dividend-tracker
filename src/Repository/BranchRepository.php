@@ -85,11 +85,18 @@ class BranchRepository extends ServiceEntityRepository
 
         foreach ($output as &$sector) {
             $sector['sectorAllocationPercentage'] = round(($sector['sectorAllocation'] / $totalAllocation) * 100, 2);
+            $positionData = []; 
+            $positionLabels = [];
             foreach ($sector['sectorPositions'] as &$position) {
                 $position['positionAllocationPercentage'] = round(($position['positionAllocation'] / $sector['sectorAllocation']) * 100, 2);
+                $positionData[] = $position['positionAllocationPercentage'];
+                $positionLabels[] = $position['positionSymbol']; 
             }
+            $sector['chartdata']['data'] = json_encode($positionData);
+            $sector['chartdata']['labels'] = json_encode($positionLabels);   
         }
-       
+        
+
         uasort($output, function($a , $b) {
             $a1 = $a['sectorTargetAllocation'];
             $b1 = $b['sectorTargetAllocation'];

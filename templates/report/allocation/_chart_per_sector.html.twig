@@ -1,0 +1,47 @@
+{% set chartId = collapseId %}
+
+<div style='width:900px;height:600px' class="col col-xs-12">
+	<canvas id="sectorChartAllocation{{ chartId }}"></canvas>
+</div>
+
+{% block javascripts %}
+	{{ encore_entry_script_tags('chart') }}
+	{{ encore_entry_script_tags('app') }}
+	{% include "report/_colors.html.twig" %}
+<script type="text/javascript">
+	var configSector{{ chartId }} = {
+	    type: 'pie',
+	    data: {
+            datasets: [
+            {
+                data: {{ sector.chartdata.data|raw }},
+                backgroundColor: [
+                    window.chartColors.red,
+                    window.chartColors.orange,
+                    window.chartColors.yellow,
+                    window.chartColors.green,
+                    window.chartColors.blue,
+                    window.chartColors.purple,
+                    window.chartColors.beige,
+                    window.chartColors.lightgreen,
+                    window.chartColors.grey,
+                ],
+                label: 'Allocation'
+            }
+            ],
+            labels: {{ sector.chartdata.labels|raw }}
+	    },
+	    options: {
+	        responsive: true,
+	        title: {
+	            display: true,
+	            fontSize: 24,
+	            text: 'Allocation {{ label }} in %'
+	        }
+	    }
+	};
+
+var ctxSectorAllocation{{ chartId }} = document.getElementById('sectorChartAllocation{{ chartId }}').getContext('2d');
+window.myPieSector{{ chartId }} = new Chart(ctxSectorAllocation{{ chartId }}, configSector{{ chartId }});
+	</script>
+{% endblock %}
