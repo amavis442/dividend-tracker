@@ -1,6 +1,8 @@
 <?php
 namespace Deployer;
 
+use Symfony\Component\Console\Input\InputOption;
+
 require 'recipe/symfony4.php';
 
 // Project name
@@ -71,3 +73,27 @@ after('deploy:writable', 'deploy:dividend');
 
 // Last step after symlink has been added.
 after('deploy', 'php-fpm:reload');
+
+
+option('source', null, InputOption::VALUE_OPTIONAL, 'Source alias of the current task.');
+option('target', null, InputOption::VALUE_OPTIONAL, 'Target alias of the current task.');
+
+task('upload:file', function() {
+    /*
+    * Usage: dep upload:file --source="some_destination/file.txt" --target="some_destination/" host
+    */
+
+    $source = null;
+    $target = null;
+
+    if (input()->hasOption('source')) {
+        $source = input()->getOption('source');
+    }
+
+    if (input()->hasOption('target')) {
+        $target = input()->getOption('target');
+    }
+    if (askConfirmation('Upload file ' . $source . ' to release/' . $target . ' ?')) {
+        upload('/< some place >' . $source, '{{release_path}}/' . $target);
+    }
+});

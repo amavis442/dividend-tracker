@@ -256,10 +256,12 @@ class ReportController extends AbstractController
      */
     public function yield(TickerRepository $tickerRepository)
     {
-        $labels = '[';
-        $data = '[';
+        $labels = [];
+        $data = [];
         $dataSource = [];
 
+        $sumDividends = 0;
+        $sumAvgPrice = 0;
         $tickers = $tickerRepository->getActiveForDividendYield();
         foreach ($tickers as $ticker) {
             $positions = $ticker->getPositions();
@@ -281,8 +283,8 @@ class ReportController extends AbstractController
             $dividendPerYear = $numPayoutsPerYear * $lastCash;
 
             $dividendYield = round(($dividendPerYear / $price) * 100, 2);
-            $labels .= sprintf("'%s (%s)',", substr(addslashes($ticker->getFullname()), 0, 8), $ticker->getTicker());
-            $data .= $dividendYield . ',';
+            $labels[] = sprintf("%s (%s)", substr(addslashes($ticker->getFullname()), 0, 8), $ticker->getTicker());
+            $data[] = $dividendYield;
             $dataSource[] = [
                 'ticker' => $ticker->getTicker(),
                 'label' => $ticker->getFullname(),
@@ -290,14 +292,18 @@ class ReportController extends AbstractController
                 'payout' => $dividendPerYear,
                 'avgPrice' => $price,
             ];
+
+            $sumAvgPrice += $price;
+            $sumDividends += $dividendPerYear;
         }
-        $labels = trim($labels, ',') . ']';
-        $data =  trim($data, ',') . ']';
+        
+        $totalAvgYield = ($sumDividends / $sumAvgPrice) * 100;
 
         return $this->render('report/yield/index.html.twig', [
-            'data' => $data,
-            'labels' => $labels,
+            'data' => json_encode($data),
+            'labels' => json_encode($labels),
             'datasource' => $dataSource,
+            'totalAvgYield' => $totalAvgYield,
             'controller_name' => 'ReportController',
         ]);
     }
