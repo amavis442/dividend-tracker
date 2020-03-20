@@ -33,18 +33,19 @@ class PortfolioController extends AbstractController
         string $sort = 'asc',
         Referer $referer
     ): Response {
+        $order = 'i.label';
         if (in_array($orderBy, ['industry'])) {
-            $orderBy = 'i.label';
+            $order = 'i.label';
         }
         if (in_array($orderBy, ['ticker', 'fullname'])) {
-            $orderBy = 't.' . $orderBy;
+            $order = 't.' . $orderBy;
         }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
         }
 
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
-        $items = $positionRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
+        $items = $positionRepository->getAll($page, 10, $order, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
