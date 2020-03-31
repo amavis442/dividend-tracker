@@ -6,7 +6,7 @@
             {% if is_granted('ROLE_USER') %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Markets
+                        Admin
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
                         <a href="{{ url('branch_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Industry</a>
@@ -14,6 +14,8 @@
                         <a href="{{ url('ticker_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Tickers</a>
                         <div class="dropdown-divider"></div>
                         <a href="{{ url('research_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Research on Tickers</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url('position_index', parameters = {status: 2}, schemeRelative = false) }}" class="dropdown-item">Closed positions</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -46,6 +48,7 @@
                         <a href="{{ url('report_projection', parameters = [], schemeRelative = false) }}" class="dropdown-item">Dividend projection</a>
                         <a href="{{ url('report_payout', parameters = [], schemeRelative = false) }}" class="dropdown-item">Dividend payout</a>
                         <a href="{{ url('report_dividend_yield', parameters = [], schemeRelative = false) }}" class="dropdown-item">Dividend yield</a>
+                        
                       </div>
                 </li>
             {% endif %}

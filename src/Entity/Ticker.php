@@ -72,6 +72,11 @@ class Ticker
      */
     private $transactions;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $isin;
+
     public function __construct()
     {
         $this->positions = new ArrayCollection();
@@ -399,6 +404,18 @@ class Ticker
                 $transaction->setTicker(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getIsin(): ?string
+    {
+        return $this->isin;
+    }
+
+    public function setIsin(?string $isin): self
+    {
+        $this->isin = $isin;
 
         return $this;
     }

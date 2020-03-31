@@ -3,19 +3,19 @@
 <ul class="pagination pagination-sm">
     {# `«` arrow  #}
     <li class="page-item {{ thisPage == 1 ? 'disabled' }}">
-        <a class="page-link" href="{{ path(routeName, { 'page': thisPage-1 < 1 ? 1 : thisPage-1, 'orderBy':  order ??  '', 'sort' : sort ?? 'asc', 'tab' : tab ?? 'All' }) }}">« Previous</a>
+        <a class="page-link" href="{{ path(routeName, { 'page': thisPage-1 < 1 ? 1 : thisPage-1, 'orderBy':  order ??  '', 'sort' : sort ?? 'asc', 'tab' : tab ?? 'All', 'status': status ?? 0 }) }}">« Previous</a>
     </li>
 
     {# Render each page number #}
     {% for i in 1..maxPages %}
     <li class="page-item {{ thisPage == i ? 'active' }}">
-        <a class="page-link" href="{{ path(routeName, {'page': i, 'orderBy':  order ?? '', 'sort' : sort ?? 'asc', 'tab' : tab ?? 'All' }) }}">{{ i }}</a>
+        <a class="page-link" href="{{ path(routeName, {'page': i, 'orderBy':  order ?? '', 'sort' : sort ?? 'asc', 'tab' : tab ?? 'All', 'status': status ?? 0 }) }}">{{ i }}</a>
     </li>
     {% endfor %}
 
     {# `»` arrow #}
     <li class="page-item {{ thisPage == maxPages ? 'disabled' }}">
-        <a class="page-link" href="{{ path(routeName, {'page': thisPage+1 <= maxPages ? thisPage+1 : thisPage, 'orderBy':  order ?? '', 'sort' : sort ?? 'asc', 'tab' : tab ?? 'All' }) }}">Next »</a>
+        <a class="page-link" href="{{ path(routeName, {'page': thisPage+1 <= maxPages ? thisPage+1 : thisPage, 'orderBy':  order ?? '', 'sort' : sort ?? 'asc', 'tab' : tab ?? 'All', 'status': status ?? 0 }) }}">Next »</a>
     </li>
 </ul>
 </nav>

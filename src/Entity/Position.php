@@ -14,7 +14,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 class Position
 {
     public const BROKERS = ['eToro', 'Trading212', 'Flatex'];
-
+    public const OPEN = 1;
+    public const CLOSED = 2;
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -72,7 +73,7 @@ class Position
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="position", cascade={"persist"})
-     * ORM\OrderBy({"transactionDate" = "ASC"})
+     * @ORM\OrderBy({"transactionDate" = "DESC"})
      */
     private $transactions;
 
@@ -92,7 +93,7 @@ class Position
                 ->addViolation();
         }
 
-        if (empty($this->amount) || $this->amount === 0) {
+        if ((empty($this->amount) || $this->amount === 0) && $this->closed === false) {
             $context->buildViolation('Amount can not be empty or zero!')
                 ->atPath('amount')
                 ->addViolation();

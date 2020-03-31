@@ -21,6 +21,9 @@ use Doctrine\ORM\Mapping\JoinColumn;
 class PositionRepository extends ServiceEntityRepository
 {
     use PagerTrait;
+    public const OPEN = 1;
+    public const CLOSED = 2;
+    public const ALL = 3;
 
     public function __construct(ManagerRegistry $registry)
     {
@@ -32,29 +35,40 @@ class PositionRepository extends ServiceEntityRepository
         int $limit = 10,
         string $orderBy = 't.ticker',
         string $sort = 'ASC',
-        string $search = ''
+        string $search = '',
+        int $status = self::OPEN
     ): Paginator {
 
         $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
         $queryBuilder->leftJoin('t.calendars', 'c');
-        $queryBuilder->andWhere('p.closed <> 1 or p.closed is null');
+        if ($status === self::OPEN) {
+            $queryBuilder->andWhere('p.closed <> 1 or p.closed is null');
+        }
+        if ($status === self::CLOSED) {
+            $queryBuilder->andWhere('p.closed = 1');
+        }
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);
 
         return $paginator;
     }
 
-    public function getForTicker(Ticker $ticker): ?Position
+    public function getForTicker(Ticker $ticker, int $status = self::OPEN): ?Position
     {
-        return $this->createQueryBuilder('p')
+        $queryBuilder = $this->createQueryBuilder('p')
             ->select('p, tr')
             ->innerJoin('p.ticker', 't')
             ->innerJoin('t.branch', 'i')
             ->innerJoin('p.transactions', 'tr')
             ->leftJoin('t.payments', 'pa')
-            ->where('t = :ticker')
-            ->andWhere('p.closed <> 1 or p.closed is null')
-            ->orderBy('tr.transactionDate', 'DESC')
+            ->where('t = :ticker');
+            if ($status === self::OPEN) {
+                $queryBuilder->andWhere('p.closed <> 1 or p.closed is null');
+            }
+            if ($status === self::CLOSED) {
+                $queryBuilder->andWhere('p.closed = 1');
+            }
+            return $queryBuilder->orderBy('tr.transactionDate', 'DESC')
             ->setParameter('ticker', $ticker)
             ->getQuery()
             ->getOneOrNullResult();

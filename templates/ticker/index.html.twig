@@ -10,6 +10,7 @@
             <tr>
                 <th>Id</th>
                 <th>Ticker</th>
+                <th>ISIN</th>
                 <th>Fullname</th>
                 <th>Industry</th>
                 <th>Research</th>
@@ -23,6 +24,7 @@
             <tr>
                 <td>{{ ticker.id }} </td>
                 <td>{{ ticker.ticker }}</td>
+                <td>{{ ticker.isin }}</td>
                 <td>{{ ticker.fullname }}</td>
                 <td>{{ ticker.branch.label}}</td>
                 <td>{{ ticker.hasResearch ? 'Y' : 'N'}}</td>

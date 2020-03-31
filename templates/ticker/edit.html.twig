@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Ticker{% endblock %}
+{% block title %}Edit Ticker: {{ ticker.ticker }}{% endblock %}
 
 {% block body %}
-    <h1>Edit Ticker</h1>
+    <h1>Edit Ticker: {{ ticker.ticker }}</h1>
 
     {{ include('ticker/_form.html.twig', {'button_label': 'Update'}) }}
     <br/>

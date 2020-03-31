@@ -14,6 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use DateTime;
 use App\Service\Summary;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Service\Referer;
 
 /**
  * @Route("/dashboard/position")
@@ -23,7 +24,7 @@ class PositionController extends AbstractController
     public const SEARCH_KEY = 'position_searchCriteria';
 
     /**
-     * @Route("/list/{page}/{tab}/{orderBy}/{sort}", name="position_index", methods={"GET"})
+     * @Route("/list/{page}/{tab}/{orderBy}/{sort}/{status}", name="position_index", methods={"GET"})
      */
     public function index(
         Summary $summary,
@@ -32,23 +33,27 @@ class PositionController extends AbstractController
         int $page = 1,
         string $tab = 'All',
         string $orderBy = 'ticker',
-        string $sort = 'asc'
+        string $sort = 'asc',
+        int $status = PositionRepository::OPEN,
+        Referer $referer
     ): Response {
         if (!in_array($orderBy, ['profit'])) {
-            $orderBy = 'p.' . $orderBy;
+            $order = 'p.' . $orderBy;
         }
         if (!in_array($orderBy, ['ticker'])) {
-            $orderBy = 't.ticker';
+            $order = 't.ticker';
         }
 
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
         }
+        
+        $referer->set('position_index',['status' => $status]);
 
         [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
 
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
-        $items = $positionRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
+        $items = $positionRepository->getAll($page, 10, $order, $sort, $searchCriteria, $status);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
@@ -62,6 +67,7 @@ class PositionController extends AbstractController
             'order' => $orderBy,
             'sort' => $sort,
             'searchCriteria' => $searchCriteria ?? '',
+            'status' => $status,
             'routeName' => 'position_index',
             'searchPath' => 'position_search',
             'brokers' => $brokers,
@@ -84,6 +90,10 @@ class PositionController extends AbstractController
         if ($position->getPrice() && empty($position->getAllocation())) {
             $position->setAllocation($position->getPrice() * ($position->getAmount() / 100));
             $position->setAllocationCurrency($position->getCurrency());
+        }
+
+        if ($position->getClosed()) {
+            $position->setAllocation(0);
         }
     }
 
@@ -146,7 +156,13 @@ class PositionController extends AbstractController
     /**
      * @Route("/{id}/edit/{closed<\d+>?0}", name="position_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Position $position, ?int $closed, SessionInterface $session): Response
+    public function edit(
+        Request $request, 
+        Position $position, 
+        ?int $closed, 
+        SessionInterface $session,
+        Referer $referer
+        ): Response
     {
         if ($closed === 1) {
             $position->setClosed(true);
@@ -157,8 +173,12 @@ class PositionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->presetMetrics($position);
+            
             $this->getDoctrine()->getManager()->flush();
             $session->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
+            if ($referer->get()) {
+                return $this->redirect($referer->get());
+            }
             return $this->redirectToRoute('position_index');
         }
 
