@@ -21,6 +21,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class ReportController extends AbstractController
 {
+    public const TAX_DIVIDEND = 0.15; // %
+    public const EXCHANGE_RATE = 1.1; // dollar to euro
+
     /**
      * @Route("/report", name="report_index")
      */
@@ -170,7 +173,7 @@ class ReportController extends AbstractController
         foreach ($dividendEstimate as $date => &$estimate) {
             $d = strftime('%B %Y', strtotime($date . '01'));
             $labels[] = $d;
-            $payout = ($estimate['totaldividend'] * 0.85) / 1.1;
+            $payout = ($estimate['totaldividend'] * (1 - self::TAX_DIVIDEND)) / self::EXCHANGE_RATE;
             $data[] = round($payout, 2);
             $estimate['payout'] = $payout;
             $estimate['normaldate'] = $d;
