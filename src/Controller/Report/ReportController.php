@@ -71,30 +71,23 @@ class ReportController extends AbstractController
     public function payouts(
         PaymentRepository $paymentRepository
     ): Response {
-
         $data = $paymentRepository->getDividendsPerInterval();
-
-        $labels = '[';
+        $labels = [];
         $dates = array_keys($data);
         foreach ($dates as $date) {
-            $labels .= "'" . strftime('%b %Y', strtotime($date . '01')) . "',";
+            $labels[] = strftime('%b %Y', strtotime($date . '01'));
         }
-        $labels = trim($labels, ',') . ']';
 
-        $accumulative = '[';
-        $dividends = '[';
         foreach ($data as $item) {
-            $dividends .= ($item['dividend'] / 100) . ',';
-            $accumulative .= ($item['accumulative'] / 100) . ',';
+            $dividends[] = ($item['dividend'] / 100);
+            $accumulative[] = ($item['accumulative'] / 100);
         }
-        $dividends .= ']';
-        $accumulative .= ']';
 
         return $this->render('report/payout/index.html.twig', [
-            'data' => $data,
-            'labels' => $labels,
-            'dividends' => $dividends,
-            'accumulative' => $accumulative,
+            'data' => json_encode($data),
+            'labels' => json_encode($labels),
+            'dividends' => json_encode($dividends),
+            'accumulative' => json_encode($accumulative),
             'controller_name' => 'ReportController',
         ]);
     }
@@ -110,19 +103,17 @@ class ReportController extends AbstractController
         $totalAllocated = $positionRepository->getSumAllocated();
 
         $allocationData = $positionRepository->getAllocationDataPerSector();
-        $labels = '[';
-        $data = '[';
+        $labels = [];
+        $data = [];
         foreach ($allocationData as $allocationItem) {
-            $labels .= "'" . $allocationItem['industry'] . "',";
+            $labels[] = $allocationItem['industry'];
             $allocation = $allocationItem['allocation'] / 100;
-            $data .= round(($allocation / $totalAllocated) * 100, 2) . ',';
+            $data[] = round(($allocation / $totalAllocated) * 100, 2);
         }
-        $labels = trim($labels, ',') . ']';
-        $data =  trim($data, ',') . ']';
 
         return $this->render('report/allocation/index.html.twig', [
-            'data' => $data,
-            'labels' => $labels,
+            'data' => json_encode($data),
+            'labels' => json_encode($labels),
             'sectors' => $sectors,
             'numActivePosition' => $numActivePosition,
             'numPosition' => $numActivePosition,
@@ -144,19 +135,17 @@ class ReportController extends AbstractController
         $totalAllocated = $positionRepository->getSumAllocated();
 
         $allocationData = $positionRepository->getAllocationDataPerPosition();
-        $labels = '[';
-        $data = '[';
+        $labels = [];
+        $data = [];
         foreach ($allocationData as $allocationItem) {
-            $labels .= "'" . $allocationItem['ticker'] . "',";
+            $labels[] = $allocationItem['ticker'];
             $allocation = $allocationItem['allocation'] / 100;
-            $data .= round(($allocation / $totalAllocated) * 100, 2) . ',';
+            $data[] = round(($allocation / $totalAllocated) * 100, 2);
         }
-        $labels = trim($labels, ',') . ']';
-        $data =  trim($data, ',') . ']';
 
         return $this->render('report/allocation/position.html.twig', [
-            'data' => $data,
-            'labels' => $labels,
+            'data' => json_encode($data),
+            'labels' => json_encode($labels),
             'numActivePosition' => $numActivePosition,
             'numPosition' => $numActivePosition,
             'numTickers' => $numTickers,
@@ -176,19 +165,17 @@ class ReportController extends AbstractController
         Referer $referer
     ): Response {
         $dividendEstimate = $calendarRepository->getDividendEstimate();
-        $labels = '[';
-        $data = '[';
+        $labels = [];
+        $data = [];
         foreach ($dividendEstimate as $date => &$estimate) {
             $d = strftime('%B %Y', strtotime($date . '01'));
-            $labels .= "'" . $d . "',";
+            $labels[] = $d;
             $payout = ($estimate['totaldividend'] * 0.85) / 1.1;
-            $data .= round($payout, 2) . ',';
+            $data[] = round($payout, 2);
             $estimate['payout'] = $payout;
             $estimate['normaldate'] = $d;
         }
-        $labels = trim($labels, ',') . ']';
-        $data =  trim($data, ',') . ']';
-
+   
         $dataSource = [];
         $d = $dividendMonthRepository->getAll();
         foreach ($d as $month => $dividendMonth) {
@@ -244,8 +231,8 @@ class ReportController extends AbstractController
         $referer->set('report_projection');
 
         return $this->render('report/projection/index.html.twig', [
-            'data' => $data,
-            'labels' => $labels,
+            'data' => json_encode($data),
+            'labels' => json_encode($labels),
             'datasource' => $dataSource, //$dividendEstimate,
             'controller_name' => 'ReportController',
         ]);
