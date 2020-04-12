@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use App\Form\Factory\CallbackTransformerFactory;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use App\Repository\BranchRepository;
@@ -31,6 +32,7 @@ class BranchType extends AbstractType
                 'html5' => true,
                 'attr' => ['min' =>0, 'max' => $options['maxAssetAllocation']]
             ])
+            ->add('description', TextareaType::class,[])
             ->add('parent', EntityType::class, [
                 'class' => Branch::class,
                 'choice_label' => 'label',
