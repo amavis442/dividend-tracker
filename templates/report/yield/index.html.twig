@@ -4,6 +4,16 @@
 {% endblock %}
 
 {% block body %}
+	<div class="card" style="margin-bottom:10px;margin-top:10px">
+  		<div class="card-body">
+		  <strong>Yield on cost dividend:</strong><br/>
+		  Total dividend in a year / total allocated = 
+		  {{ totalDividend|format_number({fraction_digit: 2}) }} / 
+		  {{ allocated|format_number({fraction_digit: 2}) }} =
+		  <strong>{{ dividendYieldOnCost|format_number({fraction_digit: 2}) }}%</strong>
+		</div>
+	</div>
+
     <div style='width:900px;height:600px' class="col col-xs-12">
         <canvas id="myChart" ></canvas>
     </div>

@@ -244,7 +244,7 @@ class ReportController extends AbstractController
     /**
      * @Route("/yield", name="report_dividend_yield")
      */
-    public function yield(TickerRepository $tickerRepository)
+    public function yield(TickerRepository $tickerRepository, PositionRepository $positionRepository)
     {
         $labels = [];
         $data = [];
@@ -253,6 +253,9 @@ class ReportController extends AbstractController
         $sumDividends = 0;
         $sumAvgPrice = 0;
         $tickers = $tickerRepository->getActiveForDividendYield();
+        $allocated = $positionRepository->getSumAllocated();
+        $totalDividend = 0;
+        
         foreach ($tickers as $ticker) {
             $positions = $ticker->getPositions();
             $position = $positions[0];
@@ -285,15 +288,21 @@ class ReportController extends AbstractController
 
             $sumAvgPrice += $price;
             $sumDividends += $dividendPerYear;
+
+            $totalDividend += ($dividendPerYear * $position->getAmount()) / 10000;
         }
         
         $totalAvgYield = ($sumDividends / $sumAvgPrice) * 100;
+        $dividendYieldOnCost = ($totalDividend / $allocated) * 100;
 
         return $this->render('report/yield/index.html.twig', [
             'data' => json_encode($data),
             'labels' => json_encode($labels),
             'datasource' => $dataSource,
             'totalAvgYield' => $totalAvgYield,
+            'dividendYieldOnCost' => $dividendYieldOnCost,
+            'allocated' => $allocated,
+            'totalDividend' => $totalDividend,
             'controller_name' => 'ReportController',
         ]);
     }
