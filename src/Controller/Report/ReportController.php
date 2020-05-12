@@ -259,27 +259,21 @@ class ReportController extends AbstractController
         foreach ($tickers as $ticker) {
             $positions = $ticker->getPositions();
             $position = $positions[0];
-            $price = $position->getPrice();
+            $avgPrice = $position->getPrice();
 
             $scheduleCalendar = $ticker->getDividendMonths();
             $numPayoutsPerYear = count($scheduleCalendar);
             $lastCash = 0;
             $lastDividendDate = null;
             $payCalendars = $ticker->getCalendars();
-
             $firstCalendarEntry = $payCalendars->first();
-            $lastCalendarEntry = $payCalendars->last();
-
-            $lastCash = $firstCalendarEntry->getCashAmount();
-            $lastDividendDate = $firstCalendarEntry->getPaymentDate();
             if ($firstCalendarEntry) {
-                $lastCash = $lastCalendarEntry->getCashAmount();
-                $lastDividendDate = $lastCalendarEntry->getPaymentDate();
+                $lastCash = $firstCalendarEntry->getCashAmount();
+                $lastDividendDate = $firstCalendarEntry->getPaymentDate();
             }
-
             $dividendPerYear = $numPayoutsPerYear * $lastCash;
 
-            $dividendYield = round(($dividendPerYear / $price) * 100, 2);
+            $dividendYield = round(($dividendPerYear / $avgPrice) * 100, 2);
             $labels[] = sprintf("%s (%s)", substr(addslashes($ticker->getFullname()), 0, 8), $ticker->getTicker());
             $data[] = $dividendYield;
             $dataSource[] = [
@@ -287,12 +281,12 @@ class ReportController extends AbstractController
                 'label' => $ticker->getFullname(),
                 'yield' => $dividendYield,
                 'payout' => $dividendPerYear,
-                'avgPrice' => $price,
+                'avgPrice' => $avgPrice,
                 'lastDividend' => $lastCash,
                 'lastDividendDate' => $lastDividendDate,
             ];
 
-            $sumAvgPrice += $price;
+            $sumAvgPrice += $avgPrice;
             $sumDividends += $dividendPerYear;
 
             $totalDividend += ($dividendPerYear * $position->getAmount()) / 10000;
