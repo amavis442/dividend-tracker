@@ -264,13 +264,17 @@ class ReportController extends AbstractController
             $scheduleCalendar = $ticker->getDividendMonths();
             $numPayoutsPerYear = count($scheduleCalendar);
             $lastCash = 0;
+            $lastDividendDate = null;
             $payCalendars = $ticker->getCalendars();
 
             $firstCalendarEntry = $payCalendars->first();
             $lastCalendarEntry = $payCalendars->last();
 
+            $lastCash = $firstCalendarEntry->getCashAmount();
+            $lastDividendDate = $firstCalendarEntry->getPaymentDate();
             if ($firstCalendarEntry) {
                 $lastCash = $lastCalendarEntry->getCashAmount();
+                $lastDividendDate = $lastCalendarEntry->getPaymentDate();
             }
 
             $dividendPerYear = $numPayoutsPerYear * $lastCash;
@@ -284,6 +288,8 @@ class ReportController extends AbstractController
                 'yield' => $dividendYield,
                 'payout' => $dividendPerYear,
                 'avgPrice' => $price,
+                'lastDividend' => $lastCash,
+                'lastDividendDate' => $lastDividendDate,
             ];
 
             $sumAvgPrice += $price;

@@ -26,6 +26,8 @@
 				<th>Share</th>
 				<th>Yield</th>
 				<th>Dividend</th>
+				<th>Last dividend</th>
+				<th>Last dividend payout date</th>
 				<th>avgPrice</th>
 			</tr>
 			</thead>
@@ -36,6 +38,8 @@
 					<td>{{ item.label }}</td>
 					<td>{{ item.yield }}%</td>
 					<td>${{ (item.payout/100)|format_number({fraction_digit: 2}) }}</td>
+					<td>${{ (item.lastDividend/100)|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ item.lastDividendDate|date("d-m-Y") }}</td>
 					<td>{{ (item.avgPrice/100)|format_number({fraction_digit: 2}) }}</td>
 				</tr>
 				{% endfor %}
