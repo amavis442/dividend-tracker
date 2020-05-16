@@ -280,10 +280,10 @@ class ReportController extends AbstractController
             $data[] = $dividendYield;
 
             if ($orderBy === 'yield') {
-                $orderKey = str_pad($dividendYield,10,'0',STR_PAD_LEFT).$ticker->getTicker();
+                $orderKey = str_pad($dividendYield * 100,10,'0',STR_PAD_LEFT).$ticker->getTicker();
             }
             if ($orderBy === 'dividend') {
-                $orderKey = str_pad($dividendPerYear,10,'0',STR_PAD_LEFT).$ticker->getTicker();
+                $orderKey = str_pad($dividendPerYear * 100,10,'0',STR_PAD_LEFT).$ticker->getTicker();
             }
             if ($orderBy === 'ticker') {
                 $orderKey += 1;
