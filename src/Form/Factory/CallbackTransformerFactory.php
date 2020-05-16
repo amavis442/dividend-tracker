@@ -8,11 +8,12 @@ class CallbackTransformerFactory
     public static function create() : CallbackTransformer
     { 
         return new CallbackTransformer(
-            function ($inputAsFloat) {
-                return round($inputAsFloat / 100, 2);
+            function ($inputAsInt) {
+                return $inputAsInt / 100;
             },
             function ($outputAsInt) {
-                return (int)($outputAsInt * 100);
+                $a = $outputAsInt * 100; 
+                return (int)ceil($a);
             }
         );
     }
