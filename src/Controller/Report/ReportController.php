@@ -242,9 +242,11 @@ class ReportController extends AbstractController
     }
 
     /**
-     * @Route("/yield", name="report_dividend_yield")
+     * @Route("/yield/{orderBy}", name="report_dividend_yield")
      */
-    public function yield(TickerRepository $tickerRepository, PositionRepository $positionRepository)
+    public function yield(TickerRepository $tickerRepository, 
+        PositionRepository $positionRepository,
+        string $orderBy = 'ticker')
     {
         $labels = [];
         $data = [];
@@ -255,7 +257,7 @@ class ReportController extends AbstractController
         $tickers = $tickerRepository->getActiveForDividendYield();
         $allocated = $positionRepository->getSumAllocated();
         $totalDividend = 0;
-        
+        $orderKey = 0;
         foreach ($tickers as $ticker) {
             $positions = $ticker->getPositions();
             $position = $positions[0];
@@ -273,10 +275,20 @@ class ReportController extends AbstractController
             }
             $dividendPerYear = $numPayoutsPerYear * $lastCash;
 
-            $dividendYield = round(($dividendPerYear / $avgPrice) * 100, 2);
+            $dividendYield = round((($dividendPerYear / self::EXCHANGE_RATE) / $avgPrice) * 100, 2);
             $labels[] = sprintf("%s (%s)", substr(addslashes($ticker->getFullname()), 0, 8), $ticker->getTicker());
             $data[] = $dividendYield;
-            $dataSource[] = [
+
+            if ($orderBy === 'yield') {
+                $orderKey = str_pad($dividendYield,10,'0',STR_PAD_LEFT).$ticker->getTicker();
+            }
+            if ($orderBy === 'dividend') {
+                $orderKey = str_pad($dividendPerYear,10,'0',STR_PAD_LEFT).$ticker->getTicker();
+            }
+            if ($orderBy === 'ticker') {
+                $orderKey += 1;
+            }
+            $dataSource[$orderKey] = [
                 'ticker' => $ticker->getTicker(),
                 'label' => $ticker->getFullname(),
                 'yield' => $dividendYield,
@@ -285,13 +297,15 @@ class ReportController extends AbstractController
                 'lastDividend' => $lastCash,
                 'lastDividendDate' => $lastDividendDate,
             ];
-
+            
             $sumAvgPrice += $avgPrice;
             $sumDividends += $dividendPerYear;
-
             $totalDividend += ($dividendPerYear * $position->getAmount()) / 10000;
         }
         
+        if ($orderBy === 'yield' || $orderBy === 'dividend' ) {
+            krsort($dataSource);
+        }
         $totalAvgYield = ($sumDividends / $sumAvgPrice) * 100;
         $dividendYieldOnCost = ($totalDividend / $allocated) * 100;
 

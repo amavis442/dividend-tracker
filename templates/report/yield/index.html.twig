@@ -22,11 +22,11 @@
 		<table class="table">
 			<thead class="thead-dark">
 			<tr>
-				<th>Ticker</th>
+				<th><a href="{{ path('report_dividend_yield', {'orderBy': 'ticker'}) }}">Ticker</a></th>
 				<th>Share</th>
 				<th>avgPrice</th>
-				<th>Yield</th>
-				<th>Dividend</th>
+				<th><a href="{{ path('report_dividend_yield', {'orderBy': 'yield'}) }}">Yield</a></th>
+				<th><a href="{{ path('report_dividend_yield', {'orderBy': 'dividend'}) }}">Dividend</a></th>
 				<th>Last dividend</th>
 				<th>Last payout date</th>				
 			</tr>
