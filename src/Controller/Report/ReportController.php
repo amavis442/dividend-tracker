@@ -181,7 +181,9 @@ class ReportController extends AbstractController
    
         $dataSource = [];
         $d = $dividendMonthRepository->getAll();
+        
         foreach ($d as $month => $dividendMonth) {
+            $receivedDividendMonth = 0.0;
             $paydate = sprintf("%4d%02d", date('Y'), $month);
             $normalDate = strftime('%B %Y', strtotime($paydate . '01'));
             $dataSource[$paydate] = [];
@@ -192,9 +194,9 @@ class ReportController extends AbstractController
                 $dataSource[$paydate]['tickers'] = [];
                 foreach ($dividendMonth->getTickers() as $ticker) {                    
                     $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
-                        'units' => 0,
-                        'dividend' => 0,
-                        'payout' => 0,
+                        'units' => 0.0,
+                        'dividend' => 0.0,
+                        'payout' => 0.0,
                         'payoutdate' => '',
                         'exdividend' => '',
                         'ticker' => $ticker,
@@ -213,6 +215,9 @@ class ReportController extends AbstractController
                     if (isset($item['tickers'][$ticker->getTicker()])) {
                         $tickerData = $item['tickers'][$ticker->getTicker()];
                         $dataSource[$paydate]['tickers'][$ticker->getTicker()] = $tickerData;
+                        if ($tickerData['payment'] instanceof Payment) {
+                            $receivedDividendMonth += $tickerData['payment']->getDividend();
+                        }
                     }
 
                     if (!isset($item['tickers'][$ticker->getTicker()])) {
@@ -229,8 +234,8 @@ class ReportController extends AbstractController
                     }
                 }
             }
+            $dataSource[$paydate]['received'] = $receivedDividendMonth / 100;
         }
-
         $referer->set('report_projection');
 
         return $this->render('report/projection/index.html.twig', [

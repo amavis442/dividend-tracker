@@ -19,7 +19,7 @@
 							<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ collapseId }}" aria-expanded="true" aria-controls="collapse{{ collapseId }}">{{ item.normaldate }}</button>
 						</div>
 						<div class="item">${{ (item.totaldividend)|format_number({fraction_digit: 2}) }}</div>
-						<div class="item">&euro;{{ item.payout|format_number({fraction_digit: 2}) }}</div>
+						<div class="item"><span class="badge badge-warning">&euro;{{ item.payout|format_number({fraction_digit: 2}) }}</span> / <span class="badge badge-success">&euro;{{ item.received|format_number({fraction_digit: 2}) }}</span></div>
 					</div>
 				</div>
 
