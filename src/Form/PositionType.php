@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Form\Factory\CallbackTransformerFactory;
 
@@ -32,11 +32,19 @@ class PositionType extends AbstractType
                         ->orderBy('t.ticker', 'ASC');
                 },
             ])
-            ->add('amount', TextType::class, ['help' => 'use decimal point if you have a fraction of a stock', 'label' => 'Units'])
-            ->add('price', TextType::class, [
-                'label' => 'Average price',
+            ->add('amount', NumberType::class, [
+                'label' => 'Units',
+                'help' => 'use decimal point if you have a fraction of a stock',
                 'required' => false,
-                'help' => 'Adjusment if automatic calculation is wrong'
+                'input' => 'string',
+                'scale' => 2,
+            ])            
+            ->add('price', NumberType::class, [
+                'label' => 'Average price',
+                'help' => 'Adjusment if automatic calculation is wrong',
+                'required' => false,
+                'input' => 'string',
+                'scale' => 2,
             ])
             ->add('currency', EntityType::class, [
                 'class' => Currency::class,
@@ -46,10 +54,12 @@ class PositionType extends AbstractType
                 'required' => true,
                 'empty_data' => 'EUR',
             ])
-            ->add('allocation', TextType::class, [
+            ->add('allocation', NumberType::class, [
                 'label' => 'Allocation',
+                'help' => 'Adjusment if automatic calculation is wrong',
                 'required' => false,
-                'help' => 'Adjusment if automatic calculation is wrong'
+                'input' => 'string',
+                'scale' => 2,
             ])
             ->add('allocation_currency', EntityType::class, [
                 'class' => Currency::class,
@@ -59,9 +69,11 @@ class PositionType extends AbstractType
                 'required' => true,
                 'empty_data' => 'EUR'
             ])
-            ->add('profit', TextType::class, [
+            ->add('profit', NumberType::class, [
                 'label' => 'Profit',
                 'required' => false,
+                'input' => 'string',
+                'scale' => 2,
             ])
             ->add('broker', ChoiceType::class, [
                 'mapped' => false,

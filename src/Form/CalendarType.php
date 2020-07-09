@@ -12,6 +12,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use App\Form\Factory\CallbackTransformerFactory;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 class CalendarType extends AbstractType
 {
@@ -40,9 +41,12 @@ class CalendarType extends AbstractType
                 'required' => true,
                 'empty_data' => 'USD'
             ])
-            ->add(
-                'cash_amount', TextType::class
-            )
+            ->add('cash_amount', NumberType::class, [
+                'label' => 'Dividend',
+                'required' => false,
+                'input' => 'string',
+                'scale' => 2,
+            ])
         ;
   
         $callbackTransformer = CallbackTransformerFactory::create();

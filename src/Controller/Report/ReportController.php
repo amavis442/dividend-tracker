@@ -159,6 +159,37 @@ class ReportController extends AbstractController
         ]);
     }
 
+    private function projectionWithPayoutDates(&$dividendMonth, &$dividendEstimate, &$receivedDividendMonth, $paydate, $normalDate)
+    {
+        $item = $dividendEstimate[$paydate];
+        $dataSource[$paydate]['totaldividend'] = $item['totaldividend'];
+        $dataSource[$paydate]['payout'] = $item['payout'];
+        $dataSource[$paydate]['normaldate'] = $normalDate;
+        $dataSource[$paydate]['tickers'] = [];
+        foreach ($dividendMonth->getTickers() as $ticker) {
+            if (isset($item['tickers'][$ticker->getTicker()])) {
+                $tickerData = $item['tickers'][$ticker->getTicker()];
+                $dataSource[$paydate]['tickers'][$ticker->getTicker()] = $tickerData;
+                if ($tickerData['payment'] instanceof Payment) {
+                    $receivedDividendMonth += $tickerData['payment']->getDividend();
+                }
+            }
+
+            if (!isset($item['tickers'][$ticker->getTicker()])) {
+                $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
+                    'units' => 0,
+                    'dividend' => 0,
+                    'payout' => 0,
+                    'payoutdate' => '',
+                    'exdividend' => '',
+                    'ticker' => $ticker,
+                    'calendar' => null,
+                    'payment' => null
+                ];
+            }
+        }
+    }
+
     /**
      * @Route("/projection", name="report_projection")
      */

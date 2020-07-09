@@ -12,7 +12,6 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Form\Factory\CallbackTransformerFactory;
 
@@ -47,7 +46,9 @@ class TransactionType extends AbstractType
             ->add('price', NumberType::class, [
                 'label' => 'Price',
                 'required' => false,
-                'help' => 'What was the stock price and not what you paid'
+                'help' => 'What was the stock price and not what you paid',
+                'input' => 'string',
+                'scale' => 2,
             ])
             ->add('currency', EntityType::class, [
                 'class' => Currency::class,
@@ -60,7 +61,9 @@ class TransactionType extends AbstractType
             ->add('allocation', NumberType::class, [
                 'label' => 'Allocation',
                 'required' => false,
-                'help' => 'What was what you paid in total for this transaction'
+                'help' => 'What was what you paid in total for this transaction',
+                'input' => 'string',
+                'scale' => 2,
             ])
             ->add('allocation_currency', EntityType::class, [
                 'class' => Currency::class,
