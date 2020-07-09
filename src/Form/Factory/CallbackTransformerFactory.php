@@ -13,7 +13,7 @@ class CallbackTransformerFactory
             },
             function ($outputAsInt) {
                 $a = $outputAsInt * 100; 
-                return (int)ceil($a);
+                return (int)floor($a);
             }
         );
     }
