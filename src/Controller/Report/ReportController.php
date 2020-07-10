@@ -14,7 +14,10 @@ use App\Repository\TickerRepository;
 use App\Repository\DividendMonthRepository;
 use App\Service\Summary;
 use App\Service\Referer;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use App\Service\Allocation;
+use App\Service\Yields;
+use App\Service\Payouts;
+use App\Service\Projection;
 
 /**
  * @Route("/dashboard/report")
@@ -29,38 +32,10 @@ class ReportController extends AbstractController
      */
     public function index(
         BranchRepository $branchRepository,
-        PositionRepository $positionRepository
+        PositionRepository $positionRepository,
+        Allocation $allocation
     ): Response {
-        $allocated = $positionRepository->getSumAllocated();
-        $branches = $branchRepository->findAll();
-
-        $data = [];
-        foreach ($branches as $branch) {
-            $item = [
-                'industry' => $branch->getLabel(),
-                'allocation' => 0,
-                'allocationPercentage' => 0,
-                'targetAllocationPercentage' => $branch->getAssetAllocation() / 100,
-                'dividend' => 0,
-                'tickers' => 0,
-            ];
-
-            $tickers = $branch->getTickers();
-            foreach ($tickers as $tickers) {
-                $item['tickers'] += 1;
-                foreach ($tickers->getPositions() as $position) {
-                    $item['allocation'] += $position->getAllocation();
-                    $item['dividend'] += $position->getDividend();
-                }
-            }
-            $item['allocationPercentage'] = 0;
-            if ($allocated > 0) {
-                $item['allocationPercentage'] = ((int) $item['allocation'] / (int) $allocated) * 100;
-            }
-            $data[$item['allocation']] = $item;
-        }
-
-        krsort($data);
+        $data = $allocation->allocation($branchRepository, $positionRepository);
 
         return $this->render('report/index.html.twig', [
             'data' => $data,
@@ -72,122 +47,38 @@ class ReportController extends AbstractController
      * @Route("/payout", name="report_payout")
      */
     public function payouts(
-        PaymentRepository $paymentRepository
+        PaymentRepository $paymentRepository,
+        Payouts $payout
     ): Response {
-        $data = $paymentRepository->getDividendsPerInterval();
-        $labels = [];
-        $dates = array_keys($data);
-        foreach ($dates as $date) {
-            $labels[] = strftime('%b %Y', strtotime($date . '01'));
-        }
+        $result = $payout->payout($paymentRepository);
 
-        foreach ($data as $item) {
-            $dividends[] = ($item['dividend'] / 100);
-            $accumulative[] = ($item['accumulative'] / 100);
-        }
-
-        return $this->render('report/payout/index.html.twig', [
-            'data' => json_encode($data),
-            'labels' => json_encode($labels),
-            'dividends' => json_encode($dividends),
-            'accumulative' => json_encode($accumulative),
+        return $this->render('report/payout/index.html.twig', array_merge($result, [
             'controller_name' => 'ReportController',
-        ]);
+        ]));
     }
 
     /**
      * @Route("/allocation/sector", name="report_allocation_sector")
      */
-    public function allocation(PositionRepository $positionRepository, BranchRepository $branchRepository, Summary $summary)
-    {
-        [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
+    public function allocation(
+        PositionRepository $positionRepository,
+        BranchRepository $branchRepository,
+        Summary $summary,
+        Allocation $allocation
+    ) {
+        $result = $allocation->sector($positionRepository, $branchRepository, $summary);
 
-        $sectors = $branchRepository->getAllocationPerSector();
-        $totalAllocated = $positionRepository->getSumAllocated();
-
-        $allocationData = $positionRepository->getAllocationDataPerSector();
-        $labels = [];
-        $data = [];
-        foreach ($allocationData as $allocationItem) {
-            $labels[] = $allocationItem['industry'];
-            $allocation = $allocationItem['allocation'] / 100;
-            $data[] = round(($allocation / $totalAllocated) * 100, 2);
-        }
-
-        return $this->render('report/allocation/index.html.twig', [
-            'data' => json_encode($data),
-            'labels' => json_encode($labels),
-            'sectors' => $sectors,
-            'numActivePosition' => $numActivePosition,
-            'numPosition' => $numActivePosition,
-            'numTickers' => $numTickers,
-            'profit' => $profit,
-            'totalDividend' => $totalDividend,
-            'totalInvested' => $allocated,
-            'controller_name' => 'ReportController',
-        ]);
+        return $this->render('report/allocation/index.html.twig', array_merge($result, ['controller_name' => 'ReportController']));
     }
 
     /**
      * @Route("/allocation/position", name="report_allocation_position")
      */
-    public function allocationPerPosition(PositionRepository $positionRepository, BranchRepository $branchRepository, Summary $summary)
+    public function allocationPerPosition(PositionRepository $positionRepository, Summary $summary, Allocation $allocation)
     {
-        [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
+        $result = $allocation->position($positionRepository, $summary);
 
-        $totalAllocated = $positionRepository->getSumAllocated();
-
-        $allocationData = $positionRepository->getAllocationDataPerPosition();
-        $labels = [];
-        $data = [];
-        foreach ($allocationData as $allocationItem) {
-            $labels[] = $allocationItem['ticker'];
-            $allocation = $allocationItem['allocation'] / 100;
-            $data[] = round(($allocation / $totalAllocated) * 100, 2);
-        }
-
-        return $this->render('report/allocation/position.html.twig', [
-            'data' => json_encode($data),
-            'labels' => json_encode($labels),
-            'numActivePosition' => $numActivePosition,
-            'numPosition' => $numActivePosition,
-            'numTickers' => $numTickers,
-            'profit' => $profit,
-            'totalDividend' => $totalDividend,
-            'totalInvested' => $allocated,
-            'controller_name' => 'ReportController',
-        ]);
-    }
-
-    private function projectionWithPayoutDates(&$dividendMonth, &$dividendEstimate, &$receivedDividendMonth, $paydate, $normalDate)
-    {
-        $item = $dividendEstimate[$paydate];
-        $dataSource[$paydate]['totaldividend'] = $item['totaldividend'];
-        $dataSource[$paydate]['payout'] = $item['payout'];
-        $dataSource[$paydate]['normaldate'] = $normalDate;
-        $dataSource[$paydate]['tickers'] = [];
-        foreach ($dividendMonth->getTickers() as $ticker) {
-            if (isset($item['tickers'][$ticker->getTicker()])) {
-                $tickerData = $item['tickers'][$ticker->getTicker()];
-                $dataSource[$paydate]['tickers'][$ticker->getTicker()] = $tickerData;
-                if ($tickerData['payment'] instanceof Payment) {
-                    $receivedDividendMonth += $tickerData['payment']->getDividend();
-                }
-            }
-
-            if (!isset($item['tickers'][$ticker->getTicker()])) {
-                $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
-                    'units' => 0,
-                    'dividend' => 0,
-                    'payout' => 0,
-                    'payoutdate' => '',
-                    'exdividend' => '',
-                    'ticker' => $ticker,
-                    'calendar' => null,
-                    'payment' => null
-                ];
-            }
-        }
+        return $this->render('report/allocation/position.html.twig', array_merge($result, ['controller_name' => 'ReportController']));
     }
 
     /**
@@ -196,164 +87,28 @@ class ReportController extends AbstractController
     public function projection(
         CalendarRepository $calendarRepository,
         DividendMonthRepository $dividendMonthRepository,
-        Referer $referer
+        Referer $referer,
+        Projection $projection
     ): Response {
-        $dividendEstimate = $calendarRepository->getDividendEstimate();
-        $labels = [];
-        $data = [];
-        foreach ($dividendEstimate as $date => &$estimate) {
-            $d = strftime('%B %Y', strtotime($date . '01'));
-            $labels[] = $d;
-            $payout = ($estimate['totaldividend'] * (1 - self::TAX_DIVIDEND)) / self::EXCHANGE_RATE;
-            $data[] = round($payout, 2);
-            $estimate['payout'] = $payout;
-            $estimate['normaldate'] = $d;
-        }
-   
-        $dataSource = [];
-        $d = $dividendMonthRepository->getAll();
-        
-        foreach ($d as $month => $dividendMonth) {
-            $receivedDividendMonth = 0.0;
-            $paydate = sprintf("%4d%02d", date('Y'), $month);
-            $normalDate = strftime('%B %Y', strtotime($paydate . '01'));
-            $dataSource[$paydate] = [];
-            if (!isset($dividendEstimate[$paydate])) {
-                $dataSource[$paydate]['totaldividend'] = 0;
-                $dataSource[$paydate]['payout'] = 0;
-                $dataSource[$paydate]['normaldate'] = $normalDate;
-                $dataSource[$paydate]['tickers'] = [];
-                foreach ($dividendMonth->getTickers() as $ticker) {                    
-                    $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
-                        'units' => 0.0,
-                        'dividend' => 0.0,
-                        'payout' => 0.0,
-                        'payoutdate' => '',
-                        'exdividend' => '',
-                        'ticker' => $ticker,
-                        'calendar' => null,
-                        'payment' => null
-                    ];
-                }
-            }
-            if (isset($dividendEstimate[$paydate])) {
-                $item = $dividendEstimate[$paydate];
-                $dataSource[$paydate]['totaldividend'] = $item['totaldividend'];
-                $dataSource[$paydate]['payout'] = $item['payout'];
-                $dataSource[$paydate]['normaldate'] = $normalDate;
-                $dataSource[$paydate]['tickers'] = [];
-                foreach ($dividendMonth->getTickers() as $ticker) {
-                    if (isset($item['tickers'][$ticker->getTicker()])) {
-                        $tickerData = $item['tickers'][$ticker->getTicker()];
-                        $dataSource[$paydate]['tickers'][$ticker->getTicker()] = $tickerData;
-                        if ($tickerData['payment'] instanceof Payment) {
-                            $receivedDividendMonth += $tickerData['payment']->getDividend();
-                        }
-                    }
 
-                    if (!isset($item['tickers'][$ticker->getTicker()])) {
-                        $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
-                            'units' => 0,
-                            'dividend' => 0,
-                            'payout' => 0,
-                            'payoutdate' => '',
-                            'exdividend' => '',
-                            'ticker' => $ticker,
-                            'calendar' => null,
-                            'payment' => null
-                        ];
-                    }
-                }
-            }
-            $dataSource[$paydate]['received'] = $receivedDividendMonth / 100;
-        }
         $referer->set('report_projection');
 
-        return $this->render('report/projection/index.html.twig', [
-            'data' => json_encode($data),
-            'labels' => json_encode($labels),
-            'datasource' => $dataSource, //$dividendEstimate,
+        $result = $projection->projection($calendarRepository, $dividendMonthRepository, self::TAX_DIVIDEND, self::EXCHANGE_RATE);
+        return $this->render('report/projection/index.html.twig', array_merge($result, [
             'controller_name' => 'ReportController',
-        ]);
+        ]));
     }
 
     /**
      * @Route("/yield/{orderBy}", name="report_dividend_yield")
      */
-    public function yield(TickerRepository $tickerRepository, 
+    public function yield(
+        TickerRepository $tickerRepository,
         PositionRepository $positionRepository,
-        string $orderBy = 'ticker')
-    {
-        $labels = [];
-        $data = [];
-        $dataSource = [];
-
-        $sumDividends = 0;
-        $sumAvgPrice = 0;
-        $tickers = $tickerRepository->getActiveForDividendYield();
-        $allocated = $positionRepository->getSumAllocated();
-        $totalDividend = 0;
-        $orderKey = 0;
-        foreach ($tickers as $ticker) {
-            $positions = $ticker->getPositions();
-            $position = $positions[0];
-            $avgPrice = $position->getPrice();
-
-            $scheduleCalendar = $ticker->getDividendMonths();
-            $numPayoutsPerYear = count($scheduleCalendar);
-            $lastCash = 0;
-            $lastDividendDate = null;
-            $payCalendars = $ticker->getCalendars();
-            $firstCalendarEntry = $payCalendars->first();
-            if ($firstCalendarEntry) {
-                $lastCash = $firstCalendarEntry->getCashAmount();
-                $lastDividendDate = $firstCalendarEntry->getPaymentDate();
-            }
-            $dividendPerYear = $numPayoutsPerYear * $lastCash;
-
-            $dividendYield = round((($dividendPerYear / self::EXCHANGE_RATE) / $avgPrice) * 100, 2);
-            $labels[] = sprintf("%s (%s)", substr(addslashes($ticker->getFullname()), 0, 8), $ticker->getTicker());
-            $data[] = $dividendYield;
-
-            if ($orderBy === 'yield') {
-                $orderKey = str_pad($dividendYield * 100,10,'0',STR_PAD_LEFT).$ticker->getTicker();
-            }
-            if ($orderBy === 'dividend') {
-                $orderKey = str_pad($dividendPerYear * 100,10,'0',STR_PAD_LEFT).$ticker->getTicker();
-            }
-            if ($orderBy === 'ticker') {
-                $orderKey += 1;
-            }
-            $dataSource[$orderKey] = [
-                'ticker' => $ticker->getTicker(),
-                'label' => $ticker->getFullname(),
-                'yield' => $dividendYield,
-                'payout' => $dividendPerYear,
-                'avgPrice' => $avgPrice,
-                'lastDividend' => $lastCash,
-                'lastDividendDate' => $lastDividendDate,
-            ];
-            
-            $sumAvgPrice += $avgPrice;
-            $sumDividends += $dividendPerYear;
-            $totalDividend += ($dividendPerYear * $position->getAmount()) / 10000;
-        }
-        
-        if ($orderBy === 'yield' || $orderBy === 'dividend' ) {
-            krsort($dataSource);
-        }
-        $totalAvgYield = ($sumDividends / $sumAvgPrice) * 100;
-        $dividendYieldOnCost = ($totalDividend / $allocated) * 100;
-
-        return $this->render('report/yield/index.html.twig', [
-            'data' => json_encode($data),
-            'labels' => json_encode($labels),
-            'datasource' => $dataSource,
-            'totalAvgYield' => $totalAvgYield,
-            'dividendYieldOnCost' => $dividendYieldOnCost,
-            'allocated' => $allocated,
-            'totalDividend' => $totalDividend,
-            'controller_name' => 'ReportController',
-        ]);
+        string $orderBy = 'ticker',
+        Yields $yields
+    ) {
+        $result = $yields->yield($tickerRepository, $positionRepository, $orderBy, self::EXCHANGE_RATE);
+        return $this->render('report/yield/index.html.twig', array_merge($result, ['controller_name' => 'ReportController']));
     }
 }
