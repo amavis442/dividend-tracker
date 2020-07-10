@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Repository\CalendarRepository;
 use App\Repository\DividendMonthRepository;
+use App\Entity\Payment;
 
 class Projection
 {
