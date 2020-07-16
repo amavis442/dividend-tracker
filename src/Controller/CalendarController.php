@@ -97,13 +97,14 @@ class CalendarController extends AbstractController
      * @Route("/{id}/edit", name="calendar_edit", methods={"GET","POST"})
      */
     public function edit(Request $request, Calendar $calendar, Referer $referer): Response
-    {
+    {       
         $form = $this->createForm(CalendarType::class, $calendar);
         $form->handleRequest($request);
-
+        
         if ($form->isSubmitted() && $form->isValid()) {
+            
             $this->getDoctrine()->getManager()->flush();
-
+            
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }

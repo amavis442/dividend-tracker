@@ -53,13 +53,13 @@ class PaymentType extends AbstractType
         ->add('stocks', NumberType::class, [
             'label' => 'Units',
             'required' => false,
-            'input' => 'string',
+            //'input' => 'string',
             'scale' => 2,
         ])
         ->add('dividend', NumberType::class, [
             'label' => 'Dividend',
             'required' => false,
-            'input' => 'string',
+            //'input' => 'string',
             'scale' => 2,
         ])
         ->add('currency', EntityType::class, [

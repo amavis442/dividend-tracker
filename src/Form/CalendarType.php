@@ -44,7 +44,7 @@ class CalendarType extends AbstractType
             ->add('cash_amount', NumberType::class, [
                 'label' => 'Dividend',
                 'required' => false,
-                'input' => 'string',
+                //'input' => 'string',
                 'scale' => 2,
             ])
         ;
