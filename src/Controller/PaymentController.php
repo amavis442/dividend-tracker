@@ -105,10 +105,6 @@ class PaymentController extends AbstractController
             $entityManager = $this->getDoctrine()->getManager();
             $payment->setTicker($ticker);
             
-            if ($calendar = $payment->getCalendar()) {
-                $calendar->setPayment($payment);
-            }
-            
             $entityManager->persist($payment);
             $entityManager->flush();
 
@@ -146,10 +142,6 @@ class PaymentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($calendar = $payment->getCalendar()) {
-                $calendar->setPayment($payment);
-            }
-
             $this->getDoctrine()->getManager()->flush();
             if ($referer->get()) {
                 return $this->redirect($referer->get());

@@ -44,7 +44,7 @@
 										<td>{{ positionLabel }}</td>
 										<td>{{ position.units }}</td>
 										<td>${{ position.dividend }} </td>
-										<td>&euro;{{ position.payout }} / &euro;{{ payment ? (payment.dividend/100)|format_number({fraction_digit: 2}) : '0' }}</td>
+										<td>&euro;{{ position.payout }} / &euro;{{ payment ? (payment/100)|format_number({fraction_digit: 2}) : '0' }}</td>
 										<td>
 											<span class="badge badge-warning">{{ position.exdividend }}</span>
 											/

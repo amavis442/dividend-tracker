@@ -92,7 +92,7 @@ class CalendarRepository extends ServiceEntityRepository
             ->innerJoin('c.ticker', 't')
             ->innerJoin('t.positions', 'p')
             ->innerJoin('t.transactions', 'a')
-            ->leftJoin('c.payment','pa', 'WITH', 'pa.calendar = c' )
+            ->leftJoin('c.payments','pa', 'WITH', 'pa.calendar = c' )
             ->andWhere('p.closed <> 1 or p.closed is null')
             ->andWhere('YEAR(c.paymentDate) = :year')
             ->setParameter('year', date('Y'))
@@ -121,6 +121,11 @@ class CalendarRepository extends ServiceEntityRepository
             $units = $this->getPositionSize($transactions, $calendar);
             $units = $units / 100;
             
+            $totalPayout = 0.0;
+            foreach ($calendar->getPayments() as $payment) {
+                $totalPayout += $payment->getDividend();
+            }
+
             $dividend = $calendar->getCashAmount() / 100;
             $payoutPosition = round(($units * $dividend * 0.85) / 1.1, 2);
             $output[$paydate]['tickers'][$ticker->getTicker()] = [
@@ -130,7 +135,7 @@ class CalendarRepository extends ServiceEntityRepository
                 'payoutdate' => $calendar->getPaymentDate()->format('d-m-Y'),
                 'exdividend' => $calendar->getExdividendDate()->format('d-m-Y'),
                 'ticker' => $ticker,
-                'payment' => $calendar->getPayment(),
+                'payment' => $totalPayout,
                 'calendar' => $calendar
             ];
             $payout = $units * $dividend;

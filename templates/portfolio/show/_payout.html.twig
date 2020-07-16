@@ -3,9 +3,11 @@
 	<thead>
 		<tr>
 			<th></th>
+			<th>Ex-dividend date</th>
 			<th>Pay date</th>
 			<th>Units</th>
 			<th>Total</th>
+			<th>Broker</th>
 			<th>Actions</th>
 		</tr>
 	</thead>
@@ -13,9 +15,11 @@
 		{% for payment in payments %}
 			<tr>
 				<td></td>
+				<td>{% if payment.calendar %}{{ payment.calendar.exDividendDate ? payment.calendar.exDividendDate|date('d-m-Y') : '' }}{% endif %}</td>
 				<td>{{ payment.payDate|date("d-m-Y") }}</td>
 				<td>{{ (payment.stocks/100)|format_number({fraction_digit: 2})}}</td>
 				<td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend/100)|format_number({fraction_digit: 2})}}</td>
+				<td>{{ payment.broker }}</td>
 				<td>
 					<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 						<div class="btn-group mr-2" role="group" aria-label="First group">
@@ -28,7 +32,7 @@
 			</tr>
 		{% else %}
 			<tr>
-				<td colspan="4">no records found</td>
+				<td colspan="6">no records found</td>
 			</tr>
 		{% endfor %}
 	</tbody>

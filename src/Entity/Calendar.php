@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CalendarRepository")
@@ -44,10 +46,11 @@ class Calendar
     private $cashAmount;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Payment", mappedBy="calendar")
+     * @ORM\OneToMany(targetEntity="App\Entity\Payment", mappedBy="calendar")
      * @ORM\JoinColumn(nullable=true)
+     * @ORM\OrderBy({"payDate" = "DESC"})
      */
-    private $payment;
+    private $payments;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="calendars")
@@ -59,6 +62,11 @@ class Calendar
      * @ORM\ManyToOne(targetEntity="App\Entity\Currency")
      */
     private $currency;
+
+    public function __construct()
+    {
+        $this->payments = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -141,20 +149,36 @@ class Calendar
     }
 
     /**
-     * @return null|Payment
+     * @return Collenction|Payment[]
      */
-    public function getPayment(): ?Payment
+    public function getPayments(): Collection
     {
-        return $this->payment;
+        return $this->payments;
     }
 
-    public function setPayment(Payment $payment): self
+    public function addPayment(Payment $payment): self
     {
-        $this->payment = $payment;
-        $payment->setCalendar($this);
+        if (!$this->payments->contains($payment)) {
+            $this->payments[] = $payment;
+            $payment->setCalendar($this);
+        }
 
         return $this;
     }
+
+    public function removePayment(Payment $payment): self
+    {
+        if ($this->payments->contains($payment)) {
+            $this->payments->removeElement($payment);
+            // set the owning side to null (unless already changed)
+            if ($payment->getCalendar() === $this) {
+                $payment->setCalendar(null);
+            }
+        }
+
+        return $this;
+    }
+
 
     public function getUser(): User
     {

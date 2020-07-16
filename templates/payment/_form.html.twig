@@ -1,20 +1,21 @@
 {{ form_start(form) }}
-    {{form_row(form.Calendar)}}
 {{form_row(form.Calendar)}}
 {{form_row(form.pay_date)}}
+{{form_row(form.broker)}}
 {{form_row(form.stocks)}}
+<div class="row">
+	<div class="col">
+		{{ form_label(form.dividend) }}
+		<div class="input-group mb-3">
+			<div class="input-group-prepend">
+				{{ form_widget(form.currency) }}
+			</div>
+			{{ form_widget(form.dividend) }}
+		</div>
+	</div>
+</div>
 
-    <div class="row">
-                    <div class="col">
-                        {{ form_label(form.dividend) }} 
-                        <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    {{ form_widget(form.currency) }}
-                                </div>
-                                {{ form_widget(form.dividend) }}
-                        </div>
-                    </div>
-                </div>
-
-    <button type="submit" class="btn btn-primary"><i class="far fa-save"></i></button>
+<button type="submit" class="btn btn-primary">
+	<i class="far fa-save"></i>
+</button>
 {{ form_end(form) }}

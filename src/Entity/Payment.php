@@ -35,7 +35,7 @@ class Payment
     private $ticker;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Calendar", inversedBy="payment")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Calendar", inversedBy="payments")
      * @ORM\JoinColumn(nullable=true)
      */
     private $calendar;
@@ -56,6 +56,11 @@ class Payment
      * @ORM\Column(type="integer", nullable=true)
      */
     private $stocks;
+
+    /**
+     * @ORM\Column(type="string", length=40, nullable=true)
+     */
+    private $broker;
 
     public function getId(): ?int
     {
@@ -155,6 +160,18 @@ class Payment
     public function setStocks(?int $stocks): self
     {
         $this->stocks = $stocks;
+
+        return $this;
+    }
+
+    public function getBroker(): ?string
+    {
+        return $this->broker;
+    }
+
+    public function setBroker(?string $broker): self
+    {
+        $this->broker = $broker;
 
         return $this;
     }

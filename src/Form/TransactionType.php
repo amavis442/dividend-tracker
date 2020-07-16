@@ -3,12 +3,10 @@
 namespace App\Form;
 
 use App\Entity\Transaction;
-use App\Entity\Ticker;
 use App\Entity\Currency;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -21,18 +19,14 @@ class TransactionType extends AbstractType
     {
         $builder
             ->add('broker', ChoiceType::class, [
-                'choices'  => [
-                    'Trading212' => 'Trading212',
-                    'Flatex' =>  'Flatex',
-                    'eToro' =>  'eToro',
-                ],
+                'choices'  => Brokers::list(),
             ])
             ->add('transactionDate', DateTimeType::class, [
                 // renders it as a single text box
                 'widget' => 'single_text',
             ])
             ->add('amount', NumberType::class, [
-                'help' => 'use decimal point if you have a fraction of a stock', 
+                'help' => 'use decimal point if you have a fraction of a stock',
                 'label' => 'Units',
                 'input' => 'string',
                 'scale' => 2,
@@ -40,7 +34,7 @@ class TransactionType extends AbstractType
             ->add('side', ChoiceType::class, [
                 'choices'  => [
                     'Buy' => Transaction::BUY,
-                    ' Sell' => Transaction::SELL,
+                    'Sell' => Transaction::SELL,
                 ],
             ])
             ->add('price', NumberType::class, [
