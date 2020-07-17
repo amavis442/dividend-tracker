@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Repository\CalendarRepository;
 use App\Repository\DividendMonthRepository;
-use App\Entity\Payment;
 
 class Projection
 {
@@ -52,6 +51,7 @@ class Projection
                     ];
                 }
             }
+
             if (isset($dividendEstimate[$paydate])) {
                 $item = $dividendEstimate[$paydate];
                 $dataSource[$paydate]['totaldividend'] = $item['totaldividend'];
@@ -62,9 +62,7 @@ class Projection
                     if (isset($item['tickers'][$ticker->getTicker()])) {
                         $tickerData = $item['tickers'][$ticker->getTicker()];
                         $dataSource[$paydate]['tickers'][$ticker->getTicker()] = $tickerData;
-                        if ($tickerData['payment'] instanceof Payment) {
-                            $receivedDividendMonth += $tickerData['payment']->getDividend();
-                        }
+                        $receivedDividendMonth += $tickerData['payment'];
                     }
 
                     if (!isset($item['tickers'][$ticker->getTicker()])) {
@@ -83,6 +81,7 @@ class Projection
             }
             $dataSource[$paydate]['received'] = $receivedDividendMonth / 100;
         }
+
         return [
             'data' => json_encode($data),
             'labels' => json_encode($labels),
