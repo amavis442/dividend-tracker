@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Calendar;
 use App\Entity\Ticker;
+use App\Entity\Transaction;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -18,7 +19,7 @@ use Doctrine\Common\Collections\Collection;
 class CalendarRepository extends ServiceEntityRepository
 {
     use PagerTrait;
-
+    
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Calendar::class);
@@ -74,10 +75,10 @@ class CalendarRepository extends ServiceEntityRepository
                 continue;
             }
             $amount = $transaction->getAmount();
-            if ($transaction->getSide() === 1) {
+            if ($transaction->getSide() === Transaction::BUY) {
                 $units += $amount;
             }
-            if ($transaction->getSide() === 2) {
+            if ($transaction->getSide() === Transaction::SELL) {
                 $units -= $amount;
             }
         }
@@ -114,32 +115,28 @@ class CalendarRepository extends ServiceEntityRepository
             if (!isset($output[$paydate][$ticker->getTicker()])) {
                 $output[$paydate]['tickers'][$ticker->getTicker()] = [];
             }
-            if (!isset($output[$paydate]['totaldividend'])){
-                $output[$paydate]['totaldividend'] = 0;
+            if (!isset($output[$paydate]['grossTotalPayment'])){
+                $output[$paydate]['grossTotalPayment'] = 0.0;
             }
             
             $units = $this->getPositionSize($transactions, $calendar);
             $units = $units / 100;
             
-            $totalPayout = 0.0;
+            $netPayment = 0.0;
             foreach ($calendar->getPayments() as $payment) {
-                $totalPayout += $payment->getDividend();
+                $netPayment += $payment->getDividend() / 100;
             }
 
             $dividend = $calendar->getCashAmount() / 100;
-            $payoutPosition = round(($units * $dividend * 0.85) / 1.1, 2);
             $output[$paydate]['tickers'][$ticker->getTicker()] = [
                 'units' => $units,
                 'dividend' => $dividend,
-                'payout' => $payoutPosition,
                 'payoutdate' => $calendar->getPaymentDate()->format('d-m-Y'),
                 'exdividend' => $calendar->getExdividendDate()->format('d-m-Y'),
                 'ticker' => $ticker,
-                'payment' => $totalPayout,
+                'netPayment' => $netPayment,
                 'calendar' => $calendar
             ];
-            $payout = $units * $dividend;
-            $output[$paydate]['totaldividend'] +=  $payout;
         }
         ksort($output);
         return $output;

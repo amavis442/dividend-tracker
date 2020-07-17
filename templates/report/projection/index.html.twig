@@ -18,8 +18,8 @@
 						<div class="item">
 							<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ collapseId }}" aria-expanded="true" aria-controls="collapse{{ collapseId }}">{{ item.normaldate }}</button>
 						</div>
-						<div class="item">${{ (item.totaldividend)|format_number({fraction_digit: 2}) }}</div>
-						<div class="item"><span class="badge badge-warning">&euro;{{ item.payout|format_number({fraction_digit: 2}) }}</span> / <span class="badge badge-success">&euro;{{ item.received|format_number({fraction_digit: 2}) }}</span></div>
+						<div class="item">${{ item.grossTotalPayment }}</div>
+						<div class="item"><span class="badge badge-warning">&euro;{{ item.estimatedNetTotalPayment }}</span> / <span class="badge badge-success">&euro;{{ item.netTotalPayment }}</span></div>
 					</div>
 				</div>
 
@@ -39,12 +39,12 @@
 							<tbody>
 								{% for positionLabel, position in item.tickers %}
 								{% set ticker = position.ticker %}
-								{% set payment = position.payment %}
+								{% set payment = position.netPayment %}
 									<tr class="{% if payment %}table-success{% else %}table-light{%endif%}" >
 										<td>{{ positionLabel }}</td>
 										<td>{{ position.units }}</td>
 										<td>${{ position.dividend }} </td>
-										<td>&euro;{{ position.payout }} / &euro;{{ payment ? (payment/100)|format_number({fraction_digit: 2}) : '0' }}</td>
+										<td>&euro;{{ position.estimatedPayment }} / &euro;{{ payment ? payment : '0' }}</td>
 										<td>
 											<span class="badge badge-warning">{{ position.exdividend }}</span>
 											/
