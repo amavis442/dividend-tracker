@@ -137,6 +137,7 @@ class CalendarRepository extends ServiceEntityRepository
                 'netPayment' => $netPayment,
                 'calendar' => $calendar
             ];
+            $output[$paydate]['grossTotalPayment'] += $units * $dividend;
         }
         ksort($output);
         return $output;
