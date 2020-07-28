@@ -41,7 +41,7 @@ class TransactionType extends AbstractType
                 'label' => 'Price',
                 'required' => false,
                 'help' => 'What was the stock price and not what you paid',
-                'input' => 'string',
+                //'input' => 'string',
                 'scale' => 2,
             ])
             ->add('currency', EntityType::class, [
@@ -56,7 +56,7 @@ class TransactionType extends AbstractType
                 'label' => 'Allocation',
                 'required' => false,
                 'help' => 'What was what you paid in total for this transaction',
-                'input' => 'string',
+                //'input' => 'string',
                 'scale' => 2,
             ])
             ->add('allocation_currency', EntityType::class, [
