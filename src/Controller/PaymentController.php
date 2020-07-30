@@ -106,11 +106,11 @@ class PaymentController extends AbstractController
 
         $year = $data['year'];
         [$startDate, $endDate] = [$year.'-01-01', $year.'-12-31'];
-        if ($data['month'] !== 0) {
+        if (isset($data['month']) && $data['month'] !== 0) {
             [$startDate, $endDate] = (new DateHelper())->monthToDates($data['month'], $data['year']);
         }
 
-        if ($data['quator'] !== 0) {
+        if (isset($data['quator']) && $data['quator'] !== 0) {
             [$startDate, $endDate] = (new DateHelper())->quaterToDates($data['quator'], $data['year']);
         }
         $totalDividend = $paymentRepository->getTotalDividend($tab, $startDate, $endDate);
