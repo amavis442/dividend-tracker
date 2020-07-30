@@ -4,71 +4,80 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Payments</h1>
+	<h1>Payments:
+		{{ startDate}}
+		/
+		{{ endDate}}</h1>
 
-    <ul class="nav nav-pills">
-        <li class="nav-item">
-            <a href="{{ path('payment_index', {'tab': 'All'}) }}" class="nav-link {{ tab == 'All'? 'active' : ''}}">All</a>
-        </li>
-        <li class="nav-item">
-            <a href="{{ path('payment_index', {'tab': 'Year'}) }}" class="nav-link {{ tab == 'Year'? 'active' : ''}}">Year</a>
-        </li>
-        <li class="nav-item">
-            <a href="{{ path('payment_index', {'tab': 'Month'}) }}" class="nav-link {{ tab == 'Month'? 'active' : ''}}">Month</a>
-        </li>
-        <li class="nav-item">
-            <a href="{{ path('payment_index', {'tab': 'Week'}) }}" class="nav-link {{ tab == 'Week'? 'active' : ''}}">Week</a>
-        </li>
-        <li class="nav-item">
-            <a href="{{ path('payment_index', {'tab': 'Quator'}) }}" class="nav-link {{ tab == 'Quator'? 'active' : ''}}">Quater</a>
-        </li>
-    </ul>
-    <br/>
-    {% include '_search_form.html.twig' %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Ticker</th>
-                <th>Industry</th>
-                <th>Units</th>
-                <th>Pay date</th>
-                <th>Dividend($)</th>
-                <th>Broker</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for payment in payments %}
-                <tr>
-                    <td>{{ payment.ticker.fullname }} ({{ payment.ticker.ticker }})</td>
-                    <td>{{ payment.ticker.branch.label }}</td>
-                    <td>{{ payment.stocks/100|format_number({fraction_digit: 2}) }}</td>
-                    <td>{{ payment.payDate ? payment.payDate|date('d-m-Y') : '' }}</td>
-                    <td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend/100)|format_number({fraction_digit: 2}) }}</td>
-                     <td>{{ payment.broker }}</td>
-                    <td>
-                        <a href="{{ path('payment_show', {'id': payment.id}) }}" class="btn btn-primary">
-                            <i class="fas fa-book-open"></i>
-                        </a>
-                        <a href="{{ path('payment_edit', {'id': payment.id}) }}" class="btn btn-primary">
-                            <i class="far fa-edit"></i>
-                        </a>
-                    </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="7">no records found</td>
-                </tr>
-            {% endfor %}
-            <tr>
-                <td colspan="3"></td>
-                <td>
-                    <span style="font-weight:bold">Total dividend {% if tab > 'All' %}this {{ tab }} {% endif %}</span>
-                </td>
-                <td>&euro; {{ dividends }}</td>
-                <td></td>
-            </tr>
-        </tbody>
-    </table>
-    {% include 'paginator.html.twig' %}
-    {% endblock %}
+	{{ form_start(searchForm) }}
+	<div class="form-row">
+		<div class="col">
+			{{form_widget(searchForm.year)}}
+		</div>
+		<div class="col">
+			{{form_widget(searchForm.month)}}
+		</div>
+		<div class="col">
+			{{form_widget(searchForm.quator)}}
+		</div>
+		<div class="col">
+			{{form_widget(searchForm.send)}}
+		</div>
+	</div>
+	{{ form_end(searchForm) }}
+
+	<br/>
+	{% include '_search_form.html.twig' %}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Ticker</th>
+				<th>Industry</th>
+				<th>Units</th>
+				<th>Pay date</th>
+				<th>Dividend($)</th>
+				<th>Broker</th>
+				<th>actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for payment in payments %}
+				<tr>
+					<td>{{ payment.ticker.fullname }}
+						({{ payment.ticker.ticker }})</td>
+					<td>{{ payment.ticker.branch.label }}</td>
+					<td>{{ payment.stocks/100|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ payment.payDate ? payment.payDate|date('d-m-Y') : '' }}</td>
+					<td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend/100)|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ payment.broker }}</td>
+					<td>
+						<a href="{{ path('payment_show', {'id': payment.id}) }}" class="btn btn-primary">
+							<i class="fas fa-book-open"></i>
+						</a>
+						<a href="{{ path('payment_edit', {'id': payment.id}) }}" class="btn btn-primary">
+							<i class="far fa-edit"></i>
+						</a>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="7">no records found</td>
+				</tr>
+			{% endfor %}
+			<tr>
+				<td colspan="3"></td>
+				<td>
+					<span style="font-weight:bold">Total dividend
+						{% if tab > 'All' %}this
+							{{ tab }}
+						{% endif %}
+					</span>
+				</td>
+				<td>&euro;
+					{{ dividends }}</td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+	{% include 'paginator.html.twig' %}
+{% endblock %}

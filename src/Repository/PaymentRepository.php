@@ -28,6 +28,11 @@ class PaymentRepository extends ServiceEntityRepository
     private function getInterval(QueryBuilder $queryBuilder, string $interval)
     {
         [$startDate, $endDate] = (new DateHelper())->getInterval($interval);
+        $this->setDateRange($queryBuilder, $startDate, $endDate);
+    }
+
+    private function setDateRange(QueryBuilder $queryBuilder, string $startDate, string $endDate)
+    {
         $queryBuilder->andWhere('p.payDate >= :startDate and p.payDate <= :endDate');
         $queryBuilder->setParameters(['startDate' => $startDate, 'endDate' => $endDate]);
     }
@@ -38,7 +43,9 @@ class PaymentRepository extends ServiceEntityRepository
         int $limit = 10,
         string $orderBy = 'exDividendDate',
         string $sort = 'DESC',
-        string $search = ''
+        string $search = '',
+        string $startDate = null,
+        string $endDate = null
     ): Paginator {
         $order = 'p.' . $orderBy;
         if ($orderBy === 'ticker') {
@@ -54,9 +61,14 @@ class PaymentRepository extends ServiceEntityRepository
             ->leftJoin('p.calendar', 'c')
             ->orderBy($order, $sort);
 
-        if ($interval !== 'All') {
+        if ($interval !== 'All'  && $startDate === null) {
             $this->getInterval($queryBuilder, $interval);
         }
+
+        if ($startDate !== null) {
+            $this->setDateRange($queryBuilder, $startDate, $endDate);
+        }
+
         if (!empty($search)) {
             $queryBuilder->andWhere('t.ticker LIKE :search');
             $queryBuilder->setParameter('search', $search . '%');
@@ -70,22 +82,26 @@ class PaymentRepository extends ServiceEntityRepository
     public function getForTicker(Ticker $ticker): ?array
     {
         return $this->createQueryBuilder('p')
-        ->join('p.ticker', 't')
-        ->where('t = :ticker')
-        ->orderBy('p.payDate', 'DESC')
-        ->setParameter('ticker', $ticker)
-        ->getQuery()
-        ->getResult();
+            ->join('p.ticker', 't')
+            ->where('t = :ticker')
+            ->orderBy('p.payDate', 'DESC')
+            ->setParameter('ticker', $ticker)
+            ->getQuery()
+            ->getResult();
     }
 
-    public function getTotalDividend(string $interval = 'All'): ?float
+    public function getTotalDividend(string $interval = 'All', string $startDate = null, string $endDate = null): ?float
     {
 
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('SUM(p.dividend) total');
 
-        if ($interval !== 'All') {
+        if ($interval !== 'All' && $startDate === null) {
             $this->getInterval($queryBuilder, $interval);
+        }
+
+        if ($startDate !== null) {
+            $this->setDateRange($queryBuilder, $startDate, $endDate);
         }
 
         $result = $queryBuilder->getQuery()
@@ -99,16 +115,15 @@ class PaymentRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('SUM(p.dividend) total')
             ->addSelect('t.id')
-            ->join('p.ticker','t')
+            ->join('p.ticker', 't')
             ->where('t IN (:tickerIds)')
             ->groupBy('p.ticker')
-            ->setParameter('tickerIds', $tickerIds)
-            ;
+            ->setParameter('tickerIds', $tickerIds);
 
         $result = $queryBuilder->getQuery()
-            ->getArrayResult(); 
+            ->getArrayResult();
         $output = [];
-        foreach ($result as $item){
+        foreach ($result as $item) {
             $output[$item['id']] = $item['total'];
         }
 
@@ -118,9 +133,9 @@ class PaymentRepository extends ServiceEntityRepository
     public function getDividendsPerInterval(string $interval = 'Month'): array
     {
         $con = $this->getEntityManager()->getConnection();
-        
+
         $sql = 'SELECT YEAR(p.pay_date) periodYear, MONTH(p.pay_date) as periodMonth, SUM(p.dividend) dividend from payment p GROUP BY YEAR(p.pay_date), MONTH(p.pay_date)';
-        
+
         $result = $con->fetchAll($sql);
 
         $sql = 'SELECT YEAR(MIN(p.pay_date)) as startdate from payment p GROUP BY YEAR(p.pay_date) LIMIT 1';
@@ -131,33 +146,33 @@ class PaymentRepository extends ServiceEntityRepository
         $output = [];
         $accumulative = 0;
         foreach ($result as $item) {
-            $period = $item['periodYear'].sprintf('%02d',$item['periodMonth']);
+            $period = $item['periodYear'] . sprintf('%02d', $item['periodMonth']);
             $output[$period]['dividend'] = (int)$item['dividend'];
             $accumulative += $item['dividend'];
             $output[$period]['accumulative'] = $accumulative;
         }
 
         for ($year = (int)$startYear; $year < (int)$currentYear + 1; $year++) {
-            for ($i = 1; $i < 13;$i++) {
-                $period = $year.sprintf('%02d',$i);
-                if (!isset($output[$period])){
+            for ($i = 1; $i < 13; $i++) {
+                $period = $year . sprintf('%02d', $i);
+                if (!isset($output[$period])) {
                     $output[$period]['dividend'] = 0;
                     $output[$period]['accumulative'] = 0;
                 }
 
                 if ($output[$period]['accumulative'] === 0) {
                     $previousPeriod = $period;
-                    if ($i > 1) { 
-                        $previousPeriod = $year.sprintf('%02d',($i-1));
+                    if ($i > 1) {
+                        $previousPeriod = $year . sprintf('%02d', ($i - 1));
                     }
-                    if ($year > (int)$startYear && $i === 1){
-                        $previousPeriod = ($year-1).'12';
+                    if ($year > (int)$startYear && $i === 1) {
+                        $previousPeriod = ($year - 1) . '12';
                     }
                     $output[$period]['accumulative'] = $output[$previousPeriod]['accumulative'];
                 }
             }
         }
         ksort($output);
-        return $output; 
+        return $output;
     }
 }

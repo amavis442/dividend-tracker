@@ -46,7 +46,83 @@ class DateHelper
         if ($currentMonth >= 10 && $currentMonth <= 12) {
             $startDate = new DateTime('first day of october');
         }
-        
+
         return $startDate;
     }
+
+    public function quaterToDates(int $quator, int $year): array
+    {
+        if ($quator === 1) {
+            $startDate = new DateTime('first day of january ' . $year);
+            $endDate = new DateTime('last day of march ' . $year);
+        }
+        if ($quator === 2) {
+            $startDate = new DateTime('first day of april ' . $year);
+            $endDate = new DateTime('last day of june ' . $year);
+        }
+        if ($quator === 3) {
+            $startDate = new DateTime('first day of july ' . $year);
+            $endDate = new DateTime('last day of september ' . $year);
+        }
+        if ($quator === 4) {
+            $startDate = new DateTime('first day of october ' . $year);
+            $endDate = new DateTime('last day of december ' . $year);
+        }
+
+        return [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')];
+    }
+
+    public function monthToDates(int $month, int $year): array
+    {
+        if ($month === 1) {
+            $startDate = new DateTime('first day of january ' . $year);
+            $endDate = new DateTime('last day of january ' . $year);
+        }
+        if ($month === 2) {
+            $startDate = new DateTime('first day of february ' . $year);
+            $endDate = new DateTime('last day of february ' . $year);
+        }
+        if ($month === 3) {
+            $startDate = new DateTime('first day of march ' . $year);
+            $endDate = new DateTime('last day of march ' . $year);
+        }
+        if ($month === 4) {
+            $startDate = new DateTime('first day of april ' . $year);
+            $endDate = new DateTime('last day of april ' . $year);
+        }
+        if ($month === 5) {
+            $startDate = new DateTime('first day of may ' . $year);
+            $endDate = new DateTime('last day of may ' . $year);
+        }
+        if ($month === 6) {
+            $startDate = new DateTime('first day of june ' . $year);
+            $endDate = new DateTime('last day of june ' . $year);
+        }
+        if ($month === 7) {
+            $startDate = new DateTime('first day of july ' . $year);
+            $endDate = new DateTime('last day of july ' . $year);
+        }
+        if ($month === 8) {
+            $startDate = new DateTime('first day of august ' . $year);
+            $endDate = new DateTime('last day of august ' . $year);
+        }
+        if ($month === 9) {
+            $startDate = new DateTime('first day of september ' . $year);
+            $endDate = new DateTime('last day of september ' . $year);
+        }
+        if ($month === 10) {
+            $startDate = new DateTime('first day of october ' . $year);
+            $endDate = new DateTime('last day of october ' . $year);
+        }
+        if ($month === 11) {
+            $startDate = new DateTime('first day of november ' . $year);
+            $endDate = new DateTime('last day of november ' . $year);
+        }
+        if ($month === 12) {
+            $startDate = new DateTime('first day of december ' . $year);
+            $endDate = new DateTime('last day of december ' . $year);
+        }
+        return [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')];
+    }
 }
+
