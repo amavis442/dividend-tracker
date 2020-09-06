@@ -8,14 +8,10 @@ use App\Entity\Position;
 class WeightedAverage
 {
     protected $transactions = [];
-    protected $resultSet = [];
 
     public function __construct()
     {
-        $this->resultSet = [
-            'position' => [],
-            'transactions' => []
-        ];
+
     }
 
     public function addTransaction(Transaction $transaction, int $index)
@@ -29,6 +25,7 @@ class WeightedAverage
 
     public function calc(Position $position): void
     {
+        $this->transactions = null;
         $transactions = $position->getTransactions();
         $n = 1;
         foreach ($transactions as $transaction) {

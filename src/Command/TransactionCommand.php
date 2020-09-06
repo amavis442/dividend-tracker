@@ -65,11 +65,13 @@ class TransactionCommand extends Command
         }
 
         foreach ($tickers as $ticker) {
+            $position = null;
             if ($ticker) {
                 $positions = $ticker->getPositions();
                 $position = $positions[0];
                 $this->weightedAverageService->calc($position);
-                
+                $io->text($ticker->getFullname() . ', ' . ($position->getAmount() / 100) . ' shares, ' . ($position->getPrice() / 100) . ' euro');
+
                 if ($overwrite) {
                     $this->em->persist($position);
                     $this->em->flush();
