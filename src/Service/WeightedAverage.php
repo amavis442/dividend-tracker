@@ -57,11 +57,12 @@ class WeightedAverage
             }
 
             if ($transaction->getSide() === Transaction::SELL) {
-                $profit = (int) round($allocation - $amount * $avgPrice, 0);
+                $calcAllocation = $amount * $avgPrice;
+                $profit = (int) round($allocation - $calcAllocation, 0);
                 $transaction->setProfit($profit);
 
                 $numShares -= $amount;
-                $costBase -= $allocation;
+                $costBase -= $calcAllocation;//$allocation;
                 $totalProfit += $profit;
             }
 
@@ -69,10 +70,6 @@ class WeightedAverage
                 $avgPrice = $costBase / $numShares;
                 $aPrice = (int) round($avgPrice * 100, 0);
                 $transaction->setAvgprice($aPrice);
-
-                if ($transaction->getSide() === Transaction::SELL && $profit < 0) {
-                    $costBase += $profit;
-                }
             }
         }
 
