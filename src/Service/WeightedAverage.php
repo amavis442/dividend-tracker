@@ -25,7 +25,7 @@ class WeightedAverage
 
     public function calc(Position $position): void
     {
-        $this->transactions = null;
+        $this->transactions = [];
         $transactions = $position->getTransactions();
         $n = 1;
         foreach ($transactions as $transaction) {
