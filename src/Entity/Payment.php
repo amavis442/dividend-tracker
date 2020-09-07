@@ -29,6 +29,13 @@ class Payment
     private $dividend;
 
     /**
+     * Undocumented variable
+     *
+     * @var float
+     */
+    private $taxes;
+
+    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Ticker", inversedBy="payments")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -89,6 +96,12 @@ class Payment
         $this->dividend = $dividend;
 
         return $this;
+    }
+
+    public function getTaxes(): ?float
+    {
+        $taxes = ($this->dividend / 85) * 15;
+        return $taxes;
     }
 
     public function getTicker(): ?Ticker

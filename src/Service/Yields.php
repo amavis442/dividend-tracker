@@ -11,7 +11,7 @@ class Yields
         TickerRepository $tickerRepository,
         PositionRepository $positionRepository,
         string $orderBy = 'ticker',
-        float $exchangeRate = 1.1
+        float $exchangeRate = 1.19
     ): array {
         $labels = [];
         $data = [];

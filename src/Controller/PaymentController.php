@@ -114,11 +114,13 @@ class PaymentController extends AbstractController
             [$startDate, $endDate] = (new DateHelper())->quaterToDates($data['quator'], $data['year']);
         }
         $totalDividend = $paymentRepository->getTotalDividend($tab, $startDate, $endDate);
+        $taxes = ($totalDividend / 85) * 15;
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
         $items = $paymentRepository->getAll($page, $tab, 10, $orderBy, $sort, $searchCriteria, $startDate, $endDate);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
+
 
         $referer->set('payment_index', ['page' => $page,  'tab' => $tab, 'orderBy' => $orderBy, 'sort' => $sort]);
 
@@ -126,6 +128,7 @@ class PaymentController extends AbstractController
             'searchForm' => $form->createView(),
             'payments' => $items->getIterator(),
             'dividends' => $totalDividend,
+            'taxes' => $taxes,
             'limit' => $limit,
             'maxPages' => $maxPages,
             'thisPage' => $thisPage,

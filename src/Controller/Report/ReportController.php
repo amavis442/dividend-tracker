@@ -2,7 +2,6 @@
 
 namespace App\Controller\Report;
 
-use App\Entity\Payment;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\BranchRepository;
@@ -25,7 +24,7 @@ use App\Service\Projection;
 class ReportController extends AbstractController
 {
     public const TAX_DIVIDEND = 0.15; // %
-    public const EXCHANGE_RATE = 1.1; // dollar to euro
+    public const EXCHANGE_RATE = 1.19; // dollar to euro
 
     /**
      * @Route("/report", name="report_index")

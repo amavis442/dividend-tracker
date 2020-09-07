@@ -98,7 +98,7 @@ class Projection
         CalendarRepository $calendarRepository,
         DividendMonthRepository $dividendMonthRepository,
         float $taxDividend = 0.15,
-        float $exchangeRate = 1.1
+        float $exchangeRate = 1.19
     ): array {
         $labels = [];
         $data = [];

@@ -35,7 +35,8 @@
 				<th>Industry</th>
 				<th>Units</th>
 				<th>Pay date</th>
-				<th>Dividend($)</th>
+				<th>Dividend(&euro;)</th>
+				<th>Taxes (15%)</th>
 				<th>Broker</th>
 				<th>actions</th>
 			</tr>
@@ -49,6 +50,7 @@
 					<td>{{ payment.stocks/100|format_number({fraction_digit: 2}) }}</td>
 					<td>{{ payment.payDate ? payment.payDate|date('d-m-Y') : '' }}</td>
 					<td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend/100)|format_number({fraction_digit: 2}) }}</td>
+					<td>&euro;{{ (payment.taxes/100)|format_number({fraction_digit: 2}) }}</td>
 					<td>{{ payment.broker }}</td>
 					<td>
 						<a href="{{ path('payment_show', {'id': payment.id}) }}" class="btn btn-primary">
@@ -61,7 +63,7 @@
 				</tr>
 			{% else %}
 				<tr>
-					<td colspan="7">no records found</td>
+					<td colspan="8">no records found</td>
 				</tr>
 			{% endfor %}
 			<tr>
@@ -75,6 +77,7 @@
 				</td>
 				<td>&euro;
 					{{ dividends }}</td>
+				<td>&euro;{{ taxes|format_number({fraction_digit: 2}) }}</td>
 				<td></td>
 			</tr>
 		</tbody>
