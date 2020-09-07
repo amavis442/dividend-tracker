@@ -36,7 +36,7 @@
 				<tr>
 					<td>{{ item.ticker }}</td>
 					<td>{{ item.label }}</td>
-					<td>{{ (item.avgPrice/100)|format_number({fraction_digit: 2}) }}</td>
+					<td>&euro;{{ (item.avgPrice/100)|format_number({fraction_digit: 2}) }}</td>
 					<td>{{ item.yield }}%</td>
 					<td>${{ (item.payout/100)|format_number({fraction_digit: 2}) }}</td>
 					<td>${{ (item.lastDividend/100)|format_number({fraction_digit: 2}) }}</td>

@@ -11,7 +11,8 @@ class Yields
         TickerRepository $tickerRepository,
         PositionRepository $positionRepository,
         string $orderBy = 'ticker',
-        float $exchangeRate = 1.19
+        float $exchangeRate = 1.19,
+        float $tax = 0.15
     ): array {
         $labels = [];
         $data = [];
@@ -40,7 +41,7 @@ class Yields
             }
             $dividendPerYear = $numPayoutsPerYear * $lastCash;
 
-            $dividendYield = round((($dividendPerYear / $exchangeRate) / $avgPrice) * 100, 2);
+            $dividendYield = round(((($dividendPerYear * (1 - $tax)) / $exchangeRate) / $avgPrice) * 100, 2);
             $labels[] = sprintf("%s (%s)", substr(addslashes($ticker->getFullname()), 0, 8), $ticker->getTicker());
             $data[] = $dividendYield;
 
