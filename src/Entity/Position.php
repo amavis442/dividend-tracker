@@ -77,6 +77,11 @@ class Position
      */
     private $transactions;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $posid;
+
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
@@ -249,6 +254,18 @@ class Position
                 $transaction->setPosition(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPosid(): ?string
+    {
+        return $this->posid;
+    }
+
+    public function setPosid(?string $posid): self
+    {
+        $this->posid = $posid;
 
         return $this;
     }

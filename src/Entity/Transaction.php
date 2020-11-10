@@ -93,6 +93,11 @@ class Transaction
     private $avgprice;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $jobid;
+
+    /**
      * @Assert\Callback
      */
     public function validate(ExecutionContextInterface $context, $payload)
@@ -273,4 +278,17 @@ class Transaction
 
         return $this;
     }
+
+    public function getJobid(): ?string
+    {
+        return $this->jobid;
+    }
+
+    public function setJobid(?string $jobid): self
+    {
+        $this->jobid = $jobid;
+
+        return $this;
+    }
+
 }

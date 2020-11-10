@@ -40,17 +40,6 @@ class User implements UserInterface
     private $password;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Branch", mappedBy="user")
-     * @ORM\JoinColumn(nullable=true)
-     */
-    private $branches;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Ticker", mappedBy="user")
-     */
-    private $tickers;
-
-    /**
      * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="user")
      */
     private $positions;
@@ -59,11 +48,6 @@ class User implements UserInterface
      * @ORM\OneToMany(targetEntity="App\Entity\Payment", mappedBy="user")
      */
     private $payments;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Calendar", mappedBy="user")
-     */
-    private $calendars;
 
     public function __construct()
     {

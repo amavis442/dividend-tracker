@@ -44,12 +44,6 @@ class Branch
     private $assetAllocation;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="branches")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $user;
-
-    /**
      * @ORM\Column(type="text", nullable=true)
      */
     private $description;
@@ -159,18 +153,6 @@ class Branch
     public function setAssetAllocation(?int $assetAllocation): self
     {
         $this->assetAllocation = $assetAllocation;
-
-        return $this;
-    }
-
-    public function getUser(): User
-    {
-        return $this->user;
-    }
-
-    public function setUser(User $user): self
-    {
-        $this->user = $user;
 
         return $this;
     }

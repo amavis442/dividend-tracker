@@ -42,7 +42,8 @@ class WeightedAverage
         $avgPrice = 0;
         $costBase = 0.0;
         $numShares = 0.0;
-
+        $aPrice = 0;
+        
         foreach ($this->transactions as $timeStamp => $transaction) {
             $profit = 0.0;
             $amount = $transaction->getAmount();
@@ -63,11 +64,11 @@ class WeightedAverage
                 $totalProfit += $profit;
             }
 
-            if ($costBase > 0) {
+            if ($costBase > 0 && $numShares > 0) {
                 $avgPrice = $costBase / $numShares;
                 $aPrice = (int) round($avgPrice * 100, 0);
                 $transaction->setAvgprice($aPrice);
-            }
+            } 
         }
 
         $position->setAllocation((int) round($costBase))
