@@ -9,13 +9,16 @@ use Exception;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TransactionRepository")
+ * @ORM\HasLifecycleCallbacks
  */
 class Transaction
 {
     public const BROKERS = ['eToro', 'Trading212', 'Flatex'];
     public const BUY = 1;
     public const SELL = 2;
-
+    public const AMOUNT_DIGITS = 7;
+    public const AMOUNT_MULTIPLE = 10000000;
+    
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -76,12 +79,6 @@ class Transaction
     private $position;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="positions")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $user;
-
-    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Ticker", inversedBy="transactions")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -96,6 +93,16 @@ class Transaction
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $jobid;
+
+    /**
+     * @ORM\Column(type="datetime", name="created_at")
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\Column(type="datetime", name="updated_at", nullable = true)
+     */
+    private $updatedAt;
 
     /**
      * @Assert\Callback
@@ -157,6 +164,11 @@ class Transaction
     }
 
     public function getAmount(): ?int
+    {
+        return $this->amount;
+    }
+
+    public function getRawAmount(): ?int
     {
         return $this->amount;
     }
@@ -231,18 +243,6 @@ class Transaction
         return $this;
     }
 
-    public function getUser(): User
-    {
-        return $this->user;
-    }
-
-    public function setUser(User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
     public function getPosition(): ?Position
     {
         return $this->position;
@@ -251,18 +251,6 @@ class Transaction
     public function setPosition(?Position $position): self
     {
         $this->position = $position;
-
-        return $this;
-    }
-
-    public function getTicker(): ?Ticker
-    {
-        return $this->ticker;
-    }
-
-    public function setTicker(?Ticker $ticker): self
-    {
-        $this->ticker = $ticker;
 
         return $this;
     }
@@ -291,4 +279,42 @@ class Transaction
         return $this;
     }
 
+    /**
+     * Gets triggered only on insert
+     * @ORM\PrePersist
+     */
+     public function onPrePersist()
+     {
+         $this->createdAt = new \DateTime("now");
+     }
+ 
+     public function setCreatedAt(DateTimeInterface $createdAt = null): self
+     {
+         $this->createdAt = $createdAt ?? new DateTime("now");
+     }
+ 
+     public function getCreatedAt(): DateTimeInterface
+     {
+         return $this->createdAt;
+     }
+ 
+     /**
+      * Gets triggered every time on update
+      * @ORM\PreUpdate
+      */
+      public function onPreUpdate()
+      {
+          $this->updatedAt = new \DateTime("now");
+      }
+ 
+      
+     public function setUpdatedAt(DateTimeInterface $updatedAt = null): self
+     {
+         $this->updatedAt = $updatedAt ?? new DateTime("now");
+     }
+ 
+     public function getUpdatedAt(): DateTimeInterface
+     {
+         return $this->updatedAt;
+     }
 }

@@ -38,21 +38,10 @@ class Ticker
     private $branch;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="ticker")
-     */
-    private $positions;
-
-    /**
      * @ORM\OneToMany(targetEntity="App\Entity\Calendar", mappedBy="ticker")
      * @ORM\OrderBy({"paymentDate" = "DESC"})
      */
     private $calendars;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Payment", mappedBy="ticker", orphanRemoval=true)
-     * @ORM\OrderBy({"payDate" = "DESC"})
-     */
-    private $payments;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Research", mappedBy="ticker")
@@ -65,24 +54,15 @@ class Ticker
     private $DividendMonths;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="ticker")
-     */
-    private $transactions;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $isin;
 
     public function __construct()
     {
-        $this->positions = new ArrayCollection();
         $this->calendars = new ArrayCollection();
-        $this->payments = new ArrayCollection();
         $this->researches = new ArrayCollection();
         $this->dividendMonths = new ArrayCollection();
-        $this->DividendMonths = new ArrayCollection();
-        $this->transactions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -127,37 +107,6 @@ class Ticker
     }
 
     /**
-     * @return Collection|Position[]
-     */
-    public function getPositions(): Collection
-    {
-        return $this->positions;
-    }
-
-    public function addPosition(Position $position): self
-    {
-        if (!$this->positions->contains($position)) {
-            $this->positions[] = $position;
-            $position->setTicker($this);
-        }
-
-        return $this;
-    }
-
-    public function removePosition(Position $position): self
-    {
-        if ($this->positions->contains($position)) {
-            $this->positions->removeElement($position);
-            // set the owning side to null (unless already changed)
-            if ($position->getTicker() === $this) {
-                $position->setTicker(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection|Calendar[]
      */
     public function getCalendars(): Collection
@@ -193,96 +142,6 @@ class Ticker
             return null;
         } 
         return $this->calendars[0];
-    }
-
-    /**
-     * @return Collection|Payment[]
-     */
-    public function getPayments(): Collection
-    {
-        return $this->payments;
-    }
-
-    public function getSumDividend(): ?int
-    {
-        if ($this->payments->count() < 1) {
-            return null;
-        }
-        $result = 0;
-        foreach ($this->payments as $payment) {
-            $result += $payment->getDividend();
-        }
-        return $result;
-    }
-
-    public function getSumAllocation(): ?int
-    {
-        if ($this->positions->count() < 1) {
-            return null;
-        }
-        $result = 0;
-        foreach ($this->positions as $position) {
-            if ($position->getClosed() <> 1) {
-                $result += $position->getAllocation();
-            }
-        }
-        return $result;
-    }
-
-    public function getSummary(): ?array
-    {
-        $allocation = 0;
-        $units = 0;
-        $dividends = 0;
-        $positions = 0;
-        $price = 0;
-
-        if (($positions = $this->positions->count()) > 0) {
-            foreach ($this->positions as $position) {
-                if ($position->getClosed() <> 1) {
-                    $allocation += $position->getAllocation();
-                    $units += $position->getAmount();
-                    $price += $position->getPrice();
-                }
-            }
-            $price = $price / $positions;
-        }
-        if ($this->payments->count() > 0) {
-            foreach($this->payments as $payment) {
-                $dividends += $payment->getDividend();
-            }
-        }
-        return [
-            'dividend' => $dividends,
-            'positions' => $positions,
-            'units' => $units,
-            'allocation' => $allocation,
-            'price' => $price
-        ];
-    }
-
-
-    public function addPayment(Payment $payment): self
-    {
-        if (!$this->payments->contains($payment)) {
-            $this->payments[] = $payment;
-            $payment->setTicker($this);
-        }
-
-        return $this;
-    }
-
-    public function removePayment(Payment $payment): self
-    {
-        if ($this->payments->contains($payment)) {
-            $this->payments->removeElement($payment);
-            // set the owning side to null (unless already changed)
-            if ($payment->getTicker() === $this) {
-                $payment->setTicker(null);
-            }
-        }
-
-        return $this;
     }
 
     /**
@@ -347,52 +206,6 @@ class Ticker
         return $this;
     }
     
-    public function getActiveUnits(): int
-    {
-        $units = 0;
-        if ($this->positions) {
-            foreach ($this->positions as $position)
-            {
-                if ($position->getClosed() === 1) {
-                    continue;   
-                }
-                $units += $position->getAmount();
-            }
-        }
-        return $units;
-    }
-
-    /**
-     * @return Collection|Transaction[]
-     */
-    public function getTransactions(): Collection
-    {
-        return $this->transactions;
-    }
-
-    public function addTransaction(Transaction $transaction): self
-    {
-        if (!$this->transactions->contains($transaction)) {
-            $this->transactions[] = $transaction;
-            $transaction->setTicker($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTransaction(Transaction $transaction): self
-    {
-        if ($this->transactions->contains($transaction)) {
-            $this->transactions->removeElement($transaction);
-            // set the owning side to null (unless already changed)
-            if ($transaction->getTicker() === $this) {
-                $transaction->setTicker(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getIsin(): ?string
     {
         return $this->isin;
@@ -404,5 +217,4 @@ class Ticker
 
         return $this;
     }
-    
 }

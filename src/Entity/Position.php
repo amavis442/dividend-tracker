@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PositionRepository")
+ * @ORM\HasLifecycleCallbacks
  */
 class Position
 {
@@ -82,9 +83,26 @@ class Position
      */
     private $posid;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Payment", mappedBy="position")
+     * @ORM\OrderBy({"payDate" = "DESC"})
+     */
+    private $payments;
+
+    /**
+     * @ORM\Column(type="datetime", name="created_at")
+     */
+    private $createdAt;
+
+    /**
+     * @ORM\Column(type="datetime", name="updated_at", nullable = true)
+     */
+    private $updatedAt;
+
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
+        $this->payments = new ArrayCollection();
     }
 
     /**
@@ -258,6 +276,38 @@ class Position
         return $this;
     }
 
+     /**
+     * @return Collection|Payment[]
+     */
+    public function getPayments(): Collection
+    {
+        return $this->payments;
+    }
+ 
+    public function addPayment(Payment $payment): self
+    {
+        if (!$this->payments->contains($payment)) {
+            $this->payments[] = $payments;
+            $payemnt->setPosition($this);
+        }
+ 
+        return $this;
+    }
+ 
+    public function removePayment(Payment $payment): self
+    {
+        if ($this->payments->contains($payment)) {
+            $this->payments->removeElement($payment);
+            // set the owning side to null (unless already changed)
+            if ($payment->getPosition() === $this) {
+                $payment->setPosition(null);
+            }
+        }
+ 
+        return $this;
+     }
+
+
     public function getPosid(): ?string
     {
         return $this->posid;
@@ -269,4 +319,43 @@ class Position
 
         return $this;
     }
+
+    /**
+     * Gets triggered only on insert
+     * @ORM\PrePersist
+     */
+     public function onPrePersist()
+     {
+         $this->createdAt = new \DateTime("now");
+     }
+ 
+     public function setCreatedAt(DateTimeInterface $createdAt = null): self
+     {
+         $this->createdAt = $createdAt ?? new DateTime("now");
+     }
+ 
+     public function getCreatedAt(): DateTimeInterface
+     {
+         return $this->createdAt;
+     }
+ 
+     /**
+      * Gets triggered every time on update
+      * @ORM\PreUpdate
+      */
+      public function onPreUpdate()
+      {
+          $this->updatedAt = new \DateTime("now");
+      }
+ 
+      
+     public function setUpdatedAt(DateTimeInterface $updatedAt = null): self
+     {
+         $this->updatedAt = $updatedAt ?? new DateTime("now");
+     }
+ 
+     public function getUpdatedAt(): DateTimeInterface
+     {
+         return $this->updatedAt;
+     }
 }

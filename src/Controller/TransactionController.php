@@ -47,197 +47,210 @@ class TransactionController extends AbstractController
         TransactionRepository $transactionRepository
     )
     {
+        ini_set('max_execution_time', 3000);
+
         // use an instance of MailMimeParser as a class dependency
         $mailParser = new MailMimeParser();
-        $handle = fopen(dirname(__DIR__).'/../test/file.eml', 'r');
-        $message = $mailParser->parse($handle); 
-        $htmlContent = '<html>'.$message->getHtmlContent().'</html>';
 
-        $currency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
-        $internalErrors = libxml_use_internal_errors(true);
-        $entityManager = $this->getDoctrine()->getManager();
+        $files = [];
+        if ($handle = opendir(dirname(__DIR__).'/../test')) {
+            echo "Directory handle: $handle\n";
+            echo "Entries:\n";
+        
+            /* This is the correct way to loop over the directory. */
+            while (false !== ($entry = readdir($handle))) {
+                $files[] = $entry;    
+            }
+            closedir($handle);
+        }
+        sort($files);
 
-        $branch = $branchRepository->findOneBy(['label' => 'Tech']);
-        $transactionsAdded = 0;
-        $totalTransaction = 0;
+        foreach ($files as $file) {
+            if (is_dir($file)){ 
+                continue;
+            }
+            $handle = fopen(dirname(__DIR__).'/../test/'.$file, 'r');
+            $message = $mailParser->parse($handle); 
+            $htmlContent = '<html>'.$message->getHtmlContent().'</html>';
 
-        $DOM = new DOMDocument();
-        $DOM->loadHTML($htmlContent);
-        libxml_use_internal_errors($internalErrors);
+            $currency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
+            $internalErrors = libxml_use_internal_errors(true);
+            $entityManager = $this->getDoctrine()->getManager();
 
-        $tables = $DOM->getElementsByTagName('table');
-        $tableNodes = $tables[3];
-        $n = 0;
-        $line = [];
-        foreach ($tableNodes->childNodes as $childNode) {
-            if ($childNode instanceof DOMElement){
-                if ($childNode->nodeName === 'tbody') {
-                    foreach ($childNode->childNodes as $tNode)
-                    {
-                        if ($tNode->nodeName === 'tr') {
-                            $row = [];
-                            $r = 0;
-                            foreach ($tNode->childNodes as $trNode) {
-                                if ($trNode->nodeName === 'td' && $trNode->nodeValue != '') {
-                                    $val = $val = trim(str_replace("\n", "", $trNode->nodeValue));
-                                    switch ($r)
-                                    {
-                                        case 0:
-                                            $row['nr'] = $val;
+            $branch = $branchRepository->findOneBy(['label' => 'Tech']);
+            $transactionsAdded = 0;
+            $totalTransaction = 0;
+
+            $DOM = new DOMDocument();
+            $DOM->loadHTML($htmlContent);
+            libxml_use_internal_errors($internalErrors);
+
+            $tables = $DOM->getElementsByTagName('table');
+            $tableNodes = $tables[3];
+            $n = 0;
+            $line = [];
+            foreach ($tableNodes->childNodes as $childNode) {
+                if ($childNode instanceof DOMElement){
+                    if ($childNode->nodeName === 'tbody') {
+                        foreach ($childNode->childNodes as $tNode)
+                        {
+                            if ($tNode->nodeName === 'tr') {
+                                $row = [];
+                                $r = 0;
+                                foreach ($tNode->childNodes as $trNode) {
+                                    if ($trNode->nodeName === 'td' && $trNode->nodeValue != '') {
+                                        $val = $val = trim(str_replace("\n", "", $trNode->nodeValue));
+                                        switch ($r)
+                                        {
+                                            case 0:
+                                                $row['nr'] = $val;
+                                                break;
+                                            case 1:
+                                                $row['opdrachtid'] = $val;
+                                                break;    
+                                            case 2: 
+                                                [$ticker,$isin] = explode('/', $val);
+                                                $row['ticker'] = $ticker;
+                                                $row['isin'] = $isin;
+                                                break;
+                                            case 3:
+                                                $d = 1;
+                                                if (strtolower($val) === 'verkopen') {
+                                                    $d = 2;
+                                                }
+                                                $row['direction'] = $d;
+                                                break;
+                                            case 4:
+                                                $row['amount'] = $val*100;
+                                                break;
+                                            case 5:
+                                                $unitPrice = str_replace(" EUR",'',$val) * 100; 
+                                                
+                                                $row['price'] = $unitPrice;
+                                                break;
+                                            case 6:
+                                                $allocation = str_replace(" EUR",'',$val) * 100;
+                                                $row['allocation'] = $allocation;
                                             break;
-                                        case 1:
-                                            $row['opdrachtid'] = $val;
-                                            break;    
-                                        case 2: 
-                                            [$ticker,$isin] = explode('/', $val);
-                                            $row['ticker'] = $ticker;
-                                            $row['isin'] = $isin;
+                                            case 7:
+                                                $row['handelsdag'] = $val;
                                             break;
-                                        case 3:
-                                            $d = 1;
-                                            if (strtolower($val) === 'verkopen') {
-                                                $d = 2;
-                                            }
-                                            $row['direction'] = $d;
+                                            case 8:
+                                                $row['handelstijd'] = $val;
                                             break;
-                                        case 4:
-                                            $row['amount'] = $val*100;
+                                            case 9:
+                                                $row['commisie'] = $val;
                                             break;
-                                        case 5:
-                                            $unitPrice = str_replace(" EUR",'',$val) * 100; 
-                                            
-                                            $row['price'] = $unitPrice;
+                                            case 10:
+                                                $row['kosten_en_vergoedingen'] = $val;
                                             break;
-                                        case 6:
-                                            $allocation = str_replace(" EUR",'',$val) * 100;
-                                            $row['allocation'] = $allocation;
-                                        break;
-                                        case 7:
-                                            $row['handelsdag'] = $val;
-                                        break;
-                                        case 8:
-                                            $row['handelstijd'] = $val;
-                                        break;
-                                        case 9:
-                                            $row['commisie'] = $val;
-                                        break;
-                                        case 10:
-                                            $row['kosten_en_vergoedingen'] = $val;
-                                        break;
-                                        case 11:
-                                            $row['opdrachttype'] = $val;
-                                        break;
-                                        case 12:
-                                            $row['plaats_van_uitvoering'] = $val;
-                                        break;
-                                        case 13:
-                                            $row['wisselkoersen'] = $val;
-                                        break;
-                                        case 14:
-                                            $row['totale_prijs'] = $val;
-                                        break;
-                                    default:
-                                            $row[] = $val;
-                                    }
-                                    $r++;
-                                }
-                            }
-
-                            if (count($row) > 0 ){
-                                $transactionDate = DateTime::createFromFormat('d-m-Y H:i:s', $row['handelsdag'].' '.$row['handelstijd']);
-                                $row['transactionDate'] = $transactionDate;
-
-                                $ticker = $tickerRepository->findOneBy(['ticker' => $row['ticker']]);
-                                if ($ticker && ($ticker->getIsin() == null || $ticker->getIsin() == '') ){
-                                    $ticker->setIsin($row['isin']);
-                                    $entityManager->persist($ticker);
-                                    $entityManager->flush();
-                                }
-                                if (!$ticker) {
-                                    $ticker = $tickerRepository->findOneBy(['isin' => $row['isin']]);
-                                    if (!$ticker) {
-                                        $ticker = new Ticker();
-                                        $ticker->setTicker($row['ticker'])
-                                        ->setFullname($row['ticker'])
-                                        ->setIsin($row['isin'])
-                                        ->setBranch($branch);
-
-                                        $position = new Position();
-                                        $position->setTicker($ticker)
-                                            ->setAmount(0)
-                                            ->setCurrency($currency)
-                                            ->setPosid($row['opdrachtid'])
-                                            ->setAllocationCurrency($currency)
-                                        ;
-                                        $entityManager->persist($ticker);
-                                        $entityManager->persist($position);
-                                        $entityManager->flush();
-                                    }
-                                }
-
-                                if ($ticker) {
-                                    $position = $positionRepository->getForTicker($ticker);
-                                    if (!$position) {
-                                        $position = new Position();
-                                        $position->setTicker($ticker)
-                                            ->setAmount(0)
-                                            ->setCurrency($currency)
-                                            ->setPosid($row['opdrachtid'])
-                                            ->setAllocationCurrency($currency)
-                                        ; 
-                                        $entityManager->persist($position);
-                                        $entityManager->flush();
-                                    }
-                                 
-                                 
-                                    if ($position) {
-                                        if (!$position->getPosid() || $position->getPosid() === ''){
-                                            $position->setPosid($row['opdrachtid']);
+                                            case 11:
+                                                $row['opdrachttype'] = $val;
+                                            break;
+                                            case 12:
+                                                $row['plaats_van_uitvoering'] = $val;
+                                            break;
+                                            case 13:
+                                                $row['wisselkoersen'] = $val;
+                                            break;
+                                            case 14:
+                                                $row['totale_prijs'] = $val;
+                                            break;
+                                        default:
+                                                $row[] = $val;
                                         }
+                                        $r++;
+                                    }
+                                }
 
-                                        $transaction = $transactionRepository->findOneBy(['transactionDate' => $row['transactionDate'], 'ticker' => $ticker]);       
-                                        if (!$transaction) {
-                                            $transaction = new Transaction();
-                                            $transaction->setTicker($ticker)
-                                                ->setSide($row['direction'])
-                                                ->setPrice($row['price'])
-                                                ->setAllocation($row['allocation'])
-                                                ->setAmount($row['amount'])
-                                                ->setTransactionDate($row['transactionDate'])
-                                                ->setBroker('Trading212')
-                                                ->setAllocationCurrency($currency)
+                                if (count($row) > 0 ){
+                                    $transactionDate = DateTime::createFromFormat('d-m-Y H:i:s', $row['handelsdag'].' '.$row['handelstijd']);
+                                    $row['transactionDate'] = $transactionDate;
+
+                                    $ticker = $tickerRepository->findOneBy(['ticker' => $row['ticker']]);
+                                    if ($ticker && ($ticker->getIsin() == null || $ticker->getIsin() == '') ){
+                                        $ticker->setIsin($row['isin']);
+                                        $entityManager->persist($ticker);
+                                        $entityManager->flush();
+                                    }
+                                    if (!$ticker) {
+                                        $ticker = $tickerRepository->findOneBy(['isin' => $row['isin']]);
+                                        if (!$ticker) {
+                                            $ticker = new Ticker();
+                                            $ticker->setTicker($row['ticker'])
+                                            ->setFullname($row['ticker'])
+                                            ->setIsin($row['isin'])
+                                            ->setBranch($branch);
+                                            
+                                            $entityManager->persist($ticker);
+                                            $entityManager->flush();
+                                        }
+                                    }
+
+                                    if ($ticker) {
+                                        $position = $positionRepository->findOneBy(['posid' => $row['opdrachtid']]);
+                                        if (!$position) {
+                                            $position = new Position();
+                                            $position->setTicker($ticker)
+                                                ->setAmount(0)
                                                 ->setCurrency($currency)
-                                                ->setPosition($position)
-                                                ->setJobid($row['opdrachtid'])
-                                                ;
-
-                                            $position->addTransaction($transaction);
-                                            $weightedAverage->calc($position);
-
-                                            if ($position->getAmount() === 0) {
-                                                $position->setClosed(1);
-                                            }
-                                        
+                                                ->setPosid($row['opdrachtid'])
+                                                ->setAllocationCurrency($currency)
+                                            ; 
                                             $entityManager->persist($position);
                                             $entityManager->flush();
-                                            $transactionsAdded++;
-                                        } else {
-                                            dump('Transaction already exists. ID: '. $transaction->getId(), $row);
                                         }
-                                    }
-                                
-                                } else {
-                                    dump('Ticker not found....' . $row['ticker']);
-                                }   
-                                $totalTransaction++;
+                                    
+                                        if ($position) {
+                                            if (!$position->getPosid() || $position->getPosid() === ''){
+                                                $position->setPosid($row['opdrachtid']);
+                                            }
+
+                                            $transaction = $transactionRepository->findOneBy(['transactionDate' => $row['transactionDate'], 'ticker' => $ticker]);       
+                                            if (!$transaction) {
+                                                $transaction = new Transaction();
+                                                $transaction->setTicker($ticker)
+                                                    ->setSide($row['direction'])
+                                                    ->setPrice($row['price'])
+                                                    ->setAllocation($row['allocation'])
+                                                    ->setAmount($row['amount'])
+                                                    ->setTransactionDate($row['transactionDate'])
+                                                    ->setBroker('Trading212')
+                                                    ->setAllocationCurrency($currency)
+                                                    ->setCurrency($currency)
+                                                    ->setPosition($position)
+                                                    ->setJobid($row['opdrachtid'])
+                                                    ;
+
+                                                $position->addTransaction($transaction);
+                                                $weightedAverage->calc($position);
+
+                                                if ($position->getAmount() === 0) {
+                                                    $position->setClosed(1);
+                                                }
+                                            
+                                                $entityManager->persist($position);
+                                                $entityManager->flush();
+                                                $transactionsAdded++;
+                                            } else {
+                                                dump('Transaction already exists. ID: '. $transaction->getId(), $row);
+                                            }
+                                        }
+                                    
+                                    } else {
+                                        dump('Ticker not found....' . $row['ticker']);
+                                    }   
+                                    $totalTransaction++;
+                                }
                             }
                         }
                     }
                 }
+                $n++;
             }
-            $n++;
+            sleep(2);
+            dump('Done processing file '.$file. '.....', 'Transaction added: '. $transactionsAdded. ' of '. $totalTransaction);
         }
-        dump('Done....', 'Transaction added: '. $transactionsAdded. ' of '. $totalTransaction);
         exit();
     }
 

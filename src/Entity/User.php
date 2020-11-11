@@ -55,7 +55,6 @@ class User implements UserInterface
         $this->positions = new ArrayCollection();
         $this->branches = new ArrayCollection();
         $this->tickers = new ArrayCollection();
-        $this->calendars = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -262,29 +261,6 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($payment->getUser() === $this) {
                 $payment->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function addCalendar(Calendar $calendar): self
-    {
-        if (!$this->calendars->contains($calendar)) {
-            $this->calendars[] = $calendar;
-            $calendar->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCalendar(Calendar $calendar): self
-    {
-        if ($this->calendars->contains($calendar)) {
-            $this->calendars->removeElement($calendar);
-            // set the owning side to null (unless already changed)
-            if ($calendar->getUser() === $this) {
-                $calendar->setUser(null);
             }
         }
 

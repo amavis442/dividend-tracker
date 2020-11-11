@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PaymentRepository")
+ * @ORM\HasLifecycleCallbacks
  */
 class Payment
 {
@@ -60,14 +61,30 @@ class Payment
     private $currency;
 
     /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Position")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $position;
+
+    /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $stocks;
+    private $units;
 
     /**
      * @ORM\Column(type="string", length=40, nullable=true)
      */
     private $broker;
+
+    /**
+     * @ORM\Column(type="datetime", name="created_at")
+     */
+    private $createdAt;
+    
+    /**
+     * @ORM\Column(type="datetime", name="updated_at", nullable = true)
+     */
+    private $updatedAt;
 
     public function getId(): ?int
     {
@@ -165,14 +182,14 @@ class Payment
         return $this->calendar !== null;
     }
 
-    public function getStocks(): ?int
+    public function getUnits(): ?int
     {
-        return $this->stocks;
+        return $this->units;
     }
 
-    public function setStocks(?int $stocks): self
+    public function setUnits(?int $units): self
     {
-        $this->stocks = $stocks;
+        $this->units = $units;
 
         return $this;
     }
@@ -187,5 +204,56 @@ class Payment
         $this->broker = $broker;
 
         return $this;
+    }
+
+    public function setPosition(Position $position): self
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+    public function getPosition(): ?Position
+    {
+        return $this->position;
+    }
+
+    /**
+     * Gets triggered only on insert
+     * @ORM\PrePersist
+     */
+    public function onPrePersist()
+    {
+        $this->createdAt = new \DateTime("now");
+    }
+
+    public function setCreatedAt(DateTimeInterface $createdAt = null): self
+    {
+        $this->createdAt = $createdAt ?? new DateTime("now");
+    }
+
+    public function getCreatedAt(): DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Gets triggered every time on update
+     * @ORM\PreUpdate
+     */
+     public function onPreUpdate()
+     {
+         $this->updatedAt = new \DateTime("now");
+     }
+
+     
+    public function setUpdatedAt(DateTimeInterface $updatedAt = null): self
+    {
+        $this->updatedAt = $updatedAt ?? new DateTime("now");
+    }
+
+    public function getUpdatedAt(): DateTimeInterface
+    {
+        return $this->updatedAt;
     }
 }
