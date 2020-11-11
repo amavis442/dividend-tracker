@@ -3,9 +3,9 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Exception;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TransactionRepository")
@@ -18,7 +18,7 @@ class Transaction
     public const SELL = 2;
     public const AMOUNT_DIGITS = 7;
     public const AMOUNT_MULTIPLE = 10000000;
-    
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -79,12 +79,6 @@ class Transaction
     private $position;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Ticker", inversedBy="transactions")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $ticker;
-
-    /**
      * @ORM\Column(type="integer", nullable=true)
      */
     private $avgprice;
@@ -93,6 +87,11 @@ class Transaction
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $jobid;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $exchangeRate;
 
     /**
      * @ORM\Column(type="datetime", name="created_at")
@@ -279,42 +278,53 @@ class Transaction
         return $this;
     }
 
+    public function getExchangeRate(): ?string
+    {
+        return $this->exchangeRate;
+    }
+
+    public function setExchangeRate(?string $exchangeRate): self
+    {
+        $this->exchangeRate = $exchangeRate;
+
+        return $this;
+    }
+
     /**
      * Gets triggered only on insert
      * @ORM\PrePersist
      */
-     public function onPrePersist()
-     {
-         $this->createdAt = new \DateTime("now");
-     }
- 
-     public function setCreatedAt(DateTimeInterface $createdAt = null): self
-     {
-         $this->createdAt = $createdAt ?? new DateTime("now");
-     }
- 
-     public function getCreatedAt(): DateTimeInterface
-     {
-         return $this->createdAt;
-     }
- 
-     /**
-      * Gets triggered every time on update
-      * @ORM\PreUpdate
-      */
-      public function onPreUpdate()
-      {
-          $this->updatedAt = new \DateTime("now");
-      }
- 
-      
-     public function setUpdatedAt(DateTimeInterface $updatedAt = null): self
-     {
-         $this->updatedAt = $updatedAt ?? new DateTime("now");
-     }
- 
-     public function getUpdatedAt(): DateTimeInterface
-     {
-         return $this->updatedAt;
-     }
+    public function onPrePersist()
+    {
+        $this->createdAt = new \DateTime("now");
+    }
+
+    public function setCreatedAt(DateTimeInterface $createdAt = null): self
+    {
+        $this->createdAt = $createdAt ?? new DateTime("now");
+    }
+
+    public function getCreatedAt(): DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Gets triggered every time on update
+     * @ORM\PreUpdate
+     */
+    public function onPreUpdate()
+    {
+        $this->updatedAt = new \DateTime("now");
+    }
+
+    public function setUpdatedAt(DateTimeInterface $updatedAt = null): self
+    {
+        $this->updatedAt = $updatedAt ?? new DateTime("now");
+    }
+
+    public function getUpdatedAt(): DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
 }
