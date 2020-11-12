@@ -17,8 +17,8 @@
 				<td></td>
 				<td>{% if payment.calendar %}{{ payment.calendar.exDividendDate ? payment.calendar.exDividendDate|date('d-m-Y') : '' }}{% endif %}</td>
 				<td>{{ payment.payDate|date("d-m-Y") }}</td>
-				<td>{{ (payment.stocks/100)|format_number({fraction_digit: 2})}}</td>
-				<td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend/100)|format_number({fraction_digit: 2})}}</td>
+				<td>{{ (payment.amount/10000000)|format_number({fraction_digit: 7})}}</td>
+				<td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend/1000)|format_number({fraction_digit: 3})}}</td>
 				<td>{{ payment.broker }}</td>
 				<td>
 					<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">

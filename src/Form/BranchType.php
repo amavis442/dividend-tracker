@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use App\Form\Factory\CallbackTransformerFactory;
+use App\Form\Factory\CallbackTransformerValutaFactory;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use App\Repository\BranchRepository;
 
@@ -41,9 +41,9 @@ class BranchType extends AbstractType
                 'empty_data' => null,
             ]);
 
-        $callbackTransformer = CallbackTransformerFactory::create();
+        $callbackValutaTransformer = CallbackTransformerValutaFactory::create();
 
-        $builder->get('assetAllocation')->addModelTransformer($callbackTransformer);
+        $builder->get('assetAllocation')->addModelTransformer($callbackValutaTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver)

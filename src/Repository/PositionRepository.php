@@ -59,8 +59,8 @@ class PositionRepository extends ServiceEntityRepository
             ->select('p, tr')
             ->innerJoin('p.ticker', 't')
             ->innerJoin('t.branch', 'i')
-            ->innerJoin('p.transactions', 'tr')
-            ->leftJoin('t.payments', 'pa')
+            ->leftJoin('p.transactions', 'tr')
+            ->leftJoin('p.payments', 'pa')
             ->where('t = :ticker');
             if ($status === self::OPEN) {
                 $queryBuilder->andWhere('p.closed <> 1 or p.closed is null');
@@ -108,7 +108,7 @@ class PositionRepository extends ServiceEntityRepository
             ->select('p, t, i, pa')
             ->innerJoin('p.ticker', 't')
             ->innerJoin('t.branch', 'i')
-            ->leftJoin('t.payments', 'pa')
+            ->leftJoin('p.payments', 'pa')
             ->orderBy($order, $sort);
 
         if (!empty($search)) {
@@ -209,7 +209,7 @@ class PositionRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
 
         if ($allocated) {
-            return $allocated / 100;
+            return $allocated / 1000;
         }
         return 0;
     }
@@ -250,12 +250,12 @@ class PositionRepository extends ServiceEntityRepository
                 $output[$item['tickerId']]['allocation'] = 0;
                 $output[$item['tickerId']]['units'] = 0;
             }
-            $price = $item['price'] / 100;
-            $units = $item['amount'] / 100;
+            $price = $item['price'] / 1000;
+            $amount = $item['amount'] / 10000000;
 
             $allocation = $price * $units;
             $output[$item['tickerId']]['allocation'] += $allocation;
-            $output[$item['tickerId']]['units'] += $units;
+            $output[$item['tickerId']]['amount'] += $amount;
         }
         return $output;
     }

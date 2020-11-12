@@ -30,12 +30,12 @@ class Position
     private $price;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="bigint")
      */
     private $amount;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Ticker", inversedBy="positions")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Ticker")
      * @ORM\JoinColumn(nullable=false)
      */
     private $ticker;
@@ -195,7 +195,7 @@ class Position
 
     public function getAllocated(): int
     {
-        return (int) round(($this->amount * $this->price) / 10000);
+        return (int) round(($this->amount * $this->price));
     }
 
     public function getAllocation(): ?int

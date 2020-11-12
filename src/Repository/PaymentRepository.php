@@ -107,7 +107,7 @@ class PaymentRepository extends ServiceEntityRepository
         $result = $queryBuilder->getQuery()
             ->getResult();
 
-        return $result[0]['total'] / 100;
+        return $result[0]['total'] / 1000;
     }
 
     public function getSumDividends(array $tickerIds)

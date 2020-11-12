@@ -3,16 +3,16 @@ namespace App\Form\Factory;
 
 use Symfony\Component\Form\CallbackTransformer;
 
-class CallbackTransformerFactory
+class CallbackTransformerUnitsFactory
 {
     public static function create() : CallbackTransformer
     { 
         return new CallbackTransformer(
             function ($inputAsInt) {
-                return $inputAsInt / 100;
+                return $inputAsInt / 10000000;
             },
             function ($outputAsInt) {
-                $a = $outputAsInt * 100; 
+                $a = $outputAsInt * 10000000; 
                 return (int)floor($a);
             }
         );

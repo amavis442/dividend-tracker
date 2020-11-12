@@ -11,7 +11,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
-use App\Form\Factory\CallbackTransformerFactory;
+use App\Form\Factory\CallbackTransformerValutaFactory;
+use App\Form\Factory\CallbackTransformerUnitsFactory;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use DateTime;
@@ -51,7 +52,7 @@ class PaymentType extends AbstractType
                 // renders it as a single text box
                 'widget' => 'single_text',
             ])
-            ->add('stocks', NumberType::class, [
+            ->add('units', NumberType::class, [
                 'label' => 'Units',
                 'required' => false,
                 //'input' => 'string',
@@ -75,9 +76,11 @@ class PaymentType extends AbstractType
                 'choices'  => Brokers::list(),
             ]);
 
-        $callbackTransformer = CallbackTransformerFactory::create();
-        $builder->get('dividend')->addModelTransformer($callbackTransformer);
-        $builder->get('stocks')->addModelTransformer($callbackTransformer);
+        $callbackValutaTransformer = CallbackTransformerValutaFactory::create();
+        $callbackUnitsTransformer = CallbackTransformerUnitsFactory::create();
+        
+        $builder->get('dividend')->addModelTransformer($callbackValutaTransformer);
+        $builder->get('units')->addModelTransformer($callbackUnitsTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver)

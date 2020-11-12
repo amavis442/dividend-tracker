@@ -14,7 +14,8 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use App\Form\Factory\CallbackTransformerFactory;
+use App\Form\Factory\CallbackTransformerValutaFactory;
+use App\Form\Factory\CallbackTransformerUnitsFactory;
 
 class PositionType extends AbstractType
 {
@@ -37,14 +38,14 @@ class PositionType extends AbstractType
                 'help' => 'use decimal point if you have a fraction of a stock',
                 'required' => false,
                 'input' => 'string',
-                'scale' => 2,
+                'scale' => 7,
             ])            
             ->add('price', NumberType::class, [
                 'label' => 'Average price',
                 'help' => 'Adjusment if automatic calculation is wrong',
                 'required' => false,
                 'input' => 'string',
-                'scale' => 2,
+                'scale' => 3,
             ])
             ->add('currency', EntityType::class, [
                 'class' => Currency::class,
@@ -59,7 +60,7 @@ class PositionType extends AbstractType
                 'help' => 'Adjusment if automatic calculation is wrong',
                 'required' => false,
                 'input' => 'string',
-                'scale' => 2,
+                'scale' => 3,
             ])
             ->add('allocation_currency', EntityType::class, [
                 'class' => Currency::class,
@@ -84,11 +85,12 @@ class PositionType extends AbstractType
                 ],
             ]);
 
-        $callbackTransformer = CallbackTransformerFactory::create();
+        $callbackValutaTransformer = CallbackTransformerValutaFactory::create();
+        $callbackUnitsTransformer = CallbackTransformerUnitsFactory::create();
 
-        $builder->get('amount')->addModelTransformer($callbackTransformer);
-        $builder->get('price')->addModelTransformer($callbackTransformer);
-        $builder->get('allocation')->addModelTransformer($callbackTransformer);
+        $builder->get('amount')->addModelTransformer($callbackUnitsTransformer);
+        $builder->get('price')->addModelTransformer($callbackValutaTransformer);
+        $builder->get('allocation')->addModelTransformer($callbackValutaTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver)

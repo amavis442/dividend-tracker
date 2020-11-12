@@ -49,6 +49,12 @@ class Ticker
     private $researches;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Payment", mappedBy="ticker")
+     */
+    private $payments;
+
+
+    /**
      * @ORM\ManyToMany(targetEntity="App\Entity\DividendMonth", inversedBy="tickers")
      */
     private $DividendMonths;

@@ -2,8 +2,6 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -19,7 +17,7 @@ class Payment
      */
     private $id;
 
-   /**
+    /**
      * @ORM\Column(type="datetime", name = "pay_date")
      */
     private $payDate;
@@ -61,15 +59,15 @@ class Payment
     private $currency;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Position")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Position", inversedBy="payments")
      * @ORM\JoinColumn(nullable=true)
      */
     private $position;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="bigint", nullable=true)
      */
-    private $units;
+    private $amount;
 
     /**
      * @ORM\Column(type="string", length=40, nullable=true)
@@ -80,7 +78,7 @@ class Payment
      * @ORM\Column(type="datetime", name="created_at")
      */
     private $createdAt;
-    
+
     /**
      * @ORM\Column(type="datetime", name="updated_at", nullable = true)
      */
@@ -90,7 +88,7 @@ class Payment
     {
         return $this->id;
     }
-    
+
     public function getPayDate(): ?\DateTimeInterface
     {
         return $this->payDate;
@@ -121,16 +119,16 @@ class Payment
         return $taxes;
     }
 
-    public function getTicker(): ?Ticker
-    {
-        return $this->ticker;
-    }
-
     public function setTicker(?Ticker $ticker): self
     {
         $this->ticker = $ticker;
 
         return $this;
+    }
+
+    public function getTicker(): ?Ticker
+    {
+        return $this->ticker;
     }
 
     /**
@@ -176,20 +174,20 @@ class Payment
     {
         return $this->calendar !== null;
     }
-    
+
     public function hasrecordDate(): bool
     {
         return $this->calendar !== null;
     }
 
-    public function getUnits(): ?int
+    public function getAmount(): ?int
     {
-        return $this->units;
+        return $this->amount;
     }
 
-    public function setUnits(?int $units): self
+    public function setAmount(?int $amount): self
     {
-        $this->units = $units;
+        $this->amount = $amount;
 
         return $this;
     }
@@ -241,12 +239,11 @@ class Payment
      * Gets triggered every time on update
      * @ORM\PreUpdate
      */
-     public function onPreUpdate()
-     {
-         $this->updatedAt = new \DateTime("now");
-     }
+    public function onPreUpdate()
+    {
+        $this->updatedAt = new \DateTime("now");
+    }
 
-     
     public function setUpdatedAt(DateTimeInterface $updatedAt = null): self
     {
         $this->updatedAt = $updatedAt ?? new DateTime("now");

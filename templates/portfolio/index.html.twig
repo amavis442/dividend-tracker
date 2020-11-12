@@ -13,7 +13,7 @@
             <tr>
                 <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a></th>
                 <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'fullname', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Fullname</a></th>
-                <th>Units</th>
+                <th>Amount</th>
                 <th>Average price</th>
                 <th>Allocation</th>
                 <th>Allocation%</th>
@@ -28,16 +28,16 @@
             {% set ticker = position.ticker %}
             {% set branchLabel = position.ticker.branch.label %}
             {% set tickerId = position.ticker.id|int %}
-            {% set units = position.amount %}
+            {% set amount = position.amount / 10000000 %}
             {% set dividend = dividends[tickerId] ?? 0 %}
-            {% set avgPrice = position.price / 100 %}
-            {% set allocation = position.allocation / 100 %}
+            {% set avgPrice = position.price / 1000 %}
+            {% set allocation = position.allocation / 1000 %}
             {% set percentageAllocation = (allocation / totalInvested) * 100 %}
           
             <tr>
                 <td>{{ ticker.ticker }}</td>
                 <td><a href="{{ path('portfolio_show', {'id': ticker.id}) }}">{{ ticker.fullname }}</a></td>
-                <td>{{ (units/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ amount|format_number({fraction_digit: 7}) }}</td>
                 <td>&euro;{{ avgPrice|format_number({fraction_digit: 2}) }}</td>
                 <td>&euro;{{ allocation|format_number({fraction_digit: 2}) }}</td>
                 <td> {{percentageAllocation|format_number({fraction_digit: 2}) }}%</td>

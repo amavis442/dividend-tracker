@@ -6,7 +6,7 @@
 /public/bundles/
 /var/
 /vendor/
-/test/
+/import/
 ###< symfony/framework-bundle ###
 
 ###> symfony/webpack-encore-bundle ###

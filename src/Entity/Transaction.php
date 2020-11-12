@@ -43,7 +43,7 @@ class Transaction
     private $currency;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="bigint")
      */
     private $amount;
 
@@ -147,6 +147,7 @@ class Transaction
     public function setPrice(?int $price): self
     {
         $this->price = $price;
+
         return $this;
     }
 
@@ -163,11 +164,6 @@ class Transaction
     }
 
     public function getAmount(): ?int
-    {
-        return $this->amount;
-    }
-
-    public function getRawAmount(): ?int
     {
         return $this->amount;
     }
@@ -191,9 +187,9 @@ class Transaction
         return $this;
     }
 
-    public function getProfit(): ?float
+    public function getProfit(): ?int
     {
-        return $this->profit / 100;
+        return $this->profit;
     }
 
     public function setProfit(int $profit): self
@@ -204,7 +200,7 @@ class Transaction
 
     public function getAllocated(): int
     {
-        return (int) round(($this->amount * $this->price) / 10000);
+        return (int) round($this->getAmount() * $this->getPrice() / 1000000000);
     }
 
     public function getAllocation(): ?int

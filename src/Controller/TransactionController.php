@@ -66,15 +66,15 @@ class TransactionController extends AbstractController
                                             $row['direction'] = $d;
                                             break;
                                         case 4:
-                                            $row['amount'] = $val * 100;
+                                            $row['amount'] = $val * 10000000;
                                             break;
                                         case 5:
-                                            $unitPrice = str_replace(" EUR", '', $val) * 100;
+                                            $unitPrice = str_replace(" EUR", '', $val) * 1000;
 
                                             $row['price'] = $unitPrice;
                                             break;
                                         case 6:
-                                            $allocation = str_replace(" EUR", '', $val) * 100;
+                                            $allocation = str_replace(" EUR", '', $val) * 1000;
                                             $row['allocation'] = $allocation;
                                             break;
                                         case 7:
@@ -123,7 +123,7 @@ class TransactionController extends AbstractController
     private function getImportFiles(): array
     {
         $files = [];
-        if ($handle = opendir(dirname(__DIR__) . '/../test')) {
+        if ($handle = opendir(dirname(__DIR__) . '/../import')) {
             echo "Directory handle: $handle\n";
             echo "Entries:\n";
 
@@ -227,7 +227,7 @@ class TransactionController extends AbstractController
             $transactionsAdded = 0;
             $totalTransaction = 0;
 
-            $handle = fopen(dirname(__DIR__) . '/../test/' . $file, 'r');
+            $handle = fopen(dirname(__DIR__) . '/../import/' . $file, 'r');
             $message = $mailParser->parse($handle);
             $htmlContent = '<html>' . $message->getHtmlContent() . '</html>';
 
@@ -341,11 +341,10 @@ class TransactionController extends AbstractController
     }
 
     /**
-     * @Route("/new/{ticker}/{position}/{side}", name="transaction_new", methods={"GET","POST"})
+     * @Route("/new/{position}/{side}", name="transaction_new", methods={"GET","POST"})
      */
     function new (
         Request $request,
-        Ticker $ticker,
         Position $position,
         int $side,
         SessionInterface $session,
@@ -354,14 +353,9 @@ class TransactionController extends AbstractController
         Referer $referer
     ): Response {
         $transaction = new Transaction();
-
-        if ($ticker instanceof Ticker) {
-            $transaction->setTicker($ticker);
-        }
         $currentDate = new DateTime();
         $transaction->setTransactionDate($currentDate);
         $transaction->setSide($side);
-        $transaction->setTicker($ticker);
         $transaction->setPosition($position);
         $currency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
         $transaction->setAllocationCurrency($currency);

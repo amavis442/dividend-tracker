@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
-use App\Form\Factory\CallbackTransformerFactory;
+use App\Form\Factory\CallbackTransformerValutaFactory;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
@@ -49,8 +49,8 @@ class CalendarType extends AbstractType
             ])
         ;
   
-        $callbackTransformer = CallbackTransformerFactory::create();
-        $builder->get('cash_amount')->addModelTransformer($callbackTransformer);
+        $callbackValutaTransformer = CallbackTransformerValutaFactory::create();
+        $builder->get('cash_amount')->addModelTransformer($callbackValutaTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver)

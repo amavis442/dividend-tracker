@@ -4,7 +4,7 @@
 		<tr>
 			<th></th>
 			<th>Transaction date</th>
-			<th>Units</th>
+			<th>Amount</th>
 			<th>Price</th>
 			<th>Allocation</th>
 			<th>avgPrice</th>
@@ -24,10 +24,10 @@
 						</span>
 					</td>
 					<td>{{ transaction.transactionDate|date("d-m-Y") }}</td>
-					<td>{{ (transaction.amount/100)|format_number({fraction_digit: 2}) }}</td>
-					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.price/100)|format_number({fraction_digit: 2}) }}</td>
-					<td>{{ (transaction.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ (transaction.allocation/100)|format_number({fraction_digit: 2}) }}</td>
-					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.avgprice/100)|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ (transaction.amount/10000000)|format_number({fraction_digit: 7}) }}</td>
+					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.price/1000)|format_number({fraction_digit: 3}) }}</td>
+					<td>{{ (transaction.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ (transaction.allocation/1000)|format_number({fraction_digit: 3}) }}</td>
+					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.avgprice/1000)|format_number({fraction_digit: 3}) }}</td>
 					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}<span class="badge badge-{% if transaction.profit > 0 %}success{% else %}danger{% endif %}">{{ transaction.profit }}</span>
 					</td>
 					<td>{{ transaction.broker }}</td>
