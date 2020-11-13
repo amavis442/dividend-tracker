@@ -5,6 +5,8 @@ namespace App\Service;
 use App\Entity\DividendMonth;
 use App\Repository\CalendarRepository;
 use App\Repository\DividendMonthRepository;
+use App\Repository\PositionRepository;
+
 
 class Projection
 {
@@ -36,12 +38,13 @@ class Projection
         $dataSource[$paydate]['tickers'] = [];
         foreach ($dividendMonth->getTickers() as $ticker) {
             $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
-                'units' => 0.0,
+                'amount' => 0.0,
                 'dividend' => 0.0,
                 'payoutdate' => '',
                 'exdividend' => '',
                 'ticker' => $ticker,
                 'calendar' => null,
+                'position' => null,
                 'netPayment' => 0.0,
                 'estimatedPayment' => 0.0
             ];
@@ -69,7 +72,7 @@ class Projection
                 $dataSource[$paydate]['tickers'][$ticker->getTicker()] = $tickerData;
                 $receivedDividendMonth += $tickerData['netPayment'];
 
-                $units = $dataSource[$paydate]['tickers'][$ticker->getTicker()]['units'];
+                $units = $dataSource[$paydate]['tickers'][$ticker->getTicker()]['amount'];
                 $dividend = $dataSource[$paydate]['tickers'][$ticker->getTicker()]['dividend'];
                 $estimatedPayment = ($units * $dividend * (1 - $this->taxDividend)) / $this->exchangeRate;
                 $dataSource[$paydate]['tickers'][$ticker->getTicker()]['estimatedPayment'] = round($estimatedPayment, 2);
@@ -79,12 +82,13 @@ class Projection
 
             if (!isset($item['tickers'][$ticker->getTicker()])) {
                 $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
-                    'units' => 0.0,
+                    'amount' => 0.0,
                     'dividend' => 0.0,
                     'payoutdate' => '',
                     'exdividend' => '',
                     'ticker' => $ticker,
                     'calendar' => null,
+                    'position' => null,
                     'netPayment' => 0.0,
                     'estimatedPayment' => 0.0
                 ];
@@ -95,6 +99,7 @@ class Projection
     }
 
     public function projection(
+        PositionRepository $positionRepository,
         CalendarRepository $calendarRepository,
         DividendMonthRepository $dividendMonthRepository,
         float $taxDividend = 0.15,
@@ -102,11 +107,33 @@ class Projection
     ): array {
         $labels = [];
         $data = [];
+        $dividendEstimate = [];
+
         $this->exchangeRate = $exchangeRate;
         $this->taxDividend = $taxDividend;
 
-        $dividendEstimate = $calendarRepository->getDividendEstimate();
-
+        $dividendEstimate = [];
+        $positions = $positionRepository->findBy(["closed" => 0, "closed" => null]);
+        foreach($positions as $position) {
+            $positionDividendEstimate = $calendarRepository->getDividendEstimate($position);
+            foreach ($positionDividendEstimate as $payDate => $estimate) {
+                if ($payDate) {
+                    if (!isset($dividendEstimate[$payDate])) {
+                        $dividendEstimate[$payDate] = [];
+                        $dividendEstimate[$payDate]['tickers'] = [];
+                        $dividendEstimate[$payDate]['grossTotalPayment'] = 0.0;
+                    }    
+                    $tickers = array_keys($estimate['tickers']);
+                    foreach ($tickers as $symbol) {
+                        $dividendEstimate[$payDate]['tickers'][$symbol] = $estimate['tickers'][$symbol];
+                        $amount = $estimate['tickers'][$symbol]['amount'];
+                        $dividend = $estimate['tickers'][$symbol]['dividend'];    
+                        $dividendEstimate[$payDate]['grossTotalPayment'] += round($amount * $dividend,2);
+                    }
+                }
+            }
+        }
+        ksort($dividendEstimate);
         $this->calcEstimatePayoutPerMonth($dividendEstimate);
 
         $dataSource = [];

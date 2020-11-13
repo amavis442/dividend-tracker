@@ -43,8 +43,8 @@
 								{% set payment = position.netPayment %}
 									<tr class="{% if payment %}table-success{% else %}table-light{%endif%}" >
 										<td>{{ positionLabel }}</td>
-										<td>{{ position.units }}</td>
-										<td>${{ position.dividend }} </td>
+										<td>{{ position.amount }}</td>
+										<td>${{ position.dividend }} </td>										
 										<td>&euro;{{ position.estimatedPayment }} / &euro;{{ payment ? payment : '0' }}</td>
 										<td>
 											<span class="badge badge-warning">{{ position.exdividend }}</span>
@@ -57,9 +57,11 @@
 													<a href="{{ path('portfolio_show', {'id': ticker.id}) }}" class="btn btn-primary">
 														<i class="fas fa-book-open"></i>
 													</a>
-													<a class="btn btn-success" href="{{ path('payment_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment">
+													{% if position.position %}
+													<a class="btn btn-success" href="{{ path('payment_new', {'position': position.position.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment">
 														<i class="far fa-money-bill-alt"></i>
 													</a>
+													{% endif %}
 													{% if not position.calendar %}	
 													<a class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend date">
 														<i class="far fa-calendar-alt"></i>

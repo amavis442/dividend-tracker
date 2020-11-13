@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Calendar;
 use App\Entity\Ticker;
 use App\Entity\Transaction;
+use App\Entity\Position;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -86,21 +87,23 @@ class CalendarRepository extends ServiceEntityRepository
         return $units;
     }
 
-    public function getDividendEstimate(): array
+    public function getDividendEstimate(Position $position): array
     {
         $qb = $this->createQueryBuilder('c')
-            ->select(['c', 't', 'a', 'pa'])
+            ->select(['c','t', 'pa'])
             ->innerJoin('c.ticker', 't')
-            ->innerJoin('t.positions', 'p')
-            ->innerJoin('t.transactions', 'a')
             ->leftJoin('c.payments','pa', 'WITH', 'pa.calendar = c' )
-            ->andWhere('p.closed <> 1 or p.closed is null')
             ->andWhere('YEAR(c.paymentDate) = :year')
+            ->andWhere('c.ticker = :ticker')
             ->setParameter('year', date('Y'))
+            ->setParameter('ticker', $position->getTicker())
             ->getQuery();
         $result = $qb->getResult();
         $output = [];
 
+        $transactions = $position->getTransactions();
+        $ticker = $position->getTicker();
+            
         foreach ($result as $calendar) {
             if ($calendar === null) {
                 continue;
@@ -109,8 +112,6 @@ class CalendarRepository extends ServiceEntityRepository
             if (!isset($output[$paydate])) {
                 $output[$paydate] = [];
             }
-            $ticker = $calendar->getTicker();
-            $transactions = $ticker->getTransactions();
             
             if (!isset($output[$paydate][$ticker->getTicker()])) {
                 $output[$paydate]['tickers'][$ticker->getTicker()] = [];
@@ -119,27 +120,26 @@ class CalendarRepository extends ServiceEntityRepository
                 $output[$paydate]['grossTotalPayment'] = 0.0;
             }
             
-            $units = $this->getPositionSize($transactions, $calendar);
-            $units = $units / 100;
+            $amount = $this->getPositionSize($transactions, $calendar);
+            $amount = $amount / 10000000;
             
             $netPayment = 0.0;
             foreach ($calendar->getPayments() as $payment) {
-                $netPayment += $payment->getDividend() / 100;
+                $netPayment += $payment->getDividend() / 1000;
             }
 
-            $dividend = $calendar->getCashAmount() / 100;
+            $dividend = $calendar->getCashAmount() / 1000;
             $output[$paydate]['tickers'][$ticker->getTicker()] = [
-                'units' => $units,
+                'amount' => $amount,
                 'dividend' => $dividend,
                 'payoutdate' => $calendar->getPaymentDate()->format('d-m-Y'),
                 'exdividend' => $calendar->getExdividendDate()->format('d-m-Y'),
                 'ticker' => $ticker,
                 'netPayment' => $netPayment,
-                'calendar' => $calendar
+                'calendar' => $calendar,
+                'position' => $position,
             ];
-            $output[$paydate]['grossTotalPayment'] += $units * $dividend;
         }
-        ksort($output);
         return $output;
     }
 }

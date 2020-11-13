@@ -84,6 +84,7 @@ class ReportController extends AbstractController
      * @Route("/projection", name="report_projection")
      */
     public function projection(
+        PositionRepository $positionRepository,
         CalendarRepository $calendarRepository,
         DividendMonthRepository $dividendMonthRepository,
         Referer $referer,
@@ -92,7 +93,7 @@ class ReportController extends AbstractController
 
         $referer->set('report_projection');
 
-        $result = $projection->projection($calendarRepository, $dividendMonthRepository, self::TAX_DIVIDEND, self::EXCHANGE_RATE);
+        $result = $projection->projection($positionRepository, $calendarRepository, $dividendMonthRepository, self::TAX_DIVIDEND, self::EXCHANGE_RATE);
         return $this->render('report/projection/index.html.twig', array_merge($result, [
             'controller_name' => 'ReportController',
         ]));
