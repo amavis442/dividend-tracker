@@ -110,7 +110,7 @@ class TransactionController extends AbstractController
                             if (count($row) > 0) {
                                 $transactionDate = DateTime::createFromFormat('d-m-Y H:i:s', $row['handelsdag'] . ' ' . $row['handelstijd']);
                                 $row['transactionDate'] = $transactionDate;
-                                $rows[$transactionDate->format('YmdHis')] = $row;
+                                $rows[$row['nr'] ] = $row;
                             }
                         }
                     }
@@ -237,14 +237,14 @@ class TransactionController extends AbstractController
             $tables = $DOM->getElementsByTagName('table');
             $tableNodes = $tables[3];
             $rows = $this->importData($tableNodes);
-            
+
             if (count($rows) > 0) {
                 ksort($rows);
                 
                 foreach ($rows as $row) {
                     $ticker = $this->preImportCheckTicker($entityManager, $branch, $tickerRepository, $row);
                     $position = $this->preImportCheckPosition($entityManager, $ticker, $currency, $positionRepository, $row);
-                    $transaction = $transactionRepository->findOneBy(['transactionDate' => $row['transactionDate'], 'position' => $position]);
+                    $transaction = $transactionRepository->findOneBy(['transactionDate' => $row['transactionDate'], 'position' => $position, 'meta' => $row['nr']]);
                                         
                     if (!$transaction) {
                         $transaction = new Transaction();
@@ -260,6 +260,8 @@ class TransactionController extends AbstractController
                             ->setPosition($position)
                             ->setExchangeRate($row['wisselkoersen'])
                             ->setJobid($row['opdrachtid'])
+                            ->setMeta($row['nr'])
+                            ->setImportfile($file)
                         ;
 
                         $position->addTransaction($transaction);

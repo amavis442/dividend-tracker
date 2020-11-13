@@ -8,10 +8,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use DateTimeInterface;
 use DateTime;
+//use Doctrine\ORM\Mapping\Index;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TransactionRepository")
  * @ORM\HasLifecycleCallbacks
+ * @ORM\Table(indexes={@ORM\Index(columns={"meta","transaction_date"})})
  */
 class Transaction
 {
@@ -104,6 +106,16 @@ class Transaction
      * @ORM\Column(type="datetime", name="updated_at", nullable = true)
      */
     private $updatedAt;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $meta;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $importfile;
 
     /**
      * @Assert\Callback
@@ -324,5 +336,29 @@ class Transaction
     public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updatedAt;
+    }
+
+    public function getMeta(): ?string
+    {
+        return $this->meta;
+    }
+
+    public function setMeta(?string $meta): self
+    {
+        $this->meta = $meta;
+
+        return $this;
+    }
+
+    public function getImportfile(): ?string
+    {
+        return $this->importfile;
+    }
+
+    public function setImportfile(?string $importfile): self
+    {
+        $this->importfile = $importfile;
+
+        return $this;
     }
 }
