@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use DateTimeInterface;
+use DateTime;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PositionRepository")
@@ -354,7 +356,7 @@ class Position
          $this->updatedAt = $updatedAt ?? new DateTime("now");
      }
  
-     public function getUpdatedAt(): DateTimeInterface
+     public function getUpdatedAt(): ?DateTimeInterface
      {
          return $this->updatedAt;
      }

@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Entity;
+use DateTimeInterface;
+use DateTime;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -249,7 +251,7 @@ class Payment
         $this->updatedAt = $updatedAt ?? new DateTime("now");
     }
 
-    public function getUpdatedAt(): DateTimeInterface
+    public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updatedAt;
     }

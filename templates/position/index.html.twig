@@ -23,9 +23,11 @@
                 </th>
                 <th>Name</th>
                 <th>Industry</th>
-                <th>Units</th>
+                <th>Amount</th>
                 <th>Average price</th>
                 <th>Allocation</th>
+                <th>Pos id</th>
+                <th>Closed at</th>
                 <th>Status</th>
                 <th style="width:20%">actions</th>
             </tr>
@@ -49,6 +51,8 @@
                     
                     <td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
                     <td>{{ (position.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ (position.allocation/100)|format_number({fraction_digit: 2}) }}</td>
+                    <td>{{ position.posid }}</td>
+                    <td>{{ position.updatedAt ? position.updatedAt|date("d/m/Y") : '' }}</td>
                     <td>{{ position.closed == 2 ? 'closed' : 'open'}}</td>
                     <td>
                         <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">

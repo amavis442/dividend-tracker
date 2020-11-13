@@ -331,11 +331,11 @@ class TransactionController extends AbstractController
     private function presetMetrics(Transaction $transaction)
     {
         if ($transaction->getAllocation() && empty($transaction->getPrice())) {
-            $transaction->setPrice($transaction->getAllocation() / ($transaction->getAmount() / 100));
+            $transaction->setPrice($transaction->getAllocation() / ($transaction->getAmount() / 10000000));
             $transaction->setCurrency($transaction->getAllocationCurrency());
         }
         if ($transaction->getPrice() && empty($transaction->getAllocation())) {
-            $transaction->setAllocation($transaction->getPrice() * ($transaction->getAmount() / 100));
+            $transaction->setAllocation($transaction->getPrice() * ($transaction->getAmount() / 10000000));
             $transaction->setAllocationCurrency($transaction->getCurrency());
         }
     }
@@ -374,8 +374,8 @@ class TransactionController extends AbstractController
             $entityManager->persist($position);
             $entityManager->flush();
 
-            $session->set(self::SEARCH_KEY, $transaction->getTicker()->getTicker());
-            $session->set(PortfolioController::SEARCH_KEY, $transaction->getTicker()->getTicker());
+            $session->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
+            $session->set(PortfolioController::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
 
             if ($referer->get()) {
                 return $this->redirect($referer->get());
@@ -420,7 +420,7 @@ class TransactionController extends AbstractController
                 $position->setClosed(1);
             }
             $this->getDoctrine()->getManager()->flush();
-            $session->set(self::SEARCH_KEY, $transaction->getTicker()->getTicker());
+            $session->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
 
             if ($referer->get()) {
                 return $this->redirect($referer->get());
