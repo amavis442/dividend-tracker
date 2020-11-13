@@ -322,6 +322,19 @@ class Position
         return $this;
     }
 
+    public function isDividendPayMonth(): bool
+    {
+        $currentMonth = date('m');
+        $months = $this->getTicker()->getDividendMonths()->getValues();
+        foreach ($months as $dividendMonth) {
+            if ($dividendMonth->getDividendMonth() === (int)$currentMonth) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     /**
      * Gets triggered only on insert
      * @ORM\PrePersist
