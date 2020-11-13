@@ -60,6 +60,8 @@
                                 <a href="{{ path('position_show', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details position">
                                     <i class="fas fa-book-open"></i>
                                 </a>
+                                <a class="btn btn-success" href="{{ path('payment_new', {'position': position.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment"><i class="far fa-money-bill-alt"></i></a>
+                            
                                 <a href="{{ path('position_edit', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit position">
                                     <i class="far fa-edit"></i>
                                 </a>

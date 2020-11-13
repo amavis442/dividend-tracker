@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Payment;
 use App\Entity\Ticker;
+use App\Entity\Position;
 use App\Form\PaymentType;
 use App\Repository\PaymentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -142,20 +143,21 @@ class PaymentController extends AbstractController
     }
 
     /**
-     * @Route("/new/{ticker}", name="payment_new", methods={"GET","POST"})
+     * @Route("/new/{position}", name="payment_new", methods={"GET","POST"})
      */
     public function new(
         Request $request,
-        Ticker $ticker,
+        position $position,
         CalendarRepository $calendarRepository,
         TickerRepository $tickerRepository,
         Referer $referer
     ): Response {
-        $units  = $tickerRepository->getActiveUnits($ticker);
+        $ticker = $position->getTicker();
+        $amount = $position->getAmount();//$tickerRepository->getActiveUnits($ticker);
 
         $payment = new Payment();
-        $payment->setTicker($ticker);
-        $payment->setStocks($units);
+        $payment->setAmount($amount);
+        $payment->setPosition($position);
         $calendar = $calendarRepository->getLastDividend($ticker);
         if ($calendar) {
             $payment->setCalendar($calendar);
@@ -169,7 +171,6 @@ class PaymentController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
             $payment->setTicker($ticker);
-
             $entityManager->persist($payment);
             $entityManager->flush();
 

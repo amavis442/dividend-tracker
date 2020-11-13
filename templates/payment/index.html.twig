@@ -31,10 +31,10 @@
 	<table class="table">
 		<thead>
 			<tr>
+				<th>Pay date</th>
 				<th>Ticker</th>
 				<th>Industry</th>
-				<th>Units</th>
-				<th>Pay date</th>
+				<th>Amount</th>
 				<th>Dividend(&euro;)</th>
 				<th>Taxes (15%)</th>
 				<th>Broker</th>
@@ -44,13 +44,13 @@
 		<tbody>
 			{% for payment in payments %}
 				<tr>
-					<td>{{ payment.ticker.fullname }}
-						({{ payment.ticker.ticker }})</td>
-					<td>{{ payment.ticker.branch.label }}</td>
-					<td>{{ payment.stocks/100|format_number({fraction_digit: 2}) }}</td>
 					<td>{{ payment.payDate ? payment.payDate|date('d-m-Y') : '' }}</td>
-					<td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend/100)|format_number({fraction_digit: 2}) }}</td>
-					<td>&euro;{{ (payment.taxes/100)|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ payment.position.ticker.fullname }}
+						({{ payment.position.ticker.ticker }})</td>
+					<td>{{ payment.position.ticker.branch.label }}</td>
+					<td>{{ (payment.amount/10000000)|format_number({fraction_digit: 7}) }}</td>
+					<td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend/1000)|format_number({fraction_digit: 2}) }}</td>
+					<td>&euro;{{ (payment.taxes/1000)|format_number({fraction_digit: 2}) }}</td>
 					<td>{{ payment.broker }}</td>
 					<td>
 						<a href="{{ path('payment_show', {'id': payment.id}) }}" class="btn btn-primary">

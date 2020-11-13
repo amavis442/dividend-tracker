@@ -24,7 +24,7 @@ class PaymentType extends AbstractType
         $payment = $options['data'];
         $tickerId = null;
         if ($payment instanceof Payment) {
-            $tickerId = $payment->getTicker()->getId();
+            $tickerId = $payment->getPosition()->getTicker()->getId();
         }
 
         $builder
@@ -52,11 +52,11 @@ class PaymentType extends AbstractType
                 // renders it as a single text box
                 'widget' => 'single_text',
             ])
-            ->add('units', NumberType::class, [
-                'label' => 'Units',
+            ->add('amount', NumberType::class, [
+                'label' => 'amount',
                 'required' => false,
                 //'input' => 'string',
-                'scale' => 2,
+                'scale' => 7,
             ])
             ->add('dividend', NumberType::class, [
                 'label' => 'Dividend',
@@ -80,7 +80,7 @@ class PaymentType extends AbstractType
         $callbackUnitsTransformer = CallbackTransformerUnitsFactory::create();
         
         $builder->get('dividend')->addModelTransformer($callbackValutaTransformer);
-        $builder->get('units')->addModelTransformer($callbackUnitsTransformer);
+        $builder->get('amount')->addModelTransformer($callbackUnitsTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver)
