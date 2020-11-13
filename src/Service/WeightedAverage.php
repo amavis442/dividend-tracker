@@ -55,8 +55,9 @@ class WeightedAverage
             }
 
             if ($transaction->getSide() === Transaction::SELL) {
-                $calcAllocation = ($amount / 10000) * $avgPrice;
+                $calcAllocation = ($amount * $avgPrice)/ 10000;
                 $profit = (int) round($allocation - $calcAllocation, 0);
+                //dd('Amount: '.$amount, 'AvgPrice: '. $avgPrice, 'Allocation: '.$allocation, 'Calc Allocation: '.$calcAllocation, 'Profit: '.$profit);
                 $transaction->setProfit($profit);
 
                 $numShares -= $amount;

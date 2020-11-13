@@ -200,7 +200,7 @@ class Transaction
 
     public function getAllocated(): int
     {
-        return (int) round($this->getAmount() * $this->getPrice() / 1000000000);
+        return (int) round($this->getAmount() * $this->getPrice() / 10000000000);
     }
 
     public function getAllocation(): ?int
