@@ -41,7 +41,7 @@
                 <td>&euro;{{ avgPrice|format_number({fraction_digit: 2}) }}</td>
                 <td>&euro;{{ allocation|format_number({fraction_digit: 2}) }}</td>
                 <td> {{percentageAllocation|format_number({fraction_digit: 2}) }}%</td>
-                <td>&euro;{{ (dividend/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>&euro;{{ (dividend/1000)|format_number({fraction_digit: 2}) }}</td>
                 <td>{{ branchLabel}}</td>
                 <td>{{ position.posid }}</td>
                 <td>
