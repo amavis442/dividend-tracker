@@ -50,9 +50,9 @@
                             <a class="btn btn-success" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id,'side': 1, }) }}" data-toggle="tooltip" data-placement="top" title="Buy"><i class="fas fa-plus"></i></a>
                             <a href="{{ path('portfolio_show', {'id': ticker.id}) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
                             <a class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend date"><i class="far fa-calendar-alt"></i></a>
-                            <a class="btn btn-success" href="{{ path('payment_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment"><i class="far fa-money-bill-alt"></i></a>
+                            <a class="btn btn-success" href="{{ path('payment_new', {'position': position.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment"><i class="far fa-money-bill-alt"></i></a>
                             <a class="btn btn-secondary" href="{{ path('research_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add/edit research"><i class="fab fa-searchengin"></i></a>
-                            <a class="btn btn-danger" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id, 'side': 2}) }}" data-toggle="tooltip" data-placement="top" title="Sell"><i class="fas fa-minus"></i></a>
+                            <a class="btn btn-danger" href="{{ path('transaction_new', {'position': position.id, 'side': 2}) }}" data-toggle="tooltip" data-placement="top" title="Sell"><i class="fas fa-minus"></i></a>
                         </div>
                     </div>
                 </td>
