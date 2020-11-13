@@ -35,7 +35,7 @@
                 <td>{{ calendar.paymentDate ? calendar.paymentDate|date('d-m-Y') : '' }}</td>
                 <td>{{ calendar.exDividendDate ? calendar.exDividendDate|date('d-m-Y') : '' }}</td>
                 <td>{{ calendar.recordDate ? calendar.recordDate|date('d-m-Y') : '' }}</td>
-                <td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount/1000)|format_number({fraction_digit: 2}) }}</td>
                 <td>
                     <a href="{{ path('calendar_show', {'id': calendar.id}) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
                     <a href="{{ path('calendar_edit', {'id': calendar.id}) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>

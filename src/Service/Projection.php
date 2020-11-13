@@ -113,7 +113,7 @@ class Projection
         $this->taxDividend = $taxDividend;
 
         $dividendEstimate = [];
-        $positions = $positionRepository->findBy(["closed" => 0, "closed" => null]);
+        $positions = $positionRepository->getAllOpen();
         foreach($positions as $position) {
             $positionDividendEstimate = $calendarRepository->getDividendEstimate($position);
             foreach ($positionDividendEstimate as $payDate => $estimate) {
@@ -134,6 +134,7 @@ class Projection
             }
         }
         ksort($dividendEstimate);
+        
         $this->calcEstimatePayoutPerMonth($dividendEstimate);
 
         $dataSource = [];

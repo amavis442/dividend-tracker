@@ -93,6 +93,16 @@ class PositionRepository extends ServiceEntityRepository
         return $paginator;
     }
 
+
+    public function getAllOpen(): array {
+        $qb = $this->createQueryBuilder('p');
+        $qb->where('p.closed = 0 OR p.closed IS NULL');
+    
+        return $qb->getQuery()
+              ->getResult();
+    }
+
+
     private function getQueryBuilder(
         string $orderBy = 't.ticker',
         string $sort = 'ASC',
