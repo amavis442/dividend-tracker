@@ -54,7 +54,15 @@
 								{% set ticker = position.ticker %}
 								{% set payment = position.netPayment %}
 									<tr class="{% if payment %}table-success{% else %}table-light{%endif%}" >
-										<td>{{ positionLabel }}</td>
+										<td>
+											{% if position.position %}
+												<a class="btn btn-success" href="{{ path('portfolio_show', {'id': position.position.ticker.id}) }}">
+												{{ positionLabel }}
+												</a>
+											{% else %}
+												{{ positionLabel }}
+											{% endif %}	
+										</td>
 										<td>{{ position.amount }}</td>
 										<td>${{ position.dividend }} </td>										
 										<td>&euro;{{ position.estimatedPayment }} / &euro;{{ payment ? payment : '0' }}</td>

@@ -7,12 +7,10 @@ use App\Repository\CalendarRepository;
 use App\Repository\DividendMonthRepository;
 use App\Repository\PositionRepository;
 
-
 class Projection
 {
     protected $taxDividend;
     protected $exchangeRate;
-
 
     private function calcEstimatePayoutPerMonth(array &$dividendEstimate)
     {
@@ -46,7 +44,7 @@ class Projection
                 'calendar' => null,
                 'position' => null,
                 'netPayment' => 0.0,
-                'estimatedPayment' => 0.0
+                'estimatedPayment' => 0.0,
             ];
         }
     }
@@ -90,7 +88,7 @@ class Projection
                     'calendar' => null,
                     'position' => null,
                     'netPayment' => 0.0,
-                    'estimatedPayment' => 0.0
+                    'estimatedPayment' => 0.0,
                 ];
             }
         }
@@ -105,7 +103,7 @@ class Projection
         DividendMonthRepository $dividendMonthRepository,
         float $taxDividend = 0.15,
         float $exchangeRate = 1.19
-    ): array {
+    ): array{
         $labels = [];
         $data = [];
         $dividendEstimate = [];
@@ -115,27 +113,26 @@ class Projection
 
         $dividendEstimate = [];
         $positions = $positionRepository->getAllOpen();
-        foreach($positions as $position) {
-            $positionDividendEstimate = $calendarRepository->getDividendEstimate($position,$year);
+        foreach ($positions as $position) {
+            $positionDividendEstimate = $calendarRepository->getDividendEstimate($position, $year);
             foreach ($positionDividendEstimate as $payDate => $estimate) {
                 if ($payDate) {
                     if (!isset($dividendEstimate[$payDate])) {
                         $dividendEstimate[$payDate] = [];
                         $dividendEstimate[$payDate]['tickers'] = [];
                         $dividendEstimate[$payDate]['grossTotalPayment'] = 0.0;
-                    }    
+                    }
                     $tickers = array_keys($estimate['tickers']);
                     foreach ($tickers as $symbol) {
                         $dividendEstimate[$payDate]['tickers'][$symbol] = $estimate['tickers'][$symbol];
                         $amount = $estimate['tickers'][$symbol]['amount'];
-                        $dividend = $estimate['tickers'][$symbol]['dividend'];    
-                        $dividendEstimate[$payDate]['grossTotalPayment'] += round($amount * $dividend,2);
+                        $dividend = $estimate['tickers'][$symbol]['dividend'];
+                        $dividendEstimate[$payDate]['grossTotalPayment'] += round($amount * $dividend, 2);
                     }
                 }
             }
         }
         ksort($dividendEstimate);
-        
         $this->calcEstimatePayoutPerMonth($dividendEstimate);
 
         $dataSource = [];
