@@ -45,7 +45,7 @@ class CalendarType extends AbstractType
                 'label' => 'Dividend',
                 'required' => false,
                 //'input' => 'string',
-                'scale' => 2,
+                'scale' => 3,
             ])
         ;
   

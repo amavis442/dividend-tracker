@@ -99,6 +99,7 @@ class Projection
     }
 
     public function projection(
+        ?int $year = null,
         PositionRepository $positionRepository,
         CalendarRepository $calendarRepository,
         DividendMonthRepository $dividendMonthRepository,
@@ -115,7 +116,7 @@ class Projection
         $dividendEstimate = [];
         $positions = $positionRepository->getAllOpen();
         foreach($positions as $position) {
-            $positionDividendEstimate = $calendarRepository->getDividendEstimate($position);
+            $positionDividendEstimate = $calendarRepository->getDividendEstimate($position,$year);
             foreach ($positionDividendEstimate as $payDate => $estimate) {
                 if ($payDate) {
                     if (!isset($dividendEstimate[$payDate])) {

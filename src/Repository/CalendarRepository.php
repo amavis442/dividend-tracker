@@ -3,13 +3,13 @@
 namespace App\Repository;
 
 use App\Entity\Calendar;
+use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Transaction;
-use App\Entity\Position;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Doctrine\Common\Collections\Collection;
 
 /**
  * @method Calendar|null find($id, $lockMode = null, $lockVersion = null)
@@ -20,7 +20,7 @@ use Doctrine\Common\Collections\Collection;
 class CalendarRepository extends ServiceEntityRepository
 {
     use PagerTrait;
-    
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Calendar::class);
@@ -72,7 +72,7 @@ class CalendarRepository extends ServiceEntityRepository
         $units = 0;
 
         foreach ($transactions as $transaction) {
-            if ($transaction->getTransactionDate() >= $item->getExdividendDate()){
+            if ($transaction->getTransactionDate() >= $item->getExdividendDate()) {
                 continue;
             }
             $amount = $transaction->getAmount();
@@ -87,15 +87,19 @@ class CalendarRepository extends ServiceEntityRepository
         return $units;
     }
 
-    public function getDividendEstimate(Position $position): array
+    public function getDividendEstimate(Position $position, ?int $year = null): array
     {
+        if (!$year) {
+            $year = date('Y');
+        }
+
         $qb = $this->createQueryBuilder('c')
-            ->select(['c','t', 'pa'])
+            ->select(['c', 't', 'pa'])
             ->innerJoin('c.ticker', 't')
-            ->leftJoin('c.payments','pa', 'WITH', 'pa.calendar = c' )
+            ->leftJoin('c.payments', 'pa', 'WITH', 'pa.calendar = c')
             ->andWhere('YEAR(c.paymentDate) = :year')
             ->andWhere('c.ticker = :ticker')
-            ->setParameter('year', date('Y'))
+            ->setParameter('year', $year)
             ->setParameter('ticker', $position->getTicker())
             ->getQuery();
         $result = $qb->getResult();
@@ -103,7 +107,7 @@ class CalendarRepository extends ServiceEntityRepository
 
         $transactions = $position->getTransactions();
         $ticker = $position->getTicker();
-            
+
         foreach ($result as $calendar) {
             if ($calendar === null) {
                 continue;
@@ -112,17 +116,17 @@ class CalendarRepository extends ServiceEntityRepository
             if (!isset($output[$paydate])) {
                 $output[$paydate] = [];
             }
-            
+
             if (!isset($output[$paydate][$ticker->getTicker()])) {
                 $output[$paydate]['tickers'][$ticker->getTicker()] = [];
             }
-            if (!isset($output[$paydate]['grossTotalPayment'])){
+            if (!isset($output[$paydate]['grossTotalPayment'])) {
                 $output[$paydate]['grossTotalPayment'] = 0.0;
             }
-            
+
             $amount = $this->getPositionSize($transactions, $calendar);
             $amount = $amount / 10000000;
-            
+
             $netPayment = 0.0;
             foreach ($calendar->getPayments() as $payment) {
                 $netPayment += $payment->getDividend() / 1000;

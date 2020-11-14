@@ -81,21 +81,25 @@ class ReportController extends AbstractController
     }
 
     /**
-     * @Route("/projection", name="report_projection")
+     * @Route("/projection/{projectionyear<\d+>?1}", name="report_projection", methods={"GET", "POST"})
      */
     public function projection(
         PositionRepository $positionRepository,
         CalendarRepository $calendarRepository,
         DividendMonthRepository $dividendMonthRepository,
         Referer $referer,
-        Projection $projection
+        Projection $projection,
+        int $projectionyear
     ): Response {
 
         $referer->set('report_projection');
-
-        $result = $projection->projection($positionRepository, $calendarRepository, $dividendMonthRepository, self::TAX_DIVIDEND, self::EXCHANGE_RATE);
+        if ($projectionyear === 1) {
+            $projectionyear = date('Y');
+        }
+        $result = $projection->projection($projectionyear, $positionRepository, $calendarRepository, $dividendMonthRepository, self::TAX_DIVIDEND, self::EXCHANGE_RATE);
         return $this->render('report/projection/index.html.twig', array_merge($result, [
             'controller_name' => 'ReportController',
+            'year' => $projectionyear,
         ]));
     }
 
