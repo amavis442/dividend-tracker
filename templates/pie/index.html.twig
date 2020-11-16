@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Pie index{% endblock %}
+
+{% block body %}
+    <h1>Pie index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Label</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for pie in pies %}
+            <tr>
+                <td>{{ pie.id }}</td>
+                <td>{{ pie.label }}</td>
+                <td>
+                    <a href="{{ path('pie_show', {'id': pie.id}) }}">show</a>
+                    <a href="{{ path('pie_edit', {'id': pie.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('pie_new') }}">Create new</a>
+{% endblock %}

@@ -48,5 +48,12 @@
 			<th>Allocation(%)</th>
 			<td>{{ percentageAllocated|format_number({fraction_digit: 2}) }}%</td>
 		</tr>
+		<tr>
+			<th>Pies</th>
+			<td>{% for pie in position.pies %}
+                        {{ pie.label }},
+                    {% endfor %}
+			</td>
+		</tr>
 	</tbody>
 </table>

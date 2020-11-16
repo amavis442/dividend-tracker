@@ -36,7 +36,8 @@ class PositionRepository extends ServiceEntityRepository
         string $orderBy = 't.ticker',
         string $sort = 'ASC',
         string $search = '',
-        int $status = self::OPEN
+        int $status = self::OPEN,
+        array $pies = null
     ): Paginator {
 
         $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
@@ -46,6 +47,13 @@ class PositionRepository extends ServiceEntityRepository
         }
         if ($status === self::CLOSED) {
             $queryBuilder->andWhere('p.closed = 1');
+        }
+        if ($pies) {
+            $queryBuilder
+            ->innerJoin('p.pies', 'pies')
+            ->andWhere('pies IN (:pies)')
+            ->setParameter('pies', $pies);;
+
         }
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);

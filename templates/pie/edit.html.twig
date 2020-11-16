@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Pie{% endblock %}
+
+{% block body %}
+    <h1>Edit Pie</h1>
+
+    {{ include('pie/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('pie_index') }}">back to list</a>
+
+    {{ include('pie/_delete_form.html.twig') }}
+{% endblock %}

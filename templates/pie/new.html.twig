@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Pie{% endblock %}
+
+{% block body %}
+    <h1>Create new Pie</h1>
+
+    {{ include('pie/_form.html.twig') }}
+
+    <a href="{{ path('pie_index') }}">back to list</a>
+{% endblock %}

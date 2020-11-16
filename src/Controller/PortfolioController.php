@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Ticker;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
+use App\Repository\PieRepository;
 use App\Service\Summary;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +20,7 @@ use App\Service\Referer;
 class PortfolioController extends AbstractController
 {
     public const SEARCH_KEY = 'portfolio_searchCriteria';
+    public const PIE_KEY = 'portfolio_searchPie';
 
     /**
      * @Route("/list/{page<\d+>?1}/{orderBy}/{sort}", name="portfolio_index", methods={"GET"})
@@ -26,6 +28,7 @@ class PortfolioController extends AbstractController
     public function index(
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
+        PieRepository $pieRepository,
         SessionInterface $session,
         Summary $summary,
         int $page = 1,
@@ -44,8 +47,15 @@ class PortfolioController extends AbstractController
             $sort = 'asc';
         }
 
+        $pies = $pieRepository->findAll();
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
-        $items = $positionRepository->getAll($page, 10, $order, $sort, $searchCriteria);
+        $pieSelected = $session->get(self::PIE_KEY, null);
+        if ($pieSelected && $pieSelected != '-') {
+            $items = $positionRepository->getAll($page, 10, $order, $sort, $searchCriteria, PositionRepository::OPEN, [$pieSelected]);
+        } else {
+            $items = $positionRepository->getAll($page, 10, $order, $sort, $searchCriteria, PositionRepository::OPEN);
+        }
+
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
@@ -72,6 +82,9 @@ class PortfolioController extends AbstractController
             'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'portfolio_index',
             'searchPath' => 'portfolio_search',
+            'piePath' => 'portfolio_pie',
+            'pies' => $pies,
+            'pieSelected' => $pieSelected ?? 1,
             'numActivePosition' => $numActivePosition,
             'numPosition' => $numActivePosition,
             'numTickers' => $numTickers,
@@ -130,4 +143,15 @@ class PortfolioController extends AbstractController
 
         return $this->redirectToRoute('portfolio_index');
     }
+
+    /**
+     * @Route("/pie", name="portfolio_pie", methods={"POST"})
+     */
+     public function pie(Request $request, SessionInterface $session): Response
+     {
+         $pie = $request->request->get('pie');
+         $session->set(self::PIE_KEY, $pie);
+ 
+         return $this->redirectToRoute('portfolio_index');
+     }
 }

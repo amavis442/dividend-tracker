@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Currency;
+use App\Entity\Pie;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -31,6 +32,19 @@ class PositionType extends AbstractType
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('t')
                         ->orderBy('t.ticker', 'ASC');
+                },
+            ])
+            ->add('pies', EntityType::class, [
+                'class' => Pie::class,
+                'label' => 'Pie',
+                'choice_label' => 'label',
+                'required' => false,
+                'placeholder' => 'Please choose a Pie',
+                'empty_data' => null,
+                'multiple'    => true,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('pie')
+                        ->orderBy('pie.label', 'ASC');
                 },
             ])
             ->add('amount', NumberType::class, [

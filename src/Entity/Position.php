@@ -101,10 +101,21 @@ class Position
      */
     private $updatedAt;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Pie", inversedBy="positions")   
+     * @ORM\OrderBy({"label" = "DESC"})
+     * @ORM\JoinTable(name="pie_position",
+     *      joinColumns={@ORM\JoinColumn(name="position_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="pie_id", referencedColumnName="id")}
+     *      )
+     */
+    private $pies;
+
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
         $this->payments = new ArrayCollection();
+        $this->pies = new ArrayCollection();
     }
 
     /**
@@ -372,5 +383,41 @@ class Position
      public function getUpdatedAt(): ?DateTimeInterface
      {
          return $this->updatedAt;
+     }
+
+     /**
+      * @return Collection|Pie[]
+      */
+     public function getPies(): Collection
+     {
+         return $this->pies;
+     }
+
+     public function addPie(Pie $pie): self
+     {
+         if (!$this->pies->contains($pie)) {
+             $this->pies[] = $pie;
+             $pie->addPosition($this);
+         }
+
+         return $this;
+     }
+
+     public function removePie(Pie $pie): self
+     {
+         if ($this->pies->removeElement($pie)) {
+             $pie->removePosition($this);
+         }
+
+         return $this;
+     }
+
+     public function hasPie(): bool
+     {
+         if (count($this->pies) > 0 ) {
+             return true;
+         }
+
+         return false;
      }
 }

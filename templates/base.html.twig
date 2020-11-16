@@ -22,8 +22,9 @@
             {% include 'menu.html.twig' %}
         </div>
 
-        <div class="container"> {% block body %}{% endblock %}
-            </div>
+        <div class="container"> 
+            {% block body %}{% endblock %}
+        </div>
             {% block javascripts %}
                 {{ encore_entry_script_tags('app') }}
                 {% block extrajavascripts %}

@@ -7,8 +7,27 @@
     {% include '_summary.html.twig' %}
     <br/>
     <br/>
+    <div class="row">
+        <div class="col">
     {% include '_search_form.html.twig' %}
-    <table class="table">
+        </div>
+        <div class="col">
+    <form action="{{ path(piePath) }}" method="POST" class="form-inline">
+        <input type="hidden" name="_method" value="POST">
+        <div class="form-group mx-sm-3 mb-2">
+            <select name='pie' class="form-control">
+                <option value ='0'>-</option>
+                {% for p in pies %}
+                    <option value="{{ p.id }}" {% if pieSelected == p.id %}selected{% endif %}>{{ p.label }}</option>
+                {% endfor %}
+            </select>
+       </div>
+        <button class="btn btn-secondary mb-2" data-toggle="tooltip" data-placement="top" title="Search Ticker"><i class="fas fa-search"></i></button>
+    </form>
+        </div>
+    </div>
+
+    <table class="table table-sm">
         <thead>
             <tr>
                 <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a></th>
@@ -20,6 +39,7 @@
                 <th>Dividends</th>
                 <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'industry', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Industry</a></th>
                 <th>Pos</th>
+                <th>Pies</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -44,6 +64,10 @@
                 <td>&euro;{{ (dividend/1000)|format_number({fraction_digit: 2}) }}</td>
                 <td>{{ branchLabel}}</td>
                 <td>{{ position.posid }}</td>
+                <td>{% for pie in position.pies %}
+                        {{ pie.label }},
+                    {% endfor %}
+				</td>
                 <td>
                     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                         <div class="btn-group mr-2" role="group" aria-label="First group">

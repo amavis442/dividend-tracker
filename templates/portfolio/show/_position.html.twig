@@ -7,6 +7,7 @@
 			<th>Weighted average price</th>
 			<th>Allocation</th>
 			<th>Profit / Loss</th>
+			<th>Pie</th>
 			<th>Actions</th>
 		</tr>
 	</thead>
@@ -22,6 +23,10 @@
 				<td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price/1000)|format_number({fraction_digit: 2}) }}</td>
 				<td>{{ allocationSign|raw }}{{ (position.allocation/1000)|format_number({fraction_digit: 2}) }}</td>
 				<td>{{ allocationSign|raw }}{{ (position.profit/1000)|format_number({fraction_digit: 2})}}</td>
+				<td>{% for pie in position.pies %}
+                        {{ pie.label }},
+                    {% endfor %}
+				</td>
 				<td>
 					<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 						<div class="btn-group mr-2" role="group" aria-label="First group">
