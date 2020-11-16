@@ -5,62 +5,10 @@
 
 {% block body %}
 	<p class="h1">Allocation information</p>
-	{% include '_summary.html.twig' %}
-	<br/>
-	<br/>
 
 	<div style='width:900px;height:600px' class="col col-xs-12">
 		<canvas id="myChartAllocation"></canvas>
 	</div>
-
-	<div class="accordion" id="accordionExample">
-		{% set collapseId = 0 %}
-		{% for label, sector in sectors %}
-			{% set collapseId = collapseId + 1  %}
-			<div class="card">
-				<div class="card-header" id="heading{{ collapseId }}">
-					<div class="d-flex flex-row bd-highlight">
-						<div class="item">
-							<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ collapseId }}" aria-expanded="true" aria-controls="collapse{{ collapseId }}">{{ label }}</button>
-						</div>
-						<div class="item">&euro;{{ (sector.sectorAllocation/100)|format_number({fraction_digit: 2}) }}</div>
-						<div class="item">{{ sector.sectorAllocationPercentage }}%</div>
-						<div class="item">
-							<span class="badge badge-info">{{ sector.sectorTargetAllocation }}%</span>
-						</div>
-					</div>
-				</div>
-
-				<div id="collapse{{ collapseId }}" class="collapse" aria-labelledby="heading{{ collapseId }}" data-parent="#accordionExample">
-					<div class="card-body">
-						<table class="table">
-							<thead class="thead-dark">
-								<tr>
-									<th>Company</th>
-									<th>Units</th>
-									<th>Allocation</th>
-									<th>Sector Allocation(%)</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for position in sector.sectorPositions %}
-									<tr>
-										<td>{{ position.positionLabel }}</td>
-										<td>{{ (position.positionAmount/100)|format_number({fraction_digit: 2}) }}</td>
-										<td>&euro;{{ (position.positionAllocation/100)|format_number({fraction_digit: 2}) }}</td>
-										<td>{{ position.positionAllocationPercentage }}%</td>
-									</tr>
-									<tr>
-								{% endfor %}
-							</tbody>
-						</table>
-						{% include 'report/allocation/_chart_per_sector.html.twig' %}
-					</div>
-				</div>
-			</div>
-		{% endfor %}
-	</div>
-
 
 {% endblock %}
 
@@ -70,35 +18,37 @@
 	{% include "report/_colors.html.twig" %}
 <script type="text/javascript">
 	var config = {
-	type: 'pie',
-	data: {
-	datasets: [
-	{
-	data: {{ data|raw }},
-	backgroundColor: [
-	window.chartColors.red,
-	window.chartColors.orange,
-	window.chartColors.yellow,
-	window.chartColors.green,
-	window.chartColors.blue,
-	window.chartColors.purple,
-	window.chartColors.beige,
-	window.chartColors.lightgreen,
-	window.chartColors.grey,
-	],
-	label: 'Allocation'
-	}
-	],
-	labels: {{ labels|raw }}
-	},
-	options: {
-	responsive: true,
-	title: {
-	display: true,
-	fontSize: 24,
-	text: 'Allocation per sector'
-	}
-	}
+		type: 'pie',
+		data: {
+			datasets: [
+			{
+				data: {{ data|raw }},
+				backgroundColor: [
+					window.chartColors.red,
+					window.chartColors.orange,
+					window.chartColors.yellow,
+					window.chartColors.green,
+					window.chartColors.blue,
+					window.chartColors.purple,
+					window.chartColors.beige,
+					window.chartColors.lightgreen,
+					window.chartColors.grey,
+					window.chartColors.aqua,
+					window.chartColors.lightorange,
+				],
+				label: 'Allocation'
+			}
+			],
+				labels: {{ labels|raw }}
+		},
+		options: {
+			responsive: true,
+			title: {
+				display: true,
+				fontSize: 24,
+				text: 'Allocation per sector'
+			}
+		}
 	};
 
 var ctxAllocation = document.getElementById('myChartAllocation').getContext('2d');

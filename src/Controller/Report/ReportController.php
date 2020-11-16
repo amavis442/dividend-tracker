@@ -35,7 +35,7 @@ class ReportController extends AbstractController
         PositionRepository $positionRepository,
         Allocation $allocation
     ): Response {
-        $data = $allocation->allocation($branchRepository, $positionRepository);
+        $data = $allocation->allocation($positionRepository);
 
         return $this->render('report/index.html.twig', [
             'data' => $data,
@@ -67,8 +67,8 @@ class ReportController extends AbstractController
         Summary $summary,
         Allocation $allocation
     ) {
-        $result = $allocation->sector($positionRepository, $branchRepository, $summary);
-
+        //$result = $allocation->sector($positionRepository, $branchRepository, $summary);
+        $result = $allocation->allocation($positionRepository);
         return $this->render('report/allocation/index.html.twig', array_merge($result, ['controller_name' => 'ReportController']));
     }
 

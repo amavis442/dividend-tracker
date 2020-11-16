@@ -9,41 +9,34 @@ use App\Service\Summary;
 class Allocation
 {
     public function allocation(
-        BranchRepository $branchRepository,
         PositionRepository $positionRepository
     ): array {
         $allocated = $positionRepository->getSumAllocated();
-        $branches = $branchRepository->findAll();
+        $positions = $positionRepository->getAllOpen();
 
         $data = [];
-        foreach ($branches as $branch) {
-            $item = [
-                'industry' => $branch->getLabel(),
-                'allocation' => 0,
-                'allocationPercentage' => 0,
-                'targetAllocationPercentage' => $branch->getAssetAllocation() / 100,
-                'dividend' => 0,
-                'tickers' => 0,
-            ];
-
-            $tickers = $branch->getTickers();
-            foreach ($tickers as $tickers) {
-                $item['tickers'] += 1;
-                foreach ($tickers->getPositions() as $position) {
-                    $item['allocation'] += $position->getAllocation();
-                    $item['dividend'] += $position->getDividend();
-                }
+        $items = [];
+        $totalAllocation = 0.0;
+        foreach ($positions as $position) {
+            if (!isset($items[$position->getTicker()->getBranch()->getLabel()])) {
+                $items[$position->getTicker()->getBranch()->getLabel()] = 0.0;
             }
-            $item['allocationPercentage'] = 0;
-            if ($allocated > 0) {
-                $item['allocationPercentage'] = ((int) $item['allocation'] / (int) $allocated) * 100;
-            }
-            $data[$item['allocation']] = $item;
+            $allocation = $position->getAllocation() / 1000;
+            $items[$position->getTicker()->getBranch()->getLabel()] += $allocation;
+            $totalAllocation += $allocation;
         }
-
-        krsort($data);
-
-        return $data;
+        krsort($items);
+    
+        foreach ($items as $branch => $allocation) {
+            $allocationPercentage = ($allocation / $totalAllocation) * 100;
+            
+            $data[$branch] = round($allocationPercentage, 2);
+        }        
+        
+        return  [
+            'data' => json_encode(array_values($data)),
+            'labels' => json_encode(array_keys($items)),
+        ];
     }
 
     public function sector(
