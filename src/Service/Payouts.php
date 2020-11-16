@@ -3,12 +3,13 @@
 namespace App\Service;
 
 use App\Repository\PaymentRepository;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class Payouts
 {
-    public function payout(PaymentRepository $paymentRepository): array
+    public function payout(PaymentRepository $paymentRepository, UserInterface $user): array
     {
-        $data = $paymentRepository->getDividendsPerInterval();
+        $data = $paymentRepository->getDividendsPerInterval('Month',$user);
         $labels = [];
         $dates = array_keys($data);
         foreach ($dates as $date) {
@@ -16,8 +17,8 @@ class Payouts
         }
 
         foreach ($data as $item) {
-            $dividends[] = ($item['dividend'] / 100);
-            $accumulative[] = ($item['accumulative'] / 100);
+            $dividends[] = ($item['dividend'] / 1000);
+            $accumulative[] = ($item['accumulative'] / 1000);
         }
 
         return [

@@ -17,6 +17,7 @@ use App\Service\Allocation;
 use App\Service\Yields;
 use App\Service\Payouts;
 use App\Service\Projection;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @Route("/dashboard/report")
@@ -47,9 +48,10 @@ class ReportController extends AbstractController
      */
     public function payouts(
         PaymentRepository $paymentRepository,
-        Payouts $payout
+        Payouts $payout,
+        UserInterface $user
     ): Response {
-        $result = $payout->payout($paymentRepository);
+        $result = $payout->payout($paymentRepository, $user);
 
         return $this->render('report/payout/index.html.twig', array_merge($result, [
             'controller_name' => 'ReportController',

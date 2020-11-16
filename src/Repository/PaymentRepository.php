@@ -9,6 +9,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use App\Helper\DateHelper;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @method Payment|null find($id, $lockMode = null, $lockVersion = null)
@@ -130,15 +131,16 @@ class PaymentRepository extends ServiceEntityRepository
         return $output;
     }
 
-    public function getDividendsPerInterval(string $interval = 'Month'): array
+    public function getDividendsPerInterval(string $interval = 'Month', UserInterface $user): array
     {
         $con = $this->getEntityManager()->getConnection();
 
-        $sql = 'SELECT YEAR(p.pay_date) periodYear, MONTH(p.pay_date) as periodMonth, SUM(p.dividend) dividend from payment p GROUP BY YEAR(p.pay_date), MONTH(p.pay_date)';
+        $sql = 'SELECT YEAR(p.pay_date) periodYear, MONTH(p.pay_date) as periodMonth, SUM(p.dividend) dividend 
+                from payment p WHERE p.user_id = '.$user->getId().' GROUP BY YEAR(p.pay_date), MONTH(p.pay_date)';
 
         $result = $con->fetchAll($sql);
 
-        $sql = 'SELECT YEAR(MIN(p.pay_date)) as startdate from payment p GROUP BY YEAR(p.pay_date) LIMIT 1';
+        $sql = 'SELECT YEAR(MIN(p.pay_date)) as startdate from payment p WHERE p.user_id = '.$user->getId().' GROUP BY YEAR(p.pay_date) LIMIT 1';
         $years = $con->fetchAll($sql);
         $currentYear = date('Y');
         $startYear = $years[0]['startdate'] ?? $currentYear;
