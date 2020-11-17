@@ -62,10 +62,10 @@
                 <td>&euro;{{ allocation|format_number({fraction_digit: 2}) }}</td>
                 <td> {{percentageAllocation|format_number({fraction_digit: 2}) }}%</td>
                 <td>&euro;{{ (dividend/1000)|format_number({fraction_digit: 2}) }}</td>
-                <td>{{ branchLabel}}</td>
+                <td><span class="badge badge-secondary">{{ branchLabel}}</span></td>
                 <td>{{ position.posid }}</td>
                 <td>{% for pie in position.pies %}
-                        {{ pie.label }},
+                        <span class="badge badge-primary">{{ pie.label }}</span>
                     {% endfor %}
 				</td>
                 <td>
