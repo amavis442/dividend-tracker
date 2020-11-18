@@ -48,7 +48,7 @@ class PositionType extends AbstractType
                 },
             ])
             ->add('amount', NumberType::class, [
-                'label' => 'Units',
+                'label' => 'Amount',
                 'help' => 'use decimal point if you have a fraction of a stock',
                 'required' => false,
                 'input' => 'string',

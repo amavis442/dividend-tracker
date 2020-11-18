@@ -116,7 +116,6 @@ class PositionController extends AbstractController
 
             $transaction = new Transaction();
             $transaction->setSide(Transaction::BUY)
-                ->setTicker($position->getTicker())
                 ->setAmount($position->getAmount())
                 ->setPrice($position->getPrice())
                 ->setCurrency($position->getCurrency())
