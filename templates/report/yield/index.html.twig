@@ -8,13 +8,13 @@
   		<div class="card-body">
 		  <strong>Yield on cost dividend:</strong><br/>
 		  Total dividend in a year / total allocated = 
-		  {{ totalDividend|format_number({fraction_digit: 2}) }} / 
-		  {{ allocated|format_number({fraction_digit: 2}) }} =
+		  &euro;{{ totalNetYearlyDividend|format_number({fraction_digit: 2}) }} / 
+		  &euro;{{ allocated|format_number({fraction_digit: 2}) }} =
 		  <strong>{{ dividendYieldOnCost|format_number({fraction_digit: 2}) }}%</strong>
 		</div>
 	</div>
 
-    <div style='width:900px;height:600px' class="col col-xs-12">
+    <div style='width:1000px;height:600px' class="col col-xs-12">
         <canvas id="myChart" ></canvas>
     </div>
 
@@ -23,12 +23,16 @@
 			<thead class="thead-dark">
 			<tr>
 				<th><a href="{{ path('report_dividend_yield', {'orderBy': 'ticker'}) }}">Ticker</a></th>
-				<th>Share</th>
+				<th>Company</th>
 				<th>avgPrice</th>
-				<th><a href="{{ path('report_dividend_yield', {'orderBy': 'yield'}) }}">Yield</a></th>
-				<th><a href="{{ path('report_dividend_yield', {'orderBy': 'dividend'}) }}">Dividend</a></th>
 				<th>Last dividend</th>
-				<th>Last payout date</th>				
+				<th>Last payout date</th>
+				<th>#Payouts per year</th>
+				<th><a href="{{ path('report_dividend_yield', {'orderBy': 'dividend'}) }}">Dividend</a></th>
+				<th><a href="{{ path('report_dividend_yield', {'orderBy': 'yield'}) }}">Yield</a></th>
+				<th>Net forward yearly dividend per share</th>
+				<th>Amount</th>
+				<th>Net forward yearly dividend total</th>
 			</tr>
 			</thead>
 			<tbody>
@@ -36,17 +40,23 @@
 				<tr>
 					<td>{{ item.ticker }}</td>
 					<td>{{ item.label }}</td>
-					<td>&euro;{{ (item.avgPrice/100)|format_number({fraction_digit: 2}) }}</td>
-					<td>{{ item.yield }}%</td>
-					<td>${{ (item.payout/100)|format_number({fraction_digit: 2}) }}</td>
-					<td>${{ (item.lastDividend/100)|format_number({fraction_digit: 2}) }}</td>
+					<td>&euro;{{ (item.avgPrice)|format_number({fraction_digit: 2}) }}</td>
+					<td>${{ (item.lastDividend)|format_number({fraction_digit: 2}) }}</td>
 					<td>{% if item.lastDividendDate is not null %}{{ item.lastDividendDate|date("d-m-Y") }}{% else %} - {% endif %}</td>
+					<td>{{ item.numPayoutsPerYear }}</td>
+					<td>${{ (item.payout)|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ item.yield }}%</td>
+					<td>&euro;{{ (item.netForwardYearlyPayout)|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ item.amount }}</td>
+					<td>&euro;{{ item.netTotalForwardYearlyPayout|format_number({fraction_digit: 2}) }}</td>
 				</tr>
 				{% endfor %}
 				<tr class="table-primary">
-					<td colspan='3'><strong>Avg. dividend yield</strong></td>
+					<td colspan='7'><strong>Avg. dividend yield</strong></td>
 					<td><strong>{{ totalAvgYield|format_number({fraction_digit: 2}) }}%</strong></td>
-					<td colspan='3'></td>
+					<td></td>
+					<td></td>
+					<td>&euro;{{ totalNetYearlyDividend|format_number({fraction_digit: 2}) }}</td>
 				</td>
 			</tbody>
 		</table>
@@ -119,7 +129,7 @@ var config = {
                 title: {
                     display: true,
                     fontSize: 24,
-                    text: 'Dividend yield avg: {{ totalAvgYield|format_number({fraction_digit: 2}) }}%'
+                    text: 'Dividend yield'
                 },
                 scales: {
                     yAxes: [{
