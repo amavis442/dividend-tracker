@@ -37,6 +37,7 @@
                 <th>Allocation</th>
                 <th>Allocation%</th>
                 <th>Dividends</th>
+                <th>Div dates</th>
                 <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'industry', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Industry</a></th>
                 <th>Pos</th>
                 <th>Pies</th>
@@ -53,15 +54,26 @@
             {% set avgPrice = position.price / 1000 %}
             {% set allocation = position.allocation / 1000 %}
             {% set percentageAllocation = (allocation / totalInvested) * 100 %}
+            {% set calendar = position.ticker.calendars.first ?? null %}
 
             <tr {{ position.isDividendPayMonth ? 'class="table-success"' : ''}}>
                 <td>{{ ticker.ticker }}</td>
-                <td><a href="{{ path('portfolio_show', {'id': ticker.id}) }}">{{ ticker.fullname }}</a></td>
+                <td>
+                    <a href="{{ path('portfolio_show', {'id': ticker.id}) }}">{{ ticker.fullname }}</a>
+                </td>
                 <td>{{ amount|format_number({fraction_digit: 7}) }}</td>
                 <td>&euro;{{ avgPrice|format_number({fraction_digit: 2}) }}</td>
                 <td>&euro;{{ allocation|format_number({fraction_digit: 2}) }}</td>
                 <td> {{percentageAllocation|format_number({fraction_digit: 2}) }}%</td>
                 <td>&euro;{{ (dividend/1000)|format_number({fraction_digit: 2}) }}</td>
+                <td><small>
+                    {% if calendar %} 
+                        {{ calendar.exDividendDate|date('d/m/Y') }} <br/>
+                        {{ calendar.paymentDate|date('d/m/Y') }} <br/>~
+                        {% if calendar.currency.id == 1 %}${% else %}&euro;{% endif %}{{ (calendar.cashAmount/1000)|format_number({fraction_digit: 3}) }}
+                    {% endif %}
+                    </small>
+                </td>
                 <td><span class="badge badge-secondary">{{ branchLabel}}</span></td>
                 <td>{{ position.posid }}</td>
                 <td>{% for pie in position.pies %}
