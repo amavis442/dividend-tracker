@@ -2,21 +2,23 @@
 
 namespace App\Controller\Report;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\BranchRepository;
 use App\Repository\CalendarRepository;
-use Symfony\Component\HttpFoundation\Response;
-use App\Repository\PositionRepository;
-use App\Repository\PaymentRepository;
-use App\Repository\TickerRepository;
 use App\Repository\DividendMonthRepository;
-use App\Service\Summary;
-use App\Service\Referer;
+use App\Repository\PaymentRepository;
+use App\Repository\PositionRepository;
+use App\Repository\TickerRepository;
 use App\Service\Allocation;
-use App\Service\Yields;
+use App\Service\Export;
 use App\Service\Payouts;
 use App\Service\Projection;
+use App\Service\Referer;
+use App\Service\Summary;
+use App\Service\Yields;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -108,13 +110,26 @@ class ReportController extends AbstractController
     /**
      * @Route("/yield/{orderBy}", name="report_dividend_yield")
      */
-    public function yield(
+    function yield (
         TickerRepository $tickerRepository,
         PositionRepository $positionRepository,
         string $orderBy = 'ticker',
         Yields $yields
-    ) {
+    ): Response {
         $result = $yields->yield($tickerRepository, $positionRepository, $orderBy, self::EXCHANGE_RATE);
         return $this->render('report/yield/index.html.twig', array_merge($result, ['controller_name' => 'ReportController']));
+    }
+
+    /**
+     * @Route("/export", name="report_export")
+     */
+    public function export(PositionRepository $positionRepository): Response
+    {
+        $export = new Export($positionRepository);
+        $filename = $export->export($positionRepository);
+
+        $response = new BinaryFileResponse($filename);
+
+        return $response;
     }
 }
