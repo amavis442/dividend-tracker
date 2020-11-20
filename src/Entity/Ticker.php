@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TickerRepository")
@@ -52,7 +51,6 @@ class Ticker
      * @ORM\OneToMany(targetEntity="App\Entity\Payment", mappedBy="ticker")
      */
     private $payments;
-
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\DividendMonth", inversedBy="tickers")
@@ -142,11 +140,21 @@ class Ticker
 
         return $this;
     }
+
+    public function hasCalendar(): bool
+    {
+        if (count($this->calendars) > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function getRecentDividendDate(): ?Calendar
     {
         if ($this->calendars->count() < 1) {
             return null;
-        } 
+        }
         return $this->calendars[0];
     }
 
@@ -211,7 +219,15 @@ class Ticker
 
         return $this;
     }
-    
+
+    public function getDividendFrequency(): int
+    {
+        if ($this->DividendMonths) {
+            return count($this->DividendMonths);
+        }
+        return 0;
+    }
+
     public function getIsin(): ?string
     {
         return $this->isin;

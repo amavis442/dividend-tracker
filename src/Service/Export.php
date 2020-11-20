@@ -24,6 +24,13 @@ class Export
             ->setCellAlignment(CellAlignment::RIGHT)
             ->setBackgroundColor(Color::YELLOW)
             ->build();
+        
+        $styleData = (new StyleBuilder())
+            ->setFontSize(10)
+            ->setFontName('Liberation Sans')
+            ->setShouldWrapText()
+            ->setCellAlignment(CellAlignment::RIGHT)
+            ->build();
 
         $data = $this->getData($positionRepository);
         
@@ -38,7 +45,7 @@ class Export
                     $writer->addRow($rowFromValues);
                 }
 
-                $rowFromValues = WriterEntityFactory::createRowFromArray(array_values($row));
+                $rowFromValues = WriterEntityFactory::createRowFromArray(array_values($row), $styleData);
                 $writer->addRow($rowFromValues);
                 $firstRow = false;
             }
@@ -65,6 +72,13 @@ class Export
             $row['Allocation'] = $position->getAllocation() / 1000;
             $row['AvgPrice'] = $position->getPrice() / 1000;
             $row['Profit'] = $position->getProfit() / 1000;
+            
+            $row['dividend'] = 0.0;
+            if ($position->getTicker()->hasCalendar()) {
+                $cash = $position->getTicker()->getCalendars()->first()->getCashAmount();
+                $row['dividend'] = $cash / 1000;
+                $row['frequency'] = $position->getTicker()->getDividendFrequency();
+            }
 
             $data[$pieName][$position->getTicker()->getTicker()] = $row;
         }
