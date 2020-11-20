@@ -6,16 +6,15 @@
 {% block body %}
  	<h3>{{ year }}: Based on 15% taxes and 1.19 exchange rate</h3>
 
-	<form method="get" class="form-inline">
-		<div class="form-group mx-sm-3 mb-2">
-		<select name='projectionyear' class="form-control">
-			{% for y in (year-1)..(year+1) %}
-			<option value="{{ y }}" {{ year == y ? "selected":''}}>{{ y }}</value>
+	<hr/>
+	<div class="row">
+		<div class="btn-group" role="group" aria-label="Years">
+			{% for y in (currentYear-1)..(currentYear+1) %}
+				<a href="{{ path('report_dividend_projection', {'projectionyear': y}) }}" class="btn btn-secondary">{{ y }}</a>
 			{% endfor %}
-		</select>
 		</div>
-    	<button class="btn btn-primary mb-2">Select</button>
-	</form>
+	</div>
+	<hr/>
 
 	<div style='width:900px;height:600px' class="col col-xs-12">
 		<canvas id="myChart"></canvas>

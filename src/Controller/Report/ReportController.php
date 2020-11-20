@@ -18,6 +18,7 @@ use App\Service\Yields;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -85,7 +86,7 @@ class ReportController extends AbstractController
     }
 
     /**
-     * @Route("/projection/{projectionyear<\d+>?1}", name="report_projection", methods={"GET", "POST"})
+     * @Route("/projection/{projectionyear<\d+>?1}", name="report_dividend_projection")
      */
     public function projection(
         PositionRepository $positionRepository,
@@ -95,15 +96,16 @@ class ReportController extends AbstractController
         Projection $projection,
         int $projectionyear
     ): Response {
-
-        $referer->set('report_projection');
         if ($projectionyear === 1) {
             $projectionyear = date('Y');
         }
+        $referer->set('report_dividend_projection',['projectionyear' => $projectionyear]);
+
         $result = $projection->projection($projectionyear, $positionRepository, $calendarRepository, $dividendMonthRepository, self::TAX_DIVIDEND, self::EXCHANGE_RATE);
         return $this->render('report/projection/index.html.twig', array_merge($result, [
             'controller_name' => 'ReportController',
             'year' => $projectionyear,
+            'currentYear' => date('Y')
         ]));
     }
 

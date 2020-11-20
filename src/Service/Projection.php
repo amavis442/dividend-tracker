@@ -133,6 +133,7 @@ class Projection
             }
         }
         ksort($dividendEstimate);
+        
         $this->calcEstimatePayoutPerMonth($dividendEstimate);
 
         $dataSource = [];
@@ -140,7 +141,7 @@ class Projection
 
         foreach ($d as $month => $dividendMonth) {
             $receivedDividendMonth = 0.0;
-            $paydate = sprintf("%4d%02d", date('Y'), $month);
+            $paydate = sprintf("%4d%02d", $year, $month);
             $normalDate = strftime('%B %Y', strtotime($paydate . '01'));
             $dataSource[$paydate] = [];
             if (!isset($dividendEstimate[$paydate])) {
