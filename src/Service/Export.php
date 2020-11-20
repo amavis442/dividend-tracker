@@ -26,17 +26,22 @@ class Export
             ->build();
 
         $data = $this->getData($positionRepository);
-        $firstRow = true;
-        foreach ($data as $ticker => $row) {
-            if ($firstRow) {
-                $headers = array_keys($row);
-                $rowFromValues = WriterEntityFactory::createRowFromArray($headers, $style);
-                $writer->addRow($rowFromValues);
-            }
+        
+        foreach ($data as $pie => $rows) {
+            $firstRow = true;
+            $sheet = $writer->addNewSheetAndMakeItCurrent();
+            $sheet->setName($pie);
+            foreach ($rows as $ticker => $row) {
+                if ($firstRow) {
+                    $headers = array_keys($row);
+                    $rowFromValues = WriterEntityFactory::createRowFromArray($headers, $style);
+                    $writer->addRow($rowFromValues);
+                }
 
-            $rowFromValues = WriterEntityFactory::createRowFromArray(array_values($row));
-            $writer->addRow($rowFromValues);
-            $firstRow = false;
+                $rowFromValues = WriterEntityFactory::createRowFromArray(array_values($row));
+                $writer->addRow($rowFromValues);
+                $firstRow = false;
+            }
         }
         $writer->close();
 
@@ -48,6 +53,11 @@ class Export
         $data = [];
         $positions = $positionRepository->getAllOpen();
         foreach ($positions as $position) {
+            $pieName = 'default';
+            if ($position->hasPie()) {
+                $pieName = $position->getPies()->first()->getLabel();
+            }
+            
             $row = [];
             $row['Ticker'] = $position->getTicker()->getTicker();
             $row['Company'] = $position->getTicker()->getFullname();
@@ -56,9 +66,11 @@ class Export
             $row['AvgPrice'] = $position->getPrice() / 1000;
             $row['Profit'] = $position->getProfit() / 1000;
 
-            $data[$position->getTicker()->getTicker()] = $row;
+            $data[$pieName][$position->getTicker()->getTicker()] = $row;
         }
-        ksort($data);
+        foreach ($data as $symbol => &$rows) {
+            ksort($rows);
+        }
         return $data;
     }
 }
