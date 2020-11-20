@@ -13,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use App\Form\Factory\CallbackTransformerValutaFactory;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Doctrine\ORM\EntityRepository;
 
 class CalendarType extends AbstractType
 {
@@ -25,7 +26,12 @@ class CalendarType extends AbstractType
             'required' => true,
             'placeholder' => 'Please choose a ticker',
             'empty_data' => null,
-            ])->add('ex_dividend_date', DateType::class, [
+            'query_builder' => function (EntityRepository $er) {
+                return $er->createQueryBuilder('t')
+                    ->orderBy('t.ticker', 'ASC');
+            },
+            ])
+            ->add('ex_dividend_date', DateType::class, [
                 // renders it as a single text box
                 'widget' => 'single_text',
             ])
