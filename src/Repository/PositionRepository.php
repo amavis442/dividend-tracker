@@ -4,13 +4,11 @@ namespace App\Repository;
 
 use App\Entity\Position;
 use App\Entity\Ticker;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use DateTime;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping\JoinColumn;
 
 /**
  * @method Position|null find($id, $lockMode = null, $lockVersion = null)
@@ -41,7 +39,6 @@ class PositionRepository extends ServiceEntityRepository
     ): Paginator {
 
         $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
-        $queryBuilder->leftJoin('t.calendars', 'c');
         if ($status === self::OPEN) {
             $queryBuilder->andWhere('p.closed <> 1 or p.closed is null');
         }
@@ -50,10 +47,8 @@ class PositionRepository extends ServiceEntityRepository
         }
         if ($pies) {
             $queryBuilder
-            ->innerJoin('p.pies', 'pies')
-            ->andWhere('pies IN (:pies)')
-            ->setParameter('pies', $pies);;
-
+                ->andWhere('pies IN (:pies)')
+                ->setParameter('pies', $pies);
         }
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);
@@ -70,13 +65,13 @@ class PositionRepository extends ServiceEntityRepository
             ->leftJoin('p.transactions', 'tr')
             ->leftJoin('p.payments', 'pa')
             ->where('t = :ticker');
-            if ($status === self::OPEN) {
-                $queryBuilder->andWhere('p.closed <> 1 or p.closed is null');
-            }
-            if ($status === self::CLOSED) {
-                $queryBuilder->andWhere('p.closed = 1');
-            }
-            return $queryBuilder->orderBy('tr.transactionDate', 'DESC')
+        if ($status === self::OPEN) {
+            $queryBuilder->andWhere('p.closed <> 1 or p.closed is null');
+        }
+        if ($status === self::CLOSED) {
+            $queryBuilder->andWhere('p.closed = 1');
+        }
+        return $queryBuilder->orderBy('tr.transactionDate', 'DESC')
             ->setParameter('ticker', $ticker)
             ->getQuery()
             ->getOneOrNullResult();
@@ -101,15 +96,19 @@ class PositionRepository extends ServiceEntityRepository
         return $paginator;
     }
 
+    public function getAllOpen(): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select('p, t, pa, c, dm')
+            ->innerJoin('p.ticker', 't')
+            ->leftJoin('t.calendars', 'c')
+            ->leftJoin('p.payments', 'pa')
+            ->leftJoin('t.DividendMonths', 'dm')
+            ->where('p.closed = 0 OR p.closed IS NULL');
 
-    public function getAllOpen(): array {
-        $qb = $this->createQueryBuilder('p');
-        $qb->where('p.closed = 0 OR p.closed IS NULL');
-    
         return $qb->getQuery()
-              ->getResult();
+            ->getResult();
     }
-
 
     private function getQueryBuilder(
         string $orderBy = 't.ticker',
@@ -123,10 +122,13 @@ class PositionRepository extends ServiceEntityRepository
 
         // Create our query
         $queryBuilder = $this->createQueryBuilder('p')
-            ->select('p, t, i, pa')
+            ->select('p, t, i, pa, pies, c, dm')
             ->innerJoin('p.ticker', 't')
             ->innerJoin('t.branch', 'i')
             ->leftJoin('p.payments', 'pa')
+            ->leftJoin('p.pies', 'pies')
+            ->leftJoin('t.calendars', 'c')
+            ->leftJoin('t.DividendMonths', 'dm')
             ->orderBy($order, $sort);
 
         if (!empty($search)) {
@@ -143,7 +145,7 @@ class PositionRepository extends ServiceEntityRepository
         string $orderBy = 'ticker',
         string $sort = 'ASC',
         string $search = ''
-    ): ?array {
+    ): ?array{
         $order = 'p.' . $orderBy;
         if ($orderBy === 'ticker') {
             $order = 't.ticker';
@@ -155,7 +157,7 @@ class PositionRepository extends ServiceEntityRepository
                 'SUM(p.allocation) sumAllocation',
                 'SUM(p.amount) sumAmount',
                 'AVG(p.price) avgPrice',
-                'SUM(pa.dividend) sumDividend'
+                'SUM(pa.dividend) sumDividend',
             ])
             ->innerJoin('p.ticker', 't')
             ->leftJoin('t.payments', 'pa')
@@ -248,11 +250,11 @@ class PositionRepository extends ServiceEntityRepository
 
     public function getAllocationsAndUnits(array $tickerIds): array
     {
-        $result =  $this->createQueryBuilder('p')
+        $result = $this->createQueryBuilder('p')
             ->select([
                 'p.price',
                 'p.amount',
-                'IDENTITY(p.ticker) as tickerId'
+                'IDENTITY(p.ticker) as tickerId',
             ])
 
             ->where('p.closed <> 1')
@@ -286,7 +288,7 @@ class PositionRepository extends ServiceEntityRepository
                 'b.label as industry',
                 'SUM(p.amount) amount',
                 'p.price',
-                'SUM(p.allocation) allocation'
+                'SUM(p.allocation) allocation',
             ])
             ->join('p.ticker', 't')
             ->join('t.branch', 'b')
@@ -299,13 +301,13 @@ class PositionRepository extends ServiceEntityRepository
     public function getAllocationDataPerPosition(): array
     {
         return $this->createQueryBuilder('p')
-        ->select([
-            't.ticker',
-            'p.allocation'
-        ])
-        ->innerJoin('p.ticker', 't')
-        ->where('p.closed is null OR p.closed = 0')
-        ->getQuery()
-        ->getArrayResult();
+            ->select([
+                't.ticker',
+                'p.allocation',
+            ])
+            ->innerJoin('p.ticker', 't')
+            ->where('p.closed is null OR p.closed = 0')
+            ->getQuery()
+            ->getArrayResult();
     }
 }
