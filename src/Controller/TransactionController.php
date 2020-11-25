@@ -271,7 +271,7 @@ class TransactionController extends AbstractController
                             $position->setClosed(1);
                         }
 
-                        if ($position->getAmount > -6 && $position->getAmount() < 0) {
+                        if ($position->getAmount() > -6 && $position->getAmount() < 0) {
                             $position->setClosed(1);
                             $position->setAmount(0);
                         }
