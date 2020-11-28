@@ -1,8 +1,54 @@
 {{ form_start(form) }}
-{{form_row(form.amount)}}
-{{form_row(form.price)}}
-{{form_row(form.dividend)}}
-{{form_row(form.growth)}}
+<div class="row">
+	<div class="col">
+		<div class="form-group">
+			{{form_label(form.amount)}}
+			{{form_widget(form.amount)}}
+			{{form_help(form.amount)}}
+		</div>
+	</div>
+	<div class="col">
+		<div class="form-group">
+			{{form_label(form.price)}}
+			{{form_widget(form.price)}}
+			{{form_help(form.price)}}
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col">
+		<div class="form-group">
+			{{form_label(form.priceAppreciation)}}
+			{{form_widget(form.priceAppreciation)}}
+			{{form_help(form.priceAppreciation)}}
+		</div>
+	</div>
+	<div class="col">
+		<div class="form-group">
+			{{form_label(form.maxPrice)}}
+			{{form_widget(form.maxPrice)}}
+			{{form_help(form.maxPrice)}}
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col">
+		<div class="form-group">
+			{{form_label(form.dividend)}}
+			{{form_widget(form.dividend)}}
+			{{form_help(form.dividend)}}
+		</div>
+	</div>
+	<div class="col">
+		<div class="form-group">
+			{{form_label(form.growth)}}
+			{{form_widget(form.growth)}}
+			{{form_help(form.growth)}}
+		</div>
+	</div>
+</div>
+
+{{form_row(form.growthAfter5Years)}}
 
 <button type="submit" class="btn btn-primary">
 	Calc

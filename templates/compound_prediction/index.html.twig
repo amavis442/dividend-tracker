@@ -13,6 +13,8 @@
     <thead>
         <tr>
             <th>Quator</th>
+            <th>Dividend growth rate</th>
+            <th>Share price</th>
             <th>Start amount</th>
             <th>Dividend</th>
             <th>Net dividend</th>
@@ -24,12 +26,13 @@
     {% for item in data %}
     <tr>
     <td>{{ item.quator }}</td>
+    <td>{{ item.dividendGrowth|format_number({fraction_digit: 3}) }}%</td>
+    <td>&euro;{{ item.shareprice|format_number({fraction_digit: 3}) }}</td>
     <td>{{ item.amount }}</td>
     <td>${{ item.dividend }}</td>
     <td>&euro;{{ item.net_dividend|format_number({fraction_digit: 3}) }}</td>
     <td>{{ item.new_amount }}</td>
     <td>&euro;{{ item.extra_dividend|format_number({fraction_digit: 3}) }}</td>
-    
     </tr>
     {% endfor %}
     </tbody>

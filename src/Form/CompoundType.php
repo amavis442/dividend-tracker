@@ -18,31 +18,58 @@ class CompoundType extends AbstractType
         $builder
             ->add('amount', NumberType::class, [
                 'label' => 'Amount',
-                'help' => 'use decimal point if you have a fraction of a stock',
-                'required' => false,
+                'help' => 'Number of shares to start with',
+                'required' => true,
                 'input' => 'string',
                 'scale' => 7,
+                'empty_data' => 1
             ])     
             ->add('price', NumberType::class, [
                 'label' => 'Average price (euro)',
-                'help' => 'Adjusment if automatic calculation is wrong',
+                'help' => 'Price that you pay for the shares',
+                'required' => true,
+                'input' => 'string',
+                'scale' => 3,
+                'empty_data' => 1000
+            ])
+            ->add('maxPrice', NumberType::class, [
+                'label' => 'Maximum that price can rise (euro)',
+                'help' => 'If there is a range, what is the max range',
+                'required' => false,
+                'input' => 'string',
+                'scale' => 3,
+            ])
+            ->add('priceAppreciation', NumberType::class, [
+                'label' => 'Rise of price in %',
+                'data' => '7380',
+                'help' => 'Historically the amrket has risen 7.38%',
                 'required' => false,
                 'input' => 'string',
                 'scale' => 3,
             ])
             ->add('dividend', NumberType::class, [
                 'label' => 'Starting dividend ($)',
-                'help' => 'Adjusment if automatic calculation is wrong',
-                'required' => false,
+                'help' => 'Starting dividend in dollars',
+                'required' => true,
                 'input' => 'string',
                 'scale' => 3,
+                'empty_data' => 1
             ])
             ->add('growth', NumberType::class, [
                 'label' => 'Average dividend growth rate (%)',
-                'help' => 'Adjusment if automatic calculation is wrong',
+                'help' => 'First 5 years. Nice target would be 10% and higher',
+                'required' => true,
+                'input' => 'string',
+                'scale' => 3,
+                'empty_data' => 1
+            ])
+            ->add('growthAfter5Years', NumberType::class, [
+                'label' => 'Average dividend growth rate (%) of dividend after 5 years and going forward',
+                'help' => 'This will be around 3%',
                 'required' => false,
                 'input' => 'string',
                 'scale' => 3,
+                'data' => '3000',
             ])
             ;
 
@@ -51,8 +78,11 @@ class CompoundType extends AbstractType
 
         $builder->get('amount')->addModelTransformer($callbackUnitsTransformer);
         $builder->get('price')->addModelTransformer($callbackValutaTransformer);
+        $builder->get('maxPrice')->addModelTransformer($callbackValutaTransformer);
         $builder->get('dividend')->addModelTransformer($callbackValutaTransformer);
         $builder->get('growth')->addModelTransformer($callbackValutaTransformer);
+        $builder->get('growthAfter5Years')->addModelTransformer($callbackValutaTransformer);
+        $builder->get('priceAppreciation')->addModelTransformer($callbackValutaTransformer);
     }
 
 
