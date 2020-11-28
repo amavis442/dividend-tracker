@@ -32,6 +32,7 @@ class CompoundPredictionController extends AbstractController
             $dividendGrowthRate = $compound->getGrowth() / 1000;
             $dividendGrowthRateAfter5Years = $compound->getGrowthAfter5Years() / 1000;
             $maxPrice = $compound->getMaxPrice() / 1000;
+            $payoutFrequency = $compound->getFrequency();
 
             $oldShares = $startAmount / 10000000;
             $oldPrice = $startPrice;
@@ -43,7 +44,9 @@ class CompoundPredictionController extends AbstractController
             if (date('m') > 9) {
                 $startYear++;
             }
-            for ($i = 0; $i < 160; $i++) {
+            $reportRange = 40 * $payoutFrequency; // 40 Years
+
+            for ($i = 0; $i < $reportRange; $i++) {
                 $data[$i]['quator'] = '';
                 $data[$i]['amount'] = $oldShares;
                 $data[$i]['dividend'] = 0.0;
@@ -53,7 +56,7 @@ class CompoundPredictionController extends AbstractController
                 $data[$i]['shareprice'] = $startPrice;
                 $data[$i]['yoc'] = 0.0;
 
-                if ($quator > 3) {
+                if ($quator > ($payoutFrequency - 1)) {
                     $year++;
                     $quator = 0;
                     if ($priceAppreciation && $priceAppreciation > 0) {
@@ -87,7 +90,14 @@ class CompoundPredictionController extends AbstractController
 
                 $data[$i]['extra_dividend'] = $newShares * $netDividend;
                 $oldShares += $newShares;
-                $data[$i]['quator'] = ($startYear + $year) . 'Q' . ($quator + 1);
+                $data[$i]['quator'] = ($startYear + $year);
+                if ($payoutFrequency === 4) {
+                    $data[$i]['quator'] .= 'Q';
+                }
+                if ($payoutFrequency === 12) {
+                    $data[$i]['quator'] .= 'M';
+                }
+                $data[$i]['quator'] .= ($quator + 1);
 
                 //$data[$i]['yoc'] = $data[$i]['net_dividend'] / ($oldShares *)
                 $quator++;

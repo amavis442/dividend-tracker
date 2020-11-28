@@ -64,12 +64,19 @@ class CompoundType extends AbstractType
                 'empty_data' => 1
             ])
             ->add('growthAfter5Years', NumberType::class, [
-                'label' => 'Average dividend growth rate (%) of dividend after 5 years and going forward',
+                'label' => 'Average dividend growth rate (%) > 5 years',
                 'help' => 'This will be around 3%',
                 'required' => false,
                 'input' => 'string',
                 'scale' => 3,
                 'data' => '3000',
+            ])
+            ->add('frequency', NumberType::class, [
+                'label' => 'Payout frequency',
+                'help' => 'How many times does the company pay dividends per year. Default will be 4 (every quator)',
+                'required' => false,
+                'input' => 'string',
+                'empty_data' => 4
             ])
             ;
 

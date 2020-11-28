@@ -47,8 +47,22 @@
 		</div>
 	</div>
 </div>
-
-{{form_row(form.growthAfter5Years)}}
+<div class="row">
+	<div class="col">
+		<div class="form-group">
+			{{form_label(form.growthAfter5Years)}}
+			{{form_widget(form.growthAfter5Years)}}
+			{{form_help(form.growthAfter5Years)}}
+		</div>
+	</div>
+	<div class="col">
+		<div class="form-group">
+			{{form_label(form.frequency)}}
+			{{form_widget(form.frequency)}}
+			{{form_help(form.frequency)}}
+		</div>
+	</div>
+</div>
 
 <button type="submit" class="btn btn-primary">
 	Calc

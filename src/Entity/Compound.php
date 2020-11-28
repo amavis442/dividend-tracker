@@ -54,6 +54,12 @@ class Compound
      * @var int|null
      */
     private $growthAfter5Years;
+    /**
+     * How many times does a company pay dividends per year. Default will be 4
+     *
+     * @var int|null
+     */
+    private $frequency;
 
     public function setAmount(int $amount): self
     {
@@ -171,6 +177,30 @@ class Compound
     public function setMaxPrice(int $maxPrice): self
     {
         $this->maxPrice = $maxPrice;
+
+        return $this;
+    }
+
+    /**
+     * Get how many times does a company pay dividends per year. Default will be 4
+     *
+     * @return  int|null
+     */ 
+    public function getFrequency(): ?int
+    {
+        return $this->frequency;
+    }
+
+    /**
+     * Set how many times does a company pay dividends per year. Default will be 4
+     *
+     * @param  int|null  $frequency  How many times does a company pay dividends per year. Default will be 4
+     *
+     * @return  self
+     */ 
+    public function setFrequency($frequency): self
+    {
+        $this->frequency = $frequency;
 
         return $this;
     }
