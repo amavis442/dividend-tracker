@@ -300,8 +300,8 @@ class Position
     public function addPayment(Payment $payment): self
     {
         if (!$this->payments->contains($payment)) {
-            $this->payments[] = $payments;
-            $payemnt->setPosition($this);
+            $this->payments[] = $payment;
+            $payment->setPosition($this);
         }
  
         return $this;
@@ -345,6 +345,16 @@ class Position
         return false;
     }
 
+    public function forwardNetDividend(): ?float
+    {
+        $forwardNetDividend = 0.0;
+        if ($this->getTicker()->getCalendars()){
+            $calendar = $this->getTicker()->getCalendars()->first();
+            $cashAmount = $calendar->getCashamount() / 1000;
+            $forwardNetDividend = ($this->getAmount() / 10000000) * $cashAmount * 0.85 / 1.19;
+        }
+        return $forwardNetDividend;
+    }
 
     /**
      * Gets triggered only on insert
