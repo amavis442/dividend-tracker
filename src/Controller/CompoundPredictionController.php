@@ -36,7 +36,7 @@ class CompoundPredictionController extends AbstractController
 
             $oldShares = $startAmount / 10000000;
             $oldPrice = $startPrice;
-            $oldDividend = (float) $startDividend; 
+            $oldDividend = (float) $startDividend;
             $dividend = (float) $startDividend;
             $year = 0;
             $quator = 0;
@@ -60,13 +60,13 @@ class CompoundPredictionController extends AbstractController
                     $year++;
                     $quator = 0;
                     if ($priceAppreciation && $priceAppreciation > 0) {
-                        $price = $oldPrice * ( 1 + ($priceAppreciation / 100));
+                        $price = $oldPrice * (1 + ($priceAppreciation / 100));
                         if ($maxPrice && $price > $maxPrice) {
                             $price = $maxPrice;
                         }
                         $data[$i]['shareprice'] = $price;
                         $oldPrice = $price;
-                    } 
+                    }
                     if ($year > 4 && $dividendGrowthRateAfter5Years > 0) {
                         $dividendGrowthRate = $dividendGrowthRateAfter5Years;
                     }
@@ -83,7 +83,7 @@ class CompoundPredictionController extends AbstractController
                 $data[$i]['dividend'] = $dividend;
 
                 $netDividend = (($dividend * 0.85) / 1.19);
-                
+
                 $data[$i]['net_dividend'] = $oldShares * $netDividend;
                 $newShares = floor($data[$i]['net_dividend'] / $data[$i]['shareprice']);
                 $data[$i]['new_amount'] = $newShares;
@@ -108,6 +108,7 @@ class CompoundPredictionController extends AbstractController
             'controller_name' => 'CompoundPredictionController',
             'form' => $form->createView(),
             'data' => $data,
+            'payoutFrequency' => $payoutFrequency,
         ]);
     }
 }
