@@ -20,8 +20,11 @@ class CompoundPredictionController extends AbstractController
     public function prediction(Request $request): Response
     {
         $compound = new Compound();
+        $payoutFrequency = 4;
+        $compound->setFrequency($payoutFrequency);
         $form = $this->createForm(CompoundType::class, $compound);
         $form->handleRequest($request);
+
 
         $data = [];
         if ($form->isSubmitted() && $form->isValid()) {
