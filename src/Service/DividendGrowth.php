@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Service;
+
+use App\Entity\Ticker;
+
+class DividendGrowth
+{
+    public function getData(Ticker $ticker)
+    {
+        $calendars = $ticker->getCalendars();
+        $data = [];
+        $labels = [];
+        $payout = [];
+        $values = [];
+
+        if ($calendars) {
+            $oldValue = 0.0;
+            $payoutFreq = $ticker->getDividendFrequency();
+
+            foreach ($calendars as $calendar) {
+                $timeStamp = $calendar->getPaymentDate()->format('Y');
+                $cashPayout = $calendar->getCashAmount() / 1000;
+                if (!isset($data[$timeStamp])) {
+                    $data[$timeStamp] = [];
+                    $data[$timeStamp]['dividend'] = 0.0;
+                    $data[$timeStamp]['payoutfreq'] = $payoutFreq;
+                    $data[$timeStamp]['payouts'] = 0;
+                }
+                $data[$timeStamp]['dividend'] += $cashPayout;
+                $data[$timeStamp]['payouts'] += 1;
+            }
+            ksort($data);
+            foreach ($data as $year => &$item) {
+                $item['percentage'] = 0.0;
+                if ($item['payouts'] !== $item['payoutfreq']) {
+                    $item['dividend'] = ($item['dividend'] / $item['payouts']) * $item['payoutfreq'];
+                }
+                $cashPayout = $item['dividend'];
+                if ($oldValue > 0) {
+                    $percentage = (($cashPayout - $oldValue) / $oldValue) * 100;
+                    $percentage = round($percentage, 2);
+                    $item['percentage'] = $percentage;
+                }
+                $oldValue = $cashPayout;
+
+                $labels[] = $year;
+                $payout[] = round($item['dividend'], 3);
+                $values[] = round($item['percentage'], 3);
+            }
+        }
+        return [
+            'data' => json_encode($values),
+            'payout' => json_encode($payout),
+            'labels' => json_encode($labels),
+        ];
+    }
+}

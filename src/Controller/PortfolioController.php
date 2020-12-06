@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\DividendMonth;
 use App\Entity\Ticker;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
 use App\Repository\PieRepository;
+use App\Service\DividendGrowth;
 use App\Service\Summary;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -102,6 +104,7 @@ class PortfolioController extends AbstractController
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
         Summary $summary,
+        DividendGrowth $dividendGrowth,
         Referer $referer
     ): Response {
         $position = $positionRepository->getForTicker($ticker);
@@ -111,7 +114,8 @@ class PortfolioController extends AbstractController
         if (!empty($dividends)) {
             $dividend = $dividends[$ticker->getId()] / 100;
         }
-
+        $growth = $dividendGrowth->getData($ticker);
+        
         $allocated = $summary->getTotalAllocated();
         $percentageAllocation = 0;
         if ($allocated > 0) {
@@ -124,6 +128,7 @@ class PortfolioController extends AbstractController
 
         return $this->render('portfolio/show.html.twig', [
             'ticker' => $ticker,
+            'growth' => $growth,
             'position' => $position,
             'payments' => $payments,
             'dividend' => $dividend,

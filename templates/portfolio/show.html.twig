@@ -26,6 +26,9 @@
 			<a class="nav-link" id="dividend-tab" data-toggle="tab" href="#dividend" role="tab" aria-controls="dividend" aria-selected="false">Dividend</a>
 		</li>
 		<li class="nav-item">
+			<a class="nav-link" id="growth-tab" data-toggle="tab" href="#growth" role="tab" aria-controls="growth" aria-selected="false">Dividend growth</a>
+		</li>
+		<li class="nav-item">
 			<a class="nav-link" id="fundamental-tab" data-toggle="tab" href="#fundamental" role="tab" aria-controls="fundamental" aria-selected="false">Fundamental</a>
 		</li>
 		
@@ -53,6 +56,10 @@
 		<div class="tab-pane fade" id="dividend" role="tabpanel" aria-labelledby="dividend-tab">
 			<br/>
 			{% include 'portfolio/show/_dividend.html.twig' %}
+		</div>
+		<div class="tab-pane fade" id="growth" role="tabpanel" aria-labelledby="growth-tab">
+			<br/>
+			{% include 'portfolio/show/_growth.html.twig' %}
 		</div>
 		<div class="tab-pane fade" id="fundamental" role="tabpanel" aria-labelledby="fundamental-tab">
 			<br/>
