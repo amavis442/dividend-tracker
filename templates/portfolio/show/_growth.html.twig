@@ -89,10 +89,7 @@ var configPayout = {
         scales: {
             yAxes: [{
                 ticks: {
-                    beginAtZero: true,
-                    /* callback: function(value, index, values) {
-                            return '$' + value;
-                    } */
+                    beginAtZero: true
                 }
             }]
         }
@@ -100,15 +97,11 @@ var configPayout = {
     
 };
 
-//var ctx = document.getElementById('myChart').getContext('2d');
-//var ctxPayout = document.getElementById('myChartPayout').getContext('2d');
-
 var ctx = document.getElementById('myChart').getContext('2d');
 window.myBar = new Chart(ctx, configGrowth);
 
 var ctxPayout = document.getElementById('myChartPayout').getContext('2d');
 window.myPayoutBar = new Chart(ctxPayout, configPayout);
-
 
 </script>
 
