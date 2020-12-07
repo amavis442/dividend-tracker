@@ -34,11 +34,11 @@ class PortfolioController extends AbstractController
         SessionInterface $session,
         Summary $summary,
         int $page = 1,
-        string $orderBy = 'industry',
+        string $orderBy = 'ticker',
         string $sort = 'asc',
         Referer $referer
     ): Response {
-        $order = 'i.label';
+        $order = 't.ticker';
         if (in_array($orderBy, ['industry'])) {
             $order = 'i.label';
         }
