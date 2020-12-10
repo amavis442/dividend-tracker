@@ -9,10 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-
-
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Doctrine\ORM\EntityRepository;
 
 class TickerType extends AbstractType
 {
@@ -34,6 +31,10 @@ class TickerType extends AbstractType
                 'required' => true,
                 'placeholder' => 'Please choose a branch',
                 'empty_data' => null,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('b')
+                        ->orderBy('b.label', 'ASC');
+                },
             ]);
     }
 
