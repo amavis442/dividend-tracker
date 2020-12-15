@@ -68,6 +68,7 @@ class Export
             $row = [];
             $row['Ticker'] = $position->getTicker()->getTicker();
             $row['Company'] = $position->getTicker()->getFullname();
+            $row['Branch'] = $position->getTicker()->getBranch()->getLabel();
             $row['Shares'] = $position->getAmount() / 10000000;
             $row['Allocation'] = $position->getAllocation() / 1000;
             $row['AvgPrice'] = $position->getPrice() / 1000;
