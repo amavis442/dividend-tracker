@@ -19,6 +19,14 @@ class PieRepository extends ServiceEntityRepository
         parent::__construct($registry, Pie::class);
     }
 
+    public function findAll(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->orderBy('p.label','ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     // /**
     //  * @return Pie[] Returns an array of Pie objects
     //  */
