@@ -14,6 +14,10 @@
 			<td>{{ ticker.branch.label }}</td>
 		</tr>
 		<tr>
+			<th>ISIN</th>
+			<td>{{ ticker.isin }}</td>
+		</tr>
+		<tr>
 			<th>Dividend payment months</th>
 			<td>
 				{% for month in ticker.dividendMonths %}

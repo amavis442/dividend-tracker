@@ -84,7 +84,7 @@ class Allocation
         $data = [];
         foreach ($allocationData as $allocationItem) {
             $labels[] = $allocationItem['ticker'];
-            $allocation = $allocationItem['allocation'] / 100;
+            $allocation = $allocationItem['allocation'] / 1000;
             $data[] = round(($allocation / $totalAllocated) * 100, 2);
         }
 

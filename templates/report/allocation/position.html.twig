@@ -18,74 +18,74 @@
 	{{ encore_entry_script_tags('chart') }}
 	{{ encore_entry_script_tags('app') }}
 	{% include "report/_colors.html.twig" %}
-<script type="text/javascript">
-	var config = {
-	type: 'pie',
-	data: {
-	datasets: [
-	{
-	data: {{ data|raw }},
-	backgroundColor: [
-						"#0074D9", 
-						"#FF4136", 
-						"#2ECC40", 
-						"#FF851B", 
-						"#7FDBFF", 
-						"#B10DC9", 
-						"#FFDC00", 
-						"#001f3f", 
-						"#39CCCC", 
-						"#01FF70", 
-						"#85144b", 
-						"#F012BE", 
-						"#3D9970", 
-						"#111111", 
+	<script type="text/javascript">
+		var config = {
+			type: 'pie',
+			data: {
+				datasets: [
+				{
+					data: {{ data|raw }},
+					backgroundColor: [
+						"#0074D9",
+						"#FF4136",
+						"#2ECC40",
+						"#FF851B",
+						"#7FDBFF",
+						"#B10DC9",
+						"#FFDC00",
+						"#001f3f",
+						"#39CCCC",
+						"#01FF70",
+						"#85144b",
+						"#F012BE",
+						"#3D9970",
+						"#111111",
 						"#AAAAAA",
-						"#0074D9", 
-						"#FF4136", 
-						"#2ECC40", 
-						"#FF851B", 
-						"#7FDBFF", 
-						"#B10DC9", 
-						"#FFDC00", 
-						"#001f3f", 
-						"#39CCCC", 
-						"#01FF70", 
-						"#85144b", 
-						"#F012BE", 
-						"#3D9970", 
-						"#111111", 
+						"#0074D9",
+						"#FF4136",
+						"#2ECC40",
+						"#FF851B",
+						"#7FDBFF",
+						"#B10DC9",
+						"#FFDC00",
+						"#001f3f",
+						"#39CCCC",
+						"#01FF70",
+						"#85144b",
+						"#F012BE",
+						"#3D9970",
+						"#111111",
 						"#AAAAAA",
-						"#0074D9", 
-						"#FF4136", 
-						"#2ECC40", 
-						"#FF851B", 
-						"#7FDBFF", 
-						"#B10DC9", 
-						"#FFDC00", 
-						"#001f3f", 
-						"#39CCCC", 
-						"#01FF70", 
-						"#85144b", 
-						"#F012BE", 
-						"#3D9970", 
-						"#111111", 
+						"#0074D9",
+						"#FF4136",
+						"#2ECC40",
+						"#FF851B",
+						"#7FDBFF",
+						"#B10DC9",
+						"#FFDC00",
+						"#001f3f",
+						"#39CCCC",
+						"#01FF70",
+						"#85144b",
+						"#F012BE",
+						"#3D9970",
+						"#111111",
 						"#AAAAAA"
-	],
-	label: 'Allocation'
-	}
-	],
-	labels: {{ labels|raw }}
-	},
-	options: {
-	responsive: true,
-	title: {
-	display: true,
-	fontSize: 24,
-	text: 'Allocation per position'
-	}
-	}
-	};
+					],
+					label: 'Allocation'
+				}
+				],
+				labels: {{ labels|raw }}
+			},
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					fontSize: 24,
+					text: 'Allocation per position'
+				}
+			}
+		};
 
 var ctxAllocation = document.getElementById('myChartAllocation').getContext('2d');
 window.myPie = new Chart(ctxAllocation, config);

@@ -119,7 +119,7 @@ class PortfolioController extends AbstractController
         $allocated = $summary->getTotalAllocated();
         $percentageAllocation = 0;
         if ($allocated > 0) {
-            $percentageAllocation = ($position->getAllocation() / $allocated);
+            $percentageAllocation = (($position->getAllocation() / 10) / $allocated);
         }
 
         $calendar = $ticker->getCalendars();
