@@ -108,8 +108,7 @@ class PortfolioController extends AbstractController
     ): Response {
         $ticker = $position->getTicker();
         $position = $positionRepository->getForPosition($position);
-        $payments = $paymentRepository->getForPosition($position);
-
+        $payments = $position->getPayments();
         $dividends = $paymentRepository->getSumDividends([$ticker->getId()]);
         $dividend = 0;
         if (!empty($dividends)) {

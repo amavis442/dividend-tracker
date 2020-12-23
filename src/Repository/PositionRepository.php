@@ -59,7 +59,7 @@ class PositionRepository extends ServiceEntityRepository
     public function getForTicker(Ticker $ticker, int $status = self::OPEN): ?Position
     {
         $queryBuilder = $this->createQueryBuilder('p')
-            ->select('p, tr')
+            ->select('p, tr, pa')
             ->innerJoin('p.ticker', 't')
             ->innerJoin('t.branch', 'i')
             ->leftJoin('p.transactions', 'tr')

@@ -15,8 +15,18 @@
 	</thead>
 	<tbody>
 		{% if position and position.transactions %}
+			{% set totalAmount = position.amount/10000000 %}
+			{% set currentAmount = totalAmount %}
+			{% set oldAmount = totalAmount %}
 			{% for transaction in position.transactions %}
 				{% set side = (transaction.side == 1 ? 'Buy' : 'Sell') %}
+				{% set currentAmount = oldAmount %}
+				{% if transaction.side == 1 %}
+					{% set oldAmount = oldAmount - transaction.amount/10000000 %}
+				{% else %}
+					{% set oldAmount = oldAmount + transaction.amount/10000000 %}
+				{% endif %}
+
 				<tr>
 					<td>
 						<span class="badge badge-{% if transaction.side == 1 %}success{% else %}danger{% endif %}">
@@ -27,7 +37,7 @@
 					<td>{{ (transaction.amount/10000000)|format_number({fraction_digit: 7}) }}</td>
 					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.price/1000)|format_number({fraction_digit: 2}) }}</td>
 					<td>{{ (transaction.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ (transaction.allocation/1000)|format_number({fraction_digit: 2}) }}</td>
-					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.avgprice/1000)|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ currentAmount }} @ {{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.avgprice/1000)|format_number({fraction_digit: 2}) }}</td>
 					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}<span class="badge badge-{% if transaction.profit > 0 %}success{% else %}danger{% endif %}">{{ (transaction.profit/1000)|format_number({fraction_digit: 2}) }}</span>
 					</td>
 					<td>{{ transaction.broker }}</td>
