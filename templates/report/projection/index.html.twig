@@ -73,20 +73,20 @@
 										<td>
 											<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 												<div class="btn-group mr-2" role="group" aria-label="First group">
-													<a href="{{ path('portfolio_show', {'id': ticker.id}) }}" class="btn btn-primary">
+													{% if position.position %}
+													<a href="{{ path('portfolio_show', {'id': position.position.id }) }}" class="btn btn-primary">
 														<i class="fas fa-book-open"></i>
 													</a>
-													{% if position.position %}
-													<a class="btn btn-success" href="{{ path('payment_new', {'position': position.position.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment">
+													<a class="btn btn-success" href="{{ path('payment_new', {'position': position.position.id }) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment">
 														<i class="far fa-money-bill-alt"></i>
 													</a>
 													{% endif %}
 													{% if not position.calendar %}	
-													<a class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend date">
+													<a class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': ticker.id }) }}" data-toggle="tooltip" data-placement="top" title="add dividend date">
 														<i class="far fa-calendar-alt"></i>
 													</a>
 													{% else %}
-													<a class="btn btn-secondary" href="{{ path('calendar_edit', {'id': position.calendar.id}) }}" data-toggle="tooltip" data-placement="top" title="edit dividend date">
+													<a class="btn btn-secondary" href="{{ path('calendar_edit', {'id': position.calendar.id }) }}" data-toggle="tooltip" data-placement="top" title="edit dividend date">
 														<i class="far fa-edit"></i>
 													</a>
 													{% endif %}
