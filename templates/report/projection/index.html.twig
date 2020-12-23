@@ -55,7 +55,7 @@
 									<tr class="{% if payment %}table-success{% else %}table-light{%endif%}" >
 										<td>
 											{% if position.position %}
-												<a class="btn btn-success" href="{{ path('portfolio_show', {'id': position.position.ticker.id}) }}">
+												<a class="btn btn-success" href="{{ path('portfolio_show', {'id': position.position.id }) }}">
 												{{ positionLabel }}
 												</a>
 											{% else %}
