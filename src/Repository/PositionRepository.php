@@ -77,6 +77,22 @@ class PositionRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    public function getForPosition(Position $position): ?Position
+    {
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->select('p, tr')
+            ->innerJoin('p.ticker', 't')
+            ->innerJoin('t.branch', 'i')
+            ->leftJoin('p.transactions', 'tr')
+            ->leftJoin('p.payments', 'pa')
+            ->where('p = :position');
+
+        return $queryBuilder->orderBy('tr.transactionDate', 'DESC')
+            ->setParameter('position', $position)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     public function getAllClosed(
         int $page = 1,
         int $limit = 10,
@@ -273,7 +289,7 @@ class PositionRepository extends ServiceEntityRepository
             $price = $item['price'] / 1000;
             $amount = $item['amount'] / 10000000;
 
-            $allocation = $price * $units;
+            $allocation = $price * $amount;
             $output[$item['tickerId']]['allocation'] += $allocation;
             $output[$item['tickerId']]['amount'] += $amount;
         }

@@ -2,19 +2,18 @@
 
 namespace App\Controller;
 
-use App\Entity\DividendMonth;
-use App\Entity\Ticker;
+use App\Entity\Position;
 use App\Repository\PaymentRepository;
-use App\Repository\PositionRepository;
 use App\Repository\PieRepository;
+use App\Repository\PositionRepository;
 use App\Service\DividendGrowth;
+use App\Service\Referer;
 use App\Service\Summary;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use App\Service\Referer;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/dashboard/portfolio")
@@ -100,22 +99,24 @@ class PortfolioController extends AbstractController
      * @Route("/{id}", name="portfolio_show", methods={"GET"})
      */
     public function show(
-        Ticker $ticker,
+        Position $position,
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
         Summary $summary,
         DividendGrowth $dividendGrowth,
         Referer $referer
     ): Response {
-        $position = $positionRepository->getForTicker($ticker);
-        $payments = $paymentRepository->getForTicker($ticker);
+        $ticker = $position->getTicker();
+        $position = $positionRepository->getForPosition($position);
+        $payments = $paymentRepository->getForPosition($position);
+
         $dividends = $paymentRepository->getSumDividends([$ticker->getId()]);
         $dividend = 0;
         if (!empty($dividends)) {
-            $dividend = $dividends[$ticker->getId()] / 100;
+            $dividend = $dividends[$ticker->getId()] / 1000;
         }
         $growth = $dividendGrowth->getData($ticker);
-        
+
         $allocated = $summary->getTotalAllocated();
         $percentageAllocation = 0;
         if ($allocated > 0) {
@@ -124,7 +125,7 @@ class PortfolioController extends AbstractController
 
         $calendar = $ticker->getCalendars();
 
-        $referer->set('portfolio_show',['id' => $ticker->getId()]);
+        $referer->set('portfolio_show', ['id' => $position->getId()]);
 
         return $this->render('portfolio/show.html.twig', [
             'ticker' => $ticker,
@@ -152,11 +153,11 @@ class PortfolioController extends AbstractController
     /**
      * @Route("/pie", name="portfolio_pie", methods={"POST"})
      */
-     public function pie(Request $request, SessionInterface $session): Response
-     {
-         $pie = $request->request->get('pie');
-         $session->set(self::PIE_KEY, $pie);
- 
-         return $this->redirectToRoute('portfolio_index');
-     }
+    public function pie(Request $request, SessionInterface $session): Response
+    {
+        $pie = $request->request->get('pie');
+        $session->set(self::PIE_KEY, $pie);
+
+        return $this->redirectToRoute('portfolio_index');
+    }
 }

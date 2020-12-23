@@ -59,7 +59,7 @@
             <tr {{ position.isDividendPayMonth ? 'class="table-success"' : ''}}>
                 <td>{{ ticker.ticker }}</td>
                 <td>
-                    <a href="{{ path('portfolio_show', {'id': ticker.id}) }}">{{ ticker.fullname }}</a>
+                    <a href="{{ path('portfolio_show', {'id': position.id}) }}">{{ ticker.fullname }}</a>
                 </td>
                 <td>{{ amount|format_number({fraction_digit: 7}) }}</td>
                 <td>&euro;{{ avgPrice|format_number({fraction_digit: 2}) }}</td>
@@ -85,7 +85,7 @@
                     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                         <div class="btn-group mr-2" role="group" aria-label="First group">
                             <a class="btn btn-success" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id,'side': 1, }) }}" data-toggle="tooltip" data-placement="top" title="Buy"><i class="fas fa-plus"></i></a>
-                            <a href="{{ path('portfolio_show', {'id': ticker.id}) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
+                            <a href="{{ path('portfolio_show', {'id': position.id}) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
                             <a class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend date"><i class="far fa-calendar-alt"></i></a>
                             <a class="btn btn-success" href="{{ path('payment_new', {'position': position.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment"><i class="far fa-money-bill-alt"></i></a>
                             <a class="btn btn-secondary" href="{{ path('research_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add/edit research"><i class="fab fa-searchengin"></i></a>

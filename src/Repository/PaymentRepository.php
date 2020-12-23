@@ -3,12 +3,13 @@
 namespace App\Repository;
 
 use App\Entity\Payment;
+use App\Entity\Position;
 use App\Entity\Ticker;
+use App\Helper\DateHelper;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use App\Helper\DateHelper;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -62,7 +63,7 @@ class PaymentRepository extends ServiceEntityRepository
             ->leftJoin('p.calendar', 'c')
             ->orderBy($order, $sort);
 
-        if ($interval !== 'All'  && $startDate === null) {
+        if ($interval !== 'All' && $startDate === null) {
             $this->getInterval($queryBuilder, $interval);
         }
 
@@ -87,6 +88,17 @@ class PaymentRepository extends ServiceEntityRepository
             ->where('t = :ticker')
             ->orderBy('p.payDate', 'DESC')
             ->setParameter('ticker', $ticker)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getForPosition(Position $position): ?array
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.position', 'pos')
+            ->where('pos = :position')
+            ->orderBy('p.payDate', 'DESC')
+            ->setParameter('position', $position)
             ->getQuery()
             ->getResult();
     }
@@ -135,12 +147,12 @@ class PaymentRepository extends ServiceEntityRepository
     {
         $con = $this->getEntityManager()->getConnection();
 
-        $sql = 'SELECT YEAR(p.pay_date) periodYear, MONTH(p.pay_date) as periodMonth, SUM(p.dividend) dividend 
-                from payment p WHERE p.user_id = '.$user->getId().' GROUP BY YEAR(p.pay_date), MONTH(p.pay_date)';
+        $sql = 'SELECT YEAR(p.pay_date) periodYear, MONTH(p.pay_date) as periodMonth, SUM(p.dividend) dividend
+                from payment p WHERE p.user_id = ' . $user->getId() . ' GROUP BY YEAR(p.pay_date), MONTH(p.pay_date)';
 
         $result = $con->fetchAll($sql);
 
-        $sql = 'SELECT YEAR(MIN(p.pay_date)) as startdate from payment p WHERE p.user_id = '.$user->getId().' GROUP BY YEAR(p.pay_date) LIMIT 1';
+        $sql = 'SELECT YEAR(MIN(p.pay_date)) as startdate from payment p WHERE p.user_id = ' . $user->getId() . ' GROUP BY YEAR(p.pay_date) LIMIT 1';
         $years = $con->fetchAll($sql);
         $currentYear = date('Y');
         $startYear = $years[0]['startdate'] ?? $currentYear;
@@ -149,12 +161,12 @@ class PaymentRepository extends ServiceEntityRepository
         $accumulative = 0;
         foreach ($result as $item) {
             $period = $item['periodYear'] . sprintf('%02d', $item['periodMonth']);
-            $output[$period]['dividend'] = (int)$item['dividend'];
+            $output[$period]['dividend'] = (int) $item['dividend'];
             $accumulative += $item['dividend'];
             $output[$period]['accumulative'] = $accumulative;
         }
 
-        for ($year = (int)$startYear; $year < (int)$currentYear + 1; $year++) {
+        for ($year = (int) $startYear; $year < (int) $currentYear + 1; $year++) {
             for ($i = 1; $i < 13; $i++) {
                 $period = $year . sprintf('%02d', $i);
                 if (!isset($output[$period])) {
@@ -167,7 +179,7 @@ class PaymentRepository extends ServiceEntityRepository
                     if ($i > 1) {
                         $previousPeriod = $year . sprintf('%02d', ($i - 1));
                     }
-                    if ($year > (int)$startYear && $i === 1) {
+                    if ($year > (int) $startYear && $i === 1) {
                         $previousPeriod = ($year - 1) . '12';
                     }
                     $output[$period]['accumulative'] = $output[$previousPeriod]['accumulative'];
