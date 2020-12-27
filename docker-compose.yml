@@ -29,11 +29,8 @@ services:
         - ./phpdocker/mysql/mariadb.cnf:/etc/mysql/mariadb.cnf
         - ../data/mysql:/var/lib/mysql
         - ../logs/mysql:/var/log/mysql
-      environment:
-        - MYSQL_ROOT_PASSWORD=hd9251zp
-        - MYSQL_DATABASE=dividend
-        - MYSQL_USER=dividend
-        - MYSQL_PASSWORD=dividend
+      env_file:
+        - .env.local 
       ports:
         - 3306:3306
 
