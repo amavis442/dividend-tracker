@@ -3,25 +3,21 @@
 namespace App\Controller;
 
 use App\Entity\Payment;
-use App\Entity\Ticker;
 use App\Entity\Position;
 use App\Form\PaymentType;
-use App\Repository\PaymentRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use App\Helper\DateHelper;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use DateTime;
 use App\Repository\CalendarRepository;
+use App\Repository\PaymentRepository;
 use App\Repository\TickerRepository;
 use App\Service\Referer;
-
+use DateTime;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/dashboard/payment")
@@ -57,16 +53,17 @@ class PaymentController extends AbstractController
             $defaultData['year'] = date('Y');
         }
 
+        $currentYear = date('Y');
+        for ($i = 2019; $i <= $currentYear; $i++) {
+            $years[$i] = $i;
+        }
         $form = $this->createFormBuilder($defaultData)
             ->add(
                 'year',
                 ChoiceType::class,
-                ['label' => 'Year', 'choices'  => [
-                    '2019' => 2019,
-                    '2020' => 2020,
-                ]]
+                ['label' => 'Year', 'choices' => $years]
             )
-            ->add('month', ChoiceType::class, ['choices'  => [
+            ->add('month', ChoiceType::class, ['choices' => [
                 '-' => 0,
                 'Jan' => 1,
                 'Feb' => 2,
@@ -84,7 +81,7 @@ class PaymentController extends AbstractController
             ->add(
                 'quator',
                 ChoiceType::class,
-                ['choices'  => [
+                ['choices' => [
                     '-' => 0,
                     'Q1' => 1,
                     'Q2' => 2,
@@ -104,7 +101,7 @@ class PaymentController extends AbstractController
         }
 
         $year = $data['year'];
-        [$startDate, $endDate] = [$year.'-01-01', $year.'-12-31'];
+        [$startDate, $endDate] = [$year . '-01-01', $year . '-12-31'];
         if (isset($data['month']) && $data['month'] !== 0) {
             [$startDate, $endDate] = (new DateHelper())->monthToDates($data['month'], $data['year']);
         }
@@ -120,8 +117,7 @@ class PaymentController extends AbstractController
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
 
-
-        $referer->set('payment_index', ['page' => $page,  'tab' => $tab, 'orderBy' => $orderBy, 'sort' => $sort]);
+        $referer->set('payment_index', ['page' => $page, 'tab' => $tab, 'orderBy' => $orderBy, 'sort' => $sort]);
 
         return $this->render('payment/index.html.twig', [
             'searchForm' => $form->createView(),
@@ -138,14 +134,14 @@ class PaymentController extends AbstractController
             'routeName' => 'payment_index',
             'searchPath' => 'payment_search',
             'startDate' => $startDate,
-            'endDate' => $endDate
+            'endDate' => $endDate,
         ]);
     }
 
     /**
      * @Route("/new/{position}", name="payment_new", methods={"GET","POST"})
      */
-    public function new(
+    function new (
         Request $request,
         position $position,
         CalendarRepository $calendarRepository,
@@ -153,7 +149,7 @@ class PaymentController extends AbstractController
         Referer $referer
     ): Response {
         $ticker = $position->getTicker();
-        $amount = $position->getAmount();//$tickerRepository->getActiveUnits($ticker);
+        $amount = $position->getAmount(); //$tickerRepository->getActiveUnits($ticker);
 
         $payment = new Payment();
         $payment->setAmount($amount);
