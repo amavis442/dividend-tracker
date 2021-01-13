@@ -10,9 +10,9 @@ use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
 class Export
 {
-    public function export(PositionRepository $positionRepository)
+    public function export(PositionRepository $positionRepository): string
     {
-        $filename = '/tmp/tmp.xlxs';
+        $filename = '/tmp/export-' . date('Ymd') . '.xlxs';
         $writer = WriterEntityFactory::createXLSXWriter();
         $writer->openToFile($filename);
 
@@ -24,7 +24,7 @@ class Export
             ->setCellAlignment(CellAlignment::RIGHT)
             ->setBackgroundColor(Color::YELLOW)
             ->build();
-        
+
         $styleData = (new StyleBuilder())
             ->setFontSize(10)
             ->setFontName('Liberation Sans')
@@ -33,7 +33,7 @@ class Export
             ->build();
 
         $data = $this->getData($positionRepository);
-        
+
         foreach ($data as $pie => $rows) {
             $firstRow = true;
             $sheet = $writer->addNewSheetAndMakeItCurrent();
@@ -64,7 +64,7 @@ class Export
             if ($position->hasPie()) {
                 $pieName = $position->getPies()->first()->getLabel();
             }
-            
+
             $row = [];
             $row['Ticker'] = $position->getTicker()->getTicker();
             $row['Company'] = $position->getTicker()->getFullname();
@@ -73,7 +73,7 @@ class Export
             $row['Allocation'] = $position->getAllocation() / 1000;
             $row['AvgPrice'] = $position->getPrice() / 1000;
             $row['Profit'] = $position->getProfit() / 1000;
-            
+
             $row['dividend'] = 0.0;
             if ($position->getTicker()->hasCalendar()) {
                 $cash = $position->getTicker()->getCalendars()->first()->getCashAmount();
