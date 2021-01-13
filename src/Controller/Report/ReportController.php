@@ -34,7 +34,6 @@ class ReportController extends AbstractController
      * @Route("/report", name="report_index")
      */
     public function index(
-        BranchRepository $branchRepository,
         PositionRepository $positionRepository,
         Allocation $allocation
     ): Response {

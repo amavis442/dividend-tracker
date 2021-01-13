@@ -41,14 +41,14 @@
 					<td>{{ item.ticker }}</td>
 					<td>{{ item.label }}</td>
 					<td>&euro;{{ (item.avgPrice)|format_number({fraction_digit: 2}) }}</td>
-					<td>${{ (item.lastDividend)|format_number({fraction_digit: 2}) }}</td>
+					<td>{% if item.lastDividend > 0 %}${{ (item.lastDividend)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
 					<td>{% if item.lastDividendDate is not null %}{{ item.lastDividendDate|date("d-m-Y") }}{% else %} - {% endif %}</td>
-					<td>{{ item.numPayoutsPerYear }}</td>
-					<td>${{ (item.payout)|format_number({fraction_digit: 2}) }}</td>
-					<td>{{ item.yield }}%</td>
-					<td>&euro;{{ (item.netForwardYearlyPayout)|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ item.numPayoutsPerYear ?: '-' }}</td>
+					<td>{% if item.payout > 0 %}${{ (item.payout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
+					<td>{% if item.yield > 0 %}{{ item.yield }}%{% else %}-{% endif %}</td>
+					<td>{% if item.netForwardYearlyPayout > 0 %}&euro;{{ (item.netForwardYearlyPayout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
 					<td>{{ item.amount }}</td>
-					<td>&euro;{{ item.netTotalForwardYearlyPayout|format_number({fraction_digit: 2}) }}</td>
+					<td>{% if item.netTotalForwardYearlyPayout > 0 %}&euro;{{ item.netTotalForwardYearlyPayout|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
 				</tr>
 				{% endfor %}
 				<tr class="table-primary">
