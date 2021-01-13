@@ -28,7 +28,8 @@ class CalendarController extends AbstractController
         SessionInterface $session,
         int $page = 1,
         string $orderBy = 'paymentDate',
-        string $sort = 'DESC'
+        string $sort = 'DESC',
+        Referer $referer
     ): Response {
         if (!in_array($orderBy, ['paymentDate', 'ticker', 'exDividendDate'])) {
             $orderBy = 'paymentDate';
@@ -42,6 +43,7 @@ class CalendarController extends AbstractController
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
 
+        $referer->set('calendar_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
 
         return $this->render('calendar/index.html.twig', [
             'calendars' => $items,
