@@ -132,7 +132,7 @@ class ReportController extends AbstractController
         $response = new BinaryFileResponse($filename);
         $disposition = HeaderUtils::makeDisposition(
             HeaderUtils::DISPOSITION_ATTACHMENT,
-            date('Ymd') . '-export.xlxs'
+            date('Ymd') . '-export.xlsx'
         );
         $response->headers->set('Content-Disposition', $disposition);
 
