@@ -1,0 +1,163 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dividend Yield 
+{% endblock %}
+
+{% block body %}
+	<div class="card" style="margin-bottom:10px;margin-top:10px">
+  		<div class="card-body">
+		  <strong>Yield on cost dividend:</strong><br/>
+		  Total dividend in a year / total allocated = 
+		  &euro;{{ totalNetYearlyDividend|format_number({fraction_digit: 2}) }} / 
+		  &euro;{{ allocated|format_number({fraction_digit: 2}) }} =
+		  <strong>{{ dividendYieldOnCost|format_number({fraction_digit: 2}) }}%</strong>
+		</div>
+	</div>
+	
+	<div>
+		<form action="{{ path('report_dividend_yield_by_pie_form') }}" method="POST" class="form-inline">
+		<input type="hidden" name="_method" value="POST">
+			<div class="form-group mx-sm-3 mb-2">
+            <select name='pie' class="form-control">
+                <option value ='0'>-</option>
+                {% for p in pies %}
+                    <option value="{{ p.id }}" {% if pieSelected == p.id %}selected{% endif %}>{{ p.label }}</option>
+                {% endfor %}
+            </select>
+       </div>
+    	<button class="btn btn-secondary mb-2" data-toggle="tooltip" data-placement="top" title="Search Ticker"><i class="fas fa-search"></i></button>
+		</form>
+	</div>
+
+
+    <div style='width:1000px;height:600px' class="col col-xs-12">
+        <canvas id="myChart" ></canvas>
+    </div>
+
+	<div>
+		<table class="table">
+			<thead class="thead-dark">
+			<tr>
+				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'ticker'}) }}">Ticker</a></th>
+				<th>Company</th>
+				<th>avgPrice</th>
+				<th>Last dividend</th>
+				<th>Last payout date</th>
+				<th>#Payouts per year</th>
+				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'dividend'}) }}">Dividend</a></th>
+				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'yield'}) }}">Yield</a></th>
+				<th>Net forward yearly dividend per share</th>
+				<th>Amount</th>
+				<th>Net forward yearly dividend total</th>
+			</tr>
+			</thead>
+			<tbody>
+				{% for item in datasource %}
+				<tr>
+					<td>{{ item.ticker }}</td>
+					<td>{{ item.label }}</td>
+					<td>&euro;{{ (item.avgPrice)|format_number({fraction_digit: 2}) }}</td>
+					<td>{% if item.lastDividend > 0 %}${{ (item.lastDividend)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
+					<td>{% if item.lastDividendDate is not null %}{{ item.lastDividendDate|date("d-m-Y") }}{% else %} - {% endif %}</td>
+					<td>{{ item.numPayoutsPerYear ?: '-' }}</td>
+					<td>{% if item.payout > 0 %}${{ (item.payout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
+					<td>{% if item.yield > 0 %}{{ item.yield }}%{% else %}-{% endif %}</td>
+					<td>{% if item.netForwardYearlyPayout > 0 %}&euro;{{ (item.netForwardYearlyPayout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
+					<td>{{ item.amount }}</td>
+					<td>{% if item.netTotalForwardYearlyPayout > 0 %}&euro;{{ item.netTotalForwardYearlyPayout|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
+				</tr>
+				{% endfor %}
+				<tr class="table-primary">
+					<td colspan='10'></td>
+					<td>&euro;{{ totalNetYearlyDividend|format_number({fraction_digit: 2}) }}</td>
+				</td>
+			</tbody>
+		</table>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('chart') }}
+    {{ encore_entry_script_tags('app') }}
+    {% include "report/_colors.html.twig" %}
+<script>
+var config = {
+			type: 'bar',
+			data: {
+				datasets: [{
+					data: {{ data|raw }},
+					backgroundColor: [
+						"#0074D9", 
+						"#FF4136", 
+						"#2ECC40", 
+						"#FF851B", 
+						"#7FDBFF", 
+						"#B10DC9", 
+						"#FFDC00", 
+						"#001f3f", 
+						"#39CCCC", 
+						"#01FF70", 
+						"#85144b", 
+						"#F012BE", 
+						"#3D9970", 
+						"#111111", 
+						"#AAAAAA",
+						"#0074D9", 
+						"#FF4136", 
+						"#2ECC40", 
+						"#FF851B", 
+						"#7FDBFF", 
+						"#B10DC9", 
+						"#FFDC00", 
+						"#001f3f", 
+						"#39CCCC", 
+						"#01FF70", 
+						"#85144b", 
+						"#F012BE", 
+						"#3D9970", 
+						"#111111", 
+						"#AAAAAA",
+						"#0074D9", 
+						"#FF4136", 
+						"#2ECC40", 
+						"#FF851B", 
+						"#7FDBFF", 
+						"#B10DC9", 
+						"#FFDC00", 
+						"#001f3f", 
+						"#39CCCC", 
+						"#01FF70", 
+						"#85144b", 
+						"#F012BE", 
+						"#3D9970", 
+						"#111111", 
+						"#AAAAAA"
+					],
+					label: 'Yield'
+				}],
+				labels: {{ labels|raw }}
+			},
+			options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    fontSize: 24,
+                    text: 'Dividend yield'
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            callback: function(value, index, values) {
+                               return value + '%';
+                            }
+                        }
+                    }]
+                }
+			}
+        };
+var ctx = document.getElementById('myChart').getContext('2d');
+window.myBar = new Chart(ctx, config);
+</script>
+
+{% endblock %}

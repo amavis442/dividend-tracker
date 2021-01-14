@@ -3,16 +3,15 @@
 namespace App\Service;
 
 use App\Repository\PositionRepository;
-use App\Repository\TickerRepository;
 
 class Yields
 {
     function yield (
-        TickerRepository $tickerRepository,
         PositionRepository $positionRepository,
         string $orderBy = 'ticker',
         float $exchangeRate = 1.19,
-        float $tax = 0.15
+        float $tax = 0.15,
+        int $pieId = null
     ): array{
         $labels = [];
         $data = [];
@@ -23,8 +22,8 @@ class Yields
         $orderKey = 0;
         $totalNetYearlyDividend = 0.0;
 
-        $positions = $positionRepository->getAllOpen();
-        $allocated = $positionRepository->getSumAllocated();
+        $positions = $positionRepository->getAllOpen($pieId);
+        $allocated = $positionRepository->getSumAllocated($pieId);
 
         foreach ($positions as $position) {
             $ticker = $position->getTicker();
@@ -78,18 +77,23 @@ class Yields
             $sumDividends += $dividendPerYear;
             $totalDividend += $dividendPerYear * $amount;
         }
-        //dump(array_values($labels));//, array_values($data));
         ksort($labels);
         ksort($data);
-        //dd(array_values($labels));//, array_values($data));
 
         if ($orderBy === 'yield' || $orderBy === 'dividend') {
             krsort($dataSource);
         } else {
             ksort($dataSource);
         }
-        $totalAvgYield = ($sumDividends / $sumAvgPrice) * 100;
-        $dividendYieldOnCost = ($totalNetYearlyDividend / $allocated) * 100;
+
+        $totalAvgYield = 0.0;
+        $dividendYieldOnCost = 0.0;
+        if ($sumAvgPrice) {
+            $totalAvgYield = ($sumDividends / $sumAvgPrice) * 100;
+        }
+        if ($allocated) {
+            $dividendYieldOnCost = ($totalNetYearlyDividend / $allocated) * 100;
+        }
 
         return [
             'data' => json_encode(array_values($data)),

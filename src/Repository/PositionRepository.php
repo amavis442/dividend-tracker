@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use DateTime;
@@ -112,7 +113,7 @@ class PositionRepository extends ServiceEntityRepository
         return $paginator;
     }
 
-    public function getAllOpen(): array
+    public function getAllOpen(int $pieId = null): array
     {
         $qb = $this->createQueryBuilder('p')
             ->select('p, t, pa, c, dm')
@@ -121,6 +122,12 @@ class PositionRepository extends ServiceEntityRepository
             ->leftJoin('p.payments', 'pa')
             ->leftJoin('t.DividendMonths', 'dm')
             ->where('p.closed = 0 OR p.closed IS NULL');
+        
+        if ($pieId) {
+            $qb->join("p.pies", 'pie')
+            ->andWhere('pie IN (:pieIds)')
+            ->setParameter('pieIds', [$pieId]);
+        }
 
         return $qb->getQuery()
             ->getResult();
@@ -236,14 +243,20 @@ class PositionRepository extends ServiceEntityRepository
         return $profit ?? 0;
     }
 
-    public function getSumAllocated(): int
+    public function getSumAllocated(int $pieId = null): int
     {
-        $allocated = $this->createQueryBuilder('p')
+        $qb = $this->createQueryBuilder('p')
             ->select('SUM(p.allocation)')
-            ->where('p.closed <> 1 or p.closed is null')
-            ->getQuery()
-            ->getSingleScalarResult();
+            ->where('p.closed <> 1 or p.closed is null');
 
+        if ($pieId) {
+            $qb->join("p.pies", 'pie')
+            ->andWhere('pie IN (:pieIds)')
+            ->setParameter('pieIds', [$pieId]);
+        }
+
+        $allocated = $qb->getQuery()
+        ->getSingleScalarResult();   
         if ($allocated) {
             return $allocated / 1000;
         }
