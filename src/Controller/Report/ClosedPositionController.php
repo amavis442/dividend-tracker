@@ -2,17 +2,13 @@
 
 namespace App\Controller\Report;
 
+use App\Repository\PaymentRepository;
+use App\Repository\PositionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
-use App\Repository\BranchRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Repository\PositionRepository;
-use App\Repository\PaymentRepository;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use App\Entity\Position;
-use App\Form\PositionType;
-
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/dashboard/report")
@@ -21,7 +17,7 @@ class ClosedPositionController extends AbstractController
 {
     public const SEARCH_KEY = 'closed_position_searchCriteria';
 
-      /**
+    /**
      * @Route("/closed/{page}/{orderBy}/{sort}", name="report_closed_positions_index", methods={"GET"})
      */
     public function index(
@@ -66,10 +62,10 @@ class ClosedPositionController extends AbstractController
             'totalDividend' => $totalDividend,
             'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'report_closed_positions_index',
-            'searchPath' => 'report_closed_positions_search'
+            'searchPath' => 'report_closed_positions_search',
         ]);
     }
-    
+
     /**
      * @Route("/closed/search", name="report_closed_positions_search", methods={"POST"})
      */
