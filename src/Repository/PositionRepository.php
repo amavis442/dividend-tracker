@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use DateTime;
@@ -113,7 +112,7 @@ class PositionRepository extends ServiceEntityRepository
         return $paginator;
     }
 
-    public function getAllOpen(int $pieId = null): array
+    public function getAllOpen(int $pieId = null, int $year = null): array
     {
         $qb = $this->createQueryBuilder('p')
             ->select('p, t, pa, c, dm')
@@ -127,6 +126,11 @@ class PositionRepository extends ServiceEntityRepository
             $qb->join("p.pies", 'pie')
             ->andWhere('pie IN (:pieIds)')
             ->setParameter('pieIds', [$pieId]);
+        }
+
+        if ($year) {
+            $qb->andWhere('YEAR(c.paymentDate) = :year')
+            ->setParameter('year', $year);
         }
 
         return $qb->getQuery()
