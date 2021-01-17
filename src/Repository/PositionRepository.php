@@ -120,7 +120,7 @@ class PositionRepository extends ServiceEntityRepository
             ->leftJoin('t.calendars', 'c')
             ->leftJoin('p.payments', 'pa')
             ->leftJoin('t.DividendMonths', 'dm')
-            ->where('p.closed = 0 OR p.closed IS NULL');
+            ->where('(p.closed = 0 OR p.closed IS NULL)');
         
         if ($pieId) {
             $qb->join("p.pies", 'pie')

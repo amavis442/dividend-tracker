@@ -112,7 +112,7 @@ class Projection
         $this->taxDividend = $taxDividend;
 
         $dividendEstimate = [];
-        $positions = $positionRepository->getAllOpen();
+        $positions = $positionRepository->getAllOpen(null, $year);
         foreach ($positions as $position) {
             $positionDividendEstimate = $calendarRepository->getDividendEstimate($position, $year);
             foreach ($positionDividendEstimate as $payDate => $estimate) {
