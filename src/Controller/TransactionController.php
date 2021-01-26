@@ -2,29 +2,24 @@
 
 namespace App\Controller;
 
-use App\Entity\Currency;
 use App\Entity\Position;
-use App\Entity\Ticker;
 use App\Entity\Transaction;
-use App\Entity\Branch;
 use App\Form\TransactionType;
 use App\Repository\BranchRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
+use App\Service\ImportMail;
+use App\Service\ImportCsv;
 use App\Service\Referer;
 use App\Service\WeightedAverage;
 use DateTime;
-use DOMDocument;
-use DOMElement;
-use DOMNode;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use ZBateson\MailMimeParser\MailMimeParser;
 
 /**
  * @Route("/dashboard/transaction")
@@ -33,176 +28,8 @@ class TransactionController extends AbstractController
 {
     public const SEARCH_KEY = 'transaction_searchCriteria';
 
-    private function importData(DOMNode $tableNodes): ?array
-    {
-        $rows = [];
-        foreach ($tableNodes->childNodes as $childNode) {
-            if ($childNode instanceof DOMElement) {
-                if ($childNode->nodeName === 'tbody') {
-                    foreach ($childNode->childNodes as $tNode) {
-                        if ($tNode->nodeName === 'tr') {
-                            $row = [];
-                            $r = 0;
-                            foreach ($tNode->childNodes as $trNode) {
-                                if ($trNode->nodeName === 'td' && $trNode->nodeValue != '') {
-                                    $val = $val = trim(str_replace("\n", "", $trNode->nodeValue));
-                                    switch ($r) {
-                                        case 0:
-                                            $row['nr'] = $val;
-                                            break;
-                                        case 1:
-                                            $row['opdrachtid'] = $val;
-                                            break;
-                                        case 2:
-                                            [$ticker, $isin] = explode('/', $val);
-                                            $row['ticker'] = $ticker;
-                                            $row['isin'] = $isin;
-                                            break;
-                                        case 3:
-                                            $d = 1;
-                                            if (strtolower($val) === 'verkopen') {
-                                                $d = 2;
-                                            }
-                                            $row['direction'] = $d;
-                                            break;
-                                        case 4:
-                                            $row['amount'] = $val * 10000000;
-                                            break;
-                                        case 5:
-                                            $unitPrice = str_replace(" EUR", '', $val) * 1000;
-
-                                            $row['price'] = $unitPrice;
-                                            break;
-                                        case 6:
-                                            $allocation = str_replace(" EUR", '', $val) * 1000;
-                                            $row['allocation'] = $allocation;
-                                            break;
-                                        case 7:
-                                            $row['handelsdag'] = $val;
-                                            break;
-                                        case 8:
-                                            $row['handelstijd'] = $val;
-                                            break;
-                                        case 9:
-                                            $row['commisie'] = $val;
-                                            break;
-                                        case 10:
-                                            $row['kosten_en_vergoedingen'] = $val;
-                                            break;
-                                        case 11:
-                                            $row['opdrachttype'] = $val;
-                                            break;
-                                        case 12:
-                                            $row['plaats_van_uitvoering'] = $val;
-                                            break;
-                                        case 13:
-                                            $row['wisselkoersen'] = $val;
-                                            break;
-                                        case 14:
-                                            $row['totale_prijs'] = $val;
-                                            break;
-                                        default:
-                                            $row[] = $val;
-                                    }
-                                    $r++;
-                                }
-                            }
-                            if (count($row) > 0) {
-                                $transactionDate = DateTime::createFromFormat('d-m-Y H:i:s', $row['handelsdag'] . ' ' . $row['handelstijd']);
-                                $row['transactionDate'] = $transactionDate;
-                                $rows[$row['nr'] ] = $row;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return $rows;
-    }
-
-    private function getImportFiles(): array
-    {
-        $files = [];
-        if ($handle = opendir(dirname(__DIR__) . '/../import')) {
-            echo "Directory handle: $handle\n";
-            echo "Entries:\n";
-
-            /* This is the correct way to loop over the directory. */
-            while (false !== ($entry = readdir($handle))) {
-                if (is_dir($entry)) {
-                    continue;
-                }
-                $files[] = $entry;
-            }
-            closedir($handle);
-        }
-        return $files;
-    }
-
     /**
-     */
-    private function preImportCheckTicker(
-        $entityManager,
-        Branch $branch,
-        TickerRepository $tickerRepository,
-        array $data
-    ): Ticker {
-        $ticker = $tickerRepository->findOneBy(['ticker' => $data['ticker']]);
-        if ($ticker && ($ticker->getIsin() == null || $ticker->getIsin() == '')) {
-            $ticker->setIsin($data['isin']);
-            $entityManager->persist($ticker);
-            $entityManager->flush();
-        }
-        if (!$ticker) {
-            $ticker = $tickerRepository->findOneBy(['isin' => $data['isin']]);
-            if (!$ticker) {
-                $ticker = new Ticker();
-                $ticker->setTicker($data['ticker'])
-                    ->setFullname($data['ticker'])
-                    ->setIsin($data['isin'])
-                    ->setBranch($branch);
-
-                $entityManager->persist($ticker);
-                $entityManager->flush();
-            }
-        }
-
-        return $ticker;
-    }
-
-    private function preImportCheckPosition(
-        $entityManager,
-        Ticker $ticker,
-        Currency $currency,
-        PositionRepository $positionRepository,
-        array $data
-    ): Position {
-        $position = $positionRepository->findOneBy(['posid' => $data['opdrachtid']]);
-        if (!$position) {
-            $position = new Position();
-            $position->setTicker($ticker)
-                ->setAmount(0)
-                ->setCurrency($currency)
-                ->setPosid($data['opdrachtid'])
-                ->setAllocationCurrency($currency)
-            ;
-            $entityManager->persist($position);
-            $entityManager->flush();
-        }
-
-        if ($position) {
-            if (!$position->getPosid() || $position->getPosid() === '') {
-                $position->setPosid($data['opdrachtid']);
-                $entityManager->persist($position);
-                $entityManager->flush();
-            }
-        }
-
-        return $position;
-    }
-
-    /**
-     * @Route("/import", name="transaction_test", methods={"GET","POST"})
+     * @Route("/import", name="transaction_import_mail", methods={"GET","POST"})
      */
     public function import(
         TickerRepository $tickerRepository,
@@ -210,90 +37,45 @@ class TransactionController extends AbstractController
         PositionRepository $positionRepository,
         WeightedAverage $weightedAverage,
         BranchRepository $branchRepository,
-        TransactionRepository $transactionRepository
+        TransactionRepository $transactionRepository,
+        ImportMail $importMail
     ): void {
-        ini_set('max_execution_time', 3000);
 
-        $files = $this->getImportFiles();
-        sort($files);
-        $internalErrors = libxml_use_internal_errors(true);
         $entityManager = $this->getDoctrine()->getManager();
-        $currency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
-        $branch = $branchRepository->findOneBy(['label' => 'Tech']);
-
-        // use an instance of MailMimeParser as a class dependency
-        $mailParser = new MailMimeParser();
-        foreach ($files as $file) {
-            $transactionsAdded = 0;
-            $totalTransaction = 0;
-
-            $handle = fopen(dirname(__DIR__) . '/../import/' . $file, 'r');
-            $message = $mailParser->parse($handle);
-            $htmlContent = '<html>' . $message->getHtmlContent() . '</html>';
-
-            $DOM = new DOMDocument();
-            $DOM->loadHTML($htmlContent);
-
-            $tables = $DOM->getElementsByTagName('table');
-            $tableNodes = $tables[3];
-            $rows = $this->importData($tableNodes);
-
-            if (count($rows) > 0) {
-                ksort($rows);
-                
-                foreach ($rows as $row) {
-                    $ticker = $this->preImportCheckTicker($entityManager, $branch, $tickerRepository, $row);
-                    $position = $this->preImportCheckPosition($entityManager, $ticker, $currency, $positionRepository, $row);
-                    $transaction = $transactionRepository->findOneBy(['transactionDate' => $row['transactionDate'], 'position' => $position, 'meta' => $row['nr']]);
-                                        
-                    if (!$transaction) {
-                        $transaction = new Transaction();
-                        $transaction
-                            ->setSide($row['direction'])
-                            ->setPrice($row['price'])
-                            ->setAllocation($row['allocation'])
-                            ->setAmount($row['amount'])
-                            ->setTransactionDate($row['transactionDate'])
-                            ->setBroker('Trading212')
-                            ->setAllocationCurrency($currency)
-                            ->setCurrency($currency)
-                            ->setPosition($position)
-                            ->setExchangeRate($row['wisselkoersen'])
-                            ->setJobid($row['opdrachtid'])
-                            ->setMeta($row['nr'])
-                            ->setImportfile($file)
-                        ;
-
-                        $position->addTransaction($transaction);
-                        $weightedAverage->calc($position);
-
-                        if ($position->getAmount() === 0) {
-                            $position->setClosed(1);
-                        }
-
-                        if ($position->getAmount() > -6 && $position->getAmount() < 0) {
-                            $position->setClosed(1);
-                            $position->setAmount(0);
-                        }
-
-                        $entityManager->persist($position);
-                        $entityManager->flush();
-                        $transactionsAdded++;
-                    } else {
-                        dump('Transaction already exists. ID: ' . $transaction->getId());
-                    }
-                    unset($ticker, $position, $transaction);
-                    
-                    $totalTransaction++;
-                }
-            }
-            fclose($handle);
-            dump('Done processing file ' . $file . '.....', 'Transaction added: ' . $transactionsAdded . ' of ' . $totalTransaction);
-        }
-        libxml_use_internal_errors($internalErrors);
+        $importMail->import($tickerRepository,
+            $currencyRepository,
+            $positionRepository,
+            $weightedAverage,
+            $branchRepository,
+            $transactionRepository, $entityManager);
 
         exit();
     }
+
+    /**
+     * @Route("/importcsv", name="transaction_import_csv", methods={"GET","POST"})
+     */
+    public function importCsv(
+        TickerRepository $tickerRepository,
+        CurrencyRepository $currencyRepository,
+        PositionRepository $positionRepository,
+        WeightedAverage $weightedAverage,
+        BranchRepository $branchRepository,
+        TransactionRepository $transactionRepository,
+        ImportCsv $importCsv
+    ): void {
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $importCsv->import($tickerRepository,
+            $currencyRepository,
+            $positionRepository,
+            $weightedAverage,
+            $branchRepository,
+            $transactionRepository, $entityManager);
+
+        exit();
+    }
+
 
     /**
      * @Route("/list/{page}/{tab}/{orderBy}/{sort}", name="transaction_index", methods={"GET"})
