@@ -27,13 +27,19 @@ class ImportCsv extends ImportBase
     protected function importData(Sheet $sheet): ?array
     {
         $rows = [];
+        $headers = [];
         $rowNum = 0;
         foreach ($sheet->getRowIterator() as $csvRow) {
+            $cells = $csvRow->getCells();
+            
             if ($rowNum === 0) {
+                foreach ($cells as $r => $cell) 
+                {
+                    $headers[$r] = strtolower($cell->getValue());    
+                }
                 $rowNum++;
                 continue;
             }
-            $cells = $csvRow->getCells();
             $cell = $cells[0];
             $cellVal = $cell->getValue();
             if (false === stripos($cellVal,'sell') && false === stripos($cellVal,'buy')){
@@ -46,10 +52,11 @@ class ImportCsv extends ImportBase
 
             foreach ($cells as $r => $cell) 
             {
+                $header = $headers[$r];
                 $val = $cell->getValue();
                 $row['nr'] = $rowNum;
-                switch ($r) {
-                    case 0:
+                switch ($header) {
+                    case 'action':
                         $row['action'] = $val;
                         $d = 1;
                         if (false !== stripos($val,'sell')) {
@@ -57,32 +64,32 @@ class ImportCsv extends ImportBase
                         }
                         $row['direction'] = $d;
                         break;
-                    case 1:
+                    case 'time':
                         $row['time'] = $val;
                         $row['transactionDate'] = DateTime::createFromFormat('Y-m-d H:i:s', $val);;
                         break;
-                    case 2:
+                    case 'isin':
                         $row['isin'] = $val;
                         break;
-                    case 3:
+                    case 'ticker':
                         $row['ticker'] = $val;
                         break;
-                    case 4:
+                    case 'name':
                         $row['name'] = $val;
                         break;
-                    case 5:
+                    case 'no. of shares':
                         $rawAmount = $val;
                         $row['amount'] = $val * 10000000;
                         break;
-                    case 8:
+                    case 'exchange rate':
                         $row['wisselkoersen'] = $val;
                         break;
-                    case 10:
+                    case 'total (eur)':
                         $rawAllocation = $val;
                         $allocation = $val * 1000;
                         $row['allocation'] = $allocation;
                         break;
-                    case 14:
+                    case 'id':
                         $row['opdrachtid'] = $val;
                         break;    
                     default:
