@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use DateTimeInterface;
-use DateTime;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PositionRepository")
@@ -102,7 +102,7 @@ class Position
     private $updatedAt;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Pie", inversedBy="positions")   
+     * @ORM\ManyToMany(targetEntity="App\Entity\Pie", inversedBy="positions")
      * @ORM\OrderBy({"label" = "DESC"})
      * @ORM\JoinTable(name="pie_position",
      *      joinColumns={@ORM\JoinColumn(name="position_id", referencedColumnName="id")},
@@ -289,24 +289,24 @@ class Position
         return $this;
     }
 
-     /**
+    /**
      * @return Collection|Payment[]
      */
     public function getPayments(): Collection
     {
         return $this->payments;
     }
- 
+
     public function addPayment(Payment $payment): self
     {
         if (!$this->payments->contains($payment)) {
             $this->payments[] = $payment;
             $payment->setPosition($this);
         }
- 
+
         return $this;
     }
- 
+
     public function removePayment(Payment $payment): self
     {
         if ($this->payments->contains($payment)) {
@@ -316,10 +316,9 @@ class Position
                 $payment->setPosition(null);
             }
         }
- 
-        return $this;
-     }
 
+        return $this;
+    }
 
     public function getPosid(): ?string
     {
@@ -338,7 +337,7 @@ class Position
         $currentMonth = date('m');
         $months = $this->getTicker()->getDividendMonths()->getValues();
         foreach ($months as $dividendMonth) {
-            if ($dividendMonth->getDividendMonth() === (int)$currentMonth) {
+            if ($dividendMonth->getDividendMonth() === (int) $currentMonth) {
                 return true;
             }
         }
@@ -348,7 +347,7 @@ class Position
     public function forwardNetDividend(): ?float
     {
         $forwardNetDividend = 0.0;
-        if ($this->getTicker()->getCalendars()){
+        if ($this->getTicker()->getCalendars()) {
             $calendar = $this->getTicker()->getCalendars()->first();
             $cashAmount = $calendar->getCashamount() / 1000;
             $forwardNetDividend = ($this->getAmount() / 10000000) * $cashAmount * 0.85 / 1.19;
@@ -360,74 +359,91 @@ class Position
      * Gets triggered only on insert
      * @ORM\PrePersist
      */
-     public function onPrePersist()
-     {
-         $this->createdAt = new \DateTime("now");
-     }
- 
-     public function setCreatedAt(DateTimeInterface $createdAt = null): self
-     {
-         $this->createdAt = $createdAt ?? new DateTime("now");
-     }
- 
-     public function getCreatedAt(): DateTimeInterface
-     {
-         return $this->createdAt;
-     }
- 
-     /**
-      * Gets triggered every time on update
-      * @ORM\PreUpdate
-      */
-      public function onPreUpdate()
-      {
-          $this->updatedAt = new \DateTime("now");
-      }
- 
-      
-     public function setUpdatedAt(DateTimeInterface $updatedAt = null): self
-     {
-         $this->updatedAt = $updatedAt ?? new DateTime("now");
-     }
- 
-     public function getUpdatedAt(): ?DateTimeInterface
-     {
-         return $this->updatedAt;
-     }
+    public function onPrePersist()
+    {
+        $this->createdAt = new \DateTime("now");
+    }
 
-     /**
-      * @return Collection|Pie[]
-      */
-     public function getPies(): Collection
-     {
-         return $this->pies;
-     }
+    public function setCreatedAt(DateTimeInterface $createdAt = null): self
+    {
+        $this->createdAt = $createdAt ?? new DateTime("now");
+    }
 
-     public function addPie(Pie $pie): self
-     {
-         if (!$this->pies->contains($pie)) {
-             $this->pies[] = $pie;
-             $pie->addPosition($this);
-         }
+    public function getCreatedAt(): DateTimeInterface
+    {
+        return $this->createdAt;
+    }
 
-         return $this;
-     }
+    /**
+     * Gets triggered every time on update
+     * @ORM\PreUpdate
+     */
+    public function onPreUpdate()
+    {
+        $this->updatedAt = new \DateTime("now");
+    }
 
-     public function removePie(Pie $pie): self
-     {
-         if ($this->pies->removeElement($pie)) {
-             $pie->removePosition($this);
-         }
+    public function setUpdatedAt(DateTimeInterface $updatedAt = null): self
+    {
+        $this->updatedAt = $updatedAt ?? new DateTime("now");
+    }
 
-         return $this;
-     }
+    public function getUpdatedAt(): ?DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
 
-     public function hasPie(): bool
-     {
-         if (count($this->pies) > 0 ) {
-             return true;
-         }
+    /**
+     * @return Collection|Pie[]
+     */
+    public function getPies(): Collection
+    {
+        return $this->pies;
+    }
 
-         return false;
-     }
+    public function addPie(Pie $pie): self
+    {
+        if (!$this->pies->contains($pie)) {
+            $this->pies[] = $pie;
+            $pie->addPosition($this);
+        }
+
+        return $this;
+    }
+
+    public function removePie(Pie $pie): self
+    {
+        if ($this->pies->removeElement($pie)) {
+            $pie->removePosition($this);
+        }
+
+        return $this;
+    }
+
+    public function hasPie(): bool
+    {
+        if (count($this->pies) > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getAmountPerDate(DateTimeInterface $datetime): ?float
+    {
+        $timestamp = $datetime->format('Ymd');
+        $amount = 0.0;
+        foreach ($this->getTransactions() as $transaction) {
+            if ($transaction->getTransactionDate()->format('Ymd') < $timestamp) {
+                if ($transaction->getSide() == Transaction::BUY) {
+                    $amount += $transaction->getAmount();
+                }
+                if ($transaction->getSide() == Transaction::SELL) {
+                    $amount -= $transaction->getAmount();
+                }
+            }
+        }
+
+        return $amount;
+    }
 }

@@ -1,9 +1,9 @@
 <?php
 
 namespace App\Entity;
-use DateTimeInterface;
-use DateTime;
 
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**

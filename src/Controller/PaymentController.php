@@ -8,7 +8,6 @@ use App\Form\PaymentType;
 use App\Helper\DateHelper;
 use App\Repository\CalendarRepository;
 use App\Repository\PaymentRepository;
-use App\Repository\TickerRepository;
 use App\Service\Referer;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -139,22 +138,37 @@ class PaymentController extends AbstractController
     }
 
     /**
-     * @Route("/new/{position}", name="payment_new", methods={"GET","POST"})
+     * @Route("/new/{position}/{timestamp?}", name="payment_new", methods={"GET","POST"})
      */
     function new (
         Request $request,
         position $position,
+        string $timestamp = null,
         CalendarRepository $calendarRepository,
-        TickerRepository $tickerRepository,
         Referer $referer
     ): Response {
         $ticker = $position->getTicker();
-        $amount = $position->getAmount(); //$tickerRepository->getActiveUnits($ticker);
+        if ($timestamp) {
+            $year = substr($timestamp, 0, 4);
+            $month = substr($timestamp, 5, 2);
+        } else {
+            $year = date('Y');
+            $month = date('m');
+        }
 
+        $positionDividendEstimate = $calendarRepository->getDividendEstimate($position, $year);
+        if (isset($positionDividendEstimate[$timestamp])) {
+            $data = $positionDividendEstimate[$timestamp]['tickers'][$ticker->getTicker()];
+            $amount = $data['amount'] * 10000000;
+            $calendar = $data['calendar'];
+        } else {
+            $amount = $position->getAmount();
+            $calendar = $calendarRepository->getLastDividend($ticker);
+        }
         $payment = new Payment();
         $payment->setAmount($amount);
         $payment->setPosition($position);
-        $calendar = $calendarRepository->getLastDividend($ticker);
+
         if ($calendar) {
             $payment->setCalendar($calendar);
             $payment->setDividend($calendar->getCashAmount());

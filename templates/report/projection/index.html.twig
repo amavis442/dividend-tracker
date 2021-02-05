@@ -77,7 +77,7 @@
 													<a href="{{ path('portfolio_show', {'id': position.position.id }) }}" class="btn btn-primary">
 														<i class="fas fa-book-open"></i>
 													</a>
-													<a class="btn btn-success" href="{{ path('payment_new', {'position': position.position.id }) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment">
+													<a class="btn btn-success" href="{{ path('payment_new', {'position': position.position.id, 'timestamp' : item.timestamp}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment">
 														<i class="far fa-money-bill-alt"></i>
 													</a>
 													{% endif %}

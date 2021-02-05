@@ -33,6 +33,7 @@ class Projection
         $dataSource[$paydate]['grossTotalPayment'] = 0.0;
         $dataSource[$paydate]['estimatedNetTotalPayment'] = 0.0;
         $dataSource[$paydate]['normaldate'] = $normalDate;
+        $dataSource[$paydate]['timestamp'] = null;
         $dataSource[$paydate]['tickers'] = [];
         foreach ($dividendMonth->getTickers() as $ticker) {
             $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
@@ -63,6 +64,8 @@ class Projection
         $dataSource[$paydate]['grossTotalPayment'] = $item['grossTotalPayment'];
         $dataSource[$paydate]['estimatedNetTotalPayment'] = 0.0;
         $dataSource[$paydate]['normaldate'] = $normalDate;
+        $dataSource[$paydate]['timestamp'] = $paydate;
+
         $dataSource[$paydate]['tickers'] = [];
         foreach ($dividendMonth->getTickers() as $ticker) {
             if (isset($item['tickers'][$ticker->getTicker()])) {
@@ -133,7 +136,7 @@ class Projection
             }
         }
         ksort($dividendEstimate);
-        
+
         $this->calcEstimatePayoutPerMonth($dividendEstimate);
 
         $dataSource = [];
