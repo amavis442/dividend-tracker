@@ -12,7 +12,6 @@ use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
 use App\Service\WeightedAverage;
 use Doctrine\ORM\EntityManager;
-use DOMNode;
 
 abstract class ImportBase
 {
@@ -45,7 +44,7 @@ abstract class ImportBase
         }
         return $files;
     }
-    
+
     protected function preImportCheckPosition(
         $entityManager,
         Ticker $ticker,
@@ -53,10 +52,7 @@ abstract class ImportBase
         PositionRepository $positionRepository,
         array $data
     ): Position {
-        $position = $positionRepository->findOneBy(['posid' => $data['opdrachtid']]);
-        if (!$position) {
-            $position = $positionRepository->findOneBy(['ticker' => $ticker, 'closed' => null]);
-        }
+        $position = $positionRepository->findOneBy(['ticker' => $ticker, 'closed' => null]);
 
         if (!$position) {
             $position = new Position();
