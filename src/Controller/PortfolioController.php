@@ -9,6 +9,8 @@ use App\Repository\PositionRepository;
 use App\Service\DividendGrowth;
 use App\Service\Referer;
 use App\Service\Summary;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -157,6 +159,24 @@ class PortfolioController extends AbstractController
         $pie = $request->request->get('pie');
         $session->set(self::PIE_KEY, $pie);
 
+        return $this->redirectToRoute('portfolio_index');
+    }
+
+    /**
+     * @Route("/close/{position}", name="portfolio_position_close", methods={"DELETE"})
+     */
+    public function closePosition(Request $request, EntityManagerInterface $em, Position $position): Response
+    {
+        if ($this->isCsrfTokenValid('delete' . $position->getId(), $request->request->get('_token'))) {
+            $position->setClosed(1);
+            $em->persist($position);
+            $em->flush();
+        }
+        /*
+        $position->setClosed(1);
+        $em->persist($position);
+        $em->flush();
+        */
         return $this->redirectToRoute('portfolio_index');
     }
 }
