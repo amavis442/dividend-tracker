@@ -52,7 +52,7 @@ abstract class ImportBase
         PositionRepository $positionRepository,
         array $data
     ): Position {
-        $position = $positionRepository->findOneBy(['ticker' => $ticker, 'closed' => null]);
+        $position = $positionRepository->findOneByTicker($ticker);
 
         if (!$position) {
             $position = new Position();
