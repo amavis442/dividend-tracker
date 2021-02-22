@@ -29,7 +29,7 @@ class TransactionController extends AbstractController
     public const SEARCH_KEY = 'transaction_searchCriteria';
 
     /**
-     * @Route("/import", name="transaction_import_mail", methods={"GET","POST"})
+     * @Route("/import/mail", name="transaction_import_mail", methods={"GET","POST"})
      */
     public function import(
         TickerRepository $tickerRepository,
@@ -53,7 +53,7 @@ class TransactionController extends AbstractController
     }
 
     /**
-     * @Route("/importcsv", name="transaction_import_csv", methods={"GET","POST"})
+     * @Route("/import/csv", name="transaction_import_csv", methods={"GET","POST"})
      */
     public function importCsv(
         TickerRepository $tickerRepository,
