@@ -47,10 +47,10 @@
                         {{ position.ticker.fullname }}
                     </td>
                     <td>{{ position.ticker.branch.label }}</td>
-                    <td>{{ (position.amount/100)|format_number({fraction_digit: 2}) }}</td>
+                    <td>{{ (position.amount/10000000)|format_number({fraction_digit: 2}) }}</td>
                     
-                    <td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price/100)|format_number({fraction_digit: 2}) }}</td>
-                    <td>{{ (position.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ (position.allocation/100)|format_number({fraction_digit: 2}) }}</td>
+                    <td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price/1000)|format_number({fraction_digit: 2}) }}</td>
+                    <td>{{ (position.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ (position.allocation/1000)|format_number({fraction_digit: 2}) }}</td>
                     <td>{{ position.posid }}</td>
                     <td>{{ position.updatedAt ? position.updatedAt|date("d/m/Y") : '' }}</td>
                     <td>{{ position.closed == 2 ? 'closed' : 'open'}}</td>
