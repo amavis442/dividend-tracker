@@ -144,7 +144,7 @@ class ImportCsv extends ImportBase
                 foreach ($rows as $row) {
                     $ticker = $this->preImportCheckTicker($entityManager, $branch, $tickerRepository, $row);
                     $position = $this->preImportCheckPosition($entityManager, $ticker, $currency, $positionRepository, $row);
-                    $transaction = $transactionRepository->findOneBy(['transactionDate' => $row['transactionDate'], 'position' => $position]);
+                    $transaction = $transactionRepository->findOneBy(['jobid' => $row['opdrachtid']]);
 
                     if (!$transaction) {
                         $transaction = new Transaction();
@@ -167,13 +167,13 @@ class ImportCsv extends ImportBase
                         $position->addTransaction($transaction);
                         $weightedAverage->calc($position);
 
-                        if ($position->getAmount() === 0 || $position->getAmount() < 0.0001) {
+                        if ($position->getAmount() === 0 || $position->getAmount() < 2) {
                             $position->setClosed(1);
                             $position->setClosedAt($row['transactionDate']);
                             $position->setAmount(0);                            
                         }
 
-                        if ($position->getAmount() > -6 && $position->getAmount() < 0.0001) {
+                        if ($position->getAmount() > -6 && $position->getAmount() < 2) {
                             $position->setClosed(1);
                             $position->setClosedAt($row['transactionDate']);
                             $position->setAmount(0);
