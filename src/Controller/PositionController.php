@@ -165,6 +165,7 @@ class PositionController extends AbstractController
     {
         if ($closed === 1) {
             $position->setClosed(true);
+            $position->setClosedAt((new DateTime()));
         }
 
         $form = $this->createForm(PositionType::class, $position);

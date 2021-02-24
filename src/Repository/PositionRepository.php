@@ -73,6 +73,41 @@ class PositionRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    public function findOneByTickerAndTransactionDate(Ticker $ticker, ?DateTime $transactionDate = null): ?Position
+    {
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->select('p')
+            ->where('p.ticker = :ticker')
+            ->andWhere(':transactionDate >= p.createdAt AND :transactionDate <= p.closedAt');
+
+        return $queryBuilder
+            ->setParameter('ticker', $ticker)
+            ->setParameter('transactionDate', $transactionDate)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findOneByTickerAndDate(Ticker $ticker, ?DateTime $transactionDate = null): ?Position
+    {
+        if ($transactionDate) {
+            $position = $this->findOneByTickerAndTransactionDate($ticker, $transactionDate);
+            if ($position) {
+                return $position;
+            }
+        }
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->select('p')
+            ->where('p.ticker = :ticker')
+            ->andWhere('p.closed IS NULL or p.closed = 0');
+
+        $position = $queryBuilder
+            ->setParameter('ticker', $ticker)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $position;
+    }
+
     public function getForTicker(Ticker $ticker, int $status = self::OPEN): ?Position
     {
         $queryBuilder = $this->createQueryBuilder('p')
@@ -138,16 +173,16 @@ class PositionRepository extends ServiceEntityRepository
             ->leftJoin('p.payments', 'pa')
             ->leftJoin('t.DividendMonths', 'dm')
             ->where('(p.closed = 0 OR p.closed IS NULL)');
-        
+
         if ($pieId) {
             $qb->join("p.pies", 'pie')
-            ->andWhere('pie IN (:pieIds)')
-            ->setParameter('pieIds', [$pieId]);
+                ->andWhere('pie IN (:pieIds)')
+                ->setParameter('pieIds', [$pieId]);
         }
 
         if ($year) {
             $qb->andWhere('YEAR(c.paymentDate) = :year')
-            ->setParameter('year', $year);
+                ->setParameter('year', $year);
         }
 
         return $qb->getQuery()
@@ -272,12 +307,12 @@ class PositionRepository extends ServiceEntityRepository
 
         if ($pieId) {
             $qb->join("p.pies", 'pie')
-            ->andWhere('pie IN (:pieIds)')
-            ->setParameter('pieIds', [$pieId]);
+                ->andWhere('pie IN (:pieIds)')
+                ->setParameter('pieIds', [$pieId]);
         }
 
         $allocated = $qb->getQuery()
-        ->getSingleScalarResult();   
+            ->getSingleScalarResult();
         if ($allocated) {
             return $allocated / 1000;
         }

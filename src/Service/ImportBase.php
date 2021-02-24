@@ -52,7 +52,8 @@ abstract class ImportBase
         PositionRepository $positionRepository,
         array $data
     ): Position {
-        $position = $positionRepository->findOneByTicker($ticker);
+        $transactionDate = $data['transactionDate'];
+        $position = $positionRepository->findOneByTickerAndDate($ticker, $transactionDate);
 
         if (!$position) {
             $position = new Position();

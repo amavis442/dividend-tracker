@@ -111,6 +111,11 @@ class Position
      */
     private $pies;
 
+    /**
+     * @ORM\Column(type="datetime", name="closed_at", nullable=true)
+     */
+    private $closedAt;
+
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
@@ -445,5 +450,17 @@ class Position
         }
 
         return $amount;
+    }
+
+    public function getClosedAt(): ?\DateTimeInterface
+    {
+        return $this->closedAt;
+    }
+
+    public function setClosedAt(?\DateTimeInterface $closedAt): self
+    {
+        $this->closedAt = $closedAt;
+
+        return $this;
     }
 }

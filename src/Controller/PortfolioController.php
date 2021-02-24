@@ -9,6 +9,7 @@ use App\Repository\PositionRepository;
 use App\Service\DividendGrowth;
 use App\Service\Referer;
 use App\Service\Summary;
+use DateTime;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -169,6 +170,7 @@ class PortfolioController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete' . $position->getId(), $request->request->get('_token'))) {
             $position->setClosed(1);
+            $position->setClosedAt((new DateTime()));
             $em->persist($position);
             $em->flush();
         }

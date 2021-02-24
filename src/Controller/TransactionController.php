@@ -10,8 +10,8 @@ use App\Repository\CurrencyRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
-use App\Service\ImportMail;
 use App\Service\ImportCsv;
+use App\Service\ImportMail;
 use App\Service\Referer;
 use App\Service\WeightedAverage;
 use DateTime;
@@ -75,7 +75,6 @@ class TransactionController extends AbstractController
 
         exit();
     }
-
 
     /**
      * @Route("/list/{page}/{tab}/{orderBy}/{sort}", name="transaction_index", methods={"GET"})
@@ -156,8 +155,9 @@ class TransactionController extends AbstractController
             $position->addTransaction($transaction);
             $weightedAverage->calc($position);
 
-            if ($position->getAmount() === 0) {
+            if ($position->getAmount() === 0 || $position->getAmount() < 0.0001) {
                 $position->setClosed(1);
+                $position->setClosedAt((new DateTime()));
             }
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($position);
@@ -207,6 +207,7 @@ class TransactionController extends AbstractController
             $weightedAverage->calc($position);
             if ($position->getAmount() === 0) {
                 $position->setClosed(1);
+                $position->setClosedAt((new DateTime()));
             }
             $this->getDoctrine()->getManager()->flush();
             $session->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
