@@ -51,7 +51,7 @@ class PortfolioController extends AbstractController
             $sort = 'asc';
         }
 
-        $pies = $pieRepository->findAll();
+        $pies = $pieRepository->findLinked();
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
         $pieSelected = $session->get(self::PIE_KEY, null);
         if ($pieSelected && $pieSelected != '-') {

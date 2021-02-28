@@ -19,7 +19,7 @@
 		<input type="hidden" name="_method" value="POST">
 			<div class="form-group mx-sm-3 mb-2">
             <select name='pie' class="form-control">
-                <option value ='0'>-</option>
+                <option value ='0'>All</option>
                 {% for p in pies %}
                     <option value="{{ p.id }}" {% if pieSelected == p.id %}selected{% endif %}>{{ p.label }}</option>
                 {% endfor %}

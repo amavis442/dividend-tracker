@@ -27,6 +27,15 @@ class PieRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findLinked(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.positions', 'pos')    
+            ->where('pos.closed IS NULL or pos.closed = 0')
+            ->orderBy('p.label','ASC')
+            ->getQuery()
+            ->getResult();
+    }
     // /**
     //  * @return Pie[] Returns an array of Pie objects
     //  */

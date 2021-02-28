@@ -33,7 +33,7 @@ class YieldByPieController extends AbstractController
 
         $pieSelected = $session->get(self::YIELD_PIE_KEY, null);
         $result = $yields->yield($positionRepository, $orderBy, self::EXCHANGE_RATE, self::TAX_DIVIDEND, $pieSelected);
-        $pies = $pieRepository->findAll();
+        $pies = $pieRepository->findLinked();
 
         return $this->render('report/yield/pie.html.twig', array_merge($result, [
             'controller_name' => 'ReportController', 'pies' => $pies, 'pieSelected' => $pieSelected]));
