@@ -60,7 +60,7 @@ class PortfolioController extends AbstractController
             $items = $positionRepository->getAll($page, 10, $order, $sort, $searchCriteria, PositionRepository::OPEN);
         }
 
-        $limit = 10;
+        $limit = 20;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
         $iter = $items->getIterator();
