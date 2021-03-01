@@ -51,16 +51,17 @@ class PortfolioController extends AbstractController
             $sort = 'asc';
         }
 
+        $limit = 20;
         $pies = $pieRepository->findLinked();
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
         $pieSelected = $session->get(self::PIE_KEY, null);
         if ($pieSelected && $pieSelected != '-') {
-            $items = $positionRepository->getAll($page, 10, $order, $sort, $searchCriteria, PositionRepository::OPEN, [$pieSelected]);
+            $items = $positionRepository->getAll($page, $limit, $order, $sort, $searchCriteria, PositionRepository::OPEN, [$pieSelected]);
         } else {
-            $items = $positionRepository->getAll($page, 10, $order, $sort, $searchCriteria, PositionRepository::OPEN);
+            $items = $positionRepository->getAll($page, $limit, $order, $sort, $searchCriteria, PositionRepository::OPEN);
         }
 
-        $limit = 20;
+        
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
         $iter = $items->getIterator();
