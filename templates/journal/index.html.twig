@@ -5,37 +5,26 @@
 {% block body %}
     <h1>Journal index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Content</th>
-                <th>CreatedAt</th>
-                <th>UpdatedAt</th>
-                <th>Title</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
+    
         {% for journal in journals %}
-            <tr>
-                <td>{{ journal.id }}</td>
-                <td>{{ journal.content }}</td>
-                <td>{{ journal.createdAt ? journal.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ journal.updatedAt ? journal.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ journal.title }}</td>
-                <td>
-                    <a href="{{ path('journal_show', {'id': journal.id}) }}">show</a>
-                    <a href="{{ path('journal_edit', {'id': journal.id}) }}">edit</a>
-                </td>
-            </tr>
+        <div class="card" style="width: 60rem;">
+            <div class="card-header">{{ journal.title }}
+            </div>
+            <div class="card-body">
+                <span class="card-text">{{ journal.content|raw }}
+                <hr/>
+                <a href="{{ path('journal_show', {'id': journal.id}) }}" class="btn btn-primary">show</a>
+                <a href="{{ path('journal_edit', {'id': journal.id}) }}" class="btn btn-secondary">edit</a>
+            </div>
+            <div class="card-footer text-muted">
+                Created: {{ journal.createdAt ? journal.createdAt|date('Y-m-d H:i:s') : '-' }}, 
+                Modified: {{ journal.updatedAt ? journal.updatedAt|date('Y-m-d H:i:s') : '-' }}
+            </div>
+        </div>
+    
         {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
+                no records found
         {% endfor %}
-        </tbody>
-    </table>
-
+<br/>
     <a href="{{ path('journal_new') }}" class="btn btn-primary">Create new</a>
 {% endblock %}
