@@ -316,10 +316,6 @@ class Position
     {
         if ($this->payments->contains($payment)) {
             $this->payments->removeElement($payment);
-            // set the owning side to null (unless already changed)
-            if ($payment->getPosition() === $this) {
-                $payment->setPosition(null);
-            }
         }
 
         return $this;
@@ -372,6 +368,8 @@ class Position
     public function setCreatedAt(DateTimeInterface $createdAt = null): self
     {
         $this->createdAt = $createdAt ?? new DateTime("now");
+
+        return $this;
     }
 
     public function getCreatedAt(): DateTimeInterface
@@ -391,6 +389,8 @@ class Position
     public function setUpdatedAt(DateTimeInterface $updatedAt = null): self
     {
         $this->updatedAt = $updatedAt ?? new DateTime("now");
+
+        return $this;
     }
 
     public function getUpdatedAt(): ?DateTimeInterface

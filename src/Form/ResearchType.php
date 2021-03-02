@@ -3,17 +3,16 @@
 namespace App\Form;
 
 use App\Entity\Research;
+use App\Form\AttachmentType;
 use App\Repository\TickerRepository;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\CallbackTransformer;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use App\Form\AttachmentType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ResearchType extends AbstractType
 {
@@ -39,12 +38,12 @@ class ResearchType extends AbstractType
                 'required' => false,
                 'label' => false,
                 'allow_add' => true,
-                'allow_delete'	=> true,
+                'allow_delete' => true,
                 'prototype' => true,
                 'by_reference' => false,
                 //'attr' => ['style' => 'display:none'],
             ]);
-  
+
         $builder->get("ticker")->addModelTransformer(new CallbackTransformer(
             function (int $tickerId) {
                 return $tickerId;
@@ -58,7 +57,7 @@ class ResearchType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Research::class
+            'data_class' => Research::class,
         ]);
     }
 
