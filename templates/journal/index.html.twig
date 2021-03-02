@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Journal index{% endblock %}
+
+{% block body %}
+    <h1>Journal index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Content</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>Title</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for journal in journals %}
+            <tr>
+                <td>{{ journal.id }}</td>
+                <td>{{ journal.content }}</td>
+                <td>{{ journal.createdAt ? journal.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ journal.updatedAt ? journal.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ journal.title }}</td>
+                <td>
+                    <a href="{{ path('journal_show', {'id': journal.id}) }}">show</a>
+                    <a href="{{ path('journal_edit', {'id': journal.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('journal_new') }}" class="btn btn-primary">Create new</a>
+{% endblock %}

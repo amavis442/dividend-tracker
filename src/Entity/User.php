@@ -14,8 +14,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface
 {
-    public const ROLES = ['user','admin','superadmin'];
-    
+    public const ROLES = ['user', 'admin', 'superadmin'];
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -49,12 +49,16 @@ class User implements UserInterface
      */
     private $payments;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Journal", mappedBy="user")
+     */
+    private $journals;
+
     public function __construct()
     {
         $this->payments = new ArrayCollection();
         $this->positions = new ArrayCollection();
-        $this->branches = new ArrayCollection();
-        $this->tickers = new ArrayCollection();
+        $this->journals = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -136,22 +140,6 @@ class User implements UserInterface
     }
 
     /**
-     * @return Collection|Branch[]
-     */
-    public function getBranches(): Collection
-    {
-        return $this->branches;
-    }
-
-    /**
-     * @return Collection|Ticker[]
-     */
-    public function getTickers(): Collection
-    {
-        return $this->tickers;
-    }
-
-    /**
      * @return Collection|Position[]
      */
     public function getPositions(): Collection
@@ -165,60 +153,6 @@ class User implements UserInterface
     public function getPayments(): Collection
     {
         return $this->payments;
-    }
-
-    /**
-     * @return Collection|Calendar[]
-     */
-    public function getCalendars(): Collection
-    {
-        return $this->calendars;
-    }
-
-    public function addBranch(Branch $branch): self
-    {
-        if (!$this->branches->contains($branch)) {
-            $this->branches[] = $branch;
-            $branch->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBranch(Branch $branch): self
-    {
-        if ($this->branches->contains($branch)) {
-            $this->branches->removeElement($branch);
-            // set the owning side to null (unless already changed)
-            if ($branch->getUser() === $this) {
-                $branch->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function addTicker(Ticker $ticker): self
-    {
-        if (!$this->tickers->contains($ticker)) {
-            $this->tickers[] = $ticker;
-            $ticker->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTicker(Ticker $ticker): self
-    {
-        if ($this->tickers->contains($ticker)) {
-            $this->tickers->removeElement($ticker);
-            // set the owning side to null (unless already changed)
-            if ($ticker->getUser() === $this) {
-                $ticker->setUser(null);
-            }
-        }
-
-        return $this;
     }
 
     public function addPosition(Position $position): self
@@ -235,10 +169,6 @@ class User implements UserInterface
     {
         if ($this->positions->contains($position)) {
             $this->positions->removeElement($position);
-            // set the owning side to null (unless already changed)
-            if ($position->getUser() === $this) {
-                $position->setUser(null);
-            }
         }
 
         return $this;
@@ -258,10 +188,33 @@ class User implements UserInterface
     {
         if ($this->payments->contains($payment)) {
             $this->payments->removeElement($payment);
-            // set the owning side to null (unless already changed)
-            if ($payment->getUser() === $this) {
-                $payment->setUser(null);
-            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Journal[]
+     */
+    public function getJournals(): Collection
+    {
+        return $this->journals;
+    }
+
+    public function addJournal(Journal $journal): self
+    {
+        if (!$this->journals->contains($journal)) {
+            $this->journals[] = $journal;
+            $journal->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeJournal(Journal $journal): self
+    {
+        if ($this->journals->contains($journal)) {
+            $this->journals->removeElement($journal);
         }
 
         return $this;
