@@ -19,7 +19,7 @@ $(document).ready(function() {
     $('[data-toggle="popover"]').popover();
     $('[data-toggle="tooltip"]').tooltip();
     $('.summernote').summernote({
-        height: 250,   //set editable area's height
+        height: 600,   //set editable area's height
         codemirror: { // codemirror options
           theme: 'monokai'
         }
