@@ -27,7 +27,7 @@ class PortfolioController extends AbstractController
     public const PIE_KEY = 'portfolio_searchPie';
 
     /**
-     * @Route("/list/{page<\d+>?1}/{orderBy}/{sort}", name="portfolio_index", methods={"GET"})
+     * @Route("/list/{page<\d+>?1}/{orderBy?ticker}/{sort?asc}", name="portfolio_index", methods={"GET"})
      */
     public function index(
         PositionRepository $positionRepository,
