@@ -6,7 +6,9 @@
 parameters:
     documents_directory: '%kernel.project_dir%/public/uploads/documents'
     app.path.research_attachments: /uploads/documents
-    
+    app.dividend.tax: 0.15
+    app.dividend.exchangerate: 1.19
+
 services:
     # default configuration for services in *this* file
     _defaults:

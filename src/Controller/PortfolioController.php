@@ -10,7 +10,6 @@ use App\Service\DividendGrowth;
 use App\Service\Referer;
 use App\Service\Summary;
 use DateTime;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -110,8 +109,16 @@ class PortfolioController extends AbstractController
         DividendGrowth $dividendGrowth,
         Referer $referer
     ): Response {
+        $dividendTax = $this->getParameter('app.dividend.tax');
+        $exhangeRate = $this->getParameter('app.dividend.exchangerate');
+
         $ticker = $position->getTicker();
         $position = $positionRepository->getForPosition($position);
+        $netYearlyDividend = 0.0;
+        if ($cals = $ticker->getCalendars()) {
+            $dividendFrequentie = count($ticker->getDividendMonths());
+            $netYearlyDividend = (($dividendFrequentie * $cals[0]->getCashAmount() / 1000) / $exhangeRate) * (1 - $dividendTax);
+        }
         $payments = $position->getPayments();
         $dividends = $paymentRepository->getSumDividends([$ticker->getId()]);
         $dividend = 0;
@@ -138,6 +145,7 @@ class PortfolioController extends AbstractController
             'dividend' => $dividend,
             'calendars' => $calendar,
             'totalInvested' => $allocated,
+            'netYearlyDividend' => $netYearlyDividend,
             'percentageAllocated' => $percentageAllocation,
         ]);
     }

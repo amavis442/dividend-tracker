@@ -9,7 +9,7 @@
 			<th>Allocation</th>
 			<th>avgPrice</th>
 			<th>Profit/Loss</th>
-			<th>Broker</th>
+			<th>Dividend yield</th>
 			<th>Actions</th>
 		</tr>
 	</thead>
@@ -23,10 +23,11 @@
 				{% set currentAmount = oldAmount %}
 				{% if transaction.side == 1 %}
 					{% set oldAmount = oldAmount - transaction.amount/10000000 %}
+					{% set dividendYield = (netYearlyDividend / (transaction.price/1000)) * 100 %}
 				{% else %}
 					{% set oldAmount = oldAmount + transaction.amount/10000000 %}
+					{% set dividendYield = 0 %}
 				{% endif %}
-
 				<tr>
 					<td>
 						<span class="badge badge-{% if transaction.side == 1 %}success{% else %}danger{% endif %}">
@@ -40,7 +41,7 @@
 					<td>{{ currentAmount }} @ {{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.avgprice/1000)|format_number({fraction_digit: 2}) }}</td>
 					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}<span class="badge badge-{% if transaction.profit > 0 %}success{% else %}danger{% endif %}">{{ (transaction.profit/1000)|format_number({fraction_digit: 2}) }}</span>
 					</td>
-					<td>{{ transaction.broker }}</td>
+					<td>{% if transaction.side == 1 %}{{ dividendYield|format_number({fraction_digit: 2}) }}% {% endif %}</td>
 					<td>
 						<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 							<div class="btn-group mr-2" role="group" aria-label="First group">
