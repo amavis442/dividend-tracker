@@ -1,11 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Journal index{% endblock %}
+{% block title %}Journal{% endblock %}
 
 {% block body %}
-    <h1>Journal index</h1>
-
-    
+    <h1>Journal</h1>
+    <div>
+        <a href="{{ path('journal_new') }}" class="btn btn-primary" role="button"><i class="far fa-file"></i> Create new</a>
+    </div>
+    <br/>    
         {% for journal in journals %}
         <div class="card" style="width: 60rem;">
             <div class="card-header">{{ journal.title }}
@@ -25,6 +27,4 @@
         {% else %}
                 no records found
         {% endfor %}
-<br/>
-    <a href="{{ path('journal_new') }}" class="btn btn-primary">Create new</a>
 {% endblock %}
