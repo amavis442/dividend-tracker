@@ -115,7 +115,8 @@ class PortfolioController extends AbstractController
         $ticker = $position->getTicker();
         $position = $positionRepository->getForPosition($position);
         $netYearlyDividend = 0.0;
-        if ($cals = $ticker->getCalendars()) {
+        $cals = $ticker->getCalendars();
+        if (count($cals) > 0) {
             $dividendFrequentie = count($ticker->getDividendMonths());
             $netYearlyDividend = (($dividendFrequentie * $cals[0]->getCashAmount() / 1000) / $exhangeRate) * (1 - $dividendTax);
         }
