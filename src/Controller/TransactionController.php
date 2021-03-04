@@ -40,33 +40,9 @@ class TransactionController extends AbstractController
         TransactionRepository $transactionRepository,
         ImportMail $importMail
     ): void {
-
+        
         $entityManager = $this->getDoctrine()->getManager();
         $importMail->import($tickerRepository,
-            $currencyRepository,
-            $positionRepository,
-            $weightedAverage,
-            $branchRepository,
-            $transactionRepository, $entityManager);
-
-        exit();
-    }
-
-    /**
-     * @Route("/import/csv", name="transaction_import_csv", methods={"GET","POST"})
-     */
-    public function importCsv(
-        TickerRepository $tickerRepository,
-        CurrencyRepository $currencyRepository,
-        PositionRepository $positionRepository,
-        WeightedAverage $weightedAverage,
-        BranchRepository $branchRepository,
-        TransactionRepository $transactionRepository,
-        ImportCsv $importCsv
-    ): void {
-
-        $entityManager = $this->getDoctrine()->getManager();
-        $importCsv->import($tickerRepository,
             $currencyRepository,
             $positionRepository,
             $weightedAverage,

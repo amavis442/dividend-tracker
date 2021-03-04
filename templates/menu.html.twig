@@ -55,6 +55,14 @@
                         <a href="{{ url('report_export', parameters = [], schemeRelative = false) }}" class="dropdown-item" target="_new">Export</a>
                       </div>
                 </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown5" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Import
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown5">
+                        <a href="{{ url('csv_import', parameters = [], schemeRelative = false) }}" class="dropdown-item">Import csv</a>
+                   </div>
+                </li>
                 <li  class="nav-item">
                     <a href="{{ url('journal_index', parameters = [], schemeRelative = false) }}" class="nav-link">Journal</a>
                 </li>

@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Import csv file!{% endblock %}
+
+{% block body %}
+<h1>Import csv</h1>
+<hr/>
+{{ form_start(form) }}
+    {{ form_row(form.importfile) }}
+    <button class="btn btn-primary"><i class="far fa-save"></i> Save</button>
+{{ form_end(form) }}
+<br/>
+<a class="btn btn-secondary" href="{{ path('portfolio_index') }}">Back</a>
+{% endblock %}

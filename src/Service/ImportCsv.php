@@ -2,9 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\Branch;
 use App\Entity\Currency;
-use App\Entity\Position;
-use App\Entity\Ticker;
 use App\Entity\Transaction;
 use App\Repository\BranchRepository;
 use App\Repository\CurrencyRepository;
@@ -12,14 +11,16 @@ use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
 use App\Service\WeightedAverage;
-use DateTime;
-use Doctrine\ORM\EntityManager;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Box\Spout\Reader\CSV\Sheet;
+use DateTime;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImportCsv extends ImportBase
 {
-    protected function formatImportData($data):array
+    protected function formatImportData($data): array
     {
         return $this->importData($data);
     }
@@ -31,18 +32,17 @@ class ImportCsv extends ImportBase
         $rowNum = 0;
         foreach ($sheet->getRowIterator() as $csvRow) {
             $cells = $csvRow->getCells();
-            
+
             if ($rowNum === 0) {
-                foreach ($cells as $r => $cell) 
-                {
-                    $headers[$r] = strtolower($cell->getValue());    
+                foreach ($cells as $r => $cell) {
+                    $headers[$r] = strtolower($cell->getValue());
                 }
                 $rowNum++;
                 continue;
             }
             $cell = $cells[0];
             $cellVal = $cell->getValue();
-            if (false === stripos($cellVal,'sell') && false === stripos($cellVal,'buy')){
+            if (false === stripos($cellVal, 'sell') && false === stripos($cellVal, 'buy')) {
                 continue;
             };
 
@@ -50,8 +50,7 @@ class ImportCsv extends ImportBase
             $rawAmount = 0;
             $rawAllocation = 0;
 
-            foreach ($cells as $r => $cell) 
-            {
+            foreach ($cells as $r => $cell) {
                 $header = $headers[$r];
                 $val = $cell->getValue();
                 $row['nr'] = $rowNum;
@@ -59,14 +58,14 @@ class ImportCsv extends ImportBase
                     case 'action':
                         $row['action'] = $val;
                         $d = 1;
-                        if (false !== stripos($val,'sell')) {
+                        if (false !== stripos($val, 'sell')) {
                             $d = 2;
                         }
                         $row['direction'] = $d;
                         break;
                     case 'time':
                         $row['time'] = $val;
-                        $row['transactionDate'] = DateTime::createFromFormat('Y-m-d H:i:s', $val);;
+                        $row['transactionDate'] = DateTime::createFromFormat('Y-m-d H:i:s', $val);
                         break;
                     case 'isin':
                         $row['isin'] = $val;
@@ -91,7 +90,7 @@ class ImportCsv extends ImportBase
                         break;
                     case 'id':
                         $row['opdrachtid'] = $val;
-                        break;    
+                        break;
                     default:
                         $row[] = $val;
                 }
@@ -105,8 +104,6 @@ class ImportCsv extends ImportBase
         }
         return $rows;
     }
-
-
 
     public function import(
         TickerRepository $tickerRepository,
@@ -123,7 +120,7 @@ class ImportCsv extends ImportBase
         sort($files);
         $currency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
         $branch = $branchRepository->findOneBy(['label' => 'Tech']);
-        
+
         $reader = ReaderEntityFactory::createCSVReader();
         $reader->setFieldDelimiter(',');
         foreach ($files as $file) {
@@ -135,11 +132,11 @@ class ImportCsv extends ImportBase
             $totalTransaction = 0;
             $filename = realpath(dirname(__DIR__) . '/../import/' . $file);
             $reader->open($filename);
-            
+
             $sheets = $reader->getSheetIterator();
             $rows = $this->formatImportData($sheets->current());
             $reader->close();
-            
+
             if (count($rows) > 0) {
                 foreach ($rows as $row) {
                     $ticker = $this->preImportCheckTicker($entityManager, $branch, $tickerRepository, $row);
@@ -170,7 +167,7 @@ class ImportCsv extends ImportBase
                         if ($position->getAmount() === 0 || $position->getAmount() < 2) {
                             $position->setClosed(1);
                             $position->setClosedAt($row['transactionDate']);
-                            $position->setAmount(0);                            
+                            $position->setAmount(0);
                         }
 
                         if ($position->getAmount() > -6 && $position->getAmount() < 2) {
@@ -194,4 +191,89 @@ class ImportCsv extends ImportBase
         }
     }
 
+    public function importFile(
+        EntityManagerInterface $entityManager,
+        TickerRepository $tickerRepository,
+        PositionRepository $positionRepository,
+        WeightedAverage $weightedAverage,
+        Currency $currency,
+        Branch $branch,
+        TransactionRepository $transactionRepository,
+        UploadedFile $uploadedFile,
+        ?\Box\Spout\Reader\CSV\Reader $reader = null
+    ): array
+    {
+        $transactionsAdded = 0;
+        $totalTransaction = 0;
+        $transactionAlreadyExists = [];
+
+        $file = $uploadedFile->getClientOriginalName();
+        $filename = $uploadedFile->getRealPath();
+
+        if (!$reader) {
+            $reader = ReaderEntityFactory::createCSVReader();
+            $reader->setFieldDelimiter(',');
+        }
+        $reader->open($filename);
+
+        $sheets = $reader->getSheetIterator();
+        $rows = $this->formatImportData($sheets->current());
+        $reader->close();
+
+        if (count($rows) > 0) {
+            foreach ($rows as $row) {
+                $ticker = $this->preImportCheckTicker($entityManager, $branch, $tickerRepository, $row);
+                $position = $this->preImportCheckPosition($entityManager, $ticker, $currency, $positionRepository, $row);
+                $transaction = $transactionRepository->findOneBy(['jobid' => $row['opdrachtid']]);
+
+                if (!$transaction) {
+                    $transaction = new Transaction();
+                    $transaction
+                        ->setSide($row['direction'])
+                        ->setPrice($row['price'])
+                        ->setAllocation($row['allocation'])
+                        ->setAmount($row['amount'])
+                        ->setTransactionDate($row['transactionDate'])
+                        ->setBroker('Trading212')
+                        ->setAllocationCurrency($currency)
+                        ->setCurrency($currency)
+                        ->setPosition($position)
+                        ->setExchangeRate($row['wisselkoersen'])
+                        ->setJobid($row['opdrachtid'])
+                        ->setMeta($row['nr'])
+                        ->setImportfile($file)
+                    ;
+
+                    $position->addTransaction($transaction);
+                    $weightedAverage->calc($position);
+
+                    if ($position->getAmount() === 0 || $position->getAmount() < 2) {
+                        $position->setClosed(1);
+                        $position->setClosedAt($row['transactionDate']);
+                        $position->setAmount(0);
+                    }
+
+                    if ($position->getAmount() > -6 && $position->getAmount() < 2) {
+                        $position->setClosed(1);
+                        $position->setClosedAt($row['transactionDate']);
+                        $position->setAmount(0);
+                    }
+
+                    $entityManager->persist($position);
+                    $entityManager->flush();
+                    $transactionsAdded++;
+                } else {
+                    $transactionAlreadyExists[] = 'Transaction already exists. ID: ' . $transaction->getId();
+                }
+                unset($ticker, $position, $transaction);
+
+                $totalTransaction++;
+            }
+        }
+        return [
+            'totalTransaction' => $totalTransaction,
+            'transactionsAdded' => $transactionsAdded,
+            'transactionAlreadyExists' => $transactionAlreadyExists,
+        ];
+    }
 }
