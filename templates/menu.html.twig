@@ -10,14 +10,15 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
                         <a href="{{ url('branch_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Industry</a>
-                        <div class="dropdown-divider"></div>
                         <a href="{{ url('ticker_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Tickers</a>
-                        <div class="dropdown-divider"></div>
                         <a href="{{ url('research_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Research on Tickers</a>
-                        <div class="dropdown-divider"></div>
                         <a href="{{ url('position_index', parameters = {status: 2}, schemeRelative = false) }}" class="dropdown-item">Closed positions</a>
                         <div class="dropdown-divider"></div>
                         <a href="{{ url('pie_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Pies</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url('csv_import', parameters = [], schemeRelative = false) }}" class="dropdown-item">Import csv</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url('journal_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Journal</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -55,17 +56,7 @@
                         <a href="{{ url('report_export', parameters = [], schemeRelative = false) }}" class="dropdown-item" target="_new">Export</a>
                       </div>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown5" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Import
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown5">
-                        <a href="{{ url('csv_import', parameters = [], schemeRelative = false) }}" class="dropdown-item">Import csv</a>
-                   </div>
-                </li>
-                <li  class="nav-item">
-                    <a href="{{ url('journal_index', parameters = [], schemeRelative = false) }}" class="nav-link">Journal</a>
-                </li>
+
             {% endif %}
         </ul>
 
