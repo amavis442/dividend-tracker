@@ -28,7 +28,7 @@ class PaymentController extends AbstractController
     public const INTERVAL_KEY = 'payment_interval';
 
     /**
-     * @Route("/list/{page}/{tab}/{orderBy}/{sort}", name="payment_index", methods={"GET","POST"})
+     * @Route("/list/{page?1}/{tab?All}/{orderBy?payDate}/{sort?DESC}", name="payment_index", methods={"GET","POST"})
      */
     public function index(
         Request $request,
