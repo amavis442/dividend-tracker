@@ -37,7 +37,6 @@
 				<th>Amount</th>
 				<th>Dividend(&euro;)</th>
 				<th>Taxes (15%)</th>
-				<th>Broker</th>
 				<th>actions</th>
 			</tr>
 		</thead>
@@ -51,7 +50,6 @@
 					<td>{{ (payment.amount/10000000)|format_number({fraction_digit: 7}) }}</td>
 					<td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend/1000)|format_number({fraction_digit: 2}) }}</td>
 					<td>&euro;{{ (payment.taxes/1000)|format_number({fraction_digit: 2}) }}</td>
-					<td>{{ payment.broker }}</td>
 					<td>
 						<a href="{{ path('payment_show', {'id': payment.id}) }}" class="btn btn-primary">
 							<i class="fas fa-book-open"></i>

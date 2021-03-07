@@ -71,9 +71,6 @@ class PaymentType extends AbstractType
                 },
                 'required' => true,
                 'empty_data' => 'USD'
-            ])
-            ->add('broker', ChoiceType::class, [
-                'choices'  => Brokers::list(),
             ]);
 
         $callbackValutaTransformer = CallbackTransformerValutaFactory::create();

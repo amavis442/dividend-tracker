@@ -16,7 +16,6 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
  */
 class Position
 {
-    public const BROKERS = ['eToro', 'Trading212', 'Flatex'];
     public const OPEN = 1;
     public const CLOSED = 2;
     /**

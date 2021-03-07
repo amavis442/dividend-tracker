@@ -17,7 +17,6 @@ use DateTime;
  */
 class Transaction
 {
-    public const BROKERS = ['eToro', 'Trading212', 'Flatex'];
     public const BUY = 1;
     public const SELL = 2;
     public const AMOUNT_DIGITS = 7;
@@ -70,11 +69,6 @@ class Transaction
      * @ORM\ManyToOne(targetEntity="App\Entity\Currency")
      */
     private $allocationCurrency;
-
-    /**
-     * @ORM\Column(type="string", length=255,  options={"default" : "Trading212"})
-     */
-    private $broker;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Position", inversedBy="transactions")
@@ -236,18 +230,6 @@ class Transaction
     public function setAllocationCurrency(?Currency $allocationCurrency): self
     {
         $this->allocationCurrency = $allocationCurrency;
-
-        return $this;
-    }
-
-    public function getBroker(): ?string
-    {
-        return $this->broker;
-    }
-
-    public function setBroker(string $broker): self
-    {
-        $this->broker = $broker;
 
         return $this;
     }

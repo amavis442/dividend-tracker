@@ -7,7 +7,6 @@
 			<th>Pay date</th>
 			<th>Units</th>
 			<th>Total</th>
-			<th>Broker</th>
 			<th>Actions</th>
 		</tr>
 	</thead>
@@ -19,7 +18,6 @@
 				<td>{{ payment.payDate|date("d-m-Y") }}</td>
 				<td>{{ (payment.amount/10000000)|format_number({fraction_digit: 7})}}</td>
 				<td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend/1000)|format_number({fraction_digit: 2})}}</td>
-				<td>{{ payment.broker }}</td>
 				<td>
 					<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 						<div class="btn-group mr-2" role="group" aria-label="First group">

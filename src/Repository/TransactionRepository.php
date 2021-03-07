@@ -25,7 +25,6 @@ class TransactionRepository extends ServiceEntityRepository
     }
 
     private function getQueryBuilder(
-        string $broker = 'All',
         string $orderBy = 'transactionDate',
         string $sort = 'ASC',
         string $search = ''
@@ -41,10 +40,6 @@ class TransactionRepository extends ServiceEntityRepository
             ->innerJoin('tr.ticker', 't')
             ->innerJoin('t.branch', 'i')
             ->orderBy($order, $sort);
-        if ($broker <> 'All') {
-            $queryBuilder->andWhere('tr.broker = :broker')
-                ->setParameter('broker', $broker);
-        }
 
         if (!empty($search)) {
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
@@ -58,13 +53,12 @@ class TransactionRepository extends ServiceEntityRepository
 
     public function getAll(
         int $page = 1,
-        string $broker = 'Trading212',
         int $limit = 10,
         string $orderBy = 'transactionDate',
         string $sort = 'ASC',
         string $search = ''
     ): Paginator {
-        $queryBuilder = $this->getQueryBuilder($broker, $orderBy, $sort, $search);
+        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
         $queryBuilder->leftJoin('t.calendars', 'c');
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);

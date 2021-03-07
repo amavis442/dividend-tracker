@@ -72,11 +72,6 @@ class Payment
     private $amount;
 
     /**
-     * @ORM\Column(type="string", length=40, nullable=true)
-     */
-    private $broker;
-
-    /**
      * @ORM\Column(type="datetime", name="created_at")
      */
     private $createdAt;
@@ -190,18 +185,6 @@ class Payment
     public function setAmount(?int $amount): self
     {
         $this->amount = $amount;
-
-        return $this;
-    }
-
-    public function getBroker(): ?string
-    {
-        return $this->broker;
-    }
-
-    public function setBroker(?string $broker): self
-    {
-        $this->broker = $broker;
 
         return $this;
     }

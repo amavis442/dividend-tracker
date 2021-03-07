@@ -9,14 +9,6 @@
 	<br/>
 	{% include '_search_form.html.twig' %}
 
-	<ul class="nav nav-tabs">
-		{% for broker in brokers %}
-			<li class="nav-item">
-				<a class="nav-link {% if broker == tab %}active{% endif %}" href="{{ path('transaction_index', {'page': 1, 'tab': broker, 'orderBy': order, 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ broker }}</a>
-			</li>
-		{% endfor %}
-	</ul>
-
 	<table class="table">
 		<thead>
 			<tr>
@@ -26,7 +18,6 @@
 				<th>
 					<a href="{{ path('transaction_index', {'page': thisPage ? thisPage : 1, 'tab': tab, 'orderBy': 'transactionDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Transaction date</a>
 				</th>
-				<th>Broker</th>
 				<th>
 					<a href="{{ path('transaction_index', {'page': thisPage ? thisPage : 1, 'tab': tab, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a>
 				</th>
@@ -51,7 +42,6 @@
 					<td>
 						{{ transaction.transactionDate|date("d-m-Y") }}
 					</td>
-					<td>{{ transaction.broker }}</td>
 					<td>
 						{{ transaction.ticker.ticker }}
 					</td>

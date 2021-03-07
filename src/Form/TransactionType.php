@@ -19,9 +19,6 @@ class TransactionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('broker', ChoiceType::class, [
-                'choices'  => Brokers::list(),
-            ])
             ->add('transactionDate', DateTimeType::class, [
                 // renders it as a single text box
                 'widget' => 'single_text',

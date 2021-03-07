@@ -89,14 +89,6 @@ class PositionType extends AbstractType
                 'required' => false,
                 'input' => 'string',
                 'scale' => 2,
-            ])
-            ->add('broker', ChoiceType::class, [
-                'mapped' => false,
-                'choices'  => [
-                    'Trading212' => 'Trading212',
-                    'Flatex' =>  'Flatex',
-                    'eToro' =>  'eToro',
-                ],
             ]);
 
         $callbackValutaTransformer = CallbackTransformerValutaFactory::create();
@@ -104,6 +96,7 @@ class PositionType extends AbstractType
 
         $builder->get('amount')->addModelTransformer($callbackUnitsTransformer);
         $builder->get('price')->addModelTransformer($callbackValutaTransformer);
+        $builder->get('profit')->addModelTransformer($callbackValutaTransformer);
         $builder->get('allocation')->addModelTransformer($callbackValutaTransformer);
     }
 

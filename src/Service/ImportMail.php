@@ -167,7 +167,6 @@ class ImportMail extends ImportBase
                             ->setAllocation($row['allocation'])
                             ->setAmount($row['amount'])
                             ->setTransactionDate($row['transactionDate'])
-                            ->setBroker('Trading212')
                             ->setAllocationCurrency($currency)
                             ->setCurrency($currency)
                             ->setPosition($position)

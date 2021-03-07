@@ -75,7 +75,6 @@ class TransactionController extends AbstractController
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
-        $brokers = array_merge(['All'], Transaction::BROKERS);
 
         return $this->render('transaction/index.html.twig', [
             'transactions' => $items->getIterator(),
@@ -87,7 +86,6 @@ class TransactionController extends AbstractController
             'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'transaction_index',
             'searchPath' => 'transaction_search',
-            'brokers' => $brokers,
             'tab' => $tab,
         ]);
     }
