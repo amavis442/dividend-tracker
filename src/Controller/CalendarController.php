@@ -86,6 +86,19 @@ class CalendarController extends AbstractController
     }
 
     /**
+     * @Route("/calendarperdate", name="calendar_per_date", methods={"GET"})
+     */
+    public function viewCalendar(CalendarRepository $calendarRepository)
+    {
+        $year = date('Y');
+        $calendar = $calendarRepository->groupByMonth($year);
+        return $this->render('calendar/view.html.twig', [
+            'calendar' => $calendar,
+            'year' => $year,
+        ]);
+    }
+
+    /**
      * @Route("/{id}", name="calendar_show", methods={"GET"})
      */
     public function show(Calendar $calendar): Response
@@ -146,4 +159,6 @@ class CalendarController extends AbstractController
 
         return $this->redirectToRoute('calendar_index');
     }
+
+
 }

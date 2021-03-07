@@ -146,4 +146,30 @@ class CalendarRepository extends ServiceEntityRepository
         }
         return $output;
     }
+
+    public function groupByMonth(int $year): ?array
+    {
+        $result = $this->createQueryBuilder('c')
+            ->select('c')
+            ->innerJoin('c.ticker', 't')
+            ->where('c.paymentDate >= :start and c.paymentDate <= :end')
+            ->setParameter('start', $year.'-01-01')
+            ->setParameter('end', $year.'-12-31')
+            ->getQuery()
+            ->getResult();
+        if (!$result){ 
+            return null;
+        }
+
+        $data = [];    
+        foreach ($result as $item)
+        {
+            $data[$item->getPaymentDate()->format('Ym')][$item->getPaymentDate()->format('j')] = $item;
+        }
+        ksort($data);
+        foreach ($data as &$month){
+            ksort($month);
+        }
+        return $data;    
+    }
 }

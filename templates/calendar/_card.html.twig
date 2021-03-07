@@ -1,0 +1,16 @@
+<div class="col-sm-3">
+    <div class="card">
+        <div class="card-header">
+            {{ month|slice(4,2) }}
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+            {% for day, item in items %}
+                <li class="list-group-item">
+                    <div><strong>{{ item.paymentDate|date('l, d-m-Y') }}</strong></div>{{ item.ticker.fullname }} (${{ item.cashAmount/1000 }})
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
