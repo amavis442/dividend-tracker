@@ -3,19 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\Position;
-use App\Entity\Transaction;
 use App\Entity\Ticker;
 use App\Form\PositionType;
 use App\Repository\PositionRepository;
 use App\Service\PositionService;
+use App\Service\Referer;
+use App\Service\Summary;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use DateTime;
-use App\Service\Summary;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use App\Service\Referer;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/dashboard/position")
@@ -48,8 +47,8 @@ class PositionController extends AbstractController
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
         }
-        
-        $referer->set('position_index',['status' => $status]);
+
+        $referer->set('position_index', ['status' => $status]);
 
         [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
 
@@ -80,33 +79,15 @@ class PositionController extends AbstractController
         ]);
     }
 
-    private function presetMetrics(Position $position)
-    {
-        if ($position->getAllocation() && empty($position->getPrice())) {
-            $position->setPrice($position->getAllocation() / ($position->getAmount() / 100));
-            $position->setCurrency($position->getAllocationCurrency());
-        }
-        if ($position->getPrice() && empty($position->getAllocation())) {
-            $position->setAllocation($position->getPrice() * ($position->getAmount() / 100));
-            $position->setAllocationCurrency($position->getCurrency());
-        }
-
-        if ($position->getClosed()) {
-            $position->setAllocation(0);
-        }
-    }
-
     /**
      * @Route("/new/{ticker}", name="position_new", methods={"GET","POST"})
      */
-    public function new(Request $request, ?Ticker $ticker = null, SessionInterface $session, PositionService $positionService): Response
-    {
+    function new (Request $request, ?Ticker $ticker = null, SessionInterface $session, PositionService $positionService): Response {
         $position = new Position();
 
         if ($ticker instanceof Ticker) {
             $position->setTicker($ticker);
         }
-        $currentDate = new DateTime();
         $form = $this->createForm(PositionType::class, $position);
         $form->handleRequest($request);
 
@@ -138,14 +119,13 @@ class PositionController extends AbstractController
      * @Route("/{id}/edit/{closed<\d+>?0}", name="position_edit", methods={"GET","POST"})
      */
     public function edit(
-        Request $request, 
+        Request $request,
         Position $position,
-        PositionService $positionService, 
-        ?int $closed, 
+        PositionService $positionService,
+        ?int $closed,
         SessionInterface $session,
         Referer $referer
-        ): Response
-    {
+    ): Response {
         if ($closed === 1) {
             $position->setClosed(true);
             $position->setClosedAt((new DateTime()));
