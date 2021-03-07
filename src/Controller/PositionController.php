@@ -7,6 +7,7 @@ use App\Entity\Transaction;
 use App\Entity\Ticker;
 use App\Form\PositionType;
 use App\Repository\PositionRepository;
+use App\Service\PositionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,7 +35,7 @@ class PositionController extends AbstractController
         string $tab = 'All',
         string $orderBy = 'ticker',
         string $sort = 'asc',
-        int $status = PositionRepository::OPEN,
+        int $status = PositionRepository::CLOSED,
         Referer $referer
     ): Response {
         if (!in_array($orderBy, ['profit'])) {
@@ -57,7 +58,6 @@ class PositionController extends AbstractController
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
-        $brokers = array_merge(['All'], Position::BROKERS);
 
         return $this->render('position/index.html.twig', [
             'positions' => $items->getIterator(),
@@ -70,7 +70,6 @@ class PositionController extends AbstractController
             'status' => $status,
             'routeName' => 'position_index',
             'searchPath' => 'position_search',
-            'brokers' => $brokers,
             'tab' => $tab,
             'numActivePosition' => $numActivePosition,
             'numPosition' => $numActivePosition,
@@ -100,7 +99,7 @@ class PositionController extends AbstractController
     /**
      * @Route("/new/{ticker}", name="position_new", methods={"GET","POST"})
      */
-    public function new(Request $request, ?Ticker $ticker = null, SessionInterface $session): Response
+    public function new(Request $request, ?Ticker $ticker = null, SessionInterface $session, PositionService $positionService): Response
     {
         $position = new Position();
 
@@ -112,25 +111,7 @@ class PositionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->presetMetrics($position);
-
-            $transaction = new Transaction();
-            $transaction->setSide(Transaction::BUY)
-                ->setAmount($position->getAmount())
-                ->setPrice($position->getPrice())
-                ->setCurrency($position->getCurrency())
-                ->setAllocation($position->getAllocation())
-                ->setAllocationCurrency($position->getAllocationCurrency())
-                ->setTransactionDate($currentDate)
-                ->setBroker($form->get('broker')->getData());
-
-            $position->addTransaction($transaction);
-
-            $position->setClosed(0);
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($transaction);
-            $entityManager->persist($position);
-            $entityManager->flush();
+            $positionService->create($position);
             $session->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
             $session->set(PortfolioController::SEARCH_KEY, $position->getTicker()->getTicker());
             return $this->redirectToRoute('portfolio_index');
@@ -149,6 +130,7 @@ class PositionController extends AbstractController
     {
         return $this->render('position/show.html.twig', [
             'position' => $position,
+            'netYearlyDividend' => 0.0,
         ]);
     }
 
@@ -157,7 +139,8 @@ class PositionController extends AbstractController
      */
     public function edit(
         Request $request, 
-        Position $position, 
+        Position $position,
+        PositionService $positionService, 
         ?int $closed, 
         SessionInterface $session,
         Referer $referer
@@ -172,9 +155,7 @@ class PositionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->presetMetrics($position);
-            
-            $this->getDoctrine()->getManager()->flush();
+            $positionService->update($position);
             $session->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
             if ($referer->get()) {
                 return $this->redirect($referer->get());

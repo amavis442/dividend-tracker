@@ -31,6 +31,10 @@ services:
         arguments:
             $targetDirectory: '%documents_directory%'
 
+    App\Service\PositionService:
+        arguments: 
+            $entityManager: "@doctrine.orm.entity_manager"
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
     App\EventListener\AddUser:
