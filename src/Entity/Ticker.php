@@ -53,6 +53,11 @@ class Ticker
     private $payments;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="ticker")
+     */
+    private $positions;
+
+    /**
      * @ORM\ManyToMany(targetEntity="App\Entity\DividendMonth", inversedBy="tickers")
      */
     private $DividendMonths;
@@ -67,6 +72,8 @@ class Ticker
         $this->calendars = new ArrayCollection();
         $this->researches = new ArrayCollection();
         $this->dividendMonths = new ArrayCollection();
+        $this->payments = new ArrayCollection();
+        $this->positions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -239,4 +246,21 @@ class Ticker
 
         return $this;
     }
+
+    /**
+     * @return Collection|Research[]
+     */
+    public function getPayments(): Collection
+    {
+        return $this->payments;
+    }
+
+    /**
+     * @return Collection|Research[]
+     */
+    public function getPositions(): Collection
+    {
+        return $this->positions;
+    }
+
 }
