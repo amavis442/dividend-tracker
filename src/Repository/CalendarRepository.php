@@ -164,7 +164,7 @@ class CalendarRepository extends ServiceEntityRepository
         $data = [];    
         foreach ($result as $item)
         {
-            $data[$item->getPaymentDate()->format('Ym')][$item->getPaymentDate()->format('j')] = $item;
+            $data[$item->getPaymentDate()->format('Ym')][$item->getPaymentDate()->format('j')][] = $item;
         }
         ksort($data);
         foreach ($data as &$month){
