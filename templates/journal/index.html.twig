@@ -10,7 +10,8 @@
     <br/>    
         {% for journal in journals %}
         <div class="card" style="width: 60rem;">
-            <div class="card-header">{{ journal.title }}
+            <div class="card-header">
+                <h3><span class="badge badge-info">{{ journal.createdAt ? journal.createdAt|date('l, d F Y') }}</span> {{ journal.title }}</h3>
             </div>
             <div class="card-body">
                 <span class="card-text">{{ journal.content|raw }}
