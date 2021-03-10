@@ -3,9 +3,10 @@ import jquery from 'jquery';
 const $ = jquery;
 global.$ = global.jQuery = $;
 
-require('bootstrap/js/dist/popover');
-require('bootstrap/js/dist/tooltip');
-require('bootstrap/js/dist/collapse');
+import 'bootstrap/js/dist/popover';
+import 'bootstrap/js/dist/tooltip';
+import 'bootstrap/js/dist/collapse';
+import 'bootstrap/js/dist/dropdown';
 
 //import 'bootstrap';
 import 'summernote/dist/summernote-bs4.min.js';
