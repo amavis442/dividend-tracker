@@ -13,21 +13,8 @@ Encore
     .setPublicPath('/build')
     // only needed for CDN's or sub-directory deploy
     //.setManifestKeyPrefix('build/')
-    .autoProvidejQuery()
-    /*
-     * ENTRY CONFIG
-     *
-     * Add 1 entry for each "page" of your app
-     * (including one that's included on every page - e.g. "app")
-     *
-     * Each entry will result in one JavaScript file (e.g. app.js)
-     * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
-     */
-    .addEntry('app', './assets/app.js')
-    //.addEntry('webfonts', './assets/js/webfonts.js')
-    .addEntry('fileupload', './assets/js/fileupload.js')
-    .addEntry('chart', './assets/js/chart.js')
-
+    //.autoProvidejQuery()
+    
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     //.enableStimulusBridge('./assets/controllers.json')
 
@@ -37,7 +24,8 @@ Encore
     // will require an extra script tag for runtime.js
     // but, you probably want this, unless you're building a single-page app
     .enableSingleRuntimeChunk()
-
+    //.disableSingleRuntimeChunk()
+    
     /*
      * FEATURE CONFIG
      *
@@ -67,16 +55,32 @@ Encore
     // uncomment if you use TypeScript
     //.enableTypeScriptLoader()
 
+    .autoProvideVariables({
+             $: 'jquery',
+             jQuery: 'jquery',
+             'window.jQuery': 'jquery'
+    })
+
     // uncomment to get integrity="..." attributes on your script & link tags
     // requires WebpackEncoreBundle 1.4 or higher
     //.enableIntegrityHashes(Encore.isProduction())
 
-    // uncomment if you're having problems with a jQuery plugin
-    .autoProvidejQuery()
-
-    // uncomment if you use API Platform Admin (composer req api-admin)
+    /*
+     * ENTRY CONFIG
+     *
+     * Add 1 entry for each "page" of your app
+     * (including one that's included on every page - e.g. "app")
+     *
+     * Each entry will result in one JavaScript file (e.g. app.js)
+     * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
+     */
     //.enableReactPreset()
-    //.addEntry('admin', './assets/js/admin.js')
+    .addEntry('app', './assets/app.js')
+    //.addEntry('webfonts', './assets/js/webfonts.js')
+    .addEntry('fileupload', './assets/js/fileupload.js')
+    .addEntry('piechart', './assets/js/piechart.js')
+    .addEntry('barchart', './assets/js/barchart.js')
+
 ;
 
 module.exports = Encore.getWebpackConfig();

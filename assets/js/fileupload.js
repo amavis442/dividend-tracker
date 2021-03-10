@@ -42,7 +42,7 @@ function createAddFile(fileCount) {
     });
 }
 
-$(document).ready(function () {
+jQuery(function(){
     createAddFile(fileCount);
     fileCount++;
 });

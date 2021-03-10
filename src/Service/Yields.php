@@ -96,8 +96,8 @@ class Yields
         }
 
         return [
-            'data' => json_encode(array_values($data)),
-            'labels' => json_encode(array_values($labels)),
+            'data' => array_values($data),
+            'labels' => array_values($labels),
             'datasource' => $dataSource,
             'totalAvgYield' => $totalAvgYield,
             'dividendYieldOnCost' => $dividendYieldOnCost,

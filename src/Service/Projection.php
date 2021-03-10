@@ -158,8 +158,8 @@ class Projection
         }
 
         return [
-            'data' => json_encode($data),
-            'labels' => json_encode($labels),
+            'data' => $data,
+            'labels' => $labels,
             'datasource' => $dataSource,
         ];
     }

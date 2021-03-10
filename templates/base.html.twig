@@ -14,7 +14,7 @@
             <!-- Renders a link tag (if your module requires any CSS)
                                          <link rel="stylesheet" href="/build/app.css"> -->
         {% endblock %}
-
+         
     </head>
     <body>
 
@@ -25,10 +25,8 @@
         <div class="container"> 
             {% block body %}{% endblock %}
         </div>
-            {% block javascripts %}
-                {{ encore_entry_script_tags('app') }}
-                {% block extrajavascripts %}
-                {% endblock %}
-            {% endblock %}
+        {{ encore_entry_script_tags('app') }}
+        {% block javascripts %}
+        {% endblock %}
         </body>
     </html>

@@ -8,11 +8,9 @@
 
     
 {% block javascripts %}
-    {{ encore_entry_script_tags('chart') }}
-    {{ encore_entry_script_tags('app') }}
     {% include "report/_colors.html.twig" %}
 <script>
-
+/*
 var configGrowth = {
     type: 'bar',
     data: {
@@ -102,7 +100,7 @@ window.myBar = new Chart(ctx, configGrowth);
 
 var ctxPayout = document.getElementById('myChartPayout').getContext('2d');
 window.myPayoutBar = new Chart(ctxPayout, configPayout);
-
+*/
 </script>
 
 {% endblock %}

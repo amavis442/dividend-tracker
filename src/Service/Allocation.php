@@ -34,8 +34,8 @@ class Allocation
         }        
         
         return  [
-            'data' => json_encode(array_values($data)),
-            'labels' => json_encode(array_keys($items)),
+            'data' => array_values($data),
+            'labels' => array_keys($items),
         ];
     }
 
@@ -59,8 +59,8 @@ class Allocation
         }
 
         return  [
-            'data' => json_encode($data),
-            'labels' => json_encode($labels),
+            'data' => $data,
+            'labels' => $labels,
             'sectors' => $sectors,
             'numActivePosition' => $numActivePosition,
             'numPosition' => $numActivePosition,
@@ -89,8 +89,8 @@ class Allocation
         }
 
         return [
-            'data' => json_encode($data),
-            'labels' => json_encode($labels),
+            'data' => $data,
+            'labels' => $labels,
             'numActivePosition' => $numActivePosition,
             'numPosition' => $numActivePosition,
             'numTickers' => $numTickers,

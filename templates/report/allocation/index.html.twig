@@ -7,52 +7,18 @@
 	<p class="h1">Allocation information</p>
 
 	<div style='width:900px;height:600px' class="col col-xs-12">
-		<canvas id="myChartAllocation"></canvas>
+		<canvas id="pieChartCanvas"></canvas>
 	</div>
-
+	
 {% endblock %}
 
 {% block javascripts %}
-	{{ encore_entry_script_tags('chart') }}
-	{{ encore_entry_script_tags('app') }}
-	{% include "report/_colors.html.twig" %}
-<script type="text/javascript">
-	var config = {
-		type: 'pie',
-		data: {
-			datasets: [
-			{
-				data: {{ data|raw }},
-				backgroundColor: [
-					window.chartColors.red,
-					window.chartColors.orange,
-					window.chartColors.yellow,
-					window.chartColors.green,
-					window.chartColors.blue,
-					window.chartColors.purple,
-					window.chartColors.beige,
-					window.chartColors.lightgreen,
-					window.chartColors.grey,
-					window.chartColors.aqua,
-					window.chartColors.lightorange,
-					window.chartColors.purple,
-				],
-				label: 'Allocation'
-			}
-			],
-				labels: {{ labels|raw }}
-		},
-		options: {
-			responsive: true,
-			title: {
-				display: true,
-				fontSize: 24,
-				text: 'Allocation per sector'
-			}
-		}
-	};
-
-var ctxAllocation = document.getElementById('myChartAllocation').getContext('2d');
-window.myPie = new Chart(ctxAllocation, config);
+	{% include 'report/_colors.html.twig' %}
+	<script>
+		window.chartData = {{ data|json_encode|raw }};
+		window.chartLabels = {{ labels|json_encode|raw }};
+		window.chartTitle = 'Allocation';
+		window.chartSubTitle = 'Allocation per sector';
 	</script>
+	{{ encore_entry_script_tags('piechart') }}
 {% endblock %}
