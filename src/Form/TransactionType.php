@@ -26,7 +26,7 @@ class TransactionType extends AbstractType
             ->add('amount', NumberType::class, [
                 'help' => 'use decimal point if you have a fraction of a stock',
                 'label' => 'Units',
-                'input' => 'string',
+                'input' => 'number',
                 'scale' => 7,
             ])
             ->add('side', ChoiceType::class, [

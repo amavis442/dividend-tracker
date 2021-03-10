@@ -15,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Form\Factory\CallbackTransformerValutaFactory;
 use App\Form\Factory\CallbackTransformerUnitsFactory;
 
@@ -51,14 +52,14 @@ class PositionType extends AbstractType
                 'label' => 'Amount',
                 'help' => 'use decimal point if you have a fraction of a stock',
                 'required' => false,
-                'input' => 'string',
+                'input' => 'number',
                 'scale' => 7,
             ])            
             ->add('price', NumberType::class, [
                 'label' => 'Average price',
                 'help' => 'Adjusment if automatic calculation is wrong',
                 'required' => false,
-                'input' => 'string',
+                'input' => 'number',
                 'scale' => 3,
             ])
             ->add('currency', EntityType::class, [
@@ -73,7 +74,7 @@ class PositionType extends AbstractType
                 'label' => 'Allocation',
                 'help' => 'Adjusment if automatic calculation is wrong',
                 'required' => false,
-                'input' => 'string',
+                'input' => 'number',
                 'scale' => 3,
             ])
             ->add('allocation_currency', EntityType::class, [
@@ -87,7 +88,7 @@ class PositionType extends AbstractType
             ->add('profit', NumberType::class, [
                 'label' => 'Profit',
                 'required' => false,
-                'input' => 'string',
+                'input' => 'number',
                 'scale' => 2,
             ]);
 
