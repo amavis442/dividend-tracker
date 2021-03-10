@@ -36,7 +36,7 @@ class Position
     private $amount;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Ticker")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Ticker", inversedBy="positions")
      * @ORM\JoinColumn(nullable=false)
      */
     private $ticker;
