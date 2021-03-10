@@ -1,8 +1,13 @@
 security:
+    # enable_authenticator_manager: true
     encoders:
+        # use your user class name here
         App\Entity\User:
-            algorithm: 'sodium'
-
+            # Use native password encoder
+            # This value auto-selects the best possible hashing algorithm
+            # (i.e. Sodium when available).
+            algorithm: auto
+            
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
         # used to reload user from session & other features (e.g. switch_user)
@@ -10,25 +15,28 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+                #algorithm: auto
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            anonymous: null
+            anonymous: true
+            lazy: true
+            provider: app_user_provider
+            #custom_authenticator: App\Security\AppCustomAuthenticator
+            #custom_authenticator: App\Security\LoginFormAuthenticator
+
+           # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#firewalls-authentication
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
             guard:
                 authenticators:
                     - App\Security\LoginFormAuthenticator
             logout:
                 path: app_logout
-                # where to redirect after logout
-                # target: app_any_route
-
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#firewalls-authentication
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used

@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 

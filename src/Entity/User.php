@@ -24,6 +24,11 @@ class User implements UserInterface
     private $id;
 
     /**
+     * @ORM\Column(type="string", unique=true, nullable=true)
+     */
+    private $apiToken;
+
+    /**
      * @ORM\Column(type="string", length=180, unique=true)
      */
     private $email;
@@ -216,6 +221,26 @@ class User implements UserInterface
         if ($this->journals->contains($journal)) {
             $this->journals->removeElement($journal);
         }
+
+        return $this;
+    }
+
+    /**
+     * Get the value of apiToken
+     */ 
+    public function getApiToken()
+    {
+        return $this->apiToken;
+    }
+
+    /**
+     * Set the value of apiToken
+     *
+     * @return  self
+     */ 
+    public function setApiToken($apiToken)
+    {
+        $this->apiToken = $apiToken;
 
         return $this;
     }

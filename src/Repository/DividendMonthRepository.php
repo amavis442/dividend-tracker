@@ -5,7 +5,7 @@ namespace App\Repository;
 use App\Entity\DividendMonth;
 use App\Entity\Position;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method DividendMonth|null find($id, $lockMode = null, $lockVersion = null)
