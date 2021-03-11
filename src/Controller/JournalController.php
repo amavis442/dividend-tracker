@@ -16,12 +16,21 @@ use Symfony\Component\Routing\Annotation\Route;
 class JournalController extends AbstractController
 {
     /**
-     * @Route("/", name="journal_index", methods={"GET"})
+     * @Route("/list/{page<\d+>?1}", name="journal_index", methods={"GET"})
      */
-    public function index(JournalRepository $journalRepository): Response
+    public function index(JournalRepository $journalRepository, int $page = 1): Response
     {
+        $limit = 5;
+        $items = $journalRepository->findItems($page, $limit);
+        $maxPages = ceil($items->count() / $limit);
+        $thisPage = $page;
+
         return $this->render('journal/index.html.twig', [
-            'journals' => $journalRepository->findAll(),
+            'journals' => $items->getIterator(),
+            'limit' => $limit,
+            'maxPages' => $maxPages,
+            'thisPage' => $thisPage,
+            'routeName' => 'journal_index',
         ]);
     }
 
