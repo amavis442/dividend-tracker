@@ -7,51 +7,16 @@
 
 {% block body %}
     <div style='width:900px;height:600px' class="col col-xs-12">
-        <canvas id="myChart" ></canvas>
+        <canvas id="myChart" class="chart"
+			data-chart-data='[{"label": "Dividend payout", "data" : {{ dividends|json_encode|raw }}}, {"label": "Accumulative", "data" : {{ accumulative|json_encode|raw }}}]' 
+			data-chart-labels='{{ labels|json_encode|raw }}'
+			data-chart-title='Dividends received in euro'
+			data-chart-sub-title='Dividends received in euro'
+			data-chart-sign='€'></canvas>
     </div>
-
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
-    {{ encore_entry_script_tags('chart') }}
-    {% include "report/_colors.html.twig" %}
-<script>
-console.log(window.chartColors);
-
-var ctx = document.getElementById('myChart').getContext('2d');
-var myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: {{ labels|raw }},
-        datasets: [{
-            label: 'Dividend payout',
-            data: {{ dividends|raw }},
-            borderColor: 'rgba(255, 99, 132, 0.2)'
-        }, {
-            label: 'Accumulative',
-            data: {{ accumulative|raw }},
-            borderColor: 'rgba(54, 162, 235, 0.2)'
-        }]
-    },
-    options: {
-       title: {
-            display: true,
-            fontSize: 24,
-            text: 'Dividends received in euro'
-        },
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true,
-                    callback: function(value, index, values) {
-                        return '€' + value;
-                    }
-                }
-            }]
-        }
-    }
-});
-</script>
-
+    {{ encore_entry_script_tags('linechart') }}
 {% endblock %}

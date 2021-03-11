@@ -22,10 +22,10 @@ class Payouts
         }
 
         return [
-            'data' => json_encode($data),
-            'labels' => json_encode($labels),
-            'dividends' => json_encode($dividends),
-            'accumulative' => json_encode($accumulative),
+            'data' => $data,
+            'labels' => $labels,
+            'dividends' => $dividends,
+            'accumulative' => $accumulative,
         ];
     }
 }

@@ -80,6 +80,7 @@ Encore
     .addEntry('fileupload', './assets/js/fileupload.js')
     .addEntry('piechart', './assets/js/piechart.js')
     .addEntry('barchart', './assets/js/barchart.js')
+    .addEntry('linechart', './assets/js/linechart.js')
 
 ;
 

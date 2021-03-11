@@ -20,7 +20,7 @@ class CompoundType extends AbstractType
                 'label' => 'Amount',
                 'help' => 'Number of shares to start with',
                 'required' => true,
-                'input' => 'string',
+                'input' => 'number',
                 'scale' => 7,
                 'empty_data' => 1
             ])     
@@ -28,7 +28,7 @@ class CompoundType extends AbstractType
                 'label' => 'Average price (euro)',
                 'help' => 'Price that you pay for the shares',
                 'required' => true,
-                'input' => 'string',
+                'input' => 'number',
                 'scale' => 3,
                 'empty_data' => 1000
             ])
@@ -36,22 +36,22 @@ class CompoundType extends AbstractType
                 'label' => 'Maximum that price can rise (euro)',
                 'help' => 'If there is a range, what is the max range',
                 'required' => false,
-                'input' => 'string',
+                'input' => 'number',
                 'scale' => 3,
             ])
             ->add('priceAppreciation', NumberType::class, [
                 'label' => 'Rise of price in %',
-                'data' => '7380',
+                'data' => '7830',
                 'help' => 'Historically the amrket has risen 7.38%',
                 'required' => false,
-                'input' => 'string',
+                'input' => 'number',
                 'scale' => 3,
             ])
             ->add('dividend', NumberType::class, [
                 'label' => 'Starting dividend ($)',
                 'help' => 'Starting dividend in dollars',
                 'required' => true,
-                'input' => 'string',
+                'input' => 'number',
                 'scale' => 3,
                 'empty_data' => 1
             ])
@@ -59,7 +59,7 @@ class CompoundType extends AbstractType
                 'label' => 'Average dividend growth rate (%)',
                 'help' => 'First 5 years. Nice target would be 10% and higher',
                 'required' => true,
-                'input' => 'string',
+                'input' => 'number',
                 'scale' => 3,
                 'empty_data' => 1
             ])
@@ -67,7 +67,7 @@ class CompoundType extends AbstractType
                 'label' => 'Average dividend growth rate (%) > 5 years',
                 'help' => 'This will be around 3%',
                 'required' => false,
-                'input' => 'string',
+                'input' => 'number',
                 'scale' => 3,
                 'data' => '3000',
             ])
@@ -75,7 +75,7 @@ class CompoundType extends AbstractType
                 'label' => 'Payout frequency',
                 'help' => 'How many times does the company pay dividends per year. Default will be 4 (every quator)',
                 'required' => false,
-                'input' => 'string',
+                'input' => 'number',
                 'empty_data' => 4
             ])
             ;
