@@ -15,7 +15,13 @@
 	</div>
 
     <div style='width:1000px;height:600px' class="col col-xs-12">
-        <canvas id="myChart" ></canvas>
+        <canvas id="myChart" class="chart"
+			data-chart-data='{{ data|json_encode|raw }}' 
+			data-chart-labels='{{ labels|json_encode|raw }}'
+			data-chart-title='Yield'
+			data-chart-sub-title='Dividend yield'
+			data-chart-sign='%'
+		></canvas>
     </div>
 
 	<div>
@@ -61,87 +67,6 @@
 {% endblock %}
 
 {% block javascripts %}
-    {{ encore_entry_script_tags('chart') }}
-    {{ encore_entry_script_tags('app') }}
-    {% include "report/_colors.html.twig" %}
-<script>
-var config = {
-			type: 'bar',
-			data: {
-				datasets: [{
-					data: {{ data|raw }},
-					backgroundColor: [
-						"#0074D9", 
-						"#FF4136", 
-						"#2ECC40", 
-						"#FF851B", 
-						"#7FDBFF", 
-						"#B10DC9", 
-						"#FFDC00", 
-						"#001f3f", 
-						"#39CCCC", 
-						"#01FF70", 
-						"#85144b", 
-						"#F012BE", 
-						"#3D9970", 
-						"#111111", 
-						"#AAAAAA",
-						"#0074D9", 
-						"#FF4136", 
-						"#2ECC40", 
-						"#FF851B", 
-						"#7FDBFF", 
-						"#B10DC9", 
-						"#FFDC00", 
-						"#001f3f", 
-						"#39CCCC", 
-						"#01FF70", 
-						"#85144b", 
-						"#F012BE", 
-						"#3D9970", 
-						"#111111", 
-						"#AAAAAA",
-						"#0074D9", 
-						"#FF4136", 
-						"#2ECC40", 
-						"#FF851B", 
-						"#7FDBFF", 
-						"#B10DC9", 
-						"#FFDC00", 
-						"#001f3f", 
-						"#39CCCC", 
-						"#01FF70", 
-						"#85144b", 
-						"#F012BE", 
-						"#3D9970", 
-						"#111111", 
-						"#AAAAAA"
-					],
-					label: 'Yield'
-				}],
-				labels: {{ labels|raw }}
-			},
-			options: {
-                responsive: true,
-                title: {
-                    display: true,
-                    fontSize: 24,
-                    text: 'Dividend yield'
-                },
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
-                            callback: function(value, index, values) {
-                               return value + '%';
-                            }
-                        }
-                    }]
-                }
-			}
-        };
-var ctx = document.getElementById('myChart').getContext('2d');
-window.myBar = new Chart(ctx, config);
-</script>
-
+	{{ parent() }}
+	{{ encore_entry_script_tags('barchart') }}
 {% endblock %}

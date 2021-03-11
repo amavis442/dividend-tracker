@@ -1,77 +1,35 @@
 import Chart from 'chart.js';
+import chartColors from './chartcolors';
 
-$(function(){
+const barChart = function (canvasName, cdata, clabels, ctitle, csubTitle, csign) {
 	var config = {
 		type: 'bar',
 		data: {
 			datasets: [
 			{
-				data: chartData,
-				backgroundColor: [
-					"#0074D9", 
-						"#FF4136", 
-						"#2ECC40", 
-						"#FF851B", 
-						"#7FDBFF", 
-						"#B10DC9", 
-						"#FFDC00", 
-						"#001f3f", 
-						"#39CCCC", 
-						"#01FF70", 
-						"#85144b", 
-						"#F012BE", 
-						"#3D9970", 
-						"#111111", 
-						"#AAAAAA",
-						"#0074D9", 
-						"#FF4136", 
-						"#2ECC40", 
-						"#FF851B", 
-						"#7FDBFF", 
-						"#B10DC9", 
-						"#FFDC00", 
-						"#001f3f", 
-						"#39CCCC", 
-						"#01FF70", 
-						"#85144b", 
-						"#F012BE", 
-						"#3D9970", 
-						"#111111", 
-						"#AAAAAA",
-						"#0074D9", 
-						"#FF4136", 
-						"#2ECC40", 
-						"#FF851B", 
-						"#7FDBFF", 
-						"#B10DC9", 
-						"#FFDC00", 
-						"#001f3f", 
-						"#39CCCC", 
-						"#01FF70", 
-						"#85144b", 
-						"#F012BE", 
-						"#3D9970", 
-						"#111111", 
-						"#AAAAAA"
-				],
-				label: chartTitle
+				data: cdata,
+				backgroundColor: chartColors,
+				label: ctitle
 			}
 			],
-				labels: chartLabels
+				labels: clabels
 		},
 		options: {
 			responsive: true,
 			title: {
 				display: true,
 				fontSize: 24,
-				text: chartSubTitle
+				text: csubTitle
 			},
 			scales: {
 				yAxes: [{
 					ticks: {
 						beginAtZero: true,
 						callback: function(value, index, values) {
-						   return '€' + value;
+							if (csign == '%') {
+								return  value + csign;	
+							}
+						   	return csign + value;
 						}
 					}
 				}]
@@ -79,6 +37,22 @@ $(function(){
 		}
 	};
 
-	var ctxBarChart = document.getElementById('barChartCanvas').getContext('2d');
-	window.myPie = new Chart(ctxBarChart, config);
+	var ctxBarChart = document.getElementById(canvasName).getContext('2d');
+	new Chart(ctxBarChart, config);
+}
+
+
+$(function(){
+	var chartElements = $('.chart');
+	
+	for (var n = 0; n < chartElements.length; n++) {
+		var chartElement = chartElements[n];
+		var chartData = JSON.parse(chartElement.dataset.chartData);
+		var chartLabels = JSON.parse(chartElement.dataset.chartLabels);
+		var chartTitle = chartElement.dataset.chartTitle;
+		var chartSubTitle = chartElement.dataset.chartSubTitle;
+		var chartSign = chartElement.dataset.chartSign;
+		
+		barChart(chartElement.id, chartData, chartLabels, chartTitle, chartSubTitle, chartSign);
+	}
 });

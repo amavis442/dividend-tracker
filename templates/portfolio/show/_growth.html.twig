@@ -1,106 +1,22 @@
 <div style='width:900px;height:600px' class="col col-xs-12">
-	<canvas id="myChart"></canvas>
+	<canvas id="myChart" class="chart"
+			data-chart-data='{{ growth.data|json_encode|raw }}' 
+			data-chart-labels='{{ growth.labels|json_encode|raw }}'
+			data-chart-title='Yield'
+			data-chart-sub-title='Dividend yield'
+			data-chart-sign='%'></canvas>
 </div>
 
 <div style='width:900px;height:600px' class="col col-xs-12">
-	<canvas id="myChartPayout"></canvas>
+	<canvas id="myChartPayout" class="chart"
+			data-chart-data='{{ growth.payout|json_encode|raw }}' 
+			data-chart-labels='{{ growth.labels|json_encode|raw }}'
+			data-chart-title='Dividend payout'
+			data-chart-sub-title='Dividend forward'
+			data-chart-sign='€'></canvas>
 </div>
 
     
 {% block javascripts %}
-    {% include "report/_colors.html.twig" %}
-<script>
-/*
-var configGrowth = {
-    type: 'bar',
-    data: {
-        datasets: [{
-            data: {{ growth.data|raw }},
-            backgroundColor: [
-                window.chartColors.red,
-                window.chartColors.orange,
-                window.chartColors.yellow,
-                window.chartColors.green,
-                window.chartColors.blue,
-                window.chartColors.purple,
-                window.chartColors.beige,
-                window.chartColors.lightgreen,
-                window.chartColors.grey,
-                window.chartColors.aqua,
-                window.chartColors.lightorange,
-                window.chartColors.purple
-            ],
-            label: 'Dividend growth',
-        }],
-        labels: {{ growth.labels|raw }},
-    },
-    options: {
-        responsive: true,
-        title: {
-            display: true,
-            fontSize: 24,
-            text: 'Dividend growth'
-        },
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true,
-                    callback: function(value, index, values) {
-                        return value + '%';
-                    }
-                }
-            }]
-        }
-    }
-};
-
-var configPayout = {
-    type: 'bar',
-    data: {
-        labels: {{ growth.labels|raw }},
-        datasets: [ {
-            data: {{ growth.payout|raw }},
-            backgroundColor: [
-                window.chartColors.red,
-                window.chartColors.orange,
-                window.chartColors.yellow,
-                window.chartColors.green,
-                window.chartColors.blue,
-                window.chartColors.purple,
-                window.chartColors.beige,
-                window.chartColors.lightgreen,
-                window.chartColors.grey,
-                window.chartColors.aqua,
-                window.chartColors.lightorange,
-                window.chartColors.purple
-            ],
-            label: 'Dividend payout',
-        }]
-    },
-    options: {
-        responsive: true,
-        title: {
-            display: true,
-            fontSize: 24,
-            text: 'Dividend forward'
-        },
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true
-                }
-            }]
-        }
-    }
-    
-};
-
-var ctx = document.getElementById('myChart').getContext('2d');
-window.myBar = new Chart(ctx, configGrowth);
-
-var ctxPayout = document.getElementById('myChartPayout').getContext('2d');
-window.myPayoutBar = new Chart(ctxPayout, configPayout);
-*/
-</script>
-
+    {{ encore_entry_script_tags('barchart') }}
 {% endblock %}

@@ -13,10 +13,12 @@
 {% endblock %}
 
 {% block javascripts %}
+    {{ parent() }}
     {{ encore_entry_script_tags('chart') }}
-    {{ encore_entry_script_tags('app') }}
     {% include "report/_colors.html.twig" %}
 <script>
+console.log(window.chartColors);
+
 var ctx = document.getElementById('myChart').getContext('2d');
 var myChart = new Chart(ctx, {
     type: 'line',

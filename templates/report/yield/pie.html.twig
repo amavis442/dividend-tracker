@@ -31,7 +31,12 @@
 
 
     <div style='width:1000px;height:600px' class="col col-xs-12">
-        <canvas id="barChartCanvas" ></canvas>
+        <canvas id="barChartCanvas" class="chart"
+			data-chart-data='{{ data|json_encode|raw }}' 
+			data-chart-labels='{{ labels|json_encode|raw }}'
+			data-chart-title='Yield'
+			data-chart-sub-title='Dividend yield'
+			data-chart-sign='%'></canvas>
     </div>
 
 	<div>
@@ -77,13 +82,6 @@
 {% endblock %}
 
 {% block javascripts %}
-   	{% include "report/_colors.html.twig" %}
-    
-	<script>
-		window.chartData = {{ data|json_encode|raw }};
-		window.chartLabels = {{ labels|json_encode|raw }};
-		window.chartTitle = 'Yield';
-		window.chartSubTitle = 'Dividend yield';
-	</script>
+	{{ parent() }}
 	{{ encore_entry_script_tags('barchart') }}
 {% endblock %}

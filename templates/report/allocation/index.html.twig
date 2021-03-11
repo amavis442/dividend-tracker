@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block javascripts %}
-	{% include 'report/_colors.html.twig' %}
+	{{ parent() }}
 	<script>
 		window.chartData = {{ data|json_encode|raw }};
 		window.chartLabels = {{ labels|json_encode|raw }};

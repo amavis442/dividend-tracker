@@ -50,9 +50,9 @@ class DividendGrowth
             }
         }
         return [
-            'data' => json_encode($values),
-            'payout' => json_encode($payout),
-            'labels' => json_encode($labels),
+            'data' => $values,
+            'payout' => $payout,
+            'labels' => $labels,
         ];
     }
 }

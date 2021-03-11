@@ -17,7 +17,13 @@
 	<hr/>
 
 	<div style='width:900px;height:600px' class="col col-xs-12">
-		<canvas id="barChartCanvas"></canvas>
+		<canvas id="barChartCanvas" class="chart"  
+			data-chart-data='{{ data|json_encode|raw }}' 
+			data-chart-labels='{{ labels|json_encode|raw }}'
+			data-chart-title='Projection'
+			data-chart-sub-title='Dividend projection'
+			data-chart-sign='€'
+			></canvas>
 	</div>
 
 	<div class="accordion" id="accordionExample">
@@ -111,12 +117,6 @@
 
 
 {% block javascripts %}
-	{% include 'report/_colors.html.twig' %}
-	<script>
-		window.chartData = {{ data|json_encode|raw }};
-		window.chartLabels = {{ labels|json_encode|raw }};
-		window.chartTitle = 'Projection';
-		window.chartSubTitle = 'Dividend projection';
-	</script>
+	{{ parent() }}
 	{{ encore_entry_script_tags('barchart') }}
 {% endblock %}
