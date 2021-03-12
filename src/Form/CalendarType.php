@@ -22,7 +22,9 @@ class CalendarType extends AbstractType
         $builder
         ->add('ticker',EntityType::class, [
             'class' => Ticker::class,
-            'choice_label' => 'ticker',
+            'choice_label' => function ($ticker) {
+                return $ticker->getTicker(). ' - '. substr($ticker->getFullname(),0,80);
+            },
             'required' => true,
             'placeholder' => 'Please choose a ticker',
             'empty_data' => null,

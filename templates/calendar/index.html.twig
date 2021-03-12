@@ -8,7 +8,8 @@
     <table class="table">
         <thead>
             <tr>
-            <th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a></th>
+                <th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a></th>
+                <th>Fullname</th>
                 <th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'paymentDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Payment date</a></th>
                 <th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'exDividendDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ex-dividend date</a></th>
                 <th>Record_date</th>
@@ -32,6 +33,7 @@
                         {% endif %}>
                 
                 <td>{{ calendar.ticker.ticker }}</td>
+                <td>{{ calendar.ticker.fullname }}</td>
                 <td>{{ calendar.paymentDate ? calendar.paymentDate|date('d-m-Y') : '' }}</td>
                 <td>{{ calendar.exDividendDate ? calendar.exDividendDate|date('d-m-Y') : '' }}</td>
                 <td>{{ calendar.recordDate ? calendar.recordDate|date('d-m-Y') : '' }}</td>
