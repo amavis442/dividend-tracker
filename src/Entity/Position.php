@@ -171,7 +171,7 @@ class Position
 
     public function getAmount(): ?int
     {
-        return $this->amount;
+        return (int)$this->amount;
     }
 
     public function setAmount(int $amount): self

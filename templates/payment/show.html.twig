@@ -21,7 +21,7 @@
             </tr>
             <tr>
                 <th>Units</th>
-                <td>{{ payment.stocks/100|format_number({fraction_digit: 2})  }}</td>
+                <td>{{ (payment.amount/10000000)|format_number({fraction_digit: 2})  }}</td>
             </tr>
             <tr>
                 <th>Total dividend</th>
