@@ -26,9 +26,9 @@ services:
       working_dir: /application
       volumes:
         - .:/application
-        - ./phpdocker/mysql/mariadb.cnf:/etc/mysql/mariadb.cnf
-        - ../data/mysql:/var/lib/mysql
-        - ../logs/mysql:/var/log/mysql
+        #- ./phpdocker/mysql/mariadb.cnf:/etc/mysql/mariadb.cnf
+        #- ../data/mysql:/var/lib/mysql
+        #- ../logs/mysql:/var/log/mysql
       env_file:
         - .env.local 
       ports:
