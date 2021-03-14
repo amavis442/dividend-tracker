@@ -20,7 +20,7 @@
                 <td>{{ item.industry }}</td>
                 <td>{{ item.allocationPercentage|format_number({fraction_digit: 2})  }}% <br/>
                  <span class="badge badge-secondary">{{ item.targetAllocationPercentage|format_number({fraction_digit: 2})  }}%</span></td>
-                <td>${{ (item.dividend/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>${{ (item.dividend)|format_number({fraction_digit: 2}) }}</td>
                 <td>{{ item.tickers }}</td>                
             </tr>
         {% else %}

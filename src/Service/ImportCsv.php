@@ -78,14 +78,14 @@ class ImportCsv extends ImportBase
                         break;
                     case 'no. of shares':
                         $rawAmount = $val;
-                        $row['amount'] = $val * 10000000;
+                        $row['amount'] = $val;
                         break;
                     case 'exchange rate':
                         $row['wisselkoersen'] = $val;
                         break;
                     case 'total (eur)':
                         $rawAllocation = $val;
-                        $allocation = $val * 1000;
+                        $allocation = $val;
                         $row['allocation'] = $allocation;
                         break;
                     case 'id':
@@ -97,7 +97,7 @@ class ImportCsv extends ImportBase
                 $r++;
             }
             if (count($row) > 0) {
-                $row['price'] = round(($rawAllocation / $rawAmount) * 1000);
+                $row['price'] = round($rawAllocation / $rawAmount);
                 $rows[$row['nr']] = $row;
             }
             $rowNum++;

@@ -49,10 +49,10 @@
             {% set ticker = position.ticker %}
             {% set branchLabel = position.ticker.branch.label %}
             {% set tickerId = position.ticker.id|int %}
-            {% set amount = position.amount / 10000000 %}
+            {% set amount = position.amount %}
             {% set dividend = dividends[tickerId] ?? 0 %}
-            {% set avgPrice = position.price / 1000 %}
-            {% set allocation = position.allocation / 1000 %}
+            {% set avgPrice = position.price %}
+            {% set allocation = position.allocation %}
             {% set percentageAllocation = (allocation / totalInvested) * 100 %}
             {% set calendar = position.ticker.calendars.first ?? null %}
 
@@ -65,12 +65,12 @@
                 <td>&euro;{{ avgPrice|format_number({fraction_digit: 2}) }}</td>
                 <td>&euro;{{ allocation|format_number({fraction_digit: 2}) }}</td>
                 <td> {{percentageAllocation|format_number({fraction_digit: 2}) }}%</td>
-                <td>&euro;{{ (dividend/1000)|format_number({fraction_digit: 2}) }}</td>
+                <td>&euro;{{ dividend|format_number({fraction_digit: 2}) }}</td>
                 <td><small>
                     {% if calendar %} 
                         <span class="badge badge-primary">{{ calendar.exDividendDate|date('d/m/Y') }}</span>
                         <span class="badge badge-warning">{{ calendar.paymentDate|date('d/m/Y') }}</span>~
-                        {% if calendar.currency.id == 1 %}${% else %}&euro;{% endif %}{{ (calendar.cashAmount/1000)|format_number({fraction_digit: 3}) }}
+                        {% if calendar.currency.id == 1 %}${% else %}&euro;{% endif %}{{ calendar.cashAmount|format_number({fraction_digit: 3}) }}
                         &euro;{{ position.forwardNetDividend|format_number({fraction_digit: 2}) }} ({{ position.forwardNetDividendYield }}%)
                     {% endif %}
                     </small>

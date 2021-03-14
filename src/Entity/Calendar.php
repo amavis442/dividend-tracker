@@ -115,14 +115,14 @@ class Calendar
         return $this;
     }
 
-    public function getCashAmount(): ?int
+    public function getCashAmount(): ?float
     {
-        return $this->cashAmount;
+        return $this->cashAmount / Constants::VALUTA_PRECISION;
     }
 
-    public function setCashAmount(int $cashAmount): self
+    public function setCashAmount(float $cashAmount): self
     {
-        $this->cashAmount = $cashAmount;
+        $this->cashAmount = $cashAmount * Constants::VALUTA_PRECISION;
 
         return $this;
     }

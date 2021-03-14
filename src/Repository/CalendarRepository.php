@@ -125,14 +125,14 @@ class CalendarRepository extends ServiceEntityRepository
             }
 
             $amount = $this->getPositionSize($transactions, $calendar);
-            $amount = $amount / 10000000;
+            $amount = $amount;
 
             $netPayment = 0.0;
             foreach ($calendar->getPayments() as $payment) {
-                $netPayment += $payment->getDividend() / 1000;
+                $netPayment += $payment->getDividend();
             }
 
-            $dividend = $calendar->getCashAmount() / 1000;
+            $dividend = $calendar->getCashAmount();
             $output[$paydate]['tickers'][$ticker->getTicker()] = [
                 'amount' => $amount,
                 'dividend' => $dividend,

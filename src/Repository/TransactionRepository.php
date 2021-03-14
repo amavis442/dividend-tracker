@@ -37,7 +37,8 @@ class TransactionRepository extends ServiceEntityRepository
         // Create our query
         $queryBuilder = $this->createQueryBuilder('tr')
             ->select('tr')
-            ->innerJoin('tr.ticker', 't')
+            ->innerJoin('tr.position', 'p')
+            ->innerJoin('p.ticker', 't')
             ->innerJoin('t.branch', 'i')
             ->orderBy($order, $sort);
 

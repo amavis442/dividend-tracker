@@ -47,9 +47,9 @@
 					<td>{{ payment.position.ticker.fullname }}
 						({{ payment.position.ticker.ticker }})</td>
 					<td>{{ payment.position.ticker.branch.label }}</td>
-					<td>{{ (payment.amount/10000000)|format_number({fraction_digit: 7}) }}</td>
-					<td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend/1000)|format_number({fraction_digit: 2}) }}</td>
-					<td>&euro;{{ (payment.taxes/1000)|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ (payment.amount)|format_number({fraction_digit: 7}) }}</td>
+					<td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend)|format_number({fraction_digit: 2}) }}</td>
+					<td>&euro;{{ (payment.taxes)|format_number({fraction_digit: 2}) }}</td>
 					<td>
 						<a href="{{ path('payment_show', {'id': payment.id}) }}" class="btn btn-primary">
 							<i class="fas fa-book-open"></i>

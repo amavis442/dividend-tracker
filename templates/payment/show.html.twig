@@ -21,11 +21,11 @@
             </tr>
             <tr>
                 <th>Units</th>
-                <td>{{ (payment.amount/10000000)|format_number({fraction_digit: 2})  }}</td>
+                <td>{{ (payment.amount)|format_number({fraction_digit: 2})  }}</td>
             </tr>
             <tr>
                 <th>Total dividend</th>
-                <td>{{ payment.currency ? payment.currency.sign|raw : '$' }}{{ payment.dividend/100|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ payment.currency ? payment.currency.sign|raw : '$' }}{{ payment.dividend|format_number({fraction_digit: 2}) }}</td>
             </tr>
         </tbody>
     </table>

@@ -27,8 +27,8 @@ class Yields
 
         foreach ($positions as $position) {
             $ticker = $position->getTicker();
-            $avgPrice = $position->getPrice() / 1000;
-            $amount = $position->getAmount() / 10000000;
+            $avgPrice = $position->getPrice();
+            $amount = $position->getAmount();
 
             $scheduleCalendar = $ticker->getDividendMonths();
             $numPayoutsPerYear = count($scheduleCalendar);
@@ -37,7 +37,7 @@ class Yields
             $payCalendars = $ticker->getCalendars();
             $firstCalendarEntry = $payCalendars->first();
             if ($firstCalendarEntry) {
-                $lastCash = $firstCalendarEntry->getCashAmount() / 1000;
+                $lastCash = $firstCalendarEntry->getCashAmount();
                 $lastDividendDate = $firstCalendarEntry->getPaymentDate();
             }
             $dividendPerYear = $numPayoutsPerYear * $lastCash;

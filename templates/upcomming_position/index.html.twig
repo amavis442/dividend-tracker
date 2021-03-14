@@ -38,7 +38,7 @@
                             {% endif %}
                             <span class="badge badge-{{ badgeColor }}">
                                 {{ dividendDaysLeft }}
-                                days left, cash amount ${{ (currentDividendData.cashAmount/100)|format_number({fraction_digit: 2})  }}
+                                days left, cash amount ${{ (currentDividendData.cashAmount)|format_number({fraction_digit: 2})  }}
                             </span>
                         {% endif %}
                     </td>

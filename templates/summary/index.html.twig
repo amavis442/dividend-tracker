@@ -38,16 +38,16 @@
                     {{ position.ticker }}
                 </td>
                 <td>
-                    ${{ (position.avgPrice/100)|format_number({fraction_digit: 2}) }}
+                    ${{ (position.avgPrice)|format_number({fraction_digit: 2}) }}
                 </td> 
                 <td>
-                    {{ (position.sumAmount/100)|format_number({fraction_digit: 2}) }}
+                    {{ (position.sumAmount)|format_number({fraction_digit: 2}) }}
                 </td>
                 <td>
-                    ${{ (position.sumAllocation/100)|format_number({fraction_digit: 2}) }}
+                    ${{ (position.sumAllocation)|format_number({fraction_digit: 2}) }}
                 </td>   
                 <td>
-                    ${{ position.sumDividend/100|format_number({fraction_digit: 2}) }}
+                    ${{ position.sumDividend|format_number({fraction_digit: 2}) }}
                 </td>
                 <td>
                     {{ position.totalPositions }}

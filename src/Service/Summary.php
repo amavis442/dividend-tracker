@@ -29,7 +29,7 @@ class Summary
         ];
     }
 
-    public function getTotalAllocated(): int
+    public function getTotalAllocated(): float
     {
         return $this->positionRepository->getSumAllocated(); 
     }

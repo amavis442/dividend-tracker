@@ -91,14 +91,6 @@ class PositionType extends AbstractType
                 'input' => 'number',
                 'scale' => 2,
             ]);
-
-        $callbackValutaTransformer = CallbackTransformerValutaFactory::create();
-        $callbackUnitsTransformer = CallbackTransformerUnitsFactory::create();
-
-        $builder->get('amount')->addModelTransformer($callbackUnitsTransformer);
-        $builder->get('price')->addModelTransformer($callbackValutaTransformer);
-        $builder->get('profit')->addModelTransformer($callbackValutaTransformer);
-        $builder->get('allocation')->addModelTransformer($callbackValutaTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver)

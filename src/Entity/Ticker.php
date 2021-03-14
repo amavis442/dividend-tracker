@@ -165,6 +165,22 @@ class Ticker
         return $this->calendars[0];
     }
 
+    public function isDividendPayMonth(int $currentMonth): bool
+    {
+        $months = $this->getDividendMonths()->getValues();
+        foreach ($months as $dividendMonth) {
+            if ($dividendMonth->isDividendPayMonth($currentMonth)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function getPayoutFrequency() :?int
+    {
+        return count($this->getDividendMonths()) ?? 0;
+    }
+
     /**
      * @return Collection|Research[]
      */

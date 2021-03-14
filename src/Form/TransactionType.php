@@ -2,17 +2,15 @@
 
 namespace App\Form;
 
-use App\Entity\Transaction;
 use App\Entity\Currency;
+use App\Entity\Transaction;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use App\Form\Factory\CallbackTransformerValutaFactory;
-use App\Form\Factory\CallbackTransformerUnitsFactory;
 
 class TransactionType extends AbstractType
 {
@@ -30,7 +28,7 @@ class TransactionType extends AbstractType
                 'scale' => 7,
             ])
             ->add('side', ChoiceType::class, [
-                'choices'  => [
+                'choices' => [
                     'Buy' => Transaction::BUY,
                     'Sell' => Transaction::SELL,
                 ],
@@ -39,13 +37,13 @@ class TransactionType extends AbstractType
                 'label' => 'Price',
                 'required' => false,
                 'help' => 'What was the stock price and not what you paid',
-                //'input' => 'string',
+                'input' => 'number',
                 'scale' => 3,
             ])
             ->add('currency', EntityType::class, [
                 'class' => Currency::class,
                 'choice_label' => function ($currency) {
-                    return  $currency->getSymbol();
+                    return $currency->getSymbol();
                 },
                 'required' => true,
                 'empty_data' => 'EUR',
@@ -54,24 +52,17 @@ class TransactionType extends AbstractType
                 'label' => 'Allocation',
                 'required' => false,
                 'help' => 'What was what you paid in total for this transaction',
-                //'input' => 'string',
+                'input' => 'number',
                 'scale' => 3,
             ])
             ->add('allocation_currency', EntityType::class, [
                 'class' => Currency::class,
                 'choice_label' => function ($currency) {
-                    return  $currency->getSymbol();
+                    return $currency->getSymbol();
                 },
                 'required' => true,
-                'empty_data' => 'EUR'
+                'empty_data' => 'EUR',
             ]);
-
-        $callbackValutaTransformer = CallbackTransformerValutaFactory::create();
-        $callbackUnitsTransformer = CallbackTransformerUnitsFactory::create();
-
-        $builder->get('amount')->addModelTransformer($callbackUnitsTransformer);
-        $builder->get('price')->addModelTransformer($callbackValutaTransformer);
-        $builder->get('allocation')->addModelTransformer($callbackValutaTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver)

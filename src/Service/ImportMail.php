@@ -60,15 +60,15 @@ class ImportMail extends ImportBase
                                             $row['direction'] = $d;
                                             break;
                                         case 4:
-                                            $row['amount'] = $val * 10000000;
+                                            $row['amount'] = $val;
                                             break;
                                         case 5:
-                                            $unitPrice = str_replace(" EUR", '', $val) * 1000;
+                                            $unitPrice = str_replace(" EUR", '', $val);
 
                                             $row['price'] = $unitPrice;
                                             break;
                                         case 6:
-                                            $allocation = str_replace(" EUR", '', $val) * 1000;
+                                            $allocation = str_replace(" EUR", '', $val);
                                             $row['allocation'] = $allocation;
                                             break;
                                         case 7:

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Constants;
 use App\Entity\Position;
 use App\Repository\PaymentRepository;
 use App\Repository\PieRepository;
@@ -60,7 +61,6 @@ class PortfolioController extends AbstractController
             $items = $positionRepository->getAll($page, $limit, $order, $sort, $searchCriteria, PositionRepository::OPEN);
         }
 
-        
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
         $iter = $items->getIterator();
@@ -109,29 +109,30 @@ class PortfolioController extends AbstractController
         DividendGrowth $dividendGrowth,
         Referer $referer
     ): Response {
-        $dividendTax = $this->getParameter('app.dividend.tax');
-        $exhangeRate = $this->getParameter('app.dividend.exchangerate');
+        $dividendTax = Constants::TAX / 100;
+        $exhangeRate = Constants::EXCHANGE;
 
         $ticker = $position->getTicker();
         $position = $positionRepository->getForPosition($position);
         $netYearlyDividend = 0.0;
         $cals = $ticker->getCalendars();
         if (count($cals) > 0) {
-            $dividendFrequentie = count($ticker->getDividendMonths());
-            $netYearlyDividend = (($dividendFrequentie * $cals[0]->getCashAmount() / 1000) / $exhangeRate) * (1 - $dividendTax);
+            $dividendFrequentie = $ticker->getPayoutFrequency();
+            $netYearlyDividend = (($dividendFrequentie * $cals[0]->getCashAmount()) / $exhangeRate) * (1 - $dividendTax);
         }
         $payments = $position->getPayments();
         $dividends = $paymentRepository->getSumDividends([$ticker->getId()]);
         $dividend = 0;
         if (!empty($dividends)) {
-            $dividend = $dividends[$ticker->getId()] / 1000;
+            $dividend = $dividends[$ticker->getId()] / Constants::VALUTA_PRECISION;
         }
         $growth = $dividendGrowth->getData($ticker);
 
         $allocated = $summary->getTotalAllocated();
         $percentageAllocation = 0;
+
         if ($allocated > 0) {
-            $percentageAllocation = (($position->getAllocation() / 10) / $allocated);
+            $percentageAllocation = ($position->getAllocation() / $allocated) * 100;
         }
 
         $calendar = $ticker->getCalendars();
@@ -188,7 +189,7 @@ class PortfolioController extends AbstractController
         $position->setClosed(1);
         $em->persist($position);
         $em->flush();
-        */
+         */
         return $this->redirectToRoute('portfolio_index');
     }
 }

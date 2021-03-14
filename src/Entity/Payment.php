@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Payment
 {
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -98,22 +99,23 @@ class Payment
         return $this;
     }
 
-    public function getDividend(): ?int
+    public function getDividend(): ?float
     {
-        return $this->dividend;
+        return $this->dividend / Constants::VALUTA_PRECISION;
     }
 
-    public function setDividend(int $dividend): self
+    public function setDividend(float $dividend): self
     {
-        $this->dividend = $dividend;
+        $this->dividend = $dividend * Constants::VALUTA_PRECISION;
 
         return $this;
     }
 
     public function getTaxes(): ?float
     {
-        $taxes = ($this->dividend / 85) * 15;
-        return $taxes;
+        $this->taxes = ($this->dividend / (100 - Constants::TAX)) * Constants::TAX;
+
+        return $this->taxes / Constants::VALUTA_PRECISION;
     }
 
     public function setTicker(?Ticker $ticker): self
@@ -177,14 +179,14 @@ class Payment
         return $this->calendar !== null;
     }
 
-    public function getAmount(): ?int
+    public function getAmount(): ?string
     {
-        return (int)$this->amount;
+        return $this->amount / Constants::AMOUNT_PRECISION;
     }
 
-    public function setAmount(?int $amount): self
+    public function setAmount(?string $amount): self
     {
-        $this->amount = $amount;
+        $this->amount = $amount * Constants::AMOUNT_PRECISION;
 
         return $this;
     }
@@ -213,6 +215,8 @@ class Payment
     public function setCreatedAt(DateTimeInterface $createdAt = null): self
     {
         $this->createdAt = $createdAt ?? new DateTime("now");
+
+        return $this;
     }
 
     public function getCreatedAt(): DateTimeInterface
@@ -232,6 +236,8 @@ class Payment
     public function setUpdatedAt(DateTimeInterface $updatedAt = null): self
     {
         $this->updatedAt = $updatedAt ?? new DateTime("now");
+
+        return $this;
     }
 
     public function getUpdatedAt(): ?DateTimeInterface

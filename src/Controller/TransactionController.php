@@ -5,13 +5,8 @@ namespace App\Controller;
 use App\Entity\Position;
 use App\Entity\Transaction;
 use App\Form\TransactionType;
-use App\Repository\BranchRepository;
 use App\Repository\CurrencyRepository;
-use App\Repository\PositionRepository;
-use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
-use App\Service\ImportCsv;
-use App\Service\ImportMail;
 use App\Service\Referer;
 use App\Service\WeightedAverage;
 use DateTime;
@@ -29,37 +24,12 @@ class TransactionController extends AbstractController
     public const SEARCH_KEY = 'transaction_searchCriteria';
 
     /**
-     * @Route("/import/mail", name="transaction_import_mail", methods={"GET","POST"})
-     */
-    public function import(
-        TickerRepository $tickerRepository,
-        CurrencyRepository $currencyRepository,
-        PositionRepository $positionRepository,
-        WeightedAverage $weightedAverage,
-        BranchRepository $branchRepository,
-        TransactionRepository $transactionRepository,
-        ImportMail $importMail
-    ): void {
-        
-        $entityManager = $this->getDoctrine()->getManager();
-        $importMail->import($tickerRepository,
-            $currencyRepository,
-            $positionRepository,
-            $weightedAverage,
-            $branchRepository,
-            $transactionRepository, $entityManager);
-
-        exit();
-    }
-
-    /**
-     * @Route("/list/{page}/{tab}/{orderBy}/{sort}", name="transaction_index", methods={"GET"})
+     * @Route("/list/{page?1}/{orderBy?transactionDate}/{sort?ASC}", name="transaction_index", methods={"GET"})
      */
     public function index(
         TransactionRepository $transactionRepository,
         SessionInterface $session,
         int $page = 1,
-        string $tab = 'All',
         string $orderBy = 'transactionDate',
         string $sort = 'desc'
     ): Response {
@@ -71,7 +41,7 @@ class TransactionController extends AbstractController
         }
 
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
-        $items = $transactionRepository->getAll($page, $tab, 10, $orderBy, $sort, $searchCriteria);
+        $items = $transactionRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
@@ -86,18 +56,17 @@ class TransactionController extends AbstractController
             'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'transaction_index',
             'searchPath' => 'transaction_search',
-            'tab' => $tab,
         ]);
     }
 
     private function presetMetrics(Transaction $transaction)
     {
         if ($transaction->getAllocation() && empty($transaction->getPrice())) {
-            $transaction->setPrice($transaction->getAllocation() / ($transaction->getAmount() / 10000000));
+            $transaction->setPrice($transaction->getAllocation() / $transaction->getAmount());
             $transaction->setCurrency($transaction->getAllocationCurrency());
         }
         if ($transaction->getPrice() && empty($transaction->getAllocation())) {
-            $transaction->setAllocation($transaction->getPrice() * ($transaction->getAmount() / 10000000));
+            $transaction->setAllocation($transaction->getPrice() * $transaction->getAmount());
             $transaction->setAllocationCurrency($transaction->getCurrency());
         }
     }
@@ -205,11 +174,15 @@ class TransactionController extends AbstractController
     public function delete(
         Request $request,
         Transaction $transaction,
+        WeightedAverage $weightedAverage,
         Referer $referer
     ): Response {
         if ($this->isCsrfTokenValid('delete' . $transaction->getId(), $request->request->get('_token'))) {
+            $position = $transaction->getPosition();
+            $position->removeTransaction($transaction);
+            $weightedAverage->calc($position);
+
             $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($transaction);
             $entityManager->flush();
         }
 

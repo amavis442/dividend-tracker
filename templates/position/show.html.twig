@@ -32,15 +32,15 @@
                     </tr>
                     <tr>
                         <th>Units</th>
-                        <td>{{ (position.amount/10000000)|format_number({fraction_digit: 2}) }}</td>
+                        <td>{{ (position.amount)|format_number({fraction_digit: 2}) }}</td>
                     </tr>
                     <tr>
                         <th>Average price</th>
-                        <td>{{ position.currency.sign|raw }}{{ (position.price/1000)|format_number({fraction_digit: 2}) }}</td>
+                        <td>{{ position.currency.sign|raw }}{{ (position.price)|format_number({fraction_digit: 2}) }}</td>
                     </tr>
                     <tr>
                         <th>Allocation</th>
-                        <td>{{ position.allocationCurrency.sign|raw }}{{ (position.allocation/1000)|format_number({fraction_digit: 2}) }}</td>
+                        <td>{{ position.allocationCurrency.sign|raw }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}</td>
                     </tr>
                     <tr>
                         <th>Status</th>
@@ -48,7 +48,7 @@
                     </tr>
                     <tr>
                         <th>Profit / Loss</th>
-                        <td>{% if position.profit %}&euro;{{ (position.profit/1000)|format_number({fraction_digit: 2}) }}{% endif %}</td>
+                        <td>{% if position.profit %}&euro;{{ (position.profit)|format_number({fraction_digit: 2}) }}{% endif %}</td>
                     </tr>
                 </tbody>
             </table> 

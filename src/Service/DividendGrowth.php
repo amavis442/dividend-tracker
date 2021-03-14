@@ -16,11 +16,11 @@ class DividendGrowth
 
         if ($calendars) {
             $oldValue = 0.0;
-            $payoutFreq = $ticker->getDividendFrequency();
+            $payoutFreq = $ticker->getPayoutFrequency();
 
             foreach ($calendars as $calendar) {
                 $timeStamp = $calendar->getPaymentDate()->format('Y');
-                $cashPayout = $calendar->getCashAmount() / 1000;
+                $cashPayout = $calendar->getCashAmount();
                 if (!isset($data[$timeStamp])) {
                     $data[$timeStamp] = [];
                     $data[$timeStamp]['dividend'] = 0.0;

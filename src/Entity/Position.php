@@ -18,6 +18,7 @@ class Position
 {
     public const OPEN = 1;
     public const CLOSED = 2;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -121,6 +122,7 @@ class Position
      * @var float
      */
     private $forwardNetDividend;
+
     /**
      * Undocumented variable
      *
@@ -146,7 +148,7 @@ class Position
                 ->addViolation();
         }
 
-        if ((empty($this->amount) || $this->amount === 0) && $this->closed === false) {
+        if ((empty($this->amount) || $this->amount == 0) && $this->closed === false) {
             $context->buildViolation('Amount can not be empty or zero!')
                 ->atPath('amount')
                 ->addViolation();
@@ -158,25 +160,25 @@ class Position
         return $this->id;
     }
 
-    public function getPrice(): ?int
+    public function getPrice(): ?float
     {
-        return $this->price;
+        return $this->price / Constants::VALUTA_PRECISION;
     }
 
-    public function setPrice(?int $price): self
+    public function setPrice(?float $price): self
     {
-        $this->price = $price;
+        $this->price = $price * Constants::VALUTA_PRECISION;
         return $this;
     }
 
-    public function getAmount(): ?int
+    public function getAmount(): ?string
     {
-        return (int)$this->amount;
+        return $this->amount / Constants::AMOUNT_PRECISION;
     }
 
-    public function setAmount(int $amount): self
+    public function setAmount(string $amount): self
     {
-        $this->amount = $amount;
+        $this->amount = $amount * Constants::AMOUNT_PRECISION;
 
         return $this;
     }
@@ -201,17 +203,19 @@ class Position
     public function setClosed(?bool $closed): self
     {
         $this->closed = $closed;
+
         return $this;
     }
 
     public function getProfit(): ?float
     {
-        return $this->profit;
+        return $this->profit / Constants::VALUTA_PRECISION;
     }
 
     public function setProfit(int $profit): self
     {
-        $this->profit = $profit;
+        $this->profit = $profit * Constants::VALUTA_PRECISION;
+
         return $this;
     }
 
@@ -223,19 +227,19 @@ class Position
         return null;
     }
 
-    public function getAllocated(): int
+    public function getAllocated(): float
     {
-        return (int) round(($this->amount * $this->price));
+        return round(($this->getAmount() * $this->getPrice()), 3);
     }
 
-    public function getAllocation(): ?int
+    public function getAllocation(): ?float
     {
-        return $this->allocation;
+        return $this->allocation / Constants::VALUTA_PRECISION;
     }
 
-    public function setAllocation(?int $allocation): self
+    public function setAllocation(?float $allocation): self
     {
-        $this->allocation = $allocation;
+        $this->allocation = $allocation * Constants::VALUTA_PRECISION;
         return $this;
     }
 
@@ -348,13 +352,7 @@ class Position
     public function isDividendPayMonth(): bool
     {
         $currentMonth = date('m');
-        $months = $this->getTicker()->getDividendMonths()->getValues();
-        foreach ($months as $dividendMonth) {
-            if ($dividendMonth->getDividendMonth() === (int) $currentMonth) {
-                return true;
-            }
-        }
-        return false;
+        return $this->getTicker()->isDividendPayMonth($currentMonth);
     }
 
     public function forwardNetDividend(): ?float
@@ -366,10 +364,11 @@ class Position
         $forwardNetDividend = 0.0;
         if ($this->getTicker()->getCalendars()) {
             $calendar = $this->getTicker()->getCalendars()->first();
-            $cashAmount = $calendar->getCashamount() / 1000;
-            $forwardNetDividend = ($this->getAmount() / 10000000) * $cashAmount * 0.85 / 1.19;
+            $cashAmount = $calendar->getCashamount();
+            $forwardNetDividend = $this->getAmount() * $cashAmount * ((100 - Constants::TAX) / 100) / Constants::EXCHANGE;
         }
         $this->forwardNetDividend = $forwardNetDividend;
+
         return $forwardNetDividend;
     }
 
@@ -380,10 +379,10 @@ class Position
         if ($forwardNetDividend) {
             $dividendFrequency = 4;
             if ($this->getTicker()->getDividendMonths()) {
-                $dividendFrequency = count($this->getTicker()->getDividendMonths());
+                $dividendFrequency = $this->getTicker()->getPayoutFrequency();
             }
             $totalNetDividend = $forwardNetDividend * $dividendFrequency;
-            $allocation = $this->getAllocation() / 1000;
+            $allocation = $this->getAllocation();
             $netDividendYield = round(($totalNetDividend / $allocation) * 100, 2);
         }
 

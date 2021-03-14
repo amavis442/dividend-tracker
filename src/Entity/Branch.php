@@ -145,14 +145,14 @@ class Branch
         return $this;
     }
 
-    public function getAssetAllocation(): ?int
+    public function getAssetAllocation(): ?float
     {
-        return $this->assetAllocation;
+        return $this->assetAllocation / 100;
     }
 
-    public function setAssetAllocation(?int $assetAllocation): self
+    public function setAssetAllocation(?float $assetAllocation): self
     {
-        $this->assetAllocation = $assetAllocation;
+        $this->assetAllocation = $assetAllocation * 100;
 
         return $this;
     }

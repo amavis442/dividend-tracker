@@ -147,14 +147,14 @@ class Transaction
         return $this;
     }
 
-    public function getPrice(): ?int
+    public function getPrice(): ?float
     {
-        return $this->price;
+        return $this->price / Constants::VALUTA_PRECISION;
     }
 
-    public function setPrice(?int $price): self
+    public function setPrice(?float $price): self
     {
-        $this->price = $price;
+        $this->price = $price * Constants::VALUTA_PRECISION;
 
         return $this;
     }
@@ -171,14 +171,14 @@ class Transaction
         return $this;
     }
 
-    public function getAmount(): ?int
+    public function getAmount(): ?string
     {
-        return $this->amount;
+        return $this->amount / Constants::AMOUNT_PRECISION;
     }
 
-    public function setAmount(int $amount): self
+    public function setAmount(string $amount): self
     {
-        $this->amount = $amount;
+        $this->amount = $amount * Constants::AMOUNT_PRECISION;
 
         return $this;
     }
@@ -195,30 +195,30 @@ class Transaction
         return $this;
     }
 
-    public function getProfit(): ?int
+    public function getProfit(): ?float
     {
-        return $this->profit;
+        return $this->profit / Constants::VALUTA_PRECISION;
     }
 
-    public function setProfit(int $profit): self
+    public function setProfit(float $profit): self
     {
-        $this->profit = $profit;
+        $this->profit = $profit * Constants::VALUTA_PRECISION;
         return $this;
     }
 
-    public function getAllocated(): int
+    public function getAllocated(): float
     {
-        return (int) round($this->getAmount() * $this->getPrice() / 10000000000);
+        return $this->getAmount() * $this->getPrice();
     }
 
-    public function getAllocation(): ?int
+    public function getAllocation(): ?float
     {
-        return $this->allocation;
+        return $this->allocation / Constants::VALUTA_PRECISION;
     }
 
-    public function setAllocation(?int $allocation): self
+    public function setAllocation(?float $allocation): self
     {
-        $this->allocation = $allocation;
+        $this->allocation = $allocation * Constants::VALUTA_PRECISION;
         return $this;
     }
 
@@ -246,14 +246,14 @@ class Transaction
         return $this;
     }
 
-    public function getAvgprice(): ?int
+    public function getAvgprice(): ?float
     {
-        return $this->avgprice;
+        return $this->avgprice / Constants::VALUTA_PRECISION;
     }
 
-    public function setAvgprice(?int $avgprice): self
+    public function setAvgprice(?float $avgprice): self
     {
-        $this->avgprice = $avgprice;
+        $this->avgprice = $avgprice * Constants::VALUTA_PRECISION;
 
         return $this;
     }

@@ -299,7 +299,7 @@ class PositionRepository extends ServiceEntityRepository
         return $profit ?? 0;
     }
 
-    public function getSumAllocated(int $pieId = null): int
+    public function getSumAllocated(int $pieId = null): float
     {
         $qb = $this->createQueryBuilder('p')
             ->select('SUM(p.allocation)')

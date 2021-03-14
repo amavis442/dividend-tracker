@@ -43,12 +43,16 @@ class DividendMonth
         return $this->dividendMonth;
     }
 
+    /**
+     * @deprecated 1.1
+     */
     public function getDividendMonthName(): string
     {
         if ($this->dividendMonth < 0 || $this->dividendMonth > 12) {
             return '';
         }
-        return date("F", strtotime(date("Y")."-".$this->dividendMonth."-10"));
+
+        return date("F", strtotime(date("Y") . "-" . $this->dividendMonth . "-10"));
     }
 
     public function setDividendMonth(int $dividendMonth): self
@@ -56,6 +60,15 @@ class DividendMonth
         $this->dividendMonth = $dividendMonth;
 
         return $this;
+    }
+
+    public function isDividendPayMonth(int $currentMonth): bool
+    {
+        if ($this->dividendMonth === (int) $currentMonth) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

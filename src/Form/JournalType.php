@@ -15,9 +15,6 @@ class JournalType extends AbstractType
         $builder
             ->add('title')
             ->add('content', TextareaType::class, ['attr' => ['class' => 'summernote', 'style' => 'display:none;']])
-            //->add('createdAt')
-            //->add('updatedAt')
-
         ;
     }
 

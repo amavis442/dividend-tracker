@@ -69,10 +69,10 @@ class Export
             $row['Ticker'] = $position->getTicker()->getTicker();
             $row['Company'] = $position->getTicker()->getFullname();
             $row['Branch'] = $position->getTicker()->getBranch()->getLabel();
-            $row['Shares'] = $position->getAmount() / 10000000;
-            $row['Allocation'] = $position->getAllocation() / 1000;
-            $row['AvgPrice'] = $position->getPrice() / 1000;
-            $row['Profit'] = $position->getProfit() / 1000;
+            $row['Shares'] = $position->getAmount();
+            $row['Allocation'] = $position->getAllocation();
+            $row['AvgPrice'] = $position->getPrice();
+            $row['Profit'] = $position->getProfit();
 
             $row['dividend'] = 0.0;
             if ($position->getTicker()->hasCalendar()) {

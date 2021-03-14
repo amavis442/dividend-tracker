@@ -21,7 +21,7 @@ class Allocation
             if (!isset($items[$position->getTicker()->getBranch()->getLabel()])) {
                 $items[$position->getTicker()->getBranch()->getLabel()] = 0.0;
             }
-            $allocation = $position->getAllocation() / 1000;
+            $allocation = $position->getAllocation();
             $items[$position->getTicker()->getBranch()->getLabel()] += $allocation;
             $totalAllocation += $allocation;
         }

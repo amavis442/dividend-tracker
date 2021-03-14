@@ -15,7 +15,7 @@
                         </div>
                     <div class="card-body">
                     {% for key,cal in item %}
-                        - {{ cal.ticker.fullname }} (${{ cal.cashAmount/1000 }})<br/>
+                        - {{ cal.ticker.fullname }} (${{ cal.cashAmount }})<br/>
                     {% endfor %}
                     </div>
                 </li>

@@ -25,7 +25,7 @@
             </tr>
             <tr>
                 <th>Cash amount</th>
-                <td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount/100)|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({fraction_digit: 2}) }}</td>
             </tr>
         </tbody>
     </table>
