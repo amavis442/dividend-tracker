@@ -97,7 +97,7 @@ class ImportCsv extends ImportBase
                 $r++;
             }
             if (count($row) > 0) {
-                $row['price'] = round($rawAllocation / $rawAmount);
+                $row['price'] = round($rawAllocation / $rawAmount, 3);
                 $rows[$row['nr']] = $row;
             }
             $rowNum++;
