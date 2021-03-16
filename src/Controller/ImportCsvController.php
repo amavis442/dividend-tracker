@@ -9,7 +9,7 @@ use App\Repository\CurrencyRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
-use App\Service\ImportCsv;
+use App\Service\ImportCsvService;
 use App\Service\WeightedAverage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,7 +32,7 @@ class ImportCsvController extends AbstractController
         WeightedAverage $weightedAverage,
         BranchRepository $branchRepository,
         TransactionRepository $transactionRepository,
-        ImportCsv $importCsv): Response {
+        ImportCsvService $importCsv): Response {
         $importfile = new fileUpload();
         $form = $this->createForm(FileUploadType::class, $importfile);
         $form->handleRequest($request);
@@ -87,7 +87,7 @@ class ImportCsvController extends AbstractController
         WeightedAverage $weightedAverage,
         BranchRepository $branchRepository,
         TransactionRepository $transactionRepository,
-        ImportCsv $importCsv
+        ImportCsvService $importCsv
     ): void {
 
         $entityManager = $this->getDoctrine()->getManager();

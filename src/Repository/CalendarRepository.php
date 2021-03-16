@@ -6,6 +6,7 @@ use App\Entity\Calendar;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Transaction;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Persistence\ManagerRegistry;
@@ -66,6 +67,23 @@ class CalendarRepository extends ServiceEntityRepository
 
         return $queryBuilder->getOneOrNullResult();
     }
+
+    public function findByDate(DateTimeInterface $dateTime, Ticker $ticker): ?Calendar
+    {
+        $queryBuilder = $this->createQueryBuilder('c')
+        ->select('c')
+        ->innerJoin('c.ticker', 't')
+        ->where('t = :ticker')
+        ->andWhere('c.paymentDate <= :paydate')
+        ->setParameter('ticker', $ticker)
+        ->setParameter('paydate', $dateTime->format('Y-m-d'))
+        ->orderBy('c.id', 'DESC')
+        ->setMaxResults(1)
+        ->getQuery();
+
+        return $queryBuilder->getOneOrNullResult();  
+    }
+
 
     private function getPositionSize(Collection $transactions, Calendar $item)
     {

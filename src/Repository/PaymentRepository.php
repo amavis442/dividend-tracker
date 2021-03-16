@@ -6,6 +6,7 @@ use App\Entity\Payment;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Helper\DateHelper;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
@@ -91,6 +92,21 @@ class PaymentRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function hasPayment(DateTimeInterface $dateTime, Ticker $ticker): bool
+    {
+        return $this->createQueryBuilder('p')
+        ->join('p.ticker', 't')
+        ->where('t = :ticker')
+        ->andWhere('p.payDate >= :paydateStart AND p.payDate <= :paydateEnd')
+        ->setParameter('ticker', $ticker)
+        ->setParameter('paydateStart', $dateTime->format('Y-m-d 00:00:00'))
+        ->setParameter('paydateEnd', $dateTime->format('Y-m-d 23:59:59'))
+        
+        ->getQuery()
+        ->getOneOrNullResult() ? true : false; 
+    }
+
 
     public function getForPosition(Position $position): ?array
     {

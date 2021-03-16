@@ -4,9 +4,12 @@ namespace App\Service;
 
 use App\Entity\Branch;
 use App\Entity\Currency;
+use App\Entity\Payment;
 use App\Entity\Transaction;
 use App\Repository\BranchRepository;
+use App\Repository\CalendarRepository;
 use App\Repository\CurrencyRepository;
+use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
@@ -18,11 +21,122 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class ImportCsv extends ImportBase
+class ImportCsvService extends ImportBase
 {
+    /**
+     * @var TickerRepository
+     */
+    protected $tickerRepository;
+
+    /**
+     * Undocumented variable
+     *
+     * @var CurrencyRepository
+     */
+    protected $currencyRepository;
+    /**
+     * Undocumented variable
+     *
+     * @var PositionRepository
+     */
+    protected $positionRepository;
+    /**
+     * Undocumented variable
+     *
+     * @var WeightedAverage
+     */
+    protected $weightedAverage;
+    /**
+     * Undocumented variable
+     *
+     * @var BranchRepository
+     */
+    protected $branchRepository;
+    /**
+     * Undocumented variable
+     *
+     * @var TransactionRepository
+     */
+    protected $transactionRepository;
+    /**
+     * Undocumented variable
+     *
+     * @var PaymentRepository
+     */
+    protected $paymentRepository;
+    /**
+     * Undocumented variable
+     *
+     * @var CalendarRepository
+     */
+    protected $calendarRepository;
+    /**
+     * Undocumented variable
+     *
+     * @var EntityManagerInterface
+     */
+    protected $entityManager;
+
+    public function __construct(
+        EntityManager $entityManager
+    ) {
+        $this->tickerRepository = $entityManager->getRepository('App\Entity\Ticker');
+        $this->currencyRepository = $entityManager->getRepository('App\Entity\Currency');
+        $this->positionRepository = $entityManager->getRepository('App\Entity\Position');
+        $this->branchRepository = $entityManager->getRepository('App\Entity\Branch');
+        $this->transactionRepository = $entityManager->getRepository('App\Entity\Transaction');
+        $this->paymentRepository = $entityManager->getRepository('App\Entity\Payment');
+        $this->calendarRepository = $entityManager->getRepository('App\Entity\Calendar');
+        $this->entityManager = $entityManager;
+    }
+
     protected function formatImportData($data): array
     {
         return $this->importData($data);
+    }
+
+    /**
+     * Import Dividends even when position is closed.
+     *
+     * @param \Box\Spout\Common\Entity\Cell[] array $cells
+     * @return void
+     */
+    protected function importDividend(array $cells)
+    {
+        $transactionDate = DateTime::createFromFormat('Y-m-d H:i:s', $cells[1]->getValue());
+        $isin = $cells[2]->getValue();
+        $amount = $cells[5]->getValue();
+        $dividend = $cells[9]->getValue();
+
+        $ticker = $this->tickerRepository->findOneBy(['isin' => $isin]);
+        if (!$ticker) {
+            return;
+        }
+
+        
+        $calendar = $this->calendarRepository->findByDate($transactionDate, $ticker);
+        if (!$calendar) {
+            return;
+        }
+ 
+        $position = $ticker->getPositions()->last();
+        $currency = $this->currencyRepository->findOneBy(['symbol' => 'EUR']);
+        
+        $payment = new Payment();
+        $payment->setTicker($ticker)
+            ->setCurrency($currency)
+            ->setAmount($amount)
+            ->setDividend($dividend)
+            ->setCalendar($calendar)
+            ->setPosition($position)
+            ->setPayDate($transactionDate);
+        
+        if ($this->paymentRepository->hasPayment($transactionDate, $ticker)) {
+            return;
+        }
+
+        $this->entityManager->persist($payment);
+        $this->entityManager->flush($payment);
     }
 
     protected function importData(Sheet $sheet): ?array
@@ -43,6 +157,9 @@ class ImportCsv extends ImportBase
             $cell = $cells[0];
             $cellVal = $cell->getValue();
             if (false === stripos($cellVal, 'sell') && false === stripos($cellVal, 'buy')) {
+                if (false !== stripos($cellVal, 'dividend')) {
+                    $this->importDividend($cells);
+                }
                 continue;
             };
 
