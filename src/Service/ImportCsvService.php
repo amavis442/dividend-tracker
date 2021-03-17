@@ -19,6 +19,7 @@ use Box\Spout\Reader\CSV\Sheet;
 use DateTime;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImportCsvService extends ImportBase
@@ -101,12 +102,15 @@ class ImportCsvService extends ImportBase
      * @param \Box\Spout\Common\Entity\Cell[] array $cells
      * @return void
      */
-    protected function importDividend(array $cells)
+    protected function importDividend(array $cells, array $headers)
     {
         $transactionDate = DateTime::createFromFormat('Y-m-d H:i:s', $cells[1]->getValue());
         $isin = $cells[2]->getValue();
         $amount = $cells[5]->getValue();
         $dividend = $cells[9]->getValue();
+        if ($headers[9] == 'result (eur)') {
+            $dividend = (float)$cells[10]->getValue();
+        }
 
         $ticker = $this->tickerRepository->findOneBy(['isin' => $isin]);
         if (!$ticker) {
@@ -121,8 +125,8 @@ class ImportCsvService extends ImportBase
  
         $position = $ticker->getPositions()->last();
         $currency = $this->currencyRepository->findOneBy(['symbol' => 'EUR']);
-        
         $payment = new Payment();
+
         $payment->setTicker($ticker)
             ->setCurrency($currency)
             ->setAmount($amount)
@@ -130,7 +134,7 @@ class ImportCsvService extends ImportBase
             ->setCalendar($calendar)
             ->setPosition($position)
             ->setPayDate($transactionDate);
-        
+
         if ($this->paymentRepository->hasPayment($transactionDate, $ticker)) {
             return;
         }
@@ -158,7 +162,7 @@ class ImportCsvService extends ImportBase
             $cellVal = $cell->getValue();
             if (false === stripos($cellVal, 'sell') && false === stripos($cellVal, 'buy')) {
                 if (false !== stripos($cellVal, 'dividend')) {
-                    $this->importDividend($cells);
+                    $this->importDividend($cells, $headers);
                 }
                 continue;
             };
