@@ -124,7 +124,7 @@ class PortfolioController extends AbstractController
         $dividends = $paymentRepository->getSumDividends([$ticker->getId()]);
         $dividend = 0;
         if (!empty($dividends)) {
-            $dividend = $dividends[$ticker->getId()] / Constants::VALUTA_PRECISION;
+            $dividend = $dividends[$ticker->getId()];
         }
         $growth = $dividendGrowth->getData($ticker);
 

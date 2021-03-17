@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Constants;
 use App\Entity\Payment;
 use App\Entity\Position;
 use App\Entity\Ticker;
@@ -153,7 +154,7 @@ class PaymentRepository extends ServiceEntityRepository
             ->getArrayResult();
         $output = [];
         foreach ($result as $item) {
-            $output[$item['id']] = $item['total'];
+            $output[$item['id']] = $item['total'] / Constants::VALUTA_PRECISION;
         }
 
         return $output;
