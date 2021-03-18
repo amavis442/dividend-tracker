@@ -46,8 +46,7 @@ class Yields
             $netTotalForwardYearlyPayout = $amount * $netForwardYearlyPayout;
             $dividendYield = round(((($dividendPerYear * (1 - $tax)) / $exchangeRate) / $avgPrice) * 100, 2);
             $tickerLabel = $ticker->getTicker();
-
-            $labels[$tickerLabel] = sprintf("%s (%s)", substr(addslashes($ticker->getFullname()), 0, 8), $ticker->getTicker());
+            $labels[$tickerLabel] = sprintf("%s (%s)", substr(addslashes(str_replace(["'",'"'],["",""],$ticker->getFullname())), 0, 8), $ticker->getTicker());
             $data[$tickerLabel] = $dividendYield;
 
             if ($orderBy === 'yield') {
