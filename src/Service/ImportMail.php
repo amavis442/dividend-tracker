@@ -4,8 +4,6 @@ namespace App\Service;
 
 use App\Entity\Branch;
 use App\Entity\Currency;
-use App\Entity\Position;
-use App\Entity\Ticker;
 use App\Entity\Transaction;
 use App\Repository\BranchRepository;
 use App\Repository\CurrencyRepository;
@@ -15,14 +13,16 @@ use App\Repository\TransactionRepository;
 use App\Service\WeightedAverage;
 use DateTime;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use ZBateson\MailMimeParser\MailMimeParser;
 
 class ImportMail extends ImportBase
 {
-    protected function formatImportData($data):array
+    protected function formatImportData($data): array
     {
         return $this->importData($data);
     }
@@ -205,4 +205,18 @@ class ImportMail extends ImportBase
         libxml_use_internal_errors($internalErrors);
     }
 
+    public function importFile(
+        EntityManagerInterface $entityManager,
+        TickerRepository $tickerRepository,
+        PositionRepository $positionRepository,
+        WeightedAverage $weightedAverage,
+        Currency $currency,
+        Branch $branch,
+        TransactionRepository $transactionRepository,
+        UploadedFile $uploadedFile,
+        ?\Box\Spout\Reader\CSV\Reader $reader = null
+    ): array
+    {
+        return [];
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Branch;
+use App\Entity\Constants;
 use App\Entity\Currency;
 use App\Entity\Payment;
 use App\Entity\Transaction;
@@ -19,7 +20,6 @@ use Box\Spout\Reader\CSV\Sheet;
 use DateTime;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImportCsvService extends ImportBase
@@ -109,7 +109,7 @@ class ImportCsvService extends ImportBase
         $amount = $cells[5]->getValue();
         $dividend = $cells[9]->getValue();
         if ($headers[9] == 'result (eur)') {
-            $dividend = (float)$cells[10]->getValue();
+            $dividend = (float) $cells[10]->getValue();
         }
 
         $ticker = $this->tickerRepository->findOneBy(['isin' => $isin]);
@@ -117,7 +117,6 @@ class ImportCsvService extends ImportBase
             return;
         }
 
-        
         $calendar = $this->calendarRepository->findByDate($transactionDate, $ticker);
         $position = $ticker->getPositions()->last();
         $currency = $this->currencyRepository->findOneBy(['symbol' => 'EUR']);
@@ -222,91 +221,6 @@ class ImportCsvService extends ImportBase
         return $rows;
     }
 
-    public function import(
-        TickerRepository $tickerRepository,
-        CurrencyRepository $currencyRepository,
-        PositionRepository $positionRepository,
-        WeightedAverage $weightedAverage,
-        BranchRepository $branchRepository,
-        TransactionRepository $transactionRepository,
-        EntityManager $entityManager
-    ): void {
-        ini_set('max_execution_time', 3000);
-
-        $files = $this->getImportFiles();
-        sort($files);
-        $currency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
-        $branch = $branchRepository->findOneBy(['label' => 'Tech']);
-
-        $reader = ReaderEntityFactory::createCSVReader();
-        $reader->setFieldDelimiter(',');
-        foreach ($files as $file) {
-            if (false === strpos($file, '.csv')) {
-                continue;
-            }
-
-            $transactionsAdded = 0;
-            $totalTransaction = 0;
-            $filename = realpath(dirname(__DIR__) . '/../import/' . $file);
-            $reader->open($filename);
-
-            $sheets = $reader->getSheetIterator();
-            $rows = $this->formatImportData($sheets->current());
-            $reader->close();
-
-            if (count($rows) > 0) {
-                foreach ($rows as $row) {
-                    $ticker = $this->preImportCheckTicker($entityManager, $branch, $tickerRepository, $row);
-                    $position = $this->preImportCheckPosition($entityManager, $ticker, $currency, $positionRepository, $row);
-                    $transaction = $transactionRepository->findOneBy(['jobid' => $row['opdrachtid']]);
-
-                    if (!$transaction) {
-                        $transaction = new Transaction();
-                        $transaction
-                            ->setSide($row['direction'])
-                            ->setPrice($row['price'])
-                            ->setAllocation($row['allocation'])
-                            ->setAmount($row['amount'])
-                            ->setTransactionDate($row['transactionDate'])
-                            ->setAllocationCurrency($currency)
-                            ->setCurrency($currency)
-                            ->setPosition($position)
-                            ->setExchangeRate($row['wisselkoersen'])
-                            ->setJobid($row['opdrachtid'])
-                            ->setMeta($row['nr'])
-                            ->setImportfile($file)
-                        ;
-
-                        $position->addTransaction($transaction);
-                        $weightedAverage->calc($position);
-
-                        if ($position->getAmount() === 0 || $position->getAmount() < 2) {
-                            $position->setClosed(1);
-                            $position->setClosedAt($row['transactionDate']);
-                            $position->setAmount(0);
-                        }
-
-                        if ($position->getAmount() > -6 && $position->getAmount() < 2) {
-                            $position->setClosed(1);
-                            $position->setClosedAt($row['transactionDate']);
-                            $position->setAmount(0);
-                        }
-
-                        $entityManager->persist($position);
-                        $entityManager->flush();
-                        $transactionsAdded++;
-                    } else {
-                        dump('Transaction already exists. ID: ' . $transaction->getId());
-                    }
-                    unset($ticker, $position, $transaction);
-
-                    $totalTransaction++;
-                }
-            }
-            dump('Done processing file ' . $file . '.....', 'Transaction added: ' . $transactionsAdded . ' of ' . $totalTransaction);
-        }
-    }
-
     public function importFile(
         EntityManagerInterface $entityManager,
         TickerRepository $tickerRepository,
@@ -362,13 +276,13 @@ class ImportCsvService extends ImportBase
                     $position->addTransaction($transaction);
                     $weightedAverage->calc($position);
 
-                    if ($position->getAmount() === 0 || $position->getAmount() < 2) {
+                    if ($position->getAmount() === 0 || $position->getAmount() < (2 / Constants::AMOUNT_PRECISION)) {
                         $position->setClosed(1);
                         $position->setClosedAt($row['transactionDate']);
                         $position->setAmount(0);
                     }
 
-                    if ($position->getAmount() > -6 && $position->getAmount() < 2) {
+                    if ($position->getAmount() > -6 && $position->getAmount() < (2 / Constants::AMOUNT_PRECISION)) {
                         $position->setClosed(1);
                         $position->setClosedAt($row['transactionDate']);
                         $position->setAmount(0);

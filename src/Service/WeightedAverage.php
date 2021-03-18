@@ -71,9 +71,9 @@ class WeightedAverage
             } 
         }
 
-        $position->setAllocation((int) round($costBase))
+        $position->setAllocation(round($costBase, 3))
             ->setAmount($numShares)
             ->setPrice($aPrice)
-            ->setProfit((int) round($totalProfit));
+            ->setProfit(round($totalProfit, 3));
     }
 }
