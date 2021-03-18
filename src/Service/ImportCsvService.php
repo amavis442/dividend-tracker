@@ -119,10 +119,6 @@ class ImportCsvService extends ImportBase
 
         
         $calendar = $this->calendarRepository->findByDate($transactionDate, $ticker);
-        if (!$calendar) {
-            return;
-        }
- 
         $position = $ticker->getPositions()->last();
         $currency = $this->currencyRepository->findOneBy(['symbol' => 'EUR']);
         $payment = new Payment();
