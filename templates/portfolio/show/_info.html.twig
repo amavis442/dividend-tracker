@@ -18,6 +18,10 @@
 			<td>{{ ticker.isin }}</td>
 		</tr>
 		<tr>
+			<th>Position</th>
+			<td>{{ position.posid }}</td>
+		</tr>
+		<tr>
 			<th>Dividend payment months</th>
 			<td>
 				{% for month in ticker.dividendMonths %}
