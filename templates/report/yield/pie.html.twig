@@ -45,16 +45,16 @@
 			<tr>
 				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'ticker'}) }}">Ticker</a></th>
 				<th>avgPrice</th>
-				<th>Allocation</th>
 				<th>Last dividend</th>
 				<th>Last payout date</th>
 				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'dividend'}) }}">Dividend</a></th>
-				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'yield'}) }}">Yield</a></th>
 				<th>Net forward yearly dividend per share</th>
 				<th>Amount</th>
 				<th>#Payouts per year</th>
 				<th>Net forward dividend per payout</th>
 				<th>Net forward yearly dividend total</th>
+				<th>Allocation</th>
+				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'yield'}) }}">Yield</a></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -62,21 +62,24 @@
 				<tr>
 					<td><span title="{{ item.label }}">{{ item.ticker }}</span></td>
 					<td>&euro;{{ (item.avgPrice)|format_number({fraction_digit: 2}) }}</td>
-					<td>&euro;{{ item.allocation|format_number({fraction_digit: 2}) }}</td>
+					
 					<td>{% if item.lastDividend > 0 %}${{ (item.lastDividend)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
 					<td>{% if item.lastDividendDate is not null %}{{ item.lastDividendDate|date("d-m-Y") }}{% else %} - {% endif %}</td>
 					<td>{% if item.payout > 0 %}${{ (item.payout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
-					<td>{% if item.yield > 0 %}{{ item.yield }}%{% else %}-{% endif %}</td>
 					<td>{% if item.netForwardYearlyPayout > 0 %}&euro;{{ (item.netForwardYearlyPayout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
 					<td>{{ item.amount }}</td>
 					<td>{{ item.numPayoutsPerYear ?: '-' }}</td>
 					<td>{% if (item.netTotalForwardYearlyPayout > 0) and (item.numPayoutsPerYear > 0) %}&euro;{{ (item.netTotalForwardYearlyPayout / item.numPayoutsPerYear)|format_number({fraction_digit: 2}) }}{% endif %}</td>
 					<td>{% if item.netTotalForwardYearlyPayout > 0 %}&euro;{{ item.netTotalForwardYearlyPayout|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
+					<td>&euro;{{ item.allocation|format_number({fraction_digit: 2}) }}</td>
+					<td>{% if item.yield > 0 %}{{ item.yield }}%{% else %}-{% endif %}</td>
 				</tr>
 				{% endfor %}
 				<tr class="table-primary">
-					<td colspan='11'></td>
+					<td colspan='9'></td>
 					<td>&euro;{{ totalNetYearlyDividend|format_number({fraction_digit: 2}) }}</td>
+					<td>&euro;{{ allocated|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ dividendYieldOnCost|format_number({fraction_digit: 2}) }}%</td>
 				</td>
 			</tbody>
 		</table>
