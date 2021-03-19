@@ -55,7 +55,7 @@
 
             <tr {{ position.isDividendPayMonth ? 'class="table-success"' : ''}}>
                 <td>
-                    <a href="{{ path('portfolio_show', {'id': position.id}) }}" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="{{ ticker.fullname }}"><i class="fas fa-info-circle"></i></a>
+                    <a href="{{ path('portfolio_show', {'id': position.id}) }}" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="{{ ticker.fullname }} ({{ ticker.ticker }})"><i class="fas fa-info-circle"></i></a>
                 </td>
                 <td>
                      {{ ticker.fullname|slice(0,10) }}...
