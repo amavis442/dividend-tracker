@@ -29,6 +29,7 @@ class Yields
             $ticker = $position->getTicker();
             $avgPrice = $position->getPrice();
             $amount = $position->getAmount();
+            $allocation = $position->getAllocation();
 
             $scheduleCalendar = $ticker->getDividendMonths();
             $numPayoutsPerYear = count($scheduleCalendar);
@@ -63,6 +64,7 @@ class Yields
                 'label' => $ticker->getFullname(),
                 'yield' => $dividendYield,
                 'payout' => $dividendPerYear,
+                'allocation' => $allocation,
                 'netForwardYearlyPayout' => $netForwardYearlyPayout,
                 'netTotalForwardYearlyPayout' => $netTotalForwardYearlyPayout,
                 'avgPrice' => $avgPrice,

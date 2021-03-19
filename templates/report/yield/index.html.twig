@@ -30,6 +30,7 @@
 			<tr>
 				<th><a href="{{ path('report_dividend_yield', {'orderBy': 'ticker'}) }}">Ticker</a></th>
 				<th>avgPrice</th>
+				<th>Allocation</th>
 				<th>Last dividend</th>
 				<th>Last payout date</th>
 				<th><a href="{{ path('report_dividend_yield', {'orderBy': 'dividend'}) }}">Dividend</a></th>
@@ -46,6 +47,7 @@
 				<tr>
 					<td><span title="{{ item.label }}">{{ item.ticker }}</span></td>
 					<td>&euro;{{ (item.avgPrice)|format_number({fraction_digit: 2}) }}</td>
+					<td>&euro;{{ item.allocation|format_number({fraction_digit: 2}) }}</td>
 					<td>{% if item.lastDividend > 0 %}${{ (item.lastDividend)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
 					<td>{% if item.lastDividendDate is not null %}{{ item.lastDividendDate|date("d-m-Y") }}{% else %} - {% endif %}</td>					
 					<td>{% if item.payout > 0 %}${{ (item.payout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
@@ -58,7 +60,7 @@
 				</tr>
 				{% endfor %}
 				<tr class="table-primary">
-					<td colspan='10'></td>
+					<td colspan='11'></td>
 					<td>&euro;{{ totalNetYearlyDividend|format_number({fraction_digit: 2}) }}</td>
 				</td>
 			</tbody>
