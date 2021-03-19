@@ -11,7 +11,7 @@
                 <li class="list-group-item">
                     <div class="card">
                         <div class="card-header">
-                            <strong>{{ currentDate|date('l, d-m-Y') }}</strong>
+                            <strong>{{ currentDate|date('l')|trans }}, {{ currentDate|date('d') }} {{ currentDate|date('F')|trans|lower }} {{ currentDate|date('d') }}</strong>
                         </div>
                     <div class="card-body">
                     {% for key,cal in item %}
