@@ -27,13 +27,16 @@ set('allow_anonymous_stats', false);
 
 // Hosts
 
-host('banpagi.com')
+host('134.209.84.155')
     ->stage('prod','staging')
     ->user('deployer')
     ->roles('app')
     ->port(22)
     ->configFile('~/.ssh/config')
-    ->set('deploy_path', '/websites/live/{{application}}');
+    ->identityFile('~/.ssh/deployer')
+    ->multiplexing(true)
+    ->forwardAgent(true)
+    ->set('deploy_path', '/var/www/{{application}}');
 
 localhost()
     ->stage('local')
