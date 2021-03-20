@@ -43,11 +43,18 @@ services:
         arguments: 
             $entityManager: "@doctrine.orm.entity_manager"
 
+    Doctrine\Migrations\Version\DbalMigrationFactory: ~
+    App\Migrations\Factory\MigrationFactoryDecorator:
+        decorates: Doctrine\Migrations\Version\DbalMigrationFactory
+        arguments: ['@App\Migrations\Factory\MigrationFactoryDecorator.inner', '@service_container']
+
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
     App\EventListener\AddUser:
         tags:
             - { name: doctrine.event_listener, event: prePersist }    
+
     on_request_listener:
         class: App\EventListener\OnRequestListener
         arguments: ["@doctrine.orm.entity_manager","@security.token_storage"]
