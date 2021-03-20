@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Account{% endblock %}
+
+{% block body %}
+    <h1>Account</h1>
+
+    {{ form_start(accountForm) }}
+        {{ form_row(accountForm.email) }}
+        {{ form_row(accountForm.plainPassword) }}
+        <button class="btn btn-primary">Update</button>
+    {{ form_end(accountForm) }}
+{% endblock %}
