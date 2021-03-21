@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Calendar;
 use App\Entity\Constants;
 use App\Entity\Position;
 use App\Repository\PaymentRepository;
@@ -113,6 +114,14 @@ class PortfolioController extends AbstractController
         $exhangeRate = Constants::EXCHANGE;
 
         $ticker = $position->getTicker();
+        $calendarRecentDividendDate = $ticker->getRecentDividendDate();
+        $netCashAmount = 0.0;
+        $amountPerDate = 0.0;
+        if ($calendarRecentDividendDate) {
+            $netCashAmount = $calendarRecentDividendDate->getNetCashAmount();
+            $amountPerDate = $position->getAmountPerDate($calendarRecentDividendDate->getExDividendDate());
+        }
+
         $position = $positionRepository->getForPosition($position);
         $netYearlyDividend = 0.0;
         $cals = $ticker->getCalendars();
@@ -149,6 +158,10 @@ class PortfolioController extends AbstractController
             'totalInvested' => $allocated,
             'netYearlyDividend' => $netYearlyDividend,
             'percentageAllocated' => $percentageAllocation,
+            'netCashAmount' => $netCashAmount,
+            'amountPerDate' => $amountPerDate,
+            'expectedPayout' => $netCashAmount * $amountPerDate,
+            'calendarRecentDividendDate' => $calendarRecentDividendDate ?? new Calendar(),
         ]);
     }
 

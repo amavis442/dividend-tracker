@@ -364,8 +364,12 @@ class Position
         $forwardNetDividend = 0.0;
         if ($this->getTicker()->getCalendars()) {
             $calendar = $this->getTicker()->getCalendars()->first();
-            $cashAmount = $calendar->getCashamount();
-            $forwardNetDividend = $this->getAmount() * $cashAmount * ((100 - Constants::TAX) / 100) / Constants::EXCHANGE;
+            $cashAmount = 0.0;
+            $forwardNetDividend = 0.0;
+            if ($calendar) {
+                $cashAmount = $calendar->getCashamount();
+                $forwardNetDividend = $this->getAmount() * $cashAmount * ((100 - Constants::TAX) / 100) / Constants::EXCHANGE;
+            }
         }
         $this->forwardNetDividend = $forwardNetDividend;
 

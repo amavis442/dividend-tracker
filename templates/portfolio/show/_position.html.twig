@@ -3,12 +3,12 @@
 	<thead>
 		<tr>
 			<th></th>
-			<th>Amount</th>
-			<th>Weighted average price</th>
-			<th>Allocation</th>
-			<th>Profit / Loss</th>
-			<th>Pie</th>
-			<th>Actions</th>
+			<th>{{ 'Amount'|trans }}</th>
+			<th>{{ 'Weighted average price'|trans }}</th>
+			<th>{{ 'Allocation'|trans }}</th>
+			<th>{{ 'Profit / Loss'|trans }}</th>
+			<th>{{ 'Pie'|trans }}</th>
+			<th>{{ 'Actions'|trans }}</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -17,7 +17,7 @@
 
 			<tr class="table-success">
 				<td>
-					<strong>Summary</strong>
+					<strong>{{ 'Summary'|trans }}</strong>
 				</td>
 				<td>{{ (position.amount)|format_number({fraction_digit: 7}) }}</td>
 				<td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ position.price|format_number({fraction_digit: 2}) }}</td>
@@ -30,13 +30,13 @@
 				<td>
 					<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 						<div class="btn-group mr-2" role="group" aria-label="First group">
-							<a class="btn btn-success" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id,'side': 1, }) }}" data-toggle="tooltip" data-placement="top" title="Buy">
+							<a class="btn btn-success" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id,'side': 1, }) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Buy'|trans }}">
 								<i class="fas fa-plus"></i>
 							</a>
-							<a href="{{ path('position_edit', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit position">
+							<a href="{{ path('position_edit', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="{{ 'Edit position'|trans }}">
 								<i class="far fa-edit"></i>
 							</a>
-							<a class="btn btn-danger" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id, 'side': 2}) }}" data-toggle="tooltip" data-placement="top" title="Sell">
+							<a class="btn btn-danger" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id, 'side': 2}) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Sell'|trans }}">
 								<i class="fas fa-minus"></i>
 							</a>
 						</div>

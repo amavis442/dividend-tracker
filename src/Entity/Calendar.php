@@ -120,6 +120,12 @@ class Calendar
         return $this->cashAmount / Constants::VALUTA_PRECISION;
     }
 
+    public function getNetCashAmount(): ?float
+    {
+        return ($this->cashAmount * (1 - (Constants::TAX / 100)) / Constants::EXCHANGE) / Constants::VALUTA_PRECISION;
+
+    }
+
     public function setCashAmount(float $cashAmount): self
     {
         $this->cashAmount = $cashAmount * Constants::VALUTA_PRECISION;
