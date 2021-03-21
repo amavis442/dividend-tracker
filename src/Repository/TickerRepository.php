@@ -36,7 +36,7 @@ class TickerRepository extends ServiceEntityRepository
             ->select('t')
             ->join('t.branch', 'i')
             ->leftJoin('t.researches','r')
-            ->leftJoin('t.DividendMonths','d')
+            ->leftJoin('t.dividendMonths','d')
             ->leftJoin('t.payments','pa')
             ->groupBy('t.id')
             ->orderBy($order, $sort);
@@ -131,7 +131,7 @@ class TickerRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('t')
             ->select('t, p, c, dm')
             ->innerJoin('t.positions', 'p')
-            ->leftJoin('t.DividendMonths', 'dm')
+            ->leftJoin('t.dividendMonths', 'dm')
             ->leftJoin('t.calendars', 'c')
             ->where('p.closed = 0 or p.closed is null')
             ->orderBy('t.ticker')

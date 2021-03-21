@@ -171,7 +171,7 @@ class PositionRepository extends ServiceEntityRepository
             ->innerJoin('p.ticker', 't')
             ->leftJoin('t.calendars', 'c')
             ->leftJoin('p.payments', 'pa')
-            ->leftJoin('t.DividendMonths', 'dm')
+            ->leftJoin('t.dividendMonths', 'dm')
             ->where('(p.closed = 0 OR p.closed IS NULL)');
 
         if ($pieId) {
@@ -207,7 +207,7 @@ class PositionRepository extends ServiceEntityRepository
             ->leftJoin('p.payments', 'pa')
             ->leftJoin('p.pies', 'pies')
             ->leftJoin('t.calendars', 'c')
-            ->leftJoin('t.DividendMonths', 'dm')
+            ->leftJoin('t.dividendMonths', 'dm')
             ->orderBy($order, $sort);
 
         if (!empty($search)) {

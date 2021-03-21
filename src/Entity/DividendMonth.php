@@ -24,7 +24,7 @@ class DividendMonth
     private $dividendMonth;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Ticker", mappedBy="DividendMonths")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Ticker", mappedBy="dividendMonths")
      */
     private $tickers;
 

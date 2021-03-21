@@ -60,7 +60,7 @@ class Ticker
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\DividendMonth", inversedBy="tickers")
      */
-    private $DividendMonths;
+    private $dividendMonths;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -167,10 +167,12 @@ class Ticker
 
     public function isDividendPayMonth(int $currentMonth): bool
     {
-        $months = $this->getDividendMonths()->getValues();
-        foreach ($months as $dividendMonth) {
-            if ($dividendMonth->isDividendPayMonth($currentMonth)) {
-                return true;
+        if ($this->getDividendMonths()) {
+            $months = $this->getDividendMonths()->getValues();
+            foreach ($months as $dividendMonth) {
+                if ($dividendMonth->isDividendPayMonth($currentMonth)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -218,17 +220,17 @@ class Ticker
     }
 
     /**
-     * @return Collection|DividendMonth[]
+     * @return Collection|null
      */
-    public function getDividendMonths(): Collection
+    public function getDividendMonths(): ?Collection
     {
-        return $this->DividendMonths;
+        return $this->dividendMonths;
     }
 
     public function addDividendMonth(DividendMonth $dividendMonth): self
     {
-        if (!$this->DividendMonths->contains($dividendMonth)) {
-            $this->DividendMonths[] = $dividendMonth;
+        if (!$this->dividendMonths->contains($dividendMonth)) {
+            $this->dividendMonths[] = $dividendMonth;
         }
 
         return $this;
@@ -236,8 +238,8 @@ class Ticker
 
     public function removeDividendMonth(DividendMonth $dividendMonth): self
     {
-        if ($this->DividendMonths->contains($dividendMonth)) {
-            $this->DividendMonths->removeElement($dividendMonth);
+        if ($this->dividendMonths->contains($dividendMonth)) {
+            $this->dividendMonths->removeElement($dividendMonth);
         }
 
         return $this;
@@ -245,8 +247,8 @@ class Ticker
 
     public function getDividendFrequency(): int
     {
-        if ($this->DividendMonths) {
-            return count($this->DividendMonths);
+        if ($this->dividendMonths) {
+            return count($this->dividendMonths);
         }
         return 0;
     }
