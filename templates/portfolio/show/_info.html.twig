@@ -1,8 +1,9 @@
+{% set calendar = position.ticker.getRecentDividendDate %}
 <h3>Info</h3>
 <table class="table">
 	<tbody>
 		<tr>
-			<th>Instrument</th>
+			<th>{{ 'Instrument'|trans }}</th>
 			<td>
 				<strong>{{ ticker.fullname }}
 					({{ ticker.ticker }})
@@ -10,7 +11,7 @@
 			</td>
 		</tr>
 		<tr>
-			<th>Industry</th>
+			<th>{{ 'Industry'|trans }}</th>
 			<td>{{ ticker.branch.label }}</td>
 		</tr>
 		<tr>
@@ -18,14 +19,14 @@
 			<td>{{ ticker.isin }}</td>
 		</tr>
 		<tr>
-			<th>Position</th>
+			<th>{{ 'Position'|trans }}</th>
 			<td>{{ position.posid }}</td>
 		</tr>
 		<tr>
-			<th>Dividend payment months</th>
+			<th>{{ 'Dividend payment months'|trans }}</th>
 			<td>
 				{% for month in ticker.dividendMonths %}
-					{{ month.getDividendMonthName}},
+					{{ month.getDividendMonthName|trans }},
 				{% endfor %}
 				<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="Edit months">
 					<i class="far fa-edit"></i>
@@ -33,7 +34,7 @@
 			</td>
 		</tr>
 		<tr>
-			<th>Total dividend</th>
+			<th>{{ 'Total dividend received'|trans }}</th>
 			<td>
 				<span class="alert alert-primary" role="alert">
 					<strong>&euro;{{ dividend|format_number({fraction_digit: 2}) }}</string>
@@ -41,23 +42,54 @@
 			</td>
 		</tr>
 		<tr>
-			<th>Quantity</th>
+			<th>{{ 'Amount'|trans }} #</th>
 			<td>{{ (position.amount)|format_number({fraction_digit: 7}) }}</td>
 		</tr>
 		<tr>
-			<th>Weighted average price</th>
+			<th>{{ 'Dividend frequency'|trans }}</th>
+			<td>
+				{{ position.ticker.getPayoutFrequency }}
+			</td>
+		</tr>
+		<tr>
+			<th>{{ 'Yearly forward dividend payout'|trans }}</th>
+			<td>
+				&euro;{{ (position.ticker.getPayoutFrequency * position.forwardNetDividend)|format_number({fraction_digit: 2}) }}
+			</td>
+		</tr>
+		<tr>
+			<th>{{ 'Single time forward dividend payout'|trans }}</th>
+			<td>
+				&euro;{{ position.forwardNetDividend|format_number({fraction_digit: 2}) }}
+			</td>
+		</tr>
+		<tr>
+			<th>{{ 'Dividend yield'|trans }}</th>
+			<td>
+				{{ position.forwardNetDividendYield }}%
+			</td>
+		</tr>
+		<tr>
+			<th>{{ 'Next dividend (Ex-div / payout)'|trans }}</th>
+			<td>
+				<span class="badge badge-primary">{{ calendar.getExDividendDate|date('Y-m-d') }}</span> /
+				 <span class="badge badge-warning">{{ calendar.getPaymentDate|date('Y-m-d') }}</span>
+			</td>
+		</tr>
+		<tr>
+			<th>{{ 'Weighted average price'|trans }}</th>
 			<td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price)|format_number({fraction_digit: 2}) }}</td>
 		</tr>
 		<tr>
-			<th>Allocation</th>
+			<th>{{ 'Allocation'|trans }}</th>
 			<td>{{ allocationSign|raw }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}</td>
 		</tr>
 		<tr>
-			<th>Allocation(%)</th>
+			<th>{{ 'Allocation'|trans }}(%)</th>
 			<td>{{ percentageAllocated|format_number({fraction_digit: 2}) }}%</td>
 		</tr>
 		<tr>
-			<th>Pies</th>
+			<th>{{ 'Pies'|trans }}</th>
 			<td>{% for pie in position.pies %}
                         <span class="badge badge-primary">{{ pie.label }}</span>
                     {% endfor %}

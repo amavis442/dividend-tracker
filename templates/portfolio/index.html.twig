@@ -31,14 +31,14 @@
         <thead>
             <tr>
                 <th></th>
-                <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'fullname', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Fullname</a></th>
-                <th>Amount</th>
-                <th>Avg. price</th>
-                <th>Allocation</th>
-                <th>Dividends</th>
-                <th>Div dates</th>
-                <th>Forward dividend</th>
-                <th>Pies</th>
+                <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'fullname', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Fullname'|trans }}</a></th>
+                <th>{{ 'Amount'|trans }}</th>
+                <th>{{ 'Avg. price'|trans }}</th>
+                <th>{{ 'Allocation'|trans }}</th>
+                <th>{{ 'Dividends'|trans }}</th>
+                <th>{{ 'Div dates'|trans }}</th>
+                <th>{{ 'Forward dividend'|trans }}</th>
+                <th>{{ 'Pies'|trans }}</th>
             </tr>
         </thead>
         <tbody>
@@ -58,7 +58,7 @@
                     <a href="{{ path('portfolio_show', {'id': position.id}) }}" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="{{ ticker.fullname }} ({{ ticker.ticker }})"><i class="fas fa-info-circle"></i></a>
                 </td>
                 <td>
-                     {{ ticker.fullname|slice(0,10) }}...
+                     {{ ticker.fullname|slice(0,10) }}{% if ticker.fullname|length > 10 %}...{% endif %}
                 </td>
                 <td>{{ amount|format_number({fraction_digit: 7}) }}</td>
                 <td>&euro;{{ avgPrice|format_number({fraction_digit: 2}) }}</td>
@@ -69,7 +69,7 @@
                 <td>&euro;{{ dividend|format_number({fraction_digit: 2}) }}</td>
                 <td><small>
                     {% if calendar %} 
-                        <span class="badge badge-primary">{{ calendar.exDividendDate|date('d/m/Y') }}</span>
+                        <span class="badge badge-primary">{{ calendar.exDividendDate|date('d/m/Y') }}</span><br/>
                         <span class="badge badge-warning">{{ calendar.paymentDate|date('d/m/Y') }}</span>
                     {% endif %}
                     </small>
@@ -83,7 +83,7 @@
                 </td>
                 <td>
                     {% for pie in position.pies %}
-                        <span class="badge badge-secondary">{{ pie.label }}</span>
+                        <span class="badge badge-secondary">{{ pie.label|slice(0,10) }}{% if pie.label|length > 10 %}...{% endif %}</span>
                     {% endfor %}
 				</td>
             </tr>

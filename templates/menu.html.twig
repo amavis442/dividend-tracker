@@ -67,10 +67,10 @@
             <div class="my-2 my-lg-0">
                 <span class="navbar-text">Email:
                     {{ app.user.email }}</span>
-                <a href="{{ path('app_logout') }}" class="btn btn-primary">Logout</a>
+                <a href="{{ path('app_logout') }}" class="btn btn-primary">{{ 'Logout'|trans }}</a>
             </div>
         {% else %}
-            <a href="{{ path('app_login') }}" class="btn btn-primary">Login</a>
+            <a href="{{ path('app_login') }}" class="btn btn-primary">{{ 'Login'|trans }}</a>
         {% endif %}
 
 
