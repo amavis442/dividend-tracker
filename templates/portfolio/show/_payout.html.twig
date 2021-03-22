@@ -3,8 +3,8 @@
 	<thead>
 		<tr>
 			<th></th>
-			<th>Ex-dividend date</th>
 			<th>Pay date</th>
+			<th>Ex-dividend date</th>
 			<th>Units</th>
 			<th>Total</th>
 			<th>Actions</th>
@@ -14,8 +14,8 @@
 		{% for payment in payments %}
 			<tr>
 				<td></td>
-				<td>{% if payment.calendar %}{{ payment.calendar.exDividendDate ? payment.calendar.exDividendDate|date('d-m-Y') : '' }}{% endif %}</td>
 				<td>{{ payment.payDate|date("d-m-Y") }}</td>
+				<td>{% if payment.calendar %}{{ payment.calendar.exDividendDate ? payment.calendar.exDividendDate|date('d-m-Y') : '' }}{% endif %}</td>
 				<td>{{ payment.amount|format_number({fraction_digit: 7})}}</td>
 				<td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ payment.dividend|format_number({fraction_digit: 2})}}</td>
 				<td>
@@ -28,9 +28,23 @@
 					</div>
 				</td>
 			</tr>
-		{% else %}
+		{% endfor %}
+		{% for payment in ticker.payments %}
 			<tr>
-				<td colspan="6">no records found</td>
+				<td></td>
+				<td>{{ payment.payDate|date("d-m-Y") }}</td>
+				<td>{% if payment.calendar %}{{ payment.calendar.exDividendDate ? payment.calendar.exDividendDate|date('d-m-Y') : '' }}{% endif %}</td>
+				<td>{{ payment.amount|format_number({fraction_digit: 7})}}</td>
+				<td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ payment.dividend|format_number({fraction_digit: 2})}}</td>
+				<td>
+					<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+						<div class="btn-group mr-2" role="group" aria-label="First group">
+							<a href="{{ path('payment_edit', {'id': payment.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit payment">
+								<i class="far fa-edit"></i>
+							</a>
+						</div>
+					</div>
+				</td>
 			</tr>
 		{% endfor %}
 	</tbody>
