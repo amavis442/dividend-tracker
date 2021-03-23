@@ -30,7 +30,7 @@
     {% for attachmentForm in form.attachments %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <div class="col-sm-4">
-                <button type="button" class="btn btn-danger" onclick="removeFile($(this), {{ attachmentForm.vars.value.id }});">
+                <button type="button" class="btn btn-danger removeFile" data-id={{ attachmentForm.vars.value.id }}>
                 <i class="fa fa-minus"></i></button>
             </div>
             <div class="col-sm-4">

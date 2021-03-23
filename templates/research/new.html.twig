@@ -12,5 +12,5 @@
 
 {% block javascripts %}
 {{ parent() }}
-{%  include 'research/_fileupload.html.twig' %}
+{{ encore_entry_script_tags('fileupload') }}
 {% endblock %}
