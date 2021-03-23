@@ -18,7 +18,7 @@ set('yarn','yarn');
 set('writable_mode','chmod');
 
 // Shared files/dirs between deploys
-add('shared_files', ['.env.local']);
+add('shared_files', ['.env.local','public/uploads']);
 //add('shared_dirs', ['public/media','public/assets','public/bundles']);
 
 // Writable dirs by web server
@@ -53,12 +53,6 @@ desc('Yarn build');
 task('yarn:build', function(){
     run('cd ' . get('release_path') . ' && {{yarn}} run encore prod');
 });
-
-//desc('Install assets');
-//task('assets:install', function() {
-//    run('{{release_path}}/bin/console assets:install --symlink');
-//    run('{{release_path}}/bin/console sylius:theme:assets:install --symlink');
-//});
 
 desc('Reload php-fpm config');
 task('php-fpm:reload', function () {
