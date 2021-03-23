@@ -1,32 +1,32 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Journal{% endblock %}
+{% block title %}{{ 'Journal'|trans }}{% endblock %}
 
 {% block body %}
-    <h1>Journal</h1>
+    <h1>{{ 'Journal'|trans }}</h1>
 
     <table class="table">
         <tbody>
             <tr>
-                <th>Title</th>
+                <th>{{ 'Title'|trans }}</th>
                 <td>{{ journal.title }}</td>
             </tr>
             <tr>
-                <th>Content</th>
+                <th>{{ 'Content'|trans }}</th>
                 <td>{{ journal.content|raw }}</td>
             </tr>
             <tr>
-                <th>CreatedAt</th>
+                <th>{{ 'Created'|trans }}</th>
                 <td>{{ journal.createdAt ? journal.createdAt|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
             <tr>
-                <th>UpdatedAt</th>
+                <th>{{ 'Modified'|trans }}</th>
                 <td>{{ journal.updatedAt ? journal.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('journal_index') }}" class="btn btn-primary"><i class="fas fa-angle-double-left"></i> back to list</a>
+    <a href="{{ path('journal_index') }}" class="btn btn-primary"><i class="fas fa-angle-double-left"></i> {{ 'back to list'|trans }}</a>
 
     <a href="{{ path('journal_edit', {'id': journal.id}) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
     <hr/>
