@@ -126,8 +126,12 @@ class PortfolioController extends AbstractController
         $netYearlyDividend = 0.0;
         $cals = $ticker->getCalendars();
         if (count($cals) > 0) {
+            $exchangeRateUsdEur = Constants::EXCHANGE;
             $dividendFrequentie = $ticker->getPayoutFrequency();
-            $netYearlyDividend = (($dividendFrequentie * $cals[0]->getCashAmount()) / $exhangeRate) * (1 - $dividendTax);
+            if ($cals[0]->getCurrency()->getSymbol() == 'EUR') {
+                $exchangeRateUsdEur = 1;
+            }
+            $netYearlyDividend = (($dividendFrequentie * $cals[0]->getCashAmount()) / $exchangeRateUsdEur) * (1 - $dividendTax);
         }
         $payments = $position->getPayments();
         $dividends = $paymentRepository->getSumDividends([$ticker->getId()]);
