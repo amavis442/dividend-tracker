@@ -3,7 +3,7 @@
 namespace App\Controller\Report;
 
 use App\Repository\PositionRepository;
-use App\Service\Allocation;
+use App\Model\AllocationModel;
 use App\Service\Summary;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,7 +20,7 @@ class AllocationPerPositionController extends AbstractController
     /**
      * @Route("/allocation/position", name="report_allocation_position")
      */
-    public function index(PositionRepository $positionRepository, Summary $summary, Allocation $allocation)
+    public function index(PositionRepository $positionRepository, Summary $summary, AllocationModel $allocation)
     {
         $result = $allocation->position($positionRepository, $summary);
 

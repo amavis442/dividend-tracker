@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Service;
+namespace App\Model;
 
 use App\Repository\BranchRepository;
 use App\Repository\PositionRepository;
 use App\Service\Summary;
 
-class Allocation
+class AllocationModel
 {
     public function allocation(
         PositionRepository $positionRepository
