@@ -2,10 +2,11 @@
 
 namespace App\Controller\Report;
 
+use App\Model\ProjectionModel;
 use App\Repository\CalendarRepository;
 use App\Repository\DividendMonthRepository;
 use App\Repository\PositionRepository;
-use App\Service\Projection;
+use App\Service\DividendService;
 use App\Service\Referer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,7 +29,8 @@ class ProjectionController extends AbstractController
         CalendarRepository $calendarRepository,
         DividendMonthRepository $dividendMonthRepository,
         Referer $referer,
-        Projection $projection,
+        ProjectionModel $projection,
+        DividendService $dividendService,
         int $projectionyear
     ): Response {
         if ($projectionyear === 1) {
@@ -36,7 +38,7 @@ class ProjectionController extends AbstractController
         }
         $referer->set('report_dividend_projection', ['projectionyear' => $projectionyear]);
 
-        $result = $projection->projection($projectionyear, $positionRepository, $calendarRepository, $dividendMonthRepository, self::TAX_DIVIDEND, self::EXCHANGE_RATE);
+        $result = $projection->projection($projectionyear, $positionRepository, $calendarRepository, $dividendMonthRepository, $dividendService);
         return $this->render('report/projection/index.html.twig', array_merge($result, [
             'controller_name' => 'ReportController',
             'year' => $projectionyear,

@@ -46,12 +46,12 @@
 						<table class="table">
 							<thead class="thead-dark">
 								<tr>
-									<th>Company</th>
-									<th>Units</th>
-									<th>Dividend</th>
-									<th>Projected dividend / Actual payout</th>
-									<th>Exdiv / Pay date</th>
-									<th>Actions</th>
+									<th>{{ 'Company'|trans }}</th>
+									<th>{{ 'Amount'|trans }}</th>
+									<th>{{ 'Dividend'|trans }}</th>
+									<th>{{ 'Projected dividend / Actual payout'|trans }}</th>
+									<th>{{ 'Exdiv / Pay date'|trans }}</th>
+									<th>{{ 'Actions'|trans }}</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -69,7 +69,7 @@
 											{% endif %}	
 										</td>
 										<td>{{ position.amount }}</td>
-										<td>${{ position.dividend }} </td>										
+										<td> {% if position.calendar %} {{ position.calendar.currency.sign|raw }}{% endif %}{{ position.dividend }} </td>										
 										<td>&euro;{{ position.estimatedPayment }} / &euro;{{ payment ? payment : '0' }}</td>
 										<td>
 											<span class="badge badge-warning">{{ position.exdividend }}</span>

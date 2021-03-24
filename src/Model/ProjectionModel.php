@@ -1,25 +1,30 @@
 <?php
 
-namespace App\Service;
+namespace App\Model;
 
+use App\Entity\Calendar;
 use App\Entity\DividendMonth;
+use App\Entity\Transaction;
 use App\Repository\CalendarRepository;
 use App\Repository\DividendMonthRepository;
 use App\Repository\PositionRepository;
+use App\Service\DividendService;
+use Doctrine\Common\Collections\Collection;
 
-class Projection
+class ProjectionModel
 {
-    protected $taxDividend;
-    protected $exchangeRate;
+    /**
+     * Undocumented variable
+     *
+     * @var DividendService
+     */
+    protected $dividendService;
 
     private function calcEstimatePayoutPerMonth(array &$dividendEstimate)
     {
         foreach ($dividendEstimate as $date => &$estimate) {
             $d = strftime('%B %Y', strtotime($date . '01'));
             $labels[] = $d;
-            //$estimatedNetTotalPayment = ($estimate['grossTotalPayment'] * (1 - $this->taxDividend)) / $this->exchangeRate;
-            //$data[] = round($estimatedNetTotalPayment, 2);
-            //$estimate['estimatedNetTotalPayment'] = round($estimatedNetTotalPayment, 2);
             $estimate['normaldate'] = $d;
         }
     }
@@ -71,11 +76,15 @@ class Projection
             if (isset($item['tickers'][$ticker->getTicker()])) {
                 $tickerData = $item['tickers'][$ticker->getTicker()];
                 $dataSource[$paydate]['tickers'][$ticker->getTicker()] = $tickerData;
-                $receivedDividendMonth += $tickerData['netPayment'];
 
-                $units = $dataSource[$paydate]['tickers'][$ticker->getTicker()]['amount'];
+                $calendar = $tickerData['calendar'];
+                [$exchangeRate, $taxDividend] = $this->dividendService->getExchangeAndTax($calendar);
+                $receivedDividendMonth += $tickerData['netPayment'];
+                $amount = $dataSource[$paydate]['tickers'][$ticker->getTicker()]['amount'];
                 $dividend = $dataSource[$paydate]['tickers'][$ticker->getTicker()]['dividend'];
-                $estimatedPayment = ($units * $dividend * (1 - $this->taxDividend)) / $this->exchangeRate;
+
+                $estimatedPayment = $amount * $dividend * (1 - $taxDividend) * $exchangeRate;
+
                 $dataSource[$paydate]['tickers'][$ticker->getTicker()]['estimatedPayment'] = round($estimatedPayment, 2);
 
                 $dataSource[$paydate]['estimatedNetTotalPayment'] += round($estimatedPayment, 2);
@@ -99,25 +108,89 @@ class Projection
         $labels[] = $normalDate;
     }
 
+    public function getPositionSize(Collection $transactions, Calendar $calendar)
+    {
+        $units = 0;
+
+        foreach ($transactions as $transaction) {
+            if ($transaction->getTransactionDate() >= $calendar->getExdividendDate()) {
+                continue;
+            }
+            $amount = $transaction->getAmount();
+            if ($transaction->getSide() === Transaction::BUY) {
+                $units += $amount;
+            }
+            if ($transaction->getSide() === Transaction::SELL) {
+                $units -= $amount;
+            }
+        }
+
+        return $units;
+    }
+
     public function projection(
         ?int $year = null,
         PositionRepository $positionRepository,
         CalendarRepository $calendarRepository,
         DividendMonthRepository $dividendMonthRepository,
-        float $taxDividend = 0.15,
-        float $exchangeRate = 1.19
+        DividendService $dividendService
     ): array{
         $labels = [];
         $data = [];
         $dividendEstimate = [];
+        $this->dividendService = $dividendService;
 
-        $this->exchangeRate = $exchangeRate;
-        $this->taxDividend = $taxDividend;
+        $positions = $positionRepository->getAllOpenForProjection(null, $year);
 
-        $dividendEstimate = [];
-        $positions = $positionRepository->getAllOpen(null, $year);
         foreach ($positions as $position) {
-            $positionDividendEstimate = $calendarRepository->getDividendEstimate($position, $year);
+            $output = [];
+            $transactions = $position->getTransactions();
+            $ticker = $position->getTicker();
+
+            $netPayment = [];
+            foreach ($position->getTicker()->getPayments() as $payment) {
+                $m = (int) $payment->getPayDate()->format('Ym');
+                if (!isset($netPayment[$m])) {
+                    $netPayment[$m] = 0.0;
+                }
+                $netPayment[$m] = $payment->getDividend();
+            }
+
+            foreach ($ticker->getCalendars() as $calendar) {
+                $paydate = $calendar->getPaymentDate()->format('Ym');
+                if (!isset($output[$paydate])) {
+                    $output[$paydate] = [];
+                }
+
+                if (!isset($output[$paydate][$ticker->getTicker()])) {
+                    $output[$paydate]['tickers'][$ticker->getTicker()] = [];
+                }
+                if (!isset($output[$paydate]['grossTotalPayment'])) {
+                    $output[$paydate]['grossTotalPayment'] = 0.0;
+                }
+
+                $amount = $this->getPositionSize($transactions, $calendar);
+                $amount = $amount;
+
+                //$netPayment = [];
+                /* foreach ($calendar->getPayments() as $payment) {
+                $netPayment += $payment->getDividend();
+                } */
+
+                $dividend = $calendar->getCashAmount();
+                $output[$paydate]['tickers'][$ticker->getTicker()] = [
+                    'amount' => $amount,
+                    'dividend' => $dividend,
+                    'payoutdate' => $calendar->getPaymentDate()->format('d-m-Y'),
+                    'exdividend' => $calendar->getExdividendDate()->format('d-m-Y'),
+                    'ticker' => $ticker,
+                    'netPayment' => $netPayment[$paydate] ?? 0.0,
+                    'calendar' => $calendar,
+                    'position' => $position,
+                ];
+            }
+            $positionDividendEstimate = $output;
+
             foreach ($positionDividendEstimate as $payDate => $estimate) {
                 if ($payDate) {
                     if (!isset($dividendEstimate[$payDate])) {

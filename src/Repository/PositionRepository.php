@@ -164,6 +164,32 @@ class PositionRepository extends ServiceEntityRepository
         return $paginator;
     }
 
+    public function getAllOpenForProjection(int $pieId = null, int $year = null): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select('p, t, pa, c, dm, tr')
+            ->innerJoin('p.ticker', 't')
+            ->leftJoin('t.calendars', 'c')
+            ->leftJoin('p.transactions', 'tr')
+            ->leftJoin('t.payments', 'pa')
+            ->leftJoin('t.dividendMonths', 'dm')
+            ->where('(p.closed = 0 OR p.closed IS NULL)');
+
+        if ($pieId) {
+            $qb->join("p.pies", 'pie')
+                ->andWhere('pie IN (:pieIds)')
+                ->setParameter('pieIds', [$pieId]);
+        }
+
+        if ($year) {
+            $qb->andWhere('YEAR(c.paymentDate) = :year')
+                ->setParameter('year', $year);
+        }
+
+        return $qb->getQuery()
+            ->getResult();
+    }
+
     public function getAllOpen(int $pieId = null, int $year = null): array
     {
         $qb = $this->createQueryBuilder('p')
