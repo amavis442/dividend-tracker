@@ -116,20 +116,6 @@ class Position
      */
     private $closedAt;
 
-    /**
-     * Undocumented variable
-     *
-     * @var float
-     */
-    private $forwardNetDividend;
-
-    /**
-     * Undocumented variable
-     *
-     * @var float
-     */
-    private $netDividendYield;
-
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
@@ -353,45 +339,6 @@ class Position
     {
         $currentMonth = date('m');
         return $this->getTicker()->isDividendPayMonth($currentMonth);
-    }
-
-    public function forwardNetDividend(): ?float
-    {
-        if ($this->forwardNetDividend) {
-            return $this->forwardNetDividend;
-        }
-
-        $forwardNetDividend = 0.0;
-        if ($this->getTicker()->getCalendars()) {
-            $calendar = $this->getTicker()->getCalendars()->first();
-            $cashAmount = 0.0;
-            $forwardNetDividend = 0.0;
-            if ($calendar) {
-                $cashAmount = $calendar->getCashamount();
-                $forwardNetDividend = $this->getAmount() * $cashAmount * ((100 - Constants::TAX) / 100) / Constants::EXCHANGE;
-            }
-        }
-        $this->forwardNetDividend = $forwardNetDividend;
-
-        return $forwardNetDividend;
-    }
-
-    public function forwardNetDividendYield(): ?float
-    {
-        $netDividendYield = 0.0;
-        $forwardNetDividend = $this->forwardNetDividend();
-        if ($forwardNetDividend) {
-            $dividendFrequency = 4;
-            if ($this->getTicker()->getDividendMonths()) {
-                $dividendFrequency = $this->getTicker()->getPayoutFrequency();
-            }
-            $totalNetDividend = $forwardNetDividend * $dividendFrequency;
-            $allocation = $this->getAllocation();
-            $netDividendYield = round(($totalNetDividend / $allocation) * 100, 2);
-        }
-
-        $this->netDividendYield = $netDividendYield;
-        return $netDividendYield;
     }
 
     /**

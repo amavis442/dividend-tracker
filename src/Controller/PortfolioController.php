@@ -9,6 +9,7 @@ use App\Repository\PaymentRepository;
 use App\Repository\PieRepository;
 use App\Repository\PositionRepository;
 use App\Service\DividendGrowth;
+use App\Service\DividendService;
 use App\Service\Referer;
 use App\Service\Summary;
 use DateTime;
@@ -39,6 +40,7 @@ class PortfolioController extends AbstractController
         int $page = 1,
         string $orderBy = 'ticker',
         string $sort = 'asc',
+        DividendService $dividendService,
         Referer $referer
     ): Response {
         $order = 't.ticker';
@@ -79,6 +81,7 @@ class PortfolioController extends AbstractController
         return $this->render('portfolio/index.html.twig', [
             'positions' => $items->getIterator(),
             'dividends' => $dividends,
+            'dividendService' => $dividendService,
             'limit' => $limit,
             'maxPages' => $maxPages,
             'thisPage' => $thisPage,
@@ -108,17 +111,17 @@ class PortfolioController extends AbstractController
         PaymentRepository $paymentRepository,
         Summary $summary,
         DividendGrowth $dividendGrowth,
+        DividendService $dividendService,
         Referer $referer
     ): Response {
-        $dividendTax = Constants::TAX / 100;
-        $exhangeRate = Constants::EXCHANGE;
-
         $ticker = $position->getTicker();
         $calendarRecentDividendDate = $ticker->getRecentDividendDate();
         $netCashAmount = 0.0;
         $amountPerDate = 0.0;
+
         if ($calendarRecentDividendDate) {
-            $netCashAmount = $calendarRecentDividendDate->getNetCashAmount();
+            [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax($calendarRecentDividendDate);
+            $netCashAmount = $calendarRecentDividendDate->getCashAmount() * $exchangeRate * (1 - $dividendTax);
             $amountPerDate = $position->getAmountPerDate($calendarRecentDividendDate->getExDividendDate());
         }
 
@@ -126,12 +129,9 @@ class PortfolioController extends AbstractController
         $netYearlyDividend = 0.0;
         $cals = $ticker->getCalendars();
         if (count($cals) > 0) {
-            $exchangeRateUsdEur = Constants::EXCHANGE;
+            [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax($cals[0]);
             $dividendFrequentie = $ticker->getPayoutFrequency();
-            if ($cals[0]->getCurrency()->getSymbol() == 'EUR') {
-                $exchangeRateUsdEur = 1;
-            }
-            $netYearlyDividend = (($dividendFrequentie * $cals[0]->getCashAmount()) / $exchangeRateUsdEur) * (1 - $dividendTax);
+            $netYearlyDividend = (($dividendFrequentie * $cals[0]->getCashAmount()) * $exchangeRate) * (1 - $dividendTax);
         }
         $payments = $position->getPayments();
         $dividends = $paymentRepository->getSumDividends([$ticker->getId()]);
@@ -148,7 +148,7 @@ class PortfolioController extends AbstractController
             $percentageAllocation = ($position->getAllocation() / $allocated) * 100;
         }
 
-        $calendar = $ticker->getCalendars();
+        $calendars = $ticker->getCalendars();
 
         $referer->set('portfolio_show', ['id' => $position->getId()]);
 
@@ -158,7 +158,8 @@ class PortfolioController extends AbstractController
             'position' => $position,
             'payments' => $payments,
             'dividend' => $dividend,
-            'calendars' => $calendar,
+            'dividendService' => $dividendService,
+            'calendars' => $calendars,
             'totalInvested' => $allocated,
             'netYearlyDividend' => $netYearlyDividend,
             'percentageAllocated' => $percentageAllocation,

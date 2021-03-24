@@ -75,9 +75,9 @@
                     </small>
                 </td>
                 <td>{% if calendar %}
-                        <div class="badge badge-primary">{% if calendar.currency.id == 1 %}${% else %}&euro;{% endif %}{{ calendar.cashAmount|format_number({fraction_digit: 3}) }}</div><br/>
-                        <div class="badge badge-secondary">&euro;{{ position.forwardNetDividend|format_number({fraction_digit: 2}) }}
-                        <div class="badge badge-success">{{ position.forwardNetDividendYield }}%</div>
+                        <div class="badge badge-primary">{{ calendar.currency.sign|raw }} {{ calendar.cashAmount|format_number({fraction_digit: 3}) }}</div><br/>
+                        <div class="badge badge-secondary">&euro; {{ dividendService.getForwardNetDividend(position)|format_number({fraction_digit: 2}) }}
+                        <div class="badge badge-success">{{ dividendService.getForwardNetDividendYield(position)|format_number({fraction_digit: 2}) }}%</div>
                         </div>
                     {% endif %}
                 </td>

@@ -55,19 +55,19 @@
 		<tr>
 			<th>{{ 'Yearly forward dividend payout'|trans }}</th>
 			<td>
-				&euro;{{ (position.ticker.getPayoutFrequency * position.forwardNetDividend)|format_number({fraction_digit: 2}) }}
+				&euro;{{ (position.ticker.getPayoutFrequency * dividendService.getForwardNetDividend(position))|format_number({fraction_digit: 2}) }}
 			</td>
 		</tr>
 		<tr>
 			<th>{{ 'Single time forward dividend payout'|trans }}</th>
 			<td>
-				&euro;{{ position.forwardNetDividend|format_number({fraction_digit: 2}) }}
+				&euro;{{ dividendService.getForwardNetDividend(position)|format_number({fraction_digit: 2}) }}
 			</td>
 		</tr>
 		<tr>
 			<th>{{ 'Dividend yield'|trans }}</th>
 			<td>
-				{{ position.forwardNetDividendYield }}%
+				{{ dividendService.getForwardNetDividendYield(position)|format_number({fraction_digit: 2}) }}%
 			</td>
 		</tr>
 		<tr>
