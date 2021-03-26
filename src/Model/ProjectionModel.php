@@ -131,7 +131,6 @@ class ProjectionModel
     public function projection(
         ?int $year = null,
         PositionRepository $positionRepository,
-        CalendarRepository $calendarRepository,
         DividendMonthRepository $dividendMonthRepository,
         DividendService $dividendService
     ): array{
@@ -171,11 +170,6 @@ class ProjectionModel
 
                 $amount = $this->getPositionSize($transactions, $calendar);
                 $amount = $amount;
-
-                //$netPayment = [];
-                /* foreach ($calendar->getPayments() as $payment) {
-                $netPayment += $payment->getDividend();
-                } */
 
                 $dividend = $calendar->getCashAmount();
                 $output[$paydate]['tickers'][$ticker->getTicker()] = [

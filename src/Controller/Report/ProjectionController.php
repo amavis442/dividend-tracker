@@ -38,7 +38,7 @@ class ProjectionController extends AbstractController
         }
         $referer->set('report_dividend_projection', ['projectionyear' => $projectionyear]);
 
-        $result = $projection->projection($projectionyear, $positionRepository, $calendarRepository, $dividendMonthRepository, $dividendService);
+        $result = $projection->projection($projectionyear, $positionRepository, $dividendMonthRepository, $dividendService);
         return $this->render('report/projection/index.html.twig', array_merge($result, [
             'controller_name' => 'ReportController',
             'year' => $projectionyear,

@@ -4,16 +4,24 @@ namespace App\Service;
 use App\Entity\Calendar;
 use App\Entity\Constants;
 use App\Entity\Position;
+use App\Model\ExchangeRateModel;
 
 class DividendService
 {
     protected $forwardNetDividend;
     protected $position;
+    protected $exchangeRateModel;
+
+    public function __construct(ExchangeRateModel $exchangeRateModel)
+    {
+        $this->exchangeRateModel = $exchangeRateModel;
+    }
 
     public function getExchangeAndTax(Calendar $calendar): array
     {
         $exchangeRate = 1;
         $dividendTax = 0.15;
+        $rates = $this->exchangeRateModel->getRates();
 
         switch ($calendar->getCurrency()->getSymbol()) {
             case 'EUR':
@@ -21,12 +29,20 @@ class DividendService
                 $dividendTax = Constants::TAX / 100;
                 break;
             case 'USD':
-                $exchangeRate = Constants::EXCHANGE_USDEUR;
+                $exchangeRate = 1 / $rates['USD'];
                 $dividendTax = Constants::TAX / 100;
                 break;
             case 'GB':
-                $exchangeRate = Constants::EXCHANGE_GBXEUR * 100;
+                $exchangeRate = 1 / $rates['GBP'];
                 $dividendTax = Constants::TAX_GB / 100;
+                break;
+            case 'CAD':
+                $exchangeRate = 1 / $rates['CAD'];
+                $dividendTax = Constants::TAX / 100;
+                break;
+            default:
+                $exchangeRate = 1 / $rates['USD'];
+                $dividendTax = Constants::TAX / 100;
                 break;
         }
 
