@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Positions
+{% endblock %}
+
+{% block body %}
+    <h1>Positions</h1>
+    <br/>
+    {% include '_search_form.html.twig' %}
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Closed at</th>
+                <th>
+                    <a href="{{ path('closed_position_index', {'page': thisPage ? thisPage : 1, 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a>
+                </th>
+                <th>Name</th>
+                <th>Industry</th>
+                <th>Profit / loss</th>
+                <th>Pos id</th>
+                <th style="width:20%">actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for position in positions %}
+                <tr>
+                    <td><div class="alert alert-primary">{{ position.closedAt ? position.closedAt|date("d-m-Y H:i:s") : '' }}</div></td>
+                    <td>
+                        {{ position.ticker.ticker }}
+                    </td>
+                    <td>
+                        {{ position.ticker.fullname }}
+                    </td>
+                    <td>{{ position.ticker.branch.label }}</td>
+                    <td><span class="alert alert-{% if position.profit > 0 %}success{% else %}danger{% endif %}">&euro;{{ (position.profit)|format_number({fraction_digit: 2}) }}</span></td>
+                    <td>{{ position.posid }}</td>
+                    <td>
+                        <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                            <div class="btn-group mr-2" role="group" aria-label="First group">
+                                <a href="{{ path('closed_position_show', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details position">
+                                    <i class="fas fa-book-open"></i>
+                                </a>
+                                <a class="btn btn-success" href="{{ path('payment_new', {'position': position.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment"><i class="far fa-money-bill-alt"></i></a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6">no records found</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% include 'paginator.html.twig' %}
+{% endblock %}

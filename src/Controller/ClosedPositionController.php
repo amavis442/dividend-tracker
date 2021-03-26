@@ -1,0 +1,114 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Position;
+use App\Form\PositionType;
+use App\Repository\PositionRepository;
+use App\Service\PositionService;
+use App\Service\Referer;
+use App\Service\Summary;
+use DateTime;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\Annotation\Route;
+
+/**
+ * @Route("/dashboard/closed/position")
+ */
+class ClosedPositionController extends AbstractController
+{
+    public const SEARCH_KEY = 'closed_position_searchCriteria';
+
+    /**
+     * @Route("/list/{page}/{sort}", name="closed_position_index", methods={"GET"})
+     */
+    public function index(
+        Summary $summary,
+        PositionRepository $positionRepository,
+        SessionInterface $session,
+        int $page = 1,
+        string $sort = 'desc',
+        Referer $referer
+    ): Response {
+        if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
+            $sort = 'asc';
+        }
+
+        $referer->set('closed_position_index', ['status' => PositionRepository::CLOSED]);
+        $searchCriteria = $session->get(self::SEARCH_KEY, '') ?? '';
+        $items = $positionRepository->getAllClosed($page, 10, $sort, $searchCriteria);
+        $limit = 10;
+        $maxPages = ceil($items->count() / $limit);
+        $thisPage = $page;
+
+        return $this->render('closed_position/index.html.twig', [
+            'positions' => $items->getIterator(),
+            'limit' => $limit,
+            'maxPages' => $maxPages,
+            'thisPage' => $thisPage,
+            'sort' => $sort,
+            'searchCriteria' => $searchCriteria ?? '',
+            'routeName' => 'closed_position_index',
+            'searchPath' => 'closed_position_search'
+        ]);
+    }
+
+    /**
+     * @Route("/{id}", name="closed_position_show", methods={"GET"})
+     */
+    public function show(Position $position): Response
+    {
+        return $this->render('closed_position/show.html.twig', [
+            'position' => $position,
+            'netYearlyDividend' => 0.0,
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/edit/{closed<\d+>?0}", name="closed_position_edit", methods={"GET","POST"})
+     */
+    public function edit(
+        Request $request,
+        Position $position,
+        PositionService $positionService,
+        ?int $closed,
+        SessionInterface $session,
+        Referer $referer
+    ): Response {
+        if ($closed === 1) {
+            $position->setClosed(true);
+            $position->setClosedAt((new DateTime()));
+        }
+
+        $form = $this->createForm(PositionType::class, $position);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $positionService->update($position);
+            $session->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
+            if ($referer->get()) {
+                return $this->redirect($referer->get());
+            }
+            return $this->redirectToRoute('closed_position_index');
+        }
+
+        return $this->render('closed_position/edit.html.twig', [
+            'position' => $position,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/search", name="closed_position_search", methods={"POST"})
+     */
+    public function search(Request $request, SessionInterface $session): Response
+    {
+        $searchCriteria = $request->request->get('searchCriteria');
+        $session->set(self::SEARCH_KEY, $searchCriteria);
+
+        return $this->redirectToRoute('closed_position_index', ['sort' => 'desc']);
+    }
+}

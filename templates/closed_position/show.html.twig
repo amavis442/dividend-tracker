@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Closed Position {{ position.ticker.ticker }}{% endblock %}
+
+{% block body %}
+    <h1>Closed Position: {{ position.ticker.fullname }}</h1>
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+		<li class="nav-item">
+			<a class="nav-link active" id="position-tab" data-toggle="tab" href="#position" role="tab" aria-controls="position" aria-selected="true">Position</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" id="transactions-tab" data-toggle="tab" href="#transactions" role="tab" aria-controls="transactions" aria-selected="true">Transactions</a>
+		</li>
+    </ul>
+
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="position" role="tabpanel" aria-labelledby="position-tab">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th>Ticker</th>
+                        <td>{{ position.ticker.ticker }}</td>
+                    </tr>
+                    <tr>
+                        <th>Name</th>
+                        <td>{{ position.ticker.fullname }}</td>
+                    </tr>
+                    <tr>
+                        <th>Industry</th>
+                        <td>{{ position.ticker.branch.label }}</td>
+                    </tr>
+                    <tr>
+                        <th>Closed At</th>
+                        <td>{{ position.closedAt|date('d-m-Y') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Profit / Loss</th>
+                        <td>
+                            <span class="alert alert-{% if position.profit > 0 %}success{% else %}danger{% endif %}">&euro;{{ (position.profit)|format_number({fraction_digit: 2}) }}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table> 
+        </div>
+        <div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="transactions-tab">
+			<br/>
+			{% include 'portfolio/show/_transaction.html.twig' %}
+		</div>
+    </div>
+
+    <a class="btn btn-primary" href="{{ path('closed_position_edit', {'id': position.id}) }}"><i class="far fa-edit"></i></a> | 
+
+    <a class="btn btn-primary" href="{{ path('closed_position_index') }}"><i class="fas fa-angle-double-left"></i> back to list</a>
+    <hr/>
+    
+{% endblock %}

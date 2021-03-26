@@ -148,15 +148,22 @@ class PositionRepository extends ServiceEntityRepository
     public function getAllClosed(
         int $page = 1,
         int $limit = 10,
-        string $orderBy = 't.ticker',
-        string $sort = 'ASC',
+        string $sort = 'DESC',
         string $search = ''
     ): Paginator {
-        $order = $orderBy;
-        if (in_array($orderBy, ['t.ticker', 'c.exDividendDate'])) {
-            $order = $orderBy;
+        $queryBuilder = $this->createQueryBuilder('p')
+        ->select('p, t, i')
+        ->innerJoin('p.ticker', 't')
+        ->innerJoin('t.branch', 'i')
+        ->orderBy('p.closedAt', $sort);
+
+        if (!empty($search)) {
+            $queryBuilder->andWhere($queryBuilder->expr()->orX(
+            $queryBuilder->expr()->like('t.ticker', ':search'),
+            $queryBuilder->expr()->like('i.label', ':search')
+            ));
+            $queryBuilder->setParameter('search', $search . '%');
         }
-        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
         $queryBuilder->andWhere('p.closed = 1');
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);
