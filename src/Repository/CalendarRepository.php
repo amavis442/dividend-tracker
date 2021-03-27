@@ -165,16 +165,31 @@ class CalendarRepository extends ServiceEntityRepository
         return $output;
     }
 
-    public function groupByMonth(int $year): ?array
+    /**
+     * Get the calendars between startDate and endDate
+     *
+     * @param integer $year
+     * @param string|null $startDate
+     * @param string|null $endDate
+     * @return array|null
+     */
+    public function groupByMonth(int $year, ?string $startDate = null, ?string $endDate = null): ?array
     {
+        if (!$startDate) {
+            $startDate = $year.'-01-01';
+        }
+        if (!$endDate) {
+            $endDate = $year.'-12-31';
+        }
+
         $result = $this->createQueryBuilder('c')
             ->select('c, t, p, tr')
             ->innerJoin('c.ticker', 't')
             ->leftJoin('t.positions' , 'p')
             ->leftJoin('p.transactions' , 'tr')
             ->where('c.paymentDate >= :start and c.paymentDate <= :end')
-            ->setParameter('start', $year.'-01-01')
-            ->setParameter('end', $year.'-12-31')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
             ->getQuery()
             ->getResult();
         if (!$result){ 

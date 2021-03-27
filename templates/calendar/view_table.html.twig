@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Calendar per date{% endblock %}
+
+{% block body %}
+<div><h1>Dividend payments per date for {{ year }}</h1></div>
+{% if calendar %}
+    <table class="table">
+    <tr>
+        <th></th>
+        <th>{{ 'Pay date'|trans }}</th>
+        <th>{{ 'Company'|trans }}</th>
+        <th>{{ 'Dividend'|trans }}</th>
+        <th>{{ 'Amount'|trans }}</th>
+        <th>{{ 'Net dividend'|trans }}</th>
+    </tr>
+    {% for month,items in calendar %}
+        {% for day, item in items %}
+            {% for key,cal in item %}
+                {% set estimatedAmount = dividendService.getPositionAmount(cal) %}
+                {% if estimatedAmount > 0 %}
+                    {% set netDividend = dividendService.getTotalNetDividend(cal) %}
+                    {% set currentDate = cal.getPaymentDate %}
+                    <tr>
+                        <td><button type="button" class="btn btn-outline-primary"><i class="far fa-circle"></i></button></td>
+                        <th>{{ currentDate|date('l')|trans }}, {{ currentDate|date('d') }} {{ currentDate|date('F')|trans|lower }} {{ currentDate|date('Y') }}</th>
+                        <td>{{ cal.ticker.fullname }}</td> 
+                        <td>{{ cal.currency.sign|raw}}{{ cal.cashAmount|format_number({fraction_digit: 2}) }}</td>
+                        <td>{{ estimatedAmount|format_number({fraction_digit: 3}) }}</td>
+                        <td>&euro;{{ netDividend|format_number({fraction_digit: 2}) }}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    {% endfor %}
+    </table>
+{% else %}
+    no items
+{% endif %}
+
+<a href="{{ path('calendar_index') }}" class="btn btn-primary"><i class="fas fa-angle-double-left"></i> back to list</a>
+{% endblock %}
