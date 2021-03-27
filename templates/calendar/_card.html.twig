@@ -15,7 +15,11 @@
                         </div>
                     <div class="card-body">
                     {% for key,cal in item %}
-                        - {{ cal.ticker.fullname }} (${{ cal.cashAmount }})<br/>
+                        {% set estimatedAmount = dividendService.getPositionAmount(cal) %}
+                        {% set netDividend = dividendService.getTotalNetDividend(cal) %}
+                            - {{ cal.ticker.fullname }} 
+                            <span class="badge badge-primary">({{ estimatedAmount|format_number({fraction_digit: 3}) }} x {{ cal.currency.sign|raw}}{{ cal.cashAmount }} = &euro;{{ netDividend|format_number({fraction_digit: 2}) }})</span>
+                        <br/>
                     {% endfor %}
                     </div>
                 </li>

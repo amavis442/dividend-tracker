@@ -168,8 +168,10 @@ class CalendarRepository extends ServiceEntityRepository
     public function groupByMonth(int $year): ?array
     {
         $result = $this->createQueryBuilder('c')
-            ->select('c, t')
+            ->select('c, t, p, tr')
             ->innerJoin('c.ticker', 't')
+            ->leftJoin('t.positions' , 'p')
+            ->leftJoin('p.transactions' , 'tr')
             ->where('c.paymentDate >= :start and c.paymentDate <= :end')
             ->setParameter('start', $year.'-01-01')
             ->setParameter('end', $year.'-12-31')

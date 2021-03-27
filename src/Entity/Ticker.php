@@ -55,6 +55,7 @@ class Ticker
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="ticker")
+     * @ORM\OrderBy({"id" = "DESC"})
      */
     private $positions;
 

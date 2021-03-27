@@ -5,7 +5,6 @@ namespace App\Model;
 use App\Entity\Calendar;
 use App\Entity\DividendMonth;
 use App\Entity\Transaction;
-use App\Repository\CalendarRepository;
 use App\Repository\DividendMonthRepository;
 use App\Repository\PositionRepository;
 use App\Service\DividendService;
@@ -108,26 +107,6 @@ class ProjectionModel
         $labels[] = $normalDate;
     }
 
-    public function getPositionSize(Collection $transactions, Calendar $calendar)
-    {
-        $units = 0;
-
-        foreach ($transactions as $transaction) {
-            if ($transaction->getTransactionDate() >= $calendar->getExdividendDate()) {
-                continue;
-            }
-            $amount = $transaction->getAmount();
-            if ($transaction->getSide() === Transaction::BUY) {
-                $units += $amount;
-            }
-            if ($transaction->getSide() === Transaction::SELL) {
-                $units -= $amount;
-            }
-        }
-
-        return $units;
-    }
-
     public function projection(
         ?int $year = null,
         PositionRepository $positionRepository,
@@ -168,7 +147,7 @@ class ProjectionModel
                     $output[$paydate]['grossTotalPayment'] = 0.0;
                 }
 
-                $amount = $this->getPositionSize($transactions, $calendar);
+                $amount = $this->dividendService->getPositionSize($transactions, $calendar);
                 $amount = $amount;
 
                 $dividend = $calendar->getCashAmount();

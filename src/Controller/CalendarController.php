@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Entity\Ticker;
+use App\Service\DividendService;
 use App\Service\Referer;
 
 /**
@@ -88,13 +89,14 @@ class CalendarController extends AbstractController
     /**
      * @Route("/calendarperdate", name="calendar_per_date", methods={"GET"})
      */
-    public function viewCalendar(CalendarRepository $calendarRepository)
+    public function viewCalendar(CalendarRepository $calendarRepository, DividendService $dividendService)
     {
         $year = date('Y');
         $calendar = $calendarRepository->groupByMonth($year);
         return $this->render('calendar/view.html.twig', [
             'calendar' => $calendar,
             'year' => $year,
+            'dividendService' => $dividendService,
         ]);
     }
 

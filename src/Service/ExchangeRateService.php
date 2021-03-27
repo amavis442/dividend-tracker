@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Model;
+namespace App\Service;
 
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class ExchangeRateModel
+class ExchangeRateService
 {
     public const EXCHANGERATE_API = 'https://api.exchangeratesapi.io/latest';
 
