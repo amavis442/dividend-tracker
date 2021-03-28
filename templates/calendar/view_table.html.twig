@@ -4,7 +4,17 @@
 
 {% block body %}
 <div><h1>Dividend payments per date for {{ year }}</h1></div>
-{% if calendar %}
+{{ form_start(form, {'attr': {'class':'form-inline'}}) }}
+    <div class="form-group mb-3">
+        {{ form_widget(form.startdate) }}
+    </div>
+    <div class="form-group mx-sm-3 mb-3">
+        {{ form_widget(form.enddate) }}
+    </div>
+    {{ form_widget(form.save, {'attr': {'class':'btn btn-primary mb-3'}}) }}
+{{ form_end(form) }}
+
+{% if calendars %}
     <table class="table">
     <tr>
         <th></th>
@@ -14,11 +24,11 @@
         <th>{{ 'Amount'|trans }}</th>
         <th>{{ 'Net dividend'|trans }}</th>
     </tr>
-    {% for month,items in calendar %}
+    {% for month,items in calendars %}
         {% for day, item in items %}
             {% for key,cal in item %}
                 {% set estimatedAmount = dividendService.getPositionAmount(cal) %}
-                {% if estimatedAmount > 0 %}
+                {% if estimatedAmount > 0.001 %}
                     {% set netDividend = dividendService.getTotalNetDividend(cal) %}
                     {% set currentDate = cal.getPaymentDate %}
                     <tr>
