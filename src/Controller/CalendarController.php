@@ -3,16 +3,20 @@
 namespace App\Controller;
 
 use App\Entity\Calendar;
+use App\Entity\DateSelect;
+use App\Entity\Ticker;
 use App\Form\CalendarType;
 use App\Repository\CalendarRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use App\Entity\Ticker;
 use App\Service\DividendService;
 use App\Service\Referer;
+use DateTime;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/dashboard/calendar")
@@ -55,15 +59,14 @@ class CalendarController extends AbstractController
             'sort' => $sort,
             'routeName' => 'calendar_index',
             'searchCriteria' => $searchCriteria ?? '',
-            'searchPath' => 'calendar_search'
+            'searchPath' => 'calendar_search',
         ]);
     }
 
     /**
      * @Route("/new/{ticker}", name="calendar_new", methods={"GET","POST"})
      */
-    public function new(Request $request, ?Ticker $ticker = null, Referer $referer): Response
-    {
+    function new (Request $request, ?Ticker $ticker = null, Referer $referer): Response {
         $calendar = new Calendar();
         $calendar->setTicker($ticker);
         $form = $this->createForm(CalendarType::class, $calendar);
@@ -89,7 +92,7 @@ class CalendarController extends AbstractController
     /**
      * @Route("/calendarperdate", name="calendar_per_date", methods={"GET"})
      */
-    public function viewCalendar(CalendarRepository $calendarRepository, DividendService $dividendService)
+    public function viewCalendar(CalendarRepository $calendarRepository, DividendService $dividendService): Response
     {
         $year = date('Y');
         $calendar = $calendarRepository->groupByMonth($year);
@@ -99,19 +102,41 @@ class CalendarController extends AbstractController
             'dividendService' => $dividendService,
         ]);
     }
-    
+
     /**
-     * @Route("/calendarperdatetable", name="calendar_per_date_table", methods={"GET"})
+     * @Route("/calendarperdatetable", name="calendar_per_date_table", methods={"GET","POST"})
      */
-    public function viewCalendarTable(CalendarRepository $calendarRepository, DividendService $dividendService)
+    public function viewCalendarTable(Request $request, CalendarRepository $calendarRepository, DividendService $dividendService): Response
     {
         $year = date('Y');
+        $endDate = $year . '-12-31';
+
+        $dateSelect = new DateSelect();
+        $dateSelect->setStartdate((new DateTime('now')))
+            ->setEnddate((new DateTime($endDate)));
+
+        $form = $this->createFormBuilder($dateSelect)
+            ->add('startdate', DateType::class, [
+                'widget' => 'single_text',
+            ])
+            ->add('enddate', DateType::class, [
+                'widget' => 'single_text',
+            ])
+            ->add('save', SubmitType::class, ['label' => 'Submit'])
+            ->getForm();
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $dateSelect = $form->getData();
+        }
+
+        $calendars = $calendarRepository->groupByMonth($year, $dateSelect->getStartdate()->format('Y-m-d'), $dateSelect->getEnddate()->format('Y-m-d'));
         
-        $calendars = $calendarRepository->groupByMonth($year, date('Y-m-d'));
         return $this->render('calendar/view_table.html.twig', [
-            'calendar' => $calendars,
+            'calendars' => $calendars,
             'year' => $year,
             'dividendService' => $dividendService,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -129,14 +154,14 @@ class CalendarController extends AbstractController
      * @Route("/{id}/edit", name="calendar_edit", methods={"GET","POST"})
      */
     public function edit(Request $request, Calendar $calendar, Referer $referer): Response
-    {       
+    {
         $form = $this->createForm(CalendarType::class, $calendar);
         $form->handleRequest($request);
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
-            
+
             $this->getDoctrine()->getManager()->flush();
-            
+
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
@@ -176,6 +201,5 @@ class CalendarController extends AbstractController
 
         return $this->redirectToRoute('calendar_index');
     }
-
 
 }
