@@ -25,6 +25,12 @@
         <th>{{ 'Net dividend'|trans }}</th>
     </tr>
     {% for month,items in calendars %}
+        <tr class="table-active">
+            <th colspan="6">
+                {% set chosenDate = month|slice(0,4) ~ '-' ~ month|slice(4,2) ~ '-01' %}
+                {{ chosenDate|date('F')|trans }}, {{ month|slice(0,4) }}
+            </th>
+        </tr>
         {% for day, item in items %}
             {% for key,cal in item %}
                 {% set estimatedAmount = dividendService.getPositionAmount(cal) %}
