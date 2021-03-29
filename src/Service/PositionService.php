@@ -19,11 +19,11 @@ class PositionService
     private function presetMetrics(Position $position): void
     {
         if ($position->getAllocation() && empty($position->getPrice())) {
-            $position->setPrice($position->getAllocation() / ($position->getAmount() / 100));
+            $position->setPrice($position->getAllocation() / $position->getAmount());
             $position->setCurrency($position->getAllocationCurrency());
         }
         if ($position->getPrice() && empty($position->getAllocation())) {
-            $position->setAllocation($position->getPrice() * ($position->getAmount() / 100));
+            $position->setAllocation($position->getPrice() * $position->getAmount());
             $position->setAllocationCurrency($position->getCurrency());
         }
 
