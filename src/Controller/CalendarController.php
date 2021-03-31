@@ -4,12 +4,15 @@ namespace App\Controller;
 
 use App\Entity\Calendar;
 use App\Entity\DateSelect;
+use App\Entity\Pie;
 use App\Entity\Ticker;
 use App\Form\CalendarType;
 use App\Repository\CalendarRepository;
 use App\Service\DividendService;
 use App\Service\Referer;
 use DateTime;
+use Doctrine\ORM\EntityRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -122,6 +125,21 @@ class CalendarController extends AbstractController
             ->add('enddate', DateType::class, [
                 'widget' => 'single_text',
             ])
+            ->add('pie', EntityType::class, [
+                'class' => Pie::class,
+                'label' => 'Pie',
+                'choice_label' => 'label',
+                'required' => false,
+                'placeholder' => 'Please choose a Pie',
+                'empty_data' => null,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('pie')
+                        ->select('pie, p')
+                        ->join('pie.positions', 'p')
+                        ->where('(p.closed = 0 OR p.closed IS NULL)')
+                        ->orderBy('pie.label', 'ASC');
+                },
+            ])
             ->add('save', SubmitType::class, ['label' => 'Submit'])
             ->getForm();
 
@@ -130,12 +148,13 @@ class CalendarController extends AbstractController
             $dateSelect = $form->getData();
         }
 
-        $calendars = $calendarRepository->groupByMonth($year, $dateSelect->getStartdate()->format('Y-m-d'), $dateSelect->getEnddate()->format('Y-m-d'));
-        
+        $calendars = $calendarRepository->groupByMonth($year, $dateSelect->getStartdate()->format('Y-m-d'), $dateSelect->getEnddate()->format('Y-m-d'), $dateSelect->getPie());
+
         return $this->render('calendar/view_table.html.twig', [
             'calendars' => $calendars,
             'year' => $year,
             'dividendService' => $dividendService,
+            'dateSelect' => $dateSelect,
             'form' => $form->createView(),
         ]);
     }

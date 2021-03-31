@@ -7,7 +7,6 @@ use DateTimeInterface;
 class DateSelect
 {
 
-
     /**
      * Date
      *
@@ -23,10 +22,17 @@ class DateSelect
     private $enddate;
 
     /**
+     * All, Undocumented variable
+     *
+     * @var Pie
+     */
+    private $pie;
+
+    /**
      * Get date
      *
      * @return  DateTimeInterface
-     */ 
+     */
     public function getStartdate()
     {
         return $this->startdate;
@@ -38,7 +44,7 @@ class DateSelect
      * @param  DateTimeInterface  $startdate  Date
      *
      * @return  self
-     */ 
+     */
     public function setStartdate(DateTimeInterface $startdate)
     {
         $this->startdate = $startdate;
@@ -50,7 +56,7 @@ class DateSelect
      * Get date
      *
      * @return  DateTimeInterface
-     */ 
+     */
     public function getEnddate()
     {
         return $this->enddate;
@@ -62,10 +68,34 @@ class DateSelect
      * @param  DateTimeInterface  $enddate  Date
      *
      * @return  self
-     */ 
+     */
     public function setEnddate(DateTimeInterface $enddate)
     {
         $this->enddate = $enddate;
+
+        return $this;
+    }
+
+    /**
+     * Get all, Undocumented variable
+     *
+     * @return  Pie
+     */
+    public function getPie(): ?Pie
+    {
+        return $this->pie;
+    }
+
+    /**
+     * Set all, Undocumented variable
+     *
+     * @param  string  $pie  All, Undocumented variable
+     *
+     * @return  self
+     */
+    public function setPie(Pie $pie)
+    {
+        $this->pie = $pie;
 
         return $this;
     }

@@ -3,14 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\Calendar;
+use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Transaction;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method Calendar|null find($id, $lockMode = null, $lockVersion = null)
@@ -71,19 +72,18 @@ class CalendarRepository extends ServiceEntityRepository
     public function findByDate(DateTimeInterface $dateTime, Ticker $ticker): ?Calendar
     {
         $queryBuilder = $this->createQueryBuilder('c')
-        ->select('c')
-        ->innerJoin('c.ticker', 't')
-        ->where('t = :ticker')
-        ->andWhere('c.paymentDate <= :paydate')
-        ->setParameter('ticker', $ticker)
-        ->setParameter('paydate', $dateTime->format('Y-m-d'))
-        ->orderBy('c.id', 'DESC')
-        ->setMaxResults(1)
-        ->getQuery();
+            ->select('c')
+            ->innerJoin('c.ticker', 't')
+            ->where('t = :ticker')
+            ->andWhere('c.paymentDate <= :paydate')
+            ->setParameter('ticker', $ticker)
+            ->setParameter('paydate', $dateTime->format('Y-m-d'))
+            ->orderBy('c.id', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery();
 
-        return $queryBuilder->getOneOrNullResult();  
+        return $queryBuilder->getOneOrNullResult();
     }
-
 
     private function getPositionSize(Collection $transactions, Calendar $item)
     {
@@ -173,38 +173,44 @@ class CalendarRepository extends ServiceEntityRepository
      * @param string|null $endDate
      * @return array|null
      */
-    public function groupByMonth(int $year, ?string $startDate = null, ?string $endDate = null): ?array
+    public function groupByMonth(int $year, ?string $startDate = null, ?string $endDate = null, ?Pie $pie = null): ?array
     {
         if (!$startDate) {
-            $startDate = $year.'-01-01';
+            $startDate = $year . '-01-01';
         }
         if (!$endDate) {
-            $endDate = $year.'-12-31';
+            $endDate = $year . '-12-31';
         }
 
-        $result = $this->createQueryBuilder('c')
-            ->select('c, t, p, tr')
+        $qb = $this->createQueryBuilder('c')
+            ->select('c, t, p, tr, pies')
             ->innerJoin('c.ticker', 't')
-            ->leftJoin('t.positions' , 'p')
-            ->leftJoin('p.transactions' , 'tr')
+            ->leftJoin('t.positions', 'p')
+            ->leftJoin('p.transactions', 'tr')
+            ->leftJoin('p.pies', 'pies')
             ->where('c.paymentDate >= :start and c.paymentDate <= :end')
             ->setParameter('start', $startDate)
-            ->setParameter('end', $endDate)
-            ->getQuery()
+            ->setParameter('end', $endDate);
+
+        if ($pie) {
+            $qb->andWhere('pies IN (:pie)')
+                ->setParameter('pie', [$pie->getId()]);
+        }
+
+        $result = $qb->getQuery()
             ->getResult();
-        if (!$result){ 
+        if (!$result) {
             return null;
         }
 
-        $data = [];    
-        foreach ($result as $item)
-        {
+        $data = [];
+        foreach ($result as $item) {
             $data[$item->getPaymentDate()->format('Ym')][$item->getPaymentDate()->format('j')][] = $item;
         }
         ksort($data);
-        foreach ($data as &$month){
+        foreach ($data as &$month) {
             ksort($month);
         }
-        return $data;    
+        return $data;
     }
 }
