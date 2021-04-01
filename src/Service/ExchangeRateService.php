@@ -2,13 +2,16 @@
 
 namespace App\Service;
 
-use Symfony\Contracts\Cache\ItemInterface;
+use DOMDocument;
+use DOMXPath;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ExchangeRateService
 {
-    public const EXCHANGERATE_API = 'https://api.exchangeratesapi.io/latest';
+    public const EXCHANGERATE_API = 'https://api.exchangeratesapi.io/latest'; // fuckers now want money
+    public const ECB_EXCHANGERATE = 'https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html';
 
     private $exchangerateCache;
     private $client;
@@ -18,18 +21,20 @@ class ExchangeRateService
         $this->exchangerateCache = $exchangerateCache;
         $this->client = $client;
     }
-    
+
     /**
      * Get the exchangerates from an external source and only refresh 1 per hour
      *
      * @return array
      */
-    public function getRates(): array 
+    /*public function getRates(): array
     {
-        $client = $this->client;
-        $apiCallUrl = self::EXCHANGERATE_API;
+        return $this->ecbRates();
 
-        $data = $this->exchangerateCache->get('exchangerates', function(ItemInterface $item) use ($client, $apiCallUrl){
+        $client = $this->client;
+        $apiCallUrl = self::ECB_EXCHANGERATE;
+
+        $data = $this->exchangerateCache->get('exchangerates', function (ItemInterface $item) use ($client, $apiCallUrl) {
             $item->expiresAfter(3600);
             $response = $client->request(
                 'GET',
@@ -41,5 +46,53 @@ class ExchangeRateService
         });
         //$this->exchangerateCache->delete('exchangerates');
         return $data['rates'] ?? [];
+    }
+    */
+    
+    public function getRates(): array
+    {
+        $apiCallUrl = self::ECB_EXCHANGERATE;
+        $client = $this->client;
+
+        $internalErrors = libxml_use_internal_errors(true);
+        $data = $this->exchangerateCache->get('exchangerates', function (ItemInterface $item) use ($client, $apiCallUrl) {
+            $item->expiresAfter(3600);
+            $response = $client->request(
+                'GET',
+                $apiCallUrl
+            );
+            $content = $response->getContent(false);
+            return $content;
+        });
+
+        $dom = new DOMDocument();
+        $dom->loadHTML($data);
+        $xpath = new DOMXPath($dom);
+        $rates = $this->parseToArray($xpath, 'forextable');
+        libxml_use_internal_errors($internalErrors);
+
+        return $rates;
+    }
+
+    public function parseToArray($xpath, $class)
+    {
+        $xpathquery = "//table[@class='" . $class . "']";
+        $elements = $xpath->query($xpathquery);
+        $resultarray = [];
+
+        if (!is_null($elements)) {
+            foreach ($elements as $element) {
+                $nodes = $element->getElementsByTagName('tr');
+                foreach ($nodes as $node) {
+                    $tdNodes = $node->getElementsByTagName('td');
+                    if ($tdNodes->count() > 0) {
+                        $currency = str_replace("\n", "", $tdNodes[0]->nodeValue);
+                        $exchangeRate = str_replace("\n", "", $tdNodes[2]->nodeValue);
+                        $resultarray[$currency] = $exchangeRate;
+                    }
+                }
+            }
+        }
+        return $resultarray;
     }
 }
