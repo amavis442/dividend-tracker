@@ -39,7 +39,6 @@ class YahooDataCommand extends Command
     {
         
         $io = new SymfonyStyle($input, $output);
-        $n = 0;
         $tickers = $this->tickerRepository->getActive();
         foreach ($tickers as $ticker) {
             $symbol = $ticker->getSymbol();
@@ -48,24 +47,18 @@ class YahooDataCommand extends Command
             if (isset($data['chart']) && isset($data['chart']['result'][0]['meta']['regularMarketPrice'])) {
                 $io->writeln('Got data for:'. $ticker->getSymbol());
                 if (isset($data['chart']['error']) && $data['chart']['error'] !== null) {
-                    $io->writeln($data['chart']['error']);
+                    $io->warning($data['chart']['error']);
                 } else {
                     $symbolData = $data['chart']['result'][0]['meta'];
                     $io->info('Currency: '. $symbolData['currency']);
                     $io->info('Price: '.$symbolData['regularMarketPrice']);
-                }
-
-                //sleep(10);
-                $n++;
-                if ($n > 30) {
-                    break;
                 }
             } else {
                 $io->warning('No data for '.$symbol);
             }
         }
 
-        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+        $io->success('Done....');
 
         return Command::SUCCESS;
     }
