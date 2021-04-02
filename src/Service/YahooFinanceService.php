@@ -33,7 +33,7 @@ class YahooFinanceService
         $apiCallUrl = self::YAHOO_API;
 
         $data = $this->yahooCache->get('yahoo_'.strtolower($symbol), function (ItemInterface $item) use ($client, $apiCallUrl, $symbol) {
-            $item->expiresAfter(600);
+            $item->expiresAfter(3600);
             $response = $client->request(
                 'GET',
                 $apiCallUrl . strtoupper($symbol)
