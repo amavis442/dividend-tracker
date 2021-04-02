@@ -95,6 +95,12 @@ class Ticker
         return $this;
     }
 
+    public function getSymbol(): ?string
+    {
+        return $this->ticker;
+    }
+
+
     public function getFullname(): ?string
     {
         return $this->fullname;

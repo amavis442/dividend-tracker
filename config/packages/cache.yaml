@@ -21,5 +21,7 @@ framework:
         pools:
             exchangerate.cache: 
                 adapter: cache.app
+            yahoo.cache: 
+                adapter: cache.app
 
    

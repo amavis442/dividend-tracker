@@ -39,6 +39,7 @@
                 <th>{{ 'Div dates'|trans }}</th>
                 <th>{{ 'Forward dividend'|trans }}</th>
                 <th>{{ 'Pies'|trans }}</th>
+                <th>Market Price</th>
             </tr>
         </thead>
         <tbody>
@@ -52,7 +53,7 @@
             {% set allocation = position.allocation %}
             {% set percentageAllocation = (allocation / totalInvested) * 100 %}
             {% set calendar = position.ticker.calendars.first ?? null %}
-
+            {% set marketPrice = yahooFinanceService.getQuote(ticker.symbol) %}
             <tr {{ position.isDividendPayMonth ? 'class="table-success"' : ''}}>
                 <td>
                     <a href="{{ path('portfolio_show', {'id': position.id}) }}" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="{{ ticker.fullname }} ({{ ticker.ticker }})"><i class="fas fa-info-circle"></i></a>
@@ -86,6 +87,9 @@
                         <span class="badge badge-secondary">{{ pie.label|slice(0,10) }}{% if pie.label|length > 10 %}...{% endif %}</span>
                     {% endfor %}
 				</td>
+                <th>
+                    <span class="text-{% if marketPrice > avgPrice %}success{% else %}danger{% endif %}">&euro;{{ marketPrice|format_number({fraction_digit: 2}) }}</span>
+                </th>
             </tr>
         {% else %}
             <tr>

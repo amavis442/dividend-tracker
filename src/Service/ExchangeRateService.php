@@ -54,7 +54,7 @@ class ExchangeRateService
         $apiCallUrl = self::ECB_EXCHANGERATE;
         $client = $this->client;
 
-        $internalErrors = libxml_use_internal_errors(true);
+        
         $data = $this->exchangerateCache->get('exchangerates', function (ItemInterface $item) use ($client, $apiCallUrl) {
             $item->expiresAfter(3600);
             $response = $client->request(
@@ -65,6 +65,7 @@ class ExchangeRateService
             return $content;
         });
 
+        $internalErrors = libxml_use_internal_errors(true);
         $dom = new DOMDocument();
         $dom->loadHTML($data);
         $xpath = new DOMXPath($dom);

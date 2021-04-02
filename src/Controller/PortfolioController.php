@@ -12,6 +12,7 @@ use App\Service\DividendGrowth;
 use App\Service\DividendService;
 use App\Service\Referer;
 use App\Service\Summary;
+use App\Service\YahooFinanceService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -41,7 +42,8 @@ class PortfolioController extends AbstractController
         string $orderBy = 'ticker',
         string $sort = 'asc',
         DividendService $dividendService,
-        Referer $referer
+        Referer $referer,
+        YahooFinanceService $yahooFinanceService
     ): Response {
         $order = 't.ticker';
         if (in_array($orderBy, ['industry'])) {
@@ -68,7 +70,7 @@ class PortfolioController extends AbstractController
         $thisPage = $page;
         $iter = $items->getIterator();
         $tickerIds = [];
-        foreach ($iter as $position) {
+        foreach ($iter as &$position) {
             $id = $position->getTicker()->getId();
             if (!in_array($id, $tickerIds)) {
                 $tickerIds[] = $position->getTicker()->getId();
@@ -82,6 +84,7 @@ class PortfolioController extends AbstractController
             'positions' => $items->getIterator(),
             'dividends' => $dividends,
             'dividendService' => $dividendService,
+            'yahooFinanceService' => $yahooFinanceService,
             'limit' => $limit,
             'maxPages' => $maxPages,
             'thisPage' => $thisPage,

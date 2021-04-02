@@ -6,9 +6,9 @@ use App\Entity\Position;
 use App\Entity\Ticker;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method Position|null find($id, $lockMode = null, $lockVersion = null)
@@ -152,15 +152,15 @@ class PositionRepository extends ServiceEntityRepository
         string $search = ''
     ): Paginator {
         $queryBuilder = $this->createQueryBuilder('p')
-        ->select('p, t, i')
-        ->innerJoin('p.ticker', 't')
-        ->innerJoin('t.branch', 'i')
-        ->orderBy('p.closedAt', $sort);
+            ->select('p, t, i')
+            ->innerJoin('p.ticker', 't')
+            ->innerJoin('t.branch', 'i')
+            ->orderBy('p.closedAt', $sort);
 
         if (!empty($search)) {
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
-            $queryBuilder->expr()->like('t.ticker', ':search'),
-            $queryBuilder->expr()->like('i.label', ':search')
+                $queryBuilder->expr()->like('t.ticker', ':search'),
+                $queryBuilder->expr()->like('i.label', ':search')
             ));
             $queryBuilder->setParameter('search', $search . '%');
         }
