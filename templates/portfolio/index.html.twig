@@ -54,7 +54,7 @@
             {% set percentageAllocation = (allocation / totalInvested) * 100 %}
             {% set calendar = position.ticker.calendars.first ?? null %}
             {% set marketPrice = yahooFinanceService.getQuote(ticker.symbol) %}
-            {% set paperDiff = marketPrice - avgPrice %}
+            {% set paperDiff = (marketPrice - avgPrice) * amount %}
             {% set paperDiffPercentage = (paperDiff / avgPrice) * 100  %}
 
             <tr {{ position.isDividendPayMonth ? 'class="table-success"' : ''}}>
