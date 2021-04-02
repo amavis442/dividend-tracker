@@ -3,7 +3,7 @@
 {% block title %}Calendar per date{% endblock %}
 
 {% block body %}
-<div><h1>Dividend payments per date for {{ year }}</h1></div>
+<div><h3>Dividend payments per date for {{ year }} </h3><small class="text-muted">({{'Current date'|trans }}: {{ timestamp|format_date('full') }})</small></div>
 {{ form_start(form, {'attr': {'class':'form-inline'}}) }}
     <div class="form-group mb-3">
         {{ form_widget(form.startdate) }}

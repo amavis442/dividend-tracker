@@ -42,7 +42,7 @@
         "symfony/yaml": "5.2.*",
         "twig/extensions": "^1.5",
         "twig/extra-bundle": "^2.12|^3.0",
-        "twig/intl-extra": "^3.0",
+        "twig/intl-extra": "^3.3",
         "twig/twig": "^2.12|^3.0",
         "zbateson/mail-mime-parser": "^1.3"
     },

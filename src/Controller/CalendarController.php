@@ -156,6 +156,7 @@ class CalendarController extends AbstractController
             'dividendService' => $dividendService,
             'dateSelect' => $dateSelect,
             'form' => $form->createView(),
+            'timestamp' => new DateTime()
         ]);
     }
 
