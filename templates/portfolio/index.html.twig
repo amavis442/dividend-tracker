@@ -54,6 +54,9 @@
             {% set percentageAllocation = (allocation / totalInvested) * 100 %}
             {% set calendar = position.ticker.calendars.first ?? null %}
             {% set marketPrice = yahooFinanceService.getQuote(ticker.symbol) %}
+            {% set paperDiff = marketPrice - avgPrice %}
+            {% set paperDiffPercentage = (paperDiff / avgPrice) * 100  %}
+
             <tr {{ position.isDividendPayMonth ? 'class="table-success"' : ''}}>
                 <td>
                     <a href="{{ path('portfolio_show', {'id': position.id}) }}" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="{{ ticker.fullname }} ({{ ticker.ticker }})"><i class="fas fa-info-circle"></i></a>
@@ -89,6 +92,8 @@
 				</td>
                 <th>
                     <span class="text-{% if marketPrice > avgPrice %}success{% else %}danger{% endif %}">&euro;{{ marketPrice|format_number({fraction_digit: 2}) }}</span>
+                    <br/>
+                        <span class="badge badge-{% if marketPrice > avgPrice %}success{% else %}danger{% endif %}">&euro;{{ paperDiff|format_number({fraction_digit: 2}) }} ({{ paperDiffPercentage|format_number({fraction_digit: 2}) }}%)</span> 
                 </th>
             </tr>
         {% else %}
