@@ -34,12 +34,12 @@
                 <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'fullname', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Fullname'|trans }}</a></th>
                 <th>{{ 'Amount'|trans }}</th>
                 <th>{{ 'Avg. price'|trans }}</th>
+                <th>Market Price</th>
                 <th>{{ 'Allocation'|trans }}</th>
                 <th>{{ 'Dividends'|trans }}</th>
                 <th>{{ 'Div dates'|trans }}</th>
                 <th>{{ 'Forward dividend'|trans }}</th>
                 <th>{{ 'Pies'|trans }}</th>
-                <th>Market Price</th>
             </tr>
         </thead>
         <tbody>
@@ -53,6 +53,11 @@
                 </td>
                 <td>{{ portfolioItem.amount|format_number({fraction_digit: 7}) }}</td>
                 <td>&euro;{{ portfolioItem.price|format_number({fraction_digit: 2}) }}</td>
+                <td>
+                    <span class="text-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.marketPrice|format_number({fraction_digit: 2}) }}</span>
+                    <br/>
+                        <span class="badge badge-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.paperProfit|format_number({fraction_digit: 2}) }} ({{ portfolioItem.paperProfitPercentage|format_number({fraction_digit: 2}) }}%)</span> 
+                </td>
                 <td>
                     <span class="badge badge-primary">&euro;{{ portfolioItem.allocation|format_number({fraction_digit: 2}) }}
                     <span class="badge badge-warning">{{ portfolioItem.percentageAllocation|format_number({fraction_digit: 2}) }}%</span></span>
@@ -77,15 +82,10 @@
                         <span class="badge badge-secondary">{{ pie.label|slice(0,10) }}{% if pie.label|length > 10 %}...{% endif %}</span>
                     {% endfor %}
 				</td>
-                <th>
-                    <span class="text-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.marketPrice|format_number({fraction_digit: 2}) }}</span>
-                    <br/>
-                        <span class="badge badge-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.paperProfit|format_number({fraction_digit: 2}) }} ({{ portfolioItem.paperProfitPercentage|format_number({fraction_digit: 2}) }}%)</span> 
-                </th>
             </tr>
         {% else %}
             <tr>
-                <td colspan="7">no records found</td>
+                <td colspan="10">no records found</td>
             </tr>
         {% endfor %}
         </tbody>
