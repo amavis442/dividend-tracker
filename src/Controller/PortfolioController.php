@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Calendar;
-use App\Entity\Constants;
 use App\Entity\Position;
+use App\Model\PortfolioModel;
 use App\Repository\PaymentRepository;
 use App\Repository\PieRepository;
 use App\Repository\PositionRepository;
@@ -43,15 +43,9 @@ class PortfolioController extends AbstractController
         string $sort = 'asc',
         DividendService $dividendService,
         Referer $referer,
-        YahooFinanceService $yahooFinanceService
+        YahooFinanceService $yahooFinanceService,
+        PortfolioModel $model
     ): Response {
-        $order = 't.ticker';
-        if (in_array($orderBy, ['industry'])) {
-            $order = 'i.label';
-        }
-        if (in_array($orderBy, ['ticker', 'fullname'])) {
-            $order = 't.' . $orderBy;
-        }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
         }
@@ -60,33 +54,27 @@ class PortfolioController extends AbstractController
         $pies = $pieRepository->findLinked();
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
         $pieSelected = $session->get(self::PIE_KEY, null);
-        if ($pieSelected && $pieSelected != '-') {
-            $items = $positionRepository->getAll($page, $limit, $order, $sort, $searchCriteria, PositionRepository::OPEN, [$pieSelected]);
-        } else {
-            $items = $positionRepository->getAll($page, $limit, $order, $sort, $searchCriteria, PositionRepository::OPEN);
-        }
-
-        $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
-        $iter = $items->getIterator();
-        $tickerIds = [];
-        foreach ($iter as &$position) {
-            $id = $position->getTicker()->getId();
-            if (!in_array($id, $tickerIds)) {
-                $tickerIds[] = $position->getTicker()->getId();
-            }
-        }
-        $dividends = $paymentRepository->getSumDividends($tickerIds);
         [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
         $referer->set('portfolio_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
 
+        $pageData = $model->getPage(
+            $positionRepository,
+            $dividendService,
+            $paymentRepository,
+            $yahooFinanceService,
+            $allocated,
+            $page,
+            $orderBy,
+            $sort,
+            $searchCriteria,
+            $pieSelected,
+        );
+        
         return $this->render('portfolio/index.html.twig', [
-            'positions' => $items->getIterator(),
-            'dividends' => $dividends,
-            'dividendService' => $dividendService,
-            'yahooFinanceService' => $yahooFinanceService,
+            'portfolioItems'  => $pageData->getPortfolioItems(),
             'limit' => $limit,
-            'maxPages' => $maxPages,
+            'maxPages' => $pageData->getMaxPages(),
             'thisPage' => $thisPage,
             'order' => $orderBy,
             'sort' => $sort,

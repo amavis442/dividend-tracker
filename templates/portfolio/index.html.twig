@@ -43,57 +43,44 @@
             </tr>
         </thead>
         <tbody>
-        {% for position in positions %}
-            {% set ticker = position.ticker %}
-            {% set branchLabel = position.ticker.branch.label %}
-            {% set tickerId = position.ticker.id|int %}
-            {% set amount = position.amount %}
-            {% set dividend = dividends[tickerId] ?? 0 %}
-            {% set avgPrice = position.price %}
-            {% set allocation = position.allocation %}
-            {% set percentageAllocation = (allocation / totalInvested) * 100 %}
-            {% set calendar = position.ticker.calendars.first ?? null %}
-            {% set marketPrice = yahooFinanceService.getQuote(ticker.symbol) %}
-            {% set paperDiff = (marketPrice - avgPrice) * amount %}
-            {% set paperDiffPercentage = (paperDiff / allocation) * 100  %}
-
-            <tr {{ position.isDividendPayMonth ? 'class="table-success"' : ''}}>
+        {% for portfolioItem in portfolioItems %}
+            <tr {{ portfolioItem.isDividendMonth ? 'class="table-success"' : ''}}>
                 <td>
-                    <a href="{{ path('portfolio_show', {'id': position.id}) }}" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="{{ ticker.fullname }} ({{ ticker.ticker }})"><i class="fas fa-info-circle"></i></a>
+                    <a href="{{ path('portfolio_show', {'id': portfolioItem.positionId}) }}" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="{{ portfolioItem.fullname }} ({{ portfolioItem.symbol }})"><i class="fas fa-info-circle"></i></a>
                 </td>
                 <td>
-                     {{ ticker.fullname|slice(0,10) }}{% if ticker.fullname|length > 10 %}...{% endif %}
+                     {{ portfolioItem.fullname|slice(0,10) }}{% if portfolioItem.fullname|length > 10 %}...{% endif %}
                 </td>
-                <td>{{ amount|format_number({fraction_digit: 7}) }}</td>
-                <td>&euro;{{ avgPrice|format_number({fraction_digit: 2}) }}</td>
+                <td>{{ portfolioItem.amount|format_number({fraction_digit: 7}) }}</td>
+                <td>&euro;{{ portfolioItem.price|format_number({fraction_digit: 2}) }}</td>
                 <td>
-                    <span class="badge badge-primary">&euro;{{ allocation|format_number({fraction_digit: 2}) }}
-                    <span class="badge badge-warning">{{percentageAllocation|format_number({fraction_digit: 2}) }}%</span></span>
+                    <span class="badge badge-primary">&euro;{{ portfolioItem.allocation|format_number({fraction_digit: 2}) }}
+                    <span class="badge badge-warning">{{ portfolioItem.percentageAllocation|format_number({fraction_digit: 2}) }}%</span></span>
                 </td>
-                <td>&euro;{{ dividend|format_number({fraction_digit: 2}) }}</td>
+                <td>&euro;{{portfolioItem.dividend|format_number({fraction_digit: 2}) }}</td>
                 <td><small>
-                    {% if calendar %} 
-                        <span class="badge badge-primary">{{ calendar.exDividendDate|date('d/m/Y') }}</span><br/>
-                        <span class="badge badge-warning">{{ calendar.paymentDate|date('d/m/Y') }}</span>
+                    {% if portfolioItem.divDate %} 
+                        <span class="badge badge-primary">{{ portfolioItem.exDividendDate|date('d/m/Y') }}</span><br/>
+                        <span class="badge badge-warning">{{ portfolioItem.paymentDate|date('d/m/Y') }}</span>
                     {% endif %}
                     </small>
                 </td>
-                <td>{% if calendar %}
-                        <div class="badge badge-primary">{{ calendar.currency.sign|raw }} {{ calendar.cashAmount|format_number({fraction_digit: 3}) }}</div><br/>
-                        <div class="badge badge-secondary">&euro; {{ dividendService.getForwardNetDividend(position)|format_number({fraction_digit: 2}) }}
-                        <div class="badge badge-success">{{ dividendService.getForwardNetDividendYield(position)|format_number({fraction_digit: 2}) }}%</div>
+                <td>{% if portfolioItem.divDate %}
+                        <div class="badge badge-primary">{{ portfolioItem.cashCurrency.sign|raw }} {{ portfolioItem.cashAmount|format_number({fraction_digit: 3}) }}</div><br/>
+                        <div class="badge badge-secondary">&euro; {{ portfolioItem.forwardNetDividend|format_number({fraction_digit: 2}) }}
+                        <div class="badge badge-success">{{ portfolioItem.forwardNetDividendYield|format_number({fraction_digit: 2}) }}%</div>
                         </div>
                     {% endif %}
                 </td>
                 <td>
-                    {% for pie in position.pies %}
+                    {% for pie in portfolioItem.pies %}
                         <span class="badge badge-secondary">{{ pie.label|slice(0,10) }}{% if pie.label|length > 10 %}...{% endif %}</span>
                     {% endfor %}
 				</td>
                 <th>
-                    <span class="text-{% if marketPrice > avgPrice %}success{% else %}danger{% endif %}">&euro;{{ marketPrice|format_number({fraction_digit: 2}) }}</span>
+                    <span class="text-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.marketPrice|format_number({fraction_digit: 2}) }}</span>
                     <br/>
-                        <span class="badge badge-{% if marketPrice > avgPrice %}success{% else %}danger{% endif %}">&euro;{{ paperDiff|format_number({fraction_digit: 2}) }} ({{ paperDiffPercentage|format_number({fraction_digit: 2}) }}%)</span> 
+                        <span class="badge badge-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.paperProfit|format_number({fraction_digit: 2}) }} ({{ portfolioItem.paperProfitPercentage|format_number({fraction_digit: 2}) }}%)</span> 
                 </th>
             </tr>
         {% else %}
