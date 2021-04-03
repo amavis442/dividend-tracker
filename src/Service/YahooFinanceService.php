@@ -39,35 +39,35 @@ class YahooFinanceService
                 $apiCallUrl . strtoupper($symbol)
             );
 
-            $content = [];
+            $marketPrice = 0.0;
+            $currency = 'USD';
             if ($response->getStatusCode() === 200) {
                 $content = $response->toArray();
+
+                if (isset($content['chart']) && isset($content['chart']['result'][0]['meta']['regularMarketPrice'])) {
+                    if (isset($content['chart']) && $content['chart']['error'] == null) {
+                        $symbolData = $content['chart']['result'][0]['meta'];
+                        $marketPrice = $symbolData['regularMarketPrice'];
+                        $currency = $symbolData['currency'];
+                    } 
+                }
             }
-            return $content;
+
+            return ['currency' => $currency, 'price' => $marketPrice];
         });
         
         //$this->yahooCache->delete('yahoo_'.strtolower($symbol));
         
-        return $data ?? [];
+        return $data;
     }
-
-
 
     public function getQuote(string $symbol): ?float
     {
         $rates = $this->exchangeRateService->getRates();
         $data = $this->getData($symbol);
-        $result = 0.0;  
-        $currency = 'USD';  
-        if (isset($data['chart']) && isset($data['chart']['result'][0]['meta']['regularMarketPrice'])) {
-            if (isset($data['chart']) && $data['chart']['error'] == null) {
-                $symbolData = $data['chart']['result'][0]['meta'];
-                $result = $symbolData['regularMarketPrice'];
-                $currency = $symbolData['currency'];
-            } else {
-                $result = null;
-            }
-        }
-        return $result / ($rates[$currency ?? 'USD']);
+        $price = $data['price'];  
+        $currency = $data['currency'];  
+        
+        return $price / ($rates[$currency]);
     }
 }
