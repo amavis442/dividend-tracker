@@ -86,9 +86,18 @@ class PortfolioModel
         $this->maxPages = (int) ceil($items->count() / $limit);
         $iter = $items->getIterator();
         $tickerIds = [];
+        $symbols = [];
 
         foreach ($iter as $position) {
-            $marketPrice = $yahooFinanceService->getQuote($position->getTicker()->getSymbol());
+            $symbol = $position->getTicker()->getSymbol();
+            $symbols[] = $symbol;
+        }
+        $marketData = $yahooFinanceService->getQuotes($symbols, $page);
+
+        foreach ($iter as $position) {
+            $symbol = $position->getTicker()->getSymbol();
+            $marketPrice = $yahooFinanceService->getMarketPrice($symbol);
+            
             $amount = $position->getAmount();
             $avgPrice = $position->getPrice();
             $allocation = $position->getAllocation();

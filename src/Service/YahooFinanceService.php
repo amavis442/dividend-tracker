@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use RuntimeException;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -10,10 +11,35 @@ class YahooFinanceService
 {
     public const YAHOO_API = 'https://query1.finance.yahoo.com/v8/finance/chart/';
     public const YAHOO_URL = 'https://finance.yahoo.com/quote/';
+    public const YAHOO_QUOTE = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=';
 
+    /**
+     * Do not call api everytime
+     *
+     * @var CacheInterface
+     */
     private $yahooCache;
+
+    /**
+     * Used for calling the api
+     *
+     * @var HttpClientInterface
+     */
     private $client;
+
+    /**
+     * Get the exchange rates
+     *
+     * @var ExchangeRateService
+     */
     private $exchangeRateService;
+
+    /**
+     * Data from the last call to the api
+     *
+     * @var array
+     */
+    private $data;
 
     public function __construct(HttpClientInterface $client, CacheInterface $yahooCache, ExchangeRateService $exchangeRateService)
     {
@@ -21,6 +47,73 @@ class YahooFinanceService
         $this->client = $client;
         $this->exchangeRateService = $exchangeRateService;
     }
+
+
+    public function getQuotes(array $symbols, string $tag)
+    {
+        $client = $this->client;
+        $apiCallUrl = self::YAHOO_QUOTE;
+
+        $tagName = 'yahoo_quotes_'.$tag;
+
+        $data = $this->yahooCache->get($tagName, function (ItemInterface $item) use ($client, $apiCallUrl, $symbols) {
+            $item->expiresAfter(3600);
+            $response = $client->request(
+                'GET',
+                $apiCallUrl . implode(',', array_map(function($symbol) { 
+                        return strtoupper($symbol);
+                }, array_values($symbols)))
+            );
+
+            $result = [];
+            if ($response->getStatusCode() === 200) {
+                $content = $response->toArray();
+                if (isset($content['quoteResponse']) && isset($content['quoteResponse']['result'])) {
+                    if (isset($content['quoteResponse']) && $content['quoteResponse']['error'] == null) {
+                        $symbolData = $content['quoteResponse']['result'];
+                        foreach ($symbolData as $data) {
+                            $result[$data['symbol']] =  $data;
+                        }
+                        //$marketPrice = $symbolData['regularMarketOpen'];
+                        //$currency = $symbolData['currency'];
+                    } 
+                }
+            }
+
+            return $result;
+        });
+        
+        //$this->yahooCache->delete($tagName);
+        $this->data = $data;
+
+        return $data;
+    }
+
+    /**
+     * Get marketprice for symbol
+     *
+     * @param string $symbol
+     * @return float
+     */
+    public function getMarketPrice(string $symbol): float
+    {
+        if (!$this->data) {
+            throw new RuntimeException('Call YahooFinanceService::getQuotes(array $symbols) first');
+        }
+
+        $rates = $this->exchangeRateService->getRates();
+        $marketPrice = 0.0;
+        $currency = 'USD';
+
+        if (isset($this->data[$symbol]) && isset($this->data[$symbol]['regularMarketPrice'])) {
+            //dd($this->data[$symbol]);
+            $marketPrice = $this->data[$symbol]['regularMarketPrice'];
+            $currency = $this->data[$symbol]['currency'];
+        }
+        
+        return $marketPrice / ($rates[$currency]);
+    }
+
 
     /**
      * Get the exchangerates from an external source and only refresh 1 per hour
