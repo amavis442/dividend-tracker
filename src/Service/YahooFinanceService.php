@@ -78,7 +78,7 @@ class YahooFinanceService
                     } 
                 }
             }
-            $result['timestamp'] = time();
+            $result['timestamp'] = time() + date('Z');
 
             return $result;
         });
