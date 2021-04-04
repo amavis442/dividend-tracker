@@ -119,7 +119,7 @@ class TickerRepository extends ServiceEntityRepository
     public function getActive()
     {
         return $this->createQueryBuilder('t','t.ticker')
-            ->select('t,p')
+            ->select('t, p')
             ->innerJoin('t.positions', 'p')
             ->where('p.closed = 0 or p.closed is null')
             ->getQuery()

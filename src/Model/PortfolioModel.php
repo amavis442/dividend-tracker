@@ -5,6 +5,7 @@ namespace App\Model;
 use App\Entity\PortfolioItem;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
+use App\Repository\TickerRepository;
 use App\Service\DividendService;
 use App\Service\YahooFinanceService;
 use RuntimeException;
@@ -38,9 +39,17 @@ class PortfolioModel
     private $maxPages = 1;
 
     /**
+     * When was the quote cache last updated
+     *
+     * @var int
+     */
+    private $timestamp;
+
+    /**
      * Get 1 page of many with position data
      *
      * @param PositionRepository $positionRepository
+     * @param TickerRepository $tickerRepository
      * @param DividendService $dividendService
      * @param PaymentRepository $paymentRepository
      * @param YahooFinanceService $yahooFinanceService
@@ -54,6 +63,7 @@ class PortfolioModel
      */
     public function getPage(
         PositionRepository $positionRepository,
+        TickerRepository $tickerRepository,
         DividendService $dividendService,
         PaymentRepository $paymentRepository,
         YahooFinanceService $yahooFinanceService,
@@ -88,11 +98,14 @@ class PortfolioModel
         $tickerIds = [];
         $symbols = [];
 
-        foreach ($iter as $position) {
-            $symbol = $position->getTicker()->getSymbol();
+        $tickers = $tickerRepository->getActive();
+        foreach ($tickers as $ticker)
+        {
+            $symbol = $ticker->getSymbol();
             $symbols[] = $symbol;
         }
-        $marketData = $yahooFinanceService->getQuotes($symbols, $page);
+        $marketData = $yahooFinanceService->getQuotes($symbols, 'all');        
+        $this->timestamp = $marketData['timestamp'];
 
         foreach ($iter as $position) {
             $symbol = $position->getTicker()->getSymbol();
@@ -105,6 +118,7 @@ class PortfolioModel
             $paperProfit = ($marketPrice - $avgPrice) * $amount;
             $paperProfitPercentage = ($paperProfit / $allocation) * 100;
             $ticker = $position->getTicker();
+            $diffPrice = $marketPrice - $avgPrice;
 
             $portfolioItem = new PortfolioItem();
             $portfolioItem
@@ -122,6 +136,7 @@ class PortfolioModel
                 ->setPercentageAllocation($percentageAllocation)
                 ->setPies($position->getPies())
                 ->setIsDividendMonth($position->isDividendPayMonth())
+                ->setDiffPrice($diffPrice)
             ;
 
             // Dividend part
@@ -199,5 +214,18 @@ class PortfolioModel
             throw new RuntimeException('First call PortfolioModel::getPage()');
         }
         return $this->maxPages;
+    }
+
+    /**
+     * Get when was the quote cache last updated
+     *
+     * @return  int
+     */ 
+    public function getCacheTimestamp()
+    {
+        if (!$this->initialized) {
+            throw new RuntimeException('First call PortfolioModel::getPage()');
+        }
+        return $this->timestamp;
     }
 }

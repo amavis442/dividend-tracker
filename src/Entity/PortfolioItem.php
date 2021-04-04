@@ -160,6 +160,12 @@ class PortfolioItem
      * @var boolean
      */
     private $isDividendMonth = false;
+    /**
+     * Diffrence between avg price and market price
+     *
+     * @var float
+     */
+    private $diffPrice;
     
     /**
      * Get undocumented variable
@@ -686,6 +692,30 @@ class PortfolioItem
     public function setPositionId(int $positionId)
     {
         $this->positionId = $positionId;
+
+        return $this;
+    }
+
+    /**
+     * Get diffrence between avg price and market price
+     *
+     * @return  float
+     */ 
+    public function getDiffPrice()
+    {
+        return $this->diffPrice;
+    }
+
+    /**
+     * Set diffrence between avg price and market price
+     *
+     * @param  float  $diffPrice  Diffrence between avg price and market price
+     *
+     * @return  self
+     */ 
+    public function setDiffPrice(float $diffPrice)
+    {
+        $this->diffPrice = $diffPrice;
 
         return $this;
     }

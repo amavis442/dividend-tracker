@@ -55,9 +55,8 @@ class YahooFinanceService
         $apiCallUrl = self::YAHOO_QUOTE;
 
         $tagName = 'yahoo_quotes_'.$tag;
-
         $data = $this->yahooCache->get($tagName, function (ItemInterface $item) use ($client, $apiCallUrl, $symbols) {
-            $item->expiresAfter(3600);
+            $item->expiresAfter(600);
             $response = $client->request(
                 'GET',
                 $apiCallUrl . implode(',', array_map(function($symbol) { 
@@ -79,10 +78,12 @@ class YahooFinanceService
                     } 
                 }
             }
+            $result['timestamp'] = time();
 
             return $result;
         });
         
+
         //$this->yahooCache->delete($tagName);
         $this->data = $data;
 

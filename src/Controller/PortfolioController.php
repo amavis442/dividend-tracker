@@ -8,6 +8,7 @@ use App\Model\PortfolioModel;
 use App\Repository\PaymentRepository;
 use App\Repository\PieRepository;
 use App\Repository\PositionRepository;
+use App\Repository\TickerRepository;
 use App\Service\DividendGrowth;
 use App\Service\DividendService;
 use App\Service\Referer;
@@ -35,6 +36,7 @@ class PortfolioController extends AbstractController
     public function index(
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
+        TickerRepository $tickerRepository,
         PieRepository $pieRepository,
         SessionInterface $session,
         Summary $summary,
@@ -60,6 +62,7 @@ class PortfolioController extends AbstractController
 
         $pageData = $model->getPage(
             $positionRepository,
+            $tickerRepository,
             $dividendService,
             $paymentRepository,
             $yahooFinanceService,
@@ -73,6 +76,7 @@ class PortfolioController extends AbstractController
         
         return $this->render('portfolio/index.html.twig', [
             'portfolioItems'  => $pageData->getPortfolioItems(),
+            'cacheTimestamp' => (new DateTime())->setTimestamp($pageData->getCacheTimestamp()),
             'limit' => $limit,
             'maxPages' => $pageData->getMaxPages(),
             'thisPage' => $thisPage,

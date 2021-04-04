@@ -4,6 +4,7 @@
 
 {% block body %}
     <h1>Portfolio</h1>
+    
     {% include '_summary.html.twig' %}
     <br/>
     <br/>
@@ -27,6 +28,7 @@
         </div>
     </div>
 
+    
     <table class="table table-sm">
         <thead>
             <tr>
@@ -55,8 +57,12 @@
                 <td>&euro;{{ portfolioItem.price|format_number({fraction_digit: 2}) }}</td>
                 <td>
                     <span class="text-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.marketPrice|format_number({fraction_digit: 2}) }}</span>
+                    <span class="badge badge-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">
+                        {% if portfolioItem.marketPrice > portfolioItem.price %}<i class="fas fa-arrow-circle-up">{% else %}<i class="fas fa-arrow-circle-down">{% endif %}</i> 
+                        &euro;{{ portfolioItem.diffPrice|format_number({fraction_digit: 2}) }}
+                    </span>
                     <br/>
-                        <span class="badge badge-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.paperProfit|format_number({fraction_digit: 2}) }} ({{ portfolioItem.paperProfitPercentage|format_number({fraction_digit: 2}) }}%)</span> 
+                    <span class="badge badge-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.paperProfit|format_number({fraction_digit: 2}) }} ({{ portfolioItem.paperProfitPercentage|format_number({fraction_digit: 2}) }}%)</span> 
                 </td>
                 <td>
                     <span class="badge badge-primary">&euro;{{ portfolioItem.allocation|format_number({fraction_digit: 2}) }}
@@ -89,6 +95,13 @@
             </tr>
         {% endfor %}
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="10">
+                    <small>Market price cache updated: {{ cacheTimestamp|format_datetime('full') }}</small>
+                </td>
+            </tr>
+        </tfoot>
     </table>
     {% include 'paginator.html.twig' %}
 {% endblock %}
