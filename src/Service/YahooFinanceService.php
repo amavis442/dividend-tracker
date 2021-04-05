@@ -56,7 +56,7 @@ class YahooFinanceService
 
         $tagName = 'yahoo_quotes_'.$tag;
         $data = $this->yahooCache->get($tagName, function (ItemInterface $item) use ($client, $apiCallUrl, $symbols) {
-            $item->expiresAfter(600);
+            $item->expiresAfter(300);
             $response = $client->request(
                 'GET',
                 $apiCallUrl . implode(',', array_map(function($symbol) { 
@@ -73,8 +73,6 @@ class YahooFinanceService
                         foreach ($symbolData as $data) {
                             $result[$data['symbol']] =  $data;
                         }
-                        //$marketPrice = $symbolData['regularMarketOpen'];
-                        //$currency = $symbolData['currency'];
                     } 
                 }
             }
@@ -96,7 +94,7 @@ class YahooFinanceService
      * @param string $symbol
      * @return float
      */
-    public function getMarketPrice(string $symbol): float
+    public function getMarketPrice(string $symbol): ?float
     {
         if (!$this->data) {
             throw new RuntimeException('Call YahooFinanceService::getQuotes(array $symbols) first');
@@ -107,9 +105,10 @@ class YahooFinanceService
         $currency = 'USD';
 
         if (isset($this->data[$symbol]) && isset($this->data[$symbol]['regularMarketPrice'])) {
-            //dd($this->data[$symbol]);
             $marketPrice = $this->data[$symbol]['regularMarketPrice'];
             $currency = $this->data[$symbol]['currency'];
+        } else {
+            return null;
         }
         
         return $marketPrice / ($rates[$currency]);

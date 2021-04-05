@@ -484,7 +484,7 @@ class PortfolioItem
      *
      * @return  float
      */ 
-    public function getMarketPrice()
+    public function getMarketPrice(): ?float
     {
         return $this->marketPrice;
     }
@@ -496,7 +496,7 @@ class PortfolioItem
      *
      * @return  self
      */ 
-    public function setMarketPrice(float $marketPrice)
+    public function setMarketPrice(?float $marketPrice)
     {
         $this->marketPrice = $marketPrice;
 

@@ -38,7 +38,6 @@
                 <th>{{ 'Avg. price'|trans }}</th>
                 <th>Market Price</th>
                 <th>{{ 'Allocation'|trans }}</th>
-                <th>{{ 'Dividends'|trans }}</th>
                 <th>{{ 'Div dates'|trans }}</th>
                 <th>{{ 'Forward dividend'|trans }}</th>
                 <th>{{ 'Pies'|trans }}</th>
@@ -51,11 +50,12 @@
                     <a href="{{ path('portfolio_show', {'id': portfolioItem.positionId}) }}" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="{{ portfolioItem.fullname }} ({{ portfolioItem.symbol }})"><i class="fas fa-info-circle"></i></a>
                 </td>
                 <td>
-                     {{ portfolioItem.fullname|slice(0,10) }}{% if portfolioItem.fullname|length > 10 %}...{% endif %}
+                     {{ portfolioItem.fullname|slice(0,20) }}{% if portfolioItem.fullname|length > 20 %}...{% endif %}
                 </td>
                 <td>{{ portfolioItem.amount|format_number({fraction_digit: 7}) }}</td>
                 <td>&euro;{{ portfolioItem.price|format_number({fraction_digit: 2}) }}</td>
                 <td>
+                    {% if portfolioItem.marketPrice %}
                     <span class="text-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.marketPrice|format_number({fraction_digit: 2}) }}</span>
                     <span class="badge badge-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">
                         {% if portfolioItem.marketPrice > portfolioItem.price %}<i class="fas fa-arrow-circle-up">{% else %}<i class="fas fa-arrow-circle-down">{% endif %}</i> 
@@ -63,16 +63,20 @@
                     </span>
                     <br/>
                     <span class="badge badge-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.paperProfit|format_number({fraction_digit: 2}) }} ({{ portfolioItem.paperProfitPercentage|format_number({fraction_digit: 2}) }}%)</span> 
+                    {% else %}
+                    &mdash;
+                    {% endif %}
                 </td>
                 <td>
                     <span class="badge badge-primary">&euro;{{ portfolioItem.allocation|format_number({fraction_digit: 2}) }}
                     <span class="badge badge-warning">{{ portfolioItem.percentageAllocation|format_number({fraction_digit: 2}) }}%</span></span>
                 </td>
-                <td>&euro;{{portfolioItem.dividend|format_number({fraction_digit: 2}) }}</td>
                 <td><small>
                     {% if portfolioItem.divDate %} 
                         <span class="badge badge-primary">{{ portfolioItem.exDividendDate|date('d/m/Y') }}</span><br/>
                         <span class="badge badge-warning">{{ portfolioItem.paymentDate|date('d/m/Y') }}</span>
+                    {% else %}
+                        &mdash;    
                     {% endif %}
                     </small>
                 </td>
@@ -81,6 +85,8 @@
                         <div class="badge badge-secondary">&euro; {{ portfolioItem.forwardNetDividend|format_number({fraction_digit: 2}) }}
                         <div class="badge badge-success">{{ portfolioItem.forwardNetDividendYield|format_number({fraction_digit: 2}) }}%</div>
                         </div>
+                    {% else %}
+                        &mdash;
                     {% endif %}
                 </td>
                 <td>

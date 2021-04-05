@@ -108,17 +108,24 @@ class PortfolioModel
         $this->timestamp = $marketData['timestamp'];
 
         foreach ($iter as $position) {
-            $symbol = $position->getTicker()->getSymbol();
-            $marketPrice = $yahooFinanceService->getMarketPrice($symbol);
+            $ticker = $position->getTicker();
+            $symbol = $ticker->getSymbol();
+ 
+            $paperProfit = 0.0;
+            $paperProfitPercentage = 0.0;
+            $diffPrice = 0.0;
             
+            $marketPrice = $yahooFinanceService->getMarketPrice($symbol);
             $amount = $position->getAmount();
             $avgPrice = $position->getPrice();
             $allocation = $position->getAllocation();
             $percentageAllocation = ($allocation / $totalInvested) * 100;
-            $paperProfit = ($marketPrice - $avgPrice) * $amount;
-            $paperProfitPercentage = ($paperProfit / $allocation) * 100;
-            $ticker = $position->getTicker();
-            $diffPrice = $marketPrice - $avgPrice;
+            
+            if ($marketPrice) {
+                $paperProfit = ($marketPrice - $avgPrice) * $amount;
+                $paperProfitPercentage = ($paperProfit / $allocation) * 100;
+                $diffPrice = $marketPrice - $avgPrice;
+            }
 
             $portfolioItem = new PortfolioItem();
             $portfolioItem
