@@ -40,7 +40,6 @@
                 <th>{{ 'Allocation'|trans }}</th>
                 <th>{{ 'Div dates'|trans }}</th>
                 <th>{{ 'Forward dividend'|trans }}</th>
-                <th>{{ 'Pies'|trans }}</th>
             </tr>
         </thead>
         <tbody>
@@ -89,21 +88,16 @@
                         &mdash;
                     {% endif %}
                 </td>
-                <td>
-                    {% for pie in portfolioItem.pies %}
-                        <span class="badge badge-secondary">{{ pie.label|slice(0,10) }}{% if pie.label|length > 10 %}...{% endif %}</span>
-                    {% endfor %}
-				</td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="10">no records found</td>
+                <td colspan="8">no records found</td>
             </tr>
         {% endfor %}
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="10">
+                <td colspan="8">
                     <small>Market price cache updated: {{ cacheTimestamp|format_datetime('full') }}</small>
                 </td>
             </tr>
