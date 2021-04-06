@@ -82,6 +82,31 @@ class Payment
      */
     private $updatedAt;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $taxWithold;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $taxCurrency;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $dividendType;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $dividendPaid;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $dividendPaidCurrency;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -243,5 +268,65 @@ class Payment
     public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updatedAt;
+    }
+
+    public function getTaxWithold(): ?float
+    {
+        return $this->taxWithold / Constants::VALUTA_PRECISION;
+    }
+
+    public function setTaxWithold(?float $taxWithold): self
+    {
+        $this->taxWithold = $taxWithold * Constants::VALUTA_PRECISION;
+
+        return $this;
+    }
+
+    public function getTaxCurrency(): ?string
+    {
+        return $this->taxCurrency;
+    }
+
+    public function setTaxCurrency(?string $taxCurrency): self
+    {
+        $this->taxCurrency = $taxCurrency;
+
+        return $this;
+    }
+
+    public function getDividendType(): ?string
+    {
+        return $this->dividendType;
+    }
+
+    public function setDividendType(?string $dividendType): self
+    {
+        $this->dividendType = $dividendType;
+
+        return $this;
+    }
+
+    public function getDividendPaid(): ?float
+    {
+        return $this->dividendPaid / Constants::VALUTA_PRECISION;
+    }
+
+    public function setDividendPaid(?float $dividendPaid): self
+    {
+        $this->dividendPaid = $dividendPaid * Constants::VALUTA_PRECISION;
+
+        return $this;
+    }
+
+    public function getDividendPaidCurrency(): ?string
+    {
+        return $this->dividendPaidCurrency;
+    }
+
+    public function setDividendPaidCurrency(?string $dividendPaidCurrency): self
+    {
+        $this->dividendPaidCurrency = $dividendPaidCurrency;
+
+        return $this;
     }
 }

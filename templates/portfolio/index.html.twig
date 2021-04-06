@@ -34,10 +34,9 @@
             <tr>
                 <th></th>
                 <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'fullname', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Fullname'|trans }}</a></th>
-                <th>{{ 'Amount'|trans }}</th>
                 <th>{{ 'Avg. price'|trans }}</th>
-                <th>Market Price</th>
-                <th>{{ 'Allocation'|trans }}</th>
+                <th>{{ 'Market Price'|trans }}</th>
+                <th>{{ 'Allocation'|trans }} / <br/>{{ 'Received dividend'|trans }}</th>
                 <th>{{ 'Div dates'|trans }}</th>
                 <th>{{ 'Forward dividend'|trans }}</th>
             </tr>
@@ -49,26 +48,34 @@
                     <a href="{{ path('portfolio_show', {'id': portfolioItem.positionId}) }}" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="{{ portfolioItem.fullname }} ({{ portfolioItem.symbol }})"><i class="fas fa-info-circle"></i></a>
                 </td>
                 <td>
-                     {{ portfolioItem.fullname|slice(0, 30) }}{% if portfolioItem.fullname|length > 30 %}...{% endif %}
+                     {{ portfolioItem.fullname|slice(0, 30) }}{% if portfolioItem.fullname|length > 30 %}...{% endif %}<br/>
+                     <small>{{ portfolioItem.amount|format_number({fraction_digit: 7}) }} {{ 'shares'|trans }}</small>
                 </td>
-                <td>{{ portfolioItem.amount|format_number({fraction_digit: 7}) }}</td>
-                <td>&euro;{{ portfolioItem.price|format_number({fraction_digit: 2}) }}</td>
+                <td>
+                    &euro;{{ portfolioItem.price|format_number({fraction_digit: 2}) }}
+                    {% if portfolioItem.marketPrice %}
+                    <br/>
+                    <span class="badge badge-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.paperProfit|format_number({fraction_digit: 2}) }} ({{ portfolioItem.paperProfitPercentage|format_number({fraction_digit: 2}) }}%)</span>
+                    {% endif %}
+                </td>
                 <td>
                     {% if portfolioItem.marketPrice %}
                     <span class="text-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.marketPrice|format_number({fraction_digit: 2}) }}</span>
+                    <br/>
                     <span class="badge badge-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">
                         {% if portfolioItem.marketPrice > portfolioItem.price %}<i class="fas fa-arrow-circle-up">{% else %}<i class="fas fa-arrow-circle-down">{% endif %}</i> 
                         &euro;{{ portfolioItem.diffPrice|format_number({fraction_digit: 2}) }}
                     </span>
-                    <br/>
-                    <span class="badge badge-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.paperProfit|format_number({fraction_digit: 2}) }} ({{ portfolioItem.paperProfitPercentage|format_number({fraction_digit: 2}) }}%)</span> 
                     {% else %}
                     &mdash;
                     {% endif %}
                 </td>
                 <td>
                     <span class="badge badge-primary">&euro;{{ portfolioItem.allocation|format_number({fraction_digit: 2}) }}
-                    <span class="badge badge-warning">{{ portfolioItem.percentageAllocation|format_number({fraction_digit: 2}) }}%</span></span>
+                        <span class="badge badge-warning">{{ portfolioItem.percentageAllocation|format_number({fraction_digit: 2}) }}%</span>
+                    </span>
+                    <br>
+                    <span class="badge badge-secondary"> &euro;{{ portfolioItem.dividend|format_number({fraction_digit: 2}) }}</span>
                 </td>
                 <td><small>
                     {% if portfolioItem.divDate %} 

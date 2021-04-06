@@ -94,16 +94,17 @@ class PaymentRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function hasPayment(DateTimeInterface $dateTime, Ticker $ticker): bool
+    public function hasPayment(DateTimeInterface $dateTime, Ticker $ticker, string $dividendType): bool
     {
         return $this->createQueryBuilder('p')
         ->join('p.ticker', 't')
         ->where('t = :ticker')
+        ->andWhere('p.dividendType = :dividendType')
         ->andWhere('p.payDate >= :paydateStart AND p.payDate <= :paydateEnd')
         ->setParameter('ticker', $ticker)
         ->setParameter('paydateStart', $dateTime->format('Y-m-d 00:00:00'))
         ->setParameter('paydateEnd', $dateTime->format('Y-m-d 23:59:59'))
-        
+        ->setParameter('dividendType', $dividendType)
         ->getQuery()
         ->getOneOrNullResult() ? true : false; 
     }

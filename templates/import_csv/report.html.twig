@@ -14,6 +14,12 @@
         <td>{{ data.transactionsAdded }}</td>
     </tr>
     <tr>
+        <td>Dividend imported</td>
+        <td>
+            {{ data.dividendsImported }}
+        </td>
+    </tr>
+    <tr>
         <td>Already existed</td>
         <td>
             {% for transactionAlreadyExists in data.transactionAlreadyExists %}
@@ -23,6 +29,7 @@
             {% endfor %}
         </td>
     </tr>
+
 </table>
 <a class="btn btn-secondary" href="{{ path('portfolio_index') }}">Back</a>
 {% endblock %}

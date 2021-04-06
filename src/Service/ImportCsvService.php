@@ -78,6 +78,8 @@ class ImportCsvService extends ImportBase
      */
     protected $entityManager;
 
+    private $importedDividendLines = 0;
+
     public function __construct(
         EntityManager $entityManager
     ) {
@@ -102,15 +104,17 @@ class ImportCsvService extends ImportBase
      * @param \Box\Spout\Common\Entity\Cell[] array $cells
      * @return void
      */
-    protected function importDividend(array $cells, array $headers)
+    protected function importDividend(array $row)
     {
-        $transactionDate = DateTime::createFromFormat('Y-m-d H:i:s', $cells[1]->getValue());
-        $isin = $cells[2]->getValue();
-        $amount = $cells[5]->getValue();
-        $dividend = $cells[9]->getValue();
-        if ($headers[9] == 'result (eur)') {
-            $dividend = (float) $cells[10]->getValue();
-        }
+        $transactionDate = $row['transactionDate'];
+        $isin = $row['isin'];
+        $amount = $row['amount'];
+        $dividend = $row['allocation'];
+        $tax = $row['tax'];
+        $taxCurrency = $row['tax_currency'];
+        $dividendType = $row['action'];
+        $dividendPaid = $row['original_price'];
+        $dividendPaidCurrency = $row['original_price_currency'];
 
         $ticker = $this->tickerRepository->findOneBy(['isin' => $isin]);
         if (!$ticker) {
@@ -128,14 +132,21 @@ class ImportCsvService extends ImportBase
             ->setDividend($dividend)
             ->setCalendar($calendar)
             ->setPosition($position)
-            ->setPayDate($transactionDate);
+            ->setPayDate($transactionDate)
+            ->setTaxWithold($tax)
+            ->setTaxCurrency($taxCurrency)
+            ->setDividendType($dividendType)
+            ->setDividendPaid($dividendPaid)
+            ->setDividendPaidCurrency($dividendPaidCurrency);
 
-        if ($this->paymentRepository->hasPayment($transactionDate, $ticker)) {
+        if ($this->paymentRepository->hasPayment($transactionDate, $ticker, $dividendType)) {
             return;
         }
 
         $this->entityManager->persist($payment);
         $this->entityManager->flush($payment);
+
+        $this->importedDividendLines++;
     }
 
     protected function importData(Sheet $sheet): ?array
@@ -155,12 +166,6 @@ class ImportCsvService extends ImportBase
             }
             $cell = $cells[0];
             $cellVal = $cell->getValue();
-            if (false === stripos($cellVal, 'sell') && false === stripos($cellVal, 'buy')) {
-                if (false !== stripos($cellVal, 'dividend')) {
-                    $this->importDividend($cells, $headers);
-                }
-                continue;
-            };
 
             $row = [];
             $rawAmount = 0;
@@ -173,9 +178,9 @@ class ImportCsvService extends ImportBase
                 switch ($header) {
                     case 'action':
                         $row['action'] = $val;
-                        $d = 1;
+                        $d = Transaction::BUY;
                         if (false !== stripos($val, 'sell')) {
-                            $d = 2;
+                            $d = Transaction::SELL;
                         }
                         $row['direction'] = $d;
                         break;
@@ -192,6 +197,15 @@ class ImportCsvService extends ImportBase
                     case 'name':
                         $row['name'] = $val;
                         break;
+                    case 'result (eur)':
+                        $row['profit'] = $val;
+                        break;
+                    case 'price / share':
+                        $row['original_price'] = $val;
+                        break;
+                    case 'currency (price / share)':
+                        $row['original_price_currency'] = $val;
+                        break;
                     case 'no. of shares':
                         $rawAmount = $val;
                         $row['amount'] = $val;
@@ -207,11 +221,31 @@ class ImportCsvService extends ImportBase
                     case 'id':
                         $row['opdrachtid'] = $val;
                         break;
+                    case 'withholding tax':
+                        $row['tax'] = (float) $val ?? null;
+                        break;
+                    case 'currency (withholding tax)':
+                        $row['tax_currency'] = $val;
+                        break;
+                    case 'stamp duty reserve tax (eur)':
+                        $row['stampduty'] = (float) $val ?? null;
+                        break;
+                    case 'currency conversion fee (eur)':
+                        $row['fx_fee'] = (float) $val ?? null;
+                        break;
                     default:
                         $row[] = $val;
                 }
                 $r++;
             }
+
+            if (false === stripos($cellVal, 'sell') && false === stripos($cellVal, 'buy')) {
+                if (false !== stripos($cellVal, 'dividend')) {
+                    $this->importDividend($row);
+                }
+                continue;
+            };
+
             if (count($row) > 0) {
                 $row['price'] = round($rawAllocation / $rawAmount, 3);
                 $rows[$row['nr']] = $row;
@@ -271,8 +305,14 @@ class ImportCsvService extends ImportBase
                         ->setJobid($row['opdrachtid'])
                         ->setMeta($row['nr'])
                         ->setImportfile($file)
+                        ->setStampduty($row['stampduty'])
+                        ->setFxFee($row['fx_fee'])
+                        ->setOriginalPrice($row['original_price'])
+                        ->setOriginalPriceCurrency($row['original_price_currency'])
                     ;
-
+                    if ($row['direction'] == Transaction::SELL) {
+                        $transaction->setProfit($row['profit']);
+                    }
                     $position->addTransaction($transaction);
                     $weightedAverage->calc($position);
 
@@ -303,6 +343,7 @@ class ImportCsvService extends ImportBase
             'totalTransaction' => $totalTransaction,
             'transactionsAdded' => $transactionsAdded,
             'transactionAlreadyExists' => $transactionAlreadyExists,
+            'dividendsImported' => $this->importedDividendLines
         ];
     }
 }

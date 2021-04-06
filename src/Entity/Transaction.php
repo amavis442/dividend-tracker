@@ -112,6 +112,26 @@ class Transaction
     private $importfile;
 
     /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $fx_fee;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $originalPrice;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $originalPriceCurrency;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $stampduty;
+
+    /**
      * @Assert\Callback
      */
     public function validate(ExecutionContextInterface $context, $payload)
@@ -340,6 +360,54 @@ class Transaction
     public function setImportfile(?string $importfile): self
     {
         $this->importfile = $importfile;
+
+        return $this;
+    }
+
+    public function getFxFee(): ?float
+    {
+        return $this->fx_fee / Constants::VALUTA_PRECISION;
+    }
+
+    public function setFxFee(?float $fx_fee): self
+    {
+        $this->fx_fee = $fx_fee * Constants::VALUTA_PRECISION;
+
+        return $this;
+    }
+
+    public function getOriginalPrice(): ?float
+    {
+        return $this->originalPrice / Constants::VALUTA_PRECISION;
+    }
+
+    public function setOriginalPrice(?float $originalPrice): self
+    {
+        $this->originalPrice = $originalPrice * Constants::VALUTA_PRECISION;
+
+        return $this;
+    }
+
+    public function getOriginalPriceCurrency(): ?string
+    {
+        return $this->originalPriceCurrency;
+    }
+
+    public function setOriginalPriceCurrency(?string $originalPriceCurrency): self
+    {
+        $this->originalPriceCurrency = $originalPriceCurrency;
+
+        return $this;
+    }
+
+    public function getStampduty(): ?float
+    {
+        return $this->stampduty / Constants::VALUTA_PRECISION;
+    }
+
+    public function setStampduty(?float $stampduty): self
+    {
+        $this->stampduty = $stampduty * Constants::VALUTA_PRECISION;
 
         return $this;
     }
