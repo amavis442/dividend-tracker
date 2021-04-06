@@ -7,6 +7,7 @@ use App\Entity\Transaction;
 use App\Form\TransactionType;
 use App\Repository\CurrencyRepository;
 use App\Repository\TransactionRepository;
+use App\Service\ExchangeRateService;
 use App\Service\Referer;
 use App\Service\WeightedAverage;
 use DateTime;
@@ -81,13 +82,19 @@ class TransactionController extends AbstractController
         SessionInterface $session,
         CurrencyRepository $currencyRepository,
         WeightedAverage $weightedAverage,
-        Referer $referer
+        Referer $referer,
+        ExchangeRateService $exchangeRateService
     ): Response {
         $transaction = new Transaction();
         $currentDate = new DateTime();
         $transaction->setTransactionDate($currentDate);
         $transaction->setSide($side);
         $transaction->setPosition($position);
+
+        $rates = $exchangeRateService->getRates();
+
+        $transaction->setExchangeRate($rates['USD']);
+
         $currency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
         $transaction->setAllocationCurrency($currency);
         $form = $this->createForm(TransactionType::class, $transaction);

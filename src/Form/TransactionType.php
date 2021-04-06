@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Currency;
 use App\Entity\Transaction;
+use Doctrine\DBAL\Types\TextType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -23,7 +24,7 @@ class TransactionType extends AbstractType
             ])
             ->add('amount', NumberType::class, [
                 'help' => 'use decimal point if you have a fraction of a stock',
-                'label' => 'Units',
+                'label' => 'Amount',
                 'input' => 'number',
                 'scale' => 7,
             ])
@@ -62,7 +63,16 @@ class TransactionType extends AbstractType
                 },
                 'required' => true,
                 'empty_data' => 'EUR',
-            ]);
+            ])
+            ->add('exchangerate', NumberType::class,
+            [
+                'label' => 'Exchange rate',
+                'required' => false,
+                'help' => 'Current exchange rate',
+                'input' => 'number',
+                'scale' => 7,
+            ])
+            ;
     }
 
     public function configureOptions(OptionsResolver $resolver)
