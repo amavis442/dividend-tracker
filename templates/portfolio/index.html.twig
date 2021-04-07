@@ -45,10 +45,11 @@
         {% for portfolioItem in portfolioItems %}
             <tr {{ portfolioItem.isDividendMonth ? 'class="table-success"' : ''}}>
                 <td>
-                    <a href="{{ path('portfolio_show', {'id': portfolioItem.positionId}) }}" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="{{ portfolioItem.fullname }} ({{ portfolioItem.symbol }})"><i class="fas fa-info-circle"></i></a>
+                    <a href="{{ path('portfolio_show', {'id': portfolioItem.positionId}) }}" class="btn btn-primary btn-sm" ><i class="fas fa-info-circle"></i></a>
                 </td>
                 <td>
-                     {{ portfolioItem.fullname|slice(0, 30) }}{% if portfolioItem.fullname|length > 30 %}...{% endif %}<br/>
+                     <span data-toggle="tooltip" data-placement="top" title="{{ portfolioItem.fullname }} ({{ portfolioItem.symbol }})">{{ portfolioItem.fullname|slice(0, 30) }}{% if portfolioItem.fullname|length > 30 %}...{% endif %}</span>
+                     <br/>
                      <small>{{ portfolioItem.amount|format_number({fraction_digit: 7}) }} {{ 'shares'|trans }}</small>
                 </td>
                 <td>
