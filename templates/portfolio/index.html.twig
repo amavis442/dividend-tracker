@@ -37,15 +37,15 @@
                 <th>{{ 'Avg. price'|trans }}</th>
                 <th>{{ 'Market Price'|trans }}</th>
                 <th>{{ 'Allocation'|trans }} / <br/>{{ 'Received dividend'|trans }}</th>
-                <th>{{ 'Div dates'|trans }}</th>
+                <th>{{ 'Ex-Div'|trans }} <br/> {{ 'Payout'|trans }} </th>
                 <th>{{ 'Forward dividend'|trans }}</th>
             </tr>
         </thead>
         <tbody>
         {% for portfolioItem in portfolioItems %}
-            <tr {{ portfolioItem.isDividendMonth ? 'class="table-success"' : ''}}>
+            <tr>
                 <td>
-                    <a href="{{ path('portfolio_show', {'id': portfolioItem.positionId}) }}" class="btn btn-primary btn-sm" ><i class="fas fa-info-circle"></i></a>
+                    <a href="{{ path('portfolio_show', {'id': portfolioItem.positionId}) }}" class="btn btn-primary btn-sm " ><i class="fas fa-info-circle"></i></a>
                 </td>
                 <td>
                      <span data-toggle="tooltip" data-placement="top" title="{{ portfolioItem.fullname }} ({{ portfolioItem.symbol }})">{{ portfolioItem.fullname|slice(0, 30) }}{% if portfolioItem.fullname|length > 30 %}...{% endif %}</span>
@@ -78,14 +78,14 @@
                     <br>
                     <span class="badge badge-secondary"> &euro;{{ portfolioItem.dividend|format_number({fraction_digit: 2}) }}</span>
                 </td>
-                <td><small>
+                <td>
                     {% if portfolioItem.divDate %} 
-                        <span class="badge badge-primary">{{ portfolioItem.exDividendDate|date('d/m/Y') }}</span><br/>
-                        <span class="badge badge-warning">{{ portfolioItem.paymentDate|date('d/m/Y') }}</span>
+                        <span class="badge badge-primary">{{ portfolioItem.exDividendDate|format_date('long') }}</span>
+                        <br/>
+                        <span class="badge badge-{{ portfolioItem.isDividendMonth ? 'success' : 'warning'}}">{{ portfolioItem.paymentDate|format_date('long') }}</span>
                     {% else %}
                         &mdash;    
                     {% endif %}
-                    </small>
                 </td>
                 <td>{% if portfolioItem.divDate %}
                         <div class="badge badge-primary">{{ portfolioItem.cashCurrency.sign|raw }} {{ portfolioItem.cashAmount|format_number({fraction_digit: 3}) }}</div><br/>
