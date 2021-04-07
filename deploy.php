@@ -15,7 +15,7 @@ set('repository', 'git@gitlab.com:amavis442/dividend.git');
 set('git_tty', true);
 set('keep_releases',2);
 set('yarn','yarn');
-set('writable_mode','chmod');
+set('writable_mode','acl');
 
 // Shared files/dirs between deploys
 add('shared_files', ['.env.local','public/uploads']);
