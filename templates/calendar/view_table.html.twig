@@ -25,7 +25,6 @@
         <th>{{ 'Pay date'|trans }}</th>
         <th>{{ 'Company'|trans }}</th>
         <th>{{ 'Dividend'|trans }}</th>
-        <th>{{ 'Amount'|trans }}</th>
         <th>{{ 'Net dividend'|trans }}</th>
     </tr>
     {% for month,items in calendars %}
@@ -46,10 +45,10 @@
                         <td><button type="button" class="btn btn-outline-primary"><i class="far fa-circle"></i></button></td>
                         <th>{{ currentDate|date('l')|trans }}, {{ currentDate|date('d') }} {{ currentDate|date('F')|trans|lower }} {{ currentDate|date('Y') }}</th>
                         <td>
-                            {{ cal.ticker.fullname }}
+                            {{ cal.ticker.fullname }}<br/>
+                            <small>{{ estimatedAmount|format_number({fraction_digit: 7}) }} {{ 'shares'|trans }}</small>
                         </td> 
                         <td>{{ cal.currency.sign|raw}}{{ cal.cashAmount|format_number({fraction_digit: 2}) }}</td>
-                        <td>{{ estimatedAmount|format_number({fraction_digit: 3}) }}</td>
                         <td>&euro;{{ netDividend|format_number({fraction_digit: 2}) }}</td>
                     </tr>
                     {% set sumDividend = sumDividend + netDividend %}
@@ -57,7 +56,7 @@
             {% endfor %}
         {% endfor %}
         <tr>
-            <td colspan="4"></td>
+            <td colspan="3"></td>
             <th>{{ 'Total'|trans }}</th>
             <th>&euro;{{ sumDividend|format_number({fraction_digit: 2}) }}</th>
         </tr>
