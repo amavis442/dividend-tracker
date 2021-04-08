@@ -67,6 +67,7 @@ class PortfolioModel
         DividendService $dividendService,
         PaymentRepository $paymentRepository,
         YahooFinanceService $yahooFinanceService,
+        string $cacheTag = 'all',
         float $totalInvested,
         int $page = 1,
         string $orderBy = 'ticker',
@@ -104,7 +105,7 @@ class PortfolioModel
             $symbol = $ticker->getSymbol();
             $symbols[] = $symbol;
         }
-        $marketData = $yahooFinanceService->getQuotes($symbols, 'all');        
+        $marketData = $yahooFinanceService->getQuotes($symbols, $cacheTag);        
         $this->timestamp = $marketData['timestamp'];
 
         foreach ($iter as $position) {

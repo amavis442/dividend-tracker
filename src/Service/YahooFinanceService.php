@@ -41,26 +41,28 @@ class YahooFinanceService
      */
     private $data;
 
-    public function __construct(HttpClientInterface $client, CacheInterface $yahooCache, ExchangeRateService $exchangeRateService)
-    {
+    public function __construct(
+        HttpClientInterface $client,
+        CacheInterface $yahooCache,
+        ExchangeRateService $exchangeRateService
+    ) {
         $this->yahooCache = $yahooCache;
         $this->client = $client;
         $this->exchangeRateService = $exchangeRateService;
     }
-
 
     public function getQuotes(array $symbols, string $tag)
     {
         $client = $this->client;
         $apiCallUrl = self::YAHOO_QUOTE;
 
-        $tagName = 'yahoo_quotes_'.$tag;
+        $tagName = 'yahoo_quotes_' . $tag;
         $data = $this->yahooCache->get($tagName, function (ItemInterface $item) use ($client, $apiCallUrl, $symbols) {
             $item->expiresAfter(300);
             $response = $client->request(
                 'GET',
-                $apiCallUrl . implode(',', array_map(function($symbol) { 
-                        return strtoupper($symbol);
+                $apiCallUrl . implode(',', array_map(function ($symbol) {
+                    return strtoupper($symbol);
                 }, array_values($symbols)))
             );
 
@@ -71,16 +73,15 @@ class YahooFinanceService
                     if (isset($content['quoteResponse']) && $content['quoteResponse']['error'] == null) {
                         $symbolData = $content['quoteResponse']['result'];
                         foreach ($symbolData as $data) {
-                            $result[$data['symbol']] =  $data;
+                            $result[$data['symbol']] = $data;
                         }
-                    } 
+                    }
                 }
             }
             $result['timestamp'] = time();
 
             return $result;
         });
-        
 
         //$this->yahooCache->delete($tagName);
         $this->data = $data;
@@ -110,10 +111,9 @@ class YahooFinanceService
         } else {
             return null;
         }
-        
+
         return $marketPrice / ($rates[$currency]);
     }
-
 
     /**
      * Get the exchangerates from an external source and only refresh 1 per hour
@@ -125,7 +125,7 @@ class YahooFinanceService
         $client = $this->client;
         $apiCallUrl = self::YAHOO_API;
 
-        $data = $this->yahooCache->get('yahoo_'.strtolower($symbol), function (ItemInterface $item) use ($client, $apiCallUrl, $symbol) {
+        $data = $this->yahooCache->get('yahoo_' . strtolower($symbol), function (ItemInterface $item) use ($client, $apiCallUrl, $symbol) {
             $item->expiresAfter(3600);
             $response = $client->request(
                 'GET',
@@ -142,15 +142,15 @@ class YahooFinanceService
                         $symbolData = $content['chart']['result'][0]['meta'];
                         $marketPrice = $symbolData['regularMarketPrice'];
                         $currency = $symbolData['currency'];
-                    } 
+                    }
                 }
             }
 
             return ['currency' => $currency, 'price' => $marketPrice];
         });
-        
+
         //$this->yahooCache->delete('yahoo_'.strtolower($symbol));
-        
+
         return $data;
     }
 
@@ -158,9 +158,9 @@ class YahooFinanceService
     {
         $rates = $this->exchangeRateService->getRates();
         $data = $this->getData($symbol);
-        $price = $data['price'];  
-        $currency = $data['currency'];  
-        
+        $price = $data['price'];
+        $currency = $data['currency'];
+
         return $price / ($rates[$currency]);
     }
 }

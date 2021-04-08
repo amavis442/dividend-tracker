@@ -59,6 +59,7 @@ class PortfolioController extends AbstractController
         $thisPage = $page;
         [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
         $referer->set('portfolio_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
+        $user = $this->getUser();
 
         $pageData = $model->getPage(
             $positionRepository,
@@ -66,6 +67,7 @@ class PortfolioController extends AbstractController
             $dividendService,
             $paymentRepository,
             $yahooFinanceService,
+            $user->getId(),
             $allocated,
             $page,
             $orderBy,
