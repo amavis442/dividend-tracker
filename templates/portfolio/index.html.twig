@@ -82,7 +82,10 @@
                     {% if portfolioItem.divDate %} 
                         <span class="badge badge-primary">{{ portfolioItem.exDividendDate|format_date('long') }}</span>
                         <br/>
-                        <span class="badge badge-{{ portfolioItem.isDividendMonth ? 'success' : 'warning'}}">{{ portfolioItem.paymentDate|format_date('long') }}</span>
+                        <span class="badge badge-warning">{{ portfolioItem.paymentDate|format_date('long') }}</span>
+                        {% if portfolioItem.isDividendMonth %}
+                            <i class="far fa-calendar-alt" data-toggle="tooltip" data-placement="right" title="{{ 'Dividend payout month'|trans }}"></i>
+                        {% endif %}
                     {% else %}
                         &mdash;    
                     {% endif %}
