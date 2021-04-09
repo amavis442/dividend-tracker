@@ -34,6 +34,7 @@ class PortfolioController extends AbstractController
      * @Route("/list/{page<\d+>?1}/{orderBy?ticker}/{sort?asc}", name="portfolio_index", methods={"GET"})
      */
     public function index(
+        Request $request,
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
         TickerRepository $tickerRepository,
@@ -76,6 +77,8 @@ class PortfolioController extends AbstractController
             $pieSelected,
         );
         
+        $session->set(get_class($this), $request->getRequestUri());
+
         return $this->render('portfolio/index.html.twig', [
             'portfolioItems'  => $pageData->getPortfolioItems(),
             'cacheTimestamp' => (new DateTime())->setTimestamp($pageData->getCacheTimestamp()),
@@ -103,6 +106,7 @@ class PortfolioController extends AbstractController
      * @Route("/{id}", name="portfolio_show", methods={"GET"})
      */
     public function show(
+        SessionInterface $session,
         Position $position,
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
@@ -148,6 +152,9 @@ class PortfolioController extends AbstractController
         $calendars = $ticker->getCalendars();
 
         $referer->set('portfolio_show', ['id' => $position->getId()]);
+        
+        $indexUrl = $session->get(get_class($this));
+
 
         return $this->render('portfolio/show.html.twig', [
             'ticker' => $ticker,
@@ -164,6 +171,7 @@ class PortfolioController extends AbstractController
             'amountPerDate' => $amountPerDate,
             'expectedPayout' => $netCashAmount * $amountPerDate,
             'calendarRecentDividendDate' => $calendarRecentDividendDate ?? new Calendar(),
+            'indexUrl' => $indexUrl,
         ]);
     }
 
