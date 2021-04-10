@@ -59,11 +59,17 @@ class User implements UserInterface
      */
     private $journals;
 
+    /**
+     * @ORM\OneToMany(targetEntity=DividendTracker::class, mappedBy="user", orphanRemoval=true)
+     */
+    private $dividendTrackers;
+
     public function __construct()
     {
         $this->payments = new ArrayCollection();
         $this->positions = new ArrayCollection();
         $this->journals = new ArrayCollection();
+        $this->dividendTrackers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -241,6 +247,36 @@ class User implements UserInterface
     public function setApiToken($apiToken)
     {
         $this->apiToken = $apiToken;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|DividendTracker[]
+     */
+    public function getDividendTrackers(): Collection
+    {
+        return $this->dividendTrackers;
+    }
+
+    public function addDividendTracker(DividendTracker $dividendTracker): self
+    {
+        if (!$this->dividendTrackers->contains($dividendTracker)) {
+            $this->dividendTrackers[] = $dividendTracker;
+            $dividendTracker->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDividendTracker(DividendTracker $dividendTracker): self
+    {
+        if ($this->dividendTrackers->removeElement($dividendTracker)) {
+            // set the owning side to null (unless already changed)
+            if ($dividendTracker->getUser() === $this) {
+                $dividendTracker->setUser(null);
+            }
+        }
 
         return $this;
     }
