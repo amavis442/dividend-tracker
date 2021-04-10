@@ -1,0 +1,86 @@
+<?php
+
+namespace App\Command;
+
+use App\Entity\DividendTracker;
+use App\Repository\PositionRepository;
+use App\Repository\UserRepository;
+use App\Service\DividendService;
+use App\Service\Yields;
+use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Security;
+
+class DividendTrackerCommand extends Command
+{
+    protected static $defaultName = 'app:dividend-tracker';
+    protected static $defaultDescription = 'Tracks the growth or demise of the expected dividend';
+    protected $userRepository;
+    protected $dividendService;
+    protected $positionRepository;
+    protected $entityManager;
+    protected $yields;
+
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        UserRepository $userRepository,
+        PositionRepository $positionRepository,
+        DividendService $dividendService,
+        Yields $yields
+    ) {
+
+        parent::__construct();
+        $this->userRepository = $userRepository;
+        $this->dividendService = $dividendService;
+        $this->positionRepository = $positionRepository;
+        $this->entityManager = $entityManager;
+        $this->yields = $yields;
+    }
+
+    protected function configure()
+    {
+        $this
+            ->setDescription(self::$defaultDescription);
+
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $io = new SymfonyStyle($input, $output);
+
+        $users = $this->userRepository->findAll();
+        $filter = $this->entityManager->getFilters()->enable('user_filter');
+        
+        foreach ($users as $user) {
+            $totalDividend = 0.0;
+            $principle = 0.0;
+            $currentDividend = 0.0;
+            $filter->setParameter('userID', $user->getId());
+
+            $positions = $this->positionRepository->getAllOpen();
+            foreach ($positions as $position) {
+                $currentDividend = $this->dividendService->getForwardNetDividend($position);
+                $totalDividend += $currentDividend * $position->getTicker()->getPayoutFrequency();
+                $principle += $position->getAllocation();
+            }
+
+            $dividendTracker = new DividendTracker();
+            $dividendTracker
+                ->setUser($user)
+                ->setPrinciple($principle)
+                ->setDividend($totalDividend)
+                ->setSampleDate(new DateTime())
+                ->setCreatedAt(new DateTime());
+        
+            $this->entityManager->persist($dividendTracker);
+            $this->entityManager->flush();
+        }
+
+        return Command::SUCCESS;
+    }
+}

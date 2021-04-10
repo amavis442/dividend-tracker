@@ -21,7 +21,10 @@ class AddUser
         $user = $this->security->getUser();
         
         $entity = $args->getObject();
-        if (method_exists(get_class($entity),'setUser')){
+        if (method_exists(get_class($entity),'setUser')) {
+            if (method_exists(get_class($entity),'getUser') && $entity->getUser() !== null) {
+                return;
+            }
             $entity->setUser($user);
         };
     }

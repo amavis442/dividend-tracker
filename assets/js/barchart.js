@@ -5,14 +5,14 @@ const barChart = function (canvasName, cdata, clabels, ctitle, csubTitle, csign)
 	var config = {
 		type: 'bar',
 		data: {
+			labels: clabels,
 			datasets: [
 			{
 				data: cdata,
 				backgroundColor: chartColors,
 				label: ctitle
 			}
-			],
-				labels: clabels
+			]
 		},
 		options: {
 			responsive: true,
