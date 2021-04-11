@@ -16,7 +16,6 @@
 */
 
 const chartColors = [
-	"#4D4D4D",
 	"#5DA5DA",
 	"#FAA43A",
 	"#60BD68",
