@@ -1,0 +1,22 @@
+import $ from 'jquery';
+import 'popper.js';
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+import CodeMirror from 'codemirror/lib/codemirror';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/mode/xml/xml';
+import 'codemirror/theme/monokai.css'
+
+import 'summernote/dist/summernote-bs4';
+import 'summernote/dist/summernote-bs4.css';
+
+jQuery(function(){
+    $(".summernote").summernote({
+        height: 450,   //set editable area's height
+        codemirror: { // codemirror options
+            CodeMirrorConstructor: CodeMirror,
+            theme: 'monokai'
+        }
+    });
+});    

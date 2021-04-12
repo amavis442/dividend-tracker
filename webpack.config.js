@@ -58,7 +58,8 @@ Encore
     .autoProvideVariables({
              $: 'jquery',
              jQuery: 'jquery',
-             'window.jQuery': 'jquery'
+             'window.jQuery': 'jquery',
+             CodeMirror: 'codemirror',
     })
 
     // uncomment to get integrity="..." attributes on your script & link tags
@@ -82,6 +83,8 @@ Encore
     .addEntry('barchart', './assets/js/barchart.js')
     .addEntry('barchart_with_labels', './assets/js/barchart_with_labels.js')
     .addEntry('linechart', './assets/js/linechart.js')
+    .addEntry('summernote', './assets/js/summernote.js')
+    
 
 ;
 

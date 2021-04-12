@@ -11,3 +11,9 @@
     <hr/>
     {{ include('journal/_delete_form.html.twig') }}
 {% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+{{ encore_entry_script_tags('fileupload') }}
+{{ encore_entry_script_tags('summernote') }}
+{% endblock %}
