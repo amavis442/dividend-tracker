@@ -145,6 +145,7 @@ class PortfolioModel
                 ->setPies($position->getPies())
                 ->setIsDividendMonth($position->isDividendPayMonth())
                 ->setDiffPrice($diffPrice)
+                ->setDividendPayoutFrequency($ticker->getPayoutFrequency());
             ;
 
             // Dividend part

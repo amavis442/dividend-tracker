@@ -168,6 +168,13 @@ class PortfolioItem
     private $diffPrice;
     
     /**
+     * How times per year will there be a dividend payout
+     *
+     * @var int
+     */
+    private $dividendPayoutFrequency;
+
+    /**
      * Get undocumented variable
      *
      * @return  \App\Entity\Position
@@ -716,6 +723,30 @@ class PortfolioItem
     public function setDiffPrice(float $diffPrice)
     {
         $this->diffPrice = $diffPrice;
+
+        return $this;
+    }
+
+    /**
+     * Get how times per year will there be a dividend payout
+     *
+     * @return  int
+     */ 
+    public function getDividendPayoutFrequency()
+    {
+        return $this->dividendPayoutFrequency;
+    }
+
+    /**
+     * Set how times per year will there be a dividend payout
+     *
+     * @param  int  $dividendPayoutFrequency  How times per year will there be a dividend payout
+     *
+     * @return  self
+     */ 
+    public function setDividendPayoutFrequency(int $dividendPayoutFrequency)
+    {
+        $this->dividendPayoutFrequency = $dividendPayoutFrequency;
 
         return $this;
     }

@@ -39,6 +39,7 @@
                 <th>{{ 'Allocation'|trans }} / <br/>{{ 'Received dividend'|trans }}</th>
                 <th>{{ 'Ex-Div'|trans }} <br/> {{ 'Payout'|trans }} </th>
                 <th>{{ 'Forward dividend'|trans }}</th>
+                <th>Freq</th>
             </tr>
         </thead>
         <tbody>
@@ -48,9 +49,14 @@
                     <a href="{{ path('portfolio_show', {'id': portfolioItem.positionId}) }}" class="btn btn-primary btn-sm " ><i class="fas fa-info-circle"></i></a>
                 </td>
                 <td>
-                     <span data-toggle="tooltip" data-placement="top" title="{{ portfolioItem.fullname }} ({{ portfolioItem.symbol }})">{{ portfolioItem.fullname|slice(0, 30) }}{% if portfolioItem.fullname|length > 30 %}...{% endif %}</span>
-                     <br/>
-                     <small>{{ portfolioItem.amount|format_number({fraction_digit: 7}) }} {{ 'shares'|trans }}</small>
+                    {% if portfolioItem.fullname|length > 30 %}   
+                    <span data-toggle="tooltip" data-placement="top" title="{{ portfolioItem.fullname }} ({{ portfolioItem.symbol }})">
+                    {% else %}
+                    <span>
+                    {% endif %}
+                    {{ portfolioItem.fullname|slice(0, 30) }}{% if portfolioItem.fullname|length > 30 %}...{% endif %}</span>
+                    <br/>
+                    <small>{{ portfolioItem.amount|format_number({fraction_digit: 7}) }} {{ 'shares'|trans }}</small>
                 </td>
                 <td>
                     &euro;{{ portfolioItem.price|format_number({fraction_digit: 2}) }}
@@ -98,6 +104,9 @@
                     {% else %}
                         &mdash;
                     {% endif %}
+                </td>
+                <td>
+                    {{ portfolioItem.dividendPayoutFrequency }} x
                 </td>
             </tr>
         {% else %}
