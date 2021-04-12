@@ -9,6 +9,7 @@ use App\Repository\TickerRepository;
 use App\Service\DividendService;
 use App\Service\YahooFinanceService;
 use RuntimeException;
+use DateTime;
 
 class PortfolioModel
 {
@@ -75,6 +76,7 @@ class PortfolioModel
         string $searchCriteria = '',
         ?string $pieSelected = null
     ): self {
+        $currentDate = new DateTime();
 
         $order = 't.ticker';
         if (in_array($orderBy, ['industry'])) {
@@ -163,6 +165,15 @@ class PortfolioModel
                     ->setForwardNetDividend($forwardNetDividend)
                     ->setForwardNetDividendYield($forwardNetDividendYield);
 
+
+                foreach ($position->getTicker()->getCalendars() as $currentCalendar) {
+                    if ($currentCalendar->getPaymentDate() >= $currentDate) {
+                        $portfolioItem->addDividendCalendar($currentCalendar);
+                    }
+                    if ($currentCalendar->getPaymentDate() < $currentDate) {
+                        break;
+                    }
+                }
             }
             $this->portfolioItems[] = $portfolioItem;
 

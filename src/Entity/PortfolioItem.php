@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Entity;
-use DateTime;
+
 use App\Entity\Currency;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -90,7 +91,7 @@ class PortfolioItem
      * @var float
      */
     private $forwardNetDividendYield;
-    
+
     /**
      * Undocumented variable
      *
@@ -166,7 +167,7 @@ class PortfolioItem
      * @var float
      */
     private $diffPrice;
-    
+
     /**
      * How times per year will there be a dividend payout
      *
@@ -175,10 +176,23 @@ class PortfolioItem
     private $dividendPayoutFrequency;
 
     /**
+     * Collection of dividend calenders of future payments
+     *
+     * @var Collection
+     */
+    private $dividendCalendars;
+
+    public function __construct()
+    {
+        $this->dividendCalendars = new ArrayCollection();
+
+    }
+
+    /**
      * Get undocumented variable
      *
      * @return  \App\Entity\Position
-     */ 
+     */
     public function getPosition()
     {
         return $this->position;
@@ -190,7 +204,7 @@ class PortfolioItem
      * @param  \App\Entity\Position  $position  Undocumented variable
      *
      * @return  self
-     */ 
+     */
     public function setPosition(\App\Entity\Position $position)
     {
         $this->position = $position;
@@ -202,7 +216,7 @@ class PortfolioItem
      * Get undocumented variable
      *
      * @return  float
-     */ 
+     */
     public function getPrice()
     {
         return $this->price;
@@ -214,7 +228,7 @@ class PortfolioItem
      * @param  float  $price  Undocumented variable
      *
      * @return  self
-     */ 
+     */
     public function setPrice(float $price)
     {
         $this->price = $price;
@@ -226,7 +240,7 @@ class PortfolioItem
      * Get undocumented variable
      *
      * @return  float
-     */ 
+     */
     public function getPaperProfit()
     {
         return $this->paperProfit;
@@ -238,7 +252,7 @@ class PortfolioItem
      * @param  float  $paperProfit  Undocumented variable
      *
      * @return  self
-     */ 
+     */
     public function setPaperProfit(float $paperProfit)
     {
         $this->paperProfit = $paperProfit;
@@ -250,7 +264,7 @@ class PortfolioItem
      * Get undocumented variable
      *
      * @return  float
-     */ 
+     */
     public function getPaperProfitPercentage()
     {
         return $this->paperProfitPercentage;
@@ -262,7 +276,7 @@ class PortfolioItem
      * @param  float  $paperProfitPercentage  Undocumented variable
      *
      * @return  self
-     */ 
+     */
     public function setPaperProfitPercentage(float $paperProfitPercentage)
     {
         $this->paperProfitPercentage = $paperProfitPercentage;
@@ -274,7 +288,7 @@ class PortfolioItem
      * Get undocumented variable
      *
      * @return  DateTime
-     */ 
+     */
     public function getExDividendDate()
     {
         return $this->exDividendDate;
@@ -286,7 +300,7 @@ class PortfolioItem
      * @param  DateTime  $exDividendDate  Undocumented variable
      *
      * @return  self
-     */ 
+     */
     public function setExDividendDate(DateTime $exDividendDate)
     {
         $this->exDividendDate = $exDividendDate;
@@ -298,7 +312,7 @@ class PortfolioItem
      * Get undocumented variable
      *
      * @return  DateTime
-     */ 
+     */
     public function getPaymentDate()
     {
         return $this->paymentDate;
@@ -310,7 +324,7 @@ class PortfolioItem
      * @param  DateTime  $paymentDate  Undocumented variable
      *
      * @return  self
-     */ 
+     */
     public function setPaymentDate(DateTime $paymentDate)
     {
         $this->paymentDate = $paymentDate;
@@ -322,7 +336,7 @@ class PortfolioItem
      * Get undocumented variable
      *
      * @return  float
-     */ 
+     */
     public function getCashAmount()
     {
         return $this->cashAmount;
@@ -334,7 +348,7 @@ class PortfolioItem
      * @param  float  $cashAmount  Undocumented variable
      *
      * @return  self
-     */ 
+     */
     public function setCashAmount(float $cashAmount)
     {
         $this->cashAmount = $cashAmount;
@@ -346,7 +360,7 @@ class PortfolioItem
      * Get undocumented variable
      *
      * @return  float
-     */ 
+     */
     public function getForwardNetDividend()
     {
         return $this->forwardNetDividend;
@@ -358,7 +372,7 @@ class PortfolioItem
      * @param  float  $forwardNetDividend  Undocumented variable
      *
      * @return  self
-     */ 
+     */
     public function setForwardNetDividend(float $forwardNetDividend)
     {
         $this->forwardNetDividend = $forwardNetDividend;
@@ -370,7 +384,7 @@ class PortfolioItem
      * Get undocumented variable
      *
      * @return  float
-     */ 
+     */
     public function getForwardNetDividendYield()
     {
         return $this->forwardNetDividendYield;
@@ -382,7 +396,7 @@ class PortfolioItem
      * @param  float  $forwardNetDividendYield  Undocumented variable
      *
      * @return  self
-     */ 
+     */
     public function setForwardNetDividendYield(float $forwardNetDividendYield)
     {
         $this->forwardNetDividendYield = $forwardNetDividendYield;
@@ -394,7 +408,7 @@ class PortfolioItem
      * Get undocumented variable
      *
      * @return  Currency
-     */ 
+     */
     public function getCashCurrency()
     {
         return $this->cashCurrency;
@@ -406,7 +420,7 @@ class PortfolioItem
      * @param  Currency  $cashCurrency  Undocumented variable
      *
      * @return  self
-     */ 
+     */
     public function setCashCurrency(Currency $cashCurrency)
     {
         $this->cashCurrency = $cashCurrency;
@@ -418,7 +432,7 @@ class PortfolioItem
      * Get undocumented variable
      *
      * @return  float
-     */ 
+     */
     public function getPercentageAllocation()
     {
         return $this->percentageAllocation;
@@ -430,7 +444,7 @@ class PortfolioItem
      * @param  float  $percentageAllocation  Undocumented variable
      *
      * @return  self
-     */ 
+     */
     public function setPercentageAllocation(float $percentageAllocation)
     {
         $this->percentageAllocation = $percentageAllocation;
@@ -442,7 +456,7 @@ class PortfolioItem
      * Get undocumented variable
      *
      * @return  string
-     */ 
+     */
     public function getSymbol()
     {
         return $this->symbol;
@@ -454,7 +468,7 @@ class PortfolioItem
      * @param  string  $symbol  Undocumented variable
      *
      * @return  self
-     */ 
+     */
     public function setSymbol(string $symbol)
     {
         $this->symbol = $symbol;
@@ -466,7 +480,7 @@ class PortfolioItem
      * Get undocumented variable
      *
      * @return  string
-     */ 
+     */
     public function getFullname()
     {
         return $this->fullname;
@@ -478,7 +492,7 @@ class PortfolioItem
      * @param  string  $fullname  Undocumented variable
      *
      * @return  self
-     */ 
+     */
     public function setFullname(string $fullname)
     {
         $this->fullname = $fullname;
@@ -490,7 +504,7 @@ class PortfolioItem
      * Get market price
      *
      * @return  float
-     */ 
+     */
     public function getMarketPrice(): ?float
     {
         return $this->marketPrice;
@@ -502,7 +516,7 @@ class PortfolioItem
      * @param  float  $marketPrice  Market price
      *
      * @return  self
-     */ 
+     */
     public function setMarketPrice(?float $marketPrice)
     {
         $this->marketPrice = $marketPrice;
@@ -514,7 +528,7 @@ class PortfolioItem
      * Get pies
      *
      * @return  Collection
-     */ 
+     */
     public function getPies()
     {
         return $this->pies;
@@ -526,7 +540,7 @@ class PortfolioItem
      * @param  Collection  $pies  Pies
      *
      * @return  self
-     */ 
+     */
     public function setPies(Collection $pies)
     {
         $this->pies = $pies;
@@ -538,7 +552,7 @@ class PortfolioItem
      * Get has a calendar entry
      *
      * @return  boolean
-     */ 
+     */
     public function hasDivDate(): bool
     {
         return $this->divDate;
@@ -550,7 +564,7 @@ class PortfolioItem
      * @param  boolean  $divDate  Has a calendar entry
      *
      * @return  self
-     */ 
+     */
     public function setDivDate(bool $divDate)
     {
         $this->divDate = $divDate;
@@ -558,12 +572,11 @@ class PortfolioItem
         return $this;
     }
 
-
     /**
      * Get position allocation
      *
      * @return  float
-     */ 
+     */
     public function getAllocation()
     {
         return $this->allocation;
@@ -575,7 +588,7 @@ class PortfolioItem
      * @param  float  $allocation  Position allocation
      *
      * @return  self
-     */ 
+     */
     public function setAllocation(float $allocation)
     {
         $this->allocation = $allocation;
@@ -587,7 +600,7 @@ class PortfolioItem
      * Get how many shares
      *
      * @return  float
-     */ 
+     */
     public function getAmount()
     {
         return $this->amount;
@@ -599,7 +612,7 @@ class PortfolioItem
      * @param  float  $amount  How many shares
      *
      * @return  self
-     */ 
+     */
     public function setAmount(float $amount)
     {
         $this->amount = $amount;
@@ -611,7 +624,7 @@ class PortfolioItem
      * Get total received dividends
      *
      * @return  float
-     */ 
+     */
     public function getDividend()
     {
         return $this->dividend;
@@ -623,7 +636,7 @@ class PortfolioItem
      * @param  float  $dividend  Total received dividends
      *
      * @return  self
-     */ 
+     */
     public function setDividend(float $dividend)
     {
         $this->dividend = $dividend;
@@ -635,7 +648,7 @@ class PortfolioItem
      * Get ticker id
      *
      * @return  int
-     */ 
+     */
     public function getTickerId()
     {
         return $this->tickerId;
@@ -647,7 +660,7 @@ class PortfolioItem
      * @param  int  $tickerId  Ticker id
      *
      * @return  self
-     */ 
+     */
     public function setTickerId(int $tickerId)
     {
         $this->tickerId = $tickerId;
@@ -659,8 +672,8 @@ class PortfolioItem
      * Get current dividend month?
      *
      * @return  boolean
-     */ 
-    public function isDividendMonth() : bool
+     */
+    public function isDividendMonth(): bool
     {
         return $this->isDividendMonth;
     }
@@ -671,7 +684,7 @@ class PortfolioItem
      * @param  boolean  $isDividendMonth  Current dividend month?
      *
      * @return  self
-     */ 
+     */
     public function setIsDividendMonth(bool $isDividendMonth)
     {
         $this->isDividendMonth = $isDividendMonth;
@@ -683,7 +696,7 @@ class PortfolioItem
      * Get position id
      *
      * @return  int
-     */ 
+     */
     public function getPositionId()
     {
         return $this->positionId;
@@ -695,7 +708,7 @@ class PortfolioItem
      * @param  int  $positionId  Position id
      *
      * @return  self
-     */ 
+     */
     public function setPositionId(int $positionId)
     {
         $this->positionId = $positionId;
@@ -707,7 +720,7 @@ class PortfolioItem
      * Get diffrence between avg price and market price
      *
      * @return  float
-     */ 
+     */
     public function getDiffPrice()
     {
         return $this->diffPrice;
@@ -719,7 +732,7 @@ class PortfolioItem
      * @param  float  $diffPrice  Diffrence between avg price and market price
      *
      * @return  self
-     */ 
+     */
     public function setDiffPrice(float $diffPrice)
     {
         $this->diffPrice = $diffPrice;
@@ -731,7 +744,7 @@ class PortfolioItem
      * Get how times per year will there be a dividend payout
      *
      * @return  int
-     */ 
+     */
     public function getDividendPayoutFrequency()
     {
         return $this->dividendPayoutFrequency;
@@ -743,10 +756,36 @@ class PortfolioItem
      * @param  int  $dividendPayoutFrequency  How times per year will there be a dividend payout
      *
      * @return  self
-     */ 
+     */
     public function setDividendPayoutFrequency(int $dividendPayoutFrequency)
     {
         $this->dividendPayoutFrequency = $dividendPayoutFrequency;
+
+        return $this;
+    }
+
+    /**
+     * Get collection of dividend calenders of future payments
+     *
+     * @return  Collection
+     */
+    public function getDividendCalendars(): Collection
+    {
+        return $this->dividendCalendars;
+    }
+
+    /**
+     * Add future calendar to collection
+     *
+     * @param  Calendar  $dividendCalendar
+     * 
+     * @return  self
+     */
+    public function addDividendCalendar(Calendar $dividendCalendar): self
+    {
+        if (!$this->dividendCalendars->contains($dividendCalendar)) {
+            $this->dividendCalendars->add($dividendCalendar);
+        }
 
         return $this;
     }

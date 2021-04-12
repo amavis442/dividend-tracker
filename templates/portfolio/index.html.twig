@@ -39,7 +39,7 @@
                 <th>{{ 'Allocation'|trans }} / <br/>{{ 'Received dividend'|trans }}</th>
                 <th>{{ 'Ex-Div'|trans }} <br/> {{ 'Payout'|trans }} </th>
                 <th>{{ 'Forward dividend'|trans }}</th>
-                <th>Freq</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -106,12 +106,21 @@
                     {% endif %}
                 </td>
                 <td>
-                    {{ portfolioItem.dividendPayoutFrequency }} x
+                    {% set dividendInfo = '<div class="alert alert-primary" role="alert">' ~ portfolioItem.dividendPayoutFrequency ~ 'x per year'|trans ~ '</div>' %}
+                    {% set divDates = '' %}
+                    {% for calendar in portfolioItem.dividendCalendars %}
+                        {% set divDates = divDates ~ '<li class="list-group-item">' ~ calendar.exDividendDate|format_date('medium') ~ ' / <i class="fas fa-money-check-alt"></i> ' ~  calendar.paymentDate|format_date('medium') ~ '</li>' %}
+                    {% endfor %}
+                    {% if divDates %}
+                         {% set dividendInfo = dividendInfo ~ '<ul class="list-group">' ~ divDates ~ '</ul>' %}
+                    {% endif %}
+                    <button class="btn btn-info btn-sm" data-toggle="popover" title="Dividend info" 
+                    data-content="{{ dividendInfo }}" data-html="true"><i class="fas fa-info-circle"></i></button>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="8">no records found</td>
+                <td colspan="9">no records found</td>
             </tr>
         {% endfor %}
         </tbody>
