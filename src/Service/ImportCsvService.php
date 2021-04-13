@@ -306,8 +306,8 @@ class ImportCsvService extends ImportBase
                         ->setJobid($row['opdrachtid'])
                         ->setMeta($row['nr'])
                         ->setImportfile($file)
-                        ->setStampduty($row['stampduty'])
-                        ->setFxFee($row['fx_fee'])
+                        ->setStampduty($row['stampduty'] ?? 0)
+                        ->setFxFee($row['fx_fee'] ?? 0)
                         ->setOriginalPrice($row['original_price'])
                         ->setOriginalPriceCurrency($row['original_price_currency'])
                     ;
