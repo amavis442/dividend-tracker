@@ -31,7 +31,7 @@ class PortfolioController extends AbstractController
     public const PIE_KEY = 'portfolio_searchPie';
 
     /**
-     * @Route("/list/{page<\d+>?1}/{orderBy?ticker}/{sort?asc}", name="portfolio_index", methods={"GET"})
+     * @Route("/list/{page<\d+>?1}/{orderBy?fullname}/{sort?asc}", name="portfolio_index", methods={"GET"})
      */
     public function index(
         Request $request,
@@ -42,7 +42,7 @@ class PortfolioController extends AbstractController
         SessionInterface $session,
         Summary $summary,
         int $page = 1,
-        string $orderBy = 'ticker',
+        string $orderBy = 'fullname',
         string $sort = 'asc',
         DividendService $dividendService,
         Referer $referer,
