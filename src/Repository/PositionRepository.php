@@ -174,11 +174,12 @@ class PositionRepository extends ServiceEntityRepository
     public function getAllOpenForProjection(int $pieId = null, int $year = null): array
     {
         $qb = $this->createQueryBuilder('p')
-            ->select('p, t, pa, c, dm, tr')
+            ->select('p, t, pa, pac, c, dm, tr')
             ->innerJoin('p.ticker', 't')
             ->leftJoin('t.calendars', 'c')
             ->leftJoin('p.transactions', 'tr')
             ->leftJoin('t.payments', 'pa')
+            ->leftJoin('pa.calendar', 'pac')
             ->leftJoin('t.dividendMonths', 'dm')
             ->where('(p.closed = 0 OR p.closed IS NULL)');
 
@@ -196,6 +197,31 @@ class PositionRepository extends ServiceEntityRepository
         return $qb->getQuery()
             ->getResult();
     }
+
+    public function getAllOpenPaymentsForProjection(int $pieId = null, int $year = null): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select('p, t, pa, pac')
+            ->innerJoin('p.ticker', 't')
+            ->leftJoin('t.payments', 'pa')
+            ->leftJoin('pa.calendar' ,'pac')
+            ->where('(p.closed = 0 OR p.closed IS NULL)');
+
+        if ($pieId) {
+            $qb->join("p.pies", 'pie')
+                ->andWhere('pie IN (:pieIds)')
+                ->setParameter('pieIds', [$pieId]);
+        }
+
+        if ($year) {
+            $qb->andWhere('YEAR(pac.paymentDate) = :year')
+                ->setParameter('year', $year);
+        }
+
+        return $qb->getQuery()
+            ->getResult();
+    }
+
 
     public function getAllOpen(int $pieId = null, int $year = null): array
     {
