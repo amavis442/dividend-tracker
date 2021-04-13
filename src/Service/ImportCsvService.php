@@ -287,10 +287,11 @@ class ImportCsvService extends ImportBase
         if (count($rows) > 0) {
             foreach ($rows as $row) {
                 $ticker = $this->preImportCheckTicker($entityManager, $branch, $tickerRepository, $row);
-                $position = $this->preImportCheckPosition($entityManager, $ticker, $currency, $positionRepository, $row);
                 $transaction = $transactionRepository->findOneBy(['jobid' => $row['opdrachtid']]);
-
+                
                 if (!$transaction) {
+                    $position = $this->preImportCheckPosition($entityManager, $ticker, $currency, $positionRepository, $row);
+
                     $transaction = new Transaction();
                     $transaction
                         ->setSide($row['direction'])
