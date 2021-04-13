@@ -133,7 +133,7 @@ class ProjectionModel
         DividendService $dividendService
     ): array{
 
-        $cacheKey = 'projection_' . $this->user->getId();
+        $cacheKey = 'projection_'. $year. '_' . $this->user->getId();
         $parent = $this;
         $data = $this->cache->get($cacheKey, function (ItemInterface $item) use (
             $year,
