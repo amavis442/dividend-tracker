@@ -767,18 +767,18 @@ class PortfolioItem
     /**
      * Get collection of dividend calenders of future payments
      *
-     * @return  Collection
+     * @return  array
      */
-    public function getDividendCalendars(): Collection
+    public function getDividendCalendars(): array
     {
-        return $this->dividendCalendars;
+        return array_reverse($this->dividendCalendars->toArray());
     }
 
     /**
      * Add future calendar to collection
      *
      * @param  Calendar  $dividendCalendar
-     * 
+     *
      * @return  self
      */
     public function addDividendCalendar(Calendar $dividendCalendar): self
