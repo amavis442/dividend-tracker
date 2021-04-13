@@ -32,9 +32,7 @@
 		<thead>
 			<tr>
 				<th>Pay date</th>
-				<th>Ticker</th>
-				<th>Industry</th>
-				<th>Amount</th>
+				<th>Company</th>
 				<th>Dividend(&euro;)</th>
 				<th>Taxes (15%)</th>
 				<th>Type</th>
@@ -44,11 +42,11 @@
 		<tbody>
 			{% for payment in payments %}
 				<tr>
-					<td>{{ payment.payDate ? payment.payDate|date('d-m-Y') : '' }}</td>
+					<td>{{ payment.payDate ? payment.payDate|format_date('medium') : '' }}</td>
 					<td>{{ payment.position.ticker.fullname }}
-						({{ payment.position.ticker.ticker }})</td>
-					<td>{{ payment.position.ticker.branch.label }}</td>
-					<td>{{ (payment.amount)|format_number({fraction_digit: 7}) }}</td>
+						({{ payment.position.ticker.ticker }})<br/>
+						<small>{{ (payment.amount)|format_number({fraction_digit: 7}) }} {{ 'shares'|trans }}</small>
+					</td>
 					<td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend)|format_number({fraction_digit: 2}) }}</td>
 					<td>&euro;{{ (payment.taxes)|format_number({fraction_digit: 2}) }}</td>
 					<td>{{ payment.dividendType }}</td>
@@ -63,11 +61,11 @@
 				</tr>
 			{% else %}
 				<tr>
-					<td colspan="8">no records found</td>
+					<td colspan="6">no records found</td>
 				</tr>
 			{% endfor %}
 			<tr>
-				<td colspan="3"></td>
+				<td colspan="2"></td>
 				<td>
 					<span style="font-weight:bold">Total dividend
 						{% if tab > 'All' %}this
@@ -78,7 +76,7 @@
 				<td>&euro;
 					{{ dividends }}</td>
 				<td>&euro;{{ taxes|format_number({fraction_digit: 2}) }}</td>
-				<td></td>
+				<td ></td>
 			</tr>
 		</tbody>
 	</table>

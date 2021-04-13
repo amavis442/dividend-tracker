@@ -27,6 +27,10 @@
                 <th>Total dividend</th>
                 <td>{{ payment.currency ? payment.currency.sign|raw : '$' }}{{ payment.dividend|format_number({fraction_digit: 2}) }}</td>
             </tr>
+            <tr>
+                <th>Type</th>
+                <td>{{ payment.dividendType }}</td>
+            </tr>
         </tbody>
     </table>
 
