@@ -2,7 +2,8 @@
 <table class="table table-striped">
 	<thead>
 		<tr>
-			<th></th>
+			<th>Id</th>
+			<th>Side</th>
 			<th>Transaction date</th>
 			<th>Amount</th>
 			<th>Price</th>
@@ -29,6 +30,7 @@
 					{% set dividendYield = 0 %}
 				{% endif %}
 				<tr>
+					<td>{{ transaction.jobid }}</td>
 					<td>
 						<span class="badge badge-{% if transaction.side == 1 %}success{% else %}danger{% endif %}">
 							{{ side }}
@@ -45,6 +47,7 @@
 						</span>
 					</td>
 					<td>{% if transaction.side == 1 %}{{ dividendYield|format_number({fraction_digit: 2}) }}% {% endif %}</td>
+					
 					<td>
 						<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 							<div class="btn-group mr-2" role="group" aria-label="First group">
