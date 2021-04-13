@@ -16,9 +16,26 @@ use App\Service\WeightedAverage;
 class TransactionCommand extends Command
 {
     protected static $defaultName = 'app:transaction';
+    /**
+     *
+     * @var TransactionRepository
+     */
     protected $transactionRepository;
+    /**
+     *
+     * @var TickerRepository
+     */
     protected $tickerRepository;
+    /**
+     *
+     * @var EntityManagerInterface
+     */
     protected $em;
+    /**
+     * Service to calculate average price
+     *
+     * @var WeightedAverage
+     */
     protected $weightedAverageService;
 
     public function __construct(
@@ -38,7 +55,7 @@ class TransactionCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Add a short description for your command')
+            ->setDescription('Recalculate avg. price position')
             ->addArgument('symbol', InputArgument::OPTIONAL, 'Ticker symbol')
             ->addOption('force', null, InputOption::VALUE_NONE, 'overwrite');
     }
@@ -67,10 +84,9 @@ class TransactionCommand extends Command
         foreach ($tickers as $ticker) {
             $position = null;
             if ($ticker) {
-                $positions = $ticker->getPositions();
-                $position = $positions[0];
+                $position = $ticker->getPositions()->first();
                 $this->weightedAverageService->calc($position);
-                $io->text($ticker->getFullname() . ', ' . ($position->getAmount() / 100) . ' shares, ' . ($position->getPrice() / 100) . ' euro');
+                $io->text($ticker->getFullname() . ', ' . $position->getAmount() . ' shares, ' . $position->getPrice() . ' euro');
 
                 if ($overwrite) {
                     $this->em->persist($position);
