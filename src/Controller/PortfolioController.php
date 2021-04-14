@@ -149,7 +149,8 @@ class PortfolioController extends AbstractController
             $percentageAllocation = ($position->getAllocation() / $allocated) * 100;
         }
 
-        $calendars = $ticker->getCalendars();
+        $calendars = $ticker->getCalendars()->slice(0, 5);
+        $calendarsCount = $ticker->getCalendars()->count();
 
         $referer->set('portfolio_show', ['id' => $position->getId()]);
         
@@ -164,6 +165,7 @@ class PortfolioController extends AbstractController
             'dividend' => $dividend,
             'dividendService' => $dividendService,
             'calendars' => $calendars,
+            'calendarsCount' => $calendarsCount,
             'totalInvested' => $allocated,
             'netYearlyDividend' => $netYearlyDividend,
             'percentageAllocated' => $percentageAllocation,
