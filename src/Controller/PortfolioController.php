@@ -9,7 +9,7 @@ use App\Repository\PaymentRepository;
 use App\Repository\PieRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
-use App\Service\DividendGrowth;
+use App\Service\DividendGrowthService;
 use App\Service\DividendService;
 use App\Service\Referer;
 use App\Service\Summary;
@@ -111,7 +111,7 @@ class PortfolioController extends AbstractController
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
         Summary $summary,
-        DividendGrowth $dividendGrowth,
+        DividendGrowthService $dividendGrowth,
         DividendService $dividendService,
         Referer $referer
     ): Response {

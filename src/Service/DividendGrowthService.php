@@ -4,7 +4,7 @@ namespace App\Service;
 
 use App\Entity\Ticker;
 
-class DividendGrowth
+class DividendGrowthService
 {
     public function getData(Ticker $ticker)
     {
@@ -19,6 +19,10 @@ class DividendGrowth
             $payoutFreq = $ticker->getPayoutFrequency();
 
             foreach ($calendars as $calendar) {
+                $dividendType = $calendar->getDividendType();
+                if ($dividendType == 'Special' || $dividendType == 'Supplement') {
+                    continue;
+                }
                 $timeStamp = $calendar->getPaymentDate()->format('Y');
                 $cashPayout = $calendar->getCashAmount();
                 if (!isset($data[$timeStamp])) {
