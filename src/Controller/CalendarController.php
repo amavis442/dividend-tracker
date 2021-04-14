@@ -48,7 +48,7 @@ class CalendarController extends AbstractController
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
         $items = $calendarRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
-        $maxPages = ceil($items->count() / $limit);
+        $maxPages = ceil($items->count() / $limit) > 10 ? 10 : ceil($items->count() / $limit);
         $thisPage = $page;
 
         $referer->set('calendar_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);

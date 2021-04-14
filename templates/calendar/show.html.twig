@@ -12,12 +12,12 @@
                 <td>{{ calendar.ticker.fullname }}</td>
             </tr>
             <tr>
+                <th>Type</th>
+                <td>{{ calendar.dividend_type ?? 'Regular' }}</td>
+            </tr>            
+            <tr>
                 <th>Ex-dividend date</th>
                 <td>{{ calendar.exDividendDate ? calendar.exDividendDate|date('d-m-Y') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Record date</th>
-                <td>{{ calendar.recordDate ? calendar.recordDate|date('d-m-Y') : '' }}</td>
             </tr>
             <tr>
                 <th>Payment date</th>

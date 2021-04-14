@@ -1,47 +1,61 @@
-<div class="row">
-    <div class="col">
+<div class="row mb-3">
+    <div class="col text-right">
         <a class="btn btn-primary" href="{{ path('calendar_new', {'ticker': ticker.id}) }}"><i class="fas fa-plus"></i></a>
     </div>
 </div>
-<br/>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Payment date</th>
-            <th>Ex-dividend date</th>
-            <th>Record_date</th>
-            <th>Cash amount</th>
-            <th>actions</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for calendar in calendars %}
-        {% set dividendDaysLeft = calendar.getDaysLeft ?? -1 %}
-        <tr  {% if dividendDaysLeft > -1 %}
-                {% set badgeColor = 'info' %}
-                {% if dividendDaysLeft > -1 and dividendDaysLeft < 2  %}
-                    {% set badgeColor = 'danger' %}
-                {% endif %}
-                {% if dividendDaysLeft > 1 and dividendDaysLeft < 3  %}
-                    {% set badgeColor = 'warning' %}
-                {% endif %}
-                class="table-{{badgeColor}}"
-            {% endif %}>
-            <td>{{ calendar.paymentDate ? calendar.paymentDate|date('d-m-Y') : '' }}</td>
-            <td>{{ calendar.exDividendDate ? calendar.exDividendDate|date('d-m-Y') : '' }}</td>
-            <td>{{ calendar.recordDate ? calendar.recordDate|date('d-m-Y') : '' }}</td>
-            <td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({fraction_digit: 3}) }}</td>
-            <td>
-                <a href="{{ path('calendar_edit', {'id': calendar.id}) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
-            </td>
-        </tr>
-    {% else %}
-        <tr>
-            <td colspan="5">no records found</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
-<small>Calendar items #{{ calendarsCount }}</small>
-<hr/>                            
+<div class="row">
+	<div class="col">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Payment date</th>
+					<th>Ex-dividend date</th>
+					<th>Record_date</th>
+					<th>Cash amount</th>
+					<th>Type</th>
+					<th>actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for calendar in calendars %}
+					{% set dividendDaysLeft = calendar.getDaysLeft ?? -1 %}
+					{% set tableColorClass = '' %}
+					{% if dividendDaysLeft > -1 %}
+						{% set badgeColor = 'info' %}
+						{% if dividendDaysLeft > -1 and dividendDaysLeft < 2  %}
+							{% set badgeColor = 'danger' %}
+						{% endif %}
+						{% if dividendDaysLeft > 1 and dividendDaysLeft < 3  %}
+							{% set badgeColor = 'warning' %}
+						{% endif %}
+						{% set tableColorClass = ' class="table-' ~ badgeColor ~ '"' %}
+					{% endif %}
+
+					<tr{{tableColorClass}}>
+						<td>{{ calendar.paymentDate ? calendar.paymentDate|date('d-m-Y') : '' }}</td>
+						<td>{{ calendar.exDividendDate ? calendar.exDividendDate|date('d-m-Y') : '' }}</td>
+						<td>{{ calendar.recordDate ? calendar.recordDate|date('d-m-Y') : '' }}</td>
+						<td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({fraction_digit: 3}) }}</td>
+						<td>{{ calendar.dividendType ?? 'Regular' }}</td>
+						<td>
+							<a href="{{ path('calendar_edit', {'id': calendar.id}) }}" class="btn btn-primary">
+								<i class="far fa-edit"></i>
+							</a>
+						</td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="5">no records found</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div class="row mb-4">
+    <div class="col">
+        <small>Calendar items #{{ calendarsCount }}</small>
+    </div>
+</div>

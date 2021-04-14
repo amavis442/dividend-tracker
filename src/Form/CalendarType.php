@@ -8,6 +8,7 @@ use App\Entity\Ticker;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -52,6 +53,14 @@ class CalendarType extends AbstractType
                 'required' => false,
                 'input' => 'number',
                 'scale' => 3,
+            ])
+            ->add('dividend_type', ChoiceType::class, [
+                'choices' => [
+                    'Regular' => 'Regular',
+                    'Supplement' => 'Supplement',
+                    'Special' => 'Special'
+                ],
+                'empty_data' => 'Regular',
             ])
         ;
     }

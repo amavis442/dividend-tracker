@@ -57,6 +57,11 @@ class Calendar
      */
     private $currency;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $dividendType;
+
     public function __construct()
     {
         $this->payments = new ArrayCollection();
@@ -187,6 +192,18 @@ class Calendar
     public function setCurrency(?Currency $currency): self
     {
         $this->currency = $currency;
+
+        return $this;
+    }
+
+    public function getDividendType(): ?string
+    {
+        return $this->dividendType;
+    }
+
+    public function setDividendType(?string $dividendType): self
+    {
+        $this->dividendType = $dividendType;
 
         return $this;
     }
