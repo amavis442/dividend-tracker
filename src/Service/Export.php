@@ -77,7 +77,7 @@ class Export
             $row['dividend'] = 0.0;
             if ($position->getTicker()->hasCalendar()) {
                 $cash = $position->getTicker()->getCalendars()->first()->getCashAmount();
-                $row['dividend'] = $cash / 1000;
+                $row['dividend'] = $cash;
                 $row['frequency'] = $position->getTicker()->getDividendFrequency();
             }
 
