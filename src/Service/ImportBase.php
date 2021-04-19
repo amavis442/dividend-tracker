@@ -85,26 +85,17 @@ abstract class ImportBase
         TickerRepository $tickerRepository,
         array $data
     ): Ticker {
-        $ticker = $tickerRepository->findOneBy(['ticker' => $data['ticker']]);
-        if ($ticker && ($ticker->getIsin() == null || $ticker->getIsin() == '')) {
-            $ticker->setIsin($data['isin']);
+        $ticker = $tickerRepository->findOneBy(['isin' => $data['isin']]);
+        if (!$ticker) {
+            $ticker = new Ticker();
+            $ticker->setTicker($data['ticker'])
+                ->setFullname($data['ticker'])
+                ->setIsin($data['isin'])
+                ->setBranch($branch);
+
             $entityManager->persist($ticker);
             $entityManager->flush();
         }
-        if (!$ticker) {
-            $ticker = $tickerRepository->findOneBy(['isin' => $data['isin']]);
-            if (!$ticker) {
-                $ticker = new Ticker();
-                $ticker->setTicker($data['ticker'])
-                    ->setFullname($data['ticker'])
-                    ->setIsin($data['isin'])
-                    ->setBranch($branch);
-
-                $entityManager->persist($ticker);
-                $entityManager->flush();
-            }
-        }
-
         return $ticker;
     }
 }

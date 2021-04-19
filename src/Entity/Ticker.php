@@ -9,7 +9,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TickerRepository")
- * @UniqueEntity("ticker")
+ * @UniqueEntity("isin")
  */
 class Ticker
 {
@@ -21,7 +21,7 @@ class Ticker
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @ORM\Column(type="string", length=255)
      */
     private $ticker;
 
@@ -65,7 +65,7 @@ class Ticker
     private $dividendMonths;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=false, unique=true)
      */
     private $isin;
 
