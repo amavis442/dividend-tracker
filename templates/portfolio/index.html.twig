@@ -106,16 +106,41 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% set dividendInfo = '<div class="alert alert-primary" role="alert">' ~ portfolioItem.dividendPayoutFrequency ~ 'x per year'|trans ~ '</div>' %}
-                    {% set divDates = '' %}
-                    {% for calendar in portfolioItem.dividendCalendars %}
-                        {% set divDates = divDates ~ '<li class="list-group-item">' ~ calendar.exDividendDate|format_date('medium') ~ ' / <i class="fas fa-money-check-alt"></i> ' ~  calendar.paymentDate|format_date('medium') ~ '</li>' %}
-                    {% endfor %}
-                    {% if divDates %}
-                         {% set dividendInfo = dividendInfo ~ '<ul class="list-group">' ~ divDates ~ '</ul>' %}
-                    {% endif %}
-                    <button class="btn btn-info btn-sm" data-toggle="popover" title="Dividend info" 
-                    data-content="{{ dividendInfo }}" data-html="true"><i class="fas fa-info-circle"></i></button>
+                    {% set dividendInfo = '' %}
+                    {% set dividendInfo %}
+                        <div><strong>{{ 'Frequency'|trans }}</strong></div>
+                        <div class="alert alert-primary" role="alert">{{ portfolioItem.dividendPayoutFrequency }} {{ 'x per year'|trans }}</div>
+                    {% endset %}
+        
+                    {% set dividendDateInfo = '' %}
+                    {% set dividendDateInfo %}
+                        <div><strong>{{ 'Dates'|trans }}</strong></div>
+                        <ul class="list-group">
+                        {% for calendar in portfolioItem.dividendCalendars %}
+                            <li class="list-group-item">{{ calendar.exDividendDate|format_date('medium') }} / <i class="fas fa-money-check-alt"></i> 
+                            {{ calendar.paymentDate|format_date('medium') }}
+                            </li>
+                        {% else %}    
+                            <li class="list-group-item">{{ 'Not available'|trans }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% endset %}
+        
+                    {% set dividendInfo = dividendInfo ~ dividendDateInfo %}
+                    {% set pieData %}
+                        <hr/>
+                        <div><strong>{{ 'Pie'|trans }}</strong></div>
+                        <ul class="list-group">
+                        {% for pie in portfolioItem.pies %}
+                            <li class="list-group-item">{{ pie.label }}</li>
+                        {% else %}    
+                            <li class="list-group-item">{{ 'Not available'|trans }}</li>    
+                        {% endfor %}
+                        </ul>
+                    {% endset %}
+                    {% set dividendInfo = dividendInfo ~ pieData %}
+                    <button class="btn btn-info btn-sm" data-toggle="popover" title="Dividend & pie info" 
+                    data-content='{{ dividendInfo }}' data-html="true"><i class="fas fa-info-circle"></i></button>
                 </td>
             </tr>
         {% else %}
