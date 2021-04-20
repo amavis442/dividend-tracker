@@ -1,4 +1,5 @@
 <h3>Transactions</h3>
+<div class="table-responsive-xl">
 <table class="table table-striped">
 	<thead>
 		<tr>
@@ -49,7 +50,22 @@
 					<td>{% if transaction.side == 1 %}{{ dividendYield|format_number({fraction_digit: 2}) }}% {% endif %}</td>
 					
 					<td>
+						{% set transactionInfo %}
+							<ul class="list-group">
+								<li class="list-group-item">Original price: &euro;{{ transaction.originalPrice }}</li>
+								<li class="list-group-item">Stamduty: &euro;{{ transaction.stampduty }}</li>
+								<li class="list-group-item">fx fee: &euro;{{ transaction.fxFee }}</li>
+								<li class="list-group-item">Exchange rate: {{ transaction.exchangeRate }}</li>
+							</ul>
+						{% endset %}
+
 						<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+							<div class="btn-group mr-2" role="group" aria-label="First group">
+								<button class="btn btn-primary" data-toggle="popover" data-placement="top" title="Transaction info"
+                    					data-content='{{ transactionInfo }}' data-html="true">
+										<i class="fas fa-info-circle"></i>
+								</button>
+							</div>
 							<div class="btn-group mr-2" role="group" aria-label="First group">
 								<a href="{{ path('transaction_edit', {'id': transaction.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit transaction">
 									<i class="far fa-edit"></i>
@@ -67,3 +83,4 @@
 		{% endif %}
 	</tbody>
 </table>
+</div>
