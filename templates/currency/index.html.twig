@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Currency index{% endblock %}
+
+{% block body %}
+    <h1>Currency index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Symbol</th>
+                <th>Description</th>
+                <th>Sign</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for currency in currencies %}
+            <tr>
+                <td>{{ currency.id }}</td>
+                <td>{{ currency.symbol }}</td>
+                <td>{{ currency.description }}</td>
+                <td>{{ currency.sign|raw }}</td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                    <a href="{{ path('currency_show', {'id': currency.id}) }}" class="btn btn-primary">show</a>
+                    <a href="{{ path('currency_edit', {'id': currency.id}) }}" class="btn btn-secondary">edit</a>
+                    </div>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a class="btn btn-primary" href="{{ path('currency_new') }}"><i class="fas fa-plus"></i></a>
+{% endblock %}

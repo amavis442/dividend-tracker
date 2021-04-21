@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tax index{% endblock %}
+
+{% block body %}
+    <h1>Tax index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>CountryCode</th>
+                <th>Currency</th>
+                <th>TaxRate</th>
+                <th>Valid from</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for tax in taxes %}
+            <tr>
+                <td>{{ tax.id }}</td>
+                <td>{{ tax.countryCode }}</td>
+                <td>{{ tax.currency.symbol }}</td>
+                <td>{{ tax.taxRate }}%</td>
+                <td>{{ tax.validFrom|format_date('short') }}</td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <a href="{{ path('tax_show', {'id': tax.id}) }}" class="btn btn-primary">show</a>
+                        <a href="{{ path('tax_edit', {'id': tax.id}) }}" class="btn btn-secondary">edit</a>
+                    </div>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a class="btn btn-primary" href="{{ path('tax_new') }}" title="Create new"><i class="fas fa-plus"></i></a>
+{% endblock %}

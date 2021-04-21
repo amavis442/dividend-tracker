@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tax{% endblock %}
+
+{% block body %}
+    <h1>Tax</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ tax.id }}</td>
+            </tr>
+            <tr>
+                <th>CountryCode</th>
+                <td>{{ tax.countryCode }}</td>
+            </tr>
+            <tr>
+                <th>TaxRate</th>
+                <td>{{ tax.taxRate }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('tax_index') }}">back to list</a>
+
+    <a href="{{ path('tax_edit', {'id': tax.id}) }}">edit</a>
+
+    {{ include('tax/_delete_form.html.twig') }}
+{% endblock %}

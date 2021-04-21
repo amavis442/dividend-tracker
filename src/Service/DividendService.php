@@ -5,18 +5,23 @@ use App\Entity\Calendar;
 use App\Entity\Constants;
 use App\Entity\Position;
 use App\Entity\Transaction;
+use App\Repository\TaxRepository;
 use App\Service\ExchangeRateService;
+use DateTime;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 
 class DividendService
 {
     protected $forwardNetDividend;
     protected $position;
     protected $exchangeRateService;
+    protected $taxRepository;
 
-    public function __construct(ExchangeRateService $exchangeRateService)
+    public function __construct(ExchangeRateService $exchangeRateService, TaxRepository $taxRepository)
     {
         $this->exchangeRateService = $exchangeRateService;
+        $this->taxRepository = $taxRepository;
     }
 
     /**
@@ -61,7 +66,11 @@ class DividendService
     public function getTaxRate(Calendar $calendar): ?float
     {
         $dividendTax = 0.15;
+        $taxRate = $this->taxRepository->findOneValid($calendar->getCurrency(), (new DateTime()));
 
+        if ($taxRate) {
+            return $taxRate->getTaxRate() / 100;
+        }      
         switch ($calendar->getCurrency()->getSymbol()) {
             case 'EUR':
                 $dividendTax = Constants::TAX / 100;
