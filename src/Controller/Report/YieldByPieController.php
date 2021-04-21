@@ -4,7 +4,8 @@ namespace App\Controller\Report;
 
 use App\Repository\PieRepository;
 use App\Repository\PositionRepository;
-use App\Service\Yields;
+use App\Service\DividendService;
+use App\Service\YieldsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,12 +28,13 @@ class YieldByPieController extends AbstractController
         string $orderBy = 'ticker',
         PositionRepository $positionRepository,
         PieRepository $pieRepository,
-        Yields $yields,
+        YieldsService $yields,
+        DividendService $dividendService,
         SessionInterface $session
     ): Response {
 
         $pieSelected = $session->get(self::YIELD_PIE_KEY, null);
-        $result = $yields->yield($positionRepository, $orderBy, self::EXCHANGE_RATE, self::TAX_DIVIDEND, $pieSelected);
+        $result = $yields->yield($positionRepository, $dividendService, $orderBy, $pieSelected);
         $pies = $pieRepository->findLinked();
 
         return $this->render('report/yield/pie.html.twig', array_merge($result, [

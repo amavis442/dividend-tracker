@@ -6,7 +6,7 @@ use App\Entity\DividendTracker;
 use App\Repository\PositionRepository;
 use App\Repository\UserRepository;
 use App\Service\DividendService;
-use App\Service\Yields;
+use App\Service\YieldsService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -24,14 +24,12 @@ class DividendTrackerCommand extends Command
     protected $dividendService;
     protected $positionRepository;
     protected $entityManager;
-    protected $yields;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         UserRepository $userRepository,
         PositionRepository $positionRepository,
-        DividendService $dividendService,
-        Yields $yields
+        DividendService $dividendService
     ) {
 
         parent::__construct();
@@ -39,7 +37,6 @@ class DividendTrackerCommand extends Command
         $this->dividendService = $dividendService;
         $this->positionRepository = $positionRepository;
         $this->entityManager = $entityManager;
-        $this->yields = $yields;
     }
 
     protected function configure()

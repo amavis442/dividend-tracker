@@ -41,6 +41,9 @@ class DividendService
             case 'CAD':
                 $exchangeRate = 1 / $rates['CAD'];
                 break;
+            case 'CHF':
+                $exchangeRate = 1 / $rates['CHF'];
+                break;   
             default:
                 $exchangeRate = 1 / $rates['USD'];
                 break;
@@ -188,8 +191,6 @@ class DividendService
     public function getForwardNetDividend(Position $position): ?float
     {
         $cashAmount = 0.0;
-        $forwardNetDividend = 0.0;
-
         $forwardNetDividend = 0.0;
         if ($position->getTicker()->getCalendars()) {
             $calendar = $position->getTicker()->getCalendars()->first();

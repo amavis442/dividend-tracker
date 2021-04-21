@@ -3,7 +3,8 @@
 namespace App\Controller\Report;
 
 use App\Repository\PositionRepository;
-use App\Service\Yields;
+use App\Service\DividendService;
+use App\Service\YieldsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,9 +24,10 @@ class YieldController extends AbstractController
     public function index(
         PositionRepository $positionRepository,
         string $orderBy = 'ticker',
-        Yields $yields
+        YieldsService $yields,
+        DividendService $dividendService
     ): Response {
-        $result = $yields->yield($positionRepository, $orderBy, self::EXCHANGE_RATE);
+        $result = $yields->yield($positionRepository, $dividendService, $orderBy);
 
         return $this->render('report/yield/index.html.twig', array_merge($result, ['controller_name' => 'ReportController']));
     }

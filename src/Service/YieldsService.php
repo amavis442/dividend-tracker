@@ -4,13 +4,12 @@ namespace App\Service;
 
 use App\Repository\PositionRepository;
 
-class Yields
+class YieldsService
 {
     function yield (
         PositionRepository $positionRepository,
+        DividendService $dividendService,
         string $orderBy = 'ticker',
-        float $exchangeRate = 1.19,
-        float $tax = 0.15,
         int $pieId = null
     ): array{
         $labels = [];
@@ -30,6 +29,9 @@ class Yields
             $avgPrice = $position->getPrice();
             $amount = $position->getAmount();
             $allocation = $position->getAllocation();
+            
+            //$exchangeRateService->getRates()
+
 
             $scheduleCalendar = $ticker->getDividendMonths();
             $numPayoutsPerYear = count($scheduleCalendar);
@@ -37,15 +39,27 @@ class Yields
             $lastDividendDate = null;
             $payCalendars = $ticker->getCalendars();
             $firstCalendarEntry = $payCalendars->first();
+
+            $netTotalForwardYearlyPayout = 0;
+            $netForwardYearlyPayout = 0;
+            $dividendYield = 0;
+            $netTotalPayoutPerPaydate = 0;
+            $lastCash = 0;
+            $lastCashCurrency = '$';
+
             if ($firstCalendarEntry) {
                 $lastCash = $firstCalendarEntry->getCashAmount();
+                $lastCashCurrency = $firstCalendarEntry->getCurrency()->getSign();
                 $lastDividendDate = $firstCalendarEntry->getPaymentDate();
+            
+                $netTotalForwardYearlyPayout = $numPayoutsPerYear * $dividendService->getForwardNetDividend($position);
+                $netForwardYearlyPayout = $numPayoutsPerYear * $dividendService->getNetDividend($firstCalendarEntry);
+                $dividendYield = $dividendService->getForwardNetDividendYield($position);
+
+                $netTotalPayoutPerPaydate = $netTotalForwardYearlyPayout / $numPayoutsPerYear;
             }
             $dividendPerYear = $numPayoutsPerYear * $lastCash;
 
-            $netForwardYearlyPayout = ($dividendPerYear * (1 - $tax)) / $exchangeRate;
-            $netTotalForwardYearlyPayout = $amount * $netForwardYearlyPayout;
-            $dividendYield = round(((($dividendPerYear * (1 - $tax)) / $exchangeRate) / $avgPrice) * 100, 2);
             $tickerLabel = $ticker->getTicker();
             $labels[$tickerLabel] = sprintf("%s (%s)", substr(addslashes(str_replace(["'",'"'],["",""],$ticker->getFullname())), 0, 8), $ticker->getTicker());
             $data[$tickerLabel] = $dividendYield;
@@ -65,10 +79,12 @@ class Yields
                 'yield' => $dividendYield,
                 'payout' => $dividendPerYear,
                 'allocation' => $allocation,
+                'netTotalPayoutPerPaydate' => $netTotalPayoutPerPaydate,
                 'netForwardYearlyPayout' => $netForwardYearlyPayout,
                 'netTotalForwardYearlyPayout' => $netTotalForwardYearlyPayout,
                 'avgPrice' => $avgPrice,
                 'lastDividend' => $lastCash,
+                'lastDividendCurrency' => $lastCashCurrency,
                 'lastDividendDate' => $lastDividendDate,
                 'numPayoutsPerYear' => $numPayoutsPerYear,
                 'amount' => $amount,
