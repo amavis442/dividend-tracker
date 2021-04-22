@@ -20,6 +20,7 @@ use Box\Spout\Reader\CSV\Sheet;
 use DateTime;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImportCsvService extends ImportBase
@@ -189,7 +190,14 @@ class ImportCsvService extends ImportBase
                         $row['transactionDate'] = DateTime::createFromFormat('Y-m-d H:i:s', $val);
                         break;
                     case 'isin':
+                        /**
+                         * @see https://www.isin.org/isin-format/
+                         */ 
                         $row['isin'] = $val;
+                        $isin = $val;
+                        if (!preg_match('/^([A-Z]{2})(\d{1})(\w+)/i', $isin, $matches)) {
+                            throw new RuntimeException('ISIN Number not correct: ' . $isin);
+                        }
                         break;
                     case 'ticker':
                         $row['ticker'] = $val;
