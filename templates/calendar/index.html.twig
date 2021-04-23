@@ -26,6 +26,7 @@
 						<a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'exDividendDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ex-dividend date</a>
 					</th>
 					<th>Cash amount</th>
+                    <th>Source</th>
 					<th>actions</th>
 				</tr>
 			</thead>
@@ -37,6 +38,7 @@
                     <td>{{ calendar.paymentDate|format_date('medium') }}</td>
                     <td>{{ calendar.exDividendDate|format_date('medium') }}</td>
                     <td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({fraction_digit: 2}) }}</td>
+                    <td>{{ calendar.source ?? 'manual' }}</td>
                     <td>
                         <a href="{{ path('calendar_show', {'id': calendar.id}) }}" class="btn btn-primary">
                             <i class="fas fa-book-open"></i>
@@ -48,7 +50,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="8">no records found</td>
+                    <td colspan="9">no records found</td>
                 </tr>
             {% endfor %}
 			</tbody>

@@ -12,6 +12,10 @@ use Doctrine\Common\Collections\Collection;
  */
 class Calendar
 {
+    public const SOURCE_SCRIPT = 'script';
+    public const SOURCE_MANUEL = 'manual';
+
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -61,6 +65,13 @@ class Calendar
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $dividendType;
+
+    /**
+     * Was this added manual or script?
+     * 
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $source;
 
     public function __construct()
     {
@@ -204,6 +215,18 @@ class Calendar
     public function setDividendType(?string $dividendType): self
     {
         $this->dividendType = $dividendType;
+
+        return $this;
+    }
+
+    public function getSource(): ?string
+    {
+        return $this->source;
+    }
+
+    public function setSource(?string $source): self
+    {
+        $this->source = $source;
 
         return $this;
     }

@@ -118,6 +118,7 @@ class DividendDateCommand extends Command
                     ->setPaymentDate($payDate)
                     ->setRecordDate($recordDate)
                     ->setCurrency($currency)
+                    ->setSource(Calendar::SOURCE_SCRIPT)
                     ;
                     $this->entityManager->persist($calendar);
                     $this->entityManager->flush();
