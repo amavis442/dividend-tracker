@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Currency{% endblock %}
+{% block title %}{{ 'New Currency'|trans }}{% endblock %}
 
 {% block body %}
-    <h1>Create new Currency</h1>
+    <h1>{{ 'Create new Currency'|trans }}</h1>
 
     {{ include('currency/_form.html.twig') }}
 
-    <a href="{{ path('currency_index') }}" class="btn btn-secondary"><i class="fas fa-angle-double-left"></i> back to list</a>
+    <a href="{{ path('currency_index') }}" class="btn btn-secondary"><i class="fas fa-angle-double-left"></i> {{ 'back to list'|trans }}</a>
 {% endblock %}

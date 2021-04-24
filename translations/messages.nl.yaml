@@ -47,7 +47,7 @@ Industry: Industrie
 Dividend frequency: Dividend frequentie
 Yearly forward dividend payout: Jaarlijkse verwachte uitbetaling van dividend
 Single time forward dividend payout: Eenmalige dividenduitbetaling
-Dividend yield: Dividendopbrengst
+Dividend yield: Dividend opbrengst
 Next dividend (Ex-div / payout): Volgende dividend (ex-div / uitbetaling)
 Weighted average price: Gewogen gemiddelde prijs
 Pies: Schijven
@@ -113,3 +113,61 @@ x per year: x per jaar
 Dates: Datum
 Frequency: Frequentie
 Not available: Niet beschikbaar
+Edit ticker / months: Bewerk ticker / dividend maanden
+manual: handmatig
+Type: Type
+Payment date: Uitbetaal datum
+Ex-dividend date: Ex-dividend datum
+Cash amount: Uitbetaal bedrag
+Source: Bron
+Descr.: Omschr.
+actions: acties
+Regular: Normaal
+Description: Omschrijving
+Side: Kant
+Transaction date: Transactie datum
+Price: Prijs
+avgPrice: Gem. Prijs
+Record date: Pijl datum
+Calendar items: Kalender regels
+Research info: Onderzoek info
+Currency: Valuta
+Admin: Beheer
+Research on Tickers: Onderzoek naar Bedrijf
+Closed positions: Gesloten posities
+Import csv: Csv importeren
+Account: Account
+Tax: Belasting
+Portfolio: Portfolio
+Payments: Betalingen
+Calendar: Kalender
+Calendar per date: Kalender per datum
+Calendar per date printout: Afdruk kalender per datum
+Reports: Rapporten
+Dividend Tracker: Dividend Tracker
+Sector allocation: Sector allocatie
+Position allocation: Positie allocatie
+Dividend month Tickers: Overzicht Dividend maandelijks
+Dividend projection: Dividend projectie
+Dividend payout: Uitbetaling
+Dividend yield pie: Dividend opbrengst per schijf
+Compound calc: Samengestelde rente rekenmachine
+Export: Exporteren
+Symbol: Symbool
+Sign: Teken
+New Currency: Nieuwe valuta
+Create new Currency: Maak een nieuwe valuta aan
+Edit Currency: Bewerk valuta
+CountryCode: Landcode
+TaxRate: Belastingtarief
+Valid from: Geldig vanaf
+Edit Tax: Bewerk belastingtarief 
+Country code: Landcode
+Tax rate: Belastingtarief
+New Tax: Nieuw belastingtarief
+Create new Tax: Maak een nieuwe belastingtarief aan
+Delete: Verwijder
+Taxtarifs: Belastingtarieven
+
+
+

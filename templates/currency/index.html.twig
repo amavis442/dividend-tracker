@@ -1,18 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Currency index{% endblock %}
+{% block title %}{{ 'Currency'|trans }}{% endblock %}
 
 {% block body %}
-    <h1>Currency index</h1>
+    <h1>{{ 'Currency'|trans }}</h1>
 
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Symbol</th>
-                <th>Description</th>
-                <th>Sign</th>
-                <th>actions</th>
+                <th>{{ 'Symbol'|trans }}</th>
+                <th>{{ 'Description'|trans }}</th>
+                <th>{{ 'Sign'|trans }}</th>
+                <th>{{ 'Actions'|trans }}</th>
             </tr>
         </thead>
         <tbody>
@@ -24,8 +24,8 @@
                 <td>{{ currency.sign|raw }}</td>
                 <td>
                     <div class="btn-group" role="group" aria-label="Basic example">
-                    <a href="{{ path('currency_show', {'id': currency.id}) }}" class="btn btn-primary">show</a>
-                    <a href="{{ path('currency_edit', {'id': currency.id}) }}" class="btn btn-secondary">edit</a>
+                    <a href="{{ path('currency_show', {'id': currency.id}) }}" class="btn btn-primary">{{ 'show'|trans }}</a>
+                    <a href="{{ path('currency_edit', {'id': currency.id}) }}" class="btn btn-secondary">{{ 'edit'|trans }}</a>
                     </div>
                 </td>
             </tr>

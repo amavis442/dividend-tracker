@@ -2,7 +2,11 @@
 <table class="table">
 	<tbody>
 		<tr>
-			<th>{{ 'Instrument'|trans }}</th>
+			<th>{{ 'Instrument'|trans }} 	
+				<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Edit ticker / months'|trans }}">
+					<i class="far fa-edit"></i>
+				</a>
+			</th>
 			<td>
 				<strong>{{ ticker.fullname }}
 					({{ ticker.ticker }})
@@ -29,9 +33,7 @@
 					<li class="list-group-item">{{ month.getDividendMonthName|trans }}</li>
 				{% endfor %}
 				</ul>
-				<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="Edit months" class="btn btn-primary">
-					<i class="far fa-edit"></i>
-				</a>
+
 			</td>
 		</tr>
 		<tr>

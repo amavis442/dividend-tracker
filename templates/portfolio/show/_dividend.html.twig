@@ -9,14 +9,14 @@
 		<table class="table">
 			<thead>
 				<tr>
-					<th>Payment date</th>
-					<th>Ex-dividend date</th>
-					<th>Record_date</th>
-					<th>Cash amount</th>
-					<th>Type</th>
-					<th>Source</th>
-					<th>Descr.</th>
-					<th>actions</th>
+					<th>{{ 'Payment date'|trans }}</th>
+					<th>{{ 'Ex-dividend date'|trans }}</th>
+					<th>{{ 'Record date'|trans }}</th>
+					<th>{{ 'Cash amount'|trans }}</th>
+					<th>{{ 'Type'|trans }}</th>
+					<th>{{ 'Source'|trans }}</th>
+					<th>{{ 'Descr.'|trans }}</th>
+					<th>{{ 'Actions'|trans }}</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -39,8 +39,8 @@
 						<td>{{ calendar.exDividendDate ? calendar.exDividendDate|date('d-m-Y') : '' }}</td>
 						<td>{{ calendar.recordDate ? calendar.recordDate|date('d-m-Y') : '' }}</td>
 						<td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({fraction_digit: 3}) }}</td>
-						<td>{{ calendar.dividendType ?? 'Regular' }}</td>
-						<td>{{ calendar.source ?? 'manual' }}</td>
+						<td>{{ (calendar.dividendType ?? 'Regular')|trans }}</td>
+						<td>{{ (calendar.source ?? 'manual')|trans }}</td>
 						<td>{{ calendar.description }}</td>
 						<td>
 							<a href="{{ path('calendar_edit', {'id': calendar.id}) }}" class="btn btn-primary">
@@ -60,7 +60,7 @@
 
 <div class="row mb-4">
     <div class="col">
-        <small>Calendar items #{{ calendarsCount }}</small>
+        <small>{{ 'Calendar items'|trans }} #{{ calendarsCount }}</small>
     </div>
 </div>
 <hr/> 

@@ -17,29 +17,29 @@
 		<table class="table">
 			<thead>
 				<tr>
-					<th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Fullname</a></th>
-					<th>Type</th>
+					<th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Fullname'|trans }}</a></th>
+					<th>{{ 'Type'|trans }}</th>
 					<th>
-						<a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'paymentDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Payment date</a>
+						<a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'paymentDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Payment date'|trans }}</a>
 					</th>
 					<th>
-						<a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'exDividendDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ex-dividend date</a>
+						<a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'exDividendDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Ex-dividend date'|trans }}</a>
 					</th>
-					<th>Cash amount</th>
-                    <th>Source</th>
-                    <th>Descr.</th>
-					<th>actions</th>
+					<th>{{ 'Cash amount'|trans }}</th>
+                    <th>{{ 'Source'|trans }}</th>
+                    <th>{{ 'Descr.'|trans }}</th>
+					<th>{{ 'actions'|trans }}</th>
 				</tr>
 			</thead>
 			<tbody>
             {% for calendar in calendars %}
                 <tr class="table">
-                    <td>{{ calendar.ticker.fullname }}<br/><small>({{ calendar.ticker.ticker }})</small></td>
-                    <td>{{ calendar.dividend_type ?? 'Regular' }}</td>
+                    <td>{{ calendar.ticker.fullname|slice(0,20) }}{% if calendar.ticker.fullname|length > 20 %}...{% endif %}<br/><small>({{ calendar.ticker.ticker }})</small></td>
+                    <td>{{ (calendar.dividend_type ?? 'Regular')|trans }}</td>
                     <td>{{ calendar.paymentDate|format_date('medium') }}</td>
                     <td>{{ calendar.exDividendDate|format_date('medium') }}</td>
                     <td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({fraction_digit: 2}) }}</td>
-                    <td>{{ calendar.source ?? 'manual' }}</td>
+                    <td>{{ (calendar.source ?? 'manual')|trans }}</td>
                     <td>{{ calendar.description }}</td>
                     <td>
                         <a href="{{ path('calendar_show', {'id': calendar.id}) }}" class="btn btn-primary">

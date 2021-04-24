@@ -6,24 +6,24 @@
             {% if is_granted('ROLE_USER') %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Admin
+                        {{ 'Admin'|trans }}
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
-                        <a href="{{ url('branch_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Industry</a>
+                        <a href="{{ url('branch_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Industry'|trans }}</a>
                         <a href="{{ url('ticker_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Tickers</a>
-                        <a href="{{ url('research_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Research on Tickers</a>
-                        <a href="{{ url('closed_position_index', parameters = {status: 2}, schemeRelative = false) }}" class="dropdown-item">Closed positions</a>
+                        <a href="{{ url('research_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Research on Tickers'|trans }}</a>
+                        <a href="{{ url('closed_position_index', parameters = {status: 2}, schemeRelative = false) }}" class="dropdown-item">{{ 'Closed positions'|trans }}</a>
                         <div class="dropdown-divider"></div>
-                        <a href="{{ url('pie_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Pies</a>
+                        <a href="{{ url('pie_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Pies'|trans }}</a>
                         <div class="dropdown-divider"></div>
-                        <a href="{{ url('csv_import', parameters = [], schemeRelative = false) }}" class="dropdown-item">Import csv</a>
+                        <a href="{{ url('csv_import', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Import csv'|trans }}</a>
                         <div class="dropdown-divider"></div>
-                        <a href="{{ url('journal_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Journal</a>
+                        <a href="{{ url('journal_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Journal'|trans }}</a>
                         <div class="dropdown-divider"></div>
-                        <a href="{{ url('app_account_update', parameters = [], schemeRelative = false) }}" class="dropdown-item">Account</a>
+                        <a href="{{ url('app_account_update', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Account'|trans }}</a>
                         <div class="dropdown-divider"></div>
-                        <a href="{{ url('currency_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Currency</a>
-                        <a href="{{ url('tax_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Tax</a>
+                        <a href="{{ url('currency_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Currency'|trans }}</a>
+                        <a href="{{ url('tax_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Taxtarifs'|trans }}</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -31,7 +31,7 @@
                         Portfolio
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
-                        <a href="{{ url('portfolio_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Portfolio</a>
+                        <a href="{{ url('portfolio_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Portfolio'|trans }}</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -39,29 +39,29 @@
                         Dividend
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown3">
-                        <a href="{{ url('payment_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Payments</a>
+                        <a href="{{ url('payment_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Payments'|trans }}</a>
                         <div class="dropdown-divider"></div>
-                        <a href="{{ url('calendar_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Calendar</a>
-                        <a href="{{ url('calendar_per_date', parameters = [], schemeRelative = false) }}" class="dropdown-item">Calendar per date</a>
-                        <a href="{{ url('calendar_per_date_table', parameters = [], schemeRelative = false) }}" class="dropdown-item">Calendar per date printout</a>
+                        <a href="{{ url('calendar_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Calendar'|trans }}</a>
+                        <a href="{{ url('calendar_per_date', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Calendar per date'|trans }}</a>
+                        <a href="{{ url('calendar_per_date_table', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Calendar per date printout'|trans }}</a>
                    </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown4" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Reports
+                        {{ 'Reports'|trans }}
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown4">
-                        <a href="{{ url('dividend_tracker', parameters = [], schemeRelative = false) }}" class="dropdown-item">Dividend Tracker</a>
-                        <a href="{{ url('report_allocation_sector', parameters = [], schemeRelative = false) }}" class="dropdown-item">Sector allocation</a>
-                        <a href="{{ url('report_allocation_position', parameters = [], schemeRelative = false) }}" class="dropdown-item">Position allocation</a>
+                        <a href="{{ url('dividend_tracker', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Dividend Tracker'|trans }}</a>
+                        <a href="{{ url('report_allocation_sector', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Sector allocation'|trans }}</a>
+                        <a href="{{ url('report_allocation_position', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Position allocation'|trans }}</a>
                         <div class="dropdown-divider"></div>
-                        <a href="{{ url('dividend_month_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">Dividend month Tickers</a>
-                        <a href="{{ url('report_dividend_projection', parameters = [], schemeRelative = false) }}" class="dropdown-item">Dividend projection</a>
-                        <a href="{{ url('report_payout', parameters = [], schemeRelative = false) }}" class="dropdown-item">Dividend payout</a>
-                        <a href="{{ url('report_dividend_yield', parameters = [], schemeRelative = false) }}" class="dropdown-item">Dividend yield</a>
-                        <a href="{{ url('report_dividend_yield_by_pie', parameters = [], schemeRelative = false) }}" class="dropdown-item">Dividend yield pie</a>
-                        <a href="{{ url('compound_prediction', parameters = [], schemeRelative = false) }}" class="dropdown-item">Compound calc</a>
-                        <a href="{{ url('report_export', parameters = [], schemeRelative = false) }}" class="dropdown-item" target="_new">Export</a>
+                        <a href="{{ url('dividend_month_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Dividend month Tickers'|trans }}</a>
+                        <a href="{{ url('report_dividend_projection', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Dividend projection'|trans }}</a>
+                        <a href="{{ url('report_payout', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Dividend payout'|trans }}</a>
+                        <a href="{{ url('report_dividend_yield', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Dividend yield'|trans }}</a>
+                        <a href="{{ url('report_dividend_yield_by_pie', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Dividend yield pie'|trans }}</a>
+                        <a href="{{ url('compound_prediction', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Compound calc'|trans }}</a>
+                        <a href="{{ url('report_export', parameters = [], schemeRelative = false) }}" class="dropdown-item" target="_new">{{ 'Export'|trans }}</a>
                       </div>
                 </li>
 
