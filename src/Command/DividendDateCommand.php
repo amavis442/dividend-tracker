@@ -9,8 +9,8 @@ use App\Repository\TickerRepository;
 use App\Service\DividendDateService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -43,22 +43,26 @@ class DividendDateCommand extends Command
      * @var CurrencyRepository
      */
     protected $currencyRepository;
-/**
- * Entity manager
- *
- * @var EntityManagerInterface
- */
+    /**
+     * Entity manager
+     *
+     * @var EntityManagerInterface
+     */
     protected $entityManager;
-
-
-
+    /**
+     * Log the shit for debugging
+     *
+     * @var LoggerInterface
+     */
+    protected $logger;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        TickerRepository $tickerRepository, 
-        CalendarRepository $calendarRepository, 
+        TickerRepository $tickerRepository,
+        CalendarRepository $calendarRepository,
         CurrencyRepository $currencyRepository,
-        DividendDateService $dividendDateService
+        DividendDateService $dividendDateService,
+        LoggerInterface $logger
     ) {
         parent::__construct();
         $this->entityManager = $entityManager;
@@ -66,7 +70,7 @@ class DividendDateCommand extends Command
         $this->dividendDateService = $dividendDateService;
         $this->calendarRepository = $calendarRepository;
         $this->currencyRepository = $currencyRepository;
- 
+        $this->logger = $logger;
     }
 
     protected function configure()
@@ -74,7 +78,7 @@ class DividendDateCommand extends Command
         $this
             ->setDescription(self::$defaultDescription)
             /* ->addArgument('ticker', InputArgument::OPTIONAL, 'Symbol of stock (MSFT, APPL)')
-               ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
+        ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
          */
         ;
     }
@@ -91,16 +95,20 @@ class DividendDateCommand extends Command
         foreach ($tickers as $ticker) {
             $data = $this->dividendDateService->getUpcommingDividendInfo($ticker->getSymbol());
             if (!$data) {
-                $io->info('No dividend data for '.$ticker->getFullname());
+                $io->info('No dividend data for ticker: ' . $ticker->getFullname());
                 continue;
             }
-            $io->info('Processing data for ticker: '.$ticker->getFullname());
 
-            foreach ($data as $payment)
-            {
-                $exDate = new DateTime($payment['ExDate']);               
+            $io->info('Processing data for ticker: ' . $ticker->getFullname());
+
+            foreach ($data as $payment) {
+                if ($payment['Type'] === 'Unknown' || empty($payment['PayDate']) || empty($payment['ExDate'])) {
+                    $this->logger->alert('Dividend date debug: ' . print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
+                    continue;
+                }
+                $exDate = new DateTime($payment['ExDate']);
                 $calendar = $this->calendarRepository->findOneBy(['ticker' => $ticker, 'exDividendDate' => $exDate]);
-                
+
                 if (!$calendar) {
                     $currencySymbol = $payment['Currency'];
                     $currency = $this->currencyRepository->findOneBy(['symbol' => $currencySymbol]);
@@ -113,14 +121,14 @@ class DividendDateCommand extends Command
 
                     $calendar = new Calendar();
                     $calendar
-                    ->setTicker($ticker)
-                    ->setCashAmount($payment['DividendAmount'])
-                    ->setExDividendDate($exDate)
-                    ->setPaymentDate($payDate)
-                    ->setRecordDate($recordDate)
-                    ->setCurrency($currency)
-                    ->setSource(Calendar::SOURCE_SCRIPT)
-                    ->setDescription($payment['Type'])
+                        ->setTicker($ticker)
+                        ->setCashAmount($payment['DividendAmount'])
+                        ->setExDividendDate($exDate)
+                        ->setPaymentDate($payDate)
+                        ->setRecordDate($recordDate)
+                        ->setCurrency($currency)
+                        ->setSource(Calendar::SOURCE_SCRIPT)
+                        ->setDescription($payment['Type'])
                     ;
                     $this->entityManager->persist($calendar);
                     $this->entityManager->flush();
@@ -130,18 +138,18 @@ class DividendDateCommand extends Command
                 }
 
                 /*
-                "DividendAmount" => 0.56
-                "Currency" => "USD"
-                "ExDate" => "2021-05-19"
-                "PayDate" => "2021-06-10"
-                "RecordDate" => "2021-05-20"
-                "DeclaredDate" => "2021-03-16"
-                "PaymentFrequency" => "Quarterly"
-                "Type" => "OrdinaryDividend"
-                */
+            "DividendAmount" => 0.56
+            "Currency" => "USD"
+            "ExDate" => "2021-05-19"
+            "PayDate" => "2021-06-10"
+            "RecordDate" => "2021-05-20"
+            "DeclaredDate" => "2021-03-16"
+            "PaymentFrequency" => "Quarterly"
+            "Type" => "OrdinaryDividend"
+             */
             }
         }
-        $io->success('Done.... added: '. $addedDates);
+        $io->success('Done.... added: ' . $addedDates);
         $io->info(implode(', ', $addedForTicker));
 
         return Command::SUCCESS;
