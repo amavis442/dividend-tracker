@@ -59,18 +59,14 @@
 							</ul>
 						{% endset %}
 
-						<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-							<div class="btn-group mr-2" role="group" aria-label="First group">
-								<button class="btn btn-primary" data-toggle="popover" data-placement="top" title="Transaction info"
-                    					data-content='{{ transactionInfo }}' data-html="true">
-										<i class="fas fa-info-circle"></i>
-								</button>
-							</div>
-							<div class="btn-group mr-2" role="group" aria-label="First group">
+						<div class="btn-group" role="group" aria-label="Actions">
 								<a href="{{ path('transaction_edit', {'id': transaction.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit transaction">
 									<i class="far fa-edit"></i>
 								</a>
-							</div>
+								<button class="btn btn-info" data-toggle="popover" data-placement="right" title="Transaction info"
+                    					data-content='{{ transactionInfo }}' data-html="true">
+										<i class="fas fa-info-circle"></i>
+								</button>
 						</div>
 					</td>
 				</tr>

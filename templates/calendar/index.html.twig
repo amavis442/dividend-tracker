@@ -28,26 +28,30 @@
 					<th>{{ 'Cash amount'|trans }}</th>
                     <th>{{ 'Source'|trans }}</th>
                     <th>{{ 'Descr.'|trans }}</th>
+                    <th>{{ 'Created'|trans }}</th>
 					<th>{{ 'actions'|trans }}</th>
 				</tr>
 			</thead>
 			<tbody>
             {% for calendar in calendars %}
                 <tr class="table">
-                    <td>{{ calendar.ticker.fullname|slice(0,20) }}{% if calendar.ticker.fullname|length > 20 %}...{% endif %}<br/><small>({{ calendar.ticker.ticker }})</small></td>
-                    <td>{{ (calendar.dividend_type ?? 'Regular')|trans }}</td>
-                    <td>{{ calendar.paymentDate|format_date('medium') }}</td>
-                    <td>{{ calendar.exDividendDate|format_date('medium') }}</td>
-                    <td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({fraction_digit: 2}) }}</td>
-                    <td>{{ (calendar.source ?? 'manual')|trans }}</td>
-                    <td>{{ calendar.description }}</td>
-                    <td>
-                        <a href="{{ path('calendar_show', {'id': calendar.id}) }}" class="btn btn-primary">
-                            <i class="fas fa-book-open"></i>
-                        </a>
-                        <a href="{{ path('calendar_edit', {'id': calendar.id}) }}" class="btn btn-primary">
-                            <i class="far fa-edit"></i>
-                        </a>
+                    <td class="col">{{ calendar.ticker.fullname|slice(0,20) }}{% if calendar.ticker.fullname|length > 20 %}...{% endif %}<br/><small>({{ calendar.ticker.ticker }})</small></td>
+                    <td class="col">{{ (calendar.dividend_type ?? 'Regular')|trans }}</td>
+                    <td class="col">{{ calendar.paymentDate|format_date('medium') }}</td>
+                    <td class="col">{{ calendar.exDividendDate|format_date('medium') }}</td>
+                    <td class="col">{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({fraction_digit: 2}) }}</td>
+                    <td class="col">{{ (calendar.source ?? 'manual')|trans }}</td>
+                    <td class="col">{{ calendar.description }}</td>
+                    <td class="col">{{ calendar.createdAt|format_date('short') }}</td>
+                    <td class="col">
+                        <div class="btn-group" role="group" aria-label="Actions">
+                            <a href="{{ path('calendar_show', {'id': calendar.id}) }}" class="btn btn-info">
+                                <i class="fas fa-book-open"></i>
+                            </a>
+                            <a href="{{ path('calendar_edit', {'id': calendar.id}) }}" class="btn btn-primary">
+                                <i class="far fa-edit"></i>
+                            </a>
+                        </div>
                     </td>
                 </tr>
             {% else %}

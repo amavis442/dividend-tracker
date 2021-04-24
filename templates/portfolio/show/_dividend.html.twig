@@ -16,6 +16,7 @@
 					<th>{{ 'Type'|trans }}</th>
 					<th>{{ 'Source'|trans }}</th>
 					<th>{{ 'Descr.'|trans }}</th>
+					<th>{{ 'Created'|trans }}</th>
 					<th>{{ 'Actions'|trans }}</th>
 				</tr>
 			</thead>
@@ -42,6 +43,7 @@
 						<td>{{ (calendar.dividendType ?? 'Regular')|trans }}</td>
 						<td>{{ (calendar.source ?? 'manual')|trans }}</td>
 						<td>{{ calendar.description }}</td>
+						<td>{{ calendar.createdAt|format_date('short') }}</td>
 						<td>
 							<a href="{{ path('calendar_edit', {'id': calendar.id}) }}" class="btn btn-primary">
 								<i class="far fa-edit"></i>

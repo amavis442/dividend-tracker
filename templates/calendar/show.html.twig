@@ -35,6 +35,10 @@
                 <th>{{ 'Description'|trans }}</th>
                 <td>{{ calendar.description }}</td>
             </tr>
+            <tr>
+                <th>{{ 'Created'|trans }}</th>
+                <td>{{ calendar.createdAt|format_date('short') }}</td>
+            </tr>
         </tbody>
     </table>
 
