@@ -29,7 +29,7 @@ class Tax
     private $taxRate;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Currency::class)
+     * @ORM\ManyToOne(targetEntity=Currency::class, inversedBy="taxes")
      */
     private $currency;
 

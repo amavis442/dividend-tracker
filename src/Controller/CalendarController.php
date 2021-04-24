@@ -149,12 +149,11 @@ class CalendarController extends AbstractController
             $dateSelect = $form->getData();
         }
 
-        $calendars = $calendarRepository->groupByMonth($year, $dateSelect->getStartdate()->format('Y-m-d'), $dateSelect->getEnddate()->format('Y-m-d'), $dateSelect->getPie());
+        $calendars = $calendarRepository->groupByMonth($dividendService, $year, $dateSelect->getStartdate()->format('Y-m-d'), $dateSelect->getEnddate()->format('Y-m-d'), $dateSelect->getPie());
 
         return $this->render('calendar/view_table.html.twig', [
             'calendars' => $calendars,
             'year' => $year,
-            'dividendService' => $dividendService,
             'dateSelect' => $dateSelect,
             'form' => $form->createView(),
             'timestamp' => new DateTime()

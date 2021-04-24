@@ -30,25 +30,30 @@
     {% for month,items in calendars %}
         {% set sumDividend = 0.0 %}
         <tr class="table-active">
-            <th colspan="6">
+            <th colspan="5">
                 {% set chosenDate = month|slice(0,4) ~ '-' ~ month|slice(4,2) ~ '-01' %}
                 {{ chosenDate|date('F')|trans }}, {{ month|slice(0,4) }}
             </th>
         </tr>
         {% for day, item in items %}
-            {% for key,cal in item %}
-                {% set estimatedAmount = dividendService.getPositionAmount(cal) %}
+            {% for key, calData in item %}
+                {% set cal = calData.calendar %}
+                {% set netDividend = calData.positionDividend %}
+                {% set estimatedAmount = calData.positionAmount %}
                 {% if estimatedAmount > 0.001 %}
-                    {% set netDividend = dividendService.getTotalNetDividend(cal) %}
                     {% set currentDate = cal.getPaymentDate %}
                     <tr>
-                        <td><button type="button" class="btn btn-outline-primary"><i class="far fa-circle"></i></button></td>
+                        <td>
+                            <button type="button" class="btn btn-outline-primary" data-toggle="tooltip" data-html="true" data-placement="left" title="{{ 'Tax rate'|trans }}: {{ calData.taxRate * 100 }}% <br/>{{ 'Exchangerate'|trans }}: {{ calData.exchangeRate }}<br/>{{ 'Tax'|trans }}: &euro;{{ calData.tax|format_number({fraction_digit: 2}) }}"><i class="far fa-circle"></i></button>
+                        </td>
                         <th>{{ currentDate|date('l')|trans }}, {{ currentDate|date('d') }} {{ currentDate|date('F')|trans|lower }} {{ currentDate|date('Y') }}</th>
                         <td>
                             {{ cal.ticker.fullname }}<br/>
                             <small>{{ estimatedAmount|format_number({fraction_digit: 7}) }} {{ 'shares'|trans }}</small>
                         </td> 
-                        <td>{{ cal.currency.sign|raw}}{{ cal.cashAmount|format_number({fraction_digit: 2}) }}</td>
+                        <td>
+                            {{ cal.currency.sign|raw}}{{ cal.cashAmount|format_number({fraction_digit: 2}) }}
+                        </td>
                         <td>&euro;{{ netDividend|format_number({fraction_digit: 2}) }}</td>
                     </tr>
                     {% set sumDividend = sumDividend + netDividend %}

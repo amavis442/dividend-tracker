@@ -9,7 +9,6 @@ use App\Repository\TaxRepository;
 use App\Service\ExchangeRateService;
 use DateTime;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\Criteria;
 
 class DividendService
 {
@@ -48,7 +47,7 @@ class DividendService
                 break;
             case 'CHF':
                 $exchangeRate = 1 / $rates['CHF'];
-                break;   
+                break;
             default:
                 $exchangeRate = 1 / $rates['USD'];
                 break;
@@ -66,11 +65,16 @@ class DividendService
     public function getTaxRate(Calendar $calendar): ?float
     {
         $dividendTax = 0.15;
-        $taxRate = $this->taxRepository->findOneValid($calendar->getCurrency(), (new DateTime()));
+
+        if (!$calendar->getCurrency()->getTaxes()) {
+            $taxRate = $this->taxRepository->findOneValid($calendar->getCurrency(), (new DateTime()));
+        } else {
+            $taxRate = $calendar->getCurrency()->getTaxes()->first();
+        }
 
         if ($taxRate) {
             return $taxRate->getTaxRate() / 100;
-        }      
+        }
         switch ($calendar->getCurrency()->getSymbol()) {
             case 'EUR':
                 $dividendTax = Constants::TAX / 100;
@@ -140,9 +144,8 @@ class DividendService
     {
         $amount = 0.0;
         $ticker = $calendar->getTicker();
-        $positions = $ticker->getPositions();
-        if ($positions) {
-            $position = $positions->first();
+        $position = $ticker->getPositions()->first();
+        if ($position) {
             if ($position) {
                 $amount = $this->getPositionSize($position->getTransactions(), $calendar);
             }

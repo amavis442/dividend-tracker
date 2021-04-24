@@ -7,6 +7,7 @@ use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Transaction;
+use App\Service\DividendService;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Collection;
@@ -168,12 +169,13 @@ class CalendarRepository extends ServiceEntityRepository
     /**
      * Get the calendars between startDate and endDate
      *
+     * @param DividendService $dividendService
      * @param integer $year
      * @param string|null $startDate
      * @param string|null $endDate
      * @return array|null
      */
-    public function groupByMonth(int $year, ?string $startDate = null, ?string $endDate = null, ?Pie $pie = null): ?array
+    public function groupByMonth(DividendService $dividendService, int $year, ?string $startDate = null, ?string $endDate = null, ?Pie $pie = null): ?array
     {
         if (!$startDate) {
             $startDate = $year . '-01-01';
@@ -183,14 +185,18 @@ class CalendarRepository extends ServiceEntityRepository
         }
 
         $qb = $this->createQueryBuilder('c')
-            ->select('c, t, p, tr, pies')
+            ->select('c, t, p, tr, pies, cur, tax')
             ->innerJoin('c.ticker', 't')
-            ->leftJoin('t.positions', 'p')
+            ->leftJoin('t.positions', 'p', 'WITH', 'p.closed is null OR p.closed = 0')
             ->leftJoin('p.transactions', 'tr')
             ->leftJoin('p.pies', 'pies')
+            ->leftJoin('c.currency', 'cur')
+            ->leftJoin('cur.taxes', 'tax', 'WITH', 'tax.validFrom <= :validFrom')
             ->where('c.paymentDate >= :start and c.paymentDate <= :end')
             ->setParameter('start', $startDate)
-            ->setParameter('end', $endDate);
+            ->setParameter('end', $endDate)
+            ->setParameter('validFrom', date('Y-m-d'))
+        ;
 
         if ($pie) {
             $qb->andWhere('pies IN (:pie)')
@@ -205,7 +211,21 @@ class CalendarRepository extends ServiceEntityRepository
 
         $data = [];
         foreach ($result as $item) {
-            $data[$item->getPaymentDate()->format('Ym')][$item->getPaymentDate()->format('j')][] = $item;
+            $positionAmount = $dividendService->getPositionAmount($item);
+            $positionDividend = $dividendService->getTotalNetDividend($item);
+            $taxRate = $dividendService->getTaxRate($item);
+            $exchangeRate = $dividendService->getExchangeRate($item);
+
+            $tax = $item->getCashAmount() * $exchangeRate * $taxRate;
+
+            $data[$item->getPaymentDate()->format('Ym')][$item->getPaymentDate()->format('j')][] = [
+                'calendar' => $item,
+                'positionAmount' => $positionAmount,
+                'positionDividend' => $positionDividend,
+                'taxRate' => $taxRate,
+                'exchangeRate' => $exchangeRate,
+                'tax' => $tax
+            ];
         }
         ksort($data);
         foreach ($data as &$month) {
