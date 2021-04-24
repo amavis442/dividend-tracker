@@ -87,6 +87,7 @@ class DividendDateCommand extends Command
         $tickers = $this->tickerRepository->getActive();
         $defaultCurrency = $this->currencyRepository->findOneBy(['symbol' => 'USD']);
         $addedDates = 0;
+        $addedForTicker = [];
         foreach ($tickers as $ticker) {
             $data = $this->dividendDateService->getUpcommingDividendInfo($ticker->getSymbol());
             if (!$data) {
@@ -119,10 +120,12 @@ class DividendDateCommand extends Command
                     ->setRecordDate($recordDate)
                     ->setCurrency($currency)
                     ->setSource(Calendar::SOURCE_SCRIPT)
+                    ->setDescription($payment['Type'])
                     ;
                     $this->entityManager->persist($calendar);
                     $this->entityManager->flush();
 
+                    $addedForTicker[] = $ticker->getSymbol();
                     $addedDates++;
                 }
 
@@ -138,7 +141,8 @@ class DividendDateCommand extends Command
                 */
             }
         }
-        $io->success('Done.... added '. $addedDates);
+        $io->success('Done.... added: '. $addedDates);
+        $io->info(implode(', ', $addedForTicker));
 
         return Command::SUCCESS;
     }

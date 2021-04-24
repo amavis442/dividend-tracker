@@ -27,6 +27,14 @@
                 <th>Cash amount</th>
                 <td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({fraction_digit: 2}) }}</td>
             </tr>
+            <tr>
+                <th>Source</th>
+                <td>{{ calendar.source ?? 'manual' }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ calendar.description }}</td>
+            </tr>
         </tbody>
     </table>
 

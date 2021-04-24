@@ -27,6 +27,7 @@
 					</th>
 					<th>Cash amount</th>
                     <th>Source</th>
+                    <th>Descr.</th>
 					<th>actions</th>
 				</tr>
 			</thead>
@@ -39,6 +40,7 @@
                     <td>{{ calendar.exDividendDate|format_date('medium') }}</td>
                     <td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({fraction_digit: 2}) }}</td>
                     <td>{{ calendar.source ?? 'manual' }}</td>
+                    <td>{{ calendar.description }}</td>
                     <td>
                         <a href="{{ path('calendar_show', {'id': calendar.id}) }}" class="btn btn-primary">
                             <i class="fas fa-book-open"></i>
