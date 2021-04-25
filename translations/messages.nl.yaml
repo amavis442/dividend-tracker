@@ -91,9 +91,9 @@ Update: Bijwerken
 Are you sure you want to delete this item?: Weet u zeker dat u dit item wilt verwijderen?
 Label: Label
 Company: Bedrijf
-Projected dividend / Actual payout: Verwachte dividend / Uitbetaald
-Exdiv / Pay date: Ex-div / Uitbetaaldatum
-Pay date: Uitbetaaldatum
+Projected dividend / Actual payout: Verwachte dividend / Uitgekeerd
+Exdiv / Pay date: Ex-div / Uitkeringsdatum
+Pay date: Uitkeringsdatum
 Net dividend: Netto dividend
 No: Nee
 With pie: Met schijf
@@ -106,7 +106,7 @@ shares: aandelen
 Received dividend: Ontvangen dividend
 Market Price: Marktprijs
 Ex-Div: Ex-Div
-Dividend payout month: Dividend uitbetaal maand
+Dividend payout month: Dividend uitkeer maand
 Principle: Inleg
 Expected dividend: Verwachte dividend
 x per year: x per jaar
@@ -116,9 +116,9 @@ Not available: Niet beschikbaar
 Edit ticker / months: Bewerk ticker / dividend maanden
 manual: handmatig
 Type: Type
-Payment date: Uitbetaal datum
+Payment date: Uitkeerdatum
 Ex-dividend date: Ex-dividend datum
-Cash amount: Uitbetaal bedrag
+Cash amount: Uitkeerbedrag
 Source: Bron
 Descr.: Omschr.
 actions: acties
