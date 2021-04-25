@@ -23,29 +23,41 @@ class DividendDateService
      * @var HttpClientInterface
      */
     private $client;
-    /**
-     * Get Ishares date
-     *
-     * @var ISharesService
-     */
-    private $iSharesService;
 
+    /**
+     * Initialized services
+     *
+     * @var Array
+     */
     private $externalServices;
 
+    /**
+     * Which service is linked to ticker
+     *
+     * @var array
+     */
+    private $tickerLinkedToService;
 
     public function __construct(HttpClientInterface $client, ISharesService $iSharesService)
     {
         $this->client = $client;
         $this->iSharesService = $iSharesService;
         $this->externalServices = [];
+        $this->tickerLinkedToService = [];
     }
 
     public function addExternalService(string $ticker, string $serviceClass)
     {
-        $service = new $serviceClass();
-        if ($service instanceof DividendRetrievalInterface) {
-            $service->setClient($this->client);
-            $this->externalServices[$ticker] = $service;
+        if (!isset($this->externalServices[$serviceClass])) {
+            $service = new $serviceClass();
+            if ($service instanceof DividendRetrievalInterface) {
+                $service->setClient($this->client);
+                $this->externalServices[$serviceClass] = $service;
+                
+            }
+        }
+        if (isset($this->externalServices[$serviceClass])) {
+            $this->tickerLinkedToService[$ticker] = $serviceClass;
         }
     }
 
@@ -102,9 +114,10 @@ class DividendDateService
     {
         $tickerNextPayments = [];
 
-        if (isset($this->externalServices[$ticker])) {
+        if (isset($this->tickerLinkedToService[$ticker])) {
+            $serviceClass = $this->tickerLinkedToService[$ticker];
             $tickerData = [];
-            $tickerData['CashDividends'][] = $this->externalServices[$ticker]->getLatest($ticker);
+            $tickerData['CashDividends'][] = $this->externalServices[$serviceClass]->getLatest($ticker);
         } else {
             $token = $this->getToken();
             $tickerData = [];
