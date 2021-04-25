@@ -4,6 +4,7 @@ namespace App\Service;
 use DateTime;
 use RuntimeException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\Service\Contracts\DividendRetrievalInterface;
 
 class DividendDateService
 {
@@ -22,10 +23,30 @@ class DividendDateService
      * @var HttpClientInterface
      */
     private $client;
+    /**
+     * Get Ishares date
+     *
+     * @var ISharesService
+     */
+    private $iSharesService;
 
-    public function __construct(HttpClientInterface $client)
+    private $externalServices;
+
+
+    public function __construct(HttpClientInterface $client, ISharesService $iSharesService)
     {
         $this->client = $client;
+        $this->iSharesService = $iSharesService;
+        $this->externalServices = [];
+    }
+
+    public function addExternalService(string $ticker, string $serviceClass)
+    {
+        $service = new $serviceClass();
+        if ($service instanceof DividendRetrievalInterface) {
+            $service->setClient($this->client);
+            $this->externalServices[$ticker] = $service;
+        }
     }
 
     public function getToken()
@@ -81,13 +102,17 @@ class DividendDateService
     {
         $tickerNextPayments = [];
 
-        $token = $this->getToken();
-        $tickerData = [];
-        $tickerData = $this->getStockHistory($token, $ticker);
-        if ($tickerData === null || count($tickerData['CashDividends']) === 0) {
-            return null;
+        if (isset($this->externalServices[$ticker])) {
+            $tickerData = [];
+            $tickerData['CashDividends'][] = $this->externalServices[$ticker]->getLatest($ticker);
+        } else {
+            $token = $this->getToken();
+            $tickerData = [];
+            $tickerData = $this->getStockHistory($token, $ticker);
+            if ($tickerData === null || count($tickerData['CashDividends']) === 0) {
+                return null;
+            }
         }
-
         $tickerNextPayments = $this->getTickerNextPayments($tickerData);
 
         return $tickerNextPayments;

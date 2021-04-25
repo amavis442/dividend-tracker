@@ -7,6 +7,7 @@ use App\Repository\CalendarRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\TickerRepository;
 use App\Service\DividendDateService;
+use App\Service\ISharesService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -78,16 +79,16 @@ class DividendDateCommand extends Command
         $this
             ->setDescription(self::$defaultDescription)
             /* ->addArgument('ticker', InputArgument::OPTIONAL, 'Symbol of stock (MSFT, APPL)')
-        ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-         */
+            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
+            */
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->dividendDateService->addExternalService('SEMB', ISharesService::class);
 
         $io = new SymfonyStyle($input, $output);
-        //$symbol = $input->getArgument('ticker');
         $tickers = $this->tickerRepository->getActive();
         $defaultCurrency = $this->currencyRepository->findOneBy(['symbol' => 'USD']);
         $addedDates = 0;
