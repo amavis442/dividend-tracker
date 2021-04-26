@@ -39,6 +39,24 @@ services:
         arguments: 
             $entityManager: "@doctrine.orm.entity_manager"
 
+    App\Service\ExchangeRateService:
+        arguments:
+            $client: '@http_client'
+            $exchangerateCache: '@exchangerate.cache'
+
+    App\Service\YahooFinanceService:
+        arguments:
+            $client: '@http_client'
+            $yahooCache: '@yahoo.cache'
+            $exchangeRateService: '@App\Service\ExchangeRateService'
+
+    App\Service\StockPriceService:
+        calls:
+            - addService: ['@App\Service\YahooFinanceService']   
+            - setDefault: ['App\Service\YahooFinanceService']
+            - linkServiceToTicker: ['App\Service\YahooFinanceService','PNN']
+            - linkServiceToTicker: ['App\Service\YahooFinanceService','SHTS']
+
     App\Service\ImportCsvService:
         arguments: 
             $entityManager: "@doctrine.orm.entity_manager"

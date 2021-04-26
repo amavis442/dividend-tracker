@@ -2,11 +2,13 @@
 
 namespace App\Model;
 
+use App\Entity\Position;
 use App\Entity\PortfolioItem;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Service\DividendService;
+use App\Service\StockPriceService;
 use App\Service\YahooFinanceService;
 use RuntimeException;
 use DateTime;
@@ -67,7 +69,7 @@ class PortfolioModel
         TickerRepository $tickerRepository,
         DividendService $dividendService,
         PaymentRepository $paymentRepository,
-        YahooFinanceService $yahooFinanceService,
+        StockPriceService $stockPriceService,
         string $cacheTag = 'all',
         float $totalInvested,
         int $page = 1,
@@ -107,9 +109,13 @@ class PortfolioModel
             $symbol = $ticker->getSymbol();
             $symbols[] = $symbol;
         }
-        $marketData = $yahooFinanceService->getQuotes($symbols, $cacheTag);        
+        
+        $marketData = $stockPriceService->getQuotes($symbols, $cacheTag);
         $this->timestamp = $marketData['timestamp'];
 
+        /**
+         * @var Position $position
+         */
         foreach ($iter as $position) {
             $ticker = $position->getTicker();
             $symbol = $ticker->getSymbol();
@@ -118,7 +124,7 @@ class PortfolioModel
             $paperProfitPercentage = 0.0;
             $diffPrice = 0.0;
             
-            $marketPrice = $yahooFinanceService->getMarketPrice($symbol);
+            $marketPrice = $stockPriceService->getMarketPrice($symbol);
             $amount = $position->getAmount();
             $avgPrice = $position->getPrice();
             $allocation = $position->getAllocation();
