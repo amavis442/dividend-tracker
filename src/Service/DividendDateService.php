@@ -4,7 +4,7 @@ namespace App\Service;
 use DateTime;
 use RuntimeException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use App\Service\Contracts\DividendRetrievalInterface;
+use App\Contracts\Service\DividendRetrievalInterface;
 
 class DividendDateService
 {
