@@ -39,6 +39,30 @@ services:
         arguments: 
             $entityManager: "@doctrine.orm.entity_manager"
 
+    App\Service\ExchangeRateService:
+        arguments:
+            $client: '@http_client'
+            $exchangerateCache: '@exchangerate.cache'
+
+    App\Service\StockPriceService:
+        arguments:
+            $client: '@http_client'
+            $stockCache: '@stock.cache'
+            $exchangeRateService: '@App\Service\ExchangeRateService' 
+        calls:
+            - addService: ['App\Service\StockPrices\YahooFinanceService']
+            - addService: ['App\Service\StockPrices\LondonService']   
+            - setDefault: ['App\Service\StockPrices\YahooFinanceService']
+            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','SEMB']
+            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','PNN']
+            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','RB']
+            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','BATS']
+            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','SSHY']
+            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','STHS']
+            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','VWRL']
+            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','VGOV']
+            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','VUSC']
+
     App\Service\ImportCsvService:
         arguments: 
             $entityManager: "@doctrine.orm.entity_manager"

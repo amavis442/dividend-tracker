@@ -12,6 +12,7 @@ use App\Repository\TickerRepository;
 use App\Service\DividendGrowthService;
 use App\Service\DividendService;
 use App\Service\Referer;
+use App\Service\StockPriceService;
 use App\Service\Summary;
 use App\Service\YahooFinanceService;
 use DateTime;
@@ -46,7 +47,8 @@ class PortfolioController extends AbstractController
         string $sort = 'asc',
         DividendService $dividendService,
         Referer $referer,
-        YahooFinanceService $yahooFinanceService,
+        StockPriceService $stockPriceService,
+        //YahooFinanceService $yahooFinanceService,
         PortfolioModel $model
     ): Response {
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
@@ -67,7 +69,7 @@ class PortfolioController extends AbstractController
             $tickerRepository,
             $dividendService,
             $paymentRepository,
-            $yahooFinanceService,
+            $stockPriceService,
             $user->getId(),
             $allocated,
             $page,

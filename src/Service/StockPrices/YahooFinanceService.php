@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\StockPrices;
 
+use App\Contracts\Service\StockPriceInterface;
+use App\Service\ExchangeRateService;
 use RuntimeException;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class YahooFinanceService
+class YahooFinanceService implements StockPriceInterface
 {
     public const YAHOO_API = 'https://query1.finance.yahoo.com/v8/finance/chart/';
     public const YAHOO_URL = 'https://finance.yahoo.com/quote/';
@@ -18,7 +20,7 @@ class YahooFinanceService
      *
      * @var CacheInterface
      */
-    private $yahooCache;
+    private $stockCache;
 
     /**
      * Used for calling the api
@@ -43,21 +45,21 @@ class YahooFinanceService
 
     public function __construct(
         HttpClientInterface $client,
-        CacheInterface $yahooCache,
+        CacheInterface $stockCache,
         ExchangeRateService $exchangeRateService
     ) {
-        $this->yahooCache = $yahooCache;
+        $this->stockCache = $stockCache;
         $this->client = $client;
         $this->exchangeRateService = $exchangeRateService;
     }
 
-    public function getQuotes(array $symbols, string $tag)
+    public function getQuotes(array $symbols): ?array
     {
         $client = $this->client;
         $apiCallUrl = self::YAHOO_QUOTE;
 
-        $tagName = 'yahoo_quotes_' . $tag;
-        $data = $this->yahooCache->get($tagName, function (ItemInterface $item) use ($client, $apiCallUrl, $symbols) {
+        $tagName = 'yahoo_quotes';
+        $data = $this->stockCache->get($tagName, function (ItemInterface $item) use ($client, $apiCallUrl, $symbols) {
             $item->expiresAfter(300);
             $response = $client->request(
                 'GET',
@@ -115,17 +117,27 @@ class YahooFinanceService
         return $marketPrice / ($rates[$currency]);
     }
 
+    public function getQuote(string $symbol): ?float
+    {
+        $rates = $this->exchangeRateService->getRates();
+        $data = $this->getData($symbol);
+        $price = $data['price'];
+        $currency = $data['currency'];
+
+        return $price / ($rates[$currency]);
+    }
+
     /**
      * Get the exchangerates from an external source and only refresh 1 per hour
      *
      * @return array
      */
-    public function getData(string $symbol): array
+    private function getData(string $symbol): array
     {
         $client = $this->client;
         $apiCallUrl = self::YAHOO_API;
 
-        $data = $this->yahooCache->get('yahoo_' . strtolower($symbol), function (ItemInterface $item) use ($client, $apiCallUrl, $symbol) {
+        $data = $this->stockCache->get('yahoo_' . strtolower($symbol), function (ItemInterface $item) use ($client, $apiCallUrl, $symbol) {
             $item->expiresAfter(3600);
             $response = $client->request(
                 'GET',
@@ -152,15 +164,5 @@ class YahooFinanceService
         //$this->yahooCache->delete('yahoo_'.strtolower($symbol));
 
         return $data;
-    }
-
-    public function getQuote(string $symbol): ?float
-    {
-        $rates = $this->exchangeRateService->getRates();
-        $data = $this->getData($symbol);
-        $price = $data['price'];
-        $currency = $data['currency'];
-
-        return $price / ($rates[$currency]);
     }
 }
