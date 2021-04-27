@@ -4,11 +4,14 @@
 
 {% block body %}
 <div><h1>Dividend payments per date for {{ year }}</h1></div>
-{% if calendar %}
+{% if calendars %}
     {% set rowColumns = 3 %}
     {% set numColumns = 0 %}
 
-    {% for month,items in calendar %}
+    {% for key, calData in item %}
+        {% set cal = calData.calendar %}
+        {% set netDividend = calData.positionDividend %}
+        {% set estimatedAmount = calData.positionAmount %}
         {% if numColumns in [0] %}
             <div class="row">
         {% endif %}

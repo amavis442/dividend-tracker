@@ -94,20 +94,6 @@ class CalendarController extends AbstractController
     }
 
     /**
-     * @Route("/calendarperdate", name="calendar_per_date", methods={"GET"})
-     */
-    public function viewCalendar(CalendarRepository $calendarRepository, DividendService $dividendService): Response
-    {
-        $year = date('Y');
-        $calendar = $calendarRepository->groupByMonth($year);
-        return $this->render('calendar/view.html.twig', [
-            'calendar' => $calendar,
-            'year' => $year,
-            'dividendService' => $dividendService,
-        ]);
-    }
-
-    /**
      * @Route("/calendarperdatetable", name="calendar_per_date_table", methods={"GET","POST"})
      */
     public function viewCalendarTable(Request $request, CalendarRepository $calendarRepository, DividendService $dividendService): Response

@@ -139,7 +139,7 @@ Import csv: Csv importeren
 Account: Account
 Tax: Belasting
 Portfolio: Portfolio
-Payments: Betalingen
+Payments: Uitkeringen
 Calendar: Kalender
 Calendar per date: Kalender per datum
 Calendar per date printout: Afdruk kalender per datum
@@ -149,7 +149,7 @@ Sector allocation: Sector allocatie
 Position allocation: Positie allocatie
 Dividend month Tickers: Overzicht Dividend maandelijks
 Dividend projection: Dividend projectie
-Dividend payout: Uitbetaling
+Dividend payout: Uitkering
 Dividend yield pie: Dividend opbrengst per schijf
 Compound calc: Samengestelde rente rekenmachine
 Export: Exporteren
