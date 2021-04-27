@@ -9,10 +9,9 @@ interface StockPriceInterface
      * Get the marketprice
      *
      * @param array $symbols
-     * @param string $tag
      * @return array|null
      */
-    public function getQuotes(array $symbols, string $tag): ?array;
+    public function getQuotes(array $symbols): ?array;
 
     /**
      * Get marketprice for symbol

@@ -110,8 +110,8 @@ class PortfolioModel
             $symbols[] = $symbol;
         }
         
-        $marketData = $stockPriceService->getQuotes($symbols, $cacheTag);
-        $this->timestamp = $marketData['timestamp'];
+        $stockPriceService->getQuotes($symbols);
+        $this->timestamp = $stockPriceService->getCacheTimeStamp();
 
         /**
          * @var Position $position

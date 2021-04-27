@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Service\YahooFinanceService;
+use App\Service\StockPriceService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,17 +10,17 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class YahooDataCommand extends Command
+class StockDataCommand extends Command
 {
     protected static $defaultName = 'app:yahoodata';
     protected static $defaultDescription = 'Get stockdata from yahoo for all open positions when posible and put them in a cache';
-    protected $yahooFinanceService;
+    protected $stockPriceService;
 
-    public function __construct(YahooFinanceService $yahooFinanceService)
+    public function __construct(StockPriceService $stockPriceService)
     {
         parent::__construct();
 
-        $this->yahooFinanceService = $yahooFinanceService;
+        $this->stockPriceService = $stockPriceService;
     }
     
     protected function configure()
@@ -37,7 +37,7 @@ class YahooDataCommand extends Command
         
         $io = new SymfonyStyle($input, $output);
         $symbol = $input->getArgument('symbol');
-        $marketPriceInEuro = $this->yahooFinanceService->getQuote($symbol);
+        $marketPriceInEuro = $this->stockPriceService->getQuote($symbol);
         $io->info('Euro: '. $marketPriceInEuro);
 
         $io->success('Done....');

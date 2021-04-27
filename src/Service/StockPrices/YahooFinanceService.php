@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\StockPrices;
 
 use App\Contracts\Service\StockPriceInterface;
+use App\Service\ExchangeRateService;
 use RuntimeException;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -19,7 +20,7 @@ class YahooFinanceService implements StockPriceInterface
      *
      * @var CacheInterface
      */
-    private $yahooCache;
+    private $stockCache;
 
     /**
      * Used for calling the api
@@ -44,21 +45,21 @@ class YahooFinanceService implements StockPriceInterface
 
     public function __construct(
         HttpClientInterface $client,
-        CacheInterface $yahooCache,
+        CacheInterface $stockCache,
         ExchangeRateService $exchangeRateService
     ) {
-        $this->yahooCache = $yahooCache;
+        $this->stockCache = $stockCache;
         $this->client = $client;
         $this->exchangeRateService = $exchangeRateService;
     }
 
-    public function getQuotes(array $symbols, string $tag): ?array
+    public function getQuotes(array $symbols): ?array
     {
         $client = $this->client;
         $apiCallUrl = self::YAHOO_QUOTE;
 
-        $tagName = 'yahoo_quotes_' . $tag;
-        $data = $this->yahooCache->get($tagName, function (ItemInterface $item) use ($client, $apiCallUrl, $symbols) {
+        $tagName = 'yahoo_quotes';
+        $data = $this->stockCache->get($tagName, function (ItemInterface $item) use ($client, $apiCallUrl, $symbols) {
             $item->expiresAfter(300);
             $response = $client->request(
                 'GET',
@@ -136,7 +137,7 @@ class YahooFinanceService implements StockPriceInterface
         $client = $this->client;
         $apiCallUrl = self::YAHOO_API;
 
-        $data = $this->yahooCache->get('yahoo_' . strtolower($symbol), function (ItemInterface $item) use ($client, $apiCallUrl, $symbol) {
+        $data = $this->stockCache->get('yahoo_' . strtolower($symbol), function (ItemInterface $item) use ($client, $apiCallUrl, $symbol) {
             $item->expiresAfter(3600);
             $response = $client->request(
                 'GET',
