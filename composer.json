@@ -40,8 +40,7 @@
         "symfony/web-link": "5.2.*",
         "symfony/webpack-encore-bundle": "^1.11",
         "symfony/yaml": "5.2.*",
-        "twig/extensions": "^1.5",
-        "twig/extra-bundle": "^2.12|^3.0",
+        "twig/extra-bundle": "^3.3",
         "twig/intl-extra": "^3.3",
         "twig/twig": "^2.12|^3.0",
         "zbateson/mail-mime-parser": "^1.3"
