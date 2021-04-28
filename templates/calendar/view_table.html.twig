@@ -22,6 +22,7 @@
     <table class="table">
     <tr>
         <th></th>
+        <th></th>
         <th>{{ 'Pay date'|trans }}</th>
         <th>{{ 'Company'|trans }}</th>
         <th>{{ 'Dividend'|trans }}</th>
@@ -29,8 +30,9 @@
     </tr>
     {% for month,items in calendars %}
         {% set sumDividend = 0.0 %}
-        {% set numPositions = 0 %}
+        {% set numPositions = 1 %}
         <tr class="table-active">
+            <th>#</th>
             <th colspan="5">
                 {% set chosenDate = month|slice(0,4) ~ '-' ~ month|slice(4,2) ~ '-01' %}
                 {{ chosenDate|date('F')|trans }}, {{ month|slice(0,4) }}
@@ -44,6 +46,7 @@
                 {% if estimatedAmount > 0.001 %}
                     {% set currentDate = cal.getPaymentDate %}
                     <tr>
+                        <td>{{ numPositions}}</td>
                         <td>
                             <button type="button" class="btn btn-outline-primary" data-toggle="tooltip" data-html="true" data-placement="left" title="{{ 'Tax rate'|trans }}: {{ calData.taxRate * 100 }}% <br/>{{ 'Exchangerate'|trans }}: {{ calData.exchangeRate }}<br/>{{ 'Tax'|trans }}: &euro;{{ calData.tax|format_number({fraction_digit: 2}) }}"><i class="far fa-circle"></i></button>
                         </td>
@@ -58,13 +61,12 @@
                         <td>&euro;{{ netDividend|format_number({fraction_digit: 2}) }}</td>
                     </tr>
                     {% set sumDividend = sumDividend + netDividend %}
+                    {% set numPositions = numPositions  + 1 %}
                 {% endif %}
             {% endfor %}
-            {% set numPositions = item|length %}
         {% endfor %}
         <tr>
-            <td colspan="2"></td>
-            <td>{{ 'positions'|trans|ucfirst }}: {{ numPositions }}</td>
+            <td colspan="4"></td>
             <th>{{ 'Total'|trans }}</th>
             <th>&euro;{{ sumDividend|format_number({fraction_digit: 2}) }}</th>
         </tr>
