@@ -28,7 +28,7 @@
 					<th>{{ 'Cash amount'|trans }}</th>
                     <th>{{ 'Source'|trans }}</th>
                     <th>{{ 'Descr.'|trans }}</th>
-                    <th>{{ 'Created'|trans }}</th>
+                    <th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'createdAt', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Created'|trans }}</a></th>
 					<th>{{ 'actions'|trans }}</th>
 				</tr>
 			</thead>
@@ -41,7 +41,7 @@
                     <td class="col">{{ calendar.exDividendDate|format_date('medium') }}</td>
                     <td class="col">{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({fraction_digit: 2}) }}</td>
                     <td class="col">{{ (calendar.source ?? 'manual')|trans }}</td>
-                    <td class="col">{{ calendar.description }}</td>
+                    <td class="col">{{ calendar.description ?? '&mdash;' }}</td>
                     <td class="col">{{ calendar.createdAt|format_date('short') }}</td>
                     <td class="col">
                         <div class="btn-group" role="group" aria-label="Actions">

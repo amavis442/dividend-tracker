@@ -31,12 +31,12 @@
 	<table class="table">
 		<thead>
 			<tr>
-				<th>Pay date</th>
-				<th>Company</th>
-				<th>Dividend(&euro;)</th>
-				<th>Taxes (15%)</th>
-				<th>Type</th>
-				<th>actions</th>
+				<th>{{ 'Pay date'|trans }}</th>
+				<th>{{ 'Company'|trans }}</th>
+				<th>{{ 'Dividend'|trans }}(&euro;)</th>
+				<th>{{ 'Tax'|trans }}</th>
+				<th>{{ 'Type'|trans }}</th>
+				<th>{{ 'Actions'|trans }}</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -47,8 +47,8 @@
 						({{ payment.position.ticker.ticker }})<br/>
 						<small>{{ (payment.amount)|format_number({fraction_digit: 7}) }} {{ 'shares'|trans }}</small>
 					</td>
-					<td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend)|format_number({fraction_digit: 2}) }}</td>
-					<td>&euro;{{ (payment.taxes)|format_number({fraction_digit: 2}) }}</td>
+					<td><strong>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend)|format_number({fraction_digit: 2}) }}</strong></td>
+					<td><span style="color:red">&euro;{{ (payment.taxes)|format_number({fraction_digit: 2}) }}</span></td>
 					<td>{{ payment.dividendType }}</td>
 					<td>
 						<a href="{{ path('payment_show', {'id': payment.id}) }}" class="btn btn-primary">
@@ -65,7 +65,7 @@
 				</tr>
 			{% endfor %}
 			<tr>
-				<td colspan="2"></td>
+				<td colspan="1"></td>
 				<td>
 					<span style="font-weight:bold">Total dividend
 						{% if tab > 'All' %}this
@@ -73,10 +73,9 @@
 						{% endif %}
 					</span>
 				</td>
-				<td>&euro;
-					{{ dividends }}</td>
-				<td>&euro;{{ taxes|format_number({fraction_digit: 2}) }}</td>
-				<td ></td>
+				<td><span style="font-weight:bold">&euro;{{ dividends|format_number({fraction_digit: 2}) }}</span></td>
+				<td><span style="color:red">&euro;{{ taxes|format_number({fraction_digit: 2}) }}</span></td>
+				<td colspan="3"></td>
 			</tr>
 		</tbody>
 	</table>
