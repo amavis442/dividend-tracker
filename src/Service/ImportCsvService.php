@@ -225,6 +225,7 @@ class ImportCsvService extends ImportBase
                         $rawAllocation = $val;
                         $allocation = $val;
                         $row['allocation'] = $allocation;
+                        $row['total'] = $val;
                         break;
                     case 'id':
                         $row['opdrachtid'] = $val;
@@ -241,6 +242,12 @@ class ImportCsvService extends ImportBase
                     case 'currency conversion fee (eur)':
                         $row['fx_fee'] = (float) $val ?? null;
                         break;
+                    case 'Transaction fee (EUR)':
+                        $row['transaction_fee'] = $val;
+                        break; 
+                    case 'Finra fee (EUR)':
+                        $row['finra_fee'] = $val;
+                        break;    
                     default:
                         $row[] = $val;
                 }
@@ -255,6 +262,8 @@ class ImportCsvService extends ImportBase
             };
 
             if (count($row) > 0) {
+                $rawAllocation -= ($row['fx_fee'] ?? 0) - ($row['stampduty'] ?? 0) - ($row['transaction_fee'] ?? 0) - ($row['finra_fee'] ?? 0);
+                $row['allocation'] = $rawAllocation;
                 $row['price'] = round($rawAllocation / $rawAmount, 3);
                 $rows[$row['nr']] = $row;
             }
@@ -318,6 +327,9 @@ class ImportCsvService extends ImportBase
                         ->setFxFee($row['fx_fee'] ?? 0)
                         ->setOriginalPrice($row['original_price'])
                         ->setOriginalPriceCurrency($row['original_price_currency'])
+                        ->setFinraFee($row['finra_fee'] ?? 0)
+                        ->setTransactionFee($row['transaction_fee'] ?? 0)
+                        ->setTotal($row['total'] ?? 0)
                     ;
                     if ($row['direction'] == Transaction::SELL) {
                         $transaction->setProfit($row['profit']);

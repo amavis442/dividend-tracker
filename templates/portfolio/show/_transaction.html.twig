@@ -12,6 +12,7 @@
 			<th>{{ 'avgPrice'|trans }}</th>
 			<th>{{ 'Profit / Loss'|trans }}</th>
 			<th>{{ 'Dividend yield'|trans }}</th>
+			<th>{{ 'Total costs'|trans }}</th>
 			<th>{{ 'Actions'|trans }}</th>
 		</tr>
 	</thead>
@@ -48,7 +49,7 @@
 						</span>
 					</td>
 					<td>{% if transaction.side == 1 %}{{ dividendYield|format_number({fraction_digit: 2}) }}% {% endif %}</td>
-					
+					<td>&euro;{{ (transaction.stampduty + transaction.fxFee + transaction.finraFee + transaction.transactionFee)|format_number({fraction_digit: 2}) }}</td>
 					<td>
 						{% set transactionInfo %}
 							<ul class="list-group">

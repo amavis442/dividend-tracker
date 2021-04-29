@@ -132,6 +132,21 @@ class Transaction
     private $stampduty;
 
     /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $transactionFee;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $finraFee;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $total;
+
+    /**
      * @Assert\Callback
      */
     public function validate(ExecutionContextInterface $context, $payload)
@@ -408,6 +423,42 @@ class Transaction
     public function setStampduty(?float $stampduty): self
     {
         $this->stampduty = $stampduty * Constants::VALUTA_PRECISION;
+
+        return $this;
+    }
+
+    public function getTransactionFee(): ?float
+    {
+        return $this->transactionFee / Constants::VALUTA_PRECISION;
+    }
+
+    public function setTransactionFee(?int $transactionFee): self
+    {
+        $this->transactionFee = $transactionFee * Constants::VALUTA_PRECISION;
+
+        return $this;
+    }
+
+    public function getFinraFee(): ?float
+    {
+        return $this->finraFee / Constants::VALUTA_PRECISION;
+    }
+
+    public function setFinraFee(?int $finraFee): self
+    {
+        $this->finraFee = $finraFee * Constants::VALUTA_PRECISION;
+
+        return $this;
+    }
+
+    public function getTotal(): ?float
+    {
+        return $this->total / Constants::VALUTA_PRECISION;
+    }
+
+    public function setTotal(int $total): self
+    {
+        $this->total = $total * Constants::VALUTA_PRECISION;
 
         return $this;
     }
