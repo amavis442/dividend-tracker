@@ -122,6 +122,7 @@ class TickerRepository extends ServiceEntityRepository
             ->select('t, p')
             ->innerJoin('t.positions', 'p')
             ->where('p.closed = 0 or p.closed is null')
+            ->groupBy('t.id')
             ->getQuery()
             ->getResult();
     }
