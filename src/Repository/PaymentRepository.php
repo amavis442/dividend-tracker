@@ -43,7 +43,6 @@ class PaymentRepository extends ServiceEntityRepository
 
     public function getAll(
         int $page = 1,
-        string $interval = 'All',
         int $limit = 10,
         string $orderBy = 'exDividendDate',
         string $sort = 'DESC',
@@ -64,10 +63,6 @@ class PaymentRepository extends ServiceEntityRepository
             ->join('p.ticker', 't')
             ->leftJoin('p.calendar', 'c')
             ->orderBy($order, $sort);
-
-        if ($interval !== 'All' && $startDate === null) {
-            $this->getInterval($queryBuilder, $interval);
-        }
 
         if ($startDate !== null) {
             $this->setDateRange($queryBuilder, $startDate, $endDate);
@@ -121,15 +116,11 @@ class PaymentRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getTotalDividend(string $interval = 'All', string $startDate = null, string $endDate = null): ?float
+    public function getTotalDividend(string $startDate = null, string $endDate = null): ?float
     {
 
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('SUM(p.dividend) total');
-
-        if ($interval !== 'All' && $startDate === null) {
-            $this->getInterval($queryBuilder, $interval);
-        }
 
         if ($startDate !== null) {
             $this->setDateRange($queryBuilder, $startDate, $endDate);

@@ -28,7 +28,7 @@ class PaymentController extends AbstractController
     public const INTERVAL_KEY = 'payment_interval';
 
     /**
-     * @Route("/list/{page?1}/{tab?All}/{orderBy?payDate}/{sort?DESC}", name="payment_index", methods={"GET","POST"})
+     * @Route("/list/{page?1}/{orderBy?payDate}/{sort?DESC}", name="payment_index", methods={"GET","POST"})
      */
     public function index(
         Request $request,
@@ -37,7 +37,6 @@ class PaymentController extends AbstractController
         int $page = 1,
         string $orderBy = 'payDate',
         string $sort = 'DESC',
-        string $tab = 'All',
         Referer $referer
     ): Response {
         if (!in_array($orderBy, ['payDate', 'ticker'])) {
@@ -108,15 +107,15 @@ class PaymentController extends AbstractController
         if (isset($data['quator']) && $data['quator'] !== 0) {
             [$startDate, $endDate] = (new DateHelper())->quaterToDates($data['quator'], $data['year']);
         }
-        $totalDividend = $paymentRepository->getTotalDividend($tab, $startDate, $endDate);
+        $totalDividend = $paymentRepository->getTotalDividend($startDate, $endDate);
         $taxes = ($totalDividend / 85) * 15;
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
-        $items = $paymentRepository->getAll($page, $tab, 10, $orderBy, $sort, $searchCriteria, $startDate, $endDate);
+        $items = $paymentRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria, $startDate, $endDate);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
 
-        $referer->set('payment_index', ['page' => $page, 'tab' => $tab, 'orderBy' => $orderBy, 'sort' => $sort]);
+        $referer->set('payment_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
 
         return $this->render('payment/index.html.twig', [
             'searchForm' => $form->createView(),
@@ -128,7 +127,6 @@ class PaymentController extends AbstractController
             'thisPage' => $thisPage,
             'order' => $orderBy,
             'sort' => $sort,
-            'tab' => $tab,
             'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'payment_index',
             'searchPath' => 'payment_search',
