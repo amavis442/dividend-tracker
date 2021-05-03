@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Constants;
 use App\Repository\PositionRepository;
 
 class YieldsService
@@ -29,10 +30,6 @@ class YieldsService
             $avgPrice = $position->getPrice();
             $amount = $position->getAmount();
             $allocation = $position->getAllocation();
-            
-            //$exchangeRateService->getRates()
-
-
             $scheduleCalendar = $ticker->getDividendMonths();
             $numPayoutsPerYear = count($scheduleCalendar);
             $lastCash = 0;
@@ -46,14 +43,17 @@ class YieldsService
             $netTotalPayoutPerPaydate = 0;
             $lastCash = 0;
             $lastCashCurrency = '$';
-
+            $taxRate = $position->getTax() ? $position->getTax()->getTaxRate() * 100 : Constants::TAX;
+            $exchangeRate = $firstCalendarEntry ? $dividendService->getExchangeRate($firstCalendarEntry) : 0;
+            
+            
             if ($firstCalendarEntry) {
                 $lastCash = $firstCalendarEntry->getCashAmount();
                 $lastCashCurrency = $firstCalendarEntry->getCurrency()->getSign();
                 $lastDividendDate = $firstCalendarEntry->getPaymentDate();
             
                 $netTotalForwardYearlyPayout = $numPayoutsPerYear * $dividendService->getForwardNetDividend($position);
-                $netForwardYearlyPayout = $numPayoutsPerYear * $dividendService->getNetDividend($firstCalendarEntry);
+                $netForwardYearlyPayout = $numPayoutsPerYear * $dividendService->getNetDividend($position, $firstCalendarEntry);
                 $dividendYield = $dividendService->getForwardNetDividendYield($position);
 
                 $netTotalPayoutPerPaydate = $netTotalForwardYearlyPayout / $numPayoutsPerYear;
@@ -88,6 +88,8 @@ class YieldsService
                 'lastDividendDate' => $lastDividendDate,
                 'numPayoutsPerYear' => $numPayoutsPerYear,
                 'amount' => $amount,
+                'taxRate' => $taxRate,
+                'exchangeRate' => $exchangeRate
             ];
             $totalNetYearlyDividend += $netTotalForwardYearlyPayout;
             $sumAvgPrice += $avgPrice;

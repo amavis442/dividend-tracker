@@ -12,12 +12,8 @@
                 <td>{{ tax.id }}</td>
             </tr>
             <tr>
-                <th>{{ 'CountryCode'|trans }}</th>
-                <td>{{ tax.countryCode }}</td>
-            </tr>
-            <tr>
                 <th>{{ 'TaxRate'|trans }}</th>
-                <td>{{ tax.taxRate }}</td>
+                <td>{{ tax.taxRate * 100 }}%</td>
             </tr>
         </tbody>
     </table>

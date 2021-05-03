@@ -9,8 +9,6 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>{{ 'CountryCode'|trans }}</th>
-                <th>{{ 'Currency'|trans }}</th>
                 <th>{{ 'TaxRate'|trans }}</th>
                 <th>{{ 'Valid from'|trans }}</th>
                 <th>{{ 'Actions'|trans }}</th>
@@ -20,9 +18,7 @@
         {% for tax in taxes %}
             <tr>
                 <td>{{ tax.id }}</td>
-                <td>{{ tax.countryCode }}</td>
-                <td>{{ tax.currency.symbol }}</td>
-                <td>{{ tax.taxRate }}%</td>
+                <td>{{ tax.taxRate * 100 }}%</td>
                 <td>{{ tax.validFrom|format_date('short') }}</td>
                 <td>
                     <div class="btn-group" role="group" aria-label="Basic example">

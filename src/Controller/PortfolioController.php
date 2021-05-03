@@ -123,7 +123,7 @@ class PortfolioController extends AbstractController
         $amountPerDate = 0.0;
 
         if ($calendarRecentDividendDate) {
-            [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax($calendarRecentDividendDate);
+            [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax($position, $calendarRecentDividendDate);
             $netCashAmount = $calendarRecentDividendDate->getCashAmount() * $exchangeRate * (1 - $dividendTax);
             $amountPerDate = $position->getAmountPerDate($calendarRecentDividendDate->getExDividendDate());
         }
@@ -132,7 +132,7 @@ class PortfolioController extends AbstractController
         $netYearlyDividend = 0.0;
         $cals = $ticker->getCalendars();
         if (count($cals) > 0) {
-            [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax($cals[0]);
+            [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax($position, $cals[0]);
             $dividendFrequentie = $ticker->getPayoutFrequency();
             $netYearlyDividend = (($dividendFrequentie * $cals[0]->getCashAmount()) * $exchangeRate) * (1 - $dividendTax);
         }

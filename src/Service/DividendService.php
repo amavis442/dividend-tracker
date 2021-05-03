@@ -65,16 +65,15 @@ class DividendService
     public function getTaxRate(Calendar $calendar): ?float
     {
         $dividendTax = 0.15;
+        $taxRate = 0;
 
-        if (!$calendar->getCurrency()->getTaxes()) {
-            $taxRate = $this->taxRepository->findOneValid($calendar->getCurrency(), (new DateTime()));
-        } else {
-            $taxRate = $calendar->getCurrency()->getTaxes()->first();
-        }
+        $position = $calendar->getTicker()->getPositions()->first();
+        $tax = $position->getTax();
+        if ($tax) {
+            $taxRate = $tax->getTaxRate();
+            return $taxRate;
+        }    
 
-        if ($taxRate) {
-            return $taxRate->getTaxRate() / 100;
-        }
         switch ($calendar->getCurrency()->getSymbol()) {
             case 'EUR':
                 $dividendTax = Constants::TAX / 100;
@@ -99,15 +98,16 @@ class DividendService
     /**
      * Get the exchange rate and tax rate
      *
+     * @param Position $position
      * @param Calendar $calendar
      * @return array
      */
-    public function getExchangeAndTax(Calendar $calendar): array
+    public function getExchangeAndTax(Position $position, Calendar $calendar): array
     {
         $exchangeRate = 1;
         $dividendTax = 0.15;
 
-        $dividendTax = $this->getTaxRate($calendar);
+        $dividendTax = $position->getTax() ? $position->getTax()->getTaxRate() : Constants::TAX / 100;
         $exchangeRate = $this->getExchangeRate($calendar);
 
         return [$exchangeRate, $dividendTax];
@@ -159,10 +159,10 @@ class DividendService
      * @param Calendar $calendar
      * @return float|null
      */
-    public function getNetDividend(Calendar $calendar): ?float
+    public function getNetDividend(Position $position, Calendar $calendar): ?float
     {
+        $dividendTax = $position->getTax() ? $position->getTax()->getTaxRate() : Constants::TAX / 100;
         $cashAmount = $calendar->getCashAmount();
-        $dividendTax = $this->getTaxRate($calendar);
         $exchangeRate = $this->getExchangeRate($calendar);
 
         return $cashAmount * (1 - $dividendTax) * $exchangeRate;
@@ -185,7 +185,7 @@ class DividendService
             if ($position) {
                 $amount = $this->getPositionSize($position->getTransactions(), $calendar);
                 if ($amount > 0) {
-                    $netDividend = $this->getNetDividend($calendar);
+                    $netDividend = $this->getNetDividend($position, $calendar);
                     $dividend = $amount * $netDividend;
                 }
             }
@@ -207,7 +207,9 @@ class DividendService
         if ($position->getTicker()->getCalendars()) {
             $calendar = $position->getTicker()->getCalendars()->first();
             if ($calendar) {
-                [$exchangeRate, $dividendTax] = $this->getExchangeAndTax($calendar);
+                $dividendTax = $position->getTax() ? $position->getTax()->getTaxRate() : Constants::TAX / 100;
+                $exchangeRate = $this->getExchangeRate($calendar);
+                //[$exchangeRate, $dividendTax] = $this->getExchangeAndTax($calendar);
                 $cashAmount = $calendar->getCashamount();
                 $amount = $position->getAmount();
                 $forwardNetDividend = $amount * $cashAmount * $exchangeRate * (1 - $dividendTax);

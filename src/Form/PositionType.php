@@ -6,6 +6,7 @@ use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Currency;
 use App\Entity\Pie;
+use App\Entity\Tax;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -90,6 +91,25 @@ class PositionType extends AbstractType
                 'required' => false,
                 'input' => 'number',
                 'scale' => 2,
+            ])
+            ->add('tax', EntityType::class, [
+                'class' => Tax::class,
+                'label' => 'Tax',
+                'choice_label' => 'label',
+                'required' => false,
+                'placeholder' => 'Please choose a tax',
+                'empty_data' => null,
+                'multiple'    => false,
+                'choice_label' => function ($tax) {
+                    return  ($tax->getTaxRate() * 100). '%';
+                },
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('t')
+                        ->where('t.validFrom <= :validFrom')
+                        ->orderBy('t.taxRate, t.validFrom', 'ASC')
+                        ->groupBy('t.taxRate')
+                        ->setParameter(':validFrom', date('Y-m-d'));
+                },
             ]);
     }
 

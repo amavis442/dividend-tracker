@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\TaxRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -19,19 +21,9 @@ class Tax
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $countryCode;
-
-    /**
      * @ORM\Column(type="integer")
      */
     private $taxRate;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Currency::class, inversedBy="taxes")
-     */
-    private $currency;
 
     /**
      * @ORM\Column(type="datetime")
@@ -43,43 +35,29 @@ class Tax
      */
     private $validFrom;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Position::class, mappedBy="tax")
+     */
+    private $positions;
+
+    public function __construct()
+    {
+        $this->positions = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getCountryCode(): ?string
+    public function getTaxRate(): ?float
     {
-        return $this->countryCode;
-    }
-
-    public function setCountryCode(string $countryCode): self
-    {
-        $this->countryCode = $countryCode;
-
-        return $this;
-    }
-
-    public function getTaxRate(): ?int
-    {
-        return $this->taxRate;
+        return $this->taxRate / 100;
     }
 
     public function setTaxRate(int $taxRate): self
     {
         $this->taxRate = $taxRate;
-
-        return $this;
-    }
-
-    public function getCurrency(): ?Currency
-    {
-        return $this->currency;
-    }
-
-    public function setCurrency(?Currency $currency): self
-    {
-        $this->currency = $currency;
 
         return $this;
     }
@@ -96,7 +74,7 @@ class Tax
         return $this;
     }
 
-        /**
+    /**
      * Gets triggered only on insert
      * @ORM\PrePersist
      */
@@ -113,6 +91,36 @@ class Tax
     public function setValidFrom(\DateTimeInterface $validFrom): self
     {
         $this->validFrom = $validFrom;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Position[]
+     */
+    public function getPositions(): Collection
+    {
+        return $this->positions;
+    }
+
+    public function addPosition(Position $position): self
+    {
+        if (!$this->positions->contains($position)) {
+            $this->positions[] = $position;
+            $position->setTax($this);
+        }
+
+        return $this;
+    }
+
+    public function removePosition(Position $position): self
+    {
+        if ($this->positions->removeElement($position)) {
+            // set the owning side to null (unless already changed)
+            if ($position->getTax() === $this) {
+                $position->setTax(null);
+            }
+        }
 
         return $this;
     }

@@ -188,14 +188,16 @@ class CalendarRepository extends ServiceEntityRepository
             ->select('c, t, p, tr, pies, cur, tax')
             ->innerJoin('c.ticker', 't')
             ->leftJoin('t.positions', 'p', 'WITH', 'p.closed is null OR p.closed = 0')
+            ->leftJoin('p.tax','tax')
             ->leftJoin('p.transactions', 'tr')
             ->leftJoin('p.pies', 'pies')
             ->leftJoin('c.currency', 'cur')
-            ->leftJoin('cur.taxes', 'tax', 'WITH', 'tax.validFrom <= :validFrom')
+            //->leftJoin('cur.taxes', 'tax', 'WITH', 'tax.validFrom <= :validFrom')
             ->where('c.paymentDate >= :start and c.paymentDate <= :end')
+            ->andWhere('EXISTS ( select 1 from App\Entity\Position pos WHERE pos.ticker = t.id AND pos.closed is null OR pos.closed = 0)')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
-            ->setParameter('validFrom', date('Y-m-d'))
+            //->setParameter('validFrom', date('Y-m-d'))
         ;
 
         if ($pie) {
@@ -215,7 +217,6 @@ class CalendarRepository extends ServiceEntityRepository
             $positionDividend = $dividendService->getTotalNetDividend($item);
             $taxRate = $dividendService->getTaxRate($item);
             $exchangeRate = $dividendService->getExchangeRate($item);
-
             $tax = $item->getCashAmount() * $exchangeRate * $taxRate;
 
             $data[$item->getPaymentDate()->format('Ym')][$item->getPaymentDate()->format('j')][] = [

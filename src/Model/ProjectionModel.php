@@ -94,9 +94,10 @@ class ProjectionModel
             if (isset($item['tickers'][$ticker->getTicker()])) {
                 $tickerData = $item['tickers'][$ticker->getTicker()];
                 $dataSource[$paydate]['tickers'][$ticker->getTicker()] = $tickerData;
+                $position = $ticker->getPositions()->first();
 
                 $calendar = $tickerData['calendar'];
-                [$exchangeRate, $taxDividend] = $this->dividendService->getExchangeAndTax($calendar);
+                [$exchangeRate, $taxDividend] = $this->dividendService->getExchangeAndTax($position, $calendar);
                 $receivedDividendMonth += $tickerData['netPayment'];
                 $amount = $dataSource[$paydate]['tickers'][$ticker->getTicker()]['amount'];
                 $dividend = $dataSource[$paydate]['tickers'][$ticker->getTicker()]['dividend'];

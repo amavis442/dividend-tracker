@@ -65,7 +65,6 @@ class TaxController extends AbstractController
     {
         $form = $this->createForm(TaxType::class, $tax);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 

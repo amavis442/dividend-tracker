@@ -33,15 +33,6 @@ class Currency
      */
     private $sign;
 
-    /**
-     * Bidirectional - One-To-Many (INVERSE SIDE)
-     *
-     * @ORM\OneToMany(targetEntity="Tax", mappedBy="currency")
-     * @ORM\OrderBy({"validFrom" = "DESC"})
-     */
-    private $taxes;
-
-
     public function getId(): ?int
     {
         return $this->id;
@@ -83,23 +74,4 @@ class Currency
         return $this;
     }
 
-    /**
-     * Get bidirectional - One-To-Many (INVERSE SIDE)
-     */ 
-    public function getTaxes()
-    {
-        return $this->taxes;
-    }
-
-    /**
-     * Set bidirectional - One-To-Many (INVERSE SIDE)
-     *
-     * @return  self
-     */ 
-    public function setTaxes($taxes)
-    {
-        $this->taxes = $taxes;
-
-        return $this;
-    }
 }
