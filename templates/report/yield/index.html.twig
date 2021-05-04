@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Dividend Yield 
+{% block title %}{{ 'Dividend Yield'|trans }} 
 {% endblock %}
 
 {% block body %}
 	<div class="card" style="margin-bottom:10px;margin-top:10px">
   		<div class="card-body">
-		  <strong>Yield on cost dividend:</strong><br/>
-		  Total dividend in a year / total allocated = 
+		  <strong>{{ 'Yield on cost dividend'|trans }}:</strong><br/>
+		  {{ 'Total dividend in a year / total allocated'|trans }} = 
 		  &euro;{{ totalNetYearlyDividend|format_number({fraction_digit: 2}) }} / 
 		  &euro;{{ allocated|format_number({fraction_digit: 2}) }} =
 		  <strong>{{ dividendYieldOnCost|format_number({fraction_digit: 2}) }}%</strong>
@@ -29,17 +29,17 @@
 			<thead class="thead-dark">
 			<tr>
 				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'ticker'}) }}">Ticker</a></th>
-				<th>avgPrice</th>
-				<th>Last dividend</th>
-				<th>Last payout date</th>
-				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'dividend'}) }}">Dividend</a></th>
-				<th>Net forward yearly dividend per share</th>
-				<th>Amount</th>
-				<th>#Payouts per year</th>
-				<th>Net forward dividend per payout</th>
-				<th>Net forward yearly dividend total</th>
-				<th>Allocation</th>
-				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'yield'}) }}">Yield</a></th>
+				<th>{{ 'avgPrice'|trans }}</th>
+				<th>{{ 'Last dividend'|trans }}</th>
+				<th>{{ 'Last payout date'|trans }}</th>
+				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'dividend'}) }}">{{ 'Dividend'|trans }}</a></th>
+				<th>{{ 'Net forward yearly dividend per share'|trans }}</th>
+				<th>{{ 'Amount'|trans }}</th>
+				<th>#{{ 'Payouts per year'|trans }}</th>
+				<th>{{ 'Net forward dividend per payout'|trans }}</th>
+				<th>{{ 'Net forward yearly dividend total'|trans }}</th>
+				<th>{{ 'Allocation'|trans }}</th>
+				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'yield'}) }}">{{ 'Yield'|trans }}</a></th>
 			</tr>
 			</thead>
 			<tbody>
