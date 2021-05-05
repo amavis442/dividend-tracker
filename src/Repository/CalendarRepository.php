@@ -218,9 +218,11 @@ class CalendarRepository extends ServiceEntityRepository
             $taxRate = $dividendService->getTaxRate($item);
             $exchangeRate = $dividendService->getExchangeRate($item);
             $tax = $item->getCashAmount() * $exchangeRate * $taxRate;
-
+            $ticker = $item->getTicker()->getTicker();
+            
             $data[$item->getPaymentDate()->format('Ym')][$item->getPaymentDate()->format('j')][] = [
                 'calendar' => $item,
+                'ticker' => $ticker,
                 'positionAmount' => $positionAmount,
                 'positionDividend' => $positionDividend,
                 'taxRate' => $taxRate,
