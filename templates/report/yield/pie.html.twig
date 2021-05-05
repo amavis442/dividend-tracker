@@ -46,8 +46,6 @@
 				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'ticker'}) }}">Ticker</a></th>
 				<th>{{ 'avgPrice'|trans }}</th>
 				<th>{{ 'Last dividend'|trans }}</th>
-				<th>{{ 'Tax'|trans }}</th>
-				<th>{{ 'Exchangerate'|trans }}</th>
 				<th>{{ 'Last payout date'|trans }}</th>
 				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'dividend'}) }}">{{ 'Yearly forward dividend'|trans }}</a></th>
 				<th>{{ 'Net forward yearly dividend per share'|trans }}</th>
@@ -62,15 +60,12 @@
 			<tbody>
 				{% for item in datasource %}
 				<tr>
-					<td><span title="{{ item.label }}">{{ item.ticker }}</span></td>
+					<td><span title="{{ item.label }}" data-toggle="tooltip" data-placement="top">{{ item.ticker }}</span></td>
 					<td>&euro;{{ (item.avgPrice)|format_number({fraction_digit: 2}) }}</td>
-					
 					<td>{% if item.lastDividend > 0 %}{{ item.lastDividendCurrency|raw }}{{ (item.lastDividend)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
-					<td>{{ item.taxRate }}%</td>
-					<td>{{ item.exchangeRate }}</td>
 					<td>{% if item.lastDividendDate is not null %}{{ item.lastDividendDate|date("d-m-Y") }}{% else %} - {% endif %}</td>
 					<td>{% if item.payout > 0 %}{{ item.lastDividendCurrency|raw }}{{ (item.payout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
-					<td>{% if item.netForwardYearlyPayout > 0 %}&euro;{{ (item.netForwardYearlyPayout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
+					<td><span data-html="true" title="{{ 'Exchangerate'|trans }}: {{ item.exchangeRate }}<br/>{{ 'Tax'|trans }}: {{ item.taxRate }}%" data-toggle="tooltip" data-placement="top">{% if item.netForwardYearlyPayout > 0 %}&euro;{{ (item.netForwardYearlyPayout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</span></td>
 					<td>{{ item.amount }}</td>
 					<td>{{ item.numPayoutsPerYear ?: '-' }}</td>
 					<td>{% if item.netTotalPayoutPerPaydate > 0  %}&euro;{{ item.netTotalPayoutPerPaydate|format_number({fraction_digit: 2}) }}{% endif %}</td>

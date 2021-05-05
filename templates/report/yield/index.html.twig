@@ -45,12 +45,12 @@
 			<tbody>
 				{% for item in datasource %}
 				<tr>
-					<td><span title="{{ item.label }}">{{ item.ticker }}</span></td>
+					<td><span data-html="true" title="{{ item.label }}" data-toggle="tooltip" data-placement="top">{{ item.ticker }}</span></td>
 					<td>&euro;{{ (item.avgPrice)|format_number({fraction_digit: 2}) }}</td>
 					<td>{% if item.lastDividend > 0 %}${{ (item.lastDividend)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
 					<td>{% if item.lastDividendDate is not null %}{{ item.lastDividendDate|date("d-m-Y") }}{% else %} - {% endif %}</td>
 					<td>{% if item.payout > 0 %}${{ (item.payout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
-					<td>{% if item.netForwardYearlyPayout > 0 %}&euro;{{ (item.netForwardYearlyPayout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
+					<td><span data-html="true" title="{{ 'Exchangerate'|trans }}: {{ item.exchangeRate }}<br/>{{ 'Tax'|trans }}: {{ item.taxRate }}%" data-toggle="tooltip" data-placement="top">{% if item.netForwardYearlyPayout > 0 %}&euro;{{ (item.netForwardYearlyPayout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</span></td>
 					<td>{{ item.amount }}</td>
 					<td>{{ item.numPayoutsPerYear ?: '-' }}</td>
 					<td>{% if (item.netTotalForwardYearlyPayout > 0) and (item.numPayoutsPerYear > 0) %}&euro;{{ (item.netTotalForwardYearlyPayout / item.numPayoutsPerYear)|format_number({fraction_digit: 2}) }}{% endif %}</td>
