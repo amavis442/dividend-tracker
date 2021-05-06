@@ -168,6 +168,10 @@ class ImportCsvService extends ImportBase
             $cell = $cells[0];
             $cellVal = $cell->getValue();
 
+            if (false !== stripos($cellVal, 'deposit') || false !== stripos($cellVal, 'withdraw')) {
+                continue;
+            };
+
             $row = [];
             $rawAmount = 0;
             $rawAllocation = 0;
