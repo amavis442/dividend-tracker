@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block body %}
-	<h1>Payments:
+	<h1>{{ 'Payments'|trans }}:
 		{{ startDate}}
 		/
 		{{ endDate}}</h1>
@@ -21,7 +21,7 @@
 			{{form_widget(searchForm.quator)}}
 		</div>
 		<div class="col">
-			{{form_widget(searchForm.send)}}
+			{{form_widget(searchForm.submit)}}
 		</div>
 	</div>
 	{{ form_end(searchForm) }}

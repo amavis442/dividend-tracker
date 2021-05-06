@@ -1,7 +1,7 @@
 <form action="{{ path(searchPath) }}" method="post" class="form-inline">
 <input type="hidden" name="_method" value="POST">
     <div class="form-group mx-sm-3 mb-2">
-        <input class="form-control" type="text" name="searchCriteria" id="text_search" value="{{ searchCriteria ?? ''}}" placeholder="Search ticker"/>
+        <input class="form-control" type="text" name="searchCriteria" id="text_search" value="{{ searchCriteria ?? ''}}" placeholder="{{ 'Search ticker'|trans }}"/>
     </div>
-    <button class="btn btn-secondary mb-2" data-toggle="tooltip" data-placement="top" title="Search Ticker"><i class="fas fa-search"></i></button>
+    <button class="btn btn-secondary mb-2" data-toggle="tooltip" data-placement="top" title="{{ 'Search ticker'|trans }}"><i class="fas fa-search"></i></button>
 </form>

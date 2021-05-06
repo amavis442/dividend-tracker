@@ -58,8 +58,9 @@ class PaymentController extends AbstractController
         $form = $this->createFormBuilder($defaultData)
             ->add(
                 'year',
+                
                 ChoiceType::class,
-                ['label' => 'Year', 'choices' => $years]
+                ['label' => 'Year', 'choices' => $years, 'choice_translation_domain' => false,]
             )
             ->add('month', ChoiceType::class, ['choices' => [
                 '-' => 0,
@@ -75,7 +76,7 @@ class PaymentController extends AbstractController
                 'Oct' => 10,
                 'Nov' => 11,
                 'Dec' => 12,
-            ]])
+            ], 'choice_translation_domain' => false,])
             ->add(
                 'quator',
                 ChoiceType::class,
@@ -85,9 +86,9 @@ class PaymentController extends AbstractController
                     'Q2' => 2,
                     'Q3' => 3,
                     'Q4' => 4,
-                ]]
+                ], 'choice_translation_domain' => false,]
             )
-            ->add('send', SubmitType::class)
+            ->add('submit', SubmitType::class)
             ->getForm();
 
         $form->handleRequest($request);
