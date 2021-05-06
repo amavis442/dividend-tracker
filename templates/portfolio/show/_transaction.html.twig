@@ -53,10 +53,11 @@
 					<td>
 						{% set transactionInfo %}
 							<ul class="list-group">
-								<li class="list-group-item">Original price: &euro;{{ transaction.originalPrice }}</li>
-								<li class="list-group-item">Stamduty: &euro;{{ transaction.stampduty }}</li>
-								<li class="list-group-item">fx fee: &euro;{{ transaction.fxFee }}</li>
-								<li class="list-group-item">Exchange rate: {{ transaction.exchangeRate }}</li>
+								<li class="list-group-item">{{ 'Pie'|trans }}: {{ transaction.pie ? transaction.pie.label : '-' }}</li>
+								<li class="list-group-item">{{ 'Original price'|trans }}: &euro;{{ transaction.originalPrice }}</li>
+								<li class="list-group-item">{{ 'Stamduty'|trans }}: &euro;{{ transaction.stampduty }}</li>
+								<li class="list-group-item">{{ 'fx fee'|trans }}: &euro;{{ transaction.fxFee }}</li>
+								<li class="list-group-item">{{ 'Exchange rate'|trans }}: {{ transaction.exchangeRate }}</li>
 							</ul>
 						{% endset %}
 

@@ -147,6 +147,11 @@ class Transaction
     private $total;
 
     /**
+     * @ORM\ManyToOne(targetEntity=Pie::class)
+     */
+    private $pie;
+
+    /**
      * @Assert\Callback
      */
     public function validate(ExecutionContextInterface $context, $payload)
@@ -459,6 +464,18 @@ class Transaction
     public function setTotal(int $total): self
     {
         $this->total = $total * Constants::VALUTA_PRECISION;
+
+        return $this;
+    }
+
+    public function getPie(): ?Pie
+    {
+        return $this->pie;
+    }
+
+    public function setPie(?Pie $pie): self
+    {
+        $this->pie = $pie;
 
         return $this;
     }
