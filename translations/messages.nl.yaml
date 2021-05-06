@@ -42,13 +42,13 @@ Position: Positie
 Amount: Aantal
 Total dividend received: Totaal ontvangen dividend
 Instrument: Instrument
-Dividend payment months: Dividendbetalingsmaanden
+Dividend payment months: Dividenduitkeermaanden
 Industry: Industrie
 Dividend frequency: Dividend frequentie
-Yearly forward dividend payout: Jaarlijkse verwachte uitbetaling van dividend
-Single time forward dividend payout: Eenmalige dividenduitbetaling
+Yearly forward dividend payout: Jaarlijkse verwachte uitkering van dividend
+Single time forward dividend payout: Eenmalige dividenduitkering
 Dividend yield: Dividend opbrengst
-Next dividend (Ex-div / payout): Volgende dividend (ex-div / uitbetaling)
+Next dividend (Ex-div / payout): Volgende dividend (ex-div / uitkering)
 Weighted average price: Gewogen gemiddelde prijs
 Pies: Schijven
 Avg. price: Gem. Prijs
@@ -59,7 +59,7 @@ Fullname: Volledige naam
 Holdings: Posities
 Total invested: Totaal geïnvesteerd
 Total dividend: Totaal ontvangen dividend
-Expected next payout: Verwachte uitbetaling
+Expected next payout: Verwachte uitkering
 Pie: Schijf
 Profit / Loss: Winst / Verlies
 Actions: Acties
@@ -69,7 +69,7 @@ Edit position: Bewerk positie
 Research: Onderzoek
 Transactions: Transacties
 Info: Info
-Payout: Uitbetaling
+Payout: Uitkering
 Dividend: Dividend
 Dividend growth: Dividend groei
 Fundamental: Fundamenteel
