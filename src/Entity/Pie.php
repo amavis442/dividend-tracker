@@ -30,6 +30,12 @@ class Pie
      */
     private $positions;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="pies")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
+
     public function __construct()
     {
         $this->positions = new ArrayCollection();
@@ -72,6 +78,18 @@ class Pie
     public function removePosition(Position $position): self
     {
         $this->positions->removeElement($position);
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

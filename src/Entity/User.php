@@ -64,12 +64,18 @@ class User implements UserInterface
      */
     private $dividendTrackers;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Pie::class, mappedBy="user", orphanRemoval=true)
+     */
+    private $pies;
+
     public function __construct()
     {
         $this->payments = new ArrayCollection();
         $this->positions = new ArrayCollection();
         $this->journals = new ArrayCollection();
         $this->dividendTrackers = new ArrayCollection();
+        $this->pies = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -275,6 +281,36 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($dividendTracker->getUser() === $this) {
                 $dividendTracker->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Pie[]
+     */
+    public function getPies(): Collection
+    {
+        return $this->pies;
+    }
+
+    public function addPy(Pie $py): self
+    {
+        if (!$this->pies->contains($py)) {
+            $this->pies[] = $py;
+            $py->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePy(Pie $py): self
+    {
+        if ($this->pies->removeElement($py)) {
+            // set the owning side to null (unless already changed)
+            if ($py->getUser() === $this) {
+                $py->setUser(null);
             }
         }
 
