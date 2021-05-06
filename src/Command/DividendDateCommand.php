@@ -7,7 +7,7 @@ use App\Repository\CalendarRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\TickerRepository;
 use App\Service\DividendDateService;
-use App\Service\ISharesService;
+use App\Service\DividendDate\ISharesService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;

@@ -5,6 +5,7 @@ use DateTime;
 use RuntimeException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\Contracts\Service\DividendRetrievalInterface;
+use App\Service\DividendDate\ISharesService;
 
 class DividendDateService
 {

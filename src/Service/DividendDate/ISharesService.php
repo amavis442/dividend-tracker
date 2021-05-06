@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\DividendDate;
 
 use DateTime;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
