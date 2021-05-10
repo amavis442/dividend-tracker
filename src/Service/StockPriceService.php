@@ -1,9 +1,10 @@
 <?php
 namespace App\Service;
 
-use App\Contracts\Service\StockPriceInterface;
+use App\Contracts\Service\StockPricePluginInterface;
 use RuntimeException;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class StockPriceService
@@ -44,6 +45,12 @@ class StockPriceService
      * @var integer
      */
     private $cacheTimeStamp;
+    /**
+     * Holder
+     *
+     * @var array
+     */
+    private $data;
 
     /**
      *
@@ -51,14 +58,18 @@ class StockPriceService
      * @param CacheInterface $stockCache
      * @param HttpClientInterface $client
      */
-    public function __construct(ExchangeRateService $exchangeRateService, CacheInterface $stockCache, HttpClientInterface $client)
-    {
+    public function __construct(
+        ExchangeRateService $exchangeRateService,
+        CacheInterface $stockCache,
+        HttpClientInterface $client
+    ) {
         $this->services = [];
         $this->linkTickerToService = [];
 
         $this->client = $client;
         $this->exchangeRateService = $exchangeRateService;
         $this->stockCache = $stockCache;
+        $this->data = [];
     }
 
     /**
@@ -73,8 +84,8 @@ class StockPriceService
             throw new \RuntimeException("Add service first with addService() then call setDefault. Class does not exist [" . $serviceClass . "]");
         }
         $service = $this->services[$serviceClass];
-        if (!$service instanceof StockPriceInterface) {
-            throw new \RuntimeException("Class [" . $serviceClass . "] should implement StockPriceInterface");
+        if (!$service instanceof StockPricePluginInterface) {
+            throw new \RuntimeException("Class [" . $serviceClass . "] should implement StockPricePluginInterface");
         }
         $this->services['_default'] = $this->services[$serviceClass];
 
@@ -84,9 +95,9 @@ class StockPriceService
     /**
      * Fallback service
      *
-     * @return StockPriceInterface|null
+     * @return StockPricePluginInterface|null
      */
-    public function getDefault(): ?StockPriceInterface
+    public function getDefault(): ?StockPricePluginInterface
     {
         return $this->services['_default'] ?? null;
     }
@@ -100,7 +111,7 @@ class StockPriceService
     public function addService(string $serviceClass): self
     {
         $service = new $serviceClass($this->client, $this->stockCache, $this->exchangeRateService);
-        if (!$service instanceof StockPriceInterface) {
+        if (!$service instanceof StockPricePluginInterface) {
             throw new \RuntimeException("Class [" . $serviceClass . "] should implement StockPriceInterface");
         }
 
@@ -133,7 +144,7 @@ class StockPriceService
      * @param string $symbol
      * @return StockPriceInterface
      */
-    public function getService(string $symbol): StockPriceInterface
+    public function getService(string $symbol): StockPricePluginInterface
     {
         if (isset($this->linkTickerToService[$symbol])) {
             $serviceClass = $this->linkTickerToService[$symbol];
@@ -150,19 +161,28 @@ class StockPriceService
      */
     public function getQuotes(array $symbols): array
     {
-        $defaultService = $this->getDefault();
-
-        $result = $defaultService->getQuotes($symbols);
-        $this->cacheTimeStamp = $result['timestamp'];
-        if (count($this->services) > 0) {
-            foreach ($this->services as $serviceClass => $service) {
-                if ($defaultService !== $service && $serviceClass !== '_default') {
-                    $result = array_merge($result, $service->getQuotes($symbols));
+        $services = $this->services;
+        $data = $this->stockCache->get('stockprices', function (ItemInterface $item) use ($services, $symbols) {
+            $item->expiresAfter(300);
+            $result = [];
+            if (count($services) > 0) {
+                $defaultService = $services["_default"];
+                $result = $defaultService->getQuotes($symbols);
+                foreach ($services as $serviceClass => $service) {
+                    if ($serviceClass !== '_default' && $service !== $defaultService) {
+                        $result = array_merge($result, $service->getQuotes($symbols));
+                    }
                 }
             }
-        }
+            $result['timestamp'] = time();
 
-        return $result;
+            return $result;
+        });
+
+        $this->cacheTimeStamp = $data['timestamp'];
+        $this->data = $data;
+
+        return $data;
     }
 
     /**
@@ -173,14 +193,19 @@ class StockPriceService
      */
     public function getQuote(string $symbol): ?float
     {
-        if (isset($this->linkTickerToService[$symbol])) {
-            $serviceClass = $this->linkTickerToService[$symbol];
-            $service = $this->services[$serviceClass];
-            $price = $service->getQuote($symbol);
+        if (isset($this->data[$symbol])) {
+            $rates = $this->exchangeRateService->getRates();
+            $data = $this->data[$symbol];
+            if (!isset($data['regularMarketPrice'])) {
+                return null;
+            }
+            $price = $data['regularMarketPrice'];
+            $currency = $data['currency'];
 
-            return $price;
+            return $price / ($rates[$currency]);
         }
-        return $this->getDefault()->getQuote($symbol);
+
+        return null;
     }
 
     /**
@@ -191,14 +216,7 @@ class StockPriceService
      */
     public function getMarketPrice(string $symbol): ?float
     {
-        if (isset($this->linkTickerToService[$symbol])) {
-            $serviceClass = $this->linkTickerToService[$symbol];
-            $service = $this->services[$serviceClass];
-            $price = $service->getMarketPrice($symbol);
-
-            return $price;
-        }
-        return $this->getDefault()->getMarketPrice($symbol);
+        return $this->getQuote($symbol);
     }
 
     /**
