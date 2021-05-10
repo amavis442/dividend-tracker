@@ -150,8 +150,9 @@ class DividendDateCommand extends Command
              */
             }
         }
-        $io->success('Done.... added: ' . $addedDates);
-        $io->info(implode(', ', $addedForTicker));
+        //$io->success('Done.... added: ' . $addedDates);
+        //$io->info(implode(', ', $addedForTicker));
+        $this->logger->debug('Added: ' . $addedDates. '. '. implode(', ', $addedForTicker));
 
         return Command::SUCCESS;
     }
