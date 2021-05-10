@@ -157,7 +157,7 @@ class StockPriceService
         if (count($this->services) > 0) {
             foreach ($this->services as $serviceClass => $service) {
                 if ($defaultService !== $service && $serviceClass !== '_default') {
-                    $result = array_merge($result, $service->getQuotes([]));
+                    $result = array_merge($result, $service->getQuotes($symbols));
                 }
             }
         }
