@@ -65,92 +65,108 @@ class LondonService implements StockPriceInterface
 
     public function getQuotes(array $symbols): ?array
     {
-        foreach ($symbols as $symbol) 
-        {
-           $this->getMarketPrice($symbol);
-        }
+        $client = $this->client;
+        $symbols = $this->retrieveableSymbols;
 
-        return null;
+        $cacheTag = 'londonstockexchange';
+        //$this->stockCache->delete($cacheTag);
+
+        $data = $this->stockCache->get($cacheTag, function (ItemInterface $item) use ($client, $symbols) {
+            $item->expiresAfter(1800);
+
+            $stockprices = [];
+            $responses = [];
+            foreach ($symbols as $symbol => $url) {
+                $responses[$symbol] = $client->request(
+                    'GET',
+                    $url
+                );
+            }
+
+            foreach ($responses as $symbol => $response) {
+                $marketPrice = 0.0;
+                $currency = 'GBX';
+                if ($response->getStatusCode() === 200) {
+                    $content = $response->getContent();
+                    $internalErrors = libxml_use_internal_errors(true);
+                    $dom = new DOMDocument();
+                    $dom->loadHTML($content);
+                    $children = $dom->getElementsByTagName('span');
+
+                    /**
+                     * @var $child \DOMElement
+                     */
+                    foreach ($children as $child) {
+                        if ($child->hasAttribute('class')) {
+                            if ($child->getAttribute('class') == 'price-tag') {
+                                $marketPrice = $child->nodeValue;
+                                break;
+                            }
+                        }
+                    }
+
+                    $children = $dom->getElementsByTagName('div');
+                    /**
+                     * @var $child \DOMElement
+                     */
+                    foreach ($children as $child) {
+                        if ($child->hasAttribute('class')) {
+                            $classData = $child->getAttribute('class');
+                            if (strpos($classData, 'currency-label') !== false) {
+                                $currency = str_replace(['Price (', ')'], '', $child->nodeValue);
+                                break;
+                            }
+                        }
+                    }
+                    libxml_use_internal_errors($internalErrors);
+                }
+
+                $marketPrice = trim(str_replace(',', '', $marketPrice));
+                $divider = 1;
+                if ($currency == 'GBX') {
+                    $divider = 100;
+                    $currency = 'GBP';
+                }
+
+                $stockprices[$symbol] = ['currency' => $currency, 'price' => (float) $marketPrice / $divider];
+            }
+
+            $stockprices['timestamp'] = time();
+            return $stockprices;
+        });
+
+        $this->data = $data;
+
+        return $data;
     }
 
     public function getMarketPrice(string $symbol): ?float
     {
-        if (!isset($this->retrieveableSymbols[$symbol])) {
+        if (!$this->data) {
+            throw new RuntimeException('Call LondonService::getQuotes(array $symbols) first');
+        }
+
+        $rates = $this->exchangeRateService->getRates();
+        $marketPrice = 0.0;
+        $currency = 'USD';
+
+        if (isset($this->data[$symbol]) && isset($this->data[$symbol]['price'])) {
+            $marketPrice = $this->data[$symbol]['price'];
+            $currency = $this->data[$symbol]['currency'];
+        } else {
             return null;
         }
 
-        $client = $this->client;
-        $apiCallUrl = $this->retrieveableSymbols[$symbol];
-
-        //$this->stockCache->delete('london_' . strtolower($symbol));
-
-        $data = $this->stockCache->get('london_' . strtolower($symbol), function (ItemInterface $item) use ($client, $apiCallUrl) {
-            $item->expiresAfter(1800);
-            $response = $client->request(
-                'GET',
-                $apiCallUrl
-            );
-
-            $marketPrice = 0.0;
-            $currency = 'GBX';
-            if ($response->getStatusCode() === 200) {
-                $content = $response->getContent();
-                $internalErrors = libxml_use_internal_errors(true);
-                $dom = new DOMDocument();
-                $dom->loadHTML($content);
-                $children = $dom->getElementsByTagName('span');
-
-                /**
-                 * @var $child \DOMElement
-                 */
-                foreach ($children as $child) {
-                    if ($child->hasAttribute('class')) {
-                        if ($child->getAttribute('class') == 'price-tag') {
-                            $marketPrice = $child->nodeValue;
-                            break;
-                        }
-                    }
-                }
-
-                $children = $dom->getElementsByTagName('div');
-                /**
-                 * @var $child \DOMElement
-                 */
-                foreach ($children as $child) {
-                    if ($child->hasAttribute('class')) {
-                        $classData = $child->getAttribute('class');
-                        if (strpos($classData, 'currency-label') !== false) {
-                            $currency = str_replace(['Price (', ')'], '', $child->nodeValue);
-                            break;
-                        }
-                    }
-                }
-                libxml_use_internal_errors($internalErrors);
-            }
-
-            $marketPrice = trim(str_replace(',', '', $marketPrice));
-            $divider = 1;
-            if ($currency == 'GBX') {
-                $divider = 100;
-                $currency = 'GBP';
-            }
-
-            return ['currency' => $currency, 'price' => (float) $marketPrice / $divider];
-        });
-
-        $rates = $this->exchangeRateService->getRates();
-
-        $currency = $data['currency'];
-        $price = $data['price'];
-        if (!isset($rates[$currency])) {
-            throw new RuntimeException('No rate found for currency ['. $currency. ']. Used scraper ['. $apiCallUrl.']');
-        }
-
-        return $price / ($rates[$currency]);
+        return $marketPrice / ($rates[$currency]);
     }
 
     public function getQuote(string $symbol): ?float
     {
-        return $this->getMarketPrice($symbol);
+        $rates = $this->exchangeRateService->getRates();
+        $data = $this->data[$symbol];
+        $price = $data['price'];
+        $currency = $data['currency'];
+
+        return $price / ($rates[$currency]);
     }
 }

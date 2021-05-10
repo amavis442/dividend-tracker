@@ -150,13 +150,15 @@ class StockPriceService
      */
     public function getQuotes(array $symbols): array
     {
-        $result = $this->getDefault()->getQuotes($symbols);
-        $this->cacheTimeStamp = $result['timestamp'];
+        $defaultService = $this->getDefault();
 
-        if (count($this->linkTickerToService) > 0) {
-            foreach ($this->linkTickerToService as $symbol => $serviceClass) {
-                $service = $this->getService($symbol);
-                $service->getMarketPrice($symbol);
+        $result = $defaultService->getQuotes($symbols);
+        $this->cacheTimeStamp = $result['timestamp'];
+        if (count($this->services) > 0) {
+            foreach ($this->services as $serviceClass => $service) {
+                if ($defaultService !== $service && $serviceClass !== '_default') {
+                    $result = array_merge($result, $service->getQuotes([]));
+                }
             }
         }
 
