@@ -1,23 +1,12 @@
 <?php
 namespace App\Service;
 
-use DateTime;
+use App\Contracts\Service\DividendDatePluginInterface;
 use RuntimeException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use App\Contracts\Service\DividendRetrievalInterface;
-use App\Service\DividendDate\ISharesService;
 
 class DividendDateService
 {
-    public const TOKEN_URL = "https://seekingalpha.com/market_data/xignite_token";
-    public const URL = "https://globalhistorical.xignite.com/";
-    /**
-     * Hold sthe returned dividend data
-     *
-     * @var array
-     */
-    private $dividenData;
-
     /**
      * Http client
      *
@@ -30,79 +19,107 @@ class DividendDateService
      *
      * @var Array
      */
-    private $externalServices;
+    private $services;
 
     /**
      * Which service is linked to ticker
      *
      * @var array
      */
-    private $tickerLinkedToService;
+    private $linkToService;
 
-    public function __construct(HttpClientInterface $client, ISharesService $iSharesService)
+    public function __construct(HttpClientInterface $client)
     {
         $this->client = $client;
-        $this->iSharesService = $iSharesService;
-        $this->externalServices = [];
-        $this->tickerLinkedToService = [];
+        $this->services = [];
+        $this->linkToService = [];
     }
 
-    public function addExternalService(string $ticker, string $serviceClass)
+    /**
+     * Add a service by classname.
+     *
+     * @param string $serviceClass
+     * @return self
+     */
+    public function addService(string $serviceClass, ?array $symbols = []): self
     {
-        if (!isset($this->externalServices[$serviceClass])) {
-            $service = new $serviceClass();
-            if ($service instanceof DividendRetrievalInterface) {
-                $service->setClient($this->client);
-                $this->externalServices[$serviceClass] = $service;
-                
+        $service = new $serviceClass($this->client);
+        if (!$service instanceof DividendDatePluginInterface) {
+            throw new \RuntimeException("Class [" . $serviceClass . "] should implement StockPriceInterface");
+        }
+
+        $this->services[$serviceClass] = $service;
+        if ($symbols) {
+            foreach ($symbols as $symbol) {
+                $this->linkServiceToTicker[$symbol] = $serviceClass;
             }
         }
-        if (isset($this->externalServices[$serviceClass])) {
-            $this->tickerLinkedToService[$ticker] = $serviceClass;
-        }
+
+        return $this;
     }
 
-    public function getToken()
+    /**
+     * Fallback service to use
+     *
+     * @param string $serviceClass
+     * @return self
+     */
+    public function setDefault(string $serviceClass): self
     {
-        $response = $this->client->request('GET', self::TOKEN_URL);
-        if ($response->getStatusCode() !== 200) {
-            throw new RuntimeException('Can not get token...');
+        if (!isset($this->services[$serviceClass])) {
+            throw new \RuntimeException("Add service first with addService() then call setDefault. Class does not exist [" . $serviceClass . "]");
         }
+        $service = $this->services[$serviceClass];
+        if (!$service instanceof DividendDatePluginInterface) {
+            throw new \RuntimeException("Class [" . $serviceClass . "] should implement DividendDatePluginInterface");
+        }
+        $this->services['_default'] = $this->services[$serviceClass];
 
-        return $response->toArray();
+        return $this;
     }
 
-    public function getStockHistory(array $token, string $ticker)
+    /**
+     * Fallback service
+     *
+     * @return DividendDatePluginInterface|null
+     */
+    public function getDefault(): ?DividendDatePluginInterface
     {
-        $url = "https://globalhistorical.xignite.com/v3/xGlobalHistorical.json/GetCashDividendHistory?"
-            . "IdentifierType=Symbol&Identifier=" . $ticker
-            . "&StartDate=01/01/" . (date('Y') - 3) . "&EndDate=12/30/" . (date('Y') + 3) . "&"
-            . "IdentifierAsOfDate=&CorporateActionsAdjusted=true&_token="
-            . $token['_token'] . "&_token_userid=" . $token['_token_userid'];
-
-        $response = $this->client->request('GET', $url);
-        if ($response->getStatusCode() !== 200) {
-            throw new RuntimeException('Can not get token...');
-        }
-        $data = $response->toArray();
-        if ($data['Outcome'] == 'Success') {
-            $this->dividenData = $data['CashDividends'];
-            return $data;
-        }
+        return $this->services['_default'] ?? null;
     }
 
-    private function getTickerNextPayments(array $tickerData): array
+    /**
+     * Explicit link between symbol and service
+     *
+     * @param string $serviceClass
+     * @param string $symbol
+     * @return self
+     */
+    private function linkServiceToTicker(string $serviceClass, string $symbol): self
     {
-        $payments = [];
-        $currentDate = new DateTime();
-        $dividends = $tickerData['CashDividends'];
-        foreach ($dividends as $dividend) {
-            $payDate = new DateTime($dividend['PayDate']);
-            if ($payDate > $currentDate) {
-                $payments[] = $dividend;
-            }
+        if (!isset($this->services[$serviceClass])) {
+            throw new RuntimeException('Use addService first before linking to ticker symbol: ' . $symbol);
         }
-        return $payments;
+
+        $this->linkToService[$symbol] = $serviceClass;
+
+        return $this;
+    }
+
+    /**
+     * Get a service which is explitly linked
+     *
+     * @param string $symbol
+     * @return StockPriceInterface
+     */
+    public function getService(string $symbol): DividendDatePluginInterface
+    {
+        if (isset($this->linkToService[$symbol])) {
+            $serviceClass = $this->linkToService[$symbol];
+            return $this->services[$serviceClass];
+        }
+        
+        return $this->services['_default'];
     }
 
     /**
@@ -111,24 +128,18 @@ class DividendDateService
      * @param string $ticker
      * @return void
      */
-    public function getUpcommingDividendInfo(string $ticker): ?array
-    {
-        $tickerNextPayments = [];
-
-        if (isset($this->tickerLinkedToService[$ticker])) {
-            $serviceClass = $this->tickerLinkedToService[$ticker];
-            $tickerData = [];
-            $tickerData['CashDividends'][] = $this->externalServices[$serviceClass]->getLatest($ticker);
-        } else {
-            $token = $this->getToken();
-            $tickerData = [];
-            $tickerData = $this->getStockHistory($token, $ticker);
-            if ($tickerData === null || count($tickerData['CashDividends']) === 0) {
-                return null;
-            }
+    public function getData(string $symbol): ?array
+    {        
+        if (isset($this->linkToService[$symbol])) {
+            $serviceClass = $this->linkToService[$symbol];
+            $service = $this->services[$serviceClass];
+            return $service->getData($symbol); 
         }
-        $tickerNextPayments = $this->getTickerNextPayments($tickerData);
 
-        return $tickerNextPayments;
+        $service = $this->getDefault();
+        if (!$service) {
+            return [];
+        }
+        return $service->getData($symbol);
     }
 }

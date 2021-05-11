@@ -108,15 +108,20 @@ class StockPriceService
      * @param string $serviceClass
      * @return self
      */
-    public function addService(string $serviceClass): self
+    public function addService(string $serviceClass, ?array $symbols = []): self
     {
-        $service = new $serviceClass($this->client, $this->stockCache, $this->exchangeRateService);
+        $service = new $serviceClass($this->client);
         if (!$service instanceof StockPricePluginInterface) {
             throw new \RuntimeException("Class [" . $serviceClass . "] should implement StockPriceInterface");
         }
 
         $this->services[$serviceClass] = $service;
-
+        if ($symbols) {
+            foreach ($symbols as $symbol) {
+                $this->linkServiceToTicker[$symbol] = $serviceClass;
+            }
+        }
+        
         return $this;
     }
 

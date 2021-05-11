@@ -2,11 +2,10 @@
 
 namespace App\Service\DividendDate;
 
-use DateTime;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use App\Contracts\Service\DividendRetrievalInterface;
+use App\Contracts\Service\DividendDatePluginInterface;
 
-class ISharesService implements DividendRetrievalInterface
+class ISharesService implements DividendDatePluginInterface
 {
     public const SEMB_FEED = 'https://www.blackrock.com/nl/particuliere-beleggers/produkten/251824/ishares-jp-morgan-emerging-markets-bond-ucits-etf/1495092399598.ajax?tab=distributions&fileType=json&subtab=table';
     
@@ -17,19 +16,12 @@ class ISharesService implements DividendRetrievalInterface
      */
     protected $client;
 
-    /*
     public function __construct(HttpClientInterface $client)
     {
         $this->client = $client;
     }
-    */
 
-    public function setClient(HttpClientInterface $client)
-    {
-        $this->client = $client;
-    }
-
-    public function getLatest(string $ticker): ?array
+    public function getData(string $ticker): ?array
     {
         $url = '';
         switch($ticker) {

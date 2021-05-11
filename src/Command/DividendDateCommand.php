@@ -7,7 +7,6 @@ use App\Repository\CalendarRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\TickerRepository;
 use App\Service\DividendDateService;
-use App\Service\DividendDate\ISharesService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -79,22 +78,23 @@ class DividendDateCommand extends Command
         $this
             ->setDescription(self::$defaultDescription)
             /* ->addArgument('ticker', InputArgument::OPTIONAL, 'Symbol of stock (MSFT, APPL)')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-            */
+        ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
+         */
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->dividendDateService->addExternalService('SEMB', ISharesService::class);
 
         $io = new SymfonyStyle($input, $output);
         $tickers = $this->tickerRepository->getActive();
         $defaultCurrency = $this->currencyRepository->findOneBy(['symbol' => 'USD']);
         $addedDates = 0;
         $addedForTicker = [];
+
         foreach ($tickers as $ticker) {
-            $data = $this->dividendDateService->getUpcommingDividendInfo($ticker->getSymbol());
+            $data = $this->dividendDateService->getData($ticker->getSymbol());
+
             if (!$data) {
                 $io->info('No dividend data for ticker: ' . $ticker->getFullname());
                 continue;
@@ -150,9 +150,9 @@ class DividendDateCommand extends Command
              */
             }
         }
-        //$io->success('Done.... added: ' . $addedDates);
-        //$io->info(implode(', ', $addedForTicker));
-        $this->logger->debug('Added: ' . $addedDates. '. '. implode(', ', $addedForTicker));
+        $io->success('Done.... added: ' . $addedDates);
+        $io->info(implode(', ', $addedForTicker));
+        $this->logger->debug('Added: ' . $addedDates . '. ' . implode(', ', $addedForTicker));
 
         return Command::SUCCESS;
     }

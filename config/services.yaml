@@ -51,17 +51,16 @@ services:
             $exchangeRateService: '@App\Service\ExchangeRateService' 
         calls:
             - addService: ['App\Service\StockPrices\YahooFinanceService']
-            - addService: ['App\Service\StockPrices\LondonService']   
+            - addService: ['App\Service\StockPrices\LondonService', ['SEMB', 'PNN','RB','BATS','SSHY','STHS','VWRL','VGOV','VUSC']]   
             - setDefault: ['App\Service\StockPrices\YahooFinanceService']
-            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','SEMB']
-            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','PNN']
-            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','RB']
-            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','BATS']
-            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','SSHY']
-            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','STHS']
-            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','VWRL']
-            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','VGOV']
-            - linkServiceToTicker: ['App\Service\StockPrices\LondonService','VUSC']
+
+    App\Service\DividendDateService:
+        arguments:
+            $client: '@http_client'
+        calls:
+            - addService: ['App\Service\DividendDate\SeekingAlphaService']
+            - addService: ['App\Service\DividendDate\ISharesService', ['SEMB']]   
+            - setDefault: ['App\Service\DividendDate\SeekingAlphaService']
 
     App\Service\ImportCsvService:
         arguments: 
