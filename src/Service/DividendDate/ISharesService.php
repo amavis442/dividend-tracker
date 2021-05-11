@@ -8,7 +8,10 @@ use App\Contracts\Service\DividendDatePluginInterface;
 class ISharesService implements DividendDatePluginInterface
 {
     public const SEMB_FEED = 'https://www.blackrock.com/nl/particuliere-beleggers/produkten/251824/ishares-jp-morgan-emerging-markets-bond-ucits-etf/1495092399598.ajax?tab=distributions&fileType=json&subtab=table';
+    public const ISPA_FEED = 'https://www.ishares.com/nl/particuliere-belegger/nl/producten/251973/ishares-stoxx-global-select-dividend-100-ucits-etf-de-fund/1497735778843.ajax?tab=distributions&fileType=json&subtab=table';
     
+
+
     /**
      * Http client
      *
@@ -24,10 +27,15 @@ class ISharesService implements DividendDatePluginInterface
     public function getData(string $ticker): ?array
     {
         $url = '';
+        $currency = 'USD';
         switch($ticker) {
             case 'SEMB':
                 $url = self::SEMB_FEED;
                 break;
+            case 'ISPA':
+                $url = self:: ISPA_FEED;
+                $currency = 'EUR';
+                break;    
         }
 
         $response = $this->client->request(
@@ -50,7 +58,7 @@ class ISharesService implements DividendDatePluginInterface
         $item['PayDate'] = $row[0][3]['raw'];
         $item['DividendAmount'] = $row[0][4]['raw'];
         $item['Type'] = 'Distribution';
-        $item['Currency'] = 'USD'; //strpos('USD', $row[0][4]['display']) 
+        $item['Currency'] = $currency; //strpos('USD', $row[0][4]['display']) 
 
         return $item;
     }
