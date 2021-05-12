@@ -1,11 +1,11 @@
-<h3>{{ 'Transactions'|trans }}</h3>
+<h3>{{ 'Orders'|trans }}</h3>
 <div class="table-responsive-xl">
 <table class="table table-striped">
 	<thead>
 		<tr>
 			<th>ID</th>
 			<th>{{ 'Side'|trans }}</th>
-			<th>{{ 'Transaction date'|trans }}</th>
+			<th>{{ 'Order date'|trans }}</th>
 			<th>{{ 'Amount'|trans }}</th>
 			<th>{{ 'Price'|trans }}</th>
 			<th>{{ 'Allocation'|trans }}</th>
@@ -62,10 +62,10 @@
 						{% endset %}
 
 						<div class="btn-group" role="group" aria-label="Actions">
-								<a href="{{ path('transaction_edit', {'id': transaction.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit transaction">
+								<a href="{{ path('transaction_edit', {'id': transaction.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="{{ 'Edit order'|trans }}">
 									<i class="far fa-edit"></i>
 								</a>
-								<button class="btn btn-info" data-toggle="popover" data-placement="right" title="Transaction info"
+								<button class="btn btn-info" data-toggle="popover" data-placement="right" title="{{ 'Order info'|trans }}"
                     					data-content='{{ transactionInfo }}' data-html="true">
 										<i class="fas fa-info-circle"></i>
 								</button>

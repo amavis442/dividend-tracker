@@ -11,29 +11,30 @@
 
 	<ul class="nav nav-tabs" id="myTab" role="tablist">
 		<li class="nav-item">
-			<a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true">{{ 'Info'|trans }}</a>
+			<a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true"><i class="fas fa-info-circle"></i> {{ 'Info'|trans }}</a>
 		</li>
 		<li class="nav-item">
 			<a class="nav-link" id="position-tab" data-toggle="tab" href="#position" role="tab" aria-controls="position" aria-selected="true">{{ 'Position'|trans }}</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" id="transactions-tab" data-toggle="tab" href="#transactions" role="tab" aria-controls="transactions" aria-selected="true">{{ 'Transactions'|trans }}</a>
+			<a class="nav-link" id="orders-tab" data-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="true"><i class="fas fa-receipt"></i> {{ 'Orders'|trans }}</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" id="dividend-tab" data-toggle="tab" href="#dividend" role="tab" aria-controls="dividend" aria-selected="false">{{ 'Dividend'|trans }}</a>
+			<a class="nav-link" id="payout-tab" data-toggle="tab" href="#payout" role="tab" aria-controls="payout" aria-selected="false"><i class="fas fa-coins"></i> {{ 'Payout'|trans }}</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" id="payout-tab" data-toggle="tab" href="#payout" role="tab" aria-controls="payout" aria-selected="false">{{ 'Payout'|trans }}</a>
+			<a class="nav-link" id="dividend-tab" data-toggle="tab" href="#dividend" role="tab" aria-controls="dividend" aria-selected="false"><i class="far fa-calendar-alt"></i> {{ 'Dividend'|trans }}</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" id="growth-tab" data-toggle="tab" href="#growth" role="tab" aria-controls="growth" aria-selected="false">{{ 'Dividend growth'|trans }}</a>
+			<a class="nav-link" id="growth-tab" data-toggle="tab" href="#growth" role="tab" aria-controls="growth" aria-selected="false"><i class="fas fa-chart-line"></i> {{ 'Dividend growth'|trans }}</a>
 		</li>
+		<!-- //
 		<li class="nav-item">
 			<a class="nav-link" id="fundamental-tab" data-toggle="tab" href="#fundamental" role="tab" aria-controls="fundamental" aria-selected="false">{{ 'Fundamental'|trans }}</a>
 		</li>
-		
+		// -->
 		<li class="nav-item">
-			<a class="nav-link" id="research-tab" data-toggle="tab" href="#research" role="tab" aria-controls="research" aria-selected="false">{{ 'Research'|trans }}</a>
+			<a class="nav-link" id="research-tab" data-toggle="tab" href="#research" role="tab" aria-controls="research" aria-selected="false"><i class="fas fa-search-dollar"></i> {{ 'Research'|trans }}</a>
 		</li>
 	</ul>
 	<div class="tab-content" id="myTabContent">
@@ -45,9 +46,9 @@
 			<br/>
 			{% include 'portfolio/show/_position.html.twig' %}
 		</div>
-		<div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="transactions-tab">
+		<div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
 			<br/>
-			{% include 'portfolio/show/_transaction.html.twig' %}
+			{% include 'portfolio/show/_orders.html.twig' %}
 		</div>
 		<div class="tab-pane fade" id="payout" role="tabpanel" aria-labelledby="payout-tab">
 			<br/>
