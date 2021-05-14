@@ -21,7 +21,8 @@
 				</tr>
 			</thead>
 			<tbody>
-				{% for calendar in calendars %}
+			{% set oldCash = 0 %}
+				{% for index, calendar in calendars %}
 					{% set dividendDaysLeft = calendar.getDaysLeft ?? -1 %}
 					{% set tableColorClass = '' %}
 					{% if dividendDaysLeft > -1 %}
@@ -39,7 +40,21 @@
 						<td>{{ calendar.paymentDate ? calendar.paymentDate|date('d-m-Y') : '' }}</td>
 						<td>{{ calendar.exDividendDate ? calendar.exDividendDate|date('d-m-Y') : '' }}</td>
 						<td>{{ calendar.recordDate ? calendar.recordDate|date('d-m-Y') : '' }}</td>
-						<td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({fraction_digit: 3}) }}</td>
+						<td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({fraction_digit: 3}) }}
+						{% if dividendRaises[index] > 0 %}
+							<span class="badge badge-success">
+                        		<i class="fas fa-arrow-circle-up"></i> 
+                        		{{ dividendRaises[index]|format_number({fraction_digit: 2})}}%
+                    		</span>
+						{% endif %}
+						{% if dividendRaises[index] < 0 %}
+							<span class="badge badge-danger">
+                        		<i class="fas fa-arrow-circle-down"></i> 
+                        		{{ dividendRaises[index]|format_number({fraction_digit: 2})}}%
+                    		</span>
+						{% endif %}
+
+						</td>
 						<td>{{ (calendar.dividendType ?? 'Regular')|trans }}</td>
 						<td>{{ (calendar.source ?? 'manual')|trans }}</td>
 						<td>{{ calendar.description }}</td>

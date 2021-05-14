@@ -136,6 +136,16 @@ class PortfolioController extends AbstractController
             $dividendFrequentie = $ticker->getPayoutFrequency();
             $netYearlyDividend = (($dividendFrequentie * $cals[0]->getCashAmount()) * $exchangeRate) * (1 - $dividendTax);
         }
+        $dividendRaises = [];
+        // Cals start with latest and descent
+        foreach ($cals as $index => $cal) {
+            $dividendRaises[$index ] = 0;
+            if (isset($cals[$index + 1])) {
+                $oldCash = $cals[$index + 1]->getCashAmount(); // previous
+                $dividendRaises[$index ] = (($cal->getCashAmount() - $oldCash) / $oldCash) * 100;
+            }
+        }
+
         $payments = $position->getPayments();
         $dividends = $paymentRepository->getSumDividends([$ticker->getId()]);
         $dividend = 0;
@@ -151,7 +161,7 @@ class PortfolioController extends AbstractController
             $percentageAllocation = ($position->getAllocation() / $allocated) * 100;
         }
 
-        $calendars = $ticker->getCalendars()->slice(0, 5);
+        $calendars = $ticker->getCalendars()->slice(0, 10);
         $calendarsCount = $ticker->getCalendars()->count();
 
         $referer->set('portfolio_show', ['id' => $position->getId()]);
@@ -168,6 +178,7 @@ class PortfolioController extends AbstractController
             'dividendService' => $dividendService,
             'calendars' => $calendars,
             'calendarsCount' => $calendarsCount,
+            'dividendRaises' => $dividendRaises,
             'totalInvested' => $allocated,
             'netYearlyDividend' => $netYearlyDividend,
             'percentageAllocated' => $percentageAllocation,
