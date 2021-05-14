@@ -181,7 +181,7 @@ Net forward yearly dividend per share: Netto verwachte jaarlijkse uitkering per 
 Payouts per year: Uitkeringen per jaar
 Net forward dividend per payout: Netto verwachte dividend per uitkering
 Net forward yearly dividend total: Netto verwachte jaarlijkse dividend totaal
-Yield: Opbrengst
+Yield: Rendement
 Yield on cost dividend: Rendement op kostendividend
 Total dividend in a year / total allocated: Totaal dividend in een jaar / totaal toegewezen
 Search ticker: Zoek ticker
@@ -195,7 +195,7 @@ Stamduty: Zegelrecht
 fx fee: Omwisselkoers vergoeding
 Please choose a ticker: Kies a.u.b een ticker
 Ticker: Ticker
-Profit: Winst
+Profit: Opbrengst
 Average price: Gemiddelde prijs
 Adjusment if automatic calculation is wrong: Aanpassing van automatische berekening is verkeerd
 Please choose a tax: Kies een belastingtarief
@@ -204,3 +204,10 @@ Orders: Orders
 Order date: Order datum
 Edit order: Bewerk order
 Order info: Order info
+Dividend yield based on cost basis: Dividendrendement op basis van kosten
+Current dividend yield: Huidig dividend rendement
+Dividend yield based on current market price: Dividendrendement op basis van de huidige marktprijs
+Current yield: Huidig rendement
+Net Dividend: Net Dividend
+Dividend to receive on total shares: Te ontvangen dividend op het totale aantal aandelen
+Diff: Verschil

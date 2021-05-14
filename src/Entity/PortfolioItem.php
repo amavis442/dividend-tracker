@@ -93,6 +93,13 @@ class PortfolioItem
     private $forwardNetDividendYield;
 
     /**
+     * Current dividend yield per share based on current marketprice
+     *
+     * @var float
+     */
+    private $forwardNetDividendYieldPerShare;
+
+    /**
      * Undocumented variable
      *
      * @var string
@@ -786,6 +793,30 @@ class PortfolioItem
         if (!$this->dividendCalendars->contains($dividendCalendar)) {
             $this->dividendCalendars->add($dividendCalendar);
         }
+
+        return $this;
+    }
+
+    /**
+     * Get current dividend yield per share based on current marketprice
+     *
+     * @return  float
+     */ 
+    public function getForwardNetDividendYieldPerShare(): float
+    {
+        return $this->forwardNetDividendYieldPerShare ?? 0;
+    }
+
+    /**
+     * Set current dividend yield per share based on current marketprice
+     *
+     * @param  float  $forwardNetDividendYieldPerShare  Current dividend yield per share based on current marketprice
+     *
+     * @return  self
+     */ 
+    public function setForwardNetDividendYieldPerShare(float $forwardNetDividendYieldPerShare): self
+    {
+        $this->forwardNetDividendYieldPerShare = $forwardNetDividendYieldPerShare;
 
         return $this;
     }

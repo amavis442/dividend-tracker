@@ -7,20 +7,46 @@ use App\Entity\Position;
 use App\Entity\Transaction;
 use App\Repository\TaxRepository;
 use App\Service\ExchangeRateService;
-use DateTime;
 use Doctrine\Common\Collections\Collection;
 
 class DividendService
 {
+    /**
+     * Net dividend over the shares
+     *
+     * @var null|float
+     */
     protected $forwardNetDividend;
+    /**
+     * Position
+     *
+     * @var Position
+     */
     protected $position;
+    /**
+     * Current exchangerate
+     *
+     * @var ExchangeRateService
+     */
     protected $exchangeRateService;
+    /**
+     * Dividend tax withhold
+     *
+     * @var TaxRepository
+     */
     protected $taxRepository;
+    /**
+     * What is the net dividend per payout per share
+     *
+     * @var null|float
+     */
+    protected $netDividendPerShare;
 
     public function __construct(ExchangeRateService $exchangeRateService, TaxRepository $taxRepository)
     {
         $this->exchangeRateService = $exchangeRateService;
         $this->taxRepository = $taxRepository;
+        $this->netDividendPerShare = null;
     }
 
     /**
@@ -72,7 +98,7 @@ class DividendService
         if ($tax) {
             $taxRate = $tax->getTaxRate();
             return $taxRate;
-        }    
+        }
 
         switch ($calendar->getCurrency()->getSymbol()) {
             case 'EUR':
@@ -212,6 +238,7 @@ class DividendService
                 //[$exchangeRate, $dividendTax] = $this->getExchangeAndTax($calendar);
                 $cashAmount = $calendar->getCashamount();
                 $amount = $position->getAmount();
+                $this->netDividendPerShare = $cashAmount * $exchangeRate * (1 - $dividendTax);
                 $forwardNetDividend = $amount * $cashAmount * $exchangeRate * (1 - $dividendTax);
             }
         }
@@ -249,5 +276,19 @@ class DividendService
         $this->netDividendYield = $netDividendYield;
 
         return $netDividendYield;
+    }
+
+    /**
+     * Get what is the net dividend per payout per share
+     *
+     * @return  null|float
+     */ 
+    public function getNetDividendPerShare(?Position $position): ?float
+    {
+        if (!$this->netDividendPerShare && $position) {
+            $this->getForwardNetDividend($position);
+        }
+
+        return $this->netDividendPerShare;
     }
 }

@@ -136,6 +136,7 @@ class PortfolioModel
                 $diffPrice = $marketPrice - $avgPrice;
             }
 
+            $payoutFrequency = $ticker->getPayoutFrequency();
             $portfolioItem = new PortfolioItem();
             $portfolioItem
                 ->setTickerId($ticker->getId())
@@ -153,7 +154,7 @@ class PortfolioModel
                 ->setPies($position->getPies())
                 ->setIsDividendMonth($position->isDividendPayMonth())
                 ->setDiffPrice($diffPrice)
-                ->setDividendPayoutFrequency($ticker->getPayoutFrequency());
+                ->setDividendPayoutFrequency($payoutFrequency);
             ;
 
             // Dividend part
@@ -161,6 +162,8 @@ class PortfolioModel
             if ($calendar) {
                 $forwardNetDividend = $dividendService->getForwardNetDividend($position);
                 $forwardNetDividendYield = $dividendService->getForwardNetDividendYield($position);
+                $forwardNetDividendPerShare = $dividendService->getNetDividendPerShare($position);
+                $forwardNetDividendYieldPerShare = (($payoutFrequency * $forwardNetDividendPerShare) / $marketPrice) * 100;
 
                 $portfolioItem
                     ->setDivDate(true)
@@ -169,7 +172,9 @@ class PortfolioModel
                     ->setCashAmount($calendar->getCashAmount())
                     ->setCashCurrency($calendar->getCurrency())
                     ->setForwardNetDividend($forwardNetDividend)
-                    ->setForwardNetDividendYield($forwardNetDividendYield);
+                    ->setForwardNetDividendYield($forwardNetDividendYield)
+                    ->setForwardNetDividendYieldPerShare($forwardNetDividendYieldPerShare)
+                    ;
 
 
                 foreach ($position->getTicker()->getCalendars() as $currentCalendar) {

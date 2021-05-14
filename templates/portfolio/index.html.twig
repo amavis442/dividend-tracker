@@ -34,11 +34,11 @@
             <tr>
                 <th></th>
                 <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'fullname', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Fullname'|trans }}</a></th>
-                <th>{{ 'Avg. price'|trans }}</th>
-                <th>{{ 'Market Price'|trans }}</th>
+                <th>{{ 'Avg. price'|trans }} / <br/> {{ 'Profit'|trans }}</th>
+                <th>{{ 'Market Price'|trans }} /<br/> {{ 'Diff' |trans }} / <br/> {{ 'Yield'|trans }} <span title="{{'Dividend yield based on current market price'|trans }}" data-toggle="tooltip" data-placement="top"><i class="fas fa-question-circle"></i></span></th>
                 <th>{{ 'Allocation'|trans }} / <br/>{{ 'Received dividend'|trans }}</th>
-                <th>{{ 'Ex-Div'|trans }} <br/> {{ 'Payout'|trans }} </th>
-                <th>{{ 'Forward dividend'|trans }}</th>
+                <th>{{ 'Ex-Div'|trans }} / <br/> {{ 'Payout'|trans }} </th>
+                <th>{{ 'Forward dividend'|trans }} <span title="{{'Dividend yield based on cost basis'|trans }}" data-toggle="tooltip" data-placement="top"><i class="fas fa-question-circle"></i></span></th>
                 <th></th>
             </tr>
         </thead>
@@ -64,6 +64,7 @@
                     <br/>
                     <span class="badge badge-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.paperProfit|format_number({fraction_digit: 2}) }} ({{ portfolioItem.paperProfitPercentage|format_number({fraction_digit: 2}) }}%)</span>
                     {% endif %}
+                    
                 </td>
                 <td>
                     {% if portfolioItem.marketPrice %}
@@ -75,6 +76,13 @@
                     </span>
                     {% else %}
                     &mdash;
+                    {% endif %}
+                    <br/>
+                    {% if portfolioItem.divDate %}
+                        <div class="badge badge-info" data-toggle="popover" title="{{ 'Current yield'|trans }}" 
+                    data-content='{{ 'Dividend yield based on current market price'|trans }}'>{{ portfolioItem.forwardNetDividendYieldPerShare|format_number({fraction_digit: 2}) }}%</div>
+                    {% else %}
+                        &mdash;
                     {% endif %}
                 </td>
                 <td>
@@ -98,9 +106,10 @@
                 </td>
                 <td>{% if portfolioItem.divDate %}
                         <div class="badge badge-primary">{{ portfolioItem.cashCurrency.sign|raw }} {{ portfolioItem.cashAmount|format_number({fraction_digit: 3}) }}</div><br/>
-                        <div class="badge badge-secondary">&euro; {{ portfolioItem.forwardNetDividend|format_number({fraction_digit: 2}) }}
-                        <div class="badge badge-success">{{ portfolioItem.forwardNetDividendYield|format_number({fraction_digit: 2}) }}%</div>
-                        </div>
+                        <div class="badge badge-secondary" data-toggle="popover" title="{{ 'Net Dividend'|trans }}" 
+                    data-content='{{ 'Dividend to receive on total shares'|trans }}'>&euro; {{ portfolioItem.forwardNetDividend|format_number({fraction_digit: 2}) }}
+                        <div class="badge badge-success" >{{ portfolioItem.forwardNetDividendYield|format_number({fraction_digit: 2}) }}%</div>
+                        </div><br/>
                     {% else %}
                         &mdash;
                     {% endif %}
