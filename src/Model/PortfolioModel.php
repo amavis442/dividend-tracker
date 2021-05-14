@@ -163,8 +163,10 @@ class PortfolioModel
                 $forwardNetDividend = $dividendService->getForwardNetDividend($position);
                 $forwardNetDividendYield = $dividendService->getForwardNetDividendYield($position);
                 $forwardNetDividendPerShare = $dividendService->getNetDividendPerShare($position);
-                $forwardNetDividendYieldPerShare = (($payoutFrequency * $forwardNetDividendPerShare) / $marketPrice) * 100;
-
+                $forwardNetDividendYieldPerShare = 0;
+                if ($marketPrice > 0) {
+                    $forwardNetDividendYieldPerShare = (($payoutFrequency * $forwardNetDividendPerShare) / $marketPrice) * 100;
+                }
                 $portfolioItem
                     ->setDivDate(true)
                     ->setExDividendDate($calendar->getExDividendDate())
