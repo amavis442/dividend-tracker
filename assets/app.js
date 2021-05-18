@@ -1,7 +1,6 @@
-import jquery from 'jquery';
+import jQuery from 'jquery';
 
-const $ = jquery;
-global.$ = global.jQuery = $;
+const $ = jQuery;
 
 import 'bootstrap/js/dist/popover';
 import 'bootstrap/js/dist/tooltip';
@@ -16,7 +15,7 @@ import './styles/app.css';
 import './styles/global.scss';
 
 jQuery(function(){
-    $('[data-toggle="popover"]').popover();
-    $('[data-toggle="tooltip"]').tooltip();
+  $('[data-toggle="popover"]').popover();
+  $('[data-toggle="tooltip"]').tooltip();
 });
 

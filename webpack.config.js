@@ -1,4 +1,5 @@
 const Encore = require('@symfony/webpack-encore');
+const webpack = require('webpack');
 
 // Manually configure the runtime environment if not already configured yet by the "encore" command.
 // It's useful when you use tools that rely on webpack.config.js file.
@@ -34,13 +35,14 @@ Encore
      * https://symfony.com/doc/current/frontend.html#adding-more-features
      */
     .cleanupOutputBeforeBuild()
-    //.enableBuildNotifications()
+    .enableBuildNotifications()
     .enableSourceMaps(!Encore.isProduction())
     // enables hashed filenames (e.g. app.abc123.css)
     .enableVersioning(Encore.isProduction())
 
     .configureBabel((config) => {
         config.plugins.push('@babel/plugin-proposal-class-properties');
+        config.plugins.push('@babel/plugin-transform-runtime');
     })
 
     // enables @babel/preset-env polyfills
@@ -51,7 +53,7 @@ Encore
 
     // enables Sass/SCSS support
     .enableSassLoader()
-
+    .enableVueLoader()
     // uncomment if you use TypeScript
     //.enableTypeScriptLoader()
 
@@ -64,7 +66,7 @@ Encore
 
     // uncomment to get integrity="..." attributes on your script & link tags
     // requires WebpackEncoreBundle 1.4 or higher
-    //.enableIntegrityHashes(Encore.isProduction())
+    .enableIntegrityHashes(Encore.isProduction())
 
     /*
      * ENTRY CONFIG
@@ -84,8 +86,24 @@ Encore
     .addEntry('barchart_with_labels', './assets/js/barchart_with_labels.js')
     .addEntry('linechart', './assets/js/linechart.js')
     .addEntry('summernote', './assets/js/summernote.js')
-    
+    .addEntry('stockprices', './assets/js/stockprices.js')
+    .addEntry('vue', './assets/vue/index.js')
 
+    .addPlugin(new webpack.DefinePlugin({
+        'ENV_API_ENDPOINT': JSON.stringify(process.env.API_ENDPOINT),
+    }))
+    // enable ESLint
+    .addLoader({
+        enforce: 'pre',
+        test: /\.(js|vue)$/,
+        loader: 'eslint-loader',
+        exclude: /node_modules/,
+        options: {
+            fix: true,
+            emitError: true,
+            emitWarning: true,
+        },
+    })
 ;
 
 module.exports = Encore.getWebpackConfig();

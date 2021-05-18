@@ -7,18 +7,13 @@
 	<p class="h1">Allocation information</p>
 
 	<div style='width:900px;height:600px' class="col col-xs-12">
-		<canvas id="pieChartCanvas"></canvas>
+		<canvas id="pieChartCanvas" data-chart-data='{{ data|json_encode|raw }}' data-chart-labels='{{ labels|json_encode|raw }}' 
+		data-chart-title="Allocation" data-chart-subtitle="Allocation per sector"></canvas>
 	</div>
-	
+
 {% endblock %}
 
 {% block javascripts %}
 	{{ parent() }}
-	<script>
-		window.chartData = {{ data|json_encode|raw }};
-		window.chartLabels = {{ labels|json_encode|raw }};
-		window.chartTitle = 'Allocation';
-		window.chartSubTitle = 'Allocation per sector';
-	</script>
 	{{ encore_entry_script_tags('piechart') }}
 {% endblock %}
