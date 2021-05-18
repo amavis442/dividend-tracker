@@ -48,13 +48,13 @@ class ExchangeRateService
         return $data['rates'] ?? [];
     }
     */
-    
+
     public function getRates(): array
     {
         $apiCallUrl = self::ECB_EXCHANGERATE;
         $client = $this->client;
 
-        
+
         $data = $this->exchangerateCache->get('exchangerates', function (ItemInterface $item) use ($client, $apiCallUrl) {
             $item->expiresAfter(3600);
             $response = $client->request(

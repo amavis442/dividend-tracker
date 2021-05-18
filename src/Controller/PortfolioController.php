@@ -78,7 +78,7 @@ class PortfolioController extends AbstractController
             $searchCriteria,
             $pieSelected,
         );
-        
+
         $session->set(get_class($this), $request->getRequestUri());
 
         return $this->render('portfolio/index.html.twig', [
@@ -165,7 +165,7 @@ class PortfolioController extends AbstractController
         $calendarsCount = $ticker->getCalendars()->count();
 
         $referer->set('portfolio_show', ['id' => $position->getId()]);
-        
+
         $indexUrl = $session->get(get_class($this));
 
 

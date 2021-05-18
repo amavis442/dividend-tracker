@@ -1,4 +1,5 @@
 <?php
+
 // api/src/DataProvider/StockPriceCollectionDataProvider.php
 
 namespace App\DataProvider;
@@ -29,8 +30,7 @@ final class StockPriceItemDataProvider implements ItemDataProviderInterface, Res
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = []): ?StockPrice
     {
         $tickers = $this->tickerRepository->getActive();
-        foreach ($tickers as $ticker)
-        {
+        foreach ($tickers as $ticker) {
             $symbol = $ticker->getSymbol();
             $symbols[] = $symbol;
         }

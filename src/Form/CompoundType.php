@@ -10,7 +10,6 @@ use App\Form\Factory\CallbackTransformerValutaFactory;
 use App\Form\Factory\CallbackTransformerUnitsFactory;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
-
 class CompoundType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -23,7 +22,7 @@ class CompoundType extends AbstractType
                 'input' => 'number',
                 'scale' => 7,
                 'empty_data' => 1
-            ])     
+            ])
             ->add('price', NumberType::class, [
                 'label' => 'Average price (euro)',
                 'help' => 'Price that you pay for the shares',

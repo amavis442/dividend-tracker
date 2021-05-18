@@ -104,12 +104,11 @@ class PortfolioModel
         $symbols = [];
 
         $tickers = $tickerRepository->getActive();
-        foreach ($tickers as $ticker)
-        {
+        foreach ($tickers as $ticker) {
             $symbol = $ticker->getSymbol();
             $symbols[] = $symbol;
         }
-        
+
         $stockPriceService->getQuotes($symbols);
         $this->timestamp = $stockPriceService->getCacheTimeStamp();
 
@@ -119,17 +118,17 @@ class PortfolioModel
         foreach ($iter as $position) {
             $ticker = $position->getTicker();
             $symbol = $ticker->getSymbol();
- 
+
             $paperProfit = 0.0;
             $paperProfitPercentage = 0.0;
             $diffPrice = 0.0;
-            
+
             $marketPrice = $stockPriceService->getMarketPrice($symbol);
             $amount = $position->getAmount();
             $avgPrice = $position->getPrice();
             $allocation = $position->getAllocation();
             $percentageAllocation = ($allocation / $totalInvested) * 100;
-            
+
             if ($marketPrice) {
                 $paperProfit = ($marketPrice - $avgPrice) * $amount;
                 $paperProfitPercentage = ($paperProfit / $allocation) * 100;
@@ -253,7 +252,7 @@ class PortfolioModel
      * Get when was the quote cache last updated
      *
      * @return  int
-     */ 
+     */
     public function getCacheTimestamp()
     {
         if (!$this->initialized) {

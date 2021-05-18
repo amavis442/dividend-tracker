@@ -12,7 +12,7 @@ class UserFilter extends SQLFilter
     {
         if ($targetEntity->getName() !== User::class && $targetEntity->hasAssociation('user') && $this->hasParameter('userID')) {
             $userID = $this->getParameter('userID');
-            return $targetTableAlias . ".user_id = ". $userID;
+            return $targetTableAlias . ".user_id = " . $userID;
         }
         return '';
     }

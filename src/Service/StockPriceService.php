@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service;
 
 use App\Contracts\Service\StockPricePluginInterface;
@@ -121,7 +122,7 @@ class StockPriceService
                 $this->linkServiceToTicker[$symbol] = $serviceClass;
             }
         }
-        
+
         return $this;
     }
 

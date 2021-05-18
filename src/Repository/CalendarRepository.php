@@ -188,7 +188,7 @@ class CalendarRepository extends ServiceEntityRepository
             ->select('c, t, p, tr, pies, cur, tax')
             ->innerJoin('c.ticker', 't')
             ->innerJoin('t.positions', 'p', 'WITH', 'p.closed is null OR p.closed = 0')
-            ->leftJoin('p.tax','tax')
+            ->leftJoin('p.tax', 'tax')
             ->leftJoin('p.transactions', 'tr')
             ->leftJoin('p.pies', 'pies')
             ->leftJoin('c.currency', 'cur')
@@ -219,7 +219,7 @@ class CalendarRepository extends ServiceEntityRepository
             $exchangeRate = $dividendService->getExchangeRate($item);
             $tax = $item->getCashAmount() * $exchangeRate * $taxRate;
             $ticker = $item->getTicker()->getTicker();
-            
+
             $data[$item->getPaymentDate()->format('Ym')][$item->getPaymentDate()->format('j')][] = [
                 'calendar' => $item,
                 'ticker' => $ticker,

@@ -215,8 +215,7 @@ class ImportMail extends ImportBase
         TransactionRepository $transactionRepository,
         UploadedFile $uploadedFile,
         ?\Box\Spout\Reader\CSV\Reader $reader = null
-    ): array
-    {
+    ): array {
         return [];
     }
 }

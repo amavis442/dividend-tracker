@@ -1,4 +1,6 @@
-<?php // src/Form/DataTransformer/IssueToNumberTransformer.php
+<?php
+
+// src/Form/DataTransformer/IssueToNumberTransformer.php
 
 namespace App\Form\DataTransformer;
 
@@ -29,7 +31,7 @@ class StringToFilesTransformer implements DataTransformerInterface
      */
     public function transform($issue)
     {
-        
+
         //die();
         if (null === $issue) {
             return '';

@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Entity\Tax;
-
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -73,5 +72,4 @@ class Currency
 
         return $this;
     }
-
 }

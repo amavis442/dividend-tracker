@@ -35,9 +35,9 @@ class TickerRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('t')
             ->select('t')
             ->join('t.branch', 'i')
-            ->leftJoin('t.researches','r')
-            ->leftJoin('t.dividendMonths','d')
-            ->leftJoin('t.payments','pa')
+            ->leftJoin('t.researches', 'r')
+            ->leftJoin('t.dividendMonths', 'd')
+            ->leftJoin('t.payments', 'pa')
             ->groupBy('t.id')
             ->orderBy($order, $sort);
 
@@ -49,14 +49,14 @@ class TickerRepository extends ServiceEntityRepository
             $queryBuilder->setParameter('search', $search . '%');
         }
         $query = $queryBuilder->getQuery();
-       
+
         $paginator = $this->paginate($query, $page, $limit);
 
-            
+
 
         return $paginator;
     }
-    
+
     public function getCurrent(
         int $page = 1,
         int $limit = 10,
@@ -64,23 +64,23 @@ class TickerRepository extends ServiceEntityRepository
         string $sort = 'ASC',
         string $search = ''
     ): Paginator {
-        [$orderTable, $orderColumn]  = explode('.',$orderBy);
+        [$orderTable, $orderColumn]  = explode('.', $orderBy);
 
         if ($orderTable == 'ticker') {
             $order = 't.' . $orderColumn;
         }
-        if ($orderTable == 'branch'){
-            $order = 'i.'. $orderColumn;
+        if ($orderTable == 'branch') {
+            $order = 'i.' . $orderColumn;
         }
 
         // Create our query
-        $queryBuilder = $this->createQueryBuilder('t','t')
+        $queryBuilder = $this->createQueryBuilder('t', 't')
             ->select('t')
             ->addSelect('i.label')
             ->addSelect('p.amount as units')
             ->addSelect('p.allocation as invested')
             ->join('t.branch', 'i')
-            ->join('t.positions','p')
+            ->join('t.positions', 'p')
             ->where('p.closed <> 1 OR p.closed is null')
             ->groupBy('t.id')
             ->orderBy($order, $sort);
@@ -91,8 +91,8 @@ class TickerRepository extends ServiceEntityRepository
                     't.ticker LIKE :search',
                     'i.label LIKE :search',
                     't.fullname LIKE :search'
-                    )
-                );        
+                )
+            );
             $queryBuilder->groupBy('t.ticker');
             $queryBuilder->setParameter('search', $search . '%');
         }
@@ -105,20 +105,20 @@ class TickerRepository extends ServiceEntityRepository
     public function getActiveUnits(Ticker $ticker): int
     {
         $queryBuilder = $this->createQueryBuilder('t')
-            ->leftJoin('t.positions','p')
+            ->leftJoin('t.positions', 'p')
             ->select('SUM(p.amount) as units')
             ->where('t.id = :tickerId')
             ->andWhere('p.closed <> 1')
             ->setParameter('tickerId', $ticker->getId())
             ->getQuery();
         $result = $queryBuilder->getScalarResult();
-        
+
         return $result[0]['units'] ?? 0;
     }
 
     public function getActive()
     {
-        $qb = $this->createQueryBuilder('t','t.ticker')
+        $qb = $this->createQueryBuilder('t', 't.ticker')
             ->select('t, p')
             ->innerJoin('t.positions', 'p')
             ->where("EXISTS (SELECT 1 FROM App\Entity\Position pos WHERE pos.ticker = t.id AND (pos.closed = 0 or pos.closed is null))")

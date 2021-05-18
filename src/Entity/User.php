@@ -239,7 +239,7 @@ class User implements UserInterface
 
     /**
      * Get the value of apiToken
-     */ 
+     */
     public function getApiToken()
     {
         return $this->apiToken;
@@ -249,7 +249,7 @@ class User implements UserInterface
      * Set the value of apiToken
      *
      * @return  self
-     */ 
+     */
     public function setApiToken($apiToken)
     {
         $this->apiToken = $apiToken;

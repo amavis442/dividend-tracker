@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Twig;
 
@@ -20,9 +20,9 @@ class MonthNumberToNameExtension extends AbstractExtension
     {
         return [
             new TwigFilter('monthToName', function ($value) {
-                $rawDate = date('Y').'-'.$value.'-01';
+                $rawDate = date('Y') . '-' . $value . '-01';
                 $formatDate = new DateTime($rawDate);
-                
+
                 return $formatDate->format('F');
             }),
         ];

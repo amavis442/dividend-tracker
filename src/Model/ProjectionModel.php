@@ -132,9 +132,9 @@ class ProjectionModel
         PositionRepository $positionRepository,
         DividendMonthRepository $dividendMonthRepository,
         DividendService $dividendService
-    ): array{
+    ): array {
 
-        $cacheKey = 'projection_'. $year. '_' . $this->user->getId();
+        $cacheKey = 'projection_' . $year . '_' . $this->user->getId();
         $parent = $this;
         $data = $this->cache->get($cacheKey, function (ItemInterface $item) use (
             $year,

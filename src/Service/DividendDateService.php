@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service;
 
 use App\Contracts\Service\DividendDatePluginInterface;
@@ -118,7 +119,7 @@ class DividendDateService
             $serviceClass = $this->linkToService[$symbol];
             return $this->services[$serviceClass];
         }
-        
+
         return $this->services['_default'];
     }
 
@@ -129,11 +130,11 @@ class DividendDateService
      * @return void
      */
     public function getData(string $symbol): ?array
-    {        
+    {
         if (isset($this->linkToService[$symbol])) {
             $serviceClass = $this->linkToService[$symbol];
             $service = $this->services[$serviceClass];
-            return $service->getData($symbol); 
+            return $service->getData($symbol);
         }
 
         $service = $this->getDefault();

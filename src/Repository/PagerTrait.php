@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Repository;
+
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 trait PagerTrait

@@ -69,7 +69,8 @@ class CalendarController extends AbstractController
     /**
      * @Route("/new/{ticker}", name="calendar_new", methods={"GET","POST"})
      */
-    function new (Request $request, ?Ticker $ticker = null, Referer $referer): Response {
+    function new(Request $request, ?Ticker $ticker = null, Referer $referer): Response
+    {
         $calendar = new Calendar();
         $calendar->setTicker($ticker);
         $form = $this->createForm(CalendarType::class, $calendar);
@@ -164,7 +165,6 @@ class CalendarController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             $this->getDoctrine()->getManager()->flush();
 
             if ($referer->get()) {
@@ -206,5 +206,4 @@ class CalendarController extends AbstractController
 
         return $this->redirectToRoute('calendar_index');
     }
-
 }

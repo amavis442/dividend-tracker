@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service;
 
 use App\Entity\Calendar;
@@ -282,7 +283,7 @@ class DividendService
      * Get what is the net dividend per payout per share
      *
      * @return  null|float
-     */ 
+     */
     public function getNetDividendPerShare(?Position $position): ?float
     {
         if (!$this->netDividendPerShare && $position) {

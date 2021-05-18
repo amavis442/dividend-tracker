@@ -34,7 +34,7 @@ class BranchRepository extends ServiceEntityRepository
         return $paginator;
     }
 
-    public function getSumAssetAllocation() :int
+    public function getSumAssetAllocation(): int
     {
         return $this->createQueryBuilder('i')
         ->select('SUM(i.assetAllocation)')
@@ -47,18 +47,18 @@ class BranchRepository extends ServiceEntityRepository
         $result = $this->createQueryBuilder('s')
             ->select('s, t, p')
             ->innerJoin('s.tickers', 't')
-            ->innerJoin('t.positions','p')
+            ->innerJoin('t.positions', 'p')
             ->where('p.closed is null OR p.closed = 0')
             ->getQuery()
             ->getArrayResult();
 
         $output = [];
         $totalAllocation = 0;
-        foreach ($result as $sector){
-            if (!isset($output[$sector['label']])){
+        foreach ($result as $sector) {
+            if (!isset($output[$sector['label']])) {
                 $output[$sector['label']] = [
-                    'sectorTargetAllocation' => round($sector['assetAllocation'] / 100, 2) , 
-                    'sectorAllocation' => 0, 
+                    'sectorTargetAllocation' => round($sector['assetAllocation'] / 100, 2) ,
+                    'sectorAllocation' => 0,
                     'sectorPositions' => []
                 ];
             }
@@ -79,34 +79,33 @@ class BranchRepository extends ServiceEntityRepository
                 }
                 $output[$sector['label']]['sectorPositions'][] = $positionData;
                 $output[$sector['label']]['sectorAllocation'] = $sectorAllocation;
-                
             }
         }
 
         foreach ($output as &$sector) {
             $sector['sectorAllocationPercentage'] = round(($sector['sectorAllocation'] / $totalAllocation) * 100, 2);
-            $positionData = []; 
+            $positionData = [];
             $positionLabels = [];
             foreach ($sector['sectorPositions'] as &$position) {
                 $position['positionAllocationPercentage'] = round(($position['positionAllocation'] / $sector['sectorAllocation']) * 100, 2);
                 $positionData[] = $position['positionAllocationPercentage'];
-                $positionLabels[] = $position['positionSymbol']; 
+                $positionLabels[] = $position['positionSymbol'];
             }
             $sector['chartdata']['data'] = json_encode($positionData);
-            $sector['chartdata']['labels'] = json_encode($positionLabels);   
+            $sector['chartdata']['labels'] = json_encode($positionLabels);
         }
-        
 
-        uasort($output, function($a , $b) {
+
+        uasort($output, function ($a, $b) {
             $a1 = $a['sectorTargetAllocation'];
             $b1 = $b['sectorTargetAllocation'];
-           
+
             if ($a1 == $b1) {
                 return 0;
             }
             return ($a1 > $b1) ? -1 : 1;
         });
-        
+
         //ksort($output);
         return $output;
     }

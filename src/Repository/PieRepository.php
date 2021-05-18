@@ -22,7 +22,7 @@ class PieRepository extends ServiceEntityRepository
     public function findAll(): array
     {
         return $this->createQueryBuilder('p')
-            ->orderBy('p.label','ASC')
+            ->orderBy('p.label', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -30,9 +30,9 @@ class PieRepository extends ServiceEntityRepository
     public function findLinked(): array
     {
         return $this->createQueryBuilder('p')
-            ->join('p.positions', 'pos')    
+            ->join('p.positions', 'pos')
             ->where('pos.closed IS NULL or pos.closed = 0')
-            ->orderBy('p.label','ASC')
+            ->orderBy('p.label', 'ASC')
             ->getQuery()
             ->getResult();
     }

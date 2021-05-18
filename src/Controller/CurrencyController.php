@@ -83,7 +83,7 @@ class CurrencyController extends AbstractController
      */
     public function delete(Request $request, Currency $currency): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$currency->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $currency->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($currency);
             $entityManager->flush();

@@ -9,7 +9,7 @@ class Payouts
 {
     public function payout(PaymentRepository $paymentRepository, UserInterface $user): array
     {
-        $data = $paymentRepository->getDividendsPerInterval('Month',$user);
+        $data = $paymentRepository->getDividendsPerInterval('Month', $user);
         $labels = [];
         $dates = array_keys($data);
         foreach ($dates as $date) {

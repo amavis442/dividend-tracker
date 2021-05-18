@@ -92,7 +92,7 @@ class JournalController extends AbstractController
      */
     public function delete(Request $request, Journal $journal): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$journal->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $journal->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($journal);
             $entityManager->flush();

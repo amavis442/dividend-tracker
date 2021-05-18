@@ -66,14 +66,17 @@ class TransactionType extends AbstractType
                 'required' => true,
                 'empty_data' => 'EUR',
             ])
-            ->add('exchangerate', NumberType::class,
-            [
+            ->add(
+                'exchangerate',
+                NumberType::class,
+                [
                 'label' => 'Exchangerate',
                 'required' => false,
                 'help' => 'Current exchange rate',
                 'input' => 'number',
                 'scale' => 7,
-            ])
+                ]
+            )
             ->add('pie', EntityType::class, [
                 'class' => Pie::class,
                 'label' => 'Pie',

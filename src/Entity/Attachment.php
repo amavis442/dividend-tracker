@@ -22,8 +22,8 @@ class Attachment
 
     /**
      * NOTE: This is not a mapped field of entity metadata, just a simple property.
-     * 
-     * 
+     *
+     *
      * @var File|null
      */
     private $attachmentFile;
@@ -55,7 +55,7 @@ class Attachment
      * @var \DateTimeInterface|null
      */
     private $createdAt;
-    
+
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Research", inversedBy="attachments")
      */

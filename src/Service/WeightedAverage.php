@@ -11,7 +11,6 @@ class WeightedAverage
 
     public function __construct()
     {
-
     }
 
     public function addTransaction(Transaction $transaction, int $index)
@@ -43,7 +42,7 @@ class WeightedAverage
         $costBase = 0.0;
         $numShares = 0.0;
         $aPrice = 0;
-        
+
         foreach ($this->transactions as $timeStamp => $transaction) {
             $profit = 0.0;
             $amount = $transaction->getAmount();
@@ -66,7 +65,7 @@ class WeightedAverage
                 $avgPrice = $costBase / $numShares;
                 $aPrice = round($avgPrice, 3);
                 $transaction->setAvgprice($aPrice);
-            } 
+            }
         }
 
         $position->setAllocation(round($costBase, 3))

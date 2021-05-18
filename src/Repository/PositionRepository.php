@@ -19,6 +19,7 @@ use Doctrine\Persistence\ManagerRegistry;
 class PositionRepository extends ServiceEntityRepository
 {
     use PagerTrait;
+
     public const OPEN = 1;
     public const CLOSED = 2;
     public const ALL = 3;
@@ -204,7 +205,7 @@ class PositionRepository extends ServiceEntityRepository
             ->select('p, t, pa, pac')
             ->innerJoin('p.ticker', 't')
             ->leftJoin('t.payments', 'pa')
-            ->leftJoin('pa.calendar' ,'pac')
+            ->leftJoin('pa.calendar', 'pac')
             ->where('(p.closed = 0 OR p.closed IS NULL)');
 
         if ($pieId) {
@@ -231,8 +232,8 @@ class PositionRepository extends ServiceEntityRepository
             ->leftJoin('t.calendars', 'c')
             ->leftJoin('p.payments', 'pa')
             ->leftJoin('t.dividendMonths', 'dm')
-            ->leftJoin('p.tax' , 'tax')
-            ->leftJoin('c.currency' ,'cur')
+            ->leftJoin('p.tax', 'tax')
+            ->leftJoin('c.currency', 'cur')
             ->where('(p.closed = 0 OR p.closed IS NULL)');
 
         if ($pieId) {
@@ -285,7 +286,7 @@ class PositionRepository extends ServiceEntityRepository
         string $orderBy = 'ticker',
         string $sort = 'ASC',
         string $search = ''
-    ): ?array{
+    ): ?array {
         $order = 'p.' . $orderBy;
         if ($orderBy === 'ticker') {
             $order = 't.ticker';

@@ -82,7 +82,7 @@ class TaxController extends AbstractController
      */
     public function delete(Request $request, Tax $tax): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$tax->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $tax->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($tax);
             $entityManager->flush();

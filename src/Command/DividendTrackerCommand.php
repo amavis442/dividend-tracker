@@ -43,7 +43,6 @@ class DividendTrackerCommand extends Command
     {
         $this
             ->setDescription(self::$defaultDescription);
-
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -52,7 +51,7 @@ class DividendTrackerCommand extends Command
 
         $users = $this->userRepository->findAll();
         $filter = $this->entityManager->getFilters()->enable('user_filter');
-        
+
         foreach ($users as $user) {
             $totalDividend = 0.0;
             $principle = 0.0;
@@ -73,7 +72,7 @@ class DividendTrackerCommand extends Command
                 ->setDividend($totalDividend)
                 ->setSampleDate(new DateTime())
                 ->setCreatedAt(new DateTime());
-        
+
             $this->entityManager->persist($dividendTracker);
             $this->entityManager->flush();
         }

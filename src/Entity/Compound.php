@@ -185,7 +185,7 @@ class Compound
      * Get how many times does a company pay dividends per year. Default will be 4
      *
      * @return  int|null
-     */ 
+     */
     public function getFrequency(): ?int
     {
         return $this->frequency;
@@ -197,7 +197,7 @@ class Compound
      * @param  int|null  $frequency  How many times does a company pay dividends per year. Default will be 4
      *
      * @return  self
-     */ 
+     */
     public function setFrequency($frequency): self
     {
         $this->frequency = $frequency;

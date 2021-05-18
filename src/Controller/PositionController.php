@@ -82,7 +82,8 @@ class PositionController extends AbstractController
     /**
      * @Route("/new/{ticker}", name="position_new", methods={"GET","POST"})
      */
-    function new (Request $request, ?Ticker $ticker = null, SessionInterface $session, PositionService $positionService): Response {
+    function new(Request $request, ?Ticker $ticker = null, SessionInterface $session, PositionService $positionService): Response
+    {
         $position = new Position();
 
         if ($ticker instanceof Ticker) {

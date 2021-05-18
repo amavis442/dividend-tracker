@@ -94,13 +94,12 @@ class CreateUserCommand extends Command
         $questionRoles->setValidator(function ($answer) {
             $roles = explode(',', trim($answer));
             foreach ($roles as &$role) {
-
                 if (!in_array($role, User::ROLES)) {
                     throw new \RuntimeException(
                         'Roles can be ' . implode(',', User::ROLES)
                     );
                 }
-                $role = 'ROLE_'.strtoupper($role);
+                $role = 'ROLE_' . strtoupper($role);
             }
             return $roles;
         });

@@ -26,7 +26,7 @@ class BranchController extends AbstractController
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
-         
+
         return $this->render('branch/index.html.twig', [
             'branches' => $items->getIterator(),
             'sumAssetAllocation' => $sumAssetAllocation,
@@ -44,7 +44,7 @@ class BranchController extends AbstractController
     {
         $branch = new Branch();
         $maxAssetAllocation = 100 - (int)(($branchRepository->getSumAssetAllocation() - $branch->getAssetAllocation()) / 100);
-        $form = $this->createForm(BranchType::class, $branch,['maxAssetAllocation' => $maxAssetAllocation]);
+        $form = $this->createForm(BranchType::class, $branch, ['maxAssetAllocation' => $maxAssetAllocation]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -77,7 +77,7 @@ class BranchController extends AbstractController
     public function edit(Request $request, Branch $branch, BranchRepository $branchRepository): Response
     {
         $maxAssetAllocation = 100 - (int)(($branchRepository->getSumAssetAllocation() - $branch->getAssetAllocation()) / 100);
-        $form = $this->createForm(BranchType::class, $branch,['maxAssetAllocation' => $maxAssetAllocation]);
+        $form = $this->createForm(BranchType::class, $branch, ['maxAssetAllocation' => $maxAssetAllocation]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -97,7 +97,7 @@ class BranchController extends AbstractController
      */
     public function delete(Request $request, Branch $branch): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$branch->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $branch->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($branch);
             $entityManager->flush();

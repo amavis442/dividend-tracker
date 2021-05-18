@@ -196,7 +196,7 @@ class ImportCsvService extends ImportBase
                     case 'isin':
                         /**
                          * @see https://www.isin.org/isin-format/
-                         */ 
+                         */
                         $row['isin'] = $val;
                         $isin = $val;
                         if (!preg_match('/^([A-Z]{2})(\d{1})(\w+)/i', $isin, $matches)) {
@@ -248,10 +248,10 @@ class ImportCsvService extends ImportBase
                         break;
                     case 'Transaction fee (EUR)':
                         $row['transaction_fee'] = $val;
-                        break; 
+                        break;
                     case 'Finra fee (EUR)':
                         $row['finra_fee'] = $val;
-                        break;    
+                        break;
                     default:
                         $row[] = $val;
                 }
@@ -286,8 +286,7 @@ class ImportCsvService extends ImportBase
         TransactionRepository $transactionRepository,
         UploadedFile $uploadedFile,
         ?\Box\Spout\Reader\CSV\Reader $reader = null
-    ): array
-    {
+    ): array {
         $transactionsAdded = 0;
         $totalTransaction = 0;
         $transactionAlreadyExists = [];
@@ -309,7 +308,7 @@ class ImportCsvService extends ImportBase
             foreach ($rows as $row) {
                 $ticker = $this->preImportCheckTicker($entityManager, $branch, $tickerRepository, $row);
                 $transaction = $transactionRepository->findOneBy(['jobid' => $row['opdrachtid']]);
-                
+
                 if (!$transaction) {
                     $position = $this->preImportCheckPosition($entityManager, $ticker, $currency, $positionRepository, $row);
 

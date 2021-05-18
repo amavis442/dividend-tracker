@@ -1,4 +1,5 @@
 <?php
+
 // api/src/DataProvider/StockPriceCollectionDataProvider.php
 
 namespace App\DataProvider;
@@ -30,8 +31,7 @@ final class StockPriceCollectionDataProvider implements ContextAwareCollectionDa
     public function getCollection(string $resourceClass, string $operationName = null, array $context = []): array
     {
         $tickers = $this->tickerRepository->getActive();
-        foreach ($tickers as $ticker)
-        {
+        foreach ($tickers as $ticker) {
             $symbol = $ticker->getSymbol();
             $symbols[] = $symbol;
         }
@@ -46,9 +46,8 @@ final class StockPriceCollectionDataProvider implements ContextAwareCollectionDa
                 $stockprice->setPrice($marketPrice);
             }
                 $data[] = $stockprice;
-            
         }
-        
+
 
         return $data;
         //return [['symbol' => 'CSWC', 'price' => $marketPrice]];

@@ -16,11 +16,11 @@ class BranchType extends AbstractType
     {
         $builder
             ->add('label')
-            ->add('assetAllocation', NumberType::class,[
+            ->add('assetAllocation', NumberType::class, [
                 'html5' => true,
-                'attr' => ['min' =>0, 'max' => $options['maxAssetAllocation']]
+                'attr' => ['min' => 0, 'max' => $options['maxAssetAllocation']]
             ])
-            ->add('description', TextareaType::class,[])
+            ->add('description', TextareaType::class, [])
             ->add('parent', EntityType::class, [
                 'class' => Branch::class,
                 'choice_label' => 'label',

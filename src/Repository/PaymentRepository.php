@@ -101,7 +101,7 @@ class PaymentRepository extends ServiceEntityRepository
         ->setParameter('paydateEnd', $dateTime->format('Y-m-d 23:59:59'))
         ->setParameter('dividendType', $dividendType)
         ->getQuery()
-        ->getOneOrNullResult() ? true : false; 
+        ->getOneOrNullResult() ? true : false;
     }
 
 

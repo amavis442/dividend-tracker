@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PieRepository")
- * @ORM\Table(name="pie") 
+ * @ORM\Table(name="pie")
  */
 class Pie
 {
@@ -26,7 +26,7 @@ class Pie
     private $label;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Position", mappedBy="pies") 
+     * @ORM\ManyToMany(targetEntity="App\Entity\Position", mappedBy="pies")
      */
     private $positions;
 
@@ -94,4 +94,3 @@ class Pie
         return $this;
     }
 }
-

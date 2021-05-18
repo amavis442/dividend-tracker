@@ -20,9 +20,9 @@ class OnRequestListener
 
     public function onKernelRequest(RequestEvent $event)
     {
-        if($this->tokenStorage->getToken()) {
+        if ($this->tokenStorage->getToken()) {
             $user = $this->tokenStorage->getToken()->getUser();
-            if ($user instanceof User){
+            if ($user instanceof User) {
                 $filter = $this->manager->getFilters()->enable('user_filter');
                 $filter->setParameter('userID', $user->getId());
             }

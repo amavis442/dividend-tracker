@@ -75,7 +75,7 @@ class TransactionController extends AbstractController
     /**
      * @Route("/new/{position}/{side?1}", name="transaction_new", methods={"GET","POST"})
      */
-    function new (
+    function new(
         Request $request,
         Position $position,
         int $side,

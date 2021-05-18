@@ -5,7 +5,7 @@ namespace App\Service;
 use App\Entity\Position;
 use App\Entity\Transaction;
 use Doctrine\ORM\EntityManagerInterface;
-use \DateTime;
+use DateTime;
 
 class PositionService
 {

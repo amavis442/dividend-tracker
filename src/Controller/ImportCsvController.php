@@ -32,7 +32,8 @@ class ImportCsvController extends AbstractController
         WeightedAverage $weightedAverage,
         BranchRepository $branchRepository,
         TransactionRepository $transactionRepository,
-        ImportCsvService $importCsv): Response {
+        ImportCsvService $importCsv
+    ): Response {
         $importfile = new fileUpload();
         $form = $this->createForm(FileUploadType::class, $importfile);
         $form->handleRequest($request);
@@ -77,7 +78,6 @@ class ImportCsvController extends AbstractController
      */
     public function report()
     {
-
     }
 
     protected function import(
@@ -91,12 +91,15 @@ class ImportCsvController extends AbstractController
     ): void {
 
         $entityManager = $this->getDoctrine()->getManager();
-        $importCsv->import($tickerRepository,
+        $importCsv->import(
+            $tickerRepository,
             $currencyRepository,
             $positionRepository,
             $weightedAverage,
             $branchRepository,
-            $transactionRepository, $entityManager);
+            $transactionRepository,
+            $entityManager
+        );
 
         exit();
     }

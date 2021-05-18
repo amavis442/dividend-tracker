@@ -27,13 +27,13 @@ class UpcommingPositionController extends AbstractController
         PaymentRepository $paymentRepository
     ): Response {
         $upcommingDividend = $positionRepository->getUpcommingDividend();
-       
+
         $numActivePosition = $positionRepository->getTotalPositions();
         $numTickers = $positionRepository->getTotalTickers();
         $profit = $positionRepository->getProfit();
         $totalDividend = $paymentRepository->getTotalDividend();
         $allocated = $positionRepository->getSumAllocated();
-        
+
         return $this->render('upcomming_position/index.html.twig', [
             'positions' => $upcommingDividend,
             'numActivePosition' => $numActivePosition,

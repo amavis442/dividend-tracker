@@ -22,13 +22,12 @@ class TickerController extends AbstractController
      * @Route("/list/{page<\d+>?1}", name="ticker_index", methods={"GET"})
      */
     public function index(
-        TickerRepository $tickerRepository, 
-        SessionInterface $session, 
-        int $page = 1, 
-        string $orderBy = 'ticker', 
+        TickerRepository $tickerRepository,
+        SessionInterface $session,
+        int $page = 1,
+        string $orderBy = 'ticker',
         string $sort = 'asc'
-    ): Response
-    {
+    ): Response {
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
         $items = $tickerRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
@@ -104,7 +103,7 @@ class TickerController extends AbstractController
      */
     public function delete(Request $request, Ticker $ticker): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$ticker->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $ticker->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($ticker);
             $entityManager->flush();

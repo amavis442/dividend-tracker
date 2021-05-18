@@ -7,12 +7,12 @@ use App\Repository\PositionRepository;
 
 class YieldsService
 {
-    function yield (
+    function yield(
         PositionRepository $positionRepository,
         DividendService $dividendService,
         string $orderBy = 'ticker',
         int $pieId = null
-    ): array{
+    ): array {
         $labels = [];
         $data = [];
         $dataSource = [];
@@ -45,13 +45,13 @@ class YieldsService
             $lastCashCurrency = '$';
             $taxRate = $position->getTax() ? $position->getTax()->getTaxRate() * 100 : Constants::TAX;
             $exchangeRate = $firstCalendarEntry ? $dividendService->getExchangeRate($firstCalendarEntry) : 0;
-            
-            
+
+
             if ($firstCalendarEntry) {
                 $lastCash = $firstCalendarEntry->getCashAmount();
                 $lastCashCurrency = $firstCalendarEntry->getCurrency()->getSign();
                 $lastDividendDate = $firstCalendarEntry->getPaymentDate();
-            
+
                 $netTotalForwardYearlyPayout = $numPayoutsPerYear * $dividendService->getForwardNetDividend($position);
                 $netForwardYearlyPayout = $numPayoutsPerYear * $dividendService->getNetDividend($position, $firstCalendarEntry);
                 $dividendYield = $dividendService->getForwardNetDividendYield($position);
@@ -61,7 +61,7 @@ class YieldsService
             $dividendPerYear = $numPayoutsPerYear * $lastCash;
 
             $tickerLabel = $ticker->getTicker();
-            $labels[$tickerLabel] = sprintf("%s (%s)", substr(addslashes(str_replace(["'",'"'],["",""],$ticker->getFullname())), 0, 8), $ticker->getTicker());
+            $labels[$tickerLabel] = sprintf("%s (%s)", substr(addslashes(str_replace(["'",'"'], ["",""], $ticker->getFullname())), 0, 8), $ticker->getTicker());
             $data[$tickerLabel] = $dividendYield;
 
             if ($orderBy === 'yield') {

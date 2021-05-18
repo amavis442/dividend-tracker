@@ -31,7 +31,7 @@ class ResearchRepository extends ServiceEntityRepository
         string $sort = 'ASC',
         string $search = ''
     ): Paginator {
-        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);       
+        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);
 

@@ -55,7 +55,7 @@ class PositionType extends AbstractType
                 'required' => false,
                 'input' => 'number',
                 'scale' => 7,
-            ])            
+            ])
             ->add('price', NumberType::class, [
                 'label' => 'Average price',
                 'help' => 'Adjusment if automatic calculation is wrong',
@@ -101,7 +101,7 @@ class PositionType extends AbstractType
                 'empty_data' => null,
                 'multiple'    => false,
                 'choice_label' => function ($tax) {
-                    return  ($tax->getTaxRate() * 100). '%';
+                    return  ($tax->getTaxRate() * 100) . '%';
                 },
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('t')

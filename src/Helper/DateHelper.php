@@ -125,4 +125,3 @@ class DateHelper
         return [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')];
     }
 }
-

@@ -26,13 +26,13 @@ class AllocationModel
             $totalAllocation += $allocation;
         }
         krsort($items);
-    
+
         foreach ($items as $branch => $allocation) {
             $allocationPercentage = ($allocation / $totalAllocation) * 100;
-            
+
             $data[$branch] = round($allocationPercentage, 2);
-        }        
-        
+        }
+
         return  [
             'data' => array_values($data),
             'labels' => array_keys($items),

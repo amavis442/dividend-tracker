@@ -192,7 +192,6 @@ class PortfolioItem
     public function __construct()
     {
         $this->dividendCalendars = new ArrayCollection();
-
     }
 
     /**
@@ -801,7 +800,7 @@ class PortfolioItem
      * Get current dividend yield per share based on current marketprice
      *
      * @return  float
-     */ 
+     */
     public function getForwardNetDividendYieldPerShare(): float
     {
         return $this->forwardNetDividendYieldPerShare ?? 0;
@@ -813,7 +812,7 @@ class PortfolioItem
      * @param  float  $forwardNetDividendYieldPerShare  Current dividend yield per share based on current marketprice
      *
      * @return  self
-     */ 
+     */
     public function setForwardNetDividendYieldPerShare(float $forwardNetDividendYieldPerShare): self
     {
         $this->forwardNetDividendYieldPerShare = $forwardNetDividendYieldPerShare;

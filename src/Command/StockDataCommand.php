@@ -22,7 +22,7 @@ class StockDataCommand extends Command
 
         $this->stockPriceService = $stockPriceService;
     }
-    
+
     protected function configure()
     {
         $this
@@ -34,11 +34,11 @@ class StockDataCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        
+
         $io = new SymfonyStyle($input, $output);
         $symbol = $input->getArgument('symbol');
         $marketPriceInEuro = $this->stockPriceService->getQuote($symbol);
-        $io->info('Euro: '. $marketPriceInEuro);
+        $io->info('Euro: ' . $marketPriceInEuro);
 
         $io->success('Done....');
 

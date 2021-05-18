@@ -1,6 +1,7 @@
-<?php 
+<?php
 
 namespace App\Service;
+
 use App\Repository\UserRepository;
 use App\Entity\User;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -10,15 +11,16 @@ class UserManager
     private $userRepository;
     private $passwordEncoder;
 
-    public function __construct(UserRepository $userRepository,UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder)
     {
         $this->userRepository = $userRepository;
         $this->passwordEncoder = $passwordEncoder;
     }
 
-    public function isUserDuplicate(string $email) {
+    public function isUserDuplicate(string $email)
+    {
         $result = $this->userRepository->findOneBy(['email' => $email]);
-        
+
         return $result !== null;
     }
 
@@ -33,5 +35,4 @@ class UserManager
         $user->setRoles($roles);
         $this->userRepository->save($user);
     }
-
 }

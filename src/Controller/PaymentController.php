@@ -58,7 +58,6 @@ class PaymentController extends AbstractController
         $form = $this->createFormBuilder($defaultData)
             ->add(
                 'year',
-                
                 ChoiceType::class,
                 ['label' => 'Year', 'choices' => $years, 'choice_translation_domain' => false,]
             )
@@ -139,7 +138,7 @@ class PaymentController extends AbstractController
     /**
      * @Route("/new/{position}/{timestamp?}", name="payment_new", methods={"GET","POST"})
      */
-    function new (
+    function new(
         Request $request,
         position $position,
         string $timestamp = null,

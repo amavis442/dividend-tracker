@@ -19,7 +19,6 @@ use App\Service\Referer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Filesystem\Filesystem;
 
-
 /**
  * @Route("/dashboard/research")
  */

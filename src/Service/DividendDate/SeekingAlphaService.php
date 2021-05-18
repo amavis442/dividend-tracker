@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service\DividendDate;
 
 use DateTime;
