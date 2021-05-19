@@ -189,6 +189,13 @@ class PortfolioItem
      */
     private $dividendCalendars;
 
+    /**
+     *  Net dividend per share
+     * 
+     * @var null|float
+     */
+    private $netDividendPerShare;
+
     public function __construct()
     {
         $this->dividendCalendars = new ArrayCollection();
@@ -816,6 +823,30 @@ class PortfolioItem
     public function setForwardNetDividendYieldPerShare(float $forwardNetDividendYieldPerShare): self
     {
         $this->forwardNetDividendYieldPerShare = $forwardNetDividendYieldPerShare;
+
+        return $this;
+    }
+
+    /**
+     * Get net dividend per share
+     *
+     * @return  null|float
+     */ 
+    public function getNetDividendPerShare(): ?float
+    {
+        return $this->netDividendPerShare ?? 0;
+    }
+
+    /**
+     * Set net dividend per share
+     *
+     * @param  null|float  $netDividendPerShare  Net dividend per share
+     *
+     * @return  self
+     */ 
+    public function setNetDividendPerShare($netDividendPerShare): self
+    {
+        $this->netDividendPerShare = $netDividendPerShare;
 
         return $this;
     }

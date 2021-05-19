@@ -8,19 +8,19 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use App\Entity\StockPrice;
 use App\Repository\TickerRepository;
+use App\Service\DividendService;
 use App\Service\StockPriceService;
 
 final class StockPriceItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
     private $tickerRepository;
     private $stockPriceService;
-
+    
     public function __construct(TickerRepository $tickerRepository, StockPriceService $stockPriceService)
     {
         $this->stockPriceService = $stockPriceService;
         $this->tickerRepository = $tickerRepository;
     }
-
 
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
@@ -43,11 +43,5 @@ final class StockPriceItemDataProvider implements ItemDataProviderInterface, Res
         $stockprice->setPrice(round($marketPrice, 2));
 
         return $stockprice;
-        //return [['symbol' => 'CSWC', 'price' => $marketPrice]];
-
-
-        // Retrieve the blog post collection from somewhere
-        //yield new StockPrice();
-        //yield new StockPrice();
     }
 }

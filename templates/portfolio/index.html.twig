@@ -28,13 +28,12 @@
         </div>
     </div>
 
-    
     <table class="table table-sm">
         <thead>
             <tr>
                 <th></th>
                 <th><a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'fullname', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Fullname'|trans }}</a></th>
-                <th>{{ 'Avg. price'|trans }} / <br/> {{ 'Profit'|trans }}</th>
+                <th>{{ 'Avg. price'|trans }}</th>
                 <th>{{ 'Market Price'|trans }} /<br/> {{ 'Diff' |trans }} / <br/> {{ 'Yield'|trans }} <span title="{{'Dividend yield based on current market price'|trans }}" data-toggle="tooltip" data-placement="top"><i class="fas fa-question-circle"></i></span></th>
                 <th>{{ 'Allocation'|trans }} / <br/>{{ 'Received dividend'|trans }}</th>
                 <th>{{ 'Ex-Div'|trans }} / <br/> {{ 'Payout'|trans }} </th>
@@ -60,30 +59,9 @@
                 </td>
                 <td>
                     &euro;{{ portfolioItem.price|format_number({fraction_digit: 2}) }}
-                    {% if portfolioItem.marketPrice %}
-                    <br/>
-                    <span class="badge badge-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.paperProfit|format_number({fraction_digit: 2}) }} ({{ portfolioItem.paperProfitPercentage|format_number({fraction_digit: 2}) }}%)</span>
-                    {% endif %}
-                    
                 </td>
                 <td>
-                    {% if portfolioItem.marketPrice %}
-                    <span class="text-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">&euro;{{ portfolioItem.marketPrice|format_number({fraction_digit: 2}) }}</span>
-                    <br/>
-                    <span class="badge badge-{% if portfolioItem.marketPrice > portfolioItem.price %}success{% else %}danger{% endif %}">
-                        {% if portfolioItem.marketPrice > portfolioItem.price %}<i class="fas fa-arrow-circle-up">{% else %}<i class="fas fa-arrow-circle-down">{% endif %}</i> 
-                        &euro;{{ portfolioItem.diffPrice|format_number({fraction_digit: 2}) }}
-                    </span>
-                    {% else %}
-                    &mdash;
-                    {% endif %}
-                    <br/>
-                    {% if portfolioItem.divDate %}
-                        <div class="badge badge-info" data-toggle="popover" title="{{ 'Current yield'|trans }}" 
-                    data-content='{{ 'Dividend yield based on current market price'|trans }}'>{{ portfolioItem.forwardNetDividendYieldPerShare|format_number({fraction_digit: 2}) }}%</div>
-                    {% else %}
-                        &mdash;
-                    {% endif %}
+                    <stockprice stock="{{ portfolioItem.symbol }}" v-bind:price="{{ portfolioItem.price }}" v-bind:freq="{{ portfolioItem.dividendPayoutFrequency }}" v-bind:netdividend="{{ portfolioItem.netDividendPerShare }}"></stockprice>
                 </td>
                 <td>
                     <span class="badge badge-primary">&euro;{{ portfolioItem.allocation|format_number({fraction_digit: 2}) }}
@@ -161,10 +139,16 @@
         <tfoot>
             <tr>
                 <td colspan="8">
-                    <small>Market price cache updated: {{ cacheTimestamp|format_datetime('full') }}</small>
+
                 </td>
             </tr>
         </tfoot>
     </table>
     {% include 'paginator.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+{{ encore_entry_script_tags('stockprices') }}
+{{ encore_entry_script_tags('vue') }}
 {% endblock %}

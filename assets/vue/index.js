@@ -1,10 +1,20 @@
 import Vue from 'vue';
-import Example from './components/Example'
-/**
-* Create a fresh Vue Application instance
-*/
+import Stockprice from './components/Stockprice';
+import process from  'process';
+
+let baseURL;
+
+if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+  baseURL = 'http://localhost/';
+} else {
+  baseURL = 'https://dividend.banpagi.com/';
+}
+Vue.prototype.$apiBaseUrl = baseURL;
+
 new Vue({
   el: '#app',
-  delimiters: ['#{', '}#'],
-  components: {Example},
-});
+  components: {Stockprice},
+  data: { 
+    url: baseURL
+  }
+})

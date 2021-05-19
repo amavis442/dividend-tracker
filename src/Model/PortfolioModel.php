@@ -8,8 +8,6 @@ use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Service\DividendService;
-use App\Service\StockPriceService;
-use App\Service\YahooFinanceService;
 use RuntimeException;
 use DateTime;
 
@@ -52,10 +50,8 @@ class PortfolioModel
      * Get 1 page of many with position data
      *
      * @param PositionRepository $positionRepository
-     * @param TickerRepository $tickerRepository
      * @param DividendService $dividendService
      * @param PaymentRepository $paymentRepository
-     * @param YahooFinanceService $yahooFinanceService
      * @param float $totalInvested
      * @param integer $page
      * @param string $orderBy
@@ -66,11 +62,8 @@ class PortfolioModel
      */
     public function getPage(
         PositionRepository $positionRepository,
-        TickerRepository $tickerRepository,
         DividendService $dividendService,
         PaymentRepository $paymentRepository,
-        StockPriceService $stockPriceService,
-        string $cacheTag = 'all',
         float $totalInvested,
         int $page = 1,
         string $orderBy = 'ticker',
@@ -101,39 +94,15 @@ class PortfolioModel
         $this->maxPages = (int) ceil($items->count() / $limit);
         $iter = $items->getIterator();
         $tickerIds = [];
-        $symbols = [];
-
-        $tickers = $tickerRepository->getActive();
-        foreach ($tickers as $ticker) {
-            $symbol = $ticker->getSymbol();
-            $symbols[] = $symbol;
-        }
-
-        $stockPriceService->getQuotes($symbols);
-        $this->timestamp = $stockPriceService->getCacheTimeStamp();
 
         /**
          * @var Position $position
          */
         foreach ($iter as $position) {
             $ticker = $position->getTicker();
-            $symbol = $ticker->getSymbol();
-
-            $paperProfit = 0.0;
-            $paperProfitPercentage = 0.0;
-            $diffPrice = 0.0;
-
-            $marketPrice = $stockPriceService->getMarketPrice($symbol);
-            $amount = $position->getAmount();
             $avgPrice = $position->getPrice();
             $allocation = $position->getAllocation();
             $percentageAllocation = ($allocation / $totalInvested) * 100;
-
-            if ($marketPrice) {
-                $paperProfit = ($marketPrice - $avgPrice) * $amount;
-                $paperProfitPercentage = ($paperProfit / $allocation) * 100;
-                $diffPrice = $marketPrice - $avgPrice;
-            }
 
             $payoutFrequency = $ticker->getPayoutFrequency();
             $portfolioItem = new PortfolioItem();
@@ -144,15 +113,11 @@ class PortfolioModel
                 ->setPositionId($position->getId())
                 ->setPosition($position)
                 ->setPrice($avgPrice)
-                ->setMarketPrice($marketPrice)
                 ->setAllocation($position->getAllocation())
                 ->setAmount($position->getAmount())
-                ->setPaperProfit($paperProfit)
-                ->setPaperProfitPercentage($paperProfitPercentage)
                 ->setPercentageAllocation($percentageAllocation)
                 ->setPies($position->getPies())
                 ->setIsDividendMonth($position->isDividendPayMonth())
-                ->setDiffPrice($diffPrice)
                 ->setDividendPayoutFrequency($payoutFrequency);
             ;
 
@@ -161,11 +126,9 @@ class PortfolioModel
             if ($calendar) {
                 $forwardNetDividend = $dividendService->getForwardNetDividend($position);
                 $forwardNetDividendYield = $dividendService->getForwardNetDividendYield($position);
-                $forwardNetDividendPerShare = $dividendService->getNetDividendPerShare($position);
                 $forwardNetDividendYieldPerShare = 0;
-                if ($marketPrice > 0) {
-                    $forwardNetDividendYieldPerShare = (($payoutFrequency * $forwardNetDividendPerShare) / $marketPrice) * 100;
-                }
+                $netDividendPerShare = $dividendService->getNetDividendPerShare($position);
+
                 $portfolioItem
                     ->setDivDate(true)
                     ->setExDividendDate($calendar->getExDividendDate())
@@ -175,6 +138,7 @@ class PortfolioModel
                     ->setForwardNetDividend($forwardNetDividend)
                     ->setForwardNetDividendYield($forwardNetDividendYield)
                     ->setForwardNetDividendYieldPerShare($forwardNetDividendYieldPerShare)
+                    ->setNetDividendPerShare($netDividendPerShare)
                     ;
 
 

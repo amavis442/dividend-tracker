@@ -26,12 +26,20 @@ class StockPrice
     private $price;
 
     /**
+     * Forward dividend yield based on current marketprice
+     *
+     * @var float|null
+     */
+    private $forwardNetDividendYieldPerShare;
+
+    /**
      * Get the value of symbol
      */
     public function getSymbol()
     {
         return $this->symbol;
     }
+
 
     /**
      * Set the value of symbol
@@ -68,4 +76,29 @@ class StockPrice
 
         return $this;
     }
+
+    /**
+     * Get forward dividend yield based on current marketprice
+     *
+     * @return  float|null
+     */ 
+    public function getForwardNetDividendYieldPerShare()
+    {
+        return $this->forwardNetDividendYieldPerShare;
+    }
+
+    /**
+     * Set forward dividend yield based on current marketprice
+     *
+     * @param  float|null  $forwardNetDividendYieldPerShare  Forward dividend yield based on current marketprice
+     *
+     * @return  self
+     */ 
+    public function setForwardNetDividendYieldPerShare($forwardNetDividendYieldPerShare)
+    {
+        $this->forwardNetDividendYieldPerShare = $forwardNetDividendYieldPerShare;
+
+        return $this;
+    }
+
 }
