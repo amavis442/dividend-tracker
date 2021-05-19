@@ -76,7 +76,7 @@ export default {
     this.getStockprice();
     setInterval(
       this.getStockprice
-      , 15000);
+      , 60000);
   },
   methods: {
     getStockprice: function() {
