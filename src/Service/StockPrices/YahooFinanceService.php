@@ -11,6 +11,28 @@ class YahooFinanceService implements StockPricePluginInterface
     public const YAHOO_URL = 'https://finance.yahoo.com/quote/';
     public const YAHOO_QUOTE = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=';
 
+    public $translate = [
+        'EQQQ' => 'EQQQ.MI',
+        'ISF' => 'ISF.L',
+        'EMIM' => 'EMIM.AS',
+        'IWDP' => 'IWDP.AS',
+        'IPRP' => 'IPRP.AS',
+        'INRG' => 'INRG.L',
+        'SGLN' => 'IGLN.L',
+        'IUS3' => 'ISP6.L',
+        'NESN' => 'NESN.SW',
+        'SIE' => 'SIE.DE',
+        'ISPA' => 'ISPA.DE',
+        'VMID' => 'VMID.L',
+        'UNA' => 'ULVR.L',
+        'VEUR' => 'VEUR.AS',
+        'VAPX' => 'VAPX.L',
+        'VJPN' => 'VJPN.SW',
+        'WHEA' => 'WHEA.L',
+        'ECAR' => 'ECAR.L',
+        'VUSA' => 'VUSA.L',
+    ];
+
     /**
      * Used for calling the api
      *
@@ -32,9 +54,13 @@ class YahooFinanceService implements StockPricePluginInterface
         $response = $client->request(
             'GET',
             $apiCallUrl . implode(',', array_map(function ($symbol) {
+                if (isset($this->translate[$symbol])) {
+                    $symbol = $this->translate[$symbol];
+                }
                 return strtoupper($symbol);
             }, array_values($symbols)))
         );
+        $translate = array_flip($this->translate);
 
         $result = [];
         if ($response->getStatusCode() === 200) {
@@ -43,6 +69,10 @@ class YahooFinanceService implements StockPricePluginInterface
                 if (isset($content['quoteResponse']) && $content['quoteResponse']['error'] == null) {
                     $symbolData = $content['quoteResponse']['result'];
                     foreach ($symbolData as $data) {
+                        if (isset($translate[$data['symbol']])) {
+                            $data['symbol'] = $translate[$data['symbol']];
+                        }
+
                         $result[$data['symbol']] = $data;
                     }
                 }

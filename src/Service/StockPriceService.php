@@ -206,9 +206,11 @@ class StockPriceService
                 return null;
             }
             $price = $data['regularMarketPrice'];
-            $currency = $data['currency'];
-
-            return $price / ($rates[$currency]);
+            $currency = strtoupper($data['currency']);
+            if ($currency !== 'EUR') {
+                return $price / ($rates[$currency]);
+            }
+            return $price;
         }
 
         return null;
