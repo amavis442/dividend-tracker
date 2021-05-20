@@ -13,7 +13,7 @@ class YahooFinanceService implements StockPricePluginInterface
 
     public $translate = [
         'EQQQ' => 'EQQQ.MI',
-        'ISF' => 'ISF.L',
+        'ISF' => 'ISFA.AS',
         'EMIM' => 'EMIM.AS',
         'IWDP' => 'IWDP.AS',
         'IPRP' => 'IPRP.AS',
@@ -69,11 +69,15 @@ class YahooFinanceService implements StockPricePluginInterface
                 if (isset($content['quoteResponse']) && $content['quoteResponse']['error'] == null) {
                     $symbolData = $content['quoteResponse']['result'];
                     foreach ($symbolData as $data) {
-                        if (isset($translate[$data['symbol']])) {
-                            $data['symbol'] = $translate[$data['symbol']];
+                        if (isset($data['currency'])) {
+                            if (isset($translate[$data['symbol']])) {
+                                $data['symbol'] = $translate[$data['symbol']];
+                            }
+                            if ($data['currency'] === 'GBp') {
+                                $data['currency'] = 'GBX';
+                            }
+                            $result[$data['symbol']] = $data;
                         }
-
-                        $result[$data['symbol']] = $data;
                     }
                 }
             }

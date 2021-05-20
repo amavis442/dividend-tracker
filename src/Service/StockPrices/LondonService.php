@@ -87,13 +87,7 @@ class LondonService implements StockPricePluginInterface
             }
 
             $marketPrice = trim(str_replace(',', '', $marketPrice));
-            $divider = 1;
-            if ($currency == 'GBX') {
-                $divider = 100;
-                $currency = 'GBP';
-            }
-
-            $stockprices[$symbol] = ['currency' => $currency, 'regularMarketPrice' => (float) $marketPrice / $divider];
+            $stockprices[$symbol] = ['currency' => $currency, 'regularMarketPrice' => (float) $marketPrice];
         }
 
         return $stockprices;
