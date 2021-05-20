@@ -58,7 +58,7 @@
                     <small>{{ portfolioItem.amount|format_number({fraction_digit: 7}) }} {{ 'shares'|trans }}</small>
                 </td>
                 <td>
-                    &euro;{{ portfolioItem.price|format_number({fraction_digit: 2}) }}
+                    &euro; {{ portfolioItem.price|format_number({fraction_digit: 2}) }}
                 </td>
                 <td>
                     <stockprice stock="{{ portfolioItem.symbol }}" v-bind:price="{{ portfolioItem.price }}" v-bind:freq="{{ portfolioItem.dividendPayoutFrequency }}" 
