@@ -24,7 +24,7 @@ class YahooFinanceService implements StockPricePluginInterface
         'SIE' => 'SIE.DE',
         'ISPA' => 'ISPA.DE',
         'VMID' => 'VMID.L',
-        'UNA' => 'ULVR.L',
+        'UNA' => 'UNA.AS',
         'VEUR' => 'VEUR.AS',
         'VAPX' => 'VAPX.L',
         'VJPN' => 'VJPN.SW',
