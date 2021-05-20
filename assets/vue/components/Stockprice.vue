@@ -11,7 +11,7 @@
     <span
       v-else
     >{{ formattedMarketPrice }}</span>
-    <br>
+ 
     <span
       v-if="price < marketPrice"
       class="badge badge-success"
@@ -35,6 +35,21 @@
       <i class="fas fa-equals" />
       {{ formattedDiffPrice }}
     </span>
+    <br>
+    
+    <span
+      v-if="result > 0"
+      class="badge badge-success"
+    >{{ formattedResult }}</span>
+    <span
+      v-else-if="result < 0"
+      class="badge badge-danger"
+    >{{ formattedResult }}</span>
+    <span
+      v-else
+      class="badge badge-secondary"
+    >{{ formattedResult }}</span>
+    
     <span class="badge badge-info">{{ dividendYield }}</span>
   </div>
 </template>
@@ -62,6 +77,11 @@ export default {
       default: 0,
       require: false
     },
+    totalshares: {
+      type: Number,
+      default: 0,
+      require: false
+    }
   },
   data: function() {
     return {
@@ -69,7 +89,9 @@ export default {
       formattedMarketPrice: null,
       diffPrice: null,
       formattedDiffPrice: null,
-      dividendYield: null
+      dividendYield: null,
+      result: null,
+      formattedResult: null
     }
   },
   mounted: function() {
@@ -92,6 +114,8 @@ export default {
             var dividendYield = (this.freq * this.netdividend) / this.marketPrice;
             this.dividendYield = new Intl.NumberFormat('nl-NL', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(dividendYield);
           } 
+          this.result = this.totalshares * this.diffPrice;
+          this.formattedResult =  new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(this.result);
         }).catch(console.log.bind(console));
     }
   }
