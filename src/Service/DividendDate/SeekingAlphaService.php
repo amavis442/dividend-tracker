@@ -12,6 +12,10 @@ class SeekingAlphaService implements DividendDatePluginInterface
     public const TOKEN_URL = "https://seekingalpha.com/market_data/xignite_token";
     public const URL = "https://globalhistorical.xignite.com/";
 
+    public $translate = [
+        'NESN'=> 'NSRGY',
+    ];
+
     /**
      * Http client
      *
@@ -76,18 +80,16 @@ class SeekingAlphaService implements DividendDatePluginInterface
     public function getData(string $ticker): ?array
     {
         $tickerNextPayments = [];
+        $symbol = $ticker;
+        if (isset($this->translate[$ticker])) {
+            $symbol = $this->translate[$ticker];
+        }
 
-        if (isset($this->tickerLinkedToService[$ticker])) {
-            $serviceClass = $this->tickerLinkedToService[$ticker];
-            $tickerData = [];
-            $tickerData['CashDividends'][] = $this->externalServices[$serviceClass]->getLatest($ticker);
-        } else {
-            $token = $this->getToken();
-            $tickerData = [];
-            $tickerData = $this->getStockHistory($token, $ticker);
-            if ($tickerData === null || count($tickerData['CashDividends']) === 0) {
-                return null;
-            }
+        $token = $this->getToken();
+        $tickerData = [];
+        $tickerData = $this->getStockHistory($token, $symbol);
+        if ($tickerData === null || count($tickerData['CashDividends']) === 0) {
+            return null;
         }
         $tickerNextPayments = $this->getTickerNextPayments($tickerData);
 
