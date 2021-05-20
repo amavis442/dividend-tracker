@@ -10,7 +10,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ExchangeRateService
 {
-    public const EXCHANGERATE_API = 'https://api.exchangeratesapi.io/latest'; // fuckers now want money
     public const ECB_EXCHANGERATE = 'https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html';
 
     private $exchangerateCache;
@@ -22,38 +21,10 @@ class ExchangeRateService
         $this->client = $client;
     }
 
-    /**
-     * Get the exchangerates from an external source and only refresh 1 per hour
-     *
-     * @return array
-     */
-    /*public function getRates(): array
-    {
-        return $this->ecbRates();
-
-        $client = $this->client;
-        $apiCallUrl = self::ECB_EXCHANGERATE;
-
-        $data = $this->exchangerateCache->get('exchangerates', function (ItemInterface $item) use ($client, $apiCallUrl) {
-            $item->expiresAfter(3600);
-            $response = $client->request(
-                'GET',
-                $apiCallUrl
-            );
-            $content = $response->toArray();
-
-            return $content;
-        });
-        //$this->exchangerateCache->delete('exchangerates');
-        return $data['rates'] ?? [];
-    }
-    */
-
     public function getRates(): array
     {
         $apiCallUrl = self::ECB_EXCHANGERATE;
         $client = $this->client;
-
 
         $data = $this->exchangerateCache->get('exchangerates', function (ItemInterface $item) use ($client, $apiCallUrl) {
             $item->expiresAfter(3600);
@@ -72,6 +43,8 @@ class ExchangeRateService
         $rates = $this->parseToArray($xpath, 'forextable');
         libxml_use_internal_errors($internalErrors);
 
+        $rates['GBX'] = $rates['GBP'] * 100;
+
         return $rates;
     }
 
@@ -89,6 +62,7 @@ class ExchangeRateService
                     if ($tdNodes->count() > 0) {
                         $currency = str_replace("\n", "", $tdNodes[0]->nodeValue);
                         $exchangeRate = str_replace("\n", "", $tdNodes[2]->nodeValue);
+
                         $resultarray[$currency] = $exchangeRate;
                     }
                 }
