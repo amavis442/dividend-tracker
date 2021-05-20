@@ -84,8 +84,7 @@
                 </td>
                 <td>{% if portfolioItem.divDate %}
                         <div class="badge badge-primary">{{ portfolioItem.cashCurrency.sign|raw }} {{ portfolioItem.cashAmount|format_number({fraction_digit: 3}) }}</div><br/>
-                        <div class="badge badge-secondary" data-toggle="popover" title="{{ 'Net Dividend'|trans }}" 
-                    data-content='{{ 'Dividend to receive on total shares'|trans }}'>&euro; {{ portfolioItem.forwardNetDividend|format_number({fraction_digit: 2}) }}
+                        <div class="badge badge-secondary">&euro; {{ portfolioItem.forwardNetDividend|format_number({fraction_digit: 2}) }}
                         <div class="badge badge-success" >{{ portfolioItem.forwardNetDividendYield|format_number({fraction_digit: 2}) }}%</div>
                         </div><br/>
                     {% else %}
