@@ -69,6 +69,11 @@ class Ticker
      */
     private $isin;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Tax::class, inversedBy="positions")
+     */
+    private $tax;
+
     public function __construct()
     {
         $this->calendars = new ArrayCollection();
@@ -287,5 +292,17 @@ class Ticker
     public function getPositions(): Collection
     {
         return $this->positions;
+    }
+
+    public function getTax(): ?Tax
+    {
+        return $this->tax;
+    }
+
+    public function setTax(?Tax $tax): self
+    {
+        $this->tax = $tax;
+
+        return $this;
     }
 }
