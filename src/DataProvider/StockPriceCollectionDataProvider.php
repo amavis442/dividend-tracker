@@ -7,7 +7,6 @@ namespace App\DataProvider;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use App\Entity\StockPrice;
-use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Service\StockPriceService;
 
@@ -21,7 +20,6 @@ final class StockPriceCollectionDataProvider implements ContextAwareCollectionDa
         $this->stockPriceService = $stockPriceService;
         $this->tickerRepository = $tickerRepository;
     }
-
 
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
@@ -45,16 +43,9 @@ final class StockPriceCollectionDataProvider implements ContextAwareCollectionDa
             if ($marketPrice) {
                 $stockprice->setPrice($marketPrice);
             }
-                $data[] = $stockprice;
+            $data[] = $stockprice;
         }
 
-
         return $data;
-        //return [['symbol' => 'CSWC', 'price' => $marketPrice]];
-
-
-        // Retrieve the blog post collection from somewhere
-        //yield new StockPrice();
-        //yield new StockPrice();
     }
 }
