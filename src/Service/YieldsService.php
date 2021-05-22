@@ -75,6 +75,8 @@ class YieldsService
             }
             $dataSource[$orderKey] = [
                 'ticker' => $ticker->getTicker(),
+                'tickerId' => $ticker->getId(),
+                'position' => $ticker->getPositions()->first(),
                 'label' => $ticker->getFullname(),
                 'yield' => $dividendYield,
                 'payout' => $dividendPerYear,

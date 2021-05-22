@@ -60,7 +60,7 @@
 			<tbody>
 				{% for item in datasource %}
 				<tr>
-					<td><span title="{{ item.label }}" data-toggle="tooltip" data-placement="top">{{ item.ticker }}</span></td>
+					<td><span title="{{ item.label }}" data-toggle="tooltip" data-placement="top"><a href="{{ path('portfolio_show', {'id': item.position.id}) }}">{{ item.ticker }}</a></span></td>
 					<td>&euro;{{ (item.avgPrice)|format_number({fraction_digit: 2}) }}</td>
 					<td>{% if item.lastDividend > 0 %}{{ item.lastDividendCurrency|raw }}{{ (item.lastDividend)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
 					<td>{% if item.lastDividendDate is not null %}{{ item.lastDividendDate|date("d-m-Y") }}{% else %} - {% endif %}</td>
