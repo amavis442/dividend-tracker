@@ -52,7 +52,7 @@ class DividendDateService
         $this->services[$serviceClass] = $service;
         if ($symbols) {
             foreach ($symbols as $symbol) {
-                $this->linkServiceToTicker[$symbol] = $serviceClass;
+                $this->linkServiceToTicker($serviceClass, $symbol);
             }
         }
 
@@ -113,14 +113,14 @@ class DividendDateService
      * @param string $symbol
      * @return StockPriceInterface
      */
-    public function getService(string $symbol): DividendDatePluginInterface
+    public function getService(string $symbol): ?DividendDatePluginInterface
     {
         if (isset($this->linkToService[$symbol])) {
             $serviceClass = $this->linkToService[$symbol];
             return $this->services[$serviceClass];
         }
 
-        return $this->services['_default'];
+        return $this->services['_default'] ?? null;
     }
 
     /**
@@ -131,16 +131,10 @@ class DividendDateService
      */
     public function getData(string $symbol): ?array
     {
-        if (isset($this->linkToService[$symbol])) {
-            $serviceClass = $this->linkToService[$symbol];
-            $service = $this->services[$serviceClass];
+        $service = $this->getService($symbol);
+        if (isset($service)) {
             return $service->getData($symbol);
         }
-
-        $service = $this->getDefault();
-        if (!$service) {
-            return [];
-        }
-        return $service->getData($symbol);
+        return [];
     }
 }

@@ -103,7 +103,7 @@ class DividendDateCommand extends Command
             $io->info('Processing data for ticker: ' . $ticker->getFullname());
 
             foreach ($data as $payment) {
-                if ($payment['Type'] === 'Unknown' || empty($payment['PayDate']) || empty($payment['ExDate'])) {
+                if (!$payment || !isset($payment['Type']) || $payment['Type'] === 'Unknown' || empty($payment['PayDate']) || empty($payment['ExDate'])) {
                     $this->logger->alert('Dividend date debug: ' . print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
                     continue;
                 }

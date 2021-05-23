@@ -83,6 +83,6 @@ class ISharesService implements DividendDatePluginInterface
         $item['Type'] = 'Distribution';
         $item['Currency'] = $currency; //strpos('USD', $row[0][4]['display'])
 
-        return $item;
+        return [$item];
     }
 }
