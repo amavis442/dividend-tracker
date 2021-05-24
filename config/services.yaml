@@ -60,7 +60,7 @@ services:
         calls:
             - addService: ['App\Service\DividendDate\SeekingAlphaService']
             - addService: ['App\Service\DividendDate\ISharesService', ['SEMB']] 
-            - addService: ['App\Service\DividendDate\VanguardService', ['VMID', 'VJPN']]   
+            - addService: ['App\Service\DividendDate\VanguardService', ['VMID', 'VJPN', 'VEUR', 'VPAX', 'VUSA', 'VGOV']]   
             - setDefault: ['App\Service\DividendDate\SeekingAlphaService']
 
     App\Service\ImportCsvService:
