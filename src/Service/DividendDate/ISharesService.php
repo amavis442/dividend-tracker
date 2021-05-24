@@ -13,7 +13,7 @@ class ISharesService implements DividendDatePluginInterface
     public const IPRP_SEED = 'https://www.ishares.com/nl/particuliere-belegger/nl/producten/251808/ishares-european-property-yield-ucits-etf/1497735778843.ajax?tab=distributions&fileType=json&subtab=table';
     public const ISF_SEED = 'https://www.ishares.com/nl/particuliere-belegger/nl/producten/251795/ishares-ftse-100-ucits-etf-inc-fund/1497735778843.ajax?tab=distributions&fileType=json&subtab=table';
     public const IUS3_SEED = 'https://www.ishares.com/nl/particuliere-belegger/nl/producten/251920/ishares-sp-smallcap-600-ucits-etf/1497735778843.ajax?tab=distributions&fileType=json&subtab=table';
-    public const IWDP_SEED = 'https://www.ishares.com/nl/particuliere-belegger/nl/producten/251920/ishares-sp-smallcap-600-ucits-etf/1497735778843.ajax?tab=distributions&fileType=json&subtab=table';
+    public const IWDP_SEED = 'https://www.ishares.com/nl/particuliere-belegger/nl/producten/251801/ishares-developed-markets-property-yield-ucits-etf/1497735778843.ajax?tab=distributions&fileType=json&subtab=table';
 
     /**
      * Http client
