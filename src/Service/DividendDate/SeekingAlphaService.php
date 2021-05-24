@@ -2,10 +2,10 @@
 
 namespace App\Service\DividendDate;
 
+use App\Contracts\Service\DividendDatePluginInterface;
 use DateTime;
 use RuntimeException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use App\Contracts\Service\DividendDatePluginInterface;
 
 class SeekingAlphaService implements DividendDatePluginInterface
 {
@@ -13,7 +13,7 @@ class SeekingAlphaService implements DividendDatePluginInterface
     public const URL = "https://globalhistorical.xignite.com/";
 
     public $translate = [
-        'NESN'=> 'NSRGY',
+        'NESN' => 'NSRGY',
     ];
 
     /**

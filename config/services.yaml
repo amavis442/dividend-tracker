@@ -59,7 +59,7 @@ services:
             $client: '@http_client'
         calls:
             - addService: ['App\Service\DividendDate\SeekingAlphaService']
-            - addService: ['App\Service\DividendDate\ISharesService', ['SEMB']] 
+            - addService: ['App\Service\DividendDate\ISharesService', ['SEMB', 'INRG', 'IPRP', 'ISF', 'IUS3', 'IWDP']] 
             - addService: ['App\Service\DividendDate\VanguardService', ['VMID', 'VJPN', 'VEUR', 'VAPX', 'VUSA', 'VGOV']]   
             - setDefault: ['App\Service\DividendDate\SeekingAlphaService']
 
