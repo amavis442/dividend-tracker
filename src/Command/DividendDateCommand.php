@@ -137,18 +137,8 @@ class DividendDateCommand extends Command
                     $addedForTicker[] = $ticker->getSymbol();
                     $addedDates++;
                 }
-
-                /*
-            "DividendAmount" => 0.56
-            "Currency" => "USD"
-            "ExDate" => "2021-05-19"
-            "PayDate" => "2021-06-10"
-            "RecordDate" => "2021-05-20"
-            "DeclaredDate" => "2021-03-16"
-            "PaymentFrequency" => "Quarterly"
-            "Type" => "OrdinaryDividend"
-             */
             }
+            sleep(5);
         }
         $io->success('Done.... added: ' . $addedDates);
         $io->info(implode(', ', $addedForTicker));

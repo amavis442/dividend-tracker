@@ -2,6 +2,7 @@
 namespace App\Service\DividendDate;
 
 use App\Contracts\Service\DividendDatePluginInterface;
+use RuntimeException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class VanguardService implements DividendDatePluginInterface
@@ -12,7 +13,7 @@ class VanguardService implements DividendDatePluginInterface
     public const VMID_PORTID = 9525;
     public const VJPN_PORTID = 9504;
     public const VEUR_PORTID = 9520;
-    public const VPAX_PORTID = 9522;
+    public const VAPX_PORTID = 9522;
     public const VUSA_PORTID = 9503;
     public const VGOV_PORTID = 9501;
 
@@ -45,8 +46,8 @@ class VanguardService implements DividendDatePluginInterface
                 $portid = self::VEUR_PORTID;
                 $currency = 'EUR';
                 break;
-            case 'VPAX':
-                $portid = self::VPAX_PORTID;
+            case 'VAPX':
+                $portid = self::VAPX_PORTID;
                 $currency = 'USD';
                 break;
             case 'VUSA':
