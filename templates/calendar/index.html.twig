@@ -36,7 +36,7 @@
             {% for calendar in calendars %}
                 <tr class="table">
                     <td class="col">{{ calendar.ticker.fullname|slice(0,20) }}{% if calendar.ticker.fullname|length > 20 %}...{% endif %}<br/><small>({{ calendar.ticker.ticker }})</small></td>
-                    <td class="col">{{ (calendar.dividend_type ?? 'Regular')|trans }}</td>
+                    <td class="col">{{ (calendar.dividendType ?? 'Regular')|trans }}</td>
                     <td class="col">{{ calendar.paymentDate|format_date('medium') }}</td>
                     <td class="col">{{ calendar.exDividendDate|format_date('medium') }}</td>
                     <td class="col">{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({fraction_digit: 2}) }}</td>
