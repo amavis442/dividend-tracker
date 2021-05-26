@@ -48,7 +48,7 @@ class YieldsService
 
 
             if ($firstCalendarEntry) {
-                $lastCash = $firstCalendarEntry->getCashAmount();
+                $lastCash = $dividendService->getCashAmount($ticker);// $firstCalendarEntry->getCashAmount();
                 $lastCashCurrency = $firstCalendarEntry->getCurrency()->getSign();
                 $lastDividendDate = $firstCalendarEntry->getPaymentDate();
 

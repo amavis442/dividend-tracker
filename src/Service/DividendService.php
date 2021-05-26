@@ -168,6 +168,12 @@ class DividendService
         return $shares;
     }
 
+    /**
+     * How many shares are applicable on ex dividenddate
+     *
+     * @param Calendar $calendar
+     * @return float|null
+     */
     public function getPositionAmount(Calendar $calendar): ?float
     {
         $amount = 0.0;
@@ -191,7 +197,7 @@ class DividendService
     {
         $ticker = $position->getTicker();
         $dividendTax = $ticker->getTax() ? $ticker->getTax()->getTaxRate() : Constants::TAX / 100;
-        $cashAmount = $calendar->getCashAmount();
+        $cashAmount = $this->getCashAmount($ticker);
         $exchangeRate = $this->getExchangeRate($calendar);
 
         return $cashAmount * (1 - $dividendTax) * $exchangeRate;
@@ -224,6 +230,39 @@ class DividendService
     }
 
     /**
+     * Are there supplemental and/or special dividends being paid?
+     * This will be gross and not net dividend. 
+     *
+     * @param \App\Entity\Ticker $ticker
+     * @return float|null
+     */
+    public function getCashAmount($ticker): ?float 
+    {
+        $cashAmount = 0;
+        $calendars = $ticker->getCalendars();
+        if ($calendars) {
+            /**
+             * @var \App\Entity\Calendar $calendar
+             */
+            $calendar = $calendars->first();
+            if ($calendar) {
+                $cashAmount = $calendar->getCashamount();
+
+                /**
+                 * @var \App\Entity\Calendar $secondCalendar
+                 */
+                $secondCalendar = $calendars[1];
+                if ($secondCalendar && $secondCalendar->getPaymentDate()->format('Ymd') === $calendar->getPaymentDate()->format('Ymd') && $secondCalendar->getDividendType() !== $calendar->getDividendType()) {
+                    $cashAmount += $secondCalendar->getCashamount();
+                }
+
+            }
+        }
+
+        return $cashAmount;
+    }
+
+    /**
      * Get the expected dividend for the next dividend payout date
      *
      * @param Position $position
@@ -234,14 +273,17 @@ class DividendService
         $cashAmount = 0.0;
         $forwardNetDividend = 0.0;
         $ticker = $position->getTicker();
-        if ($ticker->getCalendars()) {
-            $calendar = $ticker->getCalendars()->first();
+        $calendars = $ticker->getCalendars();
+        if ($calendars) {
+            /**
+             * @var \App\Entity\Calendar $calendar
+             */
+            $calendar = $calendars->first();
             if ($calendar) {
+                $cashAmount = $this->getCashAmount($ticker);
+                $amount = $position->getAmount();
                 $dividendTax = $ticker->getTax() ? $ticker->getTax()->getTaxRate() : Constants::TAX / 100;
                 $exchangeRate = $this->getExchangeRate($calendar);
-                //[$exchangeRate, $dividendTax] = $this->getExchangeAndTax($calendar);
-                $cashAmount = $calendar->getCashamount();
-                $amount = $position->getAmount();
                 $this->netDividendPerShare = $cashAmount * $exchangeRate * (1 - $dividendTax);
                 $forwardNetDividend = $amount * $cashAmount * $exchangeRate * (1 - $dividendTax);
             }
