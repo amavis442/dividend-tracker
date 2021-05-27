@@ -192,12 +192,12 @@ class CalendarRepository extends ServiceEntityRepository
             ->leftJoin('p.transactions', 'tr')
             ->leftJoin('p.pies', 'pies')
             ->leftJoin('c.currency', 'cur')
-            //->leftJoin('cur.taxes', 'tax', 'WITH', 'tax.validFrom <= :validFrom')
+        //->leftJoin('cur.taxes', 'tax', 'WITH', 'tax.validFrom <= :validFrom')
             ->where('c.paymentDate >= :start and c.paymentDate <= :end')
             ->andWhere('EXISTS ( select 1 from App\Entity\Position pos WHERE pos.ticker = t.id AND pos.closed is null OR pos.closed = 0)')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
-            //->setParameter('validFrom', date('Y-m-d'))
+        //->setParameter('validFrom', date('Y-m-d'))
         ;
 
         if ($pie) {
@@ -212,13 +212,19 @@ class CalendarRepository extends ServiceEntityRepository
         }
 
         $data = [];
+        $processed = [];
         foreach ($result as $item) {
+            $ticker = $item->getTicker()->getTicker();
+            $hashKey = $item->getPaymentDate()->format('Ym') . $item->getPaymentDate()->format('j') . $ticker;
+            if (isset($processed[$hashKey])) {
+                continue;
+            }
+
             $positionAmount = $dividendService->getPositionAmount($item);
             $positionDividend = $dividendService->getTotalNetDividend($item);
             $taxRate = $dividendService->getTaxRate($item);
             $exchangeRate = $dividendService->getExchangeRate($item);
             $tax = $item->getCashAmount() * $exchangeRate * $taxRate;
-            $ticker = $item->getTicker()->getTicker();
 
             $data[$item->getPaymentDate()->format('Ym')][$item->getPaymentDate()->format('j')][] = [
                 'calendar' => $item,
@@ -227,8 +233,9 @@ class CalendarRepository extends ServiceEntityRepository
                 'positionDividend' => $positionDividend,
                 'taxRate' => $taxRate,
                 'exchangeRate' => $exchangeRate,
-                'tax' => $tax
+                'tax' => $tax,
             ];
+            $processed[$hashKey] = 1;
         }
         ksort($data);
         foreach ($data as &$month) {
