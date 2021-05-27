@@ -22,6 +22,11 @@ class SeekingAlphaService implements DividendDatePluginInterface
      * @var HttpClientInterface
      */
     private $client;
+    /**
+     *
+     * @var string
+     */
+    private $usedUrl = '';
 
     public function __construct(HttpClientInterface $client)
     {
@@ -45,6 +50,7 @@ class SeekingAlphaService implements DividendDatePluginInterface
             . "&StartDate=01/01/" . (date('Y') - 3) . "&EndDate=12/30/" . (date('Y') + 3) . "&"
             . "IdentifierAsOfDate=&CorporateActionsAdjusted=true&_token="
             . $token['_token'] . "&_token_userid=" . $token['_token_userid'];
+        $this->usedUrl = $url;
 
         $response = $this->client->request('GET', $url);
         if ($response->getStatusCode() !== 200) {
