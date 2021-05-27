@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Calendar;
 use App\Entity\Constants;
 use App\Entity\Position;
+use App\Entity\Ticker;
 use App\Entity\Transaction;
 use App\Repository\TaxRepository;
 use App\Service\ExchangeRateService;
@@ -233,10 +234,10 @@ class DividendService
      * Are there supplemental and/or special dividends being paid?
      * This will be gross and not net dividend. 
      *
-     * @param \App\Entity\Ticker $ticker
+     * @param Ticker $ticker
      * @return float|null
      */
-    public function getCashAmount($ticker): ?float 
+    public function getCashAmount(Ticker $ticker): ?float 
     {
         $cashAmount = 0;
         $calendars = $ticker->getCalendars();
