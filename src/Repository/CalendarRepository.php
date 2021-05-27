@@ -204,7 +204,6 @@ class CalendarRepository extends ServiceEntityRepository
             $qb->andWhere('pies IN (:pie)')
                 ->setParameter('pie', [$pie->getId()]);
         }
-
         $result = $qb->getQuery()
             ->getResult();
         if (!$result) {
@@ -212,14 +211,9 @@ class CalendarRepository extends ServiceEntityRepository
         }
 
         $data = [];
-        $processed = [];
+        $dividendService->setCummulateDividendAmount(false);
         foreach ($result as $item) {
             $ticker = $item->getTicker()->getTicker();
-            $hashKey = $item->getPaymentDate()->format('Ym') . $item->getPaymentDate()->format('j') . $ticker;
-            if (isset($processed[$hashKey])) {
-                continue;
-            }
-
             $positionAmount = $dividendService->getPositionAmount($item);
             $positionDividend = $dividendService->getTotalNetDividend($item);
             $taxRate = $dividendService->getTaxRate($item);
@@ -235,7 +229,6 @@ class CalendarRepository extends ServiceEntityRepository
                 'exchangeRate' => $exchangeRate,
                 'tax' => $tax,
             ];
-            $processed[$hashKey] = 1;
         }
         ksort($data);
         foreach ($data as &$month) {

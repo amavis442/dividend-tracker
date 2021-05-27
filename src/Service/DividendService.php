@@ -44,6 +44,14 @@ class DividendService
      */
     protected $netDividendPerShare;
 
+    /**
+     * Should all dividend paid on same day to same ticker be accumulated?
+     * Normal dividend + Supplement dividend, etc
+     *
+     * @var boolean
+     */
+    protected $cummulateDividendAmount = true;
+
     public function __construct(ExchangeRateService $exchangeRateService, TaxRepository $taxRepository)
     {
         $this->exchangeRateService = $exchangeRateService;
@@ -198,7 +206,11 @@ class DividendService
     {
         $ticker = $position->getTicker();
         $dividendTax = $ticker->getTax() ? $ticker->getTax()->getTaxRate() : Constants::TAX / 100;
-        $cashAmount = $this->getCashAmount($ticker);
+        
+        $cashAmount = $calendar->getCashAmount();
+        if ($this->cummulateDividendAmount) { 
+            $cashAmount = $this->getCashAmount($ticker);
+        }
         $exchangeRate = $this->getExchangeRate($calendar);
 
         return $cashAmount * (1 - $dividendTax) * $exchangeRate;
@@ -232,12 +244,12 @@ class DividendService
 
     /**
      * Are there supplemental and/or special dividends being paid?
-     * This will be gross and not net dividend. 
+     * This will be gross and not net dividend.
      *
      * @param Ticker $ticker
      * @return float|null
      */
-    public function getCashAmount(Ticker $ticker): ?float 
+    public function getCashAmount(Ticker $ticker): ?float
     {
         $cashAmount = 0;
         $calendars = $ticker->getCalendars();
@@ -249,14 +261,15 @@ class DividendService
             if ($calendar) {
                 $cashAmount = $calendar->getCashamount();
 
-                /**
-                 * @var \App\Entity\Calendar $secondCalendar
-                 */
-                $secondCalendar = $calendars[1];
-                if ($secondCalendar && $secondCalendar->getPaymentDate()->format('Ymd') === $calendar->getPaymentDate()->format('Ymd') && $secondCalendar->getDividendType() !== $calendar->getDividendType()) {
-                    $cashAmount += $secondCalendar->getCashamount();
-                }
-
+                
+                    /**
+                     * @var \App\Entity\Calendar $secondCalendar
+                     */
+                    $secondCalendar = $calendars[1];
+                    if ($secondCalendar && $secondCalendar->getPaymentDate()->format('Ymd') === $calendar->getPaymentDate()->format('Ymd') && $secondCalendar->getDividendType() !== $calendar->getDividendType()) {
+                        $cashAmount += $secondCalendar->getCashamount();
+                    }
+                
             }
         }
 
@@ -281,7 +294,10 @@ class DividendService
              */
             $calendar = $calendars->first();
             if ($calendar) {
-                $cashAmount = $this->getCashAmount($ticker);
+                $cashAmount = $calendar->getCashAmount();
+                if ($this->cummulateDividendAmount) {
+                    $cashAmount = $this->getCashAmount($ticker);
+                }
                 $amount = $position->getAmount();
                 $dividendTax = $ticker->getTax() ? $ticker->getTax()->getTaxRate() : Constants::TAX / 100;
                 $exchangeRate = $this->getExchangeRate($calendar);
@@ -337,5 +353,20 @@ class DividendService
         }
 
         return $this->netDividendPerShare;
+    }
+
+    /**
+     * Set normal dividend + Supplement dividend, etc
+     * Normal dividend + Supplement dividend, etc
+     *
+     * @param  boolean  $cummulateDividendAmount
+     *
+     * @return  self
+     */
+    public function setCummulateDividendAmount(bool $cummulateDividendAmount = true): self
+    {
+        $this->cummulateDividendAmount = $cummulateDividendAmount;
+
+        return $this;
     }
 }
