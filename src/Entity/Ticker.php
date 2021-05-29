@@ -60,7 +60,7 @@ class Ticker
     private $positions;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\DividendMonth", inversedBy="tickers")
+     * @ORM\ManyToMany(targetEntity="App\Entity\DividendMonth", inversedBy="tickers", indexBy="dividendMonth")
      */
     private $dividendMonths;
 

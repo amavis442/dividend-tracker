@@ -3,6 +3,7 @@
 namespace App\Controller\Report;
 
 use App\Repository\PositionRepository;
+use App\Service\DividendService;
 use App\Service\Export;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -22,10 +23,10 @@ class ExportController extends AbstractController
     /**
      * @Route("/export", name="report_export")
      */
-    public function index(PositionRepository $positionRepository): Response
+    public function index(PositionRepository $positionRepository, DividendService $dividendService): Response
     {
-        $export = new Export($positionRepository);
-        $filename = $export->export($positionRepository);
+        $export = new Export($positionRepository, $dividendService);
+        $filename = $export->export();
 
         $response = new BinaryFileResponse($filename);
         $disposition = HeaderUtils::makeDisposition(

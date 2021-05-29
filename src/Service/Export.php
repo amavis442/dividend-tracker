@@ -10,7 +10,26 @@ use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
 class Export
 {
-    public function export(PositionRepository $positionRepository): string
+    /**
+     *
+     * @var DividendService
+     */
+    private $dividendService;
+    /**
+     *
+     * @var PositionRepository
+     */
+    private $positionRepository;
+
+    public function __construct(PositionRepository $positionRepository, DividendService $dividendService)
+    {
+        $this->dividendService = $dividendService;
+        $this->positionRepository = $positionRepository;
+    }
+
+
+
+    public function export(): string
     {
         $filename = '/tmp/export-' . date('Ymd') . '.xlxs';
         $writer = WriterEntityFactory::createXLSXWriter();
@@ -32,11 +51,11 @@ class Export
             ->setCellAlignment(CellAlignment::RIGHT)
             ->build();
 
-        $data = $this->getData($positionRepository);
+        $data = $this->getData();
 
+        $sheet = $writer->getCurrentSheet();
         foreach ($data as $pie => $rows) {
             $firstRow = true;
-            $sheet = $writer->addNewSheetAndMakeItCurrent();
             $sheet->setName($pie);
             foreach ($rows as $ticker => $row) {
                 if ($firstRow) {
@@ -49,16 +68,19 @@ class Export
                 $writer->addRow($rowFromValues);
                 $firstRow = false;
             }
+            if (next($data) !== false) {
+                $sheet = $writer->addNewSheetAndMakeItCurrent();
+            }
         }
         $writer->close();
 
         return $filename;
     }
 
-    private function getData(PositionRepository $positionRepository): array
+    private function getData(): array
     {
         $data = [];
-        $positions = $positionRepository->getAllOpen();
+        $positions = $this->positionRepository->getAllOpen();
         foreach ($positions as $position) {
             $pieName = 'default';
             if ($position->hasPie()) {
@@ -75,10 +97,31 @@ class Export
             $row['Profit'] = $position->getProfit();
 
             $row['dividend'] = 0.0;
-            if ($position->getTicker()->hasCalendar()) {
-                $cash = $position->getTicker()->getCalendars()->first()->getCashAmount();
+            for ($m = 1; $m < 13; $m++) {
+                $indexBy = 'Maand '.$m;
+                $row[$indexBy] = 0;
+            }
+
+            /**
+             * @var \App\Entity\Ticker $ticker
+             */
+            $ticker = $position->getTicker();
+            if ($ticker->hasCalendar()) {
+                $calendar = $ticker->getCalendars()->first();
+                $cash = $calendar->getCashAmount();
                 $row['dividend'] = $cash;
                 $row['frequency'] = $position->getTicker()->getDividendFrequency();
+                /**
+                 * @var \Doctrine\Common\Collections\Collection $dividendMonths
+                 */
+                $dividendMonths = $ticker->getDividendMonths();
+                $netDividend = $this->dividendService->getNetDividend($position, $calendar);
+                for ($m = 1; $m < 13; $m++) {
+                    $indexBy = 'Maand '.$m;
+                    if ($dividendMonths->containsKey($m)) {
+                        $row[$indexBy] = round($netDividend * $position->getAmount(), 2);
+                    }    
+                }
             }
 
             $data[$pieName][$position->getTicker()->getTicker()] = $row;
