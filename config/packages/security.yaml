@@ -53,3 +53,5 @@ security:
         - { path: ^/admin, roles: ROLE_ADMIN }
         #- { path: ^/profile, roles: ROLE_USER }
         - { path: ^/dashboard, roles: ROLE_USER }
+        # require the user to fully login to change password
+        - { path: ^/dashboard/account/update, roles: IS_AUTHENTICATED_FULLY }
