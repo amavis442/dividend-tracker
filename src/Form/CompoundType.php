@@ -8,54 +8,53 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Entity\Compound;
 use App\Form\Factory\CallbackTransformerValutaFactory;
 use App\Form\Factory\CallbackTransformerUnitsFactory;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 class CompoundType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $compound = $options['data'];
         $builder
             ->add('amount', NumberType::class, [
-                'label' => 'Amount',
-                'help' => 'Number of shares to start with',
+                'label' => 'Initial Number of Shares',
                 'required' => true,
                 'input' => 'number',
                 'scale' => 7,
                 'empty_data' => 1
             ])
             ->add('price', NumberType::class, [
-                'label' => 'Average price (euro)',
-                'help' => 'Price that you pay for the shares',
+                'label' => 'Initial Price per Share',
                 'required' => true,
                 'input' => 'number',
                 'scale' => 3,
                 'empty_data' => 1000
             ])
             ->add('maxPrice', NumberType::class, [
-                'label' => 'Maximum that price can rise (euro)',
+                'label' => 'Maximum that price can rise',
                 'help' => 'If there is a range, what is the max range',
                 'required' => false,
                 'input' => 'number',
                 'scale' => 3,
             ])
             ->add('priceAppreciation', NumberType::class, [
-                'label' => 'Rise of price in %',
+                'label' => 'Stock Price Annual Growth Rate',
                 'data' => '7830',
-                'help' => 'Historically the amrket has risen 7.38%',
+                'help' => 'Historically the market has risen 7.38%',
                 'required' => false,
                 'input' => 'number',
                 'scale' => 3,
             ])
             ->add('dividend', NumberType::class, [
-                'label' => 'Starting dividend ($)',
-                'help' => 'Starting dividend in dollars',
+                'label' => 'Annual Dividend',
                 'required' => true,
                 'input' => 'number',
                 'scale' => 3,
                 'empty_data' => 1
             ])
             ->add('growth', NumberType::class, [
-                'label' => 'Average dividend growth rate (%)',
+                'label' => 'Dividend Annual Growth Rate',
                 'help' => 'First 5 years. Nice target would be 10% and higher',
                 'required' => true,
                 'input' => 'number',
@@ -70,12 +69,38 @@ class CompoundType extends AbstractType
                 'scale' => 3,
                 'data' => '3000',
             ])
-            ->add('frequency', NumberType::class, [
-                'label' => 'Payout frequency',
-                'help' => 'How many times does the company pay dividends per year. Default will be 4 (every quator)',
-                'required' => false,
+            ->add('years', NumberType::class, [
+                'label' => 'Number of Years',
+                'required' => true,
                 'input' => 'number',
-                'empty_data' => 4
+                'scale' => 0,
+            ])
+            ->add('frequency', ChoiceType::class, [
+                'label' => 'Dividends Per Year',
+                'required' => true,
+                'empty_data' => 4,
+                'choices' => [
+                    1 => 1,
+                    2 => 2,
+                    3 => 3,
+                    4 => 4,
+                    12 => 12
+                ],
+                'choice_translation_domain' => false
+            ])
+            ->add('taxRate', NumberType::class, [
+                'label' => 'Dividend tax',
+                'required' => true,
+                'input' => 'number',
+                'scale' => 0,
+                'empty_data' => $compound->getTaxRate()
+            ])
+            ->add('exchangeRate', NumberType::class, [
+                'label' => 'Exchange rate',
+                'required' => true,
+                'input' => 'number',
+                'scale' => 2,
+                'empty_data' => $compound->getExchangeRate()
             ])
             ;
 

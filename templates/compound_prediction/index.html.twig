@@ -21,14 +21,15 @@
 	<table class="table">
 		<thead>
 			<tr>
-				<th>Quator</th>
-				<th>Dividend growth rate</th>
-				<th>Share price</th>
-				<th>Start amount</th>
-				<th>Dividend</th>
-				<th>Net dividend</th>
-				<th>New shares</th>
-				<th>Dividend from new shares</th>
+				<th>{{ 'Quator'|trans }}</th>
+				<th>{{ 'Dividend growth rate'|trans }}</th>
+				<th>{{ 'Share price'|trans }}</th>
+				<th>{{ 'Number of Shares'|trans }}</th>
+				<th>{{ 'Dividend'|trans }}</th>
+				<th>{{ 'Net dividend'|trans }}</th>
+				<th>{{ 'New shares'|trans }}</th>
+				<th>{{ 'Dividend from new shares'|trans }}</th>
+				<th>{{ 'Received dividends'|trans }}</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -48,12 +49,13 @@
 				<tr {% if oddrow %} class="table-success" {% endif %}>
 					<td>{{ item.quator }}</td>
 					<td>{{ item.dividendGrowth|format_number({fraction_digit: 3}) }}%</td>
-					<td>&euro;{{ item.shareprice|format_number({fraction_digit: 3}) }}</td>
+					<td>{{ item.shareprice|format_number({fraction_digit: 3}) }}</td>
 					<td>{{ item.amount }}</td>
-					<td>${{ item.dividend }}</td>
-					<td>&euro;{{ item.net_dividend|format_number({fraction_digit: 3}) }}</td>
+					<td>{{ item.dividend }}</td>
+					<td>{{ item.net_dividend|format_number({fraction_digit: 3}) }}</td>
 					<td>{{ item.new_amount }}</td>
-					<td>&euro;{{ item.extra_dividend|format_number({fraction_digit: 3}) }}</td>
+					<td>{{ item.extra_dividend|format_number({fraction_digit: 3}) }}</td>
+					<td>{{ item.received_dividend|format_number({fraction_digit: 3}) }}</td>
 				</tr>
 				{% set rowcount = rowcount + 1 %}
 			{% endfor %}

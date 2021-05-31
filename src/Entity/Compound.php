@@ -61,6 +61,24 @@ class Compound
      */
     private $frequency;
 
+    /**
+     *
+     * @var int
+     */
+    private $years;
+
+    /**
+     *
+     * @var float
+     */
+    private $taxRate = 15;
+
+    /**
+     *
+     * @var float
+     */
+    private $exchangeRate = 1.2;
+
     public function setAmount(int $amount): self
     {
         $this->amount = $amount;
@@ -201,6 +219,78 @@ class Compound
     public function setFrequency($frequency): self
     {
         $this->frequency = $frequency;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of years
+     *
+     * @return  int
+     */ 
+    public function getYears(): int
+    {
+        return $this->years;
+    }
+
+    /**
+     * Set the value of years
+     *
+     * @param  int  $years
+     *
+     * @return  self
+     */ 
+    public function setYears(int $years): self
+    {
+        $this->years = $years;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of taxRate
+     *
+     * @return  float
+     */ 
+    public function getTaxRate()
+    {
+        return $this->taxRate;
+    }
+
+    /**
+     * Set the value of taxRate
+     *
+     * @param  float  $taxRate
+     *
+     * @return  self
+     */ 
+    public function setTaxRate(float $taxRate)
+    {
+        $this->taxRate = $taxRate;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of exchangeRate
+     *
+     * @return  float
+     */ 
+    public function getExchangeRate()
+    {
+        return $this->exchangeRate;
+    }
+
+    /**
+     * Set the value of exchangeRate
+     *
+     * @param  float  $exchangeRate
+     *
+     * @return  self
+     */ 
+    public function setExchangeRate(float $exchangeRate)
+    {
+        $this->exchangeRate = $exchangeRate;
 
         return $this;
     }

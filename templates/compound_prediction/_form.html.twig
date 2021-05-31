@@ -41,13 +41,20 @@
 	</div>
 	<div class="col">
 		<div class="form-group">
+			{{form_label(form.frequency)}}
+			{{form_widget(form.frequency)}}
+			{{form_help(form.frequency)}}
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col">
+		<div class="form-group">
 			{{form_label(form.growth)}}
 			{{form_widget(form.growth)}}
 			{{form_help(form.growth)}}
 		</div>
 	</div>
-</div>
-<div class="row">
 	<div class="col">
 		<div class="form-group">
 			{{form_label(form.growthAfter5Years)}}
@@ -55,15 +62,32 @@
 			{{form_help(form.growthAfter5Years)}}
 		</div>
 	</div>
+</div>
+<div class="row">
 	<div class="col">
 		<div class="form-group">
-			{{form_label(form.frequency)}}
-			{{form_widget(form.frequency)}}
-			{{form_help(form.frequency)}}
+			{{form_label(form.years)}}
+			{{form_widget(form.years)}}
+			{{form_help(form.years)}}
 		</div>
 	</div>
 </div>
-
+<div class="row">
+	<div class="col">
+		<div class="form-group">
+			{{form_label(form.taxRate)}}
+			{{form_widget(form.taxRate)}}
+			{{form_help(form.taxRate)}}
+		</div>
+	</div>
+	<div class="col">
+		<div class="form-group">
+			{{form_label(form.exchangeRate)}}
+			{{form_widget(form.exchangeRate)}}
+			{{form_help(form.exchangeRate)}}
+		</div>
+	</div>
+</div>
 <button type="submit" class="btn btn-primary">
 	Calc
 </button>
