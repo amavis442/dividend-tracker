@@ -107,7 +107,7 @@
                         <ul class="list-group">
                         {% for calendar in portfolioItem.dividendCalendars %}
                             <li class="list-group-item">{{ calendar.exDividendDate|format_date('medium') }} / <i class="fas fa-money-check-alt"></i> 
-                            {{ calendar.paymentDate|format_date('medium') }}
+                            {{ calendar.paymentDate|format_date('medium') }} <span class="badge badge-primary badge-pill">{{ calendar.currency.sign|raw }} {{ calendar.cashAmount }}</span>
                             </li>
                         {% else %}    
                             <li class="list-group-item">{{ 'Not available'|trans }}</li>
