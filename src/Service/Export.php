@@ -107,7 +107,7 @@ class Export
              */
             $ticker = $position->getTicker();
             if ($ticker->hasCalendar()) {
-                $calendar = $ticker->getCalendars()->first();
+                $calendar = $this->dividendService->getRegularCalendar($ticker);
                 $cash = $calendar->getCashAmount();
                 $row['dividend'] = $cash;
                 $row['frequency'] = $position->getTicker()->getDividendFrequency();

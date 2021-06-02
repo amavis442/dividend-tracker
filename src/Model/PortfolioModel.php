@@ -122,7 +122,7 @@ class PortfolioModel
             ;
 
             // Dividend part
-            $calendar = $position->getTicker()->getCalendars()->first();
+            $calendar = $dividendService->getRegularCalendar($position->getTicker());
             if ($calendar) {
                 $forwardNetDividend = $dividendService->getForwardNetDividend($position);
                 $forwardNetDividendYield = $dividendService->getForwardNetDividendYield($position);

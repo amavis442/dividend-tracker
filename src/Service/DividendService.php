@@ -178,6 +178,31 @@ class DividendService
     }
 
     /**
+     * Get the first regular dividend calendar item. No special or suplement dividends.
+     *
+     * @param Ticker $ticker
+     * @return null|Calendar
+     */
+    public function getRegularCalendar(Ticker $ticker): ?Calendar
+    {
+        if (!$ticker->hasCalendar()) {
+            return null;
+        }
+
+        $calendars = $ticker->getCalendars()->slice(0, 8);
+        $calendars = array_filter($calendars, function ($element) {
+            return $element->getDividendType() === Calendar::REGULAR || $element->getDividendType() === null;
+        });
+
+        if (count($calendars) > 0) {
+            reset($calendars);
+            return current($calendars);
+        }
+
+        return null;
+    }
+
+    /**
      * How many shares are applicable on ex dividenddate
      *
      * @param Calendar $calendar
@@ -206,9 +231,8 @@ class DividendService
     {
         $ticker = $position->getTicker();
         $dividendTax = $ticker->getTax() ? $ticker->getTax()->getTaxRate() : Constants::TAX / 100;
-        
         $cashAmount = $calendar->getCashAmount();
-        if ($this->cummulateDividendAmount) { 
+        if ($this->cummulateDividendAmount) {
             $cashAmount = $this->getCashAmount($ticker);
         }
         $exchangeRate = $this->getExchangeRate($calendar);
@@ -243,8 +267,6 @@ class DividendService
     }
 
     /**
-     * Are there supplemental and/or special dividends being paid?
-     * This will be gross and not net dividend.
      *
      * @param Ticker $ticker
      * @return float|null
@@ -257,19 +279,9 @@ class DividendService
             /**
              * @var \App\Entity\Calendar $calendar
              */
-            $calendar = $calendars->first();
+            $calendar = $this->getRegularCalendar($ticker);
             if ($calendar) {
                 $cashAmount = $calendar->getCashamount();
-
-                
-                    /**
-                     * @var \App\Entity\Calendar $secondCalendar
-                     */
-                    $secondCalendar = $calendars[1];
-                    if ($secondCalendar && $secondCalendar->getPaymentDate()->format('Ymd') === $calendar->getPaymentDate()->format('Ymd') && $secondCalendar->getDividendType() !== $calendar->getDividendType()) {
-                        $cashAmount += $secondCalendar->getCashamount();
-                    }
-                
             }
         }
 
@@ -277,7 +289,7 @@ class DividendService
     }
 
     /**
-     * Get the expected dividend for the next dividend payout date
+     * Get the expected regular dividend for the next dividend payout date
      *
      * @param Position $position
      * @return float|null
@@ -292,7 +304,7 @@ class DividendService
             /**
              * @var \App\Entity\Calendar $calendar
              */
-            $calendar = $calendars->first();
+            $calendar = $this->getRegularCalendar($ticker);
             if ($calendar) {
                 $cashAmount = $calendar->getCashAmount();
                 if ($this->cummulateDividendAmount) {

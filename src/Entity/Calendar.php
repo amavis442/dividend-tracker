@@ -15,6 +15,10 @@ class Calendar
 {
     public const SOURCE_SCRIPT = 'script';
     public const SOURCE_MANUEL = 'manual';
+    public const REGULAR = 'Regular';
+    public const SUPPLEMENT = 'Supplement';
+    public const SPECIAL = 'Special';
+    
 
     /**
      * @ORM\Id()
@@ -223,7 +227,7 @@ class Calendar
 
     public function getDividendType(): ?string
     {
-        return $this->dividendType;
+        return $this->dividendType ?? self::REGULAR;
     }
 
     public function setDividendType(?string $dividendType): self

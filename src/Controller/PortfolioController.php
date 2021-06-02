@@ -14,7 +14,6 @@ use App\Service\DividendService;
 use App\Service\Referer;
 use App\Service\StockPriceService;
 use App\Service\Summary;
-use App\Service\YahooFinanceService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -78,7 +77,7 @@ class PortfolioController extends AbstractController
         $session->set(get_class($this), $request->getRequestUri());
 
         return $this->render('portfolio/index.html.twig', [
-            'portfolioItems'  => $pageData->getPortfolioItems(),
+            'portfolioItems' => $pageData->getPortfolioItems(),
             'cacheTimestamp' => (new DateTime())->setTimestamp($pageData->getCacheTimestamp()),
             'limit' => $limit,
             'maxPages' => $pageData->getMaxPages(),
@@ -128,17 +127,23 @@ class PortfolioController extends AbstractController
         $netYearlyDividend = 0.0;
         $cals = $ticker->getCalendars();
         if (count($cals) > 0) {
-            [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax($position, $cals[0]);
+            $cal = $dividendService->getRegularCalendar($ticker);
+            [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax($position, $cal);
             $dividendFrequentie = $ticker->getPayoutFrequency();
-            $netYearlyDividend = (($dividendFrequentie * $cals[0]->getCashAmount()) * $exchangeRate) * (1 - $dividendTax);
+            $netYearlyDividend = (($dividendFrequentie * $cal->getCashAmount()) * $exchangeRate) * (1 - $dividendTax);
         }
         $dividendRaises = [];
+        
+        $reverseCals = array_reverse($cals->toArray(), true);
         // Cals start with latest and descent
-        foreach ($cals as $index => $cal) {
-            $dividendRaises[$index ] = 0;
-            if (isset($cals[$index + 1])) {
-                $oldCash = $cals[$index + 1]->getCashAmount(); // previous
-                $dividendRaises[$index ] = (($cal->getCashAmount() - $oldCash) / $oldCash) * 100;
+        foreach ($reverseCals as $index => $cal) {
+            $dividendRaises[$index] = 0;
+            if ($cal->getDividendType() === Calendar::REGULAR) {
+                if (isset($oldCal)) {
+                    $oldCash = $oldCal->getCashAmount(); // previous
+                    $dividendRaises[$index] = (($cal->getCashAmount() - $oldCash) / $oldCash) * 100;
+                }
+                $oldCal = $cal;
             }
         }
 
@@ -163,7 +168,6 @@ class PortfolioController extends AbstractController
         $referer->set('portfolio_show', ['id' => $position->getId()]);
 
         $indexUrl = $session->get(get_class($this));
-
 
         return $this->render('portfolio/show.html.twig', [
             'ticker' => $ticker,
