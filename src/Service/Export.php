@@ -98,7 +98,7 @@ class Export
 
             $row['dividend'] = 0.0;
             for ($m = 1; $m < 13; $m++) {
-                $indexBy = 'Maand '.$m;
+                $indexBy = 'Maand ' . $m;
                 $row[$indexBy] = 0;
             }
 
@@ -117,10 +117,10 @@ class Export
                 $dividendMonths = $ticker->getDividendMonths();
                 $netDividend = $this->dividendService->getNetDividend($position, $calendar);
                 for ($m = 1; $m < 13; $m++) {
-                    $indexBy = 'Maand '.$m;
+                    $indexBy = 'Maand ' . $m;
                     if ($dividendMonths->containsKey($m)) {
                         $row[$indexBy] = round($netDividend * $position->getAmount(), 2);
-                    }    
+                    }
                 }
             }
 

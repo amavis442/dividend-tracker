@@ -191,7 +191,7 @@ class PortfolioItem
 
     /**
      *  Net dividend per share
-     * 
+     *
      * @var null|float
      */
     private $netDividendPerShare;
@@ -831,7 +831,7 @@ class PortfolioItem
      * Get net dividend per share
      *
      * @return  null|float
-     */ 
+     */
     public function getNetDividendPerShare(): ?float
     {
         return $this->netDividendPerShare ?? 0;
@@ -843,7 +843,7 @@ class PortfolioItem
      * @param  null|float  $netDividendPerShare  Net dividend per share
      *
      * @return  self
-     */ 
+     */
     public function setNetDividendPerShare($netDividendPerShare): self
     {
         $this->netDividendPerShare = $netDividendPerShare;

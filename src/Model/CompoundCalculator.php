@@ -65,7 +65,6 @@ class CompoundCalculator
                     $dividendGrowthRate = $dividendGrowthRateAfter5Years;
                 }
                 $oldDividend = $dividend;
-            
             } else {
                 if ($year > 0) {
                     $data[$i]['shareprice'] = $oldPrice;
@@ -79,7 +78,7 @@ class CompoundCalculator
             $data[$i]['dividend'] = $dividend;
             $netDividend = (($dividend * ((100 - $compound->getTaxRate()) / 100) / $compound->getExchangeRate()));
 
-            
+
             $data[$i]['net_dividend'] = $oldShares * $netDividend;
             $data[$i]['received_dividend'] = $data[$i]['net_dividend'];
             if ($i > 0) {

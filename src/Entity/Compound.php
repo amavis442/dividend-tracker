@@ -227,7 +227,7 @@ class Compound
      * Get the value of years
      *
      * @return  int
-     */ 
+     */
     public function getYears(): int
     {
         return $this->years;
@@ -239,7 +239,7 @@ class Compound
      * @param  int  $years
      *
      * @return  self
-     */ 
+     */
     public function setYears(int $years): self
     {
         $this->years = $years;
@@ -251,7 +251,7 @@ class Compound
      * Get the value of taxRate
      *
      * @return  float
-     */ 
+     */
     public function getTaxRate()
     {
         return $this->taxRate;
@@ -263,7 +263,7 @@ class Compound
      * @param  float  $taxRate
      *
      * @return  self
-     */ 
+     */
     public function setTaxRate(float $taxRate)
     {
         $this->taxRate = $taxRate;
@@ -275,7 +275,7 @@ class Compound
      * Get the value of exchangeRate
      *
      * @return  float
-     */ 
+     */
     public function getExchangeRate()
     {
         return $this->exchangeRate;
@@ -287,7 +287,7 @@ class Compound
      * @param  float  $exchangeRate
      *
      * @return  self
-     */ 
+     */
     public function setExchangeRate(float $exchangeRate)
     {
         $this->exchangeRate = $exchangeRate;

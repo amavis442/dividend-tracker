@@ -34,10 +34,10 @@ class PaymentController extends AbstractController
         Request $request,
         PaymentRepository $paymentRepository,
         SessionInterface $session,
+        Referer $referer,
         int $page = 1,
         string $orderBy = 'payDate',
-        string $sort = 'DESC',
-        Referer $referer
+        string $sort = 'DESC'
     ): Response {
         if (!in_array($orderBy, ['payDate', 'ticker'])) {
             $orderBy = 'exDividendDate';
@@ -138,7 +138,7 @@ class PaymentController extends AbstractController
     /**
      * @Route("/new/{position}/{timestamp?}", name="payment_new", methods={"GET","POST"})
      */
-    function new(
+    public function new(
         Request $request,
         position $position,
         string $timestamp = null,

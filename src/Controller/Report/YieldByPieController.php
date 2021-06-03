@@ -19,18 +19,18 @@ class YieldByPieController extends AbstractController
 {
     public const TAX_DIVIDEND = 0.15; // %
     public const EXCHANGE_RATE = 1.19; // dollar to euro
-    public const YIELD_PIE_KEY = 'yeildpie_searchPie';
+    public const YIELD_PIE_KEY = 'yieldpie_searchPie';
 
     /**
      * @Route("/pieyield/{orderBy}", name="report_dividend_yield_by_pie")
      */
     public function index(
-        string $orderBy = 'ticker',
         PositionRepository $positionRepository,
         PieRepository $pieRepository,
         YieldsService $yields,
         DividendService $dividendService,
-        SessionInterface $session
+        SessionInterface $session,
+        string $orderBy = 'ticker'
     ): Response {
 
         $pieSelected = $session->get(self::YIELD_PIE_KEY, null);

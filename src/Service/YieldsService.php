@@ -7,7 +7,7 @@ use App\Repository\PositionRepository;
 
 class YieldsService
 {
-    function yield(
+    public function yield(
         PositionRepository $positionRepository,
         DividendService $dividendService,
         string $orderBy = 'ticker',

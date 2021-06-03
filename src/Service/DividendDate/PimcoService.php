@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service\DividendDate;
 
 use App\Contracts\Service\DividendDatePluginInterface;
@@ -10,7 +11,7 @@ class PimcoService implements DividendDatePluginInterface
     public const SSHY_FEED = 'https://nl.pimco.com/en-NL/data/DataExport/DownloadXlsx?exportName=dividendsCapitalGains&cusip=G7110H164&columnNames=DistributionDate,DistributionNav,Dividens,DistributionFactor';
     public const STHS_FEED = 'https://nl.pimco.com/en-NL/data/DataExport/DownloadXlsx?exportName=dividendsCapitalGains&cusip=G7110H321&columnNames=DistributionDate,DistributionNav,Dividens,DistributionFactor';
     public const NO_FEED = -1;
-    
+
     public $calendar = [
         '2021-05-20' => ['2021-05-28', '2021-05-21'],
         '2021-06-17' => ['2021-06-30', '2021-06-18'],
@@ -98,7 +99,7 @@ class PimcoService implements DividendDatePluginInterface
                     }
                 }
             }
-            
+
             $reader->close();
             unlink($filename);
         }

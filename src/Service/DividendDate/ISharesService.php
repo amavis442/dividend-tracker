@@ -76,7 +76,7 @@ class ISharesService implements DividendDatePluginInterface
 
         $row = $data['table']['aaData'];
 
-        
+
 
         $item = [];
         $item['DeclaredDate'] = $row[0][0]['raw'];

@@ -15,7 +15,7 @@ final class StockPriceItemDataProvider implements ItemDataProviderInterface, Res
 {
     private $tickerRepository;
     private $stockPriceService;
-    
+
     public function __construct(TickerRepository $tickerRepository, StockPriceService $stockPriceService)
     {
         $this->stockPriceService = $stockPriceService;

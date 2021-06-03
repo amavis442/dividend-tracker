@@ -37,7 +37,7 @@ class CompoundPredictionController extends AbstractController
             'controller_name' => 'CompoundPredictionController',
             'form' => $form->createView(),
             'data' => $data,
-            'startCapital' => $startCapital, 
+            'startCapital' => $startCapital,
             'payoutFrequency' => $payoutFrequency,
         ]);
     }

@@ -26,12 +26,11 @@ class ClosedPositionController extends AbstractController
      * @Route("/list/{page}/{sort}", name="closed_position_index", methods={"GET"})
      */
     public function index(
-        Summary $summary,
         PositionRepository $positionRepository,
         SessionInterface $session,
+        Referer $referer,
         int $page = 1,
-        string $sort = 'desc',
-        Referer $referer
+        string $sort = 'desc'
     ): Response {
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';

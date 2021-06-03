@@ -30,12 +30,12 @@ class PositionController extends AbstractController
         Summary $summary,
         PositionRepository $positionRepository,
         SessionInterface $session,
+        Referer $referer,
         int $page = 1,
         string $tab = 'All',
         string $orderBy = 'ticker',
         string $sort = 'asc',
-        int $status = PositionRepository::CLOSED,
-        Referer $referer
+        int $status = PositionRepository::CLOSED
     ): Response {
         if (!in_array($orderBy, ['profit'])) {
             $order = 'p.' . $orderBy;
@@ -82,7 +82,7 @@ class PositionController extends AbstractController
     /**
      * @Route("/new/{ticker}", name="position_new", methods={"GET","POST"})
      */
-    function new(Request $request, ?Ticker $ticker = null, SessionInterface $session, PositionService $positionService): Response
+    public function new(Request $request, ?Ticker $ticker = null, SessionInterface $session, PositionService $positionService): Response
     {
         $position = new Position();
 

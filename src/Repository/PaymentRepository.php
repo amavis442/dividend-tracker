@@ -152,7 +152,7 @@ class PaymentRepository extends ServiceEntityRepository
         return $output;
     }
 
-    public function getDividendsPerInterval(string $interval = 'Month', UserInterface $user): array
+    public function getDividendsPerInterval(UserInterface $user, string $interval = 'Month'): array
     {
         $con = $this->getEntityManager()->getConnection();
 

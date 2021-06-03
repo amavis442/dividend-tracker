@@ -18,7 +18,7 @@ class Calendar
     public const REGULAR = 'Regular';
     public const SUPPLEMENT = 'Supplement';
     public const SPECIAL = 'Special';
-    
+
 
     /**
      * @ORM\Id()

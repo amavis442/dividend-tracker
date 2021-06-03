@@ -41,14 +41,12 @@ class PortfolioController extends AbstractController
         PieRepository $pieRepository,
         SessionInterface $session,
         Summary $summary,
-        int $page = 1,
-        string $orderBy = 'fullname',
-        string $sort = 'asc',
         DividendService $dividendService,
         Referer $referer,
-        StockPriceService $stockPriceService,
-        //YahooFinanceService $yahooFinanceService,
-        PortfolioModel $model
+        PortfolioModel $model,
+        int $page = 1,
+        string $orderBy = 'fullname',
+        string $sort = 'asc'
     ): Response {
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
@@ -133,7 +131,7 @@ class PortfolioController extends AbstractController
             $netYearlyDividend = (($dividendFrequentie * $cal->getCashAmount()) * $exchangeRate) * (1 - $dividendTax);
         }
         $dividendRaises = [];
-        
+
         $reverseCals = array_reverse($cals->toArray(), true);
         // Cals start with latest and descent
         foreach ($reverseCals as $index => $cal) {

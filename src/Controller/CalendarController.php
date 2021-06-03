@@ -34,10 +34,10 @@ class CalendarController extends AbstractController
     public function index(
         CalendarRepository $calendarRepository,
         SessionInterface $session,
+        Referer $referer,
         int $page = 1,
         string $orderBy = 'createdAt',
-        string $sort = 'DESC',
-        Referer $referer
+        string $sort = 'DESC'
     ): Response {
         if (!in_array($orderBy, ['paymentDate', 'ticker', 'exDividendDate', 'createdAt'])) {
             $orderBy = 'paymentDate';
@@ -69,7 +69,7 @@ class CalendarController extends AbstractController
     /**
      * @Route("/new/{ticker}", name="calendar_new", methods={"GET","POST"})
      */
-    function new(Request $request, ?Ticker $ticker = null, Referer $referer): Response
+    public function new(Request $request, ?Ticker $ticker = null, Referer $referer): Response
     {
         $calendar = new Calendar();
         $calendar->setTicker($ticker);
