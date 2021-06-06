@@ -88,9 +88,13 @@ class Export
             }
 
             $row = [];
-            $row['Ticker'] = $position->getTicker()->getTicker();
-            $row['Company'] = $position->getTicker()->getFullname();
-            $row['Branch'] = $position->getTicker()->getBranch()->getLabel();
+            /**
+             * @var \App\Entity\Ticker $ticker
+             */
+            $ticker = $position->getTicker();
+            $row['Ticker'] = $ticker->getTicker();
+            $row['Company'] = $ticker->getFullname();
+            $row['Branch'] = $ticker->getBranch()->getLabel();
             $row['Shares'] = $position->getAmount();
             $row['Allocation'] = $position->getAllocation();
             $row['AvgPrice'] = $position->getPrice();
@@ -99,18 +103,17 @@ class Export
             $row['dividend'] = 0.0;
             for ($m = 1; $m < 13; $m++) {
                 $indexBy = 'Maand ' . $m;
-                $row[$indexBy] = 0;
+                $dividend[$indexBy] = 0;
             }
-
-            /**
-             * @var \App\Entity\Ticker $ticker
-             */
-            $ticker = $position->getTicker();
+            
             if ($ticker->hasCalendar()) {
                 $calendar = $this->dividendService->getRegularCalendar($ticker);
                 $cash = $calendar->getCashAmount();
                 $row['dividend'] = $cash;
-                $row['frequency'] = $position->getTicker()->getDividendFrequency();
+                $row['frequency'] = $ticker->getDividendFrequency();
+                $row['tax'] = $ticker->getTax() ? $ticker->getTax()->getTaxRate() : 0.15;
+                $row['exchangerate'] = $this->dividendService->getExchangeRate($calendar);
+
                 /**
                  * @var \Doctrine\Common\Collections\Collection $dividendMonths
                  */
@@ -119,11 +122,11 @@ class Export
                 for ($m = 1; $m < 13; $m++) {
                     $indexBy = 'Maand ' . $m;
                     if ($dividendMonths->containsKey($m)) {
-                        $row[$indexBy] = round($netDividend * $position->getAmount(), 2);
+                        $dividend[$indexBy] = round($netDividend * $position->getAmount(), 2);
                     }
                 }
             }
-
+            $row = array_merge($row, $dividend);
             $data[$pieName][$position->getTicker()->getTicker()] = $row;
         }
         foreach ($data as $symbol => &$rows) {
