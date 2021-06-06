@@ -43,7 +43,7 @@ class YieldsService
             $netTotalPayoutPerPaydate = 0;
             $lastCash = 0;
             $lastCashCurrency = '$';
-            $taxRate = $position->getTax() ? $position->getTax()->getTaxRate() * 100 : Constants::TAX;
+            $taxRate = $ticker->getTax() ? $ticker->getTax()->getTaxRate() * 100 : Constants::TAX;
             $exchangeRate = $firstCalendarEntry ? $dividendService->getExchangeRate($firstCalendarEntry) : 0;
 
 
