@@ -70,7 +70,7 @@ class Ticker
     private $isin;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Tax::class, inversedBy="positions")
+     * @ORM\ManyToOne(targetEntity=Tax::class, inversedBy="tickers")
      */
     private $tax;
 

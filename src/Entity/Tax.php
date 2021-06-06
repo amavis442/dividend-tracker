@@ -36,13 +36,13 @@ class Tax
     private $validFrom;
 
     /**
-     * @ORM\OneToMany(targetEntity=Position::class, mappedBy="tax")
+     * @ORM\OneToMany(targetEntity=Ticker::class, mappedBy="tax")
      */
-    private $positions;
+    private $tickers;
 
     public function __construct()
     {
-        $this->positions = new ArrayCollection();
+        $this->tickers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -96,29 +96,29 @@ class Tax
     }
 
     /**
-     * @return Collection|Position[]
+     * @return Collection|Ticker[]
      */
-    public function getPositions(): Collection
+    public function getTickers(): Collection
     {
-        return $this->positions;
+        return $this->tickers;
     }
 
-    public function addPosition(Position $position): self
+    public function addTicker(Ticker $ticker): self
     {
-        if (!$this->positions->contains($position)) {
-            $this->positions[] = $position;
-            $position->setTax($this);
+        if (!$this->tickers->contains($ticker)) {
+            $this->tickers[] = $ticker;
+            $ticker->setTax($this);
         }
 
         return $this;
     }
 
-    public function removePosition(Position $position): self
+    public function removeTicker(Ticker $ticker): self
     {
-        if ($this->positions->removeElement($position)) {
+        if ($this->tickers->removeElement($ticker)) {
             // set the owning side to null (unless already changed)
-            if ($position->getTax() === $this) {
-                $position->setTax(null);
+            if ($ticker->getTax() === $this) {
+                $ticker->setTax(null);
             }
         }
 

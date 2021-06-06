@@ -116,11 +116,6 @@ class Position
      */
     private $closedAt;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Tax::class, inversedBy="positions")
-     */
-    private $tax;
-
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
@@ -454,15 +449,4 @@ class Position
         return $this;
     }
 
-    public function getTax(): ?Tax
-    {
-        return $this->tax;
-    }
-
-    public function setTax(?Tax $tax): self
-    {
-        $this->tax = $tax;
-
-        return $this;
-    }
 }

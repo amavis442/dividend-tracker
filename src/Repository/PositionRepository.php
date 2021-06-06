@@ -230,9 +230,9 @@ class PositionRepository extends ServiceEntityRepository
             ->select('p, t, pa, c, dm, cur, tax')
             ->innerJoin('p.ticker', 't')
             ->leftJoin('t.calendars', 'c')
-            ->leftJoin('p.payments', 'pa')
             ->leftJoin('t.dividendMonths', 'dm')
-            ->leftJoin('p.tax', 'tax')
+            ->leftJoin('t.tax', 'tax')
+            ->leftJoin('p.payments', 'pa')
             ->leftJoin('c.currency', 'cur')
             ->where('(p.closed = 0 OR p.closed IS NULL)');
 
