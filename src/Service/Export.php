@@ -27,8 +27,6 @@ class Export
         $this->positionRepository = $positionRepository;
     }
 
-
-
     public function export(): string
     {
         $filename = '/tmp/export-' . date('Ymd') . '.xlxs';
@@ -99,12 +97,18 @@ class Export
             $row['Allocation'] = $position->getAllocation();
             $row['AvgPrice'] = $position->getPrice();
             $row['Profit'] = $position->getProfit();
-
+            $row['frequency'] = 0;
+            $row['tax'] = 0;
+            $row['exchangerate'] = 0;
             $row['dividend'] = 0.0;
             for ($m = 1; $m < 13; $m++) {
                 $indexBy = 'Maand ' . $m;
-                $dividend[$indexBy] = 0;
+                $row[$indexBy] = 0;
             }
+            $row['grossDividend'] = 0;
+            $row['netDividend'] = 0;
+            $row['totalNetDividend'] = 0;
+            $row['YieldOnCost'] = 0;
             
             if ($ticker->hasCalendar()) {
                 $calendar = $this->dividendService->getRegularCalendar($ticker);
@@ -113,7 +117,7 @@ class Export
                 $row['frequency'] = $ticker->getDividendFrequency();
                 $row['tax'] = $ticker->getTax() ? $ticker->getTax()->getTaxRate() : 0.15;
                 $row['exchangerate'] = $this->dividendService->getExchangeRate($calendar);
-
+                
                 /**
                  * @var \Doctrine\Common\Collections\Collection $dividendMonths
                  */
@@ -127,6 +131,14 @@ class Export
                 }
             }
             $row = array_merge($row, $dividend);
+            $row['grossDividend'] = $cash * $ticker->getDividendFrequency();
+            $row['netDividend'] = $row['grossDividend'] * (1 - $row['tax']) * $row['exchangerate'];
+            $row['totalNetDividend'] = $row['netDividend'] * $row['Shares'];
+            $row['YieldOnCost'] = $row['netDividend'] / $row['AvgPrice'];
+
+            $row['per maand'] = $row['totalNetDividend'] / 12;
+            $row['per dag'] = $row['totalNetDividend'] / 365;
+
             $data[$pieName][$position->getTicker()->getTicker()] = $row;
         }
         foreach ($data as $symbol => &$rows) {
