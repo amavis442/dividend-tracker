@@ -97,10 +97,11 @@ class Export
             $row['Allocation'] = $position->getAllocation();
             $row['AvgPrice'] = $position->getPrice();
             $row['Profit'] = $position->getProfit();
+            $row['dividend'] = 0.0;
             $row['frequency'] = 0;
             $row['tax'] = 0;
             $row['exchangerate'] = 0;
-            $row['dividend'] = 0.0;
+            
             for ($m = 1; $m < 13; $m++) {
                 $indexBy = 'Maand ' . $m;
                 $row[$indexBy] = 0;
