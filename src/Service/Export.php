@@ -126,12 +126,12 @@ class Export
                 $netDividend = $this->dividendService->getNetDividend($position, $calendar);
                 for ($m = 1; $m < 13; $m++) {
                     $indexBy = 'Maand ' . $m;
+                    $row[$indexBy] = 0;
                     if ($dividendMonths->containsKey($m)) {
-                        $dividend[$indexBy] = round($netDividend * $position->getAmount(), 2);
+                        $row[$indexBy] = round($netDividend * $position->getAmount(), 2);
                     }
                 }
             }
-            $row = array_merge($row, $dividend);
             $row['grossDividend'] = $cash * $ticker->getDividendFrequency();
             $row['netDividend'] = $row['grossDividend'] * (1 - $row['tax']) * $row['exchangerate'];
             $row['totalNetDividend'] = $row['netDividend'] * $row['Shares'];
