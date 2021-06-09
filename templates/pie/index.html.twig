@@ -19,8 +19,10 @@
                 <td>{{ pie.id }}</td>
                 <td>{{ pie.label }}</td>
                 <td>
-                    <a href="{{ path('pie_show', {'id': pie.id}) }}">show</a>
-                    <a href="{{ path('pie_edit', {'id': pie.id}) }}">edit</a>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                    <a href="{{ path('pie_show', {'id': pie.id}) }}" class="btn btn-primary">{{ 'show'|trans }}</a>
+                    <a href="{{ path('pie_edit', {'id': pie.id}) }}" class="btn btn-secondary">{{ 'edit'|trans }}</a>
+                    </div>
                 </td>
             </tr>
         {% else %}

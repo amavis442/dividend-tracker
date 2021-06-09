@@ -36,9 +36,16 @@ class Pie
      */
     private $user;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="pie")
+     */
+    private $transactions;
+
+
     public function __construct()
     {
         $this->positions = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -81,6 +88,15 @@ class Pie
 
         return $this;
     }
+
+    /**
+     * @return Collection|Transaction[]
+     */
+    public function getTransactions(): Collection
+    {
+        return $this->transactions;
+    }
+
 
     public function getUser(): ?User
     {

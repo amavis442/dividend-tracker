@@ -148,7 +148,7 @@ class Transaction
     private $total;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Pie::class)
+     * @ORM\ManyToOne(targetEntity=Pie::class, inversedBy="transactions")
      */
     private $pie;
 

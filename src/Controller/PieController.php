@@ -84,6 +84,15 @@ class PieController extends AbstractController
     public function delete(Request $request, Pie $pie): Response
     {
         if ($this->isCsrfTokenValid('delete' . $pie->getId(), $request->request->get('_token'))) {
+            $positions = $pie->getPositions();
+            foreach ($positions as $position){
+                $position->removePie($pie);
+            }
+            $transactions = $pie->getTransactions();
+            foreach ($transactions as $transaction){
+                $transaction->setPie(null);
+            }
+            
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($pie);
             $entityManager->flush();
