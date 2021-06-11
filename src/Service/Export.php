@@ -2,11 +2,14 @@
 
 namespace App\Service;
 
+use App\Entity\Pie;
+use App\Repository\PieRepository;
 use App\Repository\PositionRepository;
 use Box\Spout\Common\Entity\Style\CellAlignment;
 use Box\Spout\Common\Entity\Style\Color;
 use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
+use Doctrine\Common\Collections\Collection;
 
 class Export
 {
@@ -20,11 +23,17 @@ class Export
      * @var PositionRepository
      */
     private $positionRepository;
+    /**
+     *
+     * @var PieRepository;
+     */
+    private $pieRepository;
 
-    public function __construct(PositionRepository $positionRepository, DividendService $dividendService)
+    public function __construct(PositionRepository $positionRepository, DividendService $dividendService, PieRepository $pieRepository)
     {
         $this->dividendService = $dividendService;
         $this->positionRepository = $positionRepository;
+        $this->pieRepository = $pieRepository;
     }
 
     public function export(): string
@@ -49,7 +58,23 @@ class Export
             ->setCellAlignment(CellAlignment::RIGHT)
             ->build();
 
-        $data = $this->getData();
+        $data = [];
+        $pies = $this->pieRepository->findAll();
+        if ($pies) {
+            /**
+             * @var \App\Entity\Pie $pie
+             */
+            foreach ($pies as $pie) {
+                $positions = $pie->getPositions();
+                if ($positions) {
+                    $data[$pie->getLabel()] = $this->getData($positions);
+                }
+            }
+        } else {
+            $positions = $this->positionRepository->getAllOpen();
+            $colPositions = new Collection($positions);
+            $data['default'] = $this->getData($colPositions);
+        }
 
         $sheet = $writer->getCurrentSheet();
         foreach ($data as $pie => $rows) {
@@ -75,16 +100,14 @@ class Export
         return $filename;
     }
 
-    private function getData(): array
+    private function getData(Collection $positions): array
     {
         $data = [];
-        $positions = $this->positionRepository->getAllOpen();
-        foreach ($positions as $position) {
-            $pieName = 'default';
-            if ($position->hasPie()) {
-                $pieName = $position->getPies()->first()->getLabel();
-            }
 
+        foreach ($positions as $position) {
+            if ($position->getClosed()) {
+                continue;
+            }
             $row = [];
             /**
              * @var \App\Entity\Ticker $ticker
@@ -101,7 +124,7 @@ class Export
             $row['frequency'] = 0;
             $row['tax'] = 0;
             $row['exchangerate'] = 0;
-            
+
             for ($m = 1; $m < 13; $m++) {
                 $indexBy = 'Maand ' . $m;
                 $row[$indexBy] = 0;
@@ -110,7 +133,9 @@ class Export
             $row['netDividend'] = 0;
             $row['totalNetDividend'] = 0;
             $row['YieldOnCost'] = 0;
-            
+            $row['per maand'] = 0;
+            $row['per dag'] = 0;
+
             if ($ticker->hasCalendar()) {
                 $calendar = $this->dividendService->getRegularCalendar($ticker);
                 $cash = $calendar->getCashAmount();
@@ -118,7 +143,7 @@ class Export
                 $row['frequency'] = $ticker->getDividendFrequency();
                 $row['tax'] = $ticker->getTax() ? $ticker->getTax()->getTaxRate() : 0.15;
                 $row['exchangerate'] = $this->dividendService->getExchangeRate($calendar);
-                
+
                 /**
                  * @var \Doctrine\Common\Collections\Collection $dividendMonths
                  */
@@ -131,20 +156,22 @@ class Export
                         $row[$indexBy] = round($netDividend * $position->getAmount(), 2);
                     }
                 }
+            
+                $row['grossDividend'] = $cash * $ticker->getDividendFrequency();
+                $row['netDividend'] = $row['grossDividend'] * (1 - $row['tax']) * $row['exchangerate'];
+                $row['totalNetDividend'] = $row['netDividend'] * $row['Shares'];
+                $row['YieldOnCost'] = $row['netDividend'] / $row['AvgPrice'];
+                $row['per maand'] = $row['totalNetDividend'] / 12;
+                $row['per dag'] = $row['totalNetDividend'] / 365;
             }
-            $row['grossDividend'] = $cash * $ticker->getDividendFrequency();
-            $row['netDividend'] = $row['grossDividend'] * (1 - $row['tax']) * $row['exchangerate'];
-            $row['totalNetDividend'] = $row['netDividend'] * $row['Shares'];
-            $row['YieldOnCost'] = $row['netDividend'] / $row['AvgPrice'];
 
-            $row['per maand'] = $row['totalNetDividend'] / 12;
-            $row['per dag'] = $row['totalNetDividend'] / 365;
 
-            $data[$pieName][$position->getTicker()->getTicker()] = $row;
+            $data[$position->getTicker()->getTicker()] = $row;
         }
-        foreach ($data as $symbol => &$rows) {
-            ksort($rows);
-        }
+        ksort($data);
+        /* foreach ($data as $symbol => &$rows) {
+        ksort($rows);
+        }*/
         return $data;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Controller\Report;
 
+use App\Repository\PieRepository;
 use App\Repository\PositionRepository;
 use App\Service\DividendService;
 use App\Service\Export;
@@ -23,9 +24,9 @@ class ExportController extends AbstractController
     /**
      * @Route("/export", name="report_export")
      */
-    public function index(PositionRepository $positionRepository, DividendService $dividendService): Response
+    public function index(PositionRepository $positionRepository, DividendService $dividendService, PieRepository $pieRepository): Response
     {
-        $export = new Export($positionRepository, $dividendService);
+        $export = new Export($positionRepository, $dividendService, $pieRepository);
         $filename = $export->export();
 
         $response = new BinaryFileResponse($filename);
