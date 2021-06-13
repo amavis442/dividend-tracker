@@ -10,18 +10,15 @@ use App\Repository\TransactionRepository;
 use App\Service\ExchangeRateService;
 use App\Service\Referer;
 use App\Service\WeightedAverage;
+use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\HeaderUtils;
-use Box\Spout\Common\Entity\Style\CellAlignment;
-use Box\Spout\Common\Entity\Style\Color;
-use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
-use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
 /**
  * @Route("/dashboard/transaction")
@@ -81,7 +78,7 @@ class TransactionController extends AbstractController
     /**
      * @Route("/new/{position}/{side?1}", name="transaction_new", methods={"GET","POST"})
      */
-    public function new(
+    function new (
         Request $request,
         Position $position,
         int $side,
@@ -226,16 +223,16 @@ class TransactionController extends AbstractController
         $tickerName = $position->getTicker()->getFullname();
         $tickerIsin = $position->getTicker()->getIsin();
 
-        $fname = 'export-'.$tickerLabel.'-orders-' . date('Ymd') . '.csv';
-        $filename = '/tmp/'. $fname;
+        $fname = 'export-' . $tickerLabel . '-orders-' . date('Ymd') . '.csv';
+        $filename = '/tmp/' . $fname;
         $writer = WriterEntityFactory::createCSVWriter();
         $writer->setFieldDelimiter(';');
         $writer->setShouldAddBOM(false);
         $writer->openToFile($filename);
-        
+
         /*
         Datum;Type;Waarde;Transactievaluta;Brutobedrag;Valuta brutobedrag;Wisselkoers;Kosten;Belastingen;Aandelen;ISIN;WKN;Tickersymbool;Naam effect;Opmerking
-        */
+         */
         $headers = [];
         $headers[] = 'Datum';
         $headers[] = 'Type';
@@ -243,35 +240,34 @@ class TransactionController extends AbstractController
         $headers[] = 'Transactievaluta';
         $headers[] = 'Brutobedrag';
         $headers[] = 'Valuta brutobedrag';
-        $headers[] ='Wisselkoers';
-        $headers[] ='Kosten';
-        $headers[] ='Belastingen';
-        $headers[] ='Aandelen';
-        $headers[] ='ISIN';
-        $headers[] ='Tickersymbool';
-        $headers[] ='Naam effect';
+        $headers[] = 'Wisselkoers';
+        $headers[] = 'Kosten';
+        $headers[] = 'Belastingen';
+        $headers[] = 'Aandelen';
+        $headers[] = 'ISIN';
+        $headers[] = 'Tickersymbool';
+        $headers[] = 'Naam effect';
 
         $headersFromValues = WriterEntityFactory::createRowFromArray(array_values($headers));
         $writer->addRow($headersFromValues);
 
-
         $row = [];
-        foreach ($transactions as $transaction){
+        foreach ($transactions as $transaction) {
             $row = [];
-            $cost = $transaction->getFxFee() + $transaction->getStampduty()  + $transaction->getFinrafee();
+            $costs = $transaction->getFxFee() + $transaction->getStampduty() + $transaction->getFinrafee();
             $total = $transaction->getAllocation();
             $row['Datum'] = $transaction->getTransactionDate()->format('Y-m-d\TH:i:s');
             $row['Type'] = $transaction->getSide() == Transaction::BUY ? 'Koop' : 'Verkoop';
-            $row['Waarde'] = number_format($total,2,',','.');
+            $row['Waarde'] = number_format(($total + $costs), 2, ',', '.');
             $row['Transactievaluta'] = 'EUR';
-            $row['Brutobedrag'] = number_format($total * $transaction->getExchangeRate(),2,',','.');
+            $row['Brutobedrag'] = number_format($total * $transaction->getExchangeRate(), 2, ',', '.');
             $row['Valuta brutobedrag'] = 'USD';
-            $row['Wisselkoers'] = number_format(1 / $transaction->getExchangeRate(),8,',','.');
-            $row['Kosten'] = number_format($transaction->getFxFee() + $transaction->getStampduty()  + $transaction->getFinrafee(), 2,',','.');;
+            $row['Wisselkoers'] = number_format(1 / $transaction->getExchangeRate(), 8, ',', '.');
+            $row['Kosten'] = number_format($costs, 2, ',', '.');
             $row['Belastingen'] = 0;
-            $row['Aandelen'] = number_format($transaction->getAmount(),8,',','.');;
+            $row['Aandelen'] = number_format($transaction->getAmount(), 8, ',', '.');
             $row['ISIN'] = $tickerIsin;
-            $row['Tickersymbool'] =$tickerLabel;
+            $row['Tickersymbool'] = $tickerLabel;
             $row['Naam effect'] = $tickerName;
 
             //$currency = $transaction->getCurrency()->getSymbol();
@@ -279,7 +275,7 @@ class TransactionController extends AbstractController
             //    $currency = $transaction->getOriginalPriceCurrency();
             //}
             //$row['currency'] = $currency;
-            
+
             //$originalPrice = $transaction->getPrice();// * $transaction->getExchangeRate();
             //if ($transaction->getOriginalPrice() > 0) {
             //    $originalPrice = $transaction->getOriginalPrice();
@@ -289,7 +285,6 @@ class TransactionController extends AbstractController
             $writer->addRow($rowFromValues);
         }
         $writer->close();
-
 
         $response = new BinaryFileResponse($filename);
         $disposition = HeaderUtils::makeDisposition(
