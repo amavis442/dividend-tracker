@@ -77,19 +77,6 @@ class TransactionType extends AbstractType
                 'scale' => 7,
                 ]
             )
-            ->add('pie', EntityType::class, [
-                'class' => Pie::class,
-                'label' => 'Pie',
-                'choice_label' => 'label',
-                'required' => false,
-                'placeholder' => 'Please choose a Pie',
-                'empty_data' => null,
-                'multiple'    => false,
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('pie')
-                        ->orderBy('pie.label', 'ASC');
-                },
-            ])
             ;
     }
 

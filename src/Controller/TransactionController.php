@@ -16,6 +16,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\HeaderUtils;
+use Box\Spout\Common\Entity\Style\CellAlignment;
+use Box\Spout\Common\Entity\Style\Color;
+use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
+use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
 /**
  * @Route("/dashboard/transaction")
@@ -208,5 +214,90 @@ class TransactionController extends AbstractController
         $session->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('transaction_index', ['orderBy' => 'transactionDate', 'sort' => 'desc']);
+    }
+
+    /**
+     * @Route("/export/{position}", name="transaction_export", methods={"GET"})
+     */
+    public function export(Request $request, Position $position): Response
+    {
+        $transactions = $position->getTransactions();
+        $tickerLabel = $position->getTicker()->getSymbol();
+        $tickerName = $position->getTicker()->getFullname();
+        $tickerIsin = $position->getTicker()->getIsin();
+
+        $fname = 'export-'.$tickerLabel.'-orders-' . date('Ymd') . '.csv';
+        $filename = '/tmp/'. $fname;
+        $writer = WriterEntityFactory::createCSVWriter();
+        $writer->setFieldDelimiter(';');
+        $writer->setShouldAddBOM(false);
+        $writer->openToFile($filename);
+        
+        /*
+        Datum;Type;Waarde;Transactievaluta;Brutobedrag;Valuta brutobedrag;Wisselkoers;Kosten;Belastingen;Aandelen;ISIN;WKN;Tickersymbool;Naam effect;Opmerking
+        */
+        $headers = [];
+        $headers[] = 'Datum';
+        $headers[] = 'Type';
+        $headers[] = 'Waarde';
+        $headers[] = 'Transactievaluta';
+        $headers[] = 'Brutobedrag';
+        $headers[] = 'Valuta brutobedrag';
+        $headers[] ='Wisselkoers';
+        $headers[] ='Kosten';
+        $headers[] ='Belastingen';
+        $headers[] ='Aandelen';
+        $headers[] ='ISIN';
+        $headers[] ='Tickersymbool';
+        $headers[] ='Naam effect';
+
+        $headersFromValues = WriterEntityFactory::createRowFromArray(array_values($headers));
+        $writer->addRow($headersFromValues);
+
+
+        $row = [];
+        foreach ($transactions as $transaction){
+            $row = [];
+            $cost = $transaction->getFxFee() + $transaction->getStampduty()  + $transaction->getFinrafee();
+            $total = $transaction->getAllocation();
+            $row['Datum'] = $transaction->getTransactionDate()->format('Y-m-d\TH:i:s');
+            $row['Type'] = $transaction->getSide() == Transaction::BUY ? 'Koop' : 'Verkoop';
+            $row['Waarde'] = number_format($total,2,',','.');
+            $row['Transactievaluta'] = 'EUR';
+            $row['Brutobedrag'] = number_format($total * $transaction->getExchangeRate(),2,',','.');
+            $row['Valuta brutobedrag'] = 'USD';
+            $row['Wisselkoers'] = number_format(1 / $transaction->getExchangeRate(),8,',','.');
+            $row['Kosten'] = number_format($transaction->getFxFee() + $transaction->getStampduty()  + $transaction->getFinrafee(), 2,',','.');;
+            $row['Belastingen'] = 0;
+            $row['Aandelen'] = number_format($transaction->getAmount(),8,',','.');;
+            $row['ISIN'] = $tickerIsin;
+            $row['Tickersymbool'] =$tickerLabel;
+            $row['Naam effect'] = $tickerName;
+
+            //$currency = $transaction->getCurrency()->getSymbol();
+            //if ($transaction->getOriginalPriceCurrency()) {
+            //    $currency = $transaction->getOriginalPriceCurrency();
+            //}
+            //$row['currency'] = $currency;
+            
+            //$originalPrice = $transaction->getPrice();// * $transaction->getExchangeRate();
+            //if ($transaction->getOriginalPrice() > 0) {
+            //    $originalPrice = $transaction->getOriginalPrice();
+            //}
+
+            $rowFromValues = WriterEntityFactory::createRowFromArray(array_values($row));
+            $writer->addRow($rowFromValues);
+        }
+        $writer->close();
+
+
+        $response = new BinaryFileResponse($filename);
+        $disposition = HeaderUtils::makeDisposition(
+            HeaderUtils::DISPOSITION_ATTACHMENT,
+            $fname
+        );
+        $response->headers->set('Content-Disposition', $disposition);
+
+        return $response;
     }
 }

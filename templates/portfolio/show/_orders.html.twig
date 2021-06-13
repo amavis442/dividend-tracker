@@ -1,4 +1,7 @@
 <h3>{{ 'Orders'|trans }}</h3>
+<div>
+<a href="{{ path('transaction_export', {'position': position.id }) }}" target="_new"><i class="fas fa-file-export pr-r"></i> {{ 'Export'|trans }}</a>
+</div>
 <div class="table-responsive-xl">
 <table class="table table-striped">
 	<thead>
