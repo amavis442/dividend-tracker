@@ -264,7 +264,7 @@ class TransactionController extends AbstractController
 
             $exchangerate = $transaction->getExchangeRate();
             $currency = $transaction->getOriginalPriceCurrency();
-            if ($currency == 'GBX') {
+            if (false && $currency == 'GBX') {
                 $currency = 'GBP';
                 $exchangerate = $exchangerate / 100;
             }
