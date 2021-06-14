@@ -438,7 +438,7 @@ class Transaction
         return $this->transactionFee / Constants::VALUTA_PRECISION;
     }
 
-    public function setTransactionFee(?int $transactionFee): self
+    public function setTransactionFee(?float $transactionFee): self
     {
         $this->transactionFee = $transactionFee * Constants::VALUTA_PRECISION;
 
@@ -450,7 +450,7 @@ class Transaction
         return $this->finraFee / Constants::VALUTA_PRECISION;
     }
 
-    public function setFinraFee(?int $finraFee): self
+    public function setFinraFee(?float $finraFee): self
     {
         $this->finraFee = $finraFee * Constants::VALUTA_PRECISION;
 
@@ -462,7 +462,7 @@ class Transaction
         return $this->total / Constants::VALUTA_PRECISION;
     }
 
-    public function setTotal(int $total): self
+    public function setTotal(float $total): self
     {
         $this->total = $total * Constants::VALUTA_PRECISION;
 

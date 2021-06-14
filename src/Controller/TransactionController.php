@@ -255,19 +255,18 @@ class TransactionController extends AbstractController
         foreach ($transactions as $transaction) {
             $row = [];
             $costs = $transaction->getFxFee() + $transaction->getStampduty() + $transaction->getFinrafee();
-            $total = $transaction->getAllocation();
+            $total = $transaction->getTotal();
             $row['Datum'] = $transaction->getTransactionDate()->format('Y-m-d\TH:i:s');
             $row['Type'] = $transaction->getSide() == Transaction::BUY ? 'Koop' : 'Verkoop';
-            $row['Waarde'] = number_format(($total + $costs), 2, ',', '.');
+            
+            $grossValue = $transaction->getAmount() * $transaction->getOriginalPrice();
+            $exchangerate = $transaction->getExchangeRate();
+            $row['Waarde'] = number_format($total, 2, ',', '.');
             $row['Transactievaluta'] = 'EUR';
-            $row['Brutobedrag'] = number_format($total * $transaction->getExchangeRate(), 2, ',', '.');
+            $row['Brutobedrag'] = number_format($grossValue, 2, ',', '.');
 
             $exchangerate = $transaction->getExchangeRate();
             $currency = $transaction->getOriginalPriceCurrency();
-            if (false && $currency == 'GBX') {
-                $currency = 'GBP';
-                $exchangerate = $exchangerate / 100;
-            }
             $row['Valuta brutobedrag'] = $currency ?? 'USD';
             $row['Wisselkoers'] = number_format($exchangerate, 8, ',', '.');
             $row['Kosten'] = number_format($costs, 2, ',', '.');
@@ -276,17 +275,6 @@ class TransactionController extends AbstractController
             $row['ISIN'] = $tickerIsin;
             $row['Tickersymbool'] = $tickerLabel;
             $row['Naam effect'] = $tickerName;
-
-            //$currency = $transaction->getCurrency()->getSymbol();
-            //if ($transaction->getOriginalPriceCurrency()) {
-            //    $currency = $transaction->getOriginalPriceCurrency();
-            //}
-            //$row['currency'] = $currency;
-
-            //$originalPrice = $transaction->getPrice();// * $transaction->getExchangeRate();
-            //if ($transaction->getOriginalPrice() > 0) {
-            //    $originalPrice = $transaction->getOriginalPrice();
-            //}
 
             $rowFromValues = WriterEntityFactory::createRowFromArray(array_values($row));
             $writer->addRow($rowFromValues);
