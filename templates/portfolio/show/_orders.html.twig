@@ -11,11 +11,12 @@
 			<th>{{ 'Order date'|trans }}</th>
 			<th>{{ 'Amount'|trans }}</th>
 			<th>{{ 'Price'|trans }}</th>
-			<th>{{ 'Allocation'|trans }}</th>
 			<th>{{ 'avgPrice'|trans }}</th>
+			<th>{{ 'Allocation'|trans }}</th>
+			<th>{{ 'Total costs'|trans }}</th>
+			<th>{{ 'Net order value'|trans }}</th>
 			<th>{{ 'Profit / Loss'|trans }}</th>
 			<th>{{ 'Dividend yield'|trans }}</th>
-			<th>{{ 'Total costs'|trans }}</th>
 			<th>{{ 'Actions'|trans }}</th>
 		</tr>
 	</thead>
@@ -44,15 +45,16 @@
 					<td>{{ transaction.transactionDate|date("d-m-Y") }}</td>
 					<td>{{ transaction.amount|format_number({fraction_digit: 7}) }}</td>
 					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ transaction.price|format_number({fraction_digit: 2}) }}</td>
-					<td>{{ (transaction.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ transaction.allocation|format_number({fraction_digit: 2}) }}</td>
 					<td>{{ currentAmount }} @ {{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ transaction.avgprice|format_number({fraction_digit: 2}) }}</td>
+					<td>{{ (transaction.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ transaction.allocation|format_number({fraction_digit: 2}) }}</td>
+					<td>&euro;{{ (transaction.stampduty + transaction.fxFee + transaction.finraFee + transaction.transactionFee)|format_number({fraction_digit: 2}) }}</td>
+					<td>&euro;{{ transaction.netOrderValue|format_number({fraction_digit: 2}) }}</td>
 					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}
 						<span class="badge badge-{% if transaction.profit > 0 %}success{% else %}danger{% endif %}">
 						{{ transaction.profit|format_number({fraction_digit: 2}) }}
 						</span>
 					</td>
 					<td>{% if transaction.side == 1 %}{{ dividendYield|format_number({fraction_digit: 2}) }}% {% endif %}</td>
-					<td>&euro;{{ (transaction.stampduty + transaction.fxFee + transaction.finraFee + transaction.transactionFee)|format_number({fraction_digit: 2}) }}</td>
 					<td>
 						{% set transactionInfo %}
 							<ul class="list-group">

@@ -480,4 +480,9 @@ class Transaction
 
         return $this;
     }
+
+    public function netOrderValue() : float
+    {
+        return $this->getAllocation() + $this->getFinraFee() + $this->getStampduty() + $this->getFxFee() + $this->getTransactionFee();
+    }
 }
