@@ -261,8 +261,15 @@ class TransactionController extends AbstractController
             $row['Waarde'] = number_format(($total + $costs), 2, ',', '.');
             $row['Transactievaluta'] = 'EUR';
             $row['Brutobedrag'] = number_format($total * $transaction->getExchangeRate(), 2, ',', '.');
-            $row['Valuta brutobedrag'] = 'USD';
-            $row['Wisselkoers'] = number_format(1 / $transaction->getExchangeRate(), 8, ',', '.');
+
+            $exchangerate = $transaction->getExchangeRate();
+            $currency = $transaction->getOriginalPriceCurrency();
+            if ($currency == 'GBX') {
+                $currency = 'GBP';
+                $exchangerate = $exchangerate / 100;
+            }
+            $row['Valuta brutobedrag'] = $currency ?? 'USD';
+            $row['Wisselkoers'] = number_format($exchangerate, 8, ',', '.');
             $row['Kosten'] = number_format($costs, 2, ',', '.');
             $row['Belastingen'] = 0;
             $row['Aandelen'] = number_format($transaction->getAmount(), 8, ',', '.');

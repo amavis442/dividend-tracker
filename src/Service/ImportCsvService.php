@@ -175,6 +175,7 @@ class ImportCsvService extends ImportBase
             $row = [];
             $rawAmount = 0;
             $rawAllocation = 0;
+            $row['stampduty'] = 0.0;
 
             foreach ($cells as $r => $cell) {
                 $header = $headers[$r];
@@ -241,7 +242,10 @@ class ImportCsvService extends ImportBase
                         $row['tax_currency'] = $val;
                         break;
                     case 'stamp duty reserve tax (eur)':
-                        $row['stampduty'] = (float) $val ?? null;
+                        $row['stampduty'] += (float) $val ?? null;
+                        break;
+                    case 'stamp duty (eur)':
+                        $row['stampduty'] += (float) $val ?? null;
                         break;
                     case 'currency conversion fee (eur)':
                         $row['fx_fee'] = (float) $val ?? null;
@@ -257,7 +261,7 @@ class ImportCsvService extends ImportBase
                 }
                 $r++;
             }
-
+            
             if (false === stripos($cellVal, 'sell') && false === stripos($cellVal, 'buy')) {
                 if (false !== stripos($cellVal, 'dividend')) {
                     $this->importDividend($row);
@@ -266,7 +270,7 @@ class ImportCsvService extends ImportBase
             };
 
             if (count($row) > 0) {
-                $rawAllocation -= ($row['fx_fee'] ?? 0) - ($row['stampduty'] ?? 0) - ($row['transaction_fee'] ?? 0) - ($row['finra_fee'] ?? 0);
+                $rawAllocation -= (($row['fx_fee'] ?? 0) + ($row['stampduty'] ?? 0) + ($row['transaction_fee'] ?? 0) + ($row['finra_fee'] ?? 0));
                 $row['allocation'] = $rawAllocation;
                 $row['price'] = round($rawAllocation / $rawAmount, 3);
                 $rows[$row['nr']] = $row;
