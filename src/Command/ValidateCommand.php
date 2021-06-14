@@ -66,6 +66,7 @@ class ValidateCommand extends Command
     {
         $headers = [];
         $rowNum = 0;
+        if (false) {
         foreach ($sheet->getRowIterator() as $csvRow) {
             $cells = $csvRow->getCells();
 
@@ -183,7 +184,7 @@ class ValidateCommand extends Command
                 $row['price'] = round($rawAllocation / $rawAmount, 3);
 
                 $transaction = $this->transactionRepository->findOneBy(['jobid' => $row['opdrachtid']]);
-                if ($transaction && $transaction->getPosition()) {
+                if ($transaction) {
                     //$output->writeln('Processing ...' . $row['opdrachtid']. ' '.$transaction->getPosition()->getTicker()->getTicker());
 
                     $transaction
@@ -205,13 +206,13 @@ class ValidateCommand extends Command
             $output->writeln('Processed: ...' . $rowNum);
             $rowNum++;
         }
-
+    }
         $positions = $this->positionRepository->getAllOpen();
         foreach ($positions as $position) {
             $output->writeln('Updating positions: ...#' . $position->getId(). ' '. $position->getTicker()->getFullname());
-            $position = $transaction->getPosition();
             $this->weightedAverage->calc($position);
             $this->entityManager->persist($position);
+            $this->entityManager->flush();
         }
     }
 
