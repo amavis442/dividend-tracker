@@ -9,6 +9,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use DoctrineExtensions\Query\Mysql\Date;
 
 /**
  * @method Position|null find($id, $lockMode = null, $lockVersion = null)
@@ -73,6 +74,19 @@ class PositionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function findForExport(): array
+    {
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->select('p')
+            ->innerJoin('p.transactions', 't')
+            ->where('(p.closed <> 1 or p.closed is null)')
+            ->orWhere('p.closed = 1 and t.transactionDate > :closedAt')
+            ->setParameter('closedAt', (new DateTime('-3 days'))->format('Y-m-d'));
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
 
     public function findOneByTickerAndTransactionDate(Ticker $ticker, ?DateTime $transactionDate = null): ?Position
     {

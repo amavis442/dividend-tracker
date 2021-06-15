@@ -7,6 +7,7 @@ use App\Entity\Payment;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Helper\DateHelper;
+use DateTime;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -88,6 +89,18 @@ class PaymentRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findForExport(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select ('p, c, t')
+            ->innerJoin('p.calendar' ,'c')
+            ->innerJoin('p.ticker', 't')
+            ->where('p.payDate > :payDate')
+            ->setParameter('payDate', (new DateTime('-7 days'))->format('Y-m-d'))
+            ->getQuery()->getResult() ?? []; 
+    }
+
 
     public function hasPayment(DateTimeInterface $dateTime, Ticker $ticker, string $dividendType): bool
     {
