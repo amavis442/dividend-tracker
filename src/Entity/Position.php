@@ -116,6 +116,11 @@ class Position
      */
     private $closedAt;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $dividendTreshold;
+
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
@@ -445,6 +450,18 @@ class Position
     public function setClosedAt(?\DateTimeInterface $closedAt): self
     {
         $this->closedAt = $closedAt;
+
+        return $this;
+    }
+
+    public function getDividendTreshold(): ?float
+    {
+        return $this->dividendTreshold;
+    }
+
+    public function setDividendTreshold(?float $dividendTreshold): self
+    {
+        $this->dividendTreshold = $dividendTreshold;
 
         return $this;
     }

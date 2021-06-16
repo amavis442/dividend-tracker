@@ -195,6 +195,12 @@ class PortfolioItem
      * @var null|float
      */
     private $netDividendPerShare;
+    /**
+     * What is the treshold for dividend yield start to buying
+     *
+     * @var float
+     */
+    private $dividendTreshold;
 
     public function __construct()
     {
@@ -847,6 +853,30 @@ class PortfolioItem
     public function setNetDividendPerShare($netDividendPerShare): self
     {
         $this->netDividendPerShare = $netDividendPerShare;
+
+        return $this;
+    }
+
+    /**
+     * Get what is the treshold for dividend yield start to buying
+     *
+     * @return  float
+     */
+    public function getDividendTreshold()
+    {
+        return $this->dividendTreshold;
+    }
+
+    /**
+     * Set what is the treshold for dividend yield start to buying
+     *
+     * @param  float  $dividendTreshold  What is the treshold for dividend yield start to buying
+     *
+     * @return  self
+     */
+    public function setDividendTreshold(float $dividendTreshold)
+    {
+        $this->dividendTreshold = $dividendTreshold;
 
         return $this;
     }

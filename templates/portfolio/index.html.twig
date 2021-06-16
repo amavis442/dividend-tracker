@@ -64,7 +64,7 @@
                     <stockprice stock="{{ portfolioItem.symbol }}" v-bind:price="{{ portfolioItem.price }}" v-bind:freq="{{ portfolioItem.dividendPayoutFrequency }}" 
                     v-bind:netdividend="{{ portfolioItem.netDividendPerShare }}"
                     v-bind:totalshares="{{ portfolioItem.amount }}"
-                    v-bind:dividend-treshold="0.035"
+                    v-bind:dividend-treshold="{{ portfolioItem.dividendTreshold }}"
                     ></stockprice>
                 </td>
                 <td>

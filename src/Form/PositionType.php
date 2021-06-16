@@ -91,6 +91,12 @@ class PositionType extends AbstractType
                 'required' => false,
                 'input' => 'number',
                 'scale' => 2,
+            ])
+            ->add('dividendTreshold', NumberType::class, [
+                'label' => 'dividendTreshold (%)',
+                'required' => false,
+                'input' => 'number',
+                'scale' => 2,
             ]);
     }
 

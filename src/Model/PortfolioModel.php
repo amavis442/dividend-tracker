@@ -118,8 +118,12 @@ class PortfolioModel
                 ->setPercentageAllocation($percentageAllocation)
                 ->setPies($position->getPies())
                 ->setIsDividendMonth($position->isDividendPayMonth())
-                ->setDividendPayoutFrequency($payoutFrequency);
+                ->setDividendPayoutFrequency($payoutFrequency)
+                ->setDividendTreshold(0.03)
             ;
+            if ($position->getDividendTreshold()) {
+                $portfolioItem->setDividendTreshold($position->getDividendTreshold() / 100); 
+            }
 
             // Dividend part
             $calendar = $dividendService->getRegularCalendar($position->getTicker());
