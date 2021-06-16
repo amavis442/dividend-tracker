@@ -50,7 +50,12 @@
       class="badge badge-secondary"
     >{{ formattedResult }}</span>
     
-    <span class="badge badge-info">{{ dividendYield }}</span>
+    <span
+      class="badge badge-info"
+    >{{ dividendYield }} <i
+      v-if="isBuyOppertunity"
+      class="fas fa-shopping-cart"
+    /></span>
   </div>
 </template>
 <script>
@@ -81,6 +86,11 @@ export default {
       type: Number,
       default: 0,
       require: false
+    },
+    dividendTreshold: {
+      type: Number,
+      default: 0.03,
+      require: false
     }
   },
   data: function() {
@@ -91,7 +101,8 @@ export default {
       formattedDiffPrice: null,
       dividendYield: null,
       result: null,
-      formattedResult: null
+      formattedResult: null,
+      isBuyOppertunity: false
     }
   },
   mounted: function() {
@@ -110,9 +121,17 @@ export default {
           this.diffPrice = this.marketPrice - this.price;
           this.formattedDiffPrice =  new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(this.diffPrice);
           this.dividendYield = '0 %';
+          this.isBuyOppertunity = false;
           if (this.marketPrice) {
             var dividendYield = (this.freq * this.netdividend) / this.marketPrice;
             this.dividendYield = new Intl.NumberFormat('nl-NL', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(dividendYield);
+            console.log(dividendYield);
+            console.log(this.dividendTreshold);
+            
+            if (this.dividendTreshold <= dividendYield) {
+              this.isBuyOppertunity = true;
+            }
+            console.log(this.isBuyOppertunity);
           } 
           this.result = this.totalshares * this.diffPrice;
           this.formattedResult =  new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(this.result);
