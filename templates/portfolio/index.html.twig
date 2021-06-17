@@ -114,6 +114,11 @@
                             <li class="list-group-item">{{ 'Not available'|trans }}</li>
                         {% endfor %}
                         </ul>
+                        <hr/>
+                        <div><strong>{{ 'Dividend treshold'|trans }}</strong></div>
+                        <ul class="list-group">
+                            <li class="list-group-item">{{ (portfolioItem.dividendTreshold * 100)|format_number({fraction_digit: 2}) }}%</li>
+                        </ul>
                     {% endset %}
         
                     {% set dividendInfo = dividendInfo ~ dividendDateInfo %}
@@ -128,6 +133,7 @@
                         {% endfor %}
                         </ul>
                     {% endset %}
+                    
                     {% set dividendInfo = dividendInfo ~ pieData %}
                     <button class="btn btn-info btn-sm" data-toggle="popover" title="Dividend & pie info" 
                     data-content='{{ dividendInfo }}' data-html="true"><i class="fas fa-info-circle"></i></button>
