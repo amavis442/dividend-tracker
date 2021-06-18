@@ -2,14 +2,13 @@
 
 namespace App\Model;
 
-use App\Entity\Position;
 use App\Entity\PortfolioItem;
+use App\Entity\Position;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
-use App\Repository\TickerRepository;
 use App\Service\DividendService;
-use RuntimeException;
 use DateTime;
+use RuntimeException;
 
 class PortfolioModel
 {
@@ -122,13 +121,16 @@ class PortfolioModel
                 ->setDividendTreshold(0.03)
             ;
             if ($position->getDividendTreshold()) {
-                $portfolioItem->setDividendTreshold($position->getDividendTreshold() / 100); 
-            }
-            if ($position->getMaxAllocation() !== null && $position->getAllocation() > $position->getMaxAllocation())
-            {
-                $portfolioItem->setIsMaxAllocation(true);
+                $portfolioItem->setDividendTreshold($position->getDividendTreshold() / 100);
             }
 
+            if ($position->getMaxAllocation() !== null) {
+                $portfolioItem->setMaxAllocation($position->getMaxAllocation());
+                if ($position->getAllocation() > $position->getMaxAllocation()) {
+                    $portfolioItem->setIsMaxAllocation(true);
+                    $portfolioItem->setMaxAllocation($position->getMaxAllocation());
+                }
+            }
 
             // Dividend part
             $calendar = $dividendService->getRegularCalendar($position->getTicker());
@@ -148,8 +150,7 @@ class PortfolioModel
                     ->setForwardNetDividendYield($forwardNetDividendYield)
                     ->setForwardNetDividendYieldPerShare($forwardNetDividendYieldPerShare)
                     ->setNetDividendPerShare($netDividendPerShare)
-                    ;
-
+                ;
 
                 foreach ($position->getTicker()->getCalendars() as $currentCalendar) {
                     if ($currentCalendar->getPaymentDate() >= $currentDate) {

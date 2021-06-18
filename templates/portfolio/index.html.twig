@@ -120,6 +120,12 @@
                         <ul class="list-group">
                             <li class="list-group-item">{{ (portfolioItem.dividendTreshold * 100)|format_number({fraction_digit: 2}) }}%</li>
                         </ul>
+                        <hr/>
+                        <div><strong>{{ 'Maximum allocation'|trans }}</strong></div>
+                        <ul class="list-group">
+                            <li class="list-group-item">&euro; {{ (portfolioItem.maxAllocation)|format_number({fraction_digit: 2}) }}</li>
+                        </ul>
+                        
                     {% endset %}
         
                     {% set dividendInfo = dividendInfo ~ dividendDateInfo %}
