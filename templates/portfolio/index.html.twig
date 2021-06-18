@@ -65,6 +65,7 @@
                     v-bind:netdividend="{{ portfolioItem.netDividendPerShare }}"
                     v-bind:totalshares="{{ portfolioItem.amount }}"
                     v-bind:dividend-treshold="{{ portfolioItem.dividendTreshold }}"
+                    v-bind:maximum-allocation-reached="{% if portfolioItem.isMaxAllocation %}true{% else %}false{% endif %}"
                     ></stockprice>
                 </td>
                 <td>

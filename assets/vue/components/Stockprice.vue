@@ -91,6 +91,11 @@ export default {
       type: Number,
       default: 0.03,
       require: false
+    },
+    maximumAllocationReached: {
+      type: Boolean,
+      default: false,
+      require: false
     }
   },
   data: function() {
@@ -125,11 +130,16 @@ export default {
           if (this.marketPrice) {
             var dividendYield = (this.freq * this.netdividend) / this.marketPrice;
             this.dividendYield = new Intl.NumberFormat('nl-NL', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(dividendYield);
+            console.log(this.stock);
             console.log(dividendYield);
             console.log(this.dividendTreshold);
             
             if (this.dividendTreshold <= dividendYield) {
               this.isBuyOppertunity = true;
+            }
+            console.log('Maximum allocation reached: ' + this.maximumAllocationReached);
+            if (this.maximumAllocationReached) {
+              this.isBuyOppertunity = false;
             }
             console.log(this.isBuyOppertunity);
           } 

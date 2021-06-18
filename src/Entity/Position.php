@@ -121,6 +121,13 @@ class Position
      */
     private $dividendTreshold;
 
+    /**
+     * What is the maximum allocation this position should be?
+     * 
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $maxAllocation;
+
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
@@ -462,6 +469,18 @@ class Position
     public function setDividendTreshold(?float $dividendTreshold): self
     {
         $this->dividendTreshold = $dividendTreshold;
+
+        return $this;
+    }
+
+    public function getMaxAllocation(): ?int
+    {
+        return $this->maxAllocation;
+    }
+
+    public function setMaxAllocation(?int $maxAllocation): self
+    {
+        $this->maxAllocation = $maxAllocation;
 
         return $this;
     }

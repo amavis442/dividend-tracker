@@ -2,28 +2,22 @@
 
 namespace App\Form;
 
-use App\Entity\Position;
-use App\Entity\Ticker;
 use App\Entity\Currency;
 use App\Entity\Pie;
-use App\Entity\Tax;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use App\Entity\Position;
+use App\Entity\Ticker;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use App\Form\Factory\CallbackTransformerValutaFactory;
-use App\Form\Factory\CallbackTransformerUnitsFactory;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PositionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+
         $builder
             ->add('ticker', EntityType::class, [
                 'class' => Ticker::class,
@@ -43,7 +37,7 @@ class PositionType extends AbstractType
                 'required' => false,
                 'placeholder' => 'Please choose a Pie',
                 'empty_data' => null,
-                'multiple'    => true,
+                'multiple' => true,
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('pie')
                         ->orderBy('pie.label', 'ASC');
@@ -66,7 +60,7 @@ class PositionType extends AbstractType
             ->add('currency', EntityType::class, [
                 'class' => Currency::class,
                 'choice_label' => function ($currency) {
-                    return  $currency->getSymbol();
+                    return $currency->getSymbol();
                 },
                 'required' => true,
                 'empty_data' => 'EUR',
@@ -81,10 +75,10 @@ class PositionType extends AbstractType
             ->add('allocation_currency', EntityType::class, [
                 'class' => Currency::class,
                 'choice_label' => function ($currency) {
-                    return  $currency->getSymbol();
+                    return $currency->getSymbol();
                 },
                 'required' => true,
-                'empty_data' => 'EUR'
+                'empty_data' => 'EUR',
             ])
             ->add('profit', NumberType::class, [
                 'label' => 'Profit',
@@ -97,6 +91,12 @@ class PositionType extends AbstractType
                 'required' => false,
                 'input' => 'number',
                 'scale' => 2,
+            ])
+            ->add('maxAllocation', NumberType::class, [
+                'label' => 'Maximum allocation',
+                'required' => false,
+                'input' => 'number',
+                'scale' => 0,
             ]);
     }
 

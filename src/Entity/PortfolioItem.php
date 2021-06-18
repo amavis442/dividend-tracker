@@ -202,9 +202,24 @@ class PortfolioItem
      */
     private $dividendTreshold;
 
+    /**
+     * Maximum allocation
+     *
+     * @var null|int
+     */
+    private $maxAllocation;
+
+    /**
+     * Has maximum allocation been reached
+     *
+     * @var bool
+     */
+    private $isMaxAllocation;
+
     public function __construct()
     {
         $this->dividendCalendars = new ArrayCollection();
+        $this->isMaxAllocation = false;
     }
 
     /**
@@ -860,9 +875,9 @@ class PortfolioItem
     /**
      * Get what is the treshold for dividend yield start to buying
      *
-     * @return  float
+     * @return  null|float
      */
-    public function getDividendTreshold()
+    public function getDividendTreshold(): ?float
     {
         return $this->dividendTreshold;
     }
@@ -874,9 +889,57 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setDividendTreshold(float $dividendTreshold)
+    public function setDividendTreshold(float $dividendTreshold): self
     {
         $this->dividendTreshold = $dividendTreshold;
+
+        return $this;
+    }
+
+    /**
+     * Get maximum allocation
+     *
+     * @return  null|int
+     */ 
+    public function getMaxAllocation(): ?int
+    {
+        return $this->maxAllocation;
+    }
+
+    /**
+     * Set maximum allocation
+     *
+     * @param  int  $maxAllocation  Maximum allocation
+     *
+     * @return  self
+     */ 
+    public function setMaxAllocation(int $maxAllocation): self
+    {
+        $this->maxAllocation = $maxAllocation;
+
+        return $this;
+    }
+
+    /**
+     * Get has maximum allocation been reached
+     *
+     * @return  bool
+     */ 
+    public function getIsMaxAllocation(): bool
+    {
+        return $this->isMaxAllocation;
+    }
+
+    /**
+     * Set has maximum allocation been reached
+     *
+     * @param  bool  $isMaxAllocation  Has maximum allocation been reached
+     *
+     * @return  self
+     */ 
+    public function setIsMaxAllocation(bool $isMaxAllocation): self
+    {
+        $this->isMaxAllocation = $isMaxAllocation;
 
         return $this;
     }

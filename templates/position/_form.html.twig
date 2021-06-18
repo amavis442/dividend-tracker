@@ -58,6 +58,19 @@
 					{{ form_row(form.dividendTreshold) }}
 				</div>
 			</div>
+			
+			<div class="row">
+				<div class="col">
+					{{ form_label(form.maxAllocation) }}
+					<div class="input-group mb-3">
+						<div class="form-group">
+							{{ form_widget(form.maxAllocation) }}
+							{{ form_help(form.maxAllocation)}}
+						</div>
+					</div>
+				</div>
+			</div>
+
 		</div>
 	</div>
 </div>

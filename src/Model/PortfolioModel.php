@@ -124,6 +124,11 @@ class PortfolioModel
             if ($position->getDividendTreshold()) {
                 $portfolioItem->setDividendTreshold($position->getDividendTreshold() / 100); 
             }
+            if ($position->getMaxAllocation() !== null && $position->getAllocation() > $position->getMaxAllocation())
+            {
+                $portfolioItem->setIsMaxAllocation(true);
+            }
+
 
             // Dividend part
             $calendar = $dividendService->getRegularCalendar($position->getTicker());
