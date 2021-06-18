@@ -235,6 +235,7 @@ class TransactionController extends AbstractController
          */
         $headers = [];
         $headers[] = 'Datum';
+        $headers[] = 'Tijd';
         $headers[] = 'Type';
         $headers[] = 'Waarde';
         $headers[] = 'Transactievaluta';
@@ -256,7 +257,8 @@ class TransactionController extends AbstractController
             $row = [];
             $costs = $transaction->getFxFee() + $transaction->getStampduty() + $transaction->getFinrafee();
             $total = $transaction->getTotal();
-            $row['Datum'] = $transaction->getTransactionDate()->format('Y-m-d\TH:i:s');
+            $row['Datum'] = $transaction->getTransactionDate()->format('Y-m-d');
+            $row['Tijd'] = $transaction->getTransactionDate()->format('H:i:s');
             $row['Type'] = $transaction->getSide() == Transaction::BUY ? 'Koop' : 'Verkoop';
             
             $grossValue = $transaction->getAmount() * $transaction->getOriginalPrice();

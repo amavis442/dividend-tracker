@@ -40,6 +40,7 @@ class ExportTransactionsController extends AbstractController
          */
         $headers = [];
         $headers[] = 'Datum';
+        $headers[] = 'Tijd';
         $headers[] = 'Type';
         $headers[] = 'Waarde';
         $headers[] = 'Transactievaluta';
@@ -70,7 +71,8 @@ class ExportTransactionsController extends AbstractController
                 $row = [];
                 $costs = $transaction->getFxFee() + $transaction->getStampduty() + $transaction->getFinrafee();
                 $total = $transaction->getTotal();
-                $row['Datum'] = $transaction->getTransactionDate()->format('Y-m-d\TH:i:s');
+                $row['Datum'] = $transaction->getTransactionDate()->format('Y-m-d');
+                $row['Tijd'] = $transaction->getTransactionDate()->format('H:i:s');
                 $row['Type'] = $transaction->getSide() == Transaction::BUY ? 'Koop' : 'Verkoop';
                 $grossValue = $transaction->getAmount() * $transaction->getOriginalPrice();
                 $exchangerate = 1 / $transaction->getExchangeRate();
@@ -120,6 +122,7 @@ class ExportTransactionsController extends AbstractController
          */
         $headers = [];
         $headers[] = 'Datum';
+        $headers[] = 'Tijd';
         $headers[] = 'Type';
         $headers[] = 'Waarde';
         $headers[] = 'Transactievaluta';
@@ -164,7 +167,8 @@ class ExportTransactionsController extends AbstractController
             $exchangerate = $total / $netPayment;
             $grossValuta = $payment->getDividendPaidCurrency();
 
-            $row['Datum'] = $payment->getPayDate()->format('Y-m-d\TH:i:s');
+            $row['Datum'] = $payment->getPayDate()->format('Y-m-d');
+            $row['Tijd'] = $payment->getPayDate()->format('H:i:s');
             $row['Type'] = 'Dividend';
             $row['Waarde'] = number_format($total, 2, ',', '.');
             $row['Transactievaluta'] = 'EUR';
