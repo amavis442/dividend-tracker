@@ -8,6 +8,7 @@ use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Transaction;
 use App\Service\DividendService;
+use DateTime;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Collection;
@@ -187,16 +188,17 @@ class CalendarRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('c')
             ->select('c, t, p, tr, pies, cur, tax')
             ->innerJoin('c.ticker', 't')
-            ->innerJoin('t.positions', 'p', 'WITH', 'p.closed is null OR p.closed = 0')
+            ->innerJoin('t.positions', 'p', 'WITH', '(p.closed is null OR p.closed = 0) OR (p.closedAt > :closedAt and p.closed = 1)')
             ->leftJoin('t.tax', 'tax')
             ->leftJoin('p.transactions', 'tr')
             ->leftJoin('p.pies', 'pies')
             ->leftJoin('c.currency', 'cur')
         //->leftJoin('cur.taxes', 'tax', 'WITH', 'tax.validFrom <= :validFrom')
             ->where('c.paymentDate >= :start and c.paymentDate <= :end')
-            ->andWhere('EXISTS ( select 1 from App\Entity\Position pos WHERE pos.ticker = t.id AND pos.closed is null OR pos.closed = 0)')
+            //->andWhere('EXISTS ( select 1 from App\Entity\Position pos WHERE pos.ticker = t.id AND (pos.closed is null OR pos.closed = 0) OR (pos.closedAt > :closedAt and pos.closed = 1))')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
+            ->setParameter('closedAt', (new DateTime('-2 month'))->format('Y-m-d'))
         //->setParameter('validFrom', date('Y-m-d'))
         ;
 
