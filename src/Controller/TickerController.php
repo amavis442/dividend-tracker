@@ -46,9 +46,9 @@ class TickerController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="ticker_new", methods={"GET","POST"})
+     * @Route("/create", name="ticker_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function create(Request $request): Response
     {
         $ticker = new Ticker();
         $form = $this->createForm(TickerType::class, $ticker);

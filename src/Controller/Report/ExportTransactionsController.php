@@ -28,7 +28,7 @@ class ExportTransactionsController extends AbstractController
      * @Route("/exporttransactions", name="report_export_transactions")
      */
     public function index(PositionRepository $positionRepository): Response
-    {        
+    {
         $fname = 'export-orders-' . date('Ymd') . '.csv';
         $filename = '/tmp/' . $fname;
         $writer = WriterEntityFactory::createCSVWriter();
@@ -110,7 +110,7 @@ class ExportTransactionsController extends AbstractController
      * @Route("/exportdividend", name="report_export_dividend")
      */
     public function dividend(PaymentRepository $paymentRepository): Response
-    {        
+    {
         $fname = 'export-dividend-' . date('Ymd') . '.csv';
         $filename = '/tmp/' . $fname;
         $writer = WriterEntityFactory::createCSVWriter();
@@ -141,7 +141,7 @@ class ExportTransactionsController extends AbstractController
 
         $payments = $paymentRepository->findForExport();
         if (!$payments) {
-            return new Response('No dividends');            
+            return new Response('No dividends');
         }
 
         /**
@@ -149,7 +149,7 @@ class ExportTransactionsController extends AbstractController
          */
         foreach ($payments as $payment) {
             $ticker = $payment->getTicker();
-            
+
             $tickerLabel = $ticker->getSymbol();
             $tickerName = $ticker->getFullname();
             $tickerIsin = $ticker->getIsin();
@@ -162,7 +162,7 @@ class ExportTransactionsController extends AbstractController
             $taxRate = ($ticker->getTax() != null ? $ticker->getTax()->getTaxRate() : 0.15);
             $taxPerShare = $grossValuePerShare * $taxRate;
             $tax = $taxPerShare * $payment->getAmount();
-            $netPayment = $totalGrossValue - $tax;            
+            $netPayment = $totalGrossValue - $tax;
             $total = $payment->getDividend();
             $exchangerate = $total / $netPayment;
             $grossValuta = $payment->getDividendPaidCurrency();

@@ -123,7 +123,7 @@ class Position
 
     /**
      * What is the maximum allocation this position should be?
-     * 
+     *
      * @ORM\Column(type="integer", nullable=true)
      */
     private $maxAllocation;
@@ -484,5 +484,4 @@ class Position
 
         return $this;
     }
-
 }

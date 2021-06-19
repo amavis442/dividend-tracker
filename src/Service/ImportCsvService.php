@@ -261,7 +261,7 @@ class ImportCsvService extends ImportBase
                 }
                 $r++;
             }
-            
+
             if (false === stripos($cellVal, 'sell') && false === stripos($cellVal, 'buy')) {
                 if (false !== stripos($cellVal, 'dividend')) {
                     $this->importDividend($row);

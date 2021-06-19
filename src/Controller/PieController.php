@@ -26,9 +26,9 @@ class PieController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="pie_new", methods={"GET","POST"})
+     * @Route("/create", name="pie_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function create(Request $request): Response
     {
         $pie = new Pie();
         $form = $this->createForm(PieType::class, $pie);
@@ -85,14 +85,14 @@ class PieController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete' . $pie->getId(), $request->request->get('_token'))) {
             $positions = $pie->getPositions();
-            foreach ($positions as $position){
+            foreach ($positions as $position) {
                 $position->removePie($pie);
             }
             $transactions = $pie->getTransactions();
-            foreach ($transactions as $transaction){
+            foreach ($transactions as $transaction) {
                 $transaction->setPie(null);
             }
-            
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($pie);
             $entityManager->flush();

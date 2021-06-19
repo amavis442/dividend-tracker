@@ -136,9 +136,9 @@ class PaymentController extends AbstractController
     }
 
     /**
-     * @Route("/new/{position}/{timestamp?}", name="payment_new", methods={"GET","POST"})
+     * @Route("/create/{position}/{timestamp?}", name="payment_new", methods={"GET","POST"})
      */
-    public function new(
+    public function create(
         Request $request,
         position $position,
         string $timestamp = null,

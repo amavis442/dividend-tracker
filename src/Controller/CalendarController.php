@@ -67,10 +67,13 @@ class CalendarController extends AbstractController
     }
 
     /**
-     * @Route("/new/{ticker}", name="calendar_new", methods={"GET","POST"})
+     * @Route("/create/{ticker}", name="calendar_new", methods={"GET","POST"})
      */
-    public function new(Request $request, ?Ticker $ticker = null, Referer $referer): Response
-    {
+    public function create(
+        Request $request,
+        ?Ticker $ticker = null,
+        Referer $referer
+    ): Response {
         $calendar = new Calendar();
         $calendar->setTicker($ticker);
         $form = $this->createForm(CalendarType::class, $calendar);
@@ -97,8 +100,11 @@ class CalendarController extends AbstractController
     /**
      * @Route("/calendarperdatetable", name="calendar_per_date_table", methods={"GET","POST"})
      */
-    public function viewCalendarTable(Request $request, CalendarRepository $calendarRepository, DividendService $dividendService): Response
-    {
+    public function viewCalendarTable(
+        Request $request,
+        CalendarRepository $calendarRepository,
+        DividendService $dividendService
+    ): Response {
         $year = date('Y');
         $endDate = $year . '-12-31';
 
@@ -136,13 +142,20 @@ class CalendarController extends AbstractController
             $dateSelect = $form->getData();
         }
 
-        $calendars = $calendarRepository->groupByMonth($dividendService, $year, $dateSelect->getStartdate()->format('Y-m-d'), $dateSelect->getEnddate()->format('Y-m-d'), $dateSelect->getPie());
+        $calendars = $calendarRepository->groupByMonth(
+            $dividendService,
+            $year,
+            $dateSelect->getStartdate()->format('Y-m-d'),
+            $dateSelect->getEnddate()->format('Y-m-d'),
+            $dateSelect->getPie()
+        );
+
         return $this->render('calendar/view_table.html.twig', [
             'calendars' => $calendars,
             'year' => $year,
             'dateSelect' => $dateSelect,
             'form' => $form->createView(),
-            'timestamp' => new DateTime()
+            'timestamp' => new DateTime(),
         ]);
     }
 
@@ -159,8 +172,11 @@ class CalendarController extends AbstractController
     /**
      * @Route("/{id}/edit", name="calendar_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Calendar $calendar, Referer $referer): Response
-    {
+    public function edit(
+        Request $request,
+        Calendar $calendar,
+        Referer $referer
+    ): Response {
         $form = $this->createForm(CalendarType::class, $calendar);
         $form->handleRequest($request);
 
@@ -182,8 +198,11 @@ class CalendarController extends AbstractController
     /**
      * @Route("/{id}", name="calendar_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Calendar $calendar, Referer $referer): Response
-    {
+    public function delete(
+        Request $request,
+        Calendar $calendar,
+        Referer $referer
+    ): Response {
         if ($this->isCsrfTokenValid('delete' . $calendar->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($calendar);
@@ -199,8 +218,10 @@ class CalendarController extends AbstractController
     /**
      * @Route("/search", name="calendar_search", methods={"POST"})
      */
-    public function search(Request $request, SessionInterface $session): Response
-    {
+    public function search(
+        Request $request,
+        SessionInterface $session
+    ): Response {
         $searchCriteria = $request->request->get('searchCriteria');
         $session->set(self::SEARCH_KEY, $searchCriteria);
 

@@ -38,13 +38,18 @@ class BranchController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="branch_new", methods={"GET","POST"})
+     * @Route("/create", name="branch_new", methods={"GET","POST"})
      */
-    public function new(Request $request, BranchRepository $branchRepository): Response
+    public function create(Request $request, BranchRepository $branchRepository): Response
     {
         $branch = new Branch();
-        $maxAssetAllocation = 100 - (int)(($branchRepository->getSumAssetAllocation() - $branch->getAssetAllocation()) / 100);
-        $form = $this->createForm(BranchType::class, $branch, ['maxAssetAllocation' => $maxAssetAllocation]);
+        $assignedAllocation = $branchRepository->getSumAssetAllocation() - $branch->getAssetAllocation();
+        $maxAssetAllocation = 100 - (int) ($assignedAllocation / 100);
+        $form = $this->createForm(
+            BranchType::class,
+            $branch,
+            ['maxAssetAllocation' => $maxAssetAllocation]
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -74,10 +79,18 @@ class BranchController extends AbstractController
     /**
      * @Route("/{id}/edit", name="branch_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Branch $branch, BranchRepository $branchRepository): Response
-    {
-        $maxAssetAllocation = 100 - (int)(($branchRepository->getSumAssetAllocation() - $branch->getAssetAllocation()) / 100);
-        $form = $this->createForm(BranchType::class, $branch, ['maxAssetAllocation' => $maxAssetAllocation]);
+    public function edit(
+        Request $request,
+        Branch $branch,
+        BranchRepository $branchRepository
+    ): Response {
+        $assignedAllocation = $branchRepository->getSumAssetAllocation() - $branch->getAssetAllocation();
+        $maxAssetAllocation = 100 - (int) ($assignedAllocation / 100);
+        $form = $this->createForm(
+            BranchType::class,
+            $branch,
+            ['maxAssetAllocation' => $maxAssetAllocation]
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

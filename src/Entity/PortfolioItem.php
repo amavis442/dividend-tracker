@@ -900,7 +900,7 @@ class PortfolioItem
      * Get maximum allocation
      *
      * @return  null|int
-     */ 
+     */
     public function getMaxAllocation(): ?int
     {
         return $this->maxAllocation;
@@ -912,7 +912,7 @@ class PortfolioItem
      * @param  int  $maxAllocation  Maximum allocation
      *
      * @return  self
-     */ 
+     */
     public function setMaxAllocation(int $maxAllocation): self
     {
         $this->maxAllocation = $maxAllocation;
@@ -924,7 +924,7 @@ class PortfolioItem
      * Get has maximum allocation been reached
      *
      * @return  bool
-     */ 
+     */
     public function getIsMaxAllocation(): bool
     {
         return $this->isMaxAllocation;
@@ -936,7 +936,7 @@ class PortfolioItem
      * @param  bool  $isMaxAllocation  Has maximum allocation been reached
      *
      * @return  self
-     */ 
+     */
     public function setIsMaxAllocation(bool $isMaxAllocation): self
     {
         $this->isMaxAllocation = $isMaxAllocation;

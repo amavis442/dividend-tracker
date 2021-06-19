@@ -66,7 +66,7 @@ class ValidateCommand extends Command
     {
         $headers = [];
         $rowNum = 0;
-        
+
         foreach ($sheet->getRowIterator() as $csvRow) {
             $cells = $csvRow->getCells();
 
@@ -179,14 +179,17 @@ class ValidateCommand extends Command
             };
 
             if (count($row) > 0) {
-                $rawAllocation -= (($row['fx_fee'] ?? 0) + ($row['stampduty'] ?? 0) + ($row['transaction_fee'] ?? 0) + ($row['finra_fee'] ?? 0));
+                $rawAllocation -= (
+                    ($row['fx_fee'] ?? 0) +
+                    ($row['stampduty'] ?? 0) +
+                    ($row['transaction_fee'] ?? 0) +
+                    ($row['finra_fee'] ?? 0)
+                );
                 $row['allocation'] = $rawAllocation;
                 $row['price'] = round($rawAllocation / $rawAmount, 3);
 
                 $transaction = $this->transactionRepository->findOneBy(['jobid' => $row['opdrachtid']]);
                 if ($transaction) {
-                    //$output->writeln('Processing ...' . $row['opdrachtid']. ' '.$transaction->getPosition()->getTicker()->getTicker());
-
                     $transaction
                         ->setPrice($row['price'])
                         ->setAllocation($row['allocation'])
@@ -206,10 +209,13 @@ class ValidateCommand extends Command
             $output->writeln('Processed: ...' . $rowNum);
             $rowNum++;
         }
-    
+
         $positions = $this->positionRepository->getAllOpen();
         foreach ($positions as $position) {
-            $output->writeln('Updating positions: ...#' . $position->getId(). ' '. $position->getTicker()->getFullname());
+            $output->writeln('Updating positions: ...#' .
+                $position->getId() .
+                ' ' .
+                $position->getTicker()->getFullname());
             $this->weightedAverage->calc($position);
             $this->entityManager->persist($position);
             $this->entityManager->flush();

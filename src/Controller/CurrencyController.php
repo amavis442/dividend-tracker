@@ -26,9 +26,9 @@ class CurrencyController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="currency_new", methods={"GET","POST"})
+     * @Route("/create", name="currency_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function create(Request $request): Response
     {
         $currency = new Currency();
         $form = $this->createForm(CurrencyType::class, $currency);

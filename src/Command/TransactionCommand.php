@@ -2,16 +2,16 @@
 
 namespace App\Command;
 
+use App\Repository\TickerRepository;
+use App\Repository\TransactionRepository;
+use App\Service\WeightedAverage;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use App\Repository\TransactionRepository;
-use App\Repository\TickerRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Service\WeightedAverage;
 
 class TransactionCommand extends Command
 {
@@ -86,7 +86,14 @@ class TransactionCommand extends Command
             if ($ticker) {
                 $position = $ticker->getPositions()->first();
                 $this->weightedAverageService->calc($position);
-                $io->text($ticker->getFullname() . ', ' . $position->getAmount() . ' shares, ' . $position->getPrice() . ' euro');
+                $io->text(
+                    $ticker->getFullname() .
+                    ', ' .
+                    $position->getAmount() .
+                    ' shares, ' .
+                    $position->getPrice() .
+                    ' euro'
+                );
 
                 if ($overwrite) {
                     $this->em->persist($position);

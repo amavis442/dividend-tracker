@@ -156,7 +156,7 @@ class Export
                         $row[$indexBy] = round($netDividend * $position->getAmount(), 2);
                     }
                 }
-            
+
                 $row['grossDividend'] = $cash * $ticker->getDividendFrequency();
                 $row['netDividend'] = $row['grossDividend'] * (1 - $row['tax']) * $row['exchangerate'];
                 $row['totalNetDividend'] = $row['netDividend'] * $row['Shares'];

@@ -63,9 +63,9 @@ class ResearchController extends AbstractController
     }
 
     /**
-     * @Route("/new/{ticker?}", name="research_new", methods={"GET","POST"})
+     * @Route("/create/{ticker?}", name="research_new", methods={"GET","POST"})
      */
-    public function new(
+    public function create(
         Request $request,
         ?Ticker $ticker,
         FileUploader $fileUploader,

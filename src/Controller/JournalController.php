@@ -35,9 +35,9 @@ class JournalController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="journal_new", methods={"GET","POST"})
+     * @Route("/create", name="journal_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function create(Request $request): Response
     {
         $journal = new Journal();
         $form = $this->createForm(JournalType::class, $journal);

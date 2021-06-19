@@ -76,9 +76,9 @@ class TransactionController extends AbstractController
     }
 
     /**
-     * @Route("/new/{position}/{side?1}", name="transaction_new", methods={"GET","POST"})
+     * @Route("/create/{position}/{side?1}", name="transaction_new", methods={"GET","POST"})
      */
-    function new (
+    function create(
         Request $request,
         Position $position,
         int $side,
@@ -260,7 +260,7 @@ class TransactionController extends AbstractController
             $row['Datum'] = $transaction->getTransactionDate()->format('Y-m-d');
             $row['Tijd'] = $transaction->getTransactionDate()->format('H:i:s');
             $row['Type'] = $transaction->getSide() == Transaction::BUY ? 'Koop' : 'Verkoop';
-            
+
             $grossValue = $transaction->getAmount() * $transaction->getOriginalPrice();
             $exchangerate = $transaction->getExchangeRate();
             $row['Waarde'] = number_format($total, 2, ',', '.');

@@ -6,14 +6,15 @@ use App\Service\StockPriceService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 class StockDataCommand extends Command
 {
     protected static $defaultName = 'app:yahoodata';
-    protected static $defaultDescription = 'Get stockdata from yahoo for all open positions when posible and put them in a cache';
+    protected static $defaultDescription =
+        'Get stockdata from yahoo for all open positions
+        when posible and put them in a cache';
     protected $stockPriceService;
 
     public function __construct(StockPriceService $stockPriceService)
@@ -28,8 +29,8 @@ class StockDataCommand extends Command
         $this
             ->setDescription(self::$defaultDescription)
             ->addArgument('symbol', InputArgument::REQUIRED, 'Ticker symbol')
-        /*    ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-        */;
+            /*    ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
+         */;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

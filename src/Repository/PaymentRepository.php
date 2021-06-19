@@ -93,12 +93,12 @@ class PaymentRepository extends ServiceEntityRepository
     public function findForExport(): array
     {
         return $this->createQueryBuilder('p')
-            ->select ('p, c, t')
-            ->innerJoin('p.calendar' ,'c')
+            ->select('p, c, t')
+            ->innerJoin('p.calendar', 'c')
             ->innerJoin('p.ticker', 't')
             ->where('p.payDate > :payDate')
             ->setParameter('payDate', (new DateTime('-7 days'))->format('Y-m-d'))
-            ->getQuery()->getResult() ?? []; 
+            ->getQuery()->getResult() ?? [];
     }
 
 

@@ -26,9 +26,9 @@ class TaxController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="tax_new", methods={"GET","POST"})
+     * @Route("/create", name="tax_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function create(Request $request): Response
     {
         $tax = new Tax();
         $form = $this->createForm(TaxType::class, $tax);
