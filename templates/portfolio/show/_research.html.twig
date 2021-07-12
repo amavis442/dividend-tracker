@@ -19,6 +19,10 @@
 					<i class="far fa-edit"></i>
 				</a>
 			</div>
+			<div class="card-footer text-muted">
+                {{ 'Created'|trans }}: {{ research.createdAt ? research.createdAt|date('Y-m-d H:i:s') : '-' }}, 
+                {{ 'Modified'|trans }}: {{ research.updatedAt ? research.updatedAt|date('Y-m-d H:i:s') : '-' }}
+            </div>
 		</div>
 	</p>
 {% else %}

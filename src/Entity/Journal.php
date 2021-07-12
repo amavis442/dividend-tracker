@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=JournalRepository::class)
- * @ORM\HasLifecycleCallbacks
  */
 class Journal
 {
@@ -68,15 +67,6 @@ class Journal
         return $this->createdAt;
     }
 
-    /**
-     * Gets triggered only on insert
-     * @ORM\PrePersist
-     */
-    public function onPrePersist()
-    {
-        $this->createdAt = new \DateTime("now");
-    }
-
     public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
@@ -87,15 +77,6 @@ class Journal
     public function getUpdatedAt(): ?\DateTimeInterface
     {
         return $this->updatedAt;
-    }
-
-    /**
-     * Gets triggered every time on update
-     * @ORM\PreUpdate
-     */
-    public function onPreUpdate()
-    {
-        $this->updatedAt = new \DateTime("now");
     }
 
     public function setUpdatedAt(\DateTimeInterface $updatedAt): self
