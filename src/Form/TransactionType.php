@@ -77,6 +77,13 @@ class TransactionType extends AbstractType
                 'scale' => 7,
                 ]
             )
+            ->add('transaction_fee', NumberType::class, [
+                'label' => 'Transaction fee',
+                'required' => false,
+                'help' => 'Commission/ extra fees etc',
+                'input' => 'number',
+                'scale' => 2,
+            ])
             ;
     }
 
