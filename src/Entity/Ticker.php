@@ -105,7 +105,6 @@ class Ticker
         return $this->ticker;
     }
 
-
     public function getFullname(): ?string
     {
         return $this->fullname;
@@ -172,10 +171,31 @@ class Ticker
 
     public function getRecentDividendDate(): ?Calendar
     {
+        $isRegularDividend = false;
         if ($this->calendars->count() < 1) {
             return null;
         }
-        return $this->calendars[0];
+        $index = 0;
+        if ($this->calendars[0]->getDividendType() === Calendar::REGULAR) {
+            $index = 0;
+            $isRegularDividend = true;
+        }
+
+        if (!$isRegularDividend &&
+            $this->calendars[1]->getPaymentDate()->format('Ymd') === $this->calendars[0]->getPaymentDate()->format('Ymd') &&
+            $this->calendars[1]->getDividendType() === Calendar::REGULAR) {
+            $index = 1;
+            $isRegularDividend = true;
+
+        }
+        if (!$isRegularDividend &&
+            $this->calendars[2]->getPaymentDate()->format('Ymd') === $this->calendars[0]->getPaymentDate()->format('Ymd') &&
+            $this->calendars[2]->getDividendType() === Calendar::REGULAR) {
+            $index = 2;
+            $isRegularDividend = true;
+        }
+
+        return $this->calendars[$index];
     }
 
     public function isDividendPayMonth(int $currentMonth): bool

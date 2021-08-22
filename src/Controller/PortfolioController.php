@@ -12,7 +12,6 @@ use App\Repository\TickerRepository;
 use App\Service\DividendGrowthService;
 use App\Service\DividendService;
 use App\Service\Referer;
-use App\Service\StockPriceService;
 use App\Service\Summary;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -114,6 +113,7 @@ class PortfolioController extends AbstractController
         $calendarRecentDividendDate = $ticker->getRecentDividendDate();
         $netCashAmount = 0.0;
         $amountPerDate = 0.0;
+        $cals = $ticker->getCalendars();
 
         if ($calendarRecentDividendDate) {
             [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax($position, $calendarRecentDividendDate);
@@ -123,7 +123,7 @@ class PortfolioController extends AbstractController
 
         $position = $positionRepository->getForPosition($position);
         $netYearlyDividend = 0.0;
-        $cals = $ticker->getCalendars();
+        
         if (count($cals) > 0) {
             $cal = $dividendService->getRegularCalendar($ticker);
             [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax($position, $cal);
