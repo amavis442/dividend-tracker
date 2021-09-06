@@ -48,7 +48,7 @@
                     <tr>
                         <td>{{ numPositions}}</td>
                         <td>
-                            <button type="button" class="btn btn-outline-primary" data-toggle="tooltip" data-html="true" data-placement="left" title="Ticker: {{ calData.ticker }}<br/>{{ 'Tax rate'|trans }}: {{ calData.taxRate * 100 }}% <br/>{{ 'Exchangerate'|trans }}: {{ calData.exchangeRate }}<br/>{{ 'Tax'|trans }}: &euro;{{ calData.tax|format_number({fraction_digit: 2}) }}"><i class="far fa-circle"></i></button>
+                            <button type="button" class="btn btn-outline-primary" data-toggle="tooltip" data-html="true" data-placement="left" title="Ticker: {{ calData.ticker }}<br/>{{ 'Tax rate'|trans }}: {{ calData.taxRate * 100 }}% <br/>{{ 'Exchangerate'|trans }}: {{ calData.exchangeRate }}<br/>{{ 'Tax'|trans }}: &euro;{{ calData.tax|format_number({fraction_digit: 2}) }}<br/>Ex-div: {{ calData.calendar.exDividendDate|date('Y-m-d') }}"><i class="far fa-circle"></i></button>
                         </td>
                         <th>{{ currentDate|date('l')|trans }}, {{ currentDate|date('d') }} {{ currentDate|date('F')|trans|lower }} {{ currentDate|date('Y') }}</th>
                         <td>

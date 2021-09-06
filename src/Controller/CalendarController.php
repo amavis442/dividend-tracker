@@ -4,18 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Calendar;
 use App\Entity\DateSelect;
-use App\Entity\Pie;
 use App\Entity\Ticker;
+use App\Form\CalendarDividendType;
 use App\Form\CalendarType;
 use App\Repository\CalendarRepository;
 use App\Service\DividendService;
 use App\Service\Referer;
 use DateTime;
-use Doctrine\ORM\EntityRepository;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -111,33 +107,9 @@ class CalendarController extends AbstractController
         $dateSelect = new DateSelect();
         $dateSelect->setStartdate((new DateTime('now')))
             ->setEnddate((new DateTime($endDate)));
-
-        $form = $this->createFormBuilder($dateSelect)
-            ->add('startdate', DateType::class, [
-                'widget' => 'single_text',
-            ])
-            ->add('enddate', DateType::class, [
-                'widget' => 'single_text',
-            ])
-            ->add('pie', EntityType::class, [
-                'class' => Pie::class,
-                'label' => 'Pie',
-                'choice_label' => 'label',
-                'required' => false,
-                'placeholder' => 'Please choose a Pie',
-                'empty_data' => null,
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('pie')
-                        ->select('pie, p')
-                        ->join('pie.positions', 'p')
-                        ->where('(p.closed = 0 OR p.closed IS NULL)')
-                        ->orderBy('pie.label', 'ASC');
-                },
-            ])
-            ->add('save', SubmitType::class, ['label' => 'Submit'])
-            ->getForm();
-
+        $form = $this->createForm(CalendarDividendType::class, $dateSelect);
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             $dateSelect = $form->getData();
         }
