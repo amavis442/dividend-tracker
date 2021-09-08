@@ -43,7 +43,6 @@
                 {% set cal = calData.calendar %}
                 {% set netDividend = calData.positionDividend %}
                 {% set estimatedAmount = calData.positionAmount %}
-                {% if estimatedAmount > 0.001 %}
                     {% set currentDate = cal.getPaymentDate %}
                     <tr>
                         <td>{{ numPositions}}</td>
@@ -62,7 +61,6 @@
                     </tr>
                     {% set sumDividend = sumDividend + netDividend %}
                     {% set numPositions = numPositions  + 1 %}
-                {% endif %}
             {% endfor %}
         {% endfor %}
         <tr>

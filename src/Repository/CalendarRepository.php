@@ -193,13 +193,10 @@ class CalendarRepository extends ServiceEntityRepository
             ->leftJoin('p.transactions', 'tr')
             ->leftJoin('p.pies', 'pies')
             ->leftJoin('c.currency', 'cur')
-        //->leftJoin('cur.taxes', 'tax', 'WITH', 'tax.validFrom <= :validFrom')
             ->where('c.paymentDate >= :start and c.paymentDate <= :end')
-            //->andWhere('EXISTS ( select 1 from App\Entity\Position pos WHERE pos.ticker = t.id AND (pos.closed is null OR pos.closed = 0) OR (pos.closedAt > :closedAt and pos.closed = 1))')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
             ->setParameter('closedAt', (new DateTime('-2 month'))->format('Y-m-d'))
-        //->setParameter('validFrom', date('Y-m-d'))
         ;
 
         if ($pie) {
@@ -215,9 +212,17 @@ class CalendarRepository extends ServiceEntityRepository
         $data = [];
         $dividendService->setCummulateDividendAmount(false);
         foreach ($result as $item) {
-            $ticker = $item->getTicker()->getTicker();
             $positionAmount = $dividendService->getPositionAmount($item);
+            if ($positionAmount < 0.001) { // filter out ones that have no amount of stocks for dividend payout
+                continue;
+            }
             $positionDividend = $dividendService->getTotalNetDividend($item);
+            if ($positionDividend < 0.01) { // filter out ones that have no payout of dividend or to small to matter
+                continue;
+            }
+
+            $ticker = $item->getTicker()->getTicker();
+
             $taxRate = $dividendService->getTaxRate($item);
             $exchangeRate = $dividendService->getExchangeRate($item);
             $tax = $item->getCashAmount() * $exchangeRate * $taxRate;
