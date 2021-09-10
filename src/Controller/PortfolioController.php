@@ -121,6 +121,7 @@ class PortfolioController extends AbstractController
             $amountPerDate = $position->getAmountPerDate($calendarRecentDividendDate->getExDividendDate());
         }
 
+        $sumDividends = array_values($paymentRepository->getSumDividends([$position->getTicker()->getId()]))[0] ?? 0.0;
         $position = $positionRepository->getForPosition($position);
         $netYearlyDividend = 0.0;
         
@@ -183,6 +184,7 @@ class PortfolioController extends AbstractController
             'netCashAmount' => $netCashAmount,
             'amountPerDate' => $amountPerDate,
             'expectedPayout' => $netCashAmount * $amountPerDate,
+            'sumDividends' => $sumDividends,
             'calendarRecentDividendDate' => $calendarRecentDividendDate ?? new Calendar(),
             'indexUrl' => $indexUrl,
         ]);
