@@ -12,6 +12,7 @@ use App\Repository\TransactionRepository;
 use App\Service\ImportCsvService;
 use App\Service\WeightedAverage;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,7 +49,7 @@ class ImportCsvController extends AbstractController
             if ($brochureFile) {
                 $currency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
                 $branch = $branchRepository->findOneBy(['label' => 'Tech']);
-
+                try {
                 $result = $importCsv->importFile(
                     $entityManager,
                     $tickerRepository,
@@ -59,7 +60,11 @@ class ImportCsvController extends AbstractController
                     $transactionRepository,
                     $brochureFile
                 );
-
+            } catch(Exception $e) {
+                return $this->render('error_handling/exception.html.twig', [
+                    'errorMessage' => $e->getMessage(),
+                ]);
+            }
                 return $this->render('import_csv/report.html.twig', [
                     'controller_name' => 'ImportCsvController',
                     'data' => $result,
@@ -91,16 +96,16 @@ class ImportCsvController extends AbstractController
     ): void {
 
         $entityManager = $this->getDoctrine()->getManager();
-        $importCsv->import(
-            $tickerRepository,
-            $currencyRepository,
-            $positionRepository,
-            $weightedAverage,
-            $branchRepository,
-            $transactionRepository,
-            $entityManager
-        );
-
+        
+            $importCsv->import(
+                $tickerRepository,
+                $currencyRepository,
+                $positionRepository,
+                $weightedAverage,
+                $branchRepository,
+                $transactionRepository,
+                $entityManager
+            );
         exit();
     }
 }

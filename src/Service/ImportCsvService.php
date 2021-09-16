@@ -124,6 +124,10 @@ class ImportCsvService extends ImportBase
 
         $calendar = $this->calendarRepository->findByDate($transactionDate, $ticker);
         $position = $ticker->getPositions()->last();
+        if (!$position instanceof \App\Entity\Position) {
+            throw new RuntimeException('There is no position for this dividend payment to link to. Are you sure you have the right account?');
+        }
+
         $currency = $this->currencyRepository->findOneBy(['symbol' => 'EUR']);
         $payment = new Payment();
 
@@ -290,7 +294,7 @@ class ImportCsvService extends ImportBase
         TransactionRepository $transactionRepository,
         UploadedFile $uploadedFile,
         ?\Box\Spout\Reader\CSV\Reader $reader = null
-    ): array {
+    ): array{
         $transactionsAdded = 0;
         $totalTransaction = 0;
         $transactionAlreadyExists = [];
@@ -371,7 +375,7 @@ class ImportCsvService extends ImportBase
             'totalTransaction' => $totalTransaction,
             'transactionsAdded' => $transactionsAdded,
             'transactionAlreadyExists' => $transactionAlreadyExists,
-            'dividendsImported' => $this->importedDividendLines
+            'dividendsImported' => $this->importedDividendLines,
         ];
     }
 }
