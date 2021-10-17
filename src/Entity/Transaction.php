@@ -238,7 +238,7 @@ class Transaction
 
     public function getProfit(): ?float
     {
-        return $this->profit / Constants::VALUTA_PRECISION;
+        return ($this->profit / Constants::VALUTA_PRECISION) ?: null;
     }
 
     public function setProfit(float $profit): self

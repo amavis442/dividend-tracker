@@ -40,31 +40,29 @@ class ImportCsvController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-
-            /** @var UploadedFile $brochureFile */
-            $brochureFile = $form->get('importfile')->getData();
-            // this condition is needed because the 'brochure' field is not required
-            // so the PDF file must be processed only when a file is uploaded
-            if ($brochureFile) {
+            /** @var UploadedFile $transactionFile */
+            $transactionFile = $form->get('importfile')->getData();
+            // this condition is needed because the 'transactionFile' field is not required
+            // so the CSV file must be processed only when a file is uploaded
+            if ($transactionFile) {
                 $currency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
                 $branch = $branchRepository->findOneBy(['label' => 'Tech']);
                 try {
-                $result = $importCsv->importFile(
-                    $entityManager,
-                    $tickerRepository,
-                    $positionRepository,
-                    $weightedAverage,
-                    $currency,
-                    $branch,
-                    $transactionRepository,
-                    $brochureFile
-                );
-            } catch(Exception $e) {
-                return $this->render('error_handling/exception.html.twig', [
-                    'errorMessage' => $e->getMessage(),
-                ]);
-            }
+                    $result = $importCsv->importFile(
+                        $entityManager,
+                        $tickerRepository,
+                        $positionRepository,
+                        $weightedAverage,
+                        $currency,
+                        $branch,
+                        $transactionRepository,
+                        $transactionFile
+                    );
+                } catch (Exception $e) {
+                    return $this->render('error_handling/exception.html.twig', [
+                        'errorMessage' => $e->getMessage(),
+                    ]);
+                }
                 return $this->render('import_csv/report.html.twig', [
                     'controller_name' => 'ImportCsvController',
                     'data' => $result,
@@ -76,36 +74,5 @@ class ImportCsvController extends AbstractController
             'controller_name' => 'ImportCsvController',
             'form' => $form->createView(),
         ]);
-    }
-
-    /**
-     * @Route("/dashboard/csv/report", name="csv_report")
-     */
-    public function report()
-    {
-    }
-
-    protected function import(
-        TickerRepository $tickerRepository,
-        CurrencyRepository $currencyRepository,
-        PositionRepository $positionRepository,
-        WeightedAverage $weightedAverage,
-        BranchRepository $branchRepository,
-        TransactionRepository $transactionRepository,
-        ImportCsvService $importCsv
-    ): void {
-
-        $entityManager = $this->getDoctrine()->getManager();
-        
-            $importCsv->import(
-                $tickerRepository,
-                $currencyRepository,
-                $positionRepository,
-                $weightedAverage,
-                $branchRepository,
-                $transactionRepository,
-                $entityManager
-            );
-        exit();
     }
 }

@@ -1,7 +1,24 @@
 <h3>{{ 'Orders'|trans }}</h3>
-<div>
-<a href="{{ path('transaction_export', {'position': position.id }) }}" target="_new"><i class="fas fa-file-export pr-r"></i> {{ 'Export'|trans }}</a>
+
+<div class="row text-right">
+	<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+		<div class="btn-group mr-2" role="group" aria-label="First group">
+			<a class="btn btn-success" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id,'side': 1, }) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Buy'|trans }}">
+				<i class="fas fa-plus"></i>
+			</a>
+			<a href="{{ path('transaction_export', {'position': position.id }) }}" target="_new" class="btn btn-secondary">
+				<i class="fas fa-file-export pr-r"></i>
+				{{ 'Export'|trans }}</a>
+
+			<a class="btn btn-danger" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id, 'side': 2}) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Sell'|trans }}">
+				<i class="fas fa-minus"></i>
+			</a>
+		</div>
+	</div>
 </div>
+
+
+
 <div class="table-responsive-xl">
 <table class="table table-striped">
 	<thead>

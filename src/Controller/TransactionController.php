@@ -78,7 +78,7 @@ class TransactionController extends AbstractController
     /**
      * @Route("/create/{position}/{side?1}", name="transaction_new", methods={"GET","POST"})
      */
-    function create(
+    public function create(
         Request $request,
         Position $position,
         int $side,
@@ -105,6 +105,20 @@ class TransactionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->presetMetrics($transaction);
+            if ($transaction->getSide() === Transaction::BUY) {
+                $transaction->setTotal($transaction->getAllocation() + $transaction->getTransactionFee());
+            }
+
+            if ($transaction->getSide() === Transaction::SELL) {
+                $transaction->setTotal($transaction->getAllocation());
+                $transaction->setAllocation($transaction->getAllocation() - $transaction->getTransactionFee());
+                if ($transaction->getProfit() === null) {
+                    $avgPrice = $position->getPrice();
+                    $profit = ($transaction->getPrice() - $avgPrice) * $transaction->getAmount();
+                    $transaction->setProfit($profit);
+                }
+            }
+
             $position->addTransaction($transaction);
             $weightedAverage->calc($position);
 

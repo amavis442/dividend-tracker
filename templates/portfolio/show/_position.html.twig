@@ -30,14 +30,8 @@
 				<td>
 					<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 						<div class="btn-group mr-2" role="group" aria-label="First group">
-							<a class="btn btn-success" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id,'side': 1, }) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Buy'|trans }}">
-								<i class="fas fa-plus"></i>
-							</a>
 							<a href="{{ path('position_edit', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="{{ 'Edit position'|trans }}">
 								<i class="far fa-edit"></i>
-							</a>
-							<a class="btn btn-danger" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id, 'side': 2}) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Sell'|trans }}">
-								<i class="fas fa-minus"></i>
 							</a>
 						</div>
 						<form method="post" action="{{ path('portfolio_position_close', {'position': position.id}) }}" onsubmit="return confirm('Are you sure you want to close this position?');">
