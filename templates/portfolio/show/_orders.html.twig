@@ -1,6 +1,5 @@
-<h3>{{ 'Orders'|trans }}</h3>
 
-<div class="row text-right">
+<div class="row float-right">
 	<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 		<div class="btn-group mr-2" role="group" aria-label="First group">
 			<a class="btn btn-success" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id,'side': 1, }) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Buy'|trans }}">
@@ -17,7 +16,7 @@
 	</div>
 </div>
 
-
+<h3>{{ 'Orders'|trans }}</h3>
 
 <div class="table-responsive-xl">
 <table class="table table-striped">

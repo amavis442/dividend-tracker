@@ -16,7 +16,7 @@ class FileUploadType extends AbstractType
         $builder
         ->add('importfile', FileType::class, [
             'label' => 'Transactions (csv)',
-
+            'label_attr' => ['data-browse' => 'Bestand kiezen'],
             // unmapped means that this field is not associated to any entity property
             'mapped' => false,
 

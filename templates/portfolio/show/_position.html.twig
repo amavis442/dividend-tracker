@@ -33,12 +33,13 @@
 							<a href="{{ path('position_edit', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="{{ 'Edit position'|trans }}">
 								<i class="far fa-edit"></i>
 							</a>
-						</div>
-						<form method="post" action="{{ path('portfolio_position_close', {'position': position.id}) }}" onsubmit="return confirm('Are you sure you want to close this position?');">
+						
+						<form method="post" action="{{ path('portfolio_position_close', {'position': position.id}) }}" class="form-inline" onsubmit="return confirm('Are you sure you want to close this position?');">
 							<input type="hidden" name="_method" value="DELETE">
 							<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ position.id) }}">
 							<button class="btn btn-danger"><i class="fas fa-window-close"></i></button>
 						</form>
+						</div>
 					</div>
 				</td>
 			</tr>
