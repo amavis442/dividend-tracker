@@ -79,11 +79,11 @@ class ISharesService implements DividendDatePluginInterface
 
 
         $item = [];
-        $item['DeclaredDate'] = $row[0][0]['raw'];
+        //$item['DeclaredDate'] = $row[0][0]['raw'];
         $item['RecordDate'] = $row[0][1]['raw'];
-        $item['ExDate'] = $row[0][2]['raw'];
-        $item['PayDate'] = $row[0][3]['raw'];
-        $item['DividendAmount'] = $row[0][4]['raw'];
+        $item['ExDate'] = $row[0][0]['raw'];
+        $item['PayDate'] = $row[0][2]['raw'];
+        $item['DividendAmount'] = $row[0][3]['raw'];
         $item['Type'] = 'Distribution';
         $item['Currency'] = $currency; //strpos('USD', $row[0][4]['display'])
         return [$item];

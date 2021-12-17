@@ -124,10 +124,10 @@ class DividendDateService
     }
 
     /**
-     * Undocumented function
+     * Return the parsed dividend data
      *
-     * @param string $ticker
-     * @return void
+     * @param string $symbol
+     * @return array|null
      */
     public function getData(string $symbol): ?array
     {
