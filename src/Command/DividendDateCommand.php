@@ -8,6 +8,7 @@ use App\Repository\CurrencyRepository;
 use App\Repository\TickerRepository;
 use App\Service\DividendDateService;
 use DateTime;
+use Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -107,7 +108,12 @@ class DividendDateCommand extends Command
                     $this->logger->alert('Dividend date debug: ' . print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
                     continue;
                 }
-                $exDate = new DateTime($payment['ExDate']);
+                try {
+                    $exDate = new DateTime($payment['ExDate']);
+                } catch (Exception $ex) {
+                    $this->logger->alert('exDate exception: '.print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
+                    continue;
+                }
                 $calendar = $this->calendarRepository->findOneBy(['ticker' => $ticker, 'exDividendDate' => $exDate]);
 
                 if (!$calendar) {
@@ -116,10 +122,19 @@ class DividendDateCommand extends Command
                     if (!$currency) {
                         $currency = $defaultCurrency;
                     }
-
-                    $payDate = new DateTime($payment['PayDate']);
-                    $recordDate = new DateTime($payment['RecordDate']);
-
+                    try {
+                        $payDate = new DateTime($payment['PayDate']);
+                    } catch (Exception $ex) {
+                        $this->logger->alert('payDate exception: '.print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
+                        continue;
+                    }
+                    try {
+                        $recordDate = new DateTime($payment['RecordDate']);
+                    } catch (Exception $ex) {
+                        $this->logger->alert('recordDate exception: '.print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
+                        continue;
+                    }
+                    
                     $calendar = new Calendar();
                     $calendar
                         ->setTicker($ticker)
