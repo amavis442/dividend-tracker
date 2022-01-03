@@ -10,9 +10,9 @@ use App\Helper\DateHelper;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -66,7 +66,7 @@ class PaymentRepository extends ServiceEntityRepository
             ->orderBy($order, $sort);
 
         if ($startDate !== null) {
-            $this->setDateRange($queryBuilder, $startDate, $endDate);
+            $this->setDateRange($queryBuilder, $startDate . " 00:00:00", $endDate . " 23:59:59");
         }
 
         if (!empty($search)) {
@@ -101,22 +101,20 @@ class PaymentRepository extends ServiceEntityRepository
             ->getQuery()->getResult() ?? [];
     }
 
-
     public function hasPayment(DateTimeInterface $dateTime, Ticker $ticker, string $dividendType): bool
     {
         return $this->createQueryBuilder('p')
-        ->join('p.ticker', 't')
-        ->where('t = :ticker')
-        ->andWhere('p.dividendType = :dividendType')
-        ->andWhere('p.payDate >= :paydateStart AND p.payDate <= :paydateEnd')
-        ->setParameter('ticker', $ticker)
-        ->setParameter('paydateStart', $dateTime->format('Y-m-d 00:00:00'))
-        ->setParameter('paydateEnd', $dateTime->format('Y-m-d 23:59:59'))
-        ->setParameter('dividendType', $dividendType)
-        ->getQuery()
-        ->getOneOrNullResult() ? true : false;
+            ->join('p.ticker', 't')
+            ->where('t = :ticker')
+            ->andWhere('p.dividendType = :dividendType')
+            ->andWhere('p.payDate >= :paydateStart AND p.payDate <= :paydateEnd')
+            ->setParameter('ticker', $ticker)
+            ->setParameter('paydateStart', $dateTime->format('Y-m-d 00:00:00'))
+            ->setParameter('paydateEnd', $dateTime->format('Y-m-d 23:59:59'))
+            ->setParameter('dividendType', $dividendType)
+            ->getQuery()
+            ->getOneOrNullResult() ? true : false;
     }
-
 
     public function getForPosition(Position $position): ?array
     {
