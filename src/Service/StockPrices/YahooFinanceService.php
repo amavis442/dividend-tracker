@@ -31,6 +31,20 @@ class YahooFinanceService implements StockPricePluginInterface
         'WHEA' => 'WHEA.L',
         'ECAR' => 'ECAR.L',
         'VUSA' => 'VUSA.L',
+        'WKL' => 'WKL.AS',
+        'SPX' => 'SPX.L',
+        'CRDA' => 'CRDA.L',
+        'BN' => 'BN.PA',
+        'DGE' => 'DGE.L',
+        'FRE' => 'FRE.DE',
+        'FME' => 'FME.DE',
+        'HLMA.' => 'HLMA.L',
+        'HEN' => 'HEN.DE',
+        'PHIA' => 'PHIA.AS',
+        'RMS' => 'RMS.PA',
+        'LISN' => 'LISN.SW',
+        'MUV2' => 'MUV2.MI',
+        'REE' => 'REE.MC'
     ];
 
     /**
