@@ -38,7 +38,7 @@ class YahooFinanceService implements StockPricePluginInterface
         'DGE' => 'DGE.L',
         'FRE' => 'FRE.DE',
         'FME' => 'FME.DE',
-        'HLMA.' => 'HLMA.L',
+        'HLMA' => 'HLMA.L',
         'HEN' => 'HEN.DE',
         'PHIA' => 'PHIA.AS',
         'RMS' => 'RMS.PA',

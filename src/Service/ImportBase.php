@@ -89,7 +89,7 @@ abstract class ImportBase
         $ticker = $tickerRepository->findOneBy(['isin' => $data['isin']]);
         if (!$ticker) {
             $ticker = new Ticker();
-            $ticker->setTicker($data['ticker'])
+            $ticker->setTicker(rtrim($data['ticker'], "."))
                 ->setFullname($data['name'])
                 ->setIsin($data['isin'])
                 ->setBranch($branch);
