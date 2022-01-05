@@ -90,7 +90,7 @@ abstract class ImportBase
         if (!$ticker) {
             $ticker = new Ticker();
             $ticker->setTicker($data['ticker'])
-                ->setFullname($data['ticker'])
+                ->setFullname($data['name'])
                 ->setIsin($data['isin'])
                 ->setBranch($branch);
 

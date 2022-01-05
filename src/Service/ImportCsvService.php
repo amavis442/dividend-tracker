@@ -204,7 +204,7 @@ class ImportCsvService extends ImportBase
                          */
                         $row['isin'] = $val;
                         $isin = $val;
-                        if (!preg_match('/^([A-Z]{2})(\d{1})(\w+)/i', $isin, $matches)) {
+                        if (!preg_match('/^([A-Z]{2})(\d{1})(\w+)/i', $isin, $matches) && !preg_match('/^([A-Z]{4})(\d{1})(\w+)/i', $isin, $matches)) {
                             throw new RuntimeException('ISIN Number not correct: ' . $isin);
                         }
                         break;
