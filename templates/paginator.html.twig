@@ -3,7 +3,7 @@
 <ul class="pagination pagination-sm">
     {# `«` arrow  #}
     <li class="page-item {{ thisPage == 1 ? 'disabled' }}">
-        <a class="page-link" href="{{ path(routeName, { 'page': thisPage-1 < 1 ? 1 : thisPage-1, 'orderBy':  order ??  '', 'sort' : sort ?? 'asc' }) }}">« Previous</a>
+        <a class="page-link" href="{{ path(routeName, { 'page': thisPage-1 < 1 ? 1 : thisPage-1, 'orderBy':  order ??  '', 'sort' : sort ?? 'asc' }) }}">« {{ 'Previous'|trans }}</a>
     </li>
 
     {# Render each page number #}
@@ -15,7 +15,7 @@
 
     {# `»` arrow #}
     <li class="page-item {{ thisPage == maxPages ? 'disabled' }}">
-        <a class="page-link" href="{{ path(routeName, {'page': thisPage+1 <= maxPages ? thisPage+1 : thisPage, 'orderBy':  order ?? '', 'sort' : sort ?? 'asc' }) }}">Next »</a>
+        <a class="page-link" href="{{ path(routeName, {'page': thisPage+1 <= maxPages ? thisPage+1 : thisPage, 'orderBy':  order ?? '', 'sort' : sort ?? 'asc' }) }}">{{ 'Next'|trans }} »</a>
     </li>
 </ul>
 </nav>
