@@ -5,8 +5,10 @@ namespace App\Service;
 use App\Entity\Branch;
 use App\Entity\Currency;
 use App\Entity\Position;
+use App\Entity\Tax;
 use App\Entity\Ticker;
 use App\Repository\PositionRepository;
+use App\Repository\TaxRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
 use App\Service\WeightedAverage;
@@ -24,6 +26,7 @@ abstract class ImportBase
         Currency $currency,
         Branch $branch,
         TransactionRepository $transactionRepository,
+        TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
         ?\Box\Spout\Reader\CSV\Reader $reader = null
     ): array;
@@ -84,6 +87,7 @@ abstract class ImportBase
         $entityManager,
         Branch $branch,
         TickerRepository $tickerRepository,
+        Tax $defaultTax,
         array $data
     ): Ticker {
         $ticker = $tickerRepository->findOneBy(['isin' => $data['isin']]);
@@ -92,7 +96,8 @@ abstract class ImportBase
             $ticker->setTicker(rtrim($data['ticker'], "."))
                 ->setFullname($data['name'])
                 ->setIsin($data['isin'])
-                ->setBranch($branch);
+                ->setBranch($branch)
+                ->setTax($defaultTax); // 15% tax
 
             $entityManager->persist($ticker);
             $entityManager->flush();

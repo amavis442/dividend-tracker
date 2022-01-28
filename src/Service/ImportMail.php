@@ -4,10 +4,12 @@ namespace App\Service;
 
 use App\Entity\Branch;
 use App\Entity\Currency;
+use App\Entity\Tax;
 use App\Entity\Transaction;
 use App\Repository\BranchRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\PositionRepository;
+use App\Repository\TaxRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
 use App\Service\WeightedAverage;
@@ -121,6 +123,7 @@ class ImportMail extends ImportBase
         WeightedAverage $weightedAverage,
         BranchRepository $branchRepository,
         TransactionRepository $transactionRepository,
+        TaxRepository $taxRepository,
         EntityManager $entityManager
     ): void {
         ini_set('max_execution_time', 3000);
@@ -150,12 +153,13 @@ class ImportMail extends ImportBase
             $tables = $DOM->getElementsByTagName('table');
             $tableNodes = $tables[3];
             $rows = $this->formatImportData($tableNodes);
+            $defaultTax = $taxRepository->find(1);
 
             if (count($rows) > 0) {
                 ksort($rows);
 
                 foreach ($rows as $row) {
-                    $ticker = $this->preImportCheckTicker($entityManager, $branch, $tickerRepository, $row);
+                    $ticker = $this->preImportCheckTicker($entityManager, $branch, $tickerRepository, $defaultTax, $row);
                     $position = $this->preImportCheckPosition($entityManager, $ticker, $currency, $positionRepository, $row);
                     $transaction = $transactionRepository->findOneBy(['transactionDate' => $row['transactionDate'], 'position' => $position, 'meta' => $row['nr']]);
 
@@ -213,9 +217,10 @@ class ImportMail extends ImportBase
         Currency $currency,
         Branch $branch,
         TransactionRepository $transactionRepository,
+        TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
         ?\Box\Spout\Reader\CSV\Reader $reader = null
-    ): array {
+    ): array{
         return [];
     }
 }

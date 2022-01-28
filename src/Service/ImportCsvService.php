@@ -12,6 +12,7 @@ use App\Repository\CalendarRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
+use App\Repository\TaxRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
 use App\Service\WeightedAverage;
@@ -292,6 +293,7 @@ class ImportCsvService extends ImportBase
         Currency $currency,
         Branch $branch,
         TransactionRepository $transactionRepository,
+        TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
         ?\Box\Spout\Reader\CSV\Reader $reader = null
     ): array{
@@ -312,9 +314,11 @@ class ImportCsvService extends ImportBase
         $rows = $this->formatImportData($sheets->current());
         $reader->close();
 
+        $defaultTax = $taxRepository->find(1);
+
         if (count($rows) > 0) {
             foreach ($rows as $row) {
-                $ticker = $this->preImportCheckTicker($entityManager, $branch, $tickerRepository, $row);
+                $ticker = $this->preImportCheckTicker($entityManager, $branch, $tickerRepository, $defaultTax, $row);
                 $transaction = $transactionRepository->findOneBy(['jobid' => $row['opdrachtid']]);
 
                 if (!$transaction) {

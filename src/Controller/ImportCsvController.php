@@ -7,6 +7,7 @@ use App\Form\FileUploadType;
 use App\Repository\BranchRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\PositionRepository;
+use App\Repository\TaxRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
 use App\Service\ImportCsvService;
@@ -33,7 +34,8 @@ class ImportCsvController extends AbstractController
         WeightedAverage $weightedAverage,
         BranchRepository $branchRepository,
         TransactionRepository $transactionRepository,
-        ImportCsvService $importCsv
+        ImportCsvService $importCsv,
+        TaxRepository $taxRepository
     ): Response {
         $importfile = new fileUpload();
         $form = $this->createForm(FileUploadType::class, $importfile);
@@ -56,6 +58,7 @@ class ImportCsvController extends AbstractController
                         $currency,
                         $branch,
                         $transactionRepository,
+                        $taxRepository,
                         $transactionFile
                     );
                 } catch (Exception $e) {
