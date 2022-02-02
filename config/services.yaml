@@ -62,6 +62,7 @@ services:
             - addService: ['App\Service\DividendDate\ISharesService', ['SEMB', 'INRG', 'IPRP', 'ISF', 'IUS3', 'IWDP']] 
             - addService: ['App\Service\DividendDate\VanguardService', ['VMID', 'VJPN', 'VEUR', 'VAPX', 'VUSA', 'VGOV']]   
             - addService: ['App\Service\DividendDate\PimcoService', ['STHS', 'SSHY']]   
+            - addService: ['\App\Service\DividendDate\NullService', ['DSM']]
             - setDefault: ['App\Service\DividendDate\SeekingAlphaService']
 
     App\Service\ImportCsvService:

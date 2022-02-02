@@ -6,6 +6,10 @@ use App\Contracts\Service\DividendDatePluginInterface;
 use RuntimeException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+/**
+ * This is the factory for gtting dividend date data from different sources like ishares or seekingalpha.
+ * The implementation to get the specific data can be found in App\Service\DividendDate\[name of service]
+ */
 class DividendDateService
 {
     /**
