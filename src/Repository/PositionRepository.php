@@ -289,6 +289,7 @@ class PositionRepository extends ServiceEntityRepository
         if (!empty($search)) {
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
                 $queryBuilder->expr()->like('t.ticker', ':search'),
+                $queryBuilder->expr()->like('t.fullname', ':search'),
                 $queryBuilder->expr()->like('i.label', ':search')
             ));
             $queryBuilder->setParameter('search', $search . '%');
