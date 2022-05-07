@@ -12,12 +12,12 @@ use App\Service\Referer;
 use App\Service\WeightedAverage;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -31,8 +31,8 @@ class TransactionController extends AbstractController
      * @Route("/list/{page?1}/{orderBy?transactionDate}/{sort?ASC}", name="transaction_index", methods={"GET"})
      */
     public function index(
+        Request $request,
         TransactionRepository $transactionRepository,
-        SessionInterface $session,
         int $page = 1,
         string $orderBy = 'transactionDate',
         string $sort = 'desc'
@@ -44,7 +44,7 @@ class TransactionController extends AbstractController
             $sort = 'desc';
         }
 
-        $searchCriteria = $session->get(self::SEARCH_KEY, '');
+        $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
         $items = $transactionRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
@@ -80,9 +80,9 @@ class TransactionController extends AbstractController
      */
     public function create(
         Request $request,
+        EntityManagerInterface $entityManager,
         Position $position,
         int $side,
-        SessionInterface $session,
         CurrencyRepository $currencyRepository,
         WeightedAverage $weightedAverage,
         Referer $referer,
@@ -126,12 +126,11 @@ class TransactionController extends AbstractController
                 $position->setClosed(1);
                 $position->setClosedAt((new DateTime()));
             }
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($position);
             $entityManager->flush();
 
-            $session->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
-            $session->set(PortfolioController::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
+            $request->getSession()->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
+            $request->getSession()->set(PortfolioController::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
 
             if ($referer->get()) {
                 return $this->redirect($referer->get());
@@ -160,8 +159,8 @@ class TransactionController extends AbstractController
      */
     public function edit(
         Request $request,
+        EntityManagerInterface $entityManager,
         Transaction $transaction,
-        SessionInterface $session,
         WeightedAverage $weightedAverage,
         Referer $referer
     ): Response {
@@ -176,8 +175,8 @@ class TransactionController extends AbstractController
                 $position->setClosed(1);
                 $position->setClosedAt((new DateTime()));
             }
-            $this->getDoctrine()->getManager()->flush();
-            $session->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
+            $entityManager->flush();
+            $request->getSession()->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
 
             if ($referer->get()) {
                 return $this->redirect($referer->get());
@@ -197,6 +196,7 @@ class TransactionController extends AbstractController
      */
     public function delete(
         Request $request,
+        EntityManagerInterface $entityManager,
         Transaction $transaction,
         WeightedAverage $weightedAverage,
         Referer $referer
@@ -205,8 +205,6 @@ class TransactionController extends AbstractController
             $position = $transaction->getPosition();
             $position->removeTransaction($transaction);
             $weightedAverage->calc($position);
-
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->flush();
         }
 
@@ -219,10 +217,10 @@ class TransactionController extends AbstractController
     /**
      * @Route("/search", name="transaction_search", methods={"POST"})
      */
-    public function search(Request $request, SessionInterface $session): Response
+    public function search(Request $request): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');
-        $session->set(self::SEARCH_KEY, $searchCriteria);
+        $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('transaction_index', ['orderBy' => 'transactionDate', 'sort' => 'desc']);
     }
@@ -230,7 +228,7 @@ class TransactionController extends AbstractController
     /**
      * @Route("/export/{position}", name="transaction_export", methods={"GET"})
      */
-    public function export(Request $request, Position $position): Response
+    public function export(Position $position): Response
     {
         $transactions = $position->getTransactions();
         $tickerLabel = $position->getTicker()->getSymbol();

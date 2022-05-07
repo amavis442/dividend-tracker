@@ -13,10 +13,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Service\FileUploader;
 use App\Service\Referer;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -30,8 +29,8 @@ class ResearchController extends AbstractController
      * @Route("/list/{page}/{orderBy}/{sort}", name="research_index", methods={"GET"})
      */
     public function index(
+        Request $request,
         ResearchRepository $researchRepository,
-        SessionInterface $session,
         int $page = 1,
         string $orderBy = 'id',
         string $sort = 'asc'
@@ -43,7 +42,7 @@ class ResearchController extends AbstractController
             $sort = 'asc';
         }
 
-        $searchCriteria = $session->get(self::SEARCH_KEY, '');
+        $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
         $items = $researchRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
@@ -67,6 +66,7 @@ class ResearchController extends AbstractController
      */
     public function create(
         Request $request,
+        EntityManagerInterface $entityManager,
         ?Ticker $ticker,
         FileUploader $fileUploader,
         Referer $referer
@@ -93,7 +93,6 @@ class ResearchController extends AbstractController
                     }
                 }
             }
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($research);
             $entityManager->flush();
 
@@ -127,6 +126,7 @@ class ResearchController extends AbstractController
 
     public function edit(
         Request $request,
+        EntityManagerInterface $entityManager,
         Research $research,
         FileUploader $fileUploader,
         AttachmentRepository $attachmentRepository,
@@ -153,7 +153,7 @@ class ResearchController extends AbstractController
                         $research->addAttachment($existingAttachment);
                     } else {
                         $research->removeAttachment($existingAttachment);
-                        $this->getDoctrine()->getManager()->remove($existingAttachment);
+                        $entityManager->remove($existingAttachment);
                         $fileOnDisk = $documentDirectory . '/' . $existingAttachment->getAttachmentName();
                         if ($filesystem->exists($fileOnDisk)) {
                             $filesystem->remove([$fileOnDisk]);
@@ -176,7 +176,7 @@ class ResearchController extends AbstractController
                     }
                 }
             }
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
@@ -196,11 +196,11 @@ class ResearchController extends AbstractController
      */
     public function delete(
         Request $request,
+        EntityManagerInterface $entityManager,
         Research $research,
         Referer $referer
     ): Response {
         if ($this->isCsrfTokenValid('delete' . $research->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($research);
             $entityManager->flush();
         }
@@ -216,11 +216,10 @@ class ResearchController extends AbstractController
      * @Route("/search", name="research_search", methods={"POST"})
      */
     public function search(
-        Request $request,
-        SessionInterface $session
+        Request $request
     ): Response {
         $searchCriteria = $request->request->get('searchCriteria');
-        $session->set(self::SEARCH_KEY, $searchCriteria);
+        $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('research_index');
     }

@@ -9,8 +9,8 @@ use App\Service\YieldsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @Route("/dashboard/report")
@@ -25,15 +25,15 @@ class YieldByPieController extends AbstractController
      * @Route("/pieyield/{orderBy}", name="report_dividend_yield_by_pie")
      */
     public function index(
+        Request $request,
         PositionRepository $positionRepository,
         PieRepository $pieRepository,
         YieldsService $yields,
         DividendService $dividendService,
-        SessionInterface $session,
         string $orderBy = 'ticker'
     ): Response {
 
-        $pieSelected = $session->get(self::YIELD_PIE_KEY, null);
+        $pieSelected = $request->getSession()->get(self::YIELD_PIE_KEY, null);
         $result = $yields->yield($positionRepository, $dividendService, $orderBy, $pieSelected);
         $pies = $pieRepository->findLinked();
 
@@ -44,10 +44,10 @@ class YieldByPieController extends AbstractController
     /**
      * @Route("/pieyieldform", name="report_dividend_yield_by_pie_form", methods={"POST"})
      */
-    public function pieSelect(Request $request, SessionInterface $session): Response
+    public function pieSelect(Request $request): Response
     {
         $pie = $request->request->get('pie');
-        $session->set(self::YIELD_PIE_KEY, $pie);
+        $request->getSession()->set(self::YIELD_PIE_KEY, $pie);
 
         return $this->redirectToRoute('report_dividend_yield_by_pie');
     }

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Journal;
 use App\Form\JournalType;
 use App\Repository\JournalRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,14 +38,13 @@ class JournalController extends AbstractController
     /**
      * @Route("/create", name="journal_new", methods={"GET","POST"})
      */
-    public function create(Request $request): Response
+    public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $journal = new Journal();
         $form = $this->createForm(JournalType::class, $journal);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($journal);
             $entityManager->flush();
 
@@ -70,13 +70,13 @@ class JournalController extends AbstractController
     /**
      * @Route("/{id}/edit", name="journal_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Journal $journal): Response
+    public function edit(Request $request, EntityManagerInterface $entityManager, Journal $journal): Response
     {
         $form = $this->createForm(JournalType::class, $journal);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             return $this->redirectToRoute('journal_index');
         }
@@ -90,10 +90,9 @@ class JournalController extends AbstractController
     /**
      * @Route("/{id}", name="journal_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Journal $journal): Response
+    public function delete(Request $request, EntityManagerInterface $entityManager, Journal $journal): Response
     {
         if ($this->isCsrfTokenValid('delete' . $journal->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($journal);
             $entityManager->flush();
         }

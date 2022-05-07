@@ -5,11 +5,11 @@ namespace App\Controller;
 use App\Entity\Ticker;
 use App\Form\TickerType;
 use App\Repository\TickerRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * @Route("/dashboard/ticker")
@@ -22,13 +22,13 @@ class TickerController extends AbstractController
      * @Route("/list/{page<\d+>?1}", name="ticker_index", methods={"GET"})
      */
     public function index(
+        Request $request,
         TickerRepository $tickerRepository,
-        SessionInterface $session,
         int $page = 1,
         string $orderBy = 'ticker',
         string $sort = 'asc'
     ): Response {
-        $searchCriteria = $session->get(self::SEARCH_KEY, '');
+        $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
         $items = $tickerRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
@@ -48,14 +48,13 @@ class TickerController extends AbstractController
     /**
      * @Route("/create", name="ticker_new", methods={"GET","POST"})
      */
-    public function create(Request $request): Response
+    public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $ticker = new Ticker();
         $form = $this->createForm(TickerType::class, $ticker);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($ticker);
             $entityManager->flush();
 
@@ -81,13 +80,13 @@ class TickerController extends AbstractController
     /**
      * @Route("/{id}/edit", name="ticker_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Ticker $ticker): Response
+    public function edit(Request $request, EntityManagerInterface $entityManager, Ticker $ticker): Response
     {
         $form = $this->createForm(TickerType::class, $ticker);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             return $this->redirectToRoute('ticker_index');
         }
@@ -101,10 +100,9 @@ class TickerController extends AbstractController
     /**
      * @Route("/{id}", name="ticker_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Ticker $ticker): Response
+    public function delete(Request $request,EntityManagerInterface $entityManager, Ticker $ticker): Response
     {
         if ($this->isCsrfTokenValid('delete' . $ticker->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($ticker);
             $entityManager->flush();
         }
@@ -115,10 +113,10 @@ class TickerController extends AbstractController
     /**
      * @Route("/search", name="ticker_search", methods={"POST"})
      */
-    public function search(Request $request, SessionInterface $session): Response
+    public function search(Request $request): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');
-        $session->set(self::SEARCH_KEY, $searchCriteria);
+        $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('ticker_index');
     }

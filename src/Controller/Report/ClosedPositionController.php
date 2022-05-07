@@ -7,7 +7,6 @@ use App\Repository\PositionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -21,9 +20,9 @@ class ClosedPositionController extends AbstractController
      * @Route("/closed/{page}/{orderBy}/{sort}", name="report_closed_positions_index", methods={"GET"})
      */
     public function index(
+        Request $request,
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
-        SessionInterface $session,
         int $page = 1,
         string $orderBy = 'ticker',
         string $sort = 'asc'
@@ -41,7 +40,7 @@ class ClosedPositionController extends AbstractController
         $allocated = $positionRepository->getSumAllocated();
         $totalDividend = $paymentRepository->getTotalDividend();
 
-        $searchCriteria = $session->get(self::SEARCH_KEY, '');
+        $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
         $items = $positionRepository->getAllClosed($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
@@ -69,10 +68,10 @@ class ClosedPositionController extends AbstractController
     /**
      * @Route("/closed/search", name="report_closed_positions_search", methods={"POST"})
      */
-    public function search(Request $request, SessionInterface $session): Response
+    public function search(Request $request): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');
-        $session->set(self::SEARCH_KEY, $searchCriteria);
+        $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('report_closed_positions_index');
     }

@@ -8,7 +8,7 @@ use App\Entity\User;
 
 class UserFilter extends SQLFilter
 {
-    public function addFilterConstraint(ClassMetadata $targetEntity, $targetTableAlias)
+    public function addFilterConstraint(ClassMetadata $targetEntity, $targetTableAlias): string
     {
         if ($targetEntity->getName() !== User::class && $targetEntity->hasAssociation('user') && $this->hasParameter('userID')) {
             $userID = $this->getParameter('userID');

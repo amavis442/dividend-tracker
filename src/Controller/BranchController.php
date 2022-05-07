@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Branch;
 use App\Form\BranchType;
 use App\Repository\BranchRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,7 +41,7 @@ class BranchController extends AbstractController
     /**
      * @Route("/create", name="branch_new", methods={"GET","POST"})
      */
-    public function create(Request $request, BranchRepository $branchRepository): Response
+    public function create(Request $request, BranchRepository $branchRepository, EntityManagerInterface $entityManager): Response
     {
         $branch = new Branch();
         $assignedAllocation = $branchRepository->getSumAssetAllocation() - $branch->getAssetAllocation();
@@ -53,7 +54,6 @@ class BranchController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($branch);
             $entityManager->flush();
 
@@ -81,6 +81,7 @@ class BranchController extends AbstractController
      */
     public function edit(
         Request $request,
+        EntityManagerInterface $entityManager,
         Branch $branch,
         BranchRepository $branchRepository
     ): Response {
@@ -94,7 +95,7 @@ class BranchController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             return $this->redirectToRoute('branch_index');
         }
@@ -108,10 +109,9 @@ class BranchController extends AbstractController
     /**
      * @Route("/{id}", name="branch_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Branch $branch): Response
+    public function delete(Request $request, EntityManagerInterface $entityManager, Branch $branch): Response
     {
         if ($this->isCsrfTokenValid('delete' . $branch->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($branch);
             $entityManager->flush();
         }

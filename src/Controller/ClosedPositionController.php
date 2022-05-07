@@ -7,12 +7,10 @@ use App\Form\PositionType;
 use App\Repository\PositionRepository;
 use App\Service\PositionService;
 use App\Service\Referer;
-use App\Service\Summary;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -26,8 +24,8 @@ class ClosedPositionController extends AbstractController
      * @Route("/list/{page}/{sort}", name="closed_position_index", methods={"GET"})
      */
     public function index(
+        Request $request,
         PositionRepository $positionRepository,
-        SessionInterface $session,
         Referer $referer,
         int $page = 1,
         string $sort = 'desc'
@@ -37,7 +35,7 @@ class ClosedPositionController extends AbstractController
         }
 
         $referer->set('closed_position_index', ['status' => PositionRepository::CLOSED]);
-        $searchCriteria = $session->get(self::SEARCH_KEY, '') ?? '';
+        $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '') ?? '';
         $items = $positionRepository->getAllClosed($page, 10, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
@@ -74,7 +72,6 @@ class ClosedPositionController extends AbstractController
         Position $position,
         PositionService $positionService,
         ?int $closed,
-        SessionInterface $session,
         Referer $referer
     ): Response {
         if ($closed === 1) {
@@ -87,7 +84,7 @@ class ClosedPositionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $positionService->update($position);
-            $session->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
+            $request->getSession()->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
@@ -103,10 +100,10 @@ class ClosedPositionController extends AbstractController
     /**
      * @Route("/search", name="closed_position_search", methods={"POST"})
      */
-    public function search(Request $request, SessionInterface $session): Response
+    public function search(Request $request): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');
-        $session->set(self::SEARCH_KEY, $searchCriteria);
+        $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('closed_position_index', ['sort' => 'desc']);
     }

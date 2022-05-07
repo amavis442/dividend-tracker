@@ -28,14 +28,13 @@ class TaxController extends AbstractController
     /**
      * @Route("/create", name="tax_new", methods={"GET","POST"})
      */
-    public function create(Request $request): Response
+    public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $tax = new Tax();
         $form = $this->createForm(TaxType::class, $tax);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($tax);
             $entityManager->flush();
 
@@ -61,12 +60,12 @@ class TaxController extends AbstractController
     /**
      * @Route("/{id}/edit", name="tax_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Tax $tax): Response
+    public function edit(Request $request, EntityManagerInterface $entityManager, Tax $tax): Response
     {
         $form = $this->createForm(TaxType::class, $tax);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             return $this->redirectToRoute('tax_index');
         }
@@ -80,10 +79,9 @@ class TaxController extends AbstractController
     /**
      * @Route("/{id}", name="tax_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Tax $tax): Response
+    public function delete(Request $request, EntityManagerInterface $entityManager, Tax $tax): Response
     {
         if ($this->isCsrfTokenValid('delete' . $tax->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($tax);
             $entityManager->flush();
         }

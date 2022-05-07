@@ -18,7 +18,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -36,9 +35,7 @@ class PortfolioController extends AbstractController
         Request $request,
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
-        TickerRepository $tickerRepository,
         PieRepository $pieRepository,
-        SessionInterface $session,
         Summary $summary,
         DividendService $dividendService,
         Referer $referer,
@@ -47,18 +44,27 @@ class PortfolioController extends AbstractController
         string $orderBy = 'fullname',
         string $sort = 'asc'
     ): Response {
+        
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
         }
-
         $limit = 20;
         $pies = $pieRepository->findLinked();
-        $searchCriteria = $session->get(self::SEARCH_KEY, '');
-        $pieSelected = $session->get(self::PIE_KEY, null);
+        $searchCriteria = '';
+        $pieSelected = null;
+        if (!$request->hasSession()){
+            dump('Nope');
+        }
+
+        $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
+        $pieSelected = $request->getSession()->get(self::PIE_KEY, null);
+        
+
         $thisPage = $page;
         [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
         $referer->set('portfolio_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
-
+        
+        
         $pageData = $model->getPage(
             $positionRepository,
             $dividendService,
@@ -70,9 +76,11 @@ class PortfolioController extends AbstractController
             $searchCriteria,
             $pieSelected,
         );
+        
 
-        $session->set(get_class($this), $request->getRequestUri());
+        $request->getSession()->set(get_class($this), $request->getRequestUri());
 
+        
         return $this->render('portfolio/index.html.twig', [
             'portfolioItems' => $pageData->getPortfolioItems(),
             'cacheTimestamp' => (new DateTime())->setTimestamp($pageData->getCacheTimestamp()),
@@ -94,13 +102,16 @@ class PortfolioController extends AbstractController
             'totalDividend' => $totalDividend,
             'totalInvested' => $allocated,
         ]);
+        
+        //return new Response('We komen ergens');
+        
     }
 
     /**
      * @Route("/{id}", name="portfolio_show", methods={"GET"})
      */
     public function show(
-        SessionInterface $session,
+        Request $request,
         Position $position,
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
@@ -166,7 +177,7 @@ class PortfolioController extends AbstractController
 
         $referer->set('portfolio_show', ['id' => $position->getId()]);
 
-        $indexUrl = $session->get(get_class($this));
+        $indexUrl = $request->getSession()->get(get_class($this));
 
         return $this->render('portfolio/show.html.twig', [
             'ticker' => $ticker,
@@ -192,10 +203,10 @@ class PortfolioController extends AbstractController
     /**
      * @Route("/search", name="portfolio_search", methods={"POST"})
      */
-    public function search(Request $request, SessionInterface $session): Response
+    public function search(Request $request): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');
-        $session->set(self::SEARCH_KEY, $searchCriteria);
+        $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('portfolio_index');
     }
@@ -203,10 +214,10 @@ class PortfolioController extends AbstractController
     /**
      * @Route("/pie", name="portfolio_pie", methods={"POST"})
      */
-    public function pie(Request $request, SessionInterface $session): Response
+    public function pie(Request $request): Response
     {
         $pie = $request->request->get('pie');
-        $session->set(self::PIE_KEY, $pie);
+        $request->getSession()->set(self::PIE_KEY, $pie);
 
         return $this->redirectToRoute('portfolio_index');
     }

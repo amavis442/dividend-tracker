@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use ApiPlatform\Core\Filter\Validator\Enum;
 use App\Entity\Payment;
 use App\Entity\Position;
 use App\Form\PaymentType;
@@ -10,12 +11,12 @@ use App\Repository\CalendarRepository;
 use App\Repository\PaymentRepository;
 use App\Service\Referer;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -33,7 +34,6 @@ class PaymentController extends AbstractController
     public function index(
         Request $request,
         PaymentRepository $paymentRepository,
-        SessionInterface $session,
         Referer $referer,
         int $page = 1,
         string $orderBy = 'payDate',
@@ -46,7 +46,7 @@ class PaymentController extends AbstractController
             $sort = 'DESC';
         }
 
-        $defaultData = $session->get(self::SEARCHFORM_KEY);
+        $defaultData = $request->getSession()->get(self::SEARCHFORM_KEY);
         if ($defaultData === null) {
             $defaultData['year'] = date('Y');
         }
@@ -94,7 +94,7 @@ class PaymentController extends AbstractController
         $data = $defaultData;
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            $session->set(self::SEARCHFORM_KEY, $data);
+            $request->getSession()->set(self::SEARCHFORM_KEY, $data);
             $page = 1;
         }
 
@@ -109,7 +109,7 @@ class PaymentController extends AbstractController
         }
         $totalDividend = $paymentRepository->getTotalDividend($startDate, $endDate);
         $taxes = ($totalDividend / 85) * 15;
-        $searchCriteria = $session->get(self::SEARCH_KEY, '');
+        $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
         $items = $paymentRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria, $startDate, $endDate);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
@@ -140,6 +140,7 @@ class PaymentController extends AbstractController
      */
     public function create(
         Request $request,
+        EntityManagerInterface $entityManager,
         position $position,
         string $timestamp = null,
         CalendarRepository $calendarRepository,
@@ -177,7 +178,6 @@ class PaymentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
             $payment->setTicker($ticker);
             $entityManager->persist($payment);
             $entityManager->flush();
@@ -209,6 +209,7 @@ class PaymentController extends AbstractController
      */
     public function edit(
         Request $request,
+        EntityManagerInterface $entityManager,
         Payment $payment,
         Referer $referer
     ): Response {
@@ -216,7 +217,7 @@ class PaymentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
@@ -234,11 +235,11 @@ class PaymentController extends AbstractController
      */
     public function delete(
         Request $request,
+        EntityManagerInterface $entityManager,
         Payment $payment,
         Referer $referer
     ): Response {
         if ($this->isCsrfTokenValid('delete' . $payment->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($payment);
             $entityManager->flush();
         }
@@ -252,10 +253,10 @@ class PaymentController extends AbstractController
     /**
      * @Route("/search", name="payment_search", methods={"POST"})
      */
-    public function search(Request $request, SessionInterface $session): Response
+    public function search(Request $request): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');
-        $session->set(self::SEARCH_KEY, $searchCriteria);
+        $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('payment_index', ['orderBy' => 'payDate', 'sort' => 'desc']);
     }

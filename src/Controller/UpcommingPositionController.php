@@ -3,16 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Position;
-use App\Form\PositionType;
 use App\Repository\PositionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Repository\TickerRepository;
-use DateTime;
 use App\Repository\PaymentRepository;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @Route("/dashboard/upcomming")
@@ -60,10 +57,9 @@ class UpcommingPositionController extends AbstractController
     /**
      * @Route("/{id}", name="upcomming_position_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Position $position): Response
+    public function delete(Request $request, EntityManagerInterface $entityManager, Position $position): Response
     {
         if ($this->isCsrfTokenValid('delete' . $position->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($position);
             $entityManager->flush();
         }

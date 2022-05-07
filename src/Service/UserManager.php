@@ -4,17 +4,17 @@ namespace App\Service;
 
 use App\Repository\UserRepository;
 use App\Entity\User;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserManager
 {
     private $userRepository;
-    private $passwordEncoder;
+    private $passwordHasher;
 
-    public function __construct(UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(UserRepository $userRepository, UserPasswordHasherInterface  $passwordHasher)
     {
         $this->userRepository = $userRepository;
-        $this->passwordEncoder = $passwordEncoder;
+        $this->passwordHasher = $passwordHasher;
     }
 
     public function isUserDuplicate(string $email)
@@ -27,7 +27,7 @@ class UserManager
     public function create(string $email, string $password, ?array $roles = null): void
     {
         $user = new User();
-        $user->setPassword($this->passwordEncoder->encodePassword(
+        $user->setPassword($this->passwordHasher->hashPassword(
             $user,
             $password
         ));

@@ -6,13 +6,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @UniqueEntity(fields={"email"}, message="There is already an account with this email")
  */
-class User implements UserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     public const ROLES = ['user', 'admin', 'superadmin'];
 
@@ -34,15 +35,15 @@ class User implements UserInterface
     private $email;
 
     /**
-     * @ORM\Column(type="json")
-     */
-    private $roles = [];
-
-    /**
      * @var string The hashed password
      * @ORM\Column(type="string")
      */
     private $password;
+
+    /**
+     * @ORM\Column(type="json")
+     */
+    private $roles = [];
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="user")
@@ -95,14 +96,29 @@ class User implements UserInterface
         return $this;
     }
 
+    public function setUsername(string $username): self
+    {
+        $this->username = $username;
+
+        return $this;
+    }
+
     /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
+     * @deprecated since Symfony 5.3
      */
     public function getUsername(): string
     {
         return (string) $this->email;
+    }
+
+    /**
+     * The public representation of the user (e.g. a username, an email address, etc.)
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
     }
 
     /**
@@ -125,7 +141,7 @@ class User implements UserInterface
     }
 
     /**
-     * @see UserInterface
+     * @see PasswordAuthenticatedUserInterface
      */
     public function getPassword(): string
     {
@@ -140,11 +156,14 @@ class User implements UserInterface
     }
 
     /**
+     * Returning a salt is only needed, if you are not using a modern
+     * hashing algorithm (e.g. bcrypt or sodium) in your security.yaml.
+     *
      * @see UserInterface
      */
-    public function getSalt()
+    public function getSalt(): ?string
     {
-        // not needed when using the "bcrypt" algorithm in security.yaml
+        return null;
     }
 
     /**

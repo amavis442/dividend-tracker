@@ -11,10 +11,10 @@ use App\Repository\CalendarRepository;
 use App\Service\DividendService;
 use App\Service\Referer;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -28,8 +28,8 @@ class CalendarController extends AbstractController
      * @Route("/list/{page}/{orderBy}/{sort}", name="calendar_index", methods={"GET"})
      */
     public function index(
+        Request $request,
         CalendarRepository $calendarRepository,
-        SessionInterface $session,
         Referer $referer,
         int $page = 1,
         string $orderBy = 'createdAt',
@@ -41,6 +41,7 @@ class CalendarController extends AbstractController
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'DESC';
         }
+        $session = $request->getSession();
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
         $items = $calendarRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
@@ -67,6 +68,7 @@ class CalendarController extends AbstractController
      */
     public function create(
         Request $request,
+        EntityManagerInterface $entityManager,
         ?Ticker $ticker = null,
         Referer $referer
     ): Response {
@@ -77,7 +79,6 @@ class CalendarController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $calendar->setSource(Calendar::SOURCE_MANUEL);
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($calendar);
             $entityManager->flush();
 
@@ -146,6 +147,7 @@ class CalendarController extends AbstractController
      */
     public function edit(
         Request $request,
+        EntityManagerInterface $entityManager,
         Calendar $calendar,
         Referer $referer
     ): Response {
@@ -153,7 +155,7 @@ class CalendarController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             if ($referer->get()) {
                 return $this->redirect($referer->get());
@@ -172,11 +174,11 @@ class CalendarController extends AbstractController
      */
     public function delete(
         Request $request,
+        EntityManagerInterface $entityManager,
         Calendar $calendar,
         Referer $referer
     ): Response {
         if ($this->isCsrfTokenValid('delete' . $calendar->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($calendar);
             $entityManager->flush();
         }
@@ -191,11 +193,10 @@ class CalendarController extends AbstractController
      * @Route("/search", name="calendar_search", methods={"POST"})
      */
     public function search(
-        Request $request,
-        SessionInterface $session
+        Request $request
     ): Response {
         $searchCriteria = $request->request->get('searchCriteria');
-        $session->set(self::SEARCH_KEY, $searchCriteria);
+        $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('calendar_index');
     }

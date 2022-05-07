@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Currency;
 use App\Form\CurrencyType;
 use App\Repository\CurrencyRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,14 +29,13 @@ class CurrencyController extends AbstractController
     /**
      * @Route("/create", name="currency_new", methods={"GET","POST"})
      */
-    public function create(Request $request): Response
+    public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $currency = new Currency();
         $form = $this->createForm(CurrencyType::class, $currency);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($currency);
             $entityManager->flush();
 
@@ -61,13 +61,13 @@ class CurrencyController extends AbstractController
     /**
      * @Route("/{id}/edit", name="currency_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Currency $currency): Response
+    public function edit(Request $request,  EntityManagerInterface $entityManager, Currency $currency): Response
     {
         $form = $this->createForm(CurrencyType::class, $currency);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             return $this->redirectToRoute('currency_index');
         }
@@ -81,10 +81,9 @@ class CurrencyController extends AbstractController
     /**
      * @Route("/{id}", name="currency_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Currency $currency): Response
+    public function delete(Request $request, EntityManagerInterface $entityManager, Currency $currency): Response
     {
         if ($this->isCsrfTokenValid('delete' . $currency->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($currency);
             $entityManager->flush();
         }

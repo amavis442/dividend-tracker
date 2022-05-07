@@ -8,19 +8,14 @@ use App\Entity\Issue;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
-use Psr\Container\ContainerInterface;
 
 class StringToFilesTransformer implements DataTransformerInterface
 {
     private $entityManager;
-    protected $container;
-
-    public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container)
+    
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->container = $container;
     }
 
     /**

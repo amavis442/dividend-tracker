@@ -10,10 +10,10 @@ use App\Service\PositionService;
 use App\Service\Referer;
 use App\Service\Summary;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -27,9 +27,9 @@ class PositionController extends AbstractController
      * @Route("/list/{page}/{tab}/{orderBy}/{sort}/{status}", name="position_index", methods={"GET"})
      */
     public function index(
+        Request $request,
         Summary $summary,
         PositionRepository $positionRepository,
-        SessionInterface $session,
         Referer $referer,
         int $page = 1,
         string $tab = 'All',
@@ -52,7 +52,7 @@ class PositionController extends AbstractController
 
         [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
 
-        $searchCriteria = $session->get(self::SEARCH_KEY, '');
+        $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
         $items = $positionRepository->getAll($page, 10, $order, $sort, $searchCriteria, $status);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
@@ -82,7 +82,7 @@ class PositionController extends AbstractController
     /**
      * @Route("/create/{ticker}", name="position_new", methods={"GET","POST"})
      */
-    public function create(Request $request, ?Ticker $ticker = null, SessionInterface $session, PositionService $positionService): Response
+    public function create(Request $request, ?Ticker $ticker = null, PositionService $positionService): Response
     {
         $position = new Position();
 
@@ -94,8 +94,8 @@ class PositionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $positionService->create($position);
-            $session->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
-            $session->set(PortfolioController::SEARCH_KEY, $position->getTicker()->getTicker());
+            $request->getSession()->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
+            $request->getSession()->set(PortfolioController::SEARCH_KEY, $position->getTicker()->getTicker());
             return $this->redirectToRoute('portfolio_index');
         }
 
@@ -124,7 +124,6 @@ class PositionController extends AbstractController
         Position $position,
         PositionService $positionService,
         ?int $closed,
-        SessionInterface $session,
         Referer $referer
     ): Response {
         if ($closed === 1) {
@@ -137,7 +136,7 @@ class PositionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $positionService->update($position);
-            $session->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
+            $request->getSession()->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
@@ -153,10 +152,9 @@ class PositionController extends AbstractController
     /**
      * @Route("/{id}", name="position_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Position $position): Response
+    public function delete(Request $request, EntityManagerInterface $entityManager, Position $position): Response
     {
         if ($this->isCsrfTokenValid('delete' . $position->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($position);
             $entityManager->flush();
         }
@@ -167,10 +165,10 @@ class PositionController extends AbstractController
     /**
      * @Route("/search", name="position_search", methods={"POST"})
      */
-    public function search(Request $request, SessionInterface $session): Response
+    public function search(Request $request): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');
-        $session->set(self::SEARCH_KEY, $searchCriteria);
+        $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('position_index', ['orderBy' => 'buyDate', 'sort' => 'desc']);
     }

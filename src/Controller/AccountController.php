@@ -3,18 +3,19 @@
 namespace App\Controller;
 
 use App\Form\AccountFormType;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AccountController extends AbstractController
 {
     /**
      * @Route("/dashboard/account/update", name="app_account_update")
      */
-    public function update(Request $request, UserPasswordEncoderInterface $passwordEncoder): Response
+    public function update(Request $request, UserPasswordHasherInterface  $passwordHasher, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         $form = $this->createForm(AccountFormType::class, $user);
@@ -23,13 +24,12 @@ class AccountController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             // encode the plain password
             $user->setPassword(
-                $passwordEncoder->encodePassword(
+                $passwordHasher->hashPassword(
                     $user,
                     $form->get('plainPassword')->getData()
                 )
             );
 
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($user);
             $entityManager->flush();
 
