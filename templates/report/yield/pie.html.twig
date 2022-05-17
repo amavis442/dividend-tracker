@@ -19,7 +19,7 @@
 		<input type="hidden" name="_method" value="POST">
 			<div class="form-group mx-sm-3 mb-2">
             <select name='pie' class="form-control">
-                <option value ='0'>All</option>
+                <option value ='0'>{{ 'All'|trans }}</option>
                 {% for p in pies %}
                     <option value="{{ p.id }}" {% if pieSelected == p.id %}selected{% endif %}>{{ p.label }}</option>
                 {% endfor %}
@@ -34,7 +34,7 @@
         <canvas id="barChartCanvas" class="chart"
 			data-chart-data='{{ data|json_encode|raw }}' 
 			data-chart-labels='{{ labels|json_encode|raw }}'
-			data-chart-title='Yield'
+			data-chart-title='{{ 'Yield'|trans }}'
 			data-chart-sub-title='Dividend yield'
 			data-chart-sign='%'></canvas>
     </div>
