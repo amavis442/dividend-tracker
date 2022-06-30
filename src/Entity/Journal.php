@@ -2,13 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\JournalRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=JournalRepository::class)
+ * @ORM\Entity(repositoryClass=App\Repository\JournalRepository::class)
  */
 class Journal
 {
@@ -44,6 +43,21 @@ class Journal
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Taxonomy::class, inversedBy="journals")
+     * @ORM\OrderBy({"title" = "DESC"})
+     * @ORM\JoinTable(name="journal_taxonomy",
+     *      joinColumns={@ORM\JoinColumn(name="journal_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="taxonomy_id", referencedColumnName="id")}
+     *      )
+     */
+    private $taxonomy;
+
+    public function __construct()
+    {
+        $this->taxonomy = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -109,4 +123,29 @@ class Journal
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Taxonomy>|null
+     */
+    public function getTaxonomy(): ?Collection
+    {
+        return $this->taxonomy;
+    }
+
+    public function addTaxonomy(Taxonomy $taxonomy): self
+    {
+        if (!$this->taxonomy->contains($taxonomy)) {
+            $this->taxonomy[] = $taxonomy;
+        }
+
+        return $this;
+    }
+
+    public function removeTaxonomy(Taxonomy $taxonomy): self
+    {
+        $this->taxonomy->removeElement($taxonomy);
+
+        return $this;
+    }
+
 }
