@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Journal;
 use App\Form\JournalType;
 use App\Repository\JournalRepository;
+use App\Repository\TaxonomyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,18 +17,35 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class JournalController extends AbstractController
 {
+    public const TAXONOMY_KEY = 'journal_taxonomy'; 
     /**
      * @Route("/list/{page<\d+>?1}", name="journal_index", methods={"GET"})
      */
-    public function index(JournalRepository $journalRepository, int $page = 1): Response
+    public function index(Request $request, JournalRepository $journalRepository,TaxonomyRepository $taxonomyRepository, int $page = 1): Response
     {
+        $taxonomySelected = null;
+        if (!$request->hasSession()){
+            dump('Nope');
+        }
+        $taxonomySelected = $request->getSession()->get(self::TAXONOMY_KEY, null);
+
+        if (!is_null($taxonomySelected)) {
+            $taxonomySelected = array_flip($taxonomySelected);
+        }
+       
+
         $limit = 5;
-        $items = $journalRepository->findItems($page, $limit);
+        $items = $journalRepository->findItems($page, $limit, $taxonomySelected);
+        $taxonomy = $taxonomyRepository->findLinked();
+
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
+        
 
         return $this->render('journal/index.html.twig', [
             'journals' => $items->getIterator(),
+            'taxonomy' => $taxonomy,
+            'taxonomySelected' => $taxonomySelected ?? [],
             'limit' => $limit,
             'maxPages' => $maxPages,
             'thisPage' => $thisPage,
@@ -97,6 +115,16 @@ class JournalController extends AbstractController
             $entityManager->flush();
         }
 
+        return $this->redirectToRoute('journal_index');
+    }
+
+    /**
+     * @Route("/taxonomy", name="journal_taxonomy", methods={"POST"})
+     */
+    public function pie(Request $request): Response
+    {
+        $taxonomy = $request->request->get('taxonomy', null);
+        $request->getSession()->set(self::TAXONOMY_KEY, $taxonomy);
         return $this->redirectToRoute('journal_index');
     }
 }

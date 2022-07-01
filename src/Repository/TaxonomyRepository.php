@@ -39,6 +39,16 @@ class TaxonomyRepository extends ServiceEntityRepository
         }
     }
 
+    public function findLinked(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->join('t.journals', 'j')
+            ->orderBy('t.title', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+
 //    /**
 //     * @return Taxonomy[] Returns an array of Taxonomy objects
 //     */

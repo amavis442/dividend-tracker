@@ -1,34 +1,63 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ 'Journal'|trans }}{% endblock %}
+{% block title %}
+	{{ 'Journal'|trans }}
+{% endblock %}
 
 {% block body %}
-    <h1>{{ 'Journal'|trans }}</h1>
-    <div>
-        <a href="{{ path('journal_new') }}" class="btn btn-primary" role="button"><i class="far fa-file"></i> {{ 'Create new'|trans }}</a>
-    </div>
-    <br/>    
-        {% for journal in journals %}
-        <div class="card" style="width: 60rem;">
-            <div class="card-header">
-                <h3><span class="badge badge-info">{{ journal.createdAt ? journal.createdAt|date('l')|trans ~ ', ' ~ journal.createdAt|date('d') ~ ' ' ~ journal.createdAt|date('F')|trans ~ ' ' ~ journal.createdAt|date('Y') }}</span> {{ journal.title }}</h3>
-            </div>
-            <div class="card-body">
-                <span class="card-text">{{ journal.content|raw }}
-                <hr/>
-                <a href="{{ path('journal_show', {'id': journal.id}) }}" class="btn btn-primary">{{ 'show'|trans }}</a>
-                <a href="{{ path('journal_edit', {'id': journal.id}) }}" class="btn btn-secondary">{{ 'edit'|trans }}</a>
-            </div>
-            <div class="card-footer text-muted">
-                {{ 'Created'|trans }}: {{ journal.createdAt ? journal.createdAt|date('Y-m-d H:i:s') : '-' }}, 
-                {{ 'Modified'|trans }}: {{ journal.updatedAt ? journal.updatedAt|date('Y-m-d H:i:s') : '-' }}
-            </div>
-        </div>
-        <br/>
-        {% else %}
-                {{ 'no records found'|trans }}
-        {% endfor %}
+	<h1>{{ 'Journal'|trans }}</h1>
+	<div>
+		<a href="{{ path('journal_new') }}" class="btn btn-primary" role="button">
+			<i class="far fa-file"></i>
+			{{ 'Create new'|trans }}</a>
+	</div>
+	<br/>
+	<form action="{{ path('journal_taxonomy') }}" method="POST" class="form-inline">
+		<input type="hidden" name="_method" value="POST">
 
-        {% include 'paginator.html.twig' %}
-        
-{% endblock %}
+		<div class="form-group mx-sm-3 mb-2">
+			{% for t in taxonomy %}
+				<div class="form-check form-check-inline">
+					<input class="form-check-input" type="checkbox" value="{{ t.id }}" name='taxonomy[]' {% if taxonomySelected[t.id] is defined %} checked {% endif %} id="defaultCheck{{t.id}}">
+					<label class="form-check-label" for="defaultCheck{{t.id}}">
+						{{ t.title }}
+					</label>
+				</div>
+			{% endfor %}
+		</div>
+
+		<button class="btn btn-secondary mb-2" data-toggle="tooltip" data-placement="top" title="Filter taxonomy">
+			<i class="fas fa-solid fa-filter"></i>
+		</button>
+	</form>
+
+
+	<br/>
+	{% for journal in journals %}
+		<div class="card" style="width: 60rem;">
+			<div class="card-header">
+				<h3>
+					<span class="badge badge-info">{{ journal.createdAt ? journal.createdAt|date('l')|trans ~ ', ' ~ journal.createdAt|date('d') ~ ' ' ~ journal.createdAt|date('F')|trans ~ ' ' ~ journal.createdAt|date('Y') }}</span>
+					{{ journal.title }}</h3>
+			</div>
+			<div class="card-body">
+				<span class="card-text">{{ journal.content|raw }}
+					<hr/>
+					<a href="{{ path('journal_show', {'id': journal.id}) }}" class="btn btn-primary">{{ 'show'|trans }}</a>
+					<a href="{{ path('journal_edit', {'id': journal.id}) }}" class="btn btn-secondary">{{ 'edit'|trans }}</a>
+				</div>
+				<div class="card-footer text-muted">
+					{{ 'Created'|trans }}:
+					{{ journal.createdAt ? journal.createdAt|date('Y-m-d H:i:s') : '-' }},
+					{{ 'Modified'|trans }}:
+					{{ journal.updatedAt ? journal.updatedAt|date('Y-m-d H:i:s') : '-' }}
+				</div>
+			</div>
+			<br/>
+		{% else %}
+			{{ 'no records found'|trans }}
+		{% endfor %}
+
+		{% include 'paginator.html.twig' %}
+
+	{% endblock %}

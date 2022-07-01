@@ -22,11 +22,19 @@ class JournalRepository extends ServiceEntityRepository
         parent::__construct($registry, Journal::class);
     }
 
-    public function findItems(int $page = 1, int $limit = 30): Paginator
+    public function findItems(int $page = 1, int $limit = 30, ?array $taxonomy): Paginator
     {
-        $query = $this->createQueryBuilder('j')
-            ->orderBy('j.id', 'DESC')
-            ->getQuery();
+        $dql = $this->createQueryBuilder('j')
+            ->orderBy('j.id', 'DESC');
+        if (!is_null($taxonomy)) {
+            $dql->join('j.taxonomy','t')
+            ->where('t.id IN (:taxonomy)')
+            ->setParameter('taxonomy', array_flip($taxonomy));
+        }
+
+
+        $query = $dql->getQuery();
+
         return $this->paginate($query, $page, $limit);
     }
 
