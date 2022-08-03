@@ -145,7 +145,7 @@ class DividendDateCommand extends Command
                         ->setCurrency($currency)
                         ->setSource(Calendar::SOURCE_SCRIPT)
                         ->setDescription($payment['Type'])
-                    ;
+                        ->setDividendType(Calendar::REGULAR);
                     if (stripos($payment['Type'], 'Extra') !== false) {
                         $calendar->setDividendType(Calendar::SUPPLEMENT);
                     }
