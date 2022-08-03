@@ -8,8 +8,8 @@ use App\Repository\CurrencyRepository;
 use App\Repository\TickerRepository;
 use App\Service\DividendDateService;
 use DateTime;
-use Exception;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -111,7 +111,7 @@ class DividendDateCommand extends Command
                 try {
                     $exDate = new DateTime($payment['ExDate']);
                 } catch (Exception $ex) {
-                    $this->logger->alert('exDate exception: '.print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
+                    $this->logger->alert('exDate exception: ' . print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
                     continue;
                 }
                 $calendar = $this->calendarRepository->findOneBy(['ticker' => $ticker, 'exDividendDate' => $exDate]);
@@ -125,16 +125,16 @@ class DividendDateCommand extends Command
                     try {
                         $payDate = new DateTime($payment['PayDate']);
                     } catch (Exception $ex) {
-                        $this->logger->alert('payDate exception: '.print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
+                        $this->logger->alert('payDate exception: ' . print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
                         continue;
                     }
                     try {
                         $recordDate = new DateTime($payment['RecordDate']);
                     } catch (Exception $ex) {
-                        $this->logger->alert('recordDate exception: '.print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
+                        $this->logger->alert('recordDate exception: ' . print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
                         continue;
                     }
-                    
+
                     $calendar = new Calendar();
                     $calendar
                         ->setTicker($ticker)
@@ -146,6 +146,9 @@ class DividendDateCommand extends Command
                         ->setSource(Calendar::SOURCE_SCRIPT)
                         ->setDescription($payment['Type'])
                     ;
+                    if (stripos($payment['Type'], 'Extra') !== false) {
+                        $calendar->setDividendType(Calendar::SUPPLEMENT);
+                    }
                     $this->entityManager->persist($calendar);
                     $this->entityManager->flush();
 
