@@ -51,6 +51,9 @@
 					{{ journal.createdAt ? journal.createdAt|date('Y-m-d H:i:s') : '-' }},
 					{{ 'Modified'|trans }}:
 					{{ journal.updatedAt ? journal.updatedAt|date('Y-m-d H:i:s') : '-' }}
+					{% for taxonomy in journal.taxonomy %}
+						<span class="badge bg-secondary text-white">{{ taxonomy.title }}</span>
+					{% endfor %}
 				</div>
 			</div>
 			<br/>
