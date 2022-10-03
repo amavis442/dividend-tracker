@@ -38,11 +38,22 @@ host('134.209.84.155')
     ->forwardAgent(true)
     ->set('deploy_path', '/var/www/{{application}}');
 
-localhost()
+host('192.168.2.143')
+    ->stage('local')
+    ->user('deployer')
+    ->roles('app')
+    ->port(22)
+    ->configFile('~/.ssh/config')
+    ->identityFile('~/.ssh/deployer')
+    ->multiplexing(true)
+    ->forwardAgent(true)
+    ->set('deploy_path', '/var/www/{{application}}');
+
+/*localhost()
     ->stage('local')
     ->roles('test', 'build')
     ->set('deploy_path', '~/Sites/live/{{application}}');
-
+*/
 // Tasks
 desc('Yarn install'); // For encore and stuff
 task('yarn:install', function(){
