@@ -27,6 +27,7 @@ set('allow_anonymous_stats', false);
 
 // Hosts
 
+/*
 host('134.209.84.155')
     ->stage('prod','staging')
     ->user('deployer')
@@ -37,9 +38,10 @@ host('134.209.84.155')
     ->multiplexing(true)
     ->forwardAgent(true)
     ->set('deploy_path', '/var/www/{{application}}');
+*/
 
 host('192.168.2.143')
-    ->stage('local')
+    ->stage('local','prod','staging')
     ->user('deployer')
     ->roles('app')
     ->port(22)
