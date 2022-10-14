@@ -41,7 +41,7 @@ host('134.209.84.155')
 */
 
 host('192.168.2.143')
-    ->stage('local','prod','staging')
+    ->stage('prod')
     ->user('deployer')
     ->roles('app')
     ->port(22)
