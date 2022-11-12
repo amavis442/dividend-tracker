@@ -1,11 +1,21 @@
 const Encore = require('@symfony/webpack-encore');
 const webpack = require('webpack');
+const ESLintPlugin = require('eslint-webpack-plugin');
+const path = require('path');
 
 // Manually configure the runtime environment if not already configured yet by the "encore" command.
 // It's useful when you use tools that rely on webpack.config.js file.
 if (!Encore.isRuntimeEnvironmentConfigured()) {
     Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
 }
+
+const myEslintOptions = {
+    extensions: [`js`, `jsx`, `ts`],
+    exclude: [`node_modules`],
+    fix: true,
+    emitError: true,
+    emitWarning: true,
+};
 
 Encore
     // directory where compiled assets will be stored
@@ -14,8 +24,8 @@ Encore
     .setPublicPath('/build')
     // only needed for CDN's or sub-directory deploy
     //.setManifestKeyPrefix('build/')
-    //.autoProvidejQuery()
-    
+    .autoProvidejQuery()
+
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     //.enableStimulusBridge('./assets/controllers.json')
 
@@ -26,7 +36,7 @@ Encore
     // but, you probably want this, unless you're building a single-page app
     .enableSingleRuntimeChunk()
     //.disableSingleRuntimeChunk()
-    
+
     /*
      * FEATURE CONFIG
      *
@@ -53,17 +63,19 @@ Encore
 
     // enables Sass/SCSS support
     .enableSassLoader()
-    .enableVueLoader(() => {}, { runtimeCompilerBuild: true })
+    .enableVueLoader(() => { }, { runtimeCompilerBuild: true })
     // uncomment if you use TypeScript
     //.enableTypeScriptLoader()
 
     .autoProvideVariables({
-             $: 'jquery',
-             jQuery: 'jquery',
-             'window.jQuery': 'jquery',
-             CodeMirror: 'codemirror',
+        $: 'jquery',
+        jQuery: 'jquery',
+        'window.jQuery': 'jquery',
+        CodeMirror: 'codemirror',
     })
-
+    .addAliases({
+        'jQuery': path.join(__dirname, 'node_modules/jquery/dist/jquery.js')
+    })
     // uncomment to get integrity="..." attributes on your script & link tags
     // requires WebpackEncoreBundle 1.4 or higher
     .enableIntegrityHashes(Encore.isProduction())
@@ -90,20 +102,23 @@ Encore
     .addEntry('vue', './assets/vue/index.js')
 
     .addPlugin(new webpack.DefinePlugin({
-        'ENV_API_ENDPOINT': JSON.stringify(process.env.API_ENDPOINT),
+        ENV_API_ENDPOINT: JSON.stringify(process.env.API_ENDPOINT),
+        __VUE_OPTIONS_API__: true,
+        __VUE_PROD_DEVTOOLS__: false,
     }))
     // enable ESLint
-    .addLoader({
+    .addPlugin(new ESLintPlugin(myEslintOptions))
+    /*.addLoader({
         enforce: 'pre',
         test: /\.(js|vue)$/,
-        loader: 'eslint-loader',
+        loader: 'eslint-webpack-plugin',
         exclude: /node_modules/,
         options: {
             fix: true,
             emitError: true,
             emitWarning: true,
         },
-    })
-;
+    })*/
+    ;
 
-module.exports = Encore.getWebpackConfig();
+module.exports = Encore.getWebpackConfig()

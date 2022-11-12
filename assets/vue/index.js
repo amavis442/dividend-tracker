@@ -1,6 +1,6 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import Stockprice from './components/Stockprice';
-import process from  'process';
+import process from 'process';
 
 let baseURL;
 
@@ -9,12 +9,29 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 } else {
   baseURL = 'https://dividend.odroid/';
 }
-Vue.prototype.$apiBaseUrl = baseURL;
 
-new Vue({
-  el: '#app',
+/*
+{
   components: {Stockprice},
-  data: { 
+  data: {
     url: baseURL
   }
-})
+}
+*/
+console.log('VUEJS......');
+const app = createApp({
+  components: { Stockprice },
+  provide: {
+    apiBaseUrl: baseURL
+  },
+  data: function () {
+    return {
+      url: baseURL
+    };
+  },
+
+}
+);
+//app.prototype.$apiBaseUrl = baseURL;
+app.mount('#app');
+
