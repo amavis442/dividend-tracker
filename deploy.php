@@ -3,7 +3,7 @@ namespace Deployer;
 
 use Symfony\Component\Console\Input\InputOption;
 
-require 'recipe/symfony4.php';
+require 'recipe/symfony.php';
 
 // Project name
 set('application', 'dividend.banpagi.com');
@@ -19,52 +19,23 @@ set('writable_mode','acl');
 
 // Shared files/dirs between deploys
 add('shared_files', ['.env.local','public/uploads']);
-//add('shared_dirs', ['public/media','public/assets','public/bundles']);
-
-// Writable dirs by web server
-//add('writable_dirs', ['public/media','public/assets','public/bundles']);
 set('allow_anonymous_stats', false);
 
 // Hosts
 
-/*
-host('134.209.84.155')
-    ->stage('prod','staging')
-    ->user('deployer')
-    ->roles('app')
-    ->port(22)
-    ->configFile('~/.ssh/config')
-    ->identityFile('~/.ssh/deployer')
-    ->multiplexing(true)
-    ->forwardAgent(true)
-    ->set('deploy_path', '/var/www/{{application}}');
-*/
-
 host('192.168.2.143')
-    ->stage('prod')
-    ->user('deployer')
-    ->roles('app')
-    ->port(22)
-    ->configFile('~/.ssh/config')
-    ->identityFile('~/.ssh/deployer')
-    ->multiplexing(true)
-    ->forwardAgent(true)
-    ->set('deploy_path', '/var/www/{{application}}');
+    ->setRemoteUser('deployer')
+    ->setDeployPath('/var/www/{{application}}');
 
-/*localhost()
-    ->stage('local')
-    ->roles('test', 'build')
-    ->set('deploy_path', '~/Sites/live/{{application}}');
-*/
 // Tasks
-desc('Yarn install'); // For encore and stuff
-task('yarn:install', function(){
-    run('cd ' . get('release_path') . ' && {{yarn}} install');
+desc('NPM install'); // For encore and stuff
+task('npm:install', function(){
+    run('cd ' . get('release_path') . ' && {{npm}} install');
 });
 
-desc('Yarn build');
-task('yarn:build', function(){
-    run('cd ' . get('release_path') . ' && {{yarn}} run encore prod');
+desc('NPM build');
+task('npm:build', function(){
+    run('cd ' . get('release_path') . ' && {{npm}} run encore prod');
 });
 
 desc('Reload php-fpm config');
@@ -75,11 +46,11 @@ task('php-fpm:reload', function () {
 desc('Runs yarn, migrates the database and install the assets');
 task('deploy:dividend', [
     'database:migrate',
-    'yarn:install',
-    'yarn:build'
+    'npm:install',
+    'npm:build'
 ]);
 
-after('deploy:writable', 'deploy:dividend');
+after('deploy:vendors', 'deploy:dividend');
 
 // Last step after symlink has been added.
 after('deploy', 'php-fpm:reload');
