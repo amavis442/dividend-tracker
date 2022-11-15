@@ -35,7 +35,7 @@ task('npm:install', function(){
 
 desc('NPM build');
 task('npm:build', function(){
-    run('cd ' . get('release_path') . ' && {{npm}} run encore prod');
+    run('cd ' . get('release_path') . ' && {{npm}} run build');
 });
 
 desc('Reload php-fpm config');
