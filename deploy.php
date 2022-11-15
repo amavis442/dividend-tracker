@@ -28,9 +28,9 @@ host('192.168.2.143')
     ->setDeployPath('/var/www/{{application}}');
 
 // Tasks
-desc('NPM install'); // For encore and stuff
-task('npm:install', function(){
-    run('cd ' . get('release_path') . ' && {{npm}} install');
+desc('NPM update'); // For encore and stuff
+task('npm:update', function(){
+    run('cd ' . get('release_path') . ' && {{npm}} update');
 });
 
 desc('NPM build');
@@ -46,7 +46,7 @@ task('php-fpm:reload', function () {
 desc('Runs yarn, migrates the database and install the assets');
 task('deploy:dividend', [
     'database:migrate',
-    'npm:install',
+    'npm:update',
     'npm:build'
 ]);
 
