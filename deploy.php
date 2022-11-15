@@ -14,7 +14,7 @@ set('repository', 'git@gitlab.com:amavis442/dividend.git');
 // [Optional] Allocate tty for git clone. Default value is false.
 set('git_tty', true);
 set('keep_releases',2);
-set('yarn','yarn');
+set('npm','npm');
 set('writable_mode','acl');
 
 // Shared files/dirs between deploys
