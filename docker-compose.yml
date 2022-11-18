@@ -21,7 +21,7 @@ services:
     mariadb:
       image: mariadb:10.5
       hostname: dbserver
-      restart: always
+      #restart: always
       container_name: dividend-mariadb
       working_dir: /application
       volumes:
@@ -30,13 +30,13 @@ services:
         #- ../data/mysql:/var/lib/mysql
         #- ../logs/mysql:/var/log/mysql
       env_file:
-        - .env.local 
+        - .env.local
       ports:
         - 3306:3306
 
     webserver:
       image: nginx:alpine
-      restart: always
+      #restart: always
       container_name: dividend-webserver
       working_dir: /application
       volumes:
@@ -50,7 +50,7 @@ services:
 
     php-fpm:
       build: phpdocker/php-fpm
-      restart: always
+      #restart: always
       container_name: dividend-php-fpm
       working_dir: /application
       volumes:
@@ -59,6 +59,6 @@ services:
       depends_on:
         - mariadb
       links:
-        - mariadb:mariadb 
+        - mariadb:mariadb
       external_links:
         - mariadb:mariadb
