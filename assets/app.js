@@ -14,7 +14,7 @@ import 'bootstrap/js/dist/tab';
 import './styles/app.css';
 import './styles/global.scss';
 
-jQuery(function(){
+jQuery(function () {
   $('[data-toggle="popover"]').popover();
   $('[data-toggle="tooltip"]').tooltip();
 });
