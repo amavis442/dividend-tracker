@@ -5,6 +5,8 @@ namespace App\Service\DividendDate;
 use App\Contracts\Service\DividendDatePluginInterface;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use DateTime;
+use DateInterval;
 
 class PimcoService implements DividendDatePluginInterface
 {
@@ -95,6 +97,30 @@ class PimcoService implements DividendDatePluginInterface
                             $items[] = $item;
                         }
 
+                        if (!isset($this->calendar[$exDate])) {
+                            $d = new DateTime($exDate);
+                            $timestamp = $d->format('Ymd');
+                            $month = $d->format('F');
+                            $year = $d->format('Y');
+                            $payDate = date('Y-m-d', strtotime("last weekday ".$month." ".$year));
+                            $timestampCutoff = date('Ymd', strtotime("first weekday ".date('F')." ".date('Y')));
+
+                            if ($timestamp > $timestampCutoff) {
+                                $interval = new DateInterval('P1D');
+                                $recordDate = $d->add($interval)->format('Y-m-d');
+                                $item = [];
+                                $item['DeclaredDate'] = date('Y-m-d');
+                                $item['RecordDate'] = $recordDate;
+                                $item['ExDate'] = $exDate;
+                                $item['PayDate'] = $payDate;
+                                $item['DividendAmount'] = $dividendAmount;
+                                $item['Type'] = 'Distribution';
+                                $item['Currency'] = $currency;
+
+                                $items[] = $item;
+                            }
+
+                        }
                         break;
                     }
                 }
