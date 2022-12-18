@@ -102,7 +102,12 @@ class PimcoService implements DividendDatePluginInterface
                             $timestamp = $d->format('Ymd');
                             $month = $d->format('F');
                             $year = $d->format('Y');
-                            $payDate = date('Y-m-d', strtotime("last weekday ".$month." ".$year));
+                            $lastWeekday = "last weekday ".$month." ".$year;
+                            //echo $lastWeekday. " ";
+                            $pDay = new DateTime($lastWeekday); // Bug even when you say last weekday of December it show the month November and not December
+                            $interval = new DateInterval('P1M');
+                            $p = $pDay->add($interval)->format('Y-m-d');
+                            $payDate = $p;
                             $timestampCutoff = date('Ymd', strtotime("first weekday ".date('F')." ".date('Y')));
 
                             if ($timestamp > $timestampCutoff) {
@@ -117,6 +122,7 @@ class PimcoService implements DividendDatePluginInterface
                                 $item['Type'] = 'Distribution';
                                 $item['Currency'] = $currency;
 
+                                //echo serialize($item);
                                 $items[] = $item;
                             }
 
