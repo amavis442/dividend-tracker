@@ -161,7 +161,7 @@ Edit Currency: Bewerk valuta
 CountryCode: Landcode
 TaxRate: Belastingtarief
 Valid from: Geldig vanaf
-Edit Tax: Bewerk belastingtarief 
+Edit Tax: Bewerk belastingtarief
 Country code: Landcode
 Tax rate: Belastingtarief
 New Tax: Nieuw belastingtarief
@@ -264,3 +264,15 @@ Plain password: Wachtwoord
 All: Alles
 Taxonomy: Taxonomy
 Please choose a taxonomy: Kies een taxonomy
+Real Estate: Vastgoed
+Financials: Financieel
+Consumer Staples: Consumenten goederen
+Industrial: Industrieel
+Consumer Discretionary: Consument Discretionair
+Communication services: Communicatie diensten
+Health Care: Gezondheid
+Energy: Energie
+Information Technology: Informatie Technologie
+Bonds: Obligaties
+ETF: ETF
+Tech: Technologie

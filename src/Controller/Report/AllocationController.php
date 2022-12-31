@@ -6,6 +6,7 @@ use App\Repository\PositionRepository;
 use App\Model\AllocationModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Route("/dashboard/report")
@@ -21,9 +22,10 @@ class AllocationController extends AbstractController
      */
     public function index(
         PositionRepository $positionRepository,
-        AllocationModel $allocation
+        AllocationModel $allocation,
+        TranslatorInterface $translator
     ) {
-        $result = $allocation->allocation($positionRepository);
+        $result = $allocation->allocation($positionRepository, $translator);
 
         return $this->render('report/allocation/index.html.twig', array_merge($result, ['controller_name' => 'ReportController']));
     }

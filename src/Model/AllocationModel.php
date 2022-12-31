@@ -5,11 +5,13 @@ namespace App\Model;
 use App\Repository\BranchRepository;
 use App\Repository\PositionRepository;
 use App\Service\Summary;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AllocationModel
 {
     public function allocation(
-        PositionRepository $positionRepository
+        PositionRepository $positionRepository,
+        TranslatorInterface $translator
     ): array {
         $allocated = $positionRepository->getSumAllocated();
         $positions = $positionRepository->getAllOpen();
@@ -18,11 +20,12 @@ class AllocationModel
         $items = [];
         $totalAllocation = 0.0;
         foreach ($positions as $position) {
-            if (!isset($items[$position->getTicker()->getBranch()->getLabel()])) {
-                $items[$position->getTicker()->getBranch()->getLabel()] = 0.0;
+            $label = $translator->trans($position->getTicker()->getBranch()->getLabel());
+            if (!isset($items[$label])) {
+                $items[$label] = 0.0;
             }
             $allocation = $position->getAllocation();
-            $items[$position->getTicker()->getBranch()->getLabel()] += $allocation;
+            $items[$label] += $allocation;
             $totalAllocation += $allocation;
         }
         krsort($items);
@@ -42,7 +45,8 @@ class AllocationModel
     public function sector(
         PositionRepository $positionRepository,
         BranchRepository $branchRepository,
-        Summary $summary
+        Summary $summary,
+        TranslatorInterface $translator
     ): array {
         [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
 
@@ -53,7 +57,7 @@ class AllocationModel
         $labels = [];
         $data = [];
         foreach ($allocationData as $allocationItem) {
-            $labels[] = $allocationItem['industry'];
+            $labels[] = $translator->trans($allocationItem['industry']);
             $allocation = $allocationItem['allocation'] / 100;
             $data[] = round(($allocation / $totalAllocated) * 100, 2);
         }
