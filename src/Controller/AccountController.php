@@ -12,9 +12,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AccountController extends AbstractController
 {
-    /**
-     * @Route("/dashboard/account/update", name="app_account_update")
-     */
+    #[Route('/dashboard/account/update', name:'app_account_update')]
     public function update(Request $request, UserPasswordHasherInterface  $passwordHasher, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
