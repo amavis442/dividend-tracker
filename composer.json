@@ -1,6 +1,8 @@
 {
     "type": "project",
     "license": "proprietary",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
     "require": {
         "php": ">=8.1.0",
         "ext-ctype": "*",
@@ -32,6 +34,7 @@
         "symfony/property-access": "6.2.*",
         "symfony/property-info": "6.2.*",
         "symfony/proxy-manager-bridge": "6.2.*",
+        "symfony/runtime": "6.2.*",
         "symfony/security-bundle": "6.2.*",
         "symfony/serializer": "6.2.*",
         "symfony/string": "6.2.*",
@@ -41,9 +44,9 @@
         "symfony/web-link": "6.2.*",
         "symfony/webpack-encore-bundle": "^1.14",
         "symfony/yaml": "6.2.*",
-        "twig/extra-bundle": "^3.3",
-        "twig/intl-extra": "^3.3",
+        "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0",
+        "twig/intl-extra": "^3.3",
         "zbateson/mail-mime-parser": "^2.2"
     },
     "require-dev": {
@@ -70,7 +73,9 @@
         "sort-packages": true,
         "allow-plugins": {
             "symfony/flex": true,
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "symfony/runtime": true,
+            "php-http/discovery": true
         }
     },
     "autoload": {
@@ -86,7 +91,11 @@
     "replace": {
         "symfony/polyfill-ctype": "*",
         "symfony/polyfill-iconv": "*",
-        "symfony/polyfill-php72": "*"
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php81": "*"
     },
     "scripts": {
         "auto-scripts": {

@@ -1,3 +1,9 @@
 index:
     path: /
     controller: App\Controller\StaticPageController::index
+
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute

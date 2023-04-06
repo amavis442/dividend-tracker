@@ -543,9 +543,6 @@
     "symfony/polyfill-mbstring": {
         "version": "v1.12.0"
     },
-    "symfony/polyfill-php80": {
-        "version": "v1.17.1"
-    },
     "symfony/process": {
         "version": "v4.3.3"
     },
