@@ -23,7 +23,7 @@ set('allow_anonymous_stats', false);
 
 // Hosts
 
-host('192.168.2.143')
+host('192.168.2.220')
     ->setRemoteUser('deployer')
     ->setDeployPath('/var/www/{{application}}');
 
