@@ -6,26 +6,18 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\DividendMonthRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\DividendMonthRepository')]
 class DividendMonth
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private $dividendMonth;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Ticker", mappedBy="dividendMonths")
-     */
+    #[ORM\ManyToMany(targetEntity: 'App\Entity\Ticker', mappedBy: 'dividendMonths')]
     private $tickers;
 
     public function __construct()

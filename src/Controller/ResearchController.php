@@ -18,16 +18,12 @@ use App\Service\Referer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @Route("/dashboard/research")
- */
+#[Route(path: '/dashboard/research')]
 class ResearchController extends AbstractController
 {
     public const SEARCH_KEY = 'research_searchCriteria';
 
-    /**
-     * @Route("/list/{page}/{orderBy}/{sort}", name="research_index", methods={"GET"})
-     */
+    #[Route(path: '/list/{page}/{orderBy}/{sort}', name: 'research_index', methods: ['GET'])]
     public function index(
         Request $request,
         ResearchRepository $researchRepository,
@@ -61,9 +57,7 @@ class ResearchController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/create/{ticker?}", name="research_new", methods={"GET","POST"})
-     */
+    #[Route(path: '/create/{ticker?}', name: 'research_new', methods: ['GET', 'POST'])]
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -110,9 +104,7 @@ class ResearchController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="research_show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'research_show', methods: ['GET'])]
     public function show(Research $research): Response
     {
         return $this->render('research/show.html.twig', [
@@ -120,10 +112,7 @@ class ResearchController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="research_edit", methods={"GET","POST"})
-     */
-
+    #[Route(path: '/{id}/edit', name: 'research_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -191,9 +180,7 @@ class ResearchController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="research_delete", methods={"DELETE"})
-     */
+    #[Route(path: '/{id}', name: 'research_delete', methods: ['DELETE'])]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -212,9 +199,7 @@ class ResearchController extends AbstractController
         return $this->redirectToRoute('research_index');
     }
 
-    /**
-     * @Route("/search", name="research_search", methods={"POST"})
-     */
+    #[Route(path: '/search', name: 'research_search', methods: ['POST'])]
     public function search(
         Request $request
     ): Response {

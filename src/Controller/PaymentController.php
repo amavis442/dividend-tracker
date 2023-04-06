@@ -19,18 +19,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dashboard/payment")
- */
+#[Route(path: '/dashboard/payment')]
 class PaymentController extends AbstractController
 {
     public const SEARCH_KEY = 'payment_searchCriteria';
     public const SEARCHFORM_KEY = 'payment_searchForm';
     public const INTERVAL_KEY = 'payment_interval';
 
-    /**
-     * @Route("/list/{page?1}/{orderBy?payDate}/{sort?DESC}", name="payment_index", methods={"GET","POST"})
-     */
+    #[Route(path: '/list/{page?1}/{orderBy?payDate}/{sort?DESC}', name: 'payment_index', methods: ['GET', 'POST'])]
     public function index(
         Request $request,
         PaymentRepository $paymentRepository,
@@ -135,9 +131,7 @@ class PaymentController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/create/{position}/{timestamp?}", name="payment_new", methods={"GET","POST"})
-     */
+    #[Route(path: '/create/{position}/{timestamp?}', name: 'payment_new', methods: ['GET', 'POST'])]
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -194,9 +188,7 @@ class PaymentController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="payment_show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'payment_show', methods: ['GET'])]
     public function show(Payment $payment): Response
     {
         return $this->render('payment/show.html.twig', [
@@ -204,9 +196,7 @@ class PaymentController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="payment_edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/{id}/edit', name: 'payment_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -230,9 +220,7 @@ class PaymentController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="payment_delete", methods={"DELETE"})
-     */
+    #[Route(path: '/{id}', name: 'payment_delete', methods: ['DELETE'])]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -250,9 +238,7 @@ class PaymentController extends AbstractController
         return $this->redirectToRoute('payment_index');
     }
 
-    /**
-     * @Route("/search", name="payment_search", methods={"POST"})
-     */
+    #[Route(path: '/search', name: 'payment_search', methods: ['POST'])]
     public function search(Request $request): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');

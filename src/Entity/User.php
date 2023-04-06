@@ -9,66 +9,46 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @UniqueEntity(fields={"email"}, message="There is already an account with this email")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\UserRepository')]
+#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     public const ROLES = ['user', 'admin', 'superadmin'];
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", unique=true, nullable=true)
-     */
-    private $apiToken;
+    #[ORM\Column(type: 'string', unique: true, nullable: true)]
+    private ?string $apiToken = null;
 
-    /**
-     * @ORM\Column(type="string", length=180, unique=true)
-     */
-    private $email;
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
+    private string $email;
 
     /**
      * @var string The hashed password
-     * @ORM\Column(type="string")
      */
-    private $password;
+    #[ORM\Column(type: 'string')]
+    private string $password;
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    #[ORM\Column(type: 'json')]
     private $roles = [];
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="user")
-     */
-    private $positions;
+    #[ORM\OneToMany(targetEntity: 'App\Entity\Position', mappedBy: 'user')]
+    private ?Collection $positions = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Payment", mappedBy="user")
-     */
-    private $payments;
+    #[ORM\OneToMany(targetEntity: 'App\Entity\Payment', mappedBy: 'user')]
+    private ?Collection $payments = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Journal", mappedBy="user")
-     */
-    private $journals;
+    #[ORM\OneToMany(targetEntity: 'App\Entity\Journal', mappedBy: 'user')]
+    private ?Collection $journals = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity=DividendTracker::class, mappedBy="user", orphanRemoval=true)
-     */
-    private $dividendTrackers;
+    #[ORM\OneToMany(targetEntity: DividendTracker::class, mappedBy: 'user', orphanRemoval: true)]
+    private ?Collection $dividendTrackers = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Pie::class, mappedBy="user", orphanRemoval=true)
-     */
-    private $pies;
+    #[ORM\OneToMany(targetEntity: Pie::class, mappedBy: 'user', orphanRemoval: true)]
+    private ?Collection $pies = null;
 
     public function __construct()
     {
@@ -232,7 +212,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection|Journal[]
      */
-    public function getJournals(): Collection
+    public function getJournals(): ?Collection
     {
         return $this->journals;
     }
@@ -279,7 +259,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection|DividendTracker[]
      */
-    public function getDividendTrackers(): Collection
+    public function getDividendTrackers(): ?Collection
     {
         return $this->dividendTrackers;
     }
@@ -309,7 +289,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection|Pie[]
      */
-    public function getPies(): Collection
+    public function getPies(): ?Collection
     {
         return $this->pies;
     }

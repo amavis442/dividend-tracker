@@ -11,14 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dashboard/currency")
- */
+#[Route(path: '/dashboard/currency')]
 class CurrencyController extends AbstractController
 {
-    /**
-     * @Route("/", name="currency_index", methods={"GET"})
-     */
+    #[Route(path: '/', name: 'currency_index', methods: ['GET'])]
     public function index(CurrencyRepository $currencyRepository): Response
     {
         return $this->render('currency/index.html.twig', [
@@ -26,9 +22,7 @@ class CurrencyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/create", name="currency_new", methods={"GET","POST"})
-     */
+    #[Route(path: '/create', name: 'currency_new', methods: ['GET', 'POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $currency = new Currency();
@@ -48,9 +42,7 @@ class CurrencyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="currency_show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'currency_show', methods: ['GET'])]
     public function show(Currency $currency): Response
     {
         return $this->render('currency/show.html.twig', [
@@ -58,9 +50,7 @@ class CurrencyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="currency_edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/{id}/edit', name: 'currency_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request,  EntityManagerInterface $entityManager, Currency $currency): Response
     {
         $form = $this->createForm(CurrencyType::class, $currency);
@@ -78,9 +68,7 @@ class CurrencyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="currency_delete", methods={"DELETE"})
-     */
+    #[Route(path: '/{id}', name: 'currency_delete', methods: ['DELETE'])]
     public function delete(Request $request, EntityManagerInterface $entityManager, Currency $currency): Response
     {
         if ($this->isCsrfTokenValid('delete' . $currency->getId(), $request->request->get('_token'))) {

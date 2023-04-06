@@ -6,28 +6,20 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\PaymentRepository")
- * @ORM\HasLifecycleCallbacks
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\PaymentRepository')]
+#[ORM\HasLifecycleCallbacks]
 class Payment
 {
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="datetime", name = "pay_date")
-     */
+    #[ORM\Column(type: 'datetime', name: 'pay_date')]
     private $payDate;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private $dividend;
 
     /**
@@ -37,74 +29,48 @@ class Payment
      */
     private $taxes;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Ticker", inversedBy="payments")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Ticker', inversedBy: 'payments')]
+    #[ORM\JoinColumn(nullable: false)]
     private $ticker;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Calendar", inversedBy="payments")
-     * @ORM\JoinColumn(nullable=true)
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Calendar', inversedBy: 'payments')]
+    #[ORM\JoinColumn(nullable: true)]
     private $calendar;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="payments")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\User', inversedBy: 'payments')]
+    #[ORM\JoinColumn(nullable: false)]
     private $user;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Currency")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
+    #[ORM\JoinColumn(nullable: false)]
     private $currency;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Position", inversedBy="payments")
-     * @ORM\JoinColumn(nullable=true)
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Position', inversedBy: 'payments')]
+    #[ORM\JoinColumn(nullable: true)]
     private $position;
 
-    /**
-     * @ORM\Column(type="bigint", nullable=true)
-     */
+    #[ORM\Column(type: 'bigint', nullable: true)]
     private $amount;
 
-    /**
-     * @ORM\Column(type="datetime", name="created_at")
-     */
+    #[ORM\Column(type: 'datetime', name: 'created_at')]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="datetime", name="updated_at", nullable = true)
-     */
+    #[ORM\Column(type: 'datetime', name: 'updated_at', nullable: true)]
     private $updatedAt;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $taxWithold;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $taxCurrency;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $dividendType;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $dividendPaid;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $dividendPaidCurrency;
 
     public function getId(): ?int
@@ -230,8 +196,8 @@ class Payment
 
     /**
      * Gets triggered only on insert
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function onPrePersist()
     {
         $this->createdAt = new \DateTime("now");
@@ -251,8 +217,8 @@ class Payment
 
     /**
      * Gets triggered every time on update
-     * @ORM\PreUpdate
      */
+    #[ORM\PreUpdate]
     public function onPreUpdate()
     {
         $this->updatedAt = new \DateTime("now");

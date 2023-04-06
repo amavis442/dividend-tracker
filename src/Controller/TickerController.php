@@ -11,16 +11,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dashboard/ticker")
- */
+#[Route(path: '/dashboard/ticker')]
 class TickerController extends AbstractController
 {
     public const SEARCH_KEY = 'ticker_searchCriteria';
 
-    /**
-     * @Route("/list/{page<\d+>?1}", name="ticker_index", methods={"GET"})
-     */
+    #[Route(path: '/list/{page<\d+>?1}', name: 'ticker_index', methods: ['GET'])]
     public function index(
         Request $request,
         TickerRepository $tickerRepository,
@@ -45,9 +41,7 @@ class TickerController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/create", name="ticker_new", methods={"GET","POST"})
-     */
+    #[Route(path: '/create', name: 'ticker_new', methods: ['GET', 'POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $ticker = new Ticker();
@@ -67,9 +61,7 @@ class TickerController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="ticker_show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'ticker_show', methods: ['GET'])]
     public function show(Ticker $ticker): Response
     {
         return $this->render('ticker/show.html.twig', [
@@ -77,9 +69,7 @@ class TickerController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="ticker_edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/{id}/edit', name: 'ticker_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, EntityManagerInterface $entityManager, Ticker $ticker): Response
     {
         $form = $this->createForm(TickerType::class, $ticker);
@@ -97,9 +87,7 @@ class TickerController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="ticker_delete", methods={"DELETE"})
-     */
+    #[Route(path: '/{id}', name: 'ticker_delete', methods: ['DELETE'])]
     public function delete(Request $request,EntityManagerInterface $entityManager, Ticker $ticker): Response
     {
         if ($this->isCsrfTokenValid('delete' . $ticker->getId(), $request->request->get('_token'))) {
@@ -110,9 +98,7 @@ class TickerController extends AbstractController
         return $this->redirectToRoute('ticker_index');
     }
 
-    /**
-     * @Route("/search", name="ticker_search", methods={"POST"})
-     */
+    #[Route(path: '/search', name: 'ticker_search', methods: ['POST'])]
     public function search(Request $request): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');

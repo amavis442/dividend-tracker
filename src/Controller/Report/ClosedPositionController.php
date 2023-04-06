@@ -9,16 +9,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dashboard/report")
- */
+#[Route(path: '/dashboard/report')]
 class ClosedPositionController extends AbstractController
 {
     public const SEARCH_KEY = 'closed_position_searchCriteria';
 
-    /**
-     * @Route("/closed/{page}/{orderBy}/{sort}", name="report_closed_positions_index", methods={"GET"})
-     */
+    #[Route(path: '/closed/{page}/{orderBy}/{sort}', name: 'report_closed_positions_index', methods: ['GET'])]
     public function index(
         Request $request,
         PositionRepository $positionRepository,
@@ -65,9 +61,7 @@ class ClosedPositionController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/closed/search", name="report_closed_positions_search", methods={"POST"})
-     */
+    #[Route(path: '/closed/search', name: 'report_closed_positions_search', methods: ['POST'])]
     public function search(Request $request): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');

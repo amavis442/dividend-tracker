@@ -7,10 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\CalendarRepository")
- * @ORM\HasLifecycleCallbacks
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\CalendarRepository')]
+#[ORM\HasLifecycleCallbacks]
 class Calendar
 {
     public const SOURCE_SCRIPT = 'script';
@@ -20,76 +18,51 @@ class Calendar
     public const SPECIAL = 'Special';
 
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Ticker", inversedBy="calendars")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Ticker', inversedBy: 'calendars')]
+    #[ORM\JoinColumn(nullable: false)]
     private $ticker;
 
-    /**
-     * @ORM\Column(type="date", name="ex_dividend_date")
-     */
+    #[ORM\Column(type: 'date', name: 'ex_dividend_date')]
     private $exDividendDate;
 
-    /**
-     * @ORM\Column(type="date", name="record_date")
-     */
+    #[ORM\Column(type: 'date', name: 'record_date')]
     private $recordDate;
 
-    /**
-     * @ORM\Column(type="date", name="payment_date")
-     */
+    #[ORM\Column(type: 'date', name: 'payment_date')]
     private $paymentDate;
 
-    /**
-     * @ORM\Column(type="integer", name="cash_amount")
-     */
+    #[ORM\Column(type: 'integer', name: 'cash_amount')]
     private $cashAmount;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Payment", mappedBy="calendar")
-     * @ORM\JoinColumn(nullable=true)
-     * @ORM\OrderBy({"payDate" = "DESC"})
-     */
+    #[ORM\OneToMany(targetEntity: 'App\Entity\Payment', mappedBy: 'calendar')]
+    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\OrderBy(['payDate' => 'DESC'])]
     private $payments;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Currency")
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     private $currency;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $dividendType;
 
     /**
      * Was this added manual or script?
-     *
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $source;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $description;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $updatedAt;
 
     public function __construct()
@@ -287,8 +260,8 @@ class Calendar
 
     /**
      * Gets triggered only on insert
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function onPrePersist()
     {
         $this->createdAt = new \DateTime("now");
@@ -296,8 +269,8 @@ class Calendar
 
     /**
      * Gets triggered every time on update
-     * @ORM\PreUpdate
      */
+    #[ORM\PreUpdate]
     public function onPreUpdate()
     {
         $this->updatedAt = new \DateTime("now");

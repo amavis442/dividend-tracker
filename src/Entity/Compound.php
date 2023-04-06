@@ -10,22 +10,22 @@ class Compound
      * Number of shares
      *
      * @var int|null
-     * @Assert\GreaterThan(0)
      */
+    #[Assert\GreaterThan(0)]
     private $amount;
     /**
      * Starting price and will be higher each year depending price Appreciation
      *
      * @var int|null
-     * @Assert\GreaterThan(0)
      */
+    #[Assert\GreaterThan(0)]
     private $price;
     /**
      * Start dividend yield
      *
      * @var int|null
-     * @Assert\GreaterThan(0)
      */
+    #[Assert\GreaterThan(0)]
     private $dividend;
     /**
      * Rise of market gain in percentage per year around 7.43%
@@ -45,8 +45,8 @@ class Compound
      * Dividend growth for the first 5 years
      *
      * @var int|null
-     * @Assert\GreaterThan(0)
      */
+    #[Assert\GreaterThan(0)]
     private $growth;
     /**
      * Growth after 5 years and into infinity will normally be around 3%

@@ -12,15 +12,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dashboard/journal")
- */
+#[Route(path: '/dashboard/journal')]
 class JournalController extends AbstractController
 {
     public const TAXONOMY_KEY = 'journal_taxonomy'; 
-    /**
-     * @Route("/list/{page<\d+>?1}", name="journal_index", methods={"GET"})
-     */
+    #[Route(path: '/list/{page<\d+>?1}', name: 'journal_index', methods: ['GET'])]
     public function index(Request $request, JournalRepository $journalRepository,TaxonomyRepository $taxonomyRepository, int $page = 1): Response
     {
         $taxonomySelected = null;
@@ -53,9 +49,7 @@ class JournalController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/create", name="journal_new", methods={"GET","POST"})
-     */
+    #[Route(path: '/create', name: 'journal_new', methods: ['GET', 'POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $journal = new Journal();
@@ -75,9 +69,7 @@ class JournalController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="journal_show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'journal_show', methods: ['GET'])]
     public function show(Journal $journal): Response
     {
         return $this->render('journal/show.html.twig', [
@@ -85,9 +77,7 @@ class JournalController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="journal_edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/{id}/edit', name: 'journal_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, EntityManagerInterface $entityManager, Journal $journal): Response
     {
         $form = $this->createForm(JournalType::class, $journal);
@@ -105,9 +95,7 @@ class JournalController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="journal_delete", methods={"DELETE"})
-     */
+    #[Route(path: '/{id}', name: 'journal_delete', methods: ['DELETE'])]
     public function delete(Request $request, EntityManagerInterface $entityManager, Journal $journal): Response
     {
         if ($this->isCsrfTokenValid('delete' . $journal->getId(), $request->request->get('_token'))) {
@@ -118,9 +106,7 @@ class JournalController extends AbstractController
         return $this->redirectToRoute('journal_index');
     }
 
-    /**
-     * @Route("/taxonomy", name="journal_taxonomy", methods={"POST"})
-     */
+    #[Route(path: '/taxonomy', name: 'journal_taxonomy', methods: ['POST'])]
     public function pie(Request $request): Response
     {
         $taxonomy = $request->request->get('taxonomy', null);

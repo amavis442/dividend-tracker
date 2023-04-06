@@ -7,71 +7,47 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\TickerRepository")
- * @UniqueEntity("isin")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\TickerRepository')]
+#[UniqueEntity('isin')]
 class Ticker
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $ticker;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $fullname;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Branch", inversedBy="tickers")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Branch', inversedBy: 'tickers')]
+    #[ORM\JoinColumn(nullable: false)]
     private $branch;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Calendar", mappedBy="ticker")
-     * @ORM\OrderBy({"paymentDate" = "DESC"})
-     */
+    #[ORM\OneToMany(targetEntity: 'App\Entity\Calendar', mappedBy: 'ticker')]
+    #[ORM\OrderBy(['paymentDate' => 'DESC'])]
     private $calendars;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Research", mappedBy="ticker")
-     */
+    #[ORM\OneToMany(targetEntity: 'App\Entity\Research', mappedBy: 'ticker')]
     private $researches;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Payment", mappedBy="ticker")
-     * @ORM\OrderBy({"payDate" = "DESC"})
-     */
+    #[ORM\OneToMany(targetEntity: 'App\Entity\Payment', mappedBy: 'ticker')]
+    #[ORM\OrderBy(['payDate' => 'DESC'])]
     private $payments;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="ticker")
-     * @ORM\OrderBy({"id" = "DESC"})
-     */
+    #[ORM\OneToMany(targetEntity: 'App\Entity\Position', mappedBy: 'ticker')]
+    #[ORM\OrderBy(['id' => 'DESC'])]
     private $positions;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\DividendMonth", inversedBy="tickers", indexBy="dividendMonth")
-     */
+    #[ORM\ManyToMany(targetEntity: 'App\Entity\DividendMonth', inversedBy: 'tickers', indexBy: 'dividendMonth')]
     private $dividendMonths;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=false, unique=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: false, unique: true)]
     private $isin;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Tax::class, inversedBy="tickers")
-     */
+    #[ORM\ManyToOne(targetEntity: Tax::class, inversedBy: 'tickers')]
     private $tax;
 
     public function __construct()

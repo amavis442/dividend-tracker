@@ -7,38 +7,26 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\PieRepository")
- * @ORM\Table(name="pie")
- */
+#[ORM\Table(name: 'pie')]
+#[ORM\Entity(repositoryClass: 'App\Repository\PieRepository')]
 class Pie
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $label;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Position", mappedBy="pies")
-     */
+    #[ORM\ManyToMany(targetEntity: 'App\Entity\Position', mappedBy: 'pies')]
     private $positions;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="pies")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'pies')]
+    #[ORM\JoinColumn(nullable: false)]
     private $user;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="pie")
-     */
+    #[ORM\OneToMany(targetEntity: 'App\Entity\Transaction', mappedBy: 'pie')]
     private $transactions;
 
 

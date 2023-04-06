@@ -10,122 +10,82 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\PositionRepository")
- * @ORM\HasLifecycleCallbacks
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\PositionRepository')]
+#[ORM\HasLifecycleCallbacks]
 class Position
 {
     public const OPEN = 1;
     public const CLOSED = 2;
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $price;
 
-    /**
-     * @ORM\Column(type="bigint")
-     */
+    #[ORM\Column(type: 'bigint')]
     private $amount;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Ticker", inversedBy="positions")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Ticker', inversedBy: 'positions')]
+    #[ORM\JoinColumn(nullable: false)]
     private $ticker;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    #[ORM\Column(type: 'boolean', nullable: true)]
     private $closed;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $profit;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $allocation;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="positions")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\User', inversedBy: 'positions')]
+    #[ORM\JoinColumn(nullable: false)]
     private $user;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Currency")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
+    #[ORM\JoinColumn(nullable: false)]
     private $currency;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Currency")
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     private $allocationCurrency;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="position", orphanRemoval=true, cascade={"persist"})
-     * @ORM\OrderBy({"transactionDate" = "DESC"})
-     */
+    #[ORM\OneToMany(targetEntity: 'App\Entity\Transaction', mappedBy: 'position', orphanRemoval: true, cascade: ['persist'])]
+    #[ORM\OrderBy(['transactionDate' => 'DESC'])]
     private $transactions;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $posid;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Payment", mappedBy="position")
-     * @ORM\OrderBy({"payDate" = "DESC"})
-     */
+    #[ORM\OneToMany(targetEntity: 'App\Entity\Payment', mappedBy: 'position')]
+    #[ORM\OrderBy(['payDate' => 'DESC'])]
     private $payments;
 
-    /**
-     * @ORM\Column(type="datetime", name="created_at")
-     */
+    #[ORM\Column(type: 'datetime', name: 'created_at')]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="datetime", name="updated_at", nullable = true)
-     */
+    #[ORM\Column(type: 'datetime', name: 'updated_at', nullable: true)]
     private $updatedAt;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Pie", inversedBy="positions")
-     * @ORM\OrderBy({"label" = "DESC"})
-     * @ORM\JoinTable(name="pie_position",
-     *      joinColumns={@ORM\JoinColumn(name="position_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="pie_id", referencedColumnName="id")}
-     *      )
-     */
+    #[ORM\JoinTable(name: 'pie_position')]
+    #[ORM\JoinColumn(name: 'position_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'pie_id', referencedColumnName: 'id')]
+    #[ORM\ManyToMany(targetEntity: 'App\Entity\Pie', inversedBy: 'positions')]
+    #[ORM\OrderBy(['label' => 'DESC'])]
     private $pies;
 
-    /**
-     * @ORM\Column(type="datetime", name="closed_at", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', name: 'closed_at', nullable: true)]
     private $closedAt;
 
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
+    #[ORM\Column(type: 'float', nullable: true)]
     private $dividendTreshold;
 
     /**
      * What is the maximum allocation this position should be?
-     *
-     * @ORM\Column(type="integer", nullable=true)
      */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $maxAllocation;
 
     public function __construct()
@@ -135,9 +95,7 @@ class Position
         $this->pies = new ArrayCollection();
     }
 
-    /**
-     * @Assert\Callback
-     */
+    #[Assert\Callback]
     public function validate(ExecutionContextInterface $context, $payload)
     {
         if (empty($this->getPrice()) && empty($this->getAllocation())) {
@@ -355,8 +313,8 @@ class Position
 
     /**
      * Gets triggered only on insert
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function onPrePersist()
     {
         $this->createdAt = new \DateTime("now");
@@ -376,8 +334,8 @@ class Position
 
     /**
      * Gets triggered every time on update
-     * @ORM\PreUpdate
      */
+    #[ORM\PreUpdate]
     public function onPreUpdate()
     {
         $this->updatedAt = new \DateTime("now");

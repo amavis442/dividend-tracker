@@ -10,14 +10,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dashboard/tax")
- */
+#[Route(path: '/dashboard/tax')]
 class TaxController extends AbstractController
 {
-    /**
-     * @Route("/", name="tax_index", methods={"GET"})
-     */
+    #[Route(path: '/', name: 'tax_index', methods: ['GET'])]
     public function index(TaxRepository $taxRepository): Response
     {
         return $this->render('tax/index.html.twig', [
@@ -25,9 +21,7 @@ class TaxController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/create", name="tax_new", methods={"GET","POST"})
-     */
+    #[Route(path: '/create', name: 'tax_new', methods: ['GET', 'POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $tax = new Tax();
@@ -47,9 +41,7 @@ class TaxController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="tax_show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'tax_show', methods: ['GET'])]
     public function show(Tax $tax): Response
     {
         return $this->render('tax/show.html.twig', [
@@ -57,9 +49,7 @@ class TaxController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="tax_edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/{id}/edit', name: 'tax_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, EntityManagerInterface $entityManager, Tax $tax): Response
     {
         $form = $this->createForm(TaxType::class, $tax);
@@ -76,9 +66,7 @@ class TaxController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="tax_delete", methods={"DELETE"})
-     */
+    #[Route(path: '/{id}', name: 'tax_delete', methods: ['DELETE'])]
     public function delete(Request $request, EntityManagerInterface $entityManager, Tax $tax): Response
     {
         if ($this->isCsrfTokenValid('delete' . $tax->getId(), $request->request->get('_token'))) {

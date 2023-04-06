@@ -11,14 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dashboard/pie")
- */
+#[Route(path: '/dashboard/pie')]
 class PieController extends AbstractController
 {
-    /**
-     * @Route("/", name="pie_index", methods={"GET"})
-     */
+    #[Route(path: '/', name: 'pie_index', methods: ['GET'])]
     public function index(PieRepository $pieRepository): Response
     {
         return $this->render('pie/index.html.twig', [
@@ -26,9 +22,7 @@ class PieController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/create", name="pie_new", methods={"GET","POST"})
-     */
+    #[Route(path: '/create', name: 'pie_new', methods: ['GET', 'POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $pie = new Pie();
@@ -48,9 +42,7 @@ class PieController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="pie_show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'pie_show', methods: ['GET'])]
     public function show(Pie $pie): Response
     {
         return $this->render('pie/show.html.twig', [
@@ -58,9 +50,7 @@ class PieController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="pie_edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/{id}/edit', name: 'pie_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, EntityManagerInterface $entityManager, Pie $pie): Response
     {
         $form = $this->createForm(PieType::class, $pie);
@@ -78,9 +68,7 @@ class PieController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="pie_delete", methods={"DELETE"})
-     */
+    #[Route(path: '/{id}', name: 'pie_delete', methods: ['DELETE'])]
     public function delete(Request $request, EntityManagerInterface $entityManager, Pie $pie): Response
     {
         if ($this->isCsrfTokenValid('delete' . $pie->getId(), $request->request->get('_token'))) {

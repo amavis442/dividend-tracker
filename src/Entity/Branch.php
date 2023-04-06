@@ -6,47 +6,31 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\BranchRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\BranchRepository')]
 class Branch
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Branch", inversedBy="branches")
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Branch', inversedBy: 'branches')]
     private $parent;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Branch", mappedBy="parent")
-     */
-    private $branches;
+    #[ORM\OneToMany(targetEntity: 'App\Entity\Branch', mappedBy: 'parent')]
+    private Collection $branches;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $label;
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $label;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Ticker", mappedBy="branch")
-     */
-    private $tickers;
+    #[ORM\OneToMany(targetEntity: 'App\Entity\Ticker', mappedBy: 'branch')]
+    private Collection $tickers;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true, name="asset_allocation")
-     */
-    private $assetAllocation;
+    #[ORM\Column(type: 'integer', nullable: true, name: 'asset_allocation')]
+    private ?int $assetAllocation = null;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $description;
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $description = null;
 
     public function __construct()
     {

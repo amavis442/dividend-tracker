@@ -13,16 +13,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dashboard/closed/position")
- */
+#[Route(path: '/dashboard/closed/position')]
 class ClosedPositionController extends AbstractController
 {
     public const SEARCH_KEY = 'closed_position_searchCriteria';
 
-    /**
-     * @Route("/list/{page}/{sort}", name="closed_position_index", methods={"GET"})
-     */
+    #[Route(path: '/list/{page}/{sort}', name: 'closed_position_index', methods: ['GET'])]
     public function index(
         Request $request,
         PositionRepository $positionRepository,
@@ -53,9 +49,7 @@ class ClosedPositionController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="closed_position_show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'closed_position_show', methods: ['GET'])]
     public function show(Position $position): Response
     {
         return $this->render('closed_position/show.html.twig', [
@@ -64,9 +58,7 @@ class ClosedPositionController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit/{closed<\d+>?0}", name="closed_position_edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/{id}/edit/{closed<\d+>?0}', name: 'closed_position_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
         Position $position,
@@ -97,9 +89,7 @@ class ClosedPositionController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/search", name="closed_position_search", methods={"POST"})
-     */
+    #[Route(path: '/search', name: 'closed_position_search', methods: ['POST'])]
     public function search(Request $request): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');

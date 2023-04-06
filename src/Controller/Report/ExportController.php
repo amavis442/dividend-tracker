@@ -12,18 +12,14 @@ use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dashboard/report")
- */
+#[Route(path: '/dashboard/report')]
 class ExportController extends AbstractController
 {
     public const TAX_DIVIDEND = 0.15; // %
     public const EXCHANGE_RATE = 1.19; // dollar to euro
     public const YIELD_PIE_KEY = 'yeildpie_searchPie';
 
-    /**
-     * @Route("/export", name="report_export")
-     */
+    #[Route(path: '/export', name: 'report_export')]
     public function index(PositionRepository $positionRepository, DividendService $dividendService, PieRepository $pieRepository): Response
     {
         $export = new Export($positionRepository, $dividendService, $pieRepository);

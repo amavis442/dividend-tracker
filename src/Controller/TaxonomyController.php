@@ -10,14 +10,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dashboard/taxonomy")
- */
+#[Route(path: '/dashboard/taxonomy')]
 class TaxonomyController extends AbstractController
 {
-    /**
-     * @Route("/", name="app_taxonomy_index", methods={"GET"})
-     */
+    #[Route(path: '/', name: 'app_taxonomy_index', methods: ['GET'])]
     public function index(TaxonomyRepository $taxonomyRepository): Response
     {
         return $this->render('taxonomy/index.html.twig', [
@@ -25,9 +21,7 @@ class TaxonomyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/new", name="app_taxonomy_new", methods={"GET", "POST"})
-     */
+    #[Route(path: '/new', name: 'app_taxonomy_new', methods: ['GET', 'POST'])]
     public function new(Request $request, TaxonomyRepository $taxonomyRepository): Response
     {
         $taxonomy = new Taxonomy();
@@ -46,9 +40,7 @@ class TaxonomyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="app_taxonomy_show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'app_taxonomy_show', methods: ['GET'])]
     public function show(Taxonomy $taxonomy): Response
     {
         return $this->render('taxonomy/show.html.twig', [
@@ -56,9 +48,7 @@ class TaxonomyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="app_taxonomy_edit", methods={"GET", "POST"})
-     */
+    #[Route(path: '/{id}/edit', name: 'app_taxonomy_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Taxonomy $taxonomy, TaxonomyRepository $taxonomyRepository): Response
     {
         $form = $this->createForm(TaxonomyType::class, $taxonomy);
@@ -76,9 +66,7 @@ class TaxonomyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="app_taxonomy_delete", methods={"POST"})
-     */
+    #[Route(path: '/{id}', name: 'app_taxonomy_delete', methods: ['POST'])]
     public function delete(Request $request, Taxonomy $taxonomy, TaxonomyRepository $taxonomyRepository): Response
     {
         if ($this->isCsrfTokenValid('delete'.$taxonomy->getId(), $request->request->get('_token'))) {

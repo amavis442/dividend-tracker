@@ -20,17 +20,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dashboard/portfolio")
- */
+#[Route(path: '/dashboard/portfolio')]
 class PortfolioController extends AbstractController
 {
     public const SEARCH_KEY = 'portfolio_searchCriteria';
     public const PIE_KEY = 'portfolio_searchPie';
 
-    /**
-     * @Route("/list/{page<\d+>?1}/{orderBy?fullname}/{sort?asc}", name="portfolio_index", methods={"GET"})
-     */
+    #[Route(path: '/list/{page<\d+>?1}/{orderBy?fullname}/{sort?asc}', name: 'portfolio_index', methods: ['GET'])]
     public function index(
         Request $request,
         PositionRepository $positionRepository,
@@ -44,7 +40,7 @@ class PortfolioController extends AbstractController
         string $orderBy = 'fullname',
         string $sort = 'asc'
     ): Response {
-        
+
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
         }
@@ -58,13 +54,13 @@ class PortfolioController extends AbstractController
 
         $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
         $pieSelected = $request->getSession()->get(self::PIE_KEY, null);
-        
+
 
         $thisPage = $page;
         [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
         $referer->set('portfolio_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
-        
-        
+
+
         $pageData = $model->getPage(
             $positionRepository,
             $dividendService,
@@ -76,11 +72,11 @@ class PortfolioController extends AbstractController
             $searchCriteria,
             $pieSelected,
         );
-        
+
 
         $request->getSession()->set(get_class($this), $request->getRequestUri());
 
-        
+
         return $this->render('portfolio/index.html.twig', [
             'portfolioItems' => $pageData->getPortfolioItems(),
             'cacheTimestamp' => (new DateTime())->setTimestamp($pageData->getCacheTimestamp()),
@@ -102,14 +98,12 @@ class PortfolioController extends AbstractController
             'totalDividend' => $totalDividend,
             'totalInvested' => $allocated,
         ]);
-        
+
         //return new Response('We komen ergens');
         
     }
 
-    /**
-     * @Route("/{id}", name="portfolio_show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'portfolio_show', methods: ['GET'])]
     public function show(
         Request $request,
         Position $position,
@@ -200,9 +194,7 @@ class PortfolioController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/search", name="portfolio_search", methods={"POST"})
-     */
+    #[Route(path: '/search', name: 'portfolio_search', methods: ['POST'])]
     public function search(Request $request): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');
@@ -211,9 +203,7 @@ class PortfolioController extends AbstractController
         return $this->redirectToRoute('portfolio_index');
     }
 
-    /**
-     * @Route("/pie", name="portfolio_pie", methods={"POST"})
-     */
+    #[Route(path: '/pie', name: 'portfolio_pie', methods: ['POST'])]
     public function pie(Request $request): Response
     {
         $pie = $request->request->get('pie');
@@ -222,9 +212,7 @@ class PortfolioController extends AbstractController
         return $this->redirectToRoute('portfolio_index');
     }
 
-    /**
-     * @Route("/close/{position}", name="portfolio_position_close", methods={"DELETE"})
-     */
+    #[Route(path: '/close/{position}', name: 'portfolio_position_close', methods: ['DELETE'])]
     public function closePosition(Request $request, EntityManagerInterface $em, Position $position): Response
     {
         if ($this->isCsrfTokenValid('delete' . $position->getId(), $request->request->get('_token'))) {

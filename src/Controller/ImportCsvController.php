@@ -22,9 +22,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ImportCsvController extends AbstractController
 {
-    /**
-     * @Route("/dashboard/csv/import", name="csv_import")
-     */
+    #[Route(path: '/dashboard/csv/import', name: 'csv_import')]
     public function index(
         Request $request,
         EntityManagerInterface $entityManager,

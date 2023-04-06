@@ -10,12 +10,10 @@ use DateTimeInterface;
 use DateTime;
 
 //use Doctrine\ORM\Mapping\Index;
-
-/**
- * @ORM\Entity(repositoryClass="App\Repository\TransactionRepository")
- * @ORM\HasLifecycleCallbacks
- * @ORM\Table(indexes={@ORM\Index(columns={"meta","transaction_date"})})
- */
+#[ORM\Table]
+#[ORM\Index(columns: ['meta', 'transaction_date'])]
+#[ORM\Entity(repositoryClass: 'App\Repository\TransactionRepository')]
+#[ORM\HasLifecycleCallbacks]
 class Transaction
 {
     public const BUY = 1;
@@ -23,138 +21,86 @@ class Transaction
     public const AMOUNT_DIGITS = 7;
     public const AMOUNT_MULTIPLE = 10000000;
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="integer", options={"default" : 1})
-     */
-    private $side;
+    #[ORM\Column(type: 'integer', options: ['default' => 1])]
+    private int $side = 1;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $price;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $price = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Currency")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
+    #[ORM\JoinColumn(nullable: false)]
     private $currency;
 
-    /**
-     * @ORM\Column(type="bigint")
-     */
-    private $amount;
+    #[ORM\Column(type: 'bigint')]
+    private int $amount;
 
-    /**
-     * @ORM\Column(type="datetime", name="transaction_date")
-     */
+    #[ORM\Column(type: 'datetime', name: 'transaction_date')]
     private $transactionDate;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $profit;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $allocation;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Currency")
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     private $allocationCurrency;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Position", inversedBy="transactions")
-     * @ORM\JoinColumn(nullable=true)
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Position', inversedBy: 'transactions')]
+    #[ORM\JoinColumn(nullable: true)]
     private $position;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $avgprice;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $jobid;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $exchangeRate;
 
-    /**
-     * @ORM\Column(type="datetime", name="created_at")
-     */
+    #[ORM\Column(type: 'datetime', name: 'created_at')]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="datetime", name="updated_at", nullable = true)
-     */
+    #[ORM\Column(type: 'datetime', name: 'updated_at', nullable: true)]
     private $updatedAt;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $meta;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $importfile;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $fx_fee;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $originalPrice;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $originalPriceCurrency;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $stampduty;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $transactionFee;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $finraFee;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $total;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Pie::class, inversedBy="transactions")
-     */
+    #[ORM\ManyToOne(targetEntity: Pie::class, inversedBy: 'transactions')]
     private $pie;
 
-    /**
-     * @Assert\Callback
-     */
+    #[Assert\Callback]
     public function validate(ExecutionContextInterface $context, $payload)
     {
         if (empty($this->getPrice()) && empty($this->getAllocation())) {
@@ -325,8 +271,8 @@ class Transaction
 
     /**
      * Gets triggered only on insert
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function onPrePersist()
     {
         $this->createdAt = new \DateTime("now");
@@ -344,8 +290,8 @@ class Transaction
 
     /**
      * Gets triggered every time on update
-     * @ORM\PreUpdate
      */
+    #[ORM\PreUpdate]
     public function onPreUpdate()
     {
         $this->updatedAt = new \DateTime("now");

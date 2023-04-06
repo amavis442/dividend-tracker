@@ -20,16 +20,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dashboard/transaction")
- */
+#[Route(path: '/dashboard/transaction')]
 class TransactionController extends AbstractController
 {
     public const SEARCH_KEY = 'transaction_searchCriteria';
 
-    /**
-     * @Route("/list/{page?1}/{orderBy?transactionDate}/{sort?ASC}", name="transaction_index", methods={"GET"})
-     */
+    #[Route(path: '/list/{page?1}/{orderBy?transactionDate}/{sort?ASC}', name: 'transaction_index', methods: ['GET'])]
     public function index(
         Request $request,
         TransactionRepository $transactionRepository,
@@ -75,9 +71,7 @@ class TransactionController extends AbstractController
         }
     }
 
-    /**
-     * @Route("/create/{position}/{side?1}", name="transaction_new", methods={"GET","POST"})
-     */
+    #[Route(path: '/create/{position}/{side?1}', name: 'transaction_new', methods: ['GET', 'POST'])]
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -144,9 +138,7 @@ class TransactionController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="transaction_show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'transaction_show', methods: ['GET'])]
     public function show(Transaction $transaction): Response
     {
         return $this->render('transaction/show.html.twig', [
@@ -154,9 +146,7 @@ class TransactionController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit/{closed<\d+>?0}", name="transaction_edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/{id}/edit/{closed<\d+>?0}', name: 'transaction_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -191,9 +181,7 @@ class TransactionController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="transaction_delete", methods={"DELETE"})
-     */
+    #[Route(path: '/{id}', name: 'transaction_delete', methods: ['DELETE'])]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -214,9 +202,7 @@ class TransactionController extends AbstractController
         return $this->redirectToRoute('transaction_index');
     }
 
-    /**
-     * @Route("/search", name="transaction_search", methods={"POST"})
-     */
+    #[Route(path: '/search', name: 'transaction_search', methods: ['POST'])]
     public function search(Request $request): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');
@@ -225,9 +211,7 @@ class TransactionController extends AbstractController
         return $this->redirectToRoute('transaction_index', ['orderBy' => 'transactionDate', 'sort' => 'desc']);
     }
 
-    /**
-     * @Route("/export/{position}", name="transaction_export", methods={"GET"})
-     */
+    #[Route(path: '/export/{position}', name: 'transaction_export', methods: ['GET'])]
     public function export(Position $position): Response
     {
         $transactions = $position->getTransactions();

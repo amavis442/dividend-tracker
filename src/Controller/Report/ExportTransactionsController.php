@@ -15,18 +15,14 @@ use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dashboard/report")
- */
+#[Route(path: '/dashboard/report')]
 class ExportTransactionsController extends AbstractController
 {
     public const TAX_DIVIDEND = 0.15; // %
     public const EXCHANGE_RATE = 1.19; // dollar to euro
     public const YIELD_PIE_KEY = 'yeildpie_searchPie';
 
-    /**
-     * @Route("/exporttransactions", name="report_export_transactions")
-     */
+    #[Route(path: '/exporttransactions', name: 'report_export_transactions')]
     public function index(PositionRepository $positionRepository): Response
     {
         $fname = 'export-orders-' . date('Ymd') . '.csv';
@@ -106,9 +102,7 @@ class ExportTransactionsController extends AbstractController
     }
 
 
-        /**
-     * @Route("/exportdividend", name="report_export_dividend")
-     */
+        #[Route(path: '/exportdividend', name: 'report_export_dividend')]
     public function dividend(PaymentRepository $paymentRepository): Response
     {
         $fname = 'export-dividend-' . date('Ymd') . '.csv';

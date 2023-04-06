@@ -8,14 +8,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * @Route("/dashboard/tracker")
- */
+#[Route(path: '/dashboard/tracker')]
 class DividendTrackerController extends AbstractController
 {
-    /**
-     * @Route("/dividend", name="dividend_tracker")
-     */
+    #[Route(path: '/dividend', name: 'dividend_tracker')]
     public function index(DividendTrackerRepository $dividendTrackerRepository, TranslatorInterface $translator): Response
     {
         $data = $dividendTrackerRepository->findAll();

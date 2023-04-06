@@ -17,16 +17,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dashboard/calendar")
- */
+#[Route(path: '/dashboard/calendar')]
 class CalendarController extends AbstractController
 {
     public const SEARCH_KEY = 'calendar_searchCriteria';
 
-    /**
-     * @Route("/list/{page}/{orderBy}/{sort}", name="calendar_index", methods={"GET"})
-     */
+    #[Route(path: '/list/{page}/{orderBy}/{sort}', name: 'calendar_index', methods: ['GET'])]
     public function index(
         Request $request,
         CalendarRepository $calendarRepository,
@@ -63,9 +59,7 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/create/{ticker}", name="calendar_new", methods={"GET","POST"})
-     */
+    #[Route(path: '/create/{ticker}', name: 'calendar_new', methods: ['GET', 'POST'])]
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -94,9 +88,7 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/calendarperdatetable", name="calendar_per_date_table", methods={"GET","POST"})
-     */
+    #[Route(path: '/calendarperdatetable', name: 'calendar_per_date_table', methods: ['GET', 'POST'])]
     public function viewCalendarTable(
         Request $request,
         CalendarRepository $calendarRepository,
@@ -132,9 +124,7 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="calendar_show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'calendar_show', methods: ['GET'])]
     public function show(Calendar $calendar): Response
     {
         return $this->render('calendar/show.html.twig', [
@@ -142,9 +132,7 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="calendar_edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/{id}/edit', name: 'calendar_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -169,9 +157,7 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="calendar_delete", methods={"DELETE"})
-     */
+    #[Route(path: '/{id}', name: 'calendar_delete', methods: ['DELETE'])]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -189,9 +175,7 @@ class CalendarController extends AbstractController
         return $this->redirectToRoute('calendar_index');
     }
 
-    /**
-     * @Route("/search", name="calendar_search", methods={"POST"})
-     */
+    #[Route(path: '/search', name: 'calendar_search', methods: ['POST'])]
     public function search(
         Request $request
     ): Response {

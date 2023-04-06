@@ -11,14 +11,10 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\PaymentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
-/**
- * @Route("/dashboard/upcomming")
- */
+#[Route(path: '/dashboard/upcomming')]
 class UpcommingPositionController extends AbstractController
 {
-    /**
-     * @Route("/list", name="upcomming_position_index", methods={"GET"})
-     */
+    #[Route(path: '/list', name: 'upcomming_position_index', methods: ['GET'])]
     public function index(
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository
@@ -44,9 +40,7 @@ class UpcommingPositionController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="upcomming_position_show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'upcomming_position_show', methods: ['GET'])]
     public function show(Position $position): Response
     {
         return $this->render('upcomming_position/show.html.twig', [
@@ -54,9 +48,7 @@ class UpcommingPositionController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="upcomming_position_delete", methods={"DELETE"})
-     */
+    #[Route(path: '/{id}', name: 'upcomming_position_delete', methods: ['DELETE'])]
     public function delete(Request $request, EntityManagerInterface $entityManager, Position $position): Response
     {
         if ($this->isCsrfTokenValid('delete' . $position->getId(), $request->request->get('_token'))) {

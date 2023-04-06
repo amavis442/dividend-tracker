@@ -4,21 +4,14 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class Attachment
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-
-    // ... other fields
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
     /**
      * NOTE: This is not a mapped field of entity metadata, just a simple property.
@@ -26,45 +19,37 @@ class Attachment
      *
      * @var File|null
      */
-    private $attachmentFile;
+    private ?File $attachmentFile = null;
 
     /**
-     * @ORM\Column(type="string")
-     *
      * @var string|null
      */
-    private $attachmentName;
+    #[ORM\Column(type: 'string')]
+    private string $attachmentName;
 
     /**
-     * @ORM\Column(type="integer")
-     *
      * @var int|null
      */
-    private $attachmentSize;
+    #[ORM\Column(type: 'bigint', nullable: true)]
+    private ?int $attachmentSize = null;
 
     /**
-     * @ORM\Column(type="datetime")
-     *
      * @var \DateTimeInterface|null
      */
-    private $updatedAt;
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
 
     /**
-     * @ORM\Column(type="datetime")
-     *
      * @var \DateTimeInterface|null
      */
-    private $createdAt;
+    #[ORM\Column(type: 'datetime')]
+    private \DateTimeInterface $createdAt;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Research", inversedBy="attachments")
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Research', inversedBy: 'attachments')]
     private $research;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $label;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $label = null;
 
     public function __construct()
     {

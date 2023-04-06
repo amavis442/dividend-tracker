@@ -6,52 +6,35 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=App\Repository\JournalRepository::class)
- */
+#[ORM\Entity(repositoryClass: App\Repository\JournalRepository::class)]
 class Journal
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: 'text')]
     private $content;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="datetime", nullable = true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $updatedAt;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $title;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="journals")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\User', inversedBy: 'journals')]
+    #[ORM\JoinColumn(nullable: false)]
     private $user;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=Taxonomy::class, inversedBy="journals")
-     * @ORM\OrderBy({"title" = "DESC"})
-     * @ORM\JoinTable(name="journal_taxonomy",
-     *      joinColumns={@ORM\JoinColumn(name="journal_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="taxonomy_id", referencedColumnName="id")}
-     *      )
-     */
+    #[ORM\JoinTable(name: 'journal_taxonomy')]
+    #[ORM\JoinColumn(name: 'journal_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'taxonomy_id', referencedColumnName: 'id')]
+    #[ORM\ManyToMany(targetEntity: Taxonomy::class, inversedBy: 'journals')]
+    #[ORM\OrderBy(['title' => 'DESC'])]
     private $taxonomy;
 
     public function __construct()

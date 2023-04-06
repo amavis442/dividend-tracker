@@ -7,9 +7,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class StaticPageController extends AbstractController
 {
-    /**
-     * @Route("/static/page", name="static_page")
-     */
+    #[Route(path: '/static/page', name: 'static_page')]
     public function index()
     {
         return $this->render('static_page/index.html.twig', [

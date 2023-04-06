@@ -16,16 +16,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dashboard/position")
- */
+#[Route(path: '/dashboard/position')]
 class PositionController extends AbstractController
 {
     public const SEARCH_KEY = 'position_searchCriteria';
 
-    /**
-     * @Route("/list/{page}/{tab}/{orderBy}/{sort}/{status}", name="position_index", methods={"GET"})
-     */
+    #[Route(path: '/list/{page}/{tab}/{orderBy}/{sort}/{status}', name: 'position_index', methods: ['GET'])]
     public function index(
         Request $request,
         Summary $summary,
@@ -79,9 +75,7 @@ class PositionController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/create/{ticker}", name="position_new", methods={"GET","POST"})
-     */
+    #[Route(path: '/create/{ticker}', name: 'position_new', methods: ['GET', 'POST'])]
     public function create(Request $request, ?Ticker $ticker = null, PositionService $positionService): Response
     {
         $position = new Position();
@@ -105,9 +99,7 @@ class PositionController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="position_show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'position_show', methods: ['GET'])]
     public function show(Position $position): Response
     {
         return $this->render('position/show.html.twig', [
@@ -116,9 +108,7 @@ class PositionController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit/{closed<\d+>?0}", name="position_edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/{id}/edit/{closed<\d+>?0}', name: 'position_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
         Position $position,
@@ -149,9 +139,7 @@ class PositionController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="position_delete", methods={"DELETE"})
-     */
+    #[Route(path: '/{id}', name: 'position_delete', methods: ['DELETE'])]
     public function delete(Request $request, EntityManagerInterface $entityManager, Position $position): Response
     {
         if ($this->isCsrfTokenValid('delete' . $position->getId(), $request->request->get('_token'))) {
@@ -162,9 +150,7 @@ class PositionController extends AbstractController
         return $this->redirectToRoute('position_index');
     }
 
-    /**
-     * @Route("/search", name="position_search", methods={"POST"})
-     */
+    #[Route(path: '/search', name: 'position_search', methods: ['POST'])]
     public function search(Request $request): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');

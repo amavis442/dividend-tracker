@@ -10,14 +10,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dashboard/compound")
- */
+#[Route(path: '/dashboard/compound')]
 class CompoundPredictionController extends AbstractController
 {
-    /**
-     * @Route("/prediction", name="compound_prediction")
-     */
+    #[Route(path: '/prediction', name: 'compound_prediction')]
     public function prediction(Request $request, CompoundCalculator $compoundCalculator): Response
     {
         $compound = new Compound();
