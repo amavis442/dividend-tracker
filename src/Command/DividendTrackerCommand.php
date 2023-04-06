@@ -6,20 +6,20 @@ use App\Entity\DividendTracker;
 use App\Repository\PositionRepository;
 use App\Repository\UserRepository;
 use App\Service\DividendService;
-use App\Service\YieldsService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Security;
 
+#[AsCommand(
+    name:'app:dividend-tracker',
+    description:'Tracks the growth or demise of the expected dividend',
+)]
 class DividendTrackerCommand extends Command
 {
-    protected static $defaultName = 'app:dividend-tracker';
-    protected static $defaultDescription = 'Tracks the growth or demise of the expected dividend';
     protected $userRepository;
     protected $dividendService;
     protected $positionRepository;
@@ -39,7 +39,7 @@ class DividendTrackerCommand extends Command
         $this->entityManager = $entityManager;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription(self::$defaultDescription);

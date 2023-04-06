@@ -6,6 +6,7 @@ use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
 use App\Service\WeightedAverage;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,9 +14,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(
+    name:'app:transaction',
+    description:'Transaction',
+)]
 class TransactionCommand extends Command
 {
-    protected static $defaultName = 'app:transaction';
     /**
      *
      * @var TransactionRepository
@@ -52,7 +56,7 @@ class TransactionCommand extends Command
         $this->weightedAverageService = $weightedAverageService;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Recalculate avg. price position')
@@ -102,6 +106,6 @@ class TransactionCommand extends Command
             }
         }
         $io->success('Done...');
-        return 0;
+        return Command::SUCCESS;
     }
 }

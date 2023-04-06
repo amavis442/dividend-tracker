@@ -4,15 +4,18 @@ namespace App\Command;
 
 use App\Repository\TickerRepository;
 use App\Service\StockPriceService;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(
+    name:'app:update:stockdata',
+    description:'Get stockdata for all open positions when posible and put them in a cache',
+)]
 class UpdateStockDataCommand extends Command
 {
-    protected static $defaultName = 'app:update:stockdata';
-    protected static $defaultDescription = 'Get stockdata for all open positions when posible and put them in a cache';
     protected $stockPriceService;
     protected $tickerRepository;
 
@@ -24,7 +27,7 @@ class UpdateStockDataCommand extends Command
         $this->tickerRepository = $tickerRepository;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription(self::$defaultDescription)

@@ -14,17 +14,19 @@ use Box\Spout\Reader\CSV\Sheet;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(
+    name:'validate',
+    description:'Validate and fix transactions based on supplioed file',
+)]
 class ValidateCommand extends Command
 {
-    protected static $defaultName = 'validate';
-    protected static $defaultDescription = 'Validate and fix transactions based on supplioed file';
-
     protected $tickerRepository;
     protected $currencyRepository;
     protected $positionRepository;

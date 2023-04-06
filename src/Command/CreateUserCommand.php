@@ -2,19 +2,21 @@
 
 namespace App\Command;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Question\Question;
-use App\Service\UserManager;
 use App\Entity\User;
+use App\Service\UserManager;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(
+    name:'app:create-user',
+    description:'Add a short description for your command',
+)]
 class CreateUserCommand extends Command
 {
-    protected static $defaultName = 'app:create-user';
     private $userManager;
 
     public function __construct(UserManager $userManager)
@@ -23,16 +25,15 @@ class CreateUserCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Create a new user');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $userManager = $this->userManager;
-
 
         $helper = $this->getHelper('question');
         $questionEmail = new Question('Please enter the email: ', null);
@@ -111,5 +112,7 @@ class CreateUserCommand extends Command
 
         $io = new SymfonyStyle($input, $output);
         $io->success('New user created.');
+
+        return Command::SUCCESS;
     }
 }

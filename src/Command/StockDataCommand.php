@@ -3,18 +3,19 @@
 namespace App\Command;
 
 use App\Service\StockPriceService;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(
+    name:'app:yahoodata',
+    description:'Get stockdata from yahoo for all open positions when posible and put them in a cache',
+)]
 class StockDataCommand extends Command
 {
-    protected static $defaultName = 'app:yahoodata';
-    protected static $defaultDescription =
-        'Get stockdata from yahoo for all open positions
-        when posible and put them in a cache';
     protected $stockPriceService;
 
     public function __construct(StockPriceService $stockPriceService)
@@ -24,7 +25,7 @@ class StockDataCommand extends Command
         $this->stockPriceService = $stockPriceService;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription(self::$defaultDescription)
