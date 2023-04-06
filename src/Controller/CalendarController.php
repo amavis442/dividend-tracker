@@ -59,15 +59,17 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/create/{ticker}', name: 'calendar_new', methods: ['GET', 'POST'])]
+    #[Route(path: '/create/{ticker?}', name: 'calendar_new', methods: ['GET', 'POST'])]
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
-        ?Ticker $ticker = null,
+        ?Ticker $ticker,
         Referer $referer
     ): Response {
         $calendar = new Calendar();
-        $calendar->setTicker($ticker);
+        if ($ticker != null) {
+            $calendar->setTicker($ticker);
+        }
         $form = $this->createForm(CalendarType::class, $calendar);
         $form->handleRequest($request);
 
@@ -157,7 +159,7 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'calendar_delete', methods: ['DELETE'])]
+    #[Route(path: '/{id}', name: 'calendar_delete', methods: ['POST'])]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,
