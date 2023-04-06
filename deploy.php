@@ -40,7 +40,7 @@ task('npm:build', function(){
 
 desc('Reload php-fpm config');
 task('php-fpm:reload', function () {
-    run('sudo /bin/systemctl reload php7.4-fpm');
+    run('sudo /bin/systemctl reload php8.2-fpm');
 });
 
 desc('Runs npm, migrates the database and install the assets');
@@ -53,7 +53,7 @@ task('deploy:dividend', [
 after('deploy:vendors', 'deploy:dividend');
 
 // Last step after symlink has been added.
-after('deploy', 'php-fpm:reload');
+//after('deploy', 'php-fpm:reload');
 
 
 option('source', null, InputOption::VALUE_OPTIONAL, 'Source alias of the current task.');
