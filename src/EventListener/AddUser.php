@@ -3,7 +3,7 @@
 namespace App\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class AddUser
 {

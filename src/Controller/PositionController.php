@@ -75,12 +75,12 @@ class PositionController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/create/{ticker}', name: 'position_new', methods: ['GET', 'POST'])]
-    public function create(Request $request, ?Ticker $ticker = null, PositionService $positionService): Response
+    #[Route(path: '/create/{ticker?}', name: 'position_new', methods: ['GET', 'POST'])]
+    public function create(Request $request,  PositionService $positionService, ?Ticker $ticker = null): Response
     {
         $position = new Position();
 
-        if ($ticker instanceof Ticker) {
+        if ($ticker != null) {
             $position->setTicker($ticker);
         }
         $form = $this->createForm(PositionType::class, $position);

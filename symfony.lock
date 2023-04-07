@@ -137,9 +137,6 @@
     "laminas/laminas-zendframework-bridge": {
         "version": "1.0.1"
     },
-    "monolog/monolog": {
-        "version": "2.2.0"
-    },
     "myclabs/deep-copy": {
         "version": "1.10.2"
     },
@@ -322,9 +319,6 @@
     "symfony/asset": {
         "version": "v4.3.3"
     },
-    "symfony/browser-kit": {
-        "version": "v4.3.3"
-    },
     "symfony/cache": {
         "version": "v4.3.3"
     },
@@ -347,23 +341,8 @@
             "config/bootstrap.php"
         ]
     },
-    "symfony/css-selector": {
-        "version": "v4.3.3"
-    },
     "symfony/debug": {
         "version": "v4.3.3"
-    },
-    "symfony/debug-bundle": {
-        "version": "4.1",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "4.1",
-            "ref": "f8863cbad2f2e58c4b65fa1eac892ab189971bea"
-        },
-        "files": [
-            "config/packages/dev/debug.yaml"
-        ]
     },
     "symfony/dependency-injection": {
         "version": "v4.3.3"
@@ -372,9 +351,6 @@
         "version": "v2.2.0"
     },
     "symfony/doctrine-bridge": {
-        "version": "v4.3.3"
-    },
-    "symfony/dom-crawler": {
         "version": "v4.3.3"
     },
     "symfony/dotenv": {
@@ -463,10 +439,10 @@
         ]
     },
     "symfony/maker-bundle": {
-        "version": "1.0",
+        "version": "1.48",
         "recipe": {
             "repo": "github.com/symfony/recipes",
-            "branch": "master",
+            "branch": "main",
             "version": "1.0",
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
@@ -474,22 +450,16 @@
     "symfony/mime": {
         "version": "v4.3.3"
     },
-    "symfony/monolog-bridge": {
-        "version": "v5.2.4"
-    },
     "symfony/monolog-bundle": {
-        "version": "3.3",
+        "version": "3.8",
         "recipe": {
             "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "3.3",
-            "ref": "d7249f7d560f6736115eee1851d02a65826f0a56"
+            "branch": "main",
+            "version": "3.7",
+            "ref": "213676c4ec929f046dfde5ea8e97625b81bc0578"
         },
         "files": [
-            "config/packages/dev/monolog.yaml",
-            "config/packages/prod/deprecations.yaml",
-            "config/packages/prod/monolog.yaml",
-            "config/packages/test/monolog.yaml"
+            "config/packages/monolog.yaml"
         ]
     },
     "symfony/notifier": {
@@ -665,17 +635,16 @@
         "version": "v5.2.4"
     },
     "symfony/web-profiler-bundle": {
-        "version": "3.3",
+        "version": "6.2",
         "recipe": {
             "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "3.3",
-            "ref": "6bdfa1a95f6b2e677ab985cd1af2eae35d62e0f6"
+            "branch": "main",
+            "version": "6.1",
+            "ref": "e42b3f0177df239add25373083a564e5ead4e13a"
         },
         "files": [
-            "config/packages/dev/web_profiler.yaml",
-            "config/packages/test/web_profiler.yaml",
-            "config/routes/dev/web_profiler.yaml"
+            "config/packages/web_profiler.yaml",
+            "config/routes/web_profiler.yaml"
         ]
     },
     "symfony/webpack-encore-bundle": {

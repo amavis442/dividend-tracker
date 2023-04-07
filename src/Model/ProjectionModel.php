@@ -7,7 +7,7 @@ use App\Entity\User;
 use App\Repository\DividendMonthRepository;
 use App\Repository\PositionRepository;
 use App\Service\DividendService;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -128,10 +128,10 @@ class ProjectionModel
     }
 
     public function projection(
-        ?int $year = null,
         PositionRepository $positionRepository,
         DividendMonthRepository $dividendMonthRepository,
-        DividendService $dividendService
+        DividendService $dividendService,
+        ?int $year = null
     ): array {
 
         $cacheKey = 'projection_' . $year . '_' . $this->user->getId();
