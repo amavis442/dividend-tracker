@@ -16,7 +16,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name:'app:transaction',
-    description:'Transaction',
+    description:'Recalculate avg. price position',
 )]
 class TransactionCommand extends Command
 {
@@ -59,7 +59,6 @@ class TransactionCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Recalculate avg. price position')
             ->addArgument('symbol', InputArgument::OPTIONAL, 'Ticker symbol')
             ->addOption('force', null, InputOption::VALUE_NONE, 'overwrite');
     }

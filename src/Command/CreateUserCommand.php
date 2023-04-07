@@ -13,7 +13,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name:'app:create-user',
-    description:'Add a short description for your command',
+    description:'Create a new user',
 )]
 class CreateUserCommand extends Command
 {
@@ -23,12 +23,6 @@ class CreateUserCommand extends Command
     {
         $this->userManager = $userManager;
         parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this
-            ->setDescription('Create a new user');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

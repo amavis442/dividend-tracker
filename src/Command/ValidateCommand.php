@@ -59,7 +59,6 @@ class ValidateCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription(self::$defaultDescription)
             ->addArgument('filename', InputArgument::REQUIRED, 'Argument description')
         ;
     }

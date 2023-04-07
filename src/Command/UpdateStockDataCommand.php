@@ -27,15 +27,6 @@ class UpdateStockDataCommand extends Command
         $this->tickerRepository = $tickerRepository;
     }
 
-    protected function configure(): void
-    {
-        $this
-            ->setDescription(self::$defaultDescription)
-            /*    ->addArgument('symbol', InputArgument::REQUIRED, 'Ticker symbol')
-        ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-         */;
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
 

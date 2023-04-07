@@ -12,14 +12,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name:'app:import',
-    description:'app:importDummy',
+    description:'Add a short description for your command',
 )]
 class ImportCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setDescription('Add a short description for your command')
             ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
             ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
         ;

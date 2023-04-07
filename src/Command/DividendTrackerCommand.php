@@ -39,12 +39,6 @@ class DividendTrackerCommand extends Command
         $this->entityManager = $entityManager;
     }
 
-    protected function configure(): void
-    {
-        $this
-            ->setDescription(self::$defaultDescription);
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
