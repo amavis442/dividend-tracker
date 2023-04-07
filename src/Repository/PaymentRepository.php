@@ -14,6 +14,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\ORM\Query\ResultSetMapping;
 
 /**
  * @method Payment|null find($id, $lockMode = null, $lockVersion = null)
@@ -166,14 +167,26 @@ class PaymentRepository extends ServiceEntityRepository
     public function getDividendsPerInterval(UserInterface $user, string $interval = 'Month'): array
     {
         $con = $this->getEntityManager()->getConnection();
+        $em = $this->getEntityManager();
 
-        $sql = 'SELECT YEAR(p.pay_date) periodYear, MONTH(p.pay_date) as periodMonth, SUM(p.dividend) dividend
-                from payment p WHERE p.user_id = ' . $user->getId() . ' GROUP BY YEAR(p.pay_date), MONTH(p.pay_date)';
+        $qb = $this->createQueryBuilder('p')
+            ->select('YEAR(p.payDate) periodYear, MONTH(p.payDate) as periodMonth, SUM(p.dividend) dividend')
+            ->join('p.user', 'u')
+            ->where('u.id = :userID')
+            ->setParameter('userID', $user->getId())
+            ->groupBy('periodYear, periodMonth');
 
-        $result = $con->fetchAll($sql);
+        $result = $qb->getQuery()->getResult();
 
-        $sql = 'SELECT YEAR(MIN(p.pay_date)) as startdate from payment p WHERE p.user_id = ' . $user->getId() . ' GROUP BY YEAR(p.pay_date) LIMIT 1';
-        $years = $con->fetchAll($sql);
+        $qb = $this->createQueryBuilder('p')
+            ->select('YEAR(MIN(p.payDate)) startdate')
+            ->join('p.user', 'u')
+            ->where('u.id = :userID')
+            ->setParameter('userID', $user->getId())
+            ->setMaxResults(1);
+
+        $years = $qb->getQuery()->getResult();
+
         $currentYear = date('Y');
         $startYear = $years[0]['startdate'] ?? $currentYear;
 
