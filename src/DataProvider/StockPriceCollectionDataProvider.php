@@ -4,13 +4,11 @@
 
 namespace App\DataProvider;
 
-use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
-use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use App\Entity\StockPrice;
 use App\Repository\TickerRepository;
 use App\Service\StockPriceService;
 
-final class StockPriceCollectionDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface
+final class StockPriceCollectionDataProvider
 {
     private $tickerRepository;
     private $stockPriceService;
@@ -21,12 +19,7 @@ final class StockPriceCollectionDataProvider implements ContextAwareCollectionDa
         $this->tickerRepository = $tickerRepository;
     }
 
-    public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
-    {
-        return StockPrice::class === $resourceClass;
-    }
-
-    public function getCollection(string $resourceClass, string $operationName = null, array $context = []): array
+    public function getCollection(): array
     {
         $tickers = $this->tickerRepository->getActive();
         foreach ($tickers as $ticker) {
@@ -45,7 +38,6 @@ final class StockPriceCollectionDataProvider implements ContextAwareCollectionDa
             }
             $data[] = $stockprice;
         }
-
         return $data;
     }
 }
