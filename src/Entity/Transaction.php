@@ -36,8 +36,13 @@ class Transaction
     #[ORM\JoinColumn(nullable: false)]
     private $currency;
 
+    /**
+     * @see https://github.com/doctrine/dbal/issues/3690
+     * 32 bit system sets amount to string for bigint and that will fuck up strong typing and will give a useless 500 error page.
+     * @var int
+     */
     #[ORM\Column(type: 'bigint')]
-    private int $amount;
+    private $amount;
 
     #[ORM\Column(type: 'datetime', name: 'transaction_date')]
     private $transactionDate;
