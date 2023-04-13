@@ -170,7 +170,7 @@ class Transaction
 
     public function setAmount(int $amount): self
     {
-        $this->amount = int($amount * Constants::AMOUNT_PRECISION);
+        $this->amount = $amount * Constants::AMOUNT_PRECISION;
 
         return $this;
     }
