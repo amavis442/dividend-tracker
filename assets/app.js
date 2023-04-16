@@ -13,3 +13,11 @@ jQuery(function () {
   $('[data-toggle="tooltip"]').tooltip();
 });
 
+import { startStimulusApp } from '@symfony/stimulus-bridge';
+
+// eslint-disable-next-line no-undef
+export const app = startStimulusApp(require.context(
+  '@symfony/stimulus-bridge/lazy-controller-loader!./controllers',
+  true,
+  /\.(j|t)sx?$/
+));

@@ -27,7 +27,7 @@ Encore
     .autoProvidejQuery()
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
-    //.enableStimulusBridge('./assets/controllers.json')
+    .enableStimulusBridge('./assets/controllers.json')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
@@ -36,14 +36,6 @@ Encore
     // but, you probably want this, unless you're building a single-page app
     .enableSingleRuntimeChunk()
     //.disableSingleRuntimeChunk()
-
-    /*
-     * FEATURE CONFIG
-     *
-     * Enable & configure other features below. For a full
-     * list of features, see:
-     * https://symfony.com/doc/current/frontend.html#adding-more-features
-     */
     .cleanupOutputBeforeBuild()
     .enableBuildNotifications()
     .enableSourceMaps(!Encore.isProduction())
@@ -65,14 +57,7 @@ Encore
     .enableSassLoader()
     .enableVueLoader(() => { }, { runtimeCompilerBuild: true })
     // uncomment if you use TypeScript
-    //.enableTypeScriptLoader()
-
-    .autoProvideVariables({
-        $: 'jquery',
-        jQuery: 'jquery',
-        'window.jQuery': 'jquery',
-        CodeMirror: 'codemirror',
-    })
+    .enableTypeScriptLoader()
     .addAliases({
         'jQuery': path.join(__dirname, 'node_modules/jquery/dist/jquery.js')
     })
@@ -100,6 +85,10 @@ Encore
     .addEntry('summernote', './assets/js/summernote.js')
     .addEntry('stockprices', './assets/js/stockprices.js')
     .addEntry('vue', './assets/vue/index.js')
+
+    //.addEntry('svelteregistercontroller', './assets/svelte/register_controller.ts')
+    //.addEntry('svelterendercontroller', './assets/svelte/render_controller.ts')
+
 
     .addPlugin(new webpack.DefinePlugin({
         ENV_API_ENDPOINT: JSON.stringify(process.env.API_ENDPOINT),

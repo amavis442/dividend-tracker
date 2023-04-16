@@ -4,7 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    documents_directory: '%kernel.project_dir%/public/uploads/documents'
+    documents_directory: "%kernel.project_dir%/public/uploads/documents"
     app.path.research_attachments: /uploads/documents
     app.dividend.tax: 0.15
     app.dividend.exchangerate: 1.19
@@ -12,68 +12,94 @@ parameters:
 services:
     # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
+        autowire: true # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
-        resource: '../src/'
+        resource: "../src/"
         exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
-            - '../src/Tests/'
+            - "../src/DependencyInjection/"
+            - "../src/Entity/"
+            - "../src/Kernel.php"
+            - "../src/Tests/"
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
     App\Controller\:
-        resource: '../src/Controller'
-        tags: ['controller.service_arguments']
+        resource: "../src/Controller"
+        tags: ["controller.service_arguments"]
 
     App\Service\FileUploader:
         arguments:
-            $targetDirectory: '%documents_directory%'
+            $targetDirectory: "%documents_directory%"
 
     App\Service\PositionService:
-        arguments: 
+        arguments:
             $entityManager: "@doctrine.orm.entity_manager"
 
     App\Service\ExchangeRateService:
         arguments:
-            $client: '@http_client'
-            $exchangerateCache: '@exchangerate.cache'
+            $client: "@http_client"
+            $exchangerateCache: "@exchangerate.cache"
 
     App\Service\StockPriceService:
         arguments:
-            $client: '@http_client'
-            $stockCache: '@stock.cache'
-            $exchangeRateService: '@App\Service\ExchangeRateService' 
+            $client: "@http_client"
+            $stockCache: "@stock.cache"
+            $exchangeRateService: '@App\Service\ExchangeRateService'
         calls:
             - addService: ['App\Service\StockPrices\YahooFinanceService']
-            - addService: ['App\Service\StockPrices\LondonService', ['SEMB', 'PNN','RB','BATS','SSHY','STHS','VWRL','VGOV','VUSC']]   
+            - addService:
+                  [
+                      'App\Service\StockPrices\LondonService',
+                      [
+                          "SEMB",
+                          "PNN",
+                          "RB",
+                          "BATS",
+                          "SSHY",
+                          "STHS",
+                          "VWRL",
+                          "VGOV",
+                          "VUSC",
+                      ],
+                  ]
             - setDefault: ['App\Service\StockPrices\YahooFinanceService']
 
     App\Service\DividendDateService:
         arguments:
-            $client: '@http_client'
+            $client: "@http_client"
         calls:
             - addService: ['App\Service\DividendDate\SeekingAlphaService']
-            - addService: ['App\Service\DividendDate\ISharesService', ['SEMB', 'INRG', 'IPRP', 'ISF', 'IUS3', 'IWDP']] 
-            - addService: ['App\Service\DividendDate\VanguardService', ['VMID', 'VJPN', 'VEUR', 'VAPX', 'VUSA', 'VGOV']]   
-            - addService: ['App\Service\DividendDate\PimcoService', ['STHS', 'SSHY']]   
-            - addService: ['\App\Service\DividendDate\NullService', ['DSM']]
+            - addService:
+                  [
+                      'App\Service\DividendDate\ISharesService',
+                      ["SEMB", "INRG", "IPRP", "ISF", "IUS3", "IWDP"],
+                  ]
+            - addService:
+                  [
+                      'App\Service\DividendDate\VanguardService',
+                      ["VMID", "VJPN", "VEUR", "VAPX", "VUSA", "VGOV"],
+                  ]
+            - addService:
+                  ['App\Service\DividendDate\PimcoService', ["STHS", "SSHY"]]
+            - addService: ['\App\Service\DividendDate\NullService', ["DSM"]]
             - setDefault: ['App\Service\DividendDate\SeekingAlphaService']
 
     App\Service\ImportCsvService:
-        arguments: 
+        arguments:
             $entityManager: "@doctrine.orm.entity_manager"
 
     Doctrine\Migrations\Version\DbalMigrationFactory: ~
     App\Migrations\Factory\MigrationFactoryDecorator:
         decorates: Doctrine\Migrations\Version\DbalMigrationFactory
-        arguments: ['@App\Migrations\Factory\MigrationFactoryDecorator.inner', '@service_container']
-
+        arguments:
+            [
+                '@App\Migrations\Factory\MigrationFactoryDecorator.inner',
+                "@service_container",
+            ]
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
@@ -83,15 +109,22 @@ services:
 
     App\EventListener\UpdatedAtTimestamp:
         tags:
-            - { name: doctrine.event_listener, event: preUpdate }  
-    
+            - { name: doctrine.event_listener, event: preUpdate }
+
     App\EventListener\AddUser:
         tags:
-            - { name: doctrine.event_listener, event: prePersist } 
+            - { name: doctrine.event_listener, event: prePersist }
 
+    App\Twig\Runtime\SvelteComponentExtensionRuntime:
+        arguments:
+            $stimulusExtension: "@webpack_encore.twig_stimulus_extension"
 
     on_request_listener:
         class: App\EventListener\OnRequestListener
-        arguments: ["@doctrine.orm.entity_manager","@security.token_storage"]
+        arguments: ["@doctrine.orm.entity_manager", "@security.token_storage"]
         tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+            - {
+                  name: kernel.event_listener,
+                  event: kernel.request,
+                  method: onKernelRequest,
+              }
