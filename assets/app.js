@@ -2,13 +2,7 @@ import jQuery from 'jquery';
 
 const $ = jQuery;
 
-import 'bootstrap/js/dist/popover';
-import 'bootstrap/js/dist/tooltip';
-import 'bootstrap/js/dist/collapse';
-import 'bootstrap/js/dist/dropdown';
-import 'bootstrap/js/dist/tab';
-
-//import 'bootstrap';
+import 'bootstrap';
 
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css';

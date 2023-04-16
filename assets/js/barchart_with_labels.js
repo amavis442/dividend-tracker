@@ -1,6 +1,6 @@
-import Chart from 'chart.js';
 import chartColors from './chartcolors';
 import jQuery from 'jquery';
+import Chart from 'chart.js/auto';
 
 const $ = jQuery;
 
@@ -25,15 +25,22 @@ const barChart = function (canvasName, cdata, clabels, csubTitle, csign) {
     },
     options: {
       responsive: true,
-      title: {
-        display: true,
-        fontSize: 24,
-        text: csubTitle
+      plugins: {
+        title: {
+          display: true,
+          text: csubTitle,
+          font: {
+            size: 24
+          }
+        },
+        legend: {
+          position: 'top',
+        },
       },
       scales: {
-        yAxes: [{
+        y: {
+          beginAtZero: true,
           ticks: {
-            beginAtZero: true,
             callback: function (value) {
               if (csign == '%') {
                 return value + csign;
@@ -41,7 +48,7 @@ const barChart = function (canvasName, cdata, clabels, csubTitle, csign) {
               return csign + value;
             }
           }
-        }]
+        }
       }
     }
   };

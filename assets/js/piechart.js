@@ -1,6 +1,6 @@
-import Chart from 'chart.js';
 import chartColors from './chartcolors';
 import jQuery from 'jquery';
+import Chart from 'chart.js/auto';
 
 const $ = jQuery;
 
@@ -26,11 +26,19 @@ $(function () {
     },
     options: {
       responsive: true,
-      title: {
-        display: true,
-        fontSize: 24,
-        text: chartSubTitle
-      }
+      plugins: {
+        title: {
+          display: true,
+          text: chartSubTitle,
+          font: {
+            size: 24
+          }
+        },
+        legend: {
+          position: 'top',
+        },
+      },
+
     }
   };
 
