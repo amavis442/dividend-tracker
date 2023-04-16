@@ -32,10 +32,8 @@
     }}</span>
     <span v-else class="badge badge-secondary">{{ formattedResult }}</span>
 
-    <span class="badge badge-info"
-      >{{ dividendYield }}
-      <i v-if="isBuyOppertunity" class="fas fa-shopping-cart"
-    /></span>
+    <span class="badge badge-info">{{ dividendYield }}
+      <i v-if="isBuyOppertunity" class="fas fa-shopping-cart" /></span>
   </div>
 </template>
 
@@ -48,6 +46,11 @@ export default {
       type: String,
       default: "",
       require: true,
+    },
+    prices: {
+      type: Object,
+      default: [],
+      require: false,
     },
     price: {
       type: Number,
@@ -94,12 +97,24 @@ export default {
   },
   mounted: function () {
     this.getStockprice();
-    setInterval(this.getStockprice, 60000);
+    setInterval(this.getStockprice, 3000);
   },
   methods: {
-    getStockprice: function () {
-      fetch(this.apiBaseUrl + "api/stock_prices/" + this.stock)
-        .then((resp) => resp.json())
+    getStockprice: async function () {
+      new Promise((resolve, reject) => {
+        if (this.$parent.prices && this.$parent.prices.length > 0) {
+          resolve(this.$parent.prices);
+        }
+        reject('I do not have the prices yet');
+      })
+        .then((result) => {
+          for (let i = 0; i < result.length; i++) {
+            if (result[i].symbol == this.stock) {
+              return result[i];
+            }
+          }
+          Promise.reject('Symbol not found: ' + this.stock);
+        })
         .then((result) => {
           this.marketPrice = result.price;
           this.formattedMarketPrice = new Intl.NumberFormat("nl-NL", {
@@ -122,20 +137,20 @@ export default {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             }).format(dividendYield);
-            console.log(this.stock);
-            console.log(dividendYield);
-            console.log(this.dividendTreshold);
+            //console.log(this.stock);
+            //console.log(dividendYield);
+            //console.log(this.dividendTreshold);
 
             if (this.dividendTreshold <= dividendYield) {
               this.isBuyOppertunity = true;
             }
-            console.log(
+            /* console.log(
               "Maximum allocation reached: " + this.maximumAllocationReached
-            );
+            ); */
             if (this.maximumAllocationReached) {
               this.isBuyOppertunity = false;
             }
-            console.log(this.isBuyOppertunity);
+            //console.log(this.isBuyOppertunity);
           }
           this.result = this.totalshares * this.diffPrice;
           this.formattedResult = new Intl.NumberFormat("nl-NL", {
@@ -143,9 +158,14 @@ export default {
             currency: "EUR",
           }).format(this.result);
         })
-        .catch(console.log.bind(console));
+
+        //.catch(console.log.bind(console));
+        .catch((error) => {
+          console.error(error);
+        })
     },
   },
 };
 </script>
-<style scoped></style>
+<style scoped>
+</style>
