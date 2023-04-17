@@ -181,7 +181,7 @@ class TransactionController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'transaction_delete', methods: ['DELETE'])]
+    #[Route(path: '/{id}', name: 'transaction_delete', methods: ['POST'])]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,
