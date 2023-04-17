@@ -168,7 +168,7 @@ class Transaction
         return $this->amount / Constants::AMOUNT_PRECISION;
     }
 
-    public function setAmount(int $amount): self
+    public function setAmount($amount): self
     {
         $this->amount = $amount * Constants::AMOUNT_PRECISION;
 
