@@ -27,6 +27,7 @@ class SeekingAlphaService implements DividendDatePluginInterface
      * @var string
      */
     private $usedUrl = '';
+    private $dividenData = [];
 
     public function __construct(HttpClientInterface $client)
     {
