@@ -5,8 +5,9 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\JournalRepository;
 
-#[ORM\Entity(repositoryClass: App\Repository\JournalRepository::class)]
+#[ORM\Entity(repositoryClass: JournalRepository::class)]
 class Journal
 {
     #[ORM\Id]
