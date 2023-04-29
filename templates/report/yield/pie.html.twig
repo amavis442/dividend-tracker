@@ -1,19 +1,26 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ 'Dividend Yield'|trans }} 
+{% block title %}{{ 'Dividend Yield'|trans }}
 {% endblock %}
 
 {% block body %}
 	<div class="card" style="margin-bottom:10px;margin-top:10px">
+	<h5 class="card-header">{{ 'Yield on cost dividend'|trans }} (<strong>{{ dividendYieldOnCost|format_number({fraction_digit: 2}) }}%</strong>)</h5>
   		<div class="card-body">
-		  <strong>{{ 'Yield on cost dividend'|trans }}:</strong><br/>
-		  {{ 'Total dividend in a year / total allocated'|trans }} = 
-		  &euro;{{ totalNetYearlyDividend|format_number({fraction_digit: 2}) }} / 
-		  &euro;{{ allocated|format_number({fraction_digit: 2}) }} =
-		  <strong>{{ dividendYieldOnCost|format_number({fraction_digit: 2}) }}%</strong>
+			  <p class="card-text">{{ 'Total dividend in a year / total allocated'|trans }} <br/>
+			  	&euro;{{ totalNetYearlyDividend|format_number({fraction_digit: 2}) }} /
+			  	&euro;{{ allocated|format_number({fraction_digit: 2}) }}<br/>
+
+				</p>
+		</div>
+		<div class="card-footer">
+			<small>
+				{{ 'Per month'|trans }} <strong>&euro;{{ (totalNetYearlyDividend / 12)|format_number({fraction_digit: 2}) }}</strong>
+			</small>
 		</div>
 	</div>
-	
+
+<div class="col col-12 border p-2 mb-2">
 	<div>
 		<form action="{{ path('report_dividend_yield_by_pie_form') }}" method="POST" class="form-inline">
 		<input type="hidden" name="_method" value="POST">
@@ -30,9 +37,9 @@
 	</div>
 
 
-    <div style='width:1000px;height:600px' class="col col-xs-12">
+
         <canvas id="barChartCanvas" class="chart"
-			data-chart-data='{{ data|json_encode|raw }}' 
+			data-chart-data='{{ data|json_encode|raw }}'
 			data-chart-labels='{{ labels|json_encode|raw }}'
 			data-chart-title='{{ 'Yield'|trans }}'
 			data-chart-sub-title='Dividend yield'
