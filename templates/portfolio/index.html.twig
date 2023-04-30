@@ -67,79 +67,68 @@
 						{% set dividendInfo = include('portfolio/_dividendinfo.html.twig', {'portfolioItem' : portfolioItem} ) %}
 						<tr>
 							<td>
-								{% if portfolioItem.fullname|length > 30 %}
-									<span data-toggle="tooltip" data-placement="top" title="{{ portfolioItem.fullname }} ({{ portfolioItem.symbol }})">
-									{% else %}
-										<span>
-										{% endif %}
-										<a href="{{ path('portfolio_show', {'id': portfolioItem.positionId}) }}">{{ portfolioItem.fullname|slice(0, 30) }}
-											{% if portfolioItem.fullname|length > 30 %}...
+
+								<div>
+									<span {% if portfolioItem.fullname|length > 20 %} data-toggle="tooltip" data-placement="top" title="{{ portfolioItem.fullname }} ({{ portfolioItem.symbol }})" {% endif %}>
+										<a href="{{ path('portfolio_show', {'id': portfolioItem.positionId}) }}">{{ portfolioItem.fullname|slice(0, 20) }}
+											{% if portfolioItem.fullname|length > 20 %}...
 											{% endif %}
 										</a>
-										<i class="fas fa-info-circle" data-toggle="popover" title="Dividend & pie info" data-content='{{ dividendInfo }}' data-html="true"></i>
 									</span>
-									<br/>
-									<small>{{ portfolioItem.amount|format_number({fraction_digit: 7}) }}
-										{{ 'shares'|trans }}</small>
-								</td>
-							</td>
-							<td>
-								&euro;
-								{{ portfolioItem.price|format_number({fraction_digit: 2}) }}
-							</td>
-							<td>
-								<stockprice stock="{{ portfolioItem.symbol }}" v-bind:price="{{ portfolioItem.price }}" v-bind:freq="{{ portfolioItem.dividendPayoutFrequency }}" v-bind:netdividend="{{ portfolioItem.netDividendPerShare }}" v-bind:totalshares="{{ portfolioItem.amount }}" v-bind:dividend-treshold="{{ portfolioItem.dividendTreshold }}" v-bind:maximum-allocation-reached="{% if portfolioItem.isMaxAllocation %}true{% else %}false{% endif %}"></stockprice>
-							</td>
-							<td>
-								<span class="badge badge-primary">&euro;{{ portfolioItem.allocation|format_number({fraction_digit: 2}) }}
-									<span class="badge badge-warning">{{ portfolioItem.percentageAllocation|format_number({fraction_digit: 2}) }}%</span>
-								</span>
-							</td>
-							<td>
-								<span class="badge badge-secondary">
-									&euro;{{ portfolioItem.dividend|format_number({fraction_digit: 2}) }}</span>
-							</td>
-							<td>
-								{% if portfolioItem.divDate %}
-									<span class="badge badge-primary">{{ portfolioItem.exDividendDate|format_date('long') }}</span>
-									<br/>
-									<span class="badge badge-warning">{{ portfolioItem.paymentDate|format_date('long') }}</span>
-								{% else %}
-									&mdash;
-								{% endif %}
-							</td>
-							<td>
-								{% if portfolioItem.divDate %}
-									<div class="badge badge-primary">{{ portfolioItem.cashCurrency.sign|raw }}
-										{{ portfolioItem.cashAmount|format_number({fraction_digit: 3}) }}</div><br/>
-									<div class="badge badge-secondary">&euro;
-										{{ portfolioItem.forwardNetDividend|format_number({fraction_digit: 2}) }}
-										<div class="badge badge-success">{{ portfolioItem.forwardNetDividendYield|format_number({fraction_digit: 2}) }}%</div>
-									</div><br/>
-								{% else %}
-									&mdash;
-								{% endif %}
-							</td>
-						</tr>
-					{% else %}
-						<tr>
-							<td colspan="9">no records found</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-				<tfoot>
-					<tr>
-						<td colspan="8"></td>
-					</tr>
-				</tfoot>
-			</table>
-			{% include 'paginator.html.twig' %}
-		</div>
-	</div>
-{% endblock %}
+									<i class="fas fa-info-circle" data-toggle="popover" title="Dividend & pie info" data-content='{{ dividendInfo }}' data-html="true"></i>
+								</div>
 
-{% block javascripts %}
-	{{ parent() }}
-	{{ encore_entry_script_tags('stockprices') }}
-	{{ encore_entry_script_tags('vue') }}
-{% endblock %}
+								<small>{{ portfolioItem.amount|format_number({fraction_digit: 7}) }}
+									{{ 'shares'|trans }}</small>
+							</td>
+						<td>
+							&euro;
+							{{ portfolioItem.price|format_number({fraction_digit: 2}) }}
+						</td>
+						<td>
+							<stockprice stock="{{ portfolioItem.symbol }}" v-bind:price="{{ portfolioItem.price }}" v-bind:freq="{{ portfolioItem.dividendPayoutFrequency }}" v-bind:netdividend="{{ portfolioItem.netDividendPerShare }}" v-bind:totalshares="{{ portfolioItem.amount }}" v-bind:dividend-treshold="{{ portfolioItem.dividendTreshold }}" v-bind:maximum-allocation-reached="{% if portfolioItem.isMaxAllocation %}true{% else %}false{% endif %}"></stockprice>
+						</td>
+						<td>
+							<span class="badge badge-primary">&euro;{{ portfolioItem.allocation|format_number({fraction_digit: 2}) }}
+								<span class="badge badge-warning">{{ portfolioItem.percentageAllocation|format_number({fraction_digit: 2}) }}%</span>
+							</span>
+						</td>
+						<td>
+							<span class="badge badge-secondary">
+								&euro;{{ portfolioItem.dividend|format_number({fraction_digit: 2}) }}</span>
+						</td>
+						<td>
+							{% if portfolioItem.divDate %}
+								<span class="badge badge-primary">{{ portfolioItem.exDividendDate|format_date('long') }}</span>
+								<br/>
+								<span class="badge badge-warning">{{ portfolioItem.paymentDate|format_date('long') }}</span>
+							{% else %}
+								&mdash;
+							{% endif %}
+						</td>
+						<td>
+							{% if portfolioItem.divDate %}
+								<div class="badge badge-primary">{{ portfolioItem.cashCurrency.sign|raw }}
+									{{ portfolioItem.cashAmount|format_number({fraction_digit: 3}) }}</div><br/>
+								<div class="badge badge-secondary">&euro;
+									{{ portfolioItem.forwardNetDividend|format_number({fraction_digit: 2}) }}
+									<div class="badge badge-success">{{ portfolioItem.forwardNetDividendYield|format_number({fraction_digit: 2}) }}%</div>
+								</div><br/>
+							{% else %}
+								&mdash;
+							{% endif %}
+						</td>
+					</tr>
+		{% else %}
+			<tr>
+				<td colspan="9">no records found</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+	<tfoot>
+		<tr>
+			<td colspan="8"></td>
+		</tr>
+	</tfoot>
+</table>
+{% include 'paginator.html.twig' %}</div></div>{% endblock %}{% block javascripts %}{{ parent() }}{{ encore_entry_script_tags('stockprices') }}{{ encore_entry_script_tags('vue') }}{% endblock %}
