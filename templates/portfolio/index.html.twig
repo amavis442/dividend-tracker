@@ -39,13 +39,7 @@
 							<a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'fullname', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Fullname'|trans }}</a>
 						</th>
 						<th>{{ 'Avg. price'|trans }}</th>
-						<th>{{ 'Market Price'|trans }}
-							<br/>
-							{{ 'Yield'|trans }}
-							<span title="{{'Dividend yield based on current market price'|trans }}" data-toggle="tooltip" data-placement="top">
-								<i class="fas fa-question-circle"></i>
-							</span>
-						</th>
+
 						<th>{{ 'Allocation'|trans }}</th>
 						<th>
 							{{ 'Received dividend'|trans }}
@@ -57,6 +51,13 @@
 						</th>
 						<th>{{ 'Forward dividend'|trans }}
 							<span title="{{'Dividend yield based on cost basis'|trans }}" data-toggle="tooltip" data-placement="top">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
+						<th>{{ 'Market Price'|trans }}
+							<br/>
+							{{ 'Yield'|trans }}
+							<span title="{{'Dividend yield based on current market price'|trans }}" data-toggle="tooltip" data-placement="top">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
@@ -85,9 +86,7 @@
 							&euro;
 							{{ portfolioItem.price|format_number({fraction_digit: 2}) }}
 						</td>
-						<td>
-							<stockprice stock="{{ portfolioItem.symbol }}" v-bind:price="{{ portfolioItem.price }}" v-bind:freq="{{ portfolioItem.dividendPayoutFrequency }}" v-bind:netdividend="{{ portfolioItem.netDividendPerShare }}" v-bind:totalshares="{{ portfolioItem.amount }}" v-bind:dividend-treshold="{{ portfolioItem.dividendTreshold }}" v-bind:maximum-allocation-reached="{% if portfolioItem.isMaxAllocation %}true{% else %}false{% endif %}"></stockprice>
-						</td>
+
 						<td>
 							<span class="badge badge-primary">&euro;{{ portfolioItem.allocation|format_number({fraction_digit: 2}) }}
 								<span class="badge badge-warning">{{ portfolioItem.percentageAllocation|format_number({fraction_digit: 2}) }}%</span>
@@ -117,6 +116,9 @@
 							{% else %}
 								&mdash;
 							{% endif %}
+						</td>
+						<td>
+							<stockprice stock="{{ portfolioItem.symbol }}" v-bind:price="{{ portfolioItem.price }}" v-bind:freq="{{ portfolioItem.dividendPayoutFrequency }}" v-bind:netdividend="{{ portfolioItem.netDividendPerShare }}" v-bind:totalshares="{{ portfolioItem.amount }}" v-bind:dividend-treshold="{{ portfolioItem.dividendTreshold }}" v-bind:maximum-allocation-reached="{% if portfolioItem.isMaxAllocation %}true{% else %}false{% endif %}"></stockprice>
 						</td>
 					</tr>
 		{% else %}
