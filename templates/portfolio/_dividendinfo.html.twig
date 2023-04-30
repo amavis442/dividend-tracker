@@ -1,0 +1,60 @@
+{% set dividendInfo = '' %}
+{% set dividendInfo %}
+<div>
+	<strong>{{ 'Frequency'|trans }}</strong>
+</div>
+<div class="alert alert-primary" role="alert">{{ portfolioItem.dividendPayoutFrequency }}
+	{{ 'x per year'|trans }}</div>
+{% endset %}
+{% set dividendDateInfo = '' %}
+{% set dividendDateInfo %}
+<div>
+	<strong>{{ 'Dates'|trans }}</strong>
+</div>
+<ul class="list-group">
+	{% for calendar in portfolioItem.dividendCalendars %}
+		<li class="list-group-item">{{ calendar.exDividendDate|format_date('medium') }}
+			/
+			<i class="fas fa-money-check-alt"></i>
+			{{ calendar.paymentDate|format_date('medium') }}
+			<span class="badge badge-primary badge-pill">{{ calendar.currency.sign|raw }}
+				{{ calendar.cashAmount }}</span>
+		</li>
+	{% else %}
+		<li class="list-group-item">{{ 'Not available'|trans }}</li>
+	{% endfor %}
+</ul>
+<hr/>
+<div>
+	<strong>{{ 'Dividend treshold'|trans }}</strong>
+</div>
+<ul class="list-group">
+	<li class="list-group-item">{{ (portfolioItem.dividendTreshold * 100)|format_number({fraction_digit: 2}) }}%</li>
+</ul>
+<hr/>
+<div>
+	<strong>{{ 'Maximum allocation'|trans }}</strong>
+</div>
+<ul class="list-group">
+	<li class="list-group-item">&euro;
+		{{ (portfolioItem.maxAllocation)|format_number({fraction_digit: 2}) }}</li>
+</ul>
+
+{% endset %}
+{% set dividendInfo = dividendInfo ~ dividendDateInfo %}
+{% set pieData %}
+<hr/>
+<div>
+	<strong>{{ 'Pie'|trans }}</strong>
+</div>
+<ul class="list-group">
+	{% for pie in portfolioItem.pies %}
+		<li class="list-group-item">{{ pie.label }}</li>
+	{% else %}
+		<li class="list-group-item">{{ 'Not available'|trans }}</li>
+	{% endfor %}
+</ul>
+{% endset %}
+
+{% set dividendInfo = dividendInfo ~ pieData %}
+{{ dividendInfo|raw }}
