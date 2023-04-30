@@ -32,7 +32,7 @@
 				</div>
 			</div>
 
-			<table class="table table-sm">
+			<table class="table table-sm table-striped">
 				<thead>
 					<tr>
 						<th>
@@ -40,21 +40,16 @@
 						</th>
 						<th>{{ 'Avg. price'|trans }}</th>
 						<th>{{ 'Market Price'|trans }}
-							/<br/>
-							{{ 'Diff' |trans }}
-							/
-							<br/>
-							{{ 'Profit' |trans }}
-							/
 							<br/>
 							{{ 'Yield'|trans }}
 							<span title="{{'Dividend yield based on current market price'|trans }}" data-toggle="tooltip" data-placement="top">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
-						<th>{{ 'Allocation'|trans }}
-							/
-							<br/>{{ 'Received dividend'|trans }}</th>
+						<th>{{ 'Allocation'|trans }}</th>
+						<th>
+							{{ 'Received dividend'|trans }}
+						</th>
 						<th>{{ 'Ex-Div'|trans }}
 							/
 							<br/>
@@ -99,7 +94,8 @@
 								<span class="badge badge-primary">&euro;{{ portfolioItem.allocation|format_number({fraction_digit: 2}) }}
 									<span class="badge badge-warning">{{ portfolioItem.percentageAllocation|format_number({fraction_digit: 2}) }}%</span>
 								</span>
-								<br>
+							</td>
+							<td>
 								<span class="badge badge-secondary">
 									&euro;{{ portfolioItem.dividend|format_number({fraction_digit: 2}) }}</span>
 							</td>
@@ -108,9 +104,6 @@
 									<span class="badge badge-primary">{{ portfolioItem.exDividendDate|format_date('long') }}</span>
 									<br/>
 									<span class="badge badge-warning">{{ portfolioItem.paymentDate|format_date('long') }}</span>
-									{% if portfolioItem.isDividendMonth %}
-										<i class="far fa-calendar-alt" data-toggle="tooltip" data-placement="right" title="{{ 'Dividend payout month'|trans }}"></i>
-									{% endif %}
 								{% else %}
 									&mdash;
 								{% endif %}

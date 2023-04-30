@@ -7,33 +7,8 @@
       formattedMarketPrice
     }}</span>
     <span v-else>{{ formattedMarketPrice }}</span>
-
-    <span v-if="price < marketPrice" class="badge badge-success">
-      <i class="fas fa-arrow-circle-up" />
-      {{ formattedDiffPrice }}
-    </span>
-
-    <span v-else-if="price > marketPrice" class="badge badge-danger">
-      <i class="fas fa-arrow-circle-down" />
-      {{ formattedDiffPrice }}
-    </span>
-
-    <span v-else class="badge badge-info">
-      <i class="fas fa-equals" />
-      {{ formattedDiffPrice }}
-    </span>
     <br />
-
-    <span v-if="result > 0" class="badge badge-success">{{
-      formattedResult
-    }}</span>
-    <span v-else-if="result < 0" class="badge badge-danger">{{
-      formattedResult
-    }}</span>
-    <span v-else class="badge badge-secondary">{{ formattedResult }}</span>
-
-    <span class="badge badge-info">{{ dividendYield }}
-      <i v-if="isBuyOppertunity" class="fas fa-shopping-cart" /></span>
+    <span class="badge badge-info">{{ dividendYield }}</span>
   </div>
 </template>
 
