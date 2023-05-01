@@ -7,10 +7,12 @@ import 'bootstrap';
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css';
 import './styles/global.scss';
+import bsCustomFileInput from 'bs-custom-file-input';
 
 jQuery(function () {
   $('[data-toggle="popover"]').popover();
   $('[data-toggle="tooltip"]').tooltip();
+  bsCustomFileInput.init();
 });
 
 import { startStimulusApp } from '@symfony/stimulus-bridge';

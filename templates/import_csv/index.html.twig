@@ -4,11 +4,24 @@
 
 {% block body %}
 <h1>Import csv</h1>
-<hr/>
-{{ form_start(form) }}
-    {{ form_row(form.importfile) }}
+<div class="col-10 p-4">
+	{{ form_start(form,{'attr': {'class': 'p-10'}}) }}
+	{{ form_errors(form) }}
+
+
+       	<div class="form-group row">
+		{{ form_label(form.importfile, null, {'label_attr': {'class':'col-sm-2 col-form-label'}}) }}
+		<div class="col-sm-10">
+			{{ form_widget(form.importfile, {'attr': {'class': 'form-control'}}) }}
+			{% if form.importfile.vars.errors|length %}
+			<div class="alert alert-danger" role="alert">
+    			{{ form_errors(form.importfile) }}
+			</div>
+			{% endif %}
+		</div>
+	</div>
     <button class="btn btn-primary"><i class="far fa-save"></i> Save</button>
 {{ form_end(form) }}
-<br/>
+</div>
 <a class="btn btn-secondary" href="{{ path('portfolio_index') }}">Back</a>
 {% endblock %}
