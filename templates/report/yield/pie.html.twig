@@ -48,8 +48,8 @@
 		</canvas>
 </div>
 
-	<div class="col col-12 border p-2">
-		<table class="table table-striped mx-auto">
+	<div class="col col-12 border p-2 mb-2">
+		<table class="table table-striped">
 			<thead>
 			<tr>
 				<th scope="col"><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'ticker'}) }}">Ticker</a></th>
@@ -96,7 +96,7 @@
 				</tr>
 				{% endfor %}
 				<tr class="table-primary">
-					<td colspan='9'></td>
+					<td colspan='7'></td>
 					<td>&euro;{{ totalNetYearlyDividend|format_number({fraction_digit: 2}) }}</td>
 					<td>&euro;{{ allocated|format_number({fraction_digit: 2}) }}</td>
 					<td>{{ dividendYieldOnCost|format_number({fraction_digit: 2}) }}%</td>
