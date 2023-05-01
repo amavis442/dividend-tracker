@@ -21,6 +21,7 @@
 	</div>
 
 <div class="col col-12 border p-2 mb-2">
+
 	<div>
 		<form action="{{ path('report_dividend_yield_by_pie_form') }}" method="POST" class="form-inline">
 		<input type="hidden" name="_method" value="POST">
@@ -38,47 +39,60 @@
 
 
 
-        <canvas id="barChartCanvas" class="chart"
+    <canvas id="barChartCanvas" class="chart"
 			data-chart-data='{{ data|json_encode|raw }}'
 			data-chart-labels='{{ labels|json_encode|raw }}'
 			data-chart-title='{{ 'Yield'|trans }}'
 			data-chart-sub-title='Dividend yield'
-			data-chart-sign='%'></canvas>
-    </div>
+			data-chart-sign='%'>
+		</canvas>
+</div>
 
-	<div>
-		<table class="table">
-			<thead class="thead-dark">
+	<div class="col col-12 border p-2">
+		<table class="table table-striped mx-auto">
+			<thead>
 			<tr>
-				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'ticker'}) }}">Ticker</a></th>
-				<th>{{ 'avgPrice'|trans }}</th>
-				<th>{{ 'Last dividend'|trans }}</th>
-				<th>{{ 'Last payout date'|trans }}</th>
-				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'dividend'}) }}">{{ 'Yearly forward dividend'|trans }}</a></th>
-				<th>{{ 'Net forward yearly dividend per share'|trans }}</th>
-				<th>{{ 'Amount'|trans }}</th>
-				<th>#{{ 'Payouts per year'|trans }}</th>
-				<th>{{ 'Net forward dividend per payout'|trans }}</th>
-				<th>{{ 'Net forward yearly dividend total'|trans }}</th>
-				<th>{{ 'Allocation'|trans }}</th>
-				<th><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'yield'}) }}">{{ 'Yield'|trans }}</a></th>
+				<th scope="col"><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'ticker'}) }}">Ticker</a></th>
+				<th scope="col">{{ 'avgPrice'|trans }}</th>
+				<th scope="col"><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'dividend'}) }}">{{ 'Yearly forward dividend'|trans }}</a></th>
+				<th scope="col">{{ 'Net forward yearly dividend per share'|trans }}</th>
+				<th scope="col">{{ 'Amount'|trans }}</th>
+				<th scope="col">{{ 'Net forward dividend per payout'|trans }}</th>
+				<th scope="col">{{ 'Net forward yearly dividend total'|trans }}</th>
+				<th scope="col">{{ 'Allocation'|trans }}</th>
+				<th scope="col"><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'yield'}) }}">{{ 'Yield'|trans }}</a></th>
+				<th scope="col">info</th>
 			</tr>
 			</thead>
 			<tbody>
 				{% for item in datasource %}
 				<tr>
-					<td><span title="{{ item.label }}" data-toggle="tooltip" data-placement="top"><a href="{{ path('portfolio_show', {'id': item.position.id}) }}">{{ item.ticker }}</a></span></td>
+					<td>
+						<div>
+						<span title="{{ item.label }}" data-toggle="tooltip" data-placement="top"><a href="{{ path('portfolio_show', {'id': item.position.id}) }}">{{ item.ticker }}</a></span>
+
+						</div>
+					</td>
+
 					<td>&euro;{{ (item.avgPrice)|format_number({fraction_digit: 2}) }}</td>
-					<td>{% if item.lastDividend > 0 %}{{ item.lastDividendCurrency|raw }}{{ (item.lastDividend)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
-					<td>{% if item.lastDividendDate is not null %}{{ item.lastDividendDate|date("d-m-Y") }}{% else %} - {% endif %}</td>
 					<td>{% if item.payout > 0 %}{{ item.lastDividendCurrency|raw }}{{ (item.payout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
 					<td><span data-html="true" title="{{ 'Exchangerate'|trans }}: {{ item.exchangeRate }}<br/>{{ 'Tax'|trans }}: {{ item.taxRate }}%" data-toggle="tooltip" data-placement="top">{% if item.netForwardYearlyPayout > 0 %}&euro;{{ (item.netForwardYearlyPayout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</span></td>
 					<td>{{ item.amount }}</td>
-					<td>{{ item.numPayoutsPerYear ?: '-' }}</td>
 					<td>{% if item.netTotalPayoutPerPaydate > 0  %}&euro;{{ item.netTotalPayoutPerPaydate|format_number({fraction_digit: 2}) }}{% endif %}</td>
 					<td>{% if item.netTotalForwardYearlyPayout > 0 %}&euro;{{ item.netTotalForwardYearlyPayout|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
 					<td>&euro;{{ item.allocation|format_number({fraction_digit: 2}) }}</td>
 					<td>{% if item.yield > 0 %}{{ item.yield }}%{% else %}-{% endif %}</td>
+					<td>
+					{% set info = '' %}
+						{% set info %}
+						<ul class="list-group">
+							<li class="list-group-item">{{ 'Last dividend'|trans }}: {% if item.lastDividend > 0 %}{{ item.lastDividendCurrency|raw }}{{ (item.lastDividend)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</li>
+							<li class="list-group-item">{{ 'Last payout date'|trans }}: {% if item.lastDividendDate is not null %}{{ item.lastDividendDate|date("d-m-Y") }}{% else %} - {% endif %}</li>
+							<li class="list-group-item">#{{ 'Payouts per year'|trans }}: {{ item.numPayoutsPerYear ?: '-' }}</li>
+						</ul>
+						{% endset %}
+						<i class="fas fa-info-circle" data-toggle="popover" title="Info" data-content='{{ info }}' data-html="true"></i>
+					</td>
 				</tr>
 				{% endfor %}
 				<tr class="table-primary">
