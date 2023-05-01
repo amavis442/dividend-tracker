@@ -96,11 +96,12 @@
 				</tr>
 				{% endfor %}
 				<tr class="table-primary">
-					<td colspan='7'></td>
+					<td colspan='6'></td>
 					<td>&euro;{{ totalNetYearlyDividend|format_number({fraction_digit: 2}) }}</td>
 					<td>&euro;{{ allocated|format_number({fraction_digit: 2}) }}</td>
 					<td>{{ dividendYieldOnCost|format_number({fraction_digit: 2}) }}%</td>
-				</td>
+					<td></td>
+				</tr>
 			</tbody>
 		</table>
 	</div>
