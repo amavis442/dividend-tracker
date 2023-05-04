@@ -14,15 +14,14 @@
     <div class="form-group mx-sm-3 mb-3">
         {{ form_widget(form.pie) }}
     </div>
-    
+
     {{ form_widget(form.save, {'attr': {'class':'btn btn-primary mb-3'}}) }}
 {{ form_end(form) }}
 
 {% if calendars %}
     <table class="table">
     <tr>
-        <th></th>
-        <th></th>
+        <th>#</th>
         <th>{{ 'Pay date'|trans }}</th>
         <th>{{ 'Company'|trans }}</th>
         <th>{{ 'Dividend'|trans }}</th>
@@ -46,14 +45,25 @@
                     {% set currentDate = cal.getPaymentDate %}
                     <tr>
                         <td>{{ numPositions}}</td>
-                        <td>
-                            <button type="button" class="btn btn-outline-primary" data-toggle="tooltip" data-html="true" data-placement="left" title="Ticker: {{ calData.ticker }}<br/>{{ 'Tax rate'|trans }}: {{ calData.taxRate * 100 }}% <br/>{{ 'Exchangerate'|trans }}: {{ calData.exchangeRate }}<br/>{{ 'Tax'|trans }}: &euro;{{ calData.tax|format_number({fraction_digit: 2}) }}<br/>Ex-div: {{ calData.calendar.exDividendDate|date('Y-m-d') }}"><i class="far fa-circle"></i></button>
-                        </td>
                         <th>{{ currentDate|date('l')|trans }}, {{ currentDate|date('d') }} {{ currentDate|date('F')|trans|lower }} {{ currentDate|date('Y') }}</th>
                         <td>
-                            {{ cal.ticker.fullname }}<br/>
+                            {% set tickerInfo  = '' %}
+                            {% set tickerInfo %}
+                                Ticker: {{ calData.ticker }}<br/>
+                                {{ 'Tax rate'|trans }}: {{ calData.taxRate * 100 }}% <br/>
+                                {{ 'Exchangerate'|trans }}: {{ calData.exchangeRate|format_number({fraction_digit: 4}) }}<br/>
+                                {{ 'Tax'|trans }}: &euro;{{ (calData.tax * estimatedAmount)|format_number({fraction_digit: 2}) }}<br/>
+                                Ex-div: {{ calData.calendar.exDividendDate|date('D d-m-Y') }}
+                            {% endset %}
+                            {{ cal.ticker.fullname }} <i class="fas fa-info-circle"
+                                data-toggle="tooltip"
+                                data-html="true"
+                                data-placement="right"
+                                title="{{ tickerInfo }}">
+                                </i>
+                            <br/>
                             <small>{{ estimatedAmount|format_number({fraction_digit: 7}) }} {{ 'shares'|trans }}</small>
-                        </td> 
+                        </td>
                         <td>
                             {{ cal.currency.sign|raw}}{{ cal.cashAmount|format_number({fraction_digit: 2}) }}
                         </td>
@@ -64,7 +74,7 @@
             {% endfor %}
         {% endfor %}
         <tr>
-            <td colspan="4"></td>
+            <td colspan="3"></td>
             <th>{{ 'Total'|trans }}</th>
             <th>&euro;{{ sumDividend|format_number({fraction_digit: 2}) }}</th>
         </tr>
