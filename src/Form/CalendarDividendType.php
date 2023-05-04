@@ -37,8 +37,7 @@ class CalendarDividendType extends AbstractType
                         ->where('(p.closed = 0 OR p.closed IS NULL)')
                         ->orderBy('pie.label', 'ASC');
                 },
-            ])
-            ->add('save', SubmitType::class, ['label' => 'Submit']);
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
