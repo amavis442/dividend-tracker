@@ -7,6 +7,7 @@ use RuntimeException;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\Service\ExchangeRate\ExchangeRateInterface;
 
 class StockPriceService
 {
@@ -25,7 +26,7 @@ class StockPriceService
     /**
      * Get the current exchange rates
      *
-     * @var ExchangeRateService
+     * @var ExchangeRateInterface
      */
     protected $exchangeRateService;
     /**
@@ -55,12 +56,12 @@ class StockPriceService
 
     /**
      *
-     * @param ExchangeRateService $exchangeRateService
+     * @param ExchangeRateInterface $exchangeRateService
      * @param CacheInterface $stockCache
      * @param HttpClientInterface $client
      */
     public function __construct(
-        ExchangeRateService $exchangeRateService,
+        ExchangeRateInterface $exchangeRateService,
         CacheInterface $stockCache,
         HttpClientInterface $client
     ) {

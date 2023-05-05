@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\ExchangeRate;
 
 use DOMDocument;
 use DOMXPath;
@@ -8,7 +8,7 @@ use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class ExchangeRateService
+class EuExchangeRateService implements ExchangeRateInterface
 {
     public const ECB_EXCHANGERATE = 'https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html';
 
@@ -36,12 +36,15 @@ class ExchangeRateService
             return $content;
         });
 
+        dd($data);
         $internalErrors = libxml_use_internal_errors(true);
         $dom = new DOMDocument();
         $dom->loadHTML($data);
         $xpath = new DOMXPath($dom);
         $rates = $this->parseToArray($xpath, 'forextable');
         libxml_use_internal_errors($internalErrors);
+
+        dd($rates, $internalErrors);
 
         $rates['GBX'] = $rates['GBP'] * 100;
 

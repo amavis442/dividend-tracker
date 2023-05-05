@@ -9,7 +9,7 @@ class YahooFinanceService implements StockPricePluginInterface
 {
     public const YAHOO_API = 'https://query1.finance.yahoo.com/v8/finance/chart/';
     public const YAHOO_URL = 'https://finance.yahoo.com/quote/';
-    public const YAHOO_QUOTE = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=';
+    public const YAHOO_QUOTE = 'https://query1.finance.yahoo.com/v6/finance/quote?symbols=';
 
     public $translate = [
         'EQQQ' => 'EQQQ.MI',
