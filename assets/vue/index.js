@@ -7,7 +7,7 @@ let baseURL;
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
   baseURL = 'http://dividend.local/';
 } else {
-  baseURL = 'https://dividend.banpagi.com/';
+  baseURL = 'https://dividend.odroid/';
 }
 
 /*
