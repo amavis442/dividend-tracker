@@ -1,83 +1,81 @@
 <div class="row mb-3">
-    <div class="col text-right">
-        <a class="btn btn-primary" href="{{ path('calendar_new', {'ticker': ticker.id}) }}"><i class="fas fa-plus"></i></a>
-    </div>
+  <div class="col text-right">
+    <a class="btn btn-primary" href="{{ path('calendar_new', { ticker: ticker.id }) }}"><i class="fas fa-plus"></i></a>
+  </div>
 </div>
 
 <div class="row">
-	<div class="col">
-		<table class="table">
-			<thead>
-				<tr>
-					<th>{{ 'Payment date'|trans }}</th>
-					<th>{{ 'Ex-dividend date'|trans }}</th>
-					<th>{{ 'Record date'|trans }}</th>
-					<th>{{ 'Cash amount'|trans }}</th>
-					<th>{{ 'Type'|trans }}</th>
-					<th>{{ 'Source'|trans }}</th>
-					<th>{{ 'Descr.'|trans }}</th>
-					<th>{{ 'Created'|trans }}</th>
-					<th>{{ 'Actions'|trans }}</th>
-				</tr>
-			</thead>
-			<tbody>
-			{% set oldCash = 0 %}
-				{% for index, calendar in calendars %}
-					{% set dividendDaysLeft = calendar.getDaysLeft ?? -1 %}
-					{% set tableColorClass = '' %}
-					{% if dividendDaysLeft > -1 %}
-						{% set badgeColor = 'info' %}
-						{% if dividendDaysLeft > -1 and dividendDaysLeft < 2  %}
-							{% set badgeColor = 'danger' %}
-						{% endif %}
-						{% if dividendDaysLeft > 1 and dividendDaysLeft < 3  %}
-							{% set badgeColor = 'warning' %}
-						{% endif %}
-						{% set tableColorClass = ' class="table-' ~ badgeColor ~ '"' %}
-					{% endif %}
+  <div class="col">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{{ 'Payment date'|trans }}</th>
+          <th>{{ 'Ex-dividend date'|trans }}</th>
+          <th>{{ 'Record date'|trans }}</th>
+          <th>{{ 'Cash amount'|trans }}</th>
+          <th>{{ 'Type'|trans }}</th>
+          <th>{{ 'Source'|trans }}</th>
+          <th>{{ 'Descr.'|trans }}</th>
+          <th>{{ 'Created'|trans }}</th>
+          <th>{{ 'Actions'|trans }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set oldCash = 0 %}
+        {% for index, calendar in calendars %}
+          {% set dividendDaysLeft = calendar.getDaysLeft ?? - 1 %}
+          {% set tableColorClass = '' %}
+          {% if dividendDaysLeft > - 1 %}
+            {% set badgeColor = 'info' %}
+            {% if dividendDaysLeft > - 1 and dividendDaysLeft < 2 %}
+              {% set badgeColor = 'danger' %}
+            {% endif %}
+            {% if dividendDaysLeft > 1 and dividendDaysLeft < 3 %}
+              {% set badgeColor = 'warning' %}
+            {% endif %}
+            {% set tableColorClass = ' class="table-' ~ badgeColor ~ '"' %}
+          {% endif %}
 
-					<tr{{tableColorClass}}>
-						<td>{{ calendar.paymentDate ? calendar.paymentDate|date('d-m-Y') : '' }}</td>
-						<td>{{ calendar.exDividendDate ? calendar.exDividendDate|date('d-m-Y') : '' }}</td>
-						<td>{{ calendar.recordDate ? calendar.recordDate|date('d-m-Y') : '' }}</td>
-						<td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({fraction_digit: 3}) }}
-						{% if dividendRaises[index] > 0 %}
-							<span class="badge badge-success">
-                        		<i class="fas fa-arrow-circle-up"></i> 
-                        		{{ dividendRaises[index]|format_number({fraction_digit: 2})}}%
-                    		</span>
-						{% endif %}
-						{% if dividendRaises[index] < 0 %}
-							<span class="badge badge-danger">
-                        		<i class="fas fa-arrow-circle-down"></i> 
-                        		{{ dividendRaises[index]|format_number({fraction_digit: 2})}}%
-                    		</span>
-						{% endif %}
-
-						</td>
-						<td>{{ (calendar.dividendType ?? 'Regular')|trans }}</td>
-						<td>{{ (calendar.source ?? 'manual')|trans }}</td>
-						<td>{{ calendar.description }}</td>
-						<td>{{ calendar.createdAt|format_date('short') }}</td>
-						<td>
-							<a href="{{ path('calendar_edit', {'id': calendar.id}) }}" class="btn btn-primary">
-								<i class="far fa-edit"></i>
-							</a>
-						</td>
-					</tr>
-				{% else %}
-					<tr>
-						<td colspan="5">no records found</td>
-					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-	</div>
+          <tr {{ tableColorClass }}>
+            <td>{{ (calendar.paymentDate ? '<strong>' ~ (calendar.paymentDate|date('d-m-Y')) ~ '</strong><br/>(<small>' ~ (calendar.paymentDate|date('l')|trans) ~ '</small>)' : '')|raw }}</td>
+            <td>{{ (calendar.exDividendDate ? '<strong>' ~ (calendar.exDividendDate|date('d-m-Y')) ~ '</strong><br/>(<small>' ~ (calendar.exDividendDate|date('l')|trans) ~ '</small>)' : '')|raw }}</td>
+            <td>{{ calendar.recordDate ? calendar.recordDate|date('d-m-Y') : '' }}</td>
+            <td>
+              {{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ calendar.cashAmount|format_number({ fraction_digit: 3 }) }}
+              {% if dividendRaises[index] > 0 %}
+                <span class="badge badge-success">
+                  <i class="fas fa-arrow-circle-up"></i>
+                  {{ dividendRaises[index]|format_number({ fraction_digit: 2 }) }}%
+                </span>
+              {% endif %}
+              {% if dividendRaises[index] < 0 %}
+                <span class="badge badge-danger">
+                  <i class="fas fa-arrow-circle-down"></i>
+                  {{ dividendRaises[index]|format_number({ fraction_digit: 2 }) }}%
+                </span>
+              {% endif %}
+            </td>
+            <td>{{ (calendar.dividendType ?? 'Regular')|trans }}</td>
+            <td>{{ (calendar.source ?? 'manual')|trans }}</td>
+            <td>{{ calendar.description }}</td>
+            <td>{{ calendar.createdAt|format_date('short') }}</td>
+            <td>
+              <a href="{{ path('calendar_edit', { id: calendar.id }) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="5">no records found</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <div class="row mb-4">
-    <div class="col">
-        <small>{{ 'Calendar items'|trans }} #{{ calendarsCount }}</small>
-    </div>
+  <div class="col">
+    <small>{{ 'Calendar items'|trans }} #{{ calendarsCount }}</small>
+  </div>
 </div>
-<hr/> 
+<hr />
