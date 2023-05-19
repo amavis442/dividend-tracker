@@ -88,6 +88,9 @@ class Position
     #[ORM\Column(type: 'integer', nullable: true)]
     private $maxAllocation;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $ignore_for_dividend = null;
+
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
@@ -439,6 +442,18 @@ class Position
     public function setMaxAllocation(?int $maxAllocation): self
     {
         $this->maxAllocation = $maxAllocation;
+
+        return $this;
+    }
+
+    public function isIgnoreForDividend(): ?bool
+    {
+        return $this->ignore_for_dividend;
+    }
+
+    public function setIgnoreForDividend(?bool $ignore_for_dividend): self
+    {
+        $this->ignore_for_dividend = $ignore_for_dividend;
 
         return $this;
     }

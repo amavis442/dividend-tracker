@@ -97,7 +97,12 @@ class PositionType extends AbstractType
                 'required' => false,
                 'input' => 'number',
                 'scale' => 0,
-            ]);
+            ])
+            ->add(
+                'ignore_for_dividend',
+                null,
+                ['label' => 'Exclude from dividend yeld calculation']
+            );
     }
 
     public function configureOptions(OptionsResolver $resolver)

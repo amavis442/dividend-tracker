@@ -22,10 +22,12 @@ class YieldsService
         $orderKey = 0;
         $totalNetYearlyDividend = 0.0;
 
-        $positions = $positionRepository->getAllOpen($pieId);
+        $positions = $positionRepository->getAllOpen($pieId, null, true);
         $allocated = $positionRepository->getSumAllocated($pieId);
 
         foreach ($positions as $position) {
+            if ($position->isIgnoreForDividend()) continue;
+
             $ticker = $position->getTicker();
             $avgPrice = $position->getPrice();
             $amount = $position->getAmount();
@@ -48,7 +50,7 @@ class YieldsService
 
 
             if ($firstCalendarEntry) {
-                $lastCash = $dividendService->getCashAmount($ticker);// $firstCalendarEntry->getCashAmount();
+                $lastCash = $dividendService->getCashAmount($ticker); // $firstCalendarEntry->getCashAmount();
                 $lastCashCurrency = $firstCalendarEntry->getCurrency()->getSign();
                 $lastDividendDate = $firstCalendarEntry->getPaymentDate();
 
@@ -63,7 +65,7 @@ class YieldsService
             $dividendPerYear = $numPayoutsPerYear * $lastCash;
 
             $tickerLabel = $ticker->getTicker();
-            $labels[$tickerLabel] = sprintf("%s (%s)", substr(addslashes(str_replace(["'",'"'], ["",""], $ticker->getFullname())), 0, 8), $ticker->getTicker());
+            $labels[$tickerLabel] = sprintf("%s (%s)", substr(addslashes(str_replace(["'", '"'], ["", ""], $ticker->getFullname())), 0, 8), $ticker->getTicker());
             $data[$tickerLabel] = $dividendYield;
 
             if ($orderBy === 'yield') {

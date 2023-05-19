@@ -1,52 +1,51 @@
 <h3>{{ 'Position'|trans }}</h3>
 <table class="table">
-	<thead>
-		<tr>
-			<th></th>
-			<th>{{ 'Amount'|trans }}</th>
-			<th>{{ 'Weighted average price'|trans }}</th>
-			<th>{{ 'Allocation'|trans }}</th>
-			<th>{{ 'Profit / Loss'|trans }}</th>
-			<th>{{ 'Pie'|trans }}</th>
-			<th>{{ 'Actions'|trans }}</th>
-		</tr>
-	</thead>
-	<tbody>
-		{% if position %}
+  <thead>
+    <tr>
+      <th></th>
+      <th>{{ 'Amount'|trans }}</th>
+      <th>{{ 'Weighted average price'|trans }}</th>
+      <th>{{ 'Allocation'|trans }}</th>
+      <th>{{ 'Profit / Loss'|trans }}</th>
+      <th>{{ 'Pie'|trans }}</th>
+      <th>{{ 'Exclude from dividend yield calc'|trans }}</th>
+      <th>{{ 'Actions'|trans }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if position %}
+      <tr class="table-success">
+        <td>
+          <strong>{{ 'Summary'|trans }}</strong>
+        </td>
+        <td>{{ position.amount|format_number({ fraction_digit: 7 }) }}</td>
+        <td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ position.price|format_number({ fraction_digit: 2 }) }}</td>
+        <td>{{ allocationSign|raw }}{{ position.allocation|format_number({ fraction_digit: 2 }) }}</td>
+        <td>{{ allocationSign|raw }}{{ position.profit|format_number({ fraction_digit: 2 }) }}</td>
+        <td>
+          {% for pie in position.pies %}
+            {{ pie.label }},
+          {% endfor %}
+        </td>
+        <td>{{ position.ignoreForDividend ? '<i class="fa-regular fa-circle-check"></i>'|raw:'' }}</td>
+        <td>
+          <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="btn-group mr-2" role="group" aria-label="First group">
+              <a href="{{ path('position_edit', { id: position.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="{{ 'Edit position'|trans }}"><i class="far fa-edit"></i></a>
 
-
-			<tr class="table-success">
-				<td>
-					<strong>{{ 'Summary'|trans }}</strong>
-				</td>
-				<td>{{ (position.amount)|format_number({fraction_digit: 7}) }}</td>
-				<td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ position.price|format_number({fraction_digit: 2}) }}</td>
-				<td>{{ allocationSign|raw }}{{ position.allocation|format_number({fraction_digit: 2}) }}</td>
-				<td>{{ allocationSign|raw }}{{ position.profit|format_number({fraction_digit: 2})}}</td>
-				<td>{% for pie in position.pies %}
-                        {{ pie.label }},
-                    {% endfor %}
-				</td>
-				<td>
-					<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-						<div class="btn-group mr-2" role="group" aria-label="First group">
-							<a href="{{ path('position_edit', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="{{ 'Edit position'|trans }}">
-								<i class="far fa-edit"></i>
-							</a>
-						
-						<form method="post" action="{{ path('portfolio_position_close', {'position': position.id}) }}" class="form-inline" onsubmit="return confirm('Are you sure you want to close this position?');">
-							<input type="hidden" name="_method" value="DELETE">
-							<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ position.id) }}">
-							<button class="btn btn-danger"><i class="fas fa-window-close"></i></button>
-						</form>
-						</div>
-					</div>
-				</td>
-			</tr>
-		{% else %}
-			<tr class="table-success" colspan="6">
-				<td colspan="6">no records found</td>
-			</tr>
-		{% endif %}
-	</tbody>
+              <form method="post" action="{{ path('portfolio_position_close', { position: position.id }) }}" class="form-inline" onsubmit="return confirm('Are you sure you want to close this position?');">
+                <input type="hidden" name="_method" value="DELETE" />
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ position.id) }}" />
+                <button class="btn btn-danger"><i class="fas fa-window-close"></i></button>
+              </form>
+            </div>
+          </div>
+        </td>
+      </tr>
+    {% else %}
+      <tr class="table-success" colspan="6">
+        <td colspan="6">no records found</td>
+      </tr>
+    {% endif %}
+  </tbody>
 </table>

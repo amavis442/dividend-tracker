@@ -32,6 +32,7 @@ class PieRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->join('p.positions', 'pos')
             ->where('pos.closed IS NULL or pos.closed = 0')
+            ->andWhere('NOT (pos.ignore_for_dividend IS NOT NULL AND pos.ignore_for_dividend=1)')
             ->orderBy('p.label', 'ASC')
             ->getQuery()
             ->getResult();
