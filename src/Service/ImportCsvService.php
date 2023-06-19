@@ -173,7 +173,7 @@ class ImportCsvService extends ImportBase
             $cell = $cells[0];
             $cellVal = $cell->getValue();
 
-            if (false !== stripos($cellVal, 'deposit') || false !== stripos($cellVal, 'withdraw')) {
+            if (false !== stripos($cellVal, 'deposit') || false !== stripos($cellVal, 'withdraw') || false !== stripos($cellVal, 'interest')) {
                 continue;
             };
 
@@ -296,7 +296,7 @@ class ImportCsvService extends ImportBase
         TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
         ?\Box\Spout\Reader\CSV\Reader $reader = null
-    ): array{
+    ): array {
         $transactionsAdded = 0;
         $totalTransaction = 0;
         $transactionAlreadyExists = [];
@@ -344,8 +344,7 @@ class ImportCsvService extends ImportBase
                         ->setOriginalPriceCurrency($row['original_price_currency'])
                         ->setFinraFee($row['finra_fee'] ?? 0)
                         ->setTransactionFee($row['transaction_fee'] ?? 0)
-                        ->setTotal($row['total'] ?? 0)
-                    ;
+                        ->setTotal($row['total'] ?? 0);
                     if ($row['direction'] == Transaction::SELL) {
                         $transaction->setProfit($row['profit']);
                     }
