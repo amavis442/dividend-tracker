@@ -8,7 +8,7 @@ use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Transaction;
 use App\Repository\TaxRepository;
-use App\Service\ExchangeRate\ExchangeRateService;
+use App\Service\ExchangeRate\FawazahExchangeRateService as ExchangeRateService;
 use Doctrine\Common\Collections\Collection;
 
 class DividendService
