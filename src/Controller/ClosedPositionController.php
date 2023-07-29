@@ -54,6 +54,7 @@ class ClosedPositionController extends AbstractController
     {
         return $this->render('closed_position/show.html.twig', [
             'position' => $position,
+            'ticker' => $position->getTicker(),
             'netYearlyDividend' => 0.0,
         ]);
     }
