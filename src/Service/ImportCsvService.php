@@ -183,7 +183,7 @@ class ImportCsvService extends ImportBase
             $row['stampduty'] = 0.0;
 
             foreach ($cells as $r => $cell) {
-                $header = $headers[$r];
+                $header = strtolower($headers[$r]);
                 $val = $cell->getValue();
                 $row['nr'] = $rowNum;
                 switch ($header) {
@@ -215,8 +215,9 @@ class ImportCsvService extends ImportBase
                     case 'name':
                         $row['name'] = $val;
                         break;
-                    case 'result (eur)':
-                        $row['profit'] = $val;
+                    case 'no. of shares':
+                        $rawAmount = $val;
+                        $row['amount'] = $val;
                         break;
                     case 'price / share':
                         $row['original_price'] = $val;
@@ -224,21 +225,23 @@ class ImportCsvService extends ImportBase
                     case 'currency (price / share)':
                         $row['original_price_currency'] = $val;
                         break;
-                    case 'no. of shares':
-                        $rawAmount = $val;
-                        $row['amount'] = $val;
-                        break;
                     case 'exchange rate':
                         $row['wisselkoersen'] = $val;
                         break;
-                    case 'total (eur)':
+                    case 'result':
+                        $row['profit'] = (float)$val;
+                        break;
+                    case 'currency (result)':
+                        $row['profit_currency'] = $val;
+                        break;
+                    case 'total':
                         $rawAllocation = $val;
                         $allocation = $val;
-                        $row['allocation'] = $allocation;
-                        $row['total'] = $val;
+                        $row['allocation'] = (float)$allocation;
+                        $row['total'] = (float)$val;
                         break;
-                    case 'id':
-                        $row['opdrachtid'] = $val;
+                    case 'currency (total)':
+                        $row['allocation_currency'] = $val;
                         break;
                     case 'withholding tax':
                         $row['tax'] = (float) $val ?? null;
@@ -246,19 +249,25 @@ class ImportCsvService extends ImportBase
                     case 'currency (withholding tax)':
                         $row['tax_currency'] = $val;
                         break;
+                    case 'id':
+                        $row['opdrachtid'] = $val;
+                        break;
+                    case 'currency conversion fee':
+                        $row['fx_fee'] = (float) $val ?? null;
+                        break;
+                    case 'currency (currency conversion fee)':
+                        $row['fx_fee_currency'] = (float) $val ?? null;
+                        break;
                     case 'stamp duty reserve tax (eur)':
                         $row['stampduty'] += (float) $val ?? null;
                         break;
                     case 'stamp duty (eur)':
                         $row['stampduty'] += (float) $val ?? null;
                         break;
-                    case 'currency conversion fee (eur)':
-                        $row['fx_fee'] = (float) $val ?? null;
-                        break;
-                    case 'Transaction fee (EUR)':
+                    case 'transaction fee (eur)':
                         $row['transaction_fee'] = $val;
                         break;
-                    case 'Finra fee (EUR)':
+                    case 'finra fee (eur)':
                         $row['finra_fee'] = $val;
                         break;
                     default:
@@ -282,6 +291,7 @@ class ImportCsvService extends ImportBase
             }
             $rowNum++;
         }
+        //dd($rows);
         return $rows;
     }
 
@@ -351,13 +361,10 @@ class ImportCsvService extends ImportBase
                     $position->addTransaction($transaction);
                     $weightedAverage->calc($position);
 
-                    if ($position->getAmount() === 0 || $position->getAmount() < (2 / Constants::AMOUNT_PRECISION)) {
-                        $position->setClosed(1);
-                        $position->setClosedAt($row['transactionDate']);
-                        $position->setAmount(0);
-                    }
-
-                    if ($position->getAmount() > -6 && $position->getAmount() < (2 / Constants::AMOUNT_PRECISION)) {
+                    if (
+                        ($position->getAmount() === 0 || $position->getAmount() < (2 / Constants::AMOUNT_PRECISION)) ||
+                        ($position->getAmount() > -6 && $position->getAmount() < (2 / Constants::AMOUNT_PRECISION))
+                    ) {
                         $position->setClosed(1);
                         $position->setClosedAt($row['transactionDate']);
                         $position->setAmount(0);
