@@ -12,7 +12,7 @@ use App\DataProvider\StockPriceCollectionDataProvider;
 #[Route('/api')]
 class ApiController extends AbstractController
 {
-  #[Route('/stock_prices/{stock}', name:'api_stockprice')]
+  #[Route('/stock_prices/{stock}', name: 'api_stockprice')]
   public function getStockPrice(StockPriceCollectionDataProvider $dataProvider, Request $request, string $stock): JsonResponse
   {
     $data = $dataProvider->getCollection();
@@ -24,21 +24,25 @@ class ApiController extends AbstractController
       }
     }
 
-    $response = new JsonResponse(['result'=> 'ok', 'symbol' => $stock, 'price' => $price]);
+    $response = new JsonResponse(['result' => 'ok', 'symbol' => $stock, 'price' => $price]);
     return $response;
   }
 
-  #[Route('/prices', name:'api_prices')]
+  #[Route('/prices', name: 'api_prices')]
   public function getPrices(StockPriceCollectionDataProvider $dataProvider, Request $request): JsonResponse
   {
+    //Yahoo services do not work anymore. So no live prices :(
+
+    /*
     $data = $dataProvider->getCollection();
     $price = 0.0;
     $output = [];
     foreach ($data as $item) {
       $output[] = ['symbol' => $item->getSymbol(), 'price' => $item->getPrice()];
     }
+    */
 
-    $response = new JsonResponse(['result'=> 'ok', 'data' => $output]);
+    $response = new JsonResponse(['result' => 'ok', 'data' => []]);
     return $response;
   }
 }
