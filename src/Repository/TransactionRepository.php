@@ -78,6 +78,18 @@ class TransactionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getLastImportFile(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->select("t.importfile")
+            ->where('t.importfile is not null')
+            ->orderBy('t.id', 'desc')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     // /**
     //  * @return Transaction[] Returns an array of Transaction objects
     //  */

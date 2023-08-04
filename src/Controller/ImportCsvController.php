@@ -39,6 +39,8 @@ class ImportCsvController extends AbstractController
         $form = $this->createForm(FileUploadType::class, $importfile);
         $form->handleRequest($request);
 
+        $imp = $transactionRepository->getLastImportFile();
+
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $transactionFile */
             $transactionFile = $form->get('importfile')->getData();
@@ -74,6 +76,7 @@ class ImportCsvController extends AbstractController
         return $this->render('import_csv/index.html.twig', [
             'controller_name' => 'ImportCsvController',
             'form' => $form->createView(),
+            "importfile" => (is_array($imp) ? $imp["importfile"] : "")
         ]);
     }
 }

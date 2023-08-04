@@ -4,6 +4,9 @@
 
 {% block body %}
 <h1>Import csv</h1>
+
+<div>Last imported: {{ importfile}}</div>
+
 <div class="col-10 p-4">
 	{{ form_start(form,{'attr': {'class': 'p-10'}}) }}
 	{{ form_errors(form) }}
