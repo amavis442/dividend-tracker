@@ -56,10 +56,10 @@ class CompoundType extends AbstractType
             ->add('growth', NumberType::class, [
                 'label' => 'Dividend Annual Growth Rate',
                 'help' => 'First 5 years. Nice target would be 10% and higher',
-                'required' => true,
+                'required' => false,
                 'input' => 'number',
                 'scale' => 3,
-                'empty_data' => 1
+                'empty_data' => 0
             ])
             ->add('growthAfter5Years', NumberType::class, [
                 'label' => 'Average dividend growth rate (%) > 5 years',
@@ -101,8 +101,7 @@ class CompoundType extends AbstractType
                 'input' => 'number',
                 'scale' => 2,
                 'empty_data' => $compound->getExchangeRate()
-            ])
-            ;
+            ]);
 
         $callbackValutaTransformer = CallbackTransformerValutaFactory::create();
         $callbackUnitsTransformer = CallbackTransformerUnitsFactory::create();

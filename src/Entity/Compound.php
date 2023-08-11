@@ -46,7 +46,6 @@ class Compound
      *
      * @var int|null
      */
-    #[Assert\GreaterThan(0)]
     private $growth;
     /**
      * Growth after 5 years and into infinity will normally be around 3%
