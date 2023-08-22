@@ -15,12 +15,12 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route(path: '/dashboard/journal')]
 class JournalController extends AbstractController
 {
-    public const TAXONOMY_KEY = 'journal_taxonomy'; 
+    public const TAXONOMY_KEY = 'journal_taxonomy';
     #[Route(path: '/list/{page<\d+>?1}', name: 'journal_index', methods: ['GET'])]
-    public function index(Request $request, JournalRepository $journalRepository,TaxonomyRepository $taxonomyRepository, int $page = 1): Response
+    public function index(Request $request, JournalRepository $journalRepository, TaxonomyRepository $taxonomyRepository, int $page = 1): Response
     {
         $taxonomySelected = null;
-        if (!$request->hasSession()){
+        if (!$request->hasSession()) {
             dump('Nope');
         }
         $taxonomySelected = $request->getSession()->get(self::TAXONOMY_KEY, null);
@@ -28,7 +28,7 @@ class JournalController extends AbstractController
         if (!is_null($taxonomySelected)) {
             $taxonomySelected = array_flip($taxonomySelected);
         }
-       
+
 
         $limit = 5;
         $items = $journalRepository->findItems($page, $limit, $taxonomySelected);
@@ -36,7 +36,7 @@ class JournalController extends AbstractController
 
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
-        
+
 
         return $this->render('journal/index.html.twig', [
             'journals' => $items->getIterator(),
@@ -109,7 +109,7 @@ class JournalController extends AbstractController
     #[Route(path: '/taxonomy', name: 'journal_taxonomy', methods: ['POST'])]
     public function pie(Request $request): Response
     {
-        $taxonomy = $request->request->get('taxonomy', null);
+        $taxonomy = $request->request->all('taxonomy'); // ->get('taxonomy', []);
         $request->getSession()->set(self::TAXONOMY_KEY, $taxonomy);
         return $this->redirectToRoute('journal_index');
     }

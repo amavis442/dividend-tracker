@@ -26,10 +26,10 @@ class JournalRepository extends ServiceEntityRepository
     {
         $dql = $this->createQueryBuilder('j')
             ->orderBy('j.id', 'DESC');
-        if (!is_null($taxonomy)) {
-            $dql->join('j.taxonomy','t')
-            ->where('t.id IN (:taxonomy)')
-            ->setParameter('taxonomy', array_flip($taxonomy));
+        if (!is_null($taxonomy) && !empty($taxonomy)) {
+            $dql->join('j.taxonomy', 't')
+                ->where('t.id IN (:taxonomy)')
+                ->setParameter('taxonomy', array_flip($taxonomy));
         }
 
 
@@ -37,33 +37,4 @@ class JournalRepository extends ServiceEntityRepository
 
         return $this->paginate($query, $page, $limit);
     }
-
-    // /**
-    //  * @return Journal[] Returns an array of Journal objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('j')
-            ->andWhere('j.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('j.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Journal
-    {
-        return $this->createQueryBuilder('j')
-            ->andWhere('j.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }
