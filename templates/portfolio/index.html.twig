@@ -87,7 +87,9 @@
 						</td>
 						<td>
 							<span class="badge badge-secondary">
-								&euro;{{ portfolioItem.dividend|format_number({fraction_digit: 2}) }}</span>
+								&euro;{{ portfolioItem.dividend|format_number({fraction_digit: 2}) }}
+								<span class="badge badge-warning">{{ ((portfolioItem.dividend / portfolioItem.allocation) *100)|format_number({fraction_digit: 2}) }}%</span>
+							</span>
 						</td>
 						<td>
 							{% if portfolioItem.divDate %}
