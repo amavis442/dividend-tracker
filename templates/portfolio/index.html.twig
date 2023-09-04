@@ -125,4 +125,7 @@
 		</tr>
 	</tfoot>
 </table>
-{% include 'paginator.html.twig' %}</div></div>{% endblock %}{% block javascripts %}{{ parent() }}{{ encore_entry_script_tags('stockprices') }}{{ encore_entry_script_tags('vue') }}{% endblock %}
+{% include 'paginator.html.twig' %}</div></div>{% endblock %}
+{% block javascripts %}
+{{ parent() }}
+{% endblock %}
