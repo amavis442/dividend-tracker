@@ -14,7 +14,7 @@ use Doctrine\ORM\EntityRepository;
 
 class TickerType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('ticker')
@@ -46,7 +46,7 @@ class TickerType extends AbstractType
                 'empty_data' => null,
                 'multiple'    => false,
                 'choice_label' => function ($tax) {
-                    return  ($tax->getTaxRate() * 100) . '%';
+                    return ($tax->getTaxRate() * 100) . '%';
                 },
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('t')
@@ -58,7 +58,7 @@ class TickerType extends AbstractType
             ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Ticker::class,

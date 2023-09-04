@@ -12,15 +12,14 @@ use Symfony\Component\Form\CallbackTransformer;
 
 class TaxType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('taxRate', NumberType::class)
             ->add('validFrom', DateType::class, [
                 // renders it as a single text box
                 'widget' => 'single_text',
-            ])
-        ;
+            ]);
 
         $builder->get('taxRate')->addModelTransformer(new CallbackTransformer(
             function ($taxRate) {
@@ -34,7 +33,7 @@ class TaxType extends AbstractType
         ));
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Tax::class,

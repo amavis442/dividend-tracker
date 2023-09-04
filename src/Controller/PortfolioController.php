@@ -48,7 +48,7 @@ class PortfolioController extends AbstractController
         $pies = $pieRepository->findLinked();
         $searchCriteria = '';
         $pieSelected = null;
-        if (!$request->hasSession()){
+        if (!$request->hasSession()) {
             dump('Nope');
         }
 
@@ -79,7 +79,7 @@ class PortfolioController extends AbstractController
 
         return $this->render('portfolio/index.html.twig', [
             'portfolioItems' => $pageData->getPortfolioItems(),
-            'cacheTimestamp' => (new DateTime())->setTimestamp($pageData->getCacheTimestamp()),
+            'cacheTimestamp' => (new DateTime())->setTimestamp($pageData->getCacheTimestamp() ?: 0),
             'limit' => $limit,
             'maxPages' => $pageData->getMaxPages(),
             'thisPage' => $thisPage,
@@ -100,7 +100,7 @@ class PortfolioController extends AbstractController
         ]);
 
         //return new Response('We komen ergens');
-        
+
     }
 
     #[Route(path: '/{id}', name: 'portfolio_show', methods: ['GET'])]
@@ -126,10 +126,10 @@ class PortfolioController extends AbstractController
             $amountPerDate = $position->getAmountPerDate($calendarRecentDividendDate->getExDividendDate());
         }
 
-        
+
         $position = $positionRepository->getForPosition($position);
         $netYearlyDividend = 0.0;
-        
+
         if (count($cals) > 0) {
             $cal = $dividendService->getRegularCalendar($ticker);
             [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax($position, $cal);
@@ -142,7 +142,7 @@ class PortfolioController extends AbstractController
         // Cals start with latest and descent
         foreach ($reverseCals as $index => $cal) {
             $dividendRaises[$index] = 0;
-            if ($cal->getDividendType() === Calendar::REGULAR && stripos($cal->getDescription(),'Extra') === false) {
+            if ($cal->getDividendType() === Calendar::REGULAR && stripos($cal->getDescription(), 'Extra') === false) {
                 if (isset($oldCal)) {
                     $oldCash = $oldCal->getCashAmount(); // previous
                     $dividendRaises[$index] = (($cal->getCashAmount() - $oldCash) / $oldCash) * 100;

@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityRepository;
 
 class JournalType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('title')
@@ -31,11 +31,10 @@ class JournalType extends AbstractType
                     return $er->createQueryBuilder('taxonomy')
                         ->orderBy('taxonomy.title', 'ASC');
                 },
-            ])
-        ;
+            ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Journal::class,

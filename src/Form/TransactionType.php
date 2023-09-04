@@ -17,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TransactionType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('transactionDate', DateTimeType::class, [
@@ -70,11 +70,11 @@ class TransactionType extends AbstractType
                 'exchangerate',
                 NumberType::class,
                 [
-                'label' => 'Exchangerate',
-                'required' => false,
-                'help' => 'Current exchange rate',
-                'input' => 'number',
-                'scale' => 7,
+                    'label' => 'Exchangerate',
+                    'required' => false,
+                    'help' => 'Current exchange rate',
+                    'input' => 'number',
+                    'scale' => 7,
                 ]
             )
             ->add('transaction_fee', NumberType::class, [
@@ -83,11 +83,10 @@ class TransactionType extends AbstractType
                 'help' => 'Commission/ extra fees etc',
                 'input' => 'number',
                 'scale' => 2,
-            ])
-            ;
+            ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Transaction::class,

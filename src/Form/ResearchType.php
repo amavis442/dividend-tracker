@@ -24,7 +24,7 @@ class ResearchType extends AbstractType
         $this->tickerRepository = $tickerRepository;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         //$builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSubmit']);
 
@@ -54,14 +54,14 @@ class ResearchType extends AbstractType
         ));
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Research::class,
         ]);
     }
 
-    public function onPreSubmit(FormEvent $event)
+    public function onPreSubmit(FormEvent $event): void
     {
         $data = $event->getData();
         $data['attachments'] = array_values($data['attachments']);
