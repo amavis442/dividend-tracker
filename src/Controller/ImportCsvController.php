@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\FileUpload;
+use App\Entity\ImportFiles;
 use App\Form\FileUploadType;
 use App\Repository\BranchRepository;
 use App\Repository\CurrencyRepository;
+use App\Repository\ImportFilesRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TaxRepository;
 use App\Repository\TickerRepository;
@@ -33,13 +35,14 @@ class ImportCsvController extends AbstractController
         BranchRepository $branchRepository,
         TransactionRepository $transactionRepository,
         ImportCsvService $importCsv,
-        TaxRepository $taxRepository
+        TaxRepository $taxRepository,
+        ImportFilesRepository $importFilesRepository
     ): Response {
         $importfile = new fileUpload();
         $form = $this->createForm(FileUploadType::class, $importfile);
         $form->handleRequest($request);
 
-        $imp = $transactionRepository->getLastImportFile();
+        $imp = $importFilesRepository->findOneBy([], ['id' => 'DESC']);
 
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $transactionFile */
@@ -66,6 +69,12 @@ class ImportCsvController extends AbstractController
                         'errorMessage' => $e->getMessage(),
                     ]);
                 }
+
+                $importFiles = new ImportFiles();
+                $importFiles->setName($transactionFile->getClientOriginalName())->setCreatedAt((new \DateTime()));
+                $entityManager->persist($importFiles);
+                $entityManager->flush();
+
                 return $this->render('import_csv/report.html.twig', [
                     'controller_name' => 'ImportCsvController',
                     'data' => $result,
@@ -76,7 +85,7 @@ class ImportCsvController extends AbstractController
         return $this->render('import_csv/index.html.twig', [
             'controller_name' => 'ImportCsvController',
             'form' => $form->createView(),
-            "importfile" => (is_array($imp) ? $imp["importfile"] : "")
+            "importfile" => (is_object($imp) ? $imp->getName() : "")
         ]);
     }
 }
