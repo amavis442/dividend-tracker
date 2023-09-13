@@ -1,70 +1,77 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Calendar index{% endblock %}
+{% block title %}
+  Calendar index
+{% endblock %}
 
 {% block body %}
-    <h1>Calendar</h1>
-    {% include '_search_form.html.twig' %}
+  <h1>Calendar</h1>
+  {% include '_search_form.html.twig' %}
 
-<div class="row mb-3">
+  <div class="row mb-3">
     <div class="col text-right">
-	    <a class="btn btn-primary " href="{{ path('calendar_new') }}"><i class="fas fa-plus"></i></a>
-	</div>
-</div>
-	
-<div class="row">
-	<div class="col-sm">
-		<table class="table">
-			<thead>
-				<tr>
-					<th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Fullname'|trans }}</a></th>
-					<th>{{ 'Type'|trans }}</th>
-					<th>
-						<a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'paymentDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Payment date'|trans }}</a>
-					</th>
-					<th>
-						<a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'exDividendDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Ex-dividend date'|trans }}</a>
-					</th>
-					<th>{{ 'Cash amount'|trans }}</th>
-                    <th>{{ 'Source'|trans }}</th>
-                    <th>{{ 'Descr.'|trans }}</th>
-                    <th><a href="{{ path('calendar_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'createdAt', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Created'|trans }}</a></th>
-					<th>{{ 'actions'|trans }}</th>
-				</tr>
-			</thead>
-			<tbody>
-            {% for calendar in calendars %}
-                <tr class="table">
-                    <td class="col">{{ calendar.ticker.fullname|slice(0,20) }}{% if calendar.ticker.fullname|length > 20 %}...{% endif %}<br/><small>({{ calendar.ticker.ticker }})</small></td>
-                    <td class="col">{{ (calendar.dividendType ?? 'Regular')|trans }}</td>
-                    <td class="col">{{ calendar.paymentDate|format_date('medium') }}</td>
-                    <td class="col">{{ calendar.exDividendDate|format_date('medium') }}</td>
-                    <td class="col">{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({fraction_digit: 2}) }}</td>
-                    <td class="col">{{ (calendar.source ?? 'manual')|trans }}</td>
-                    <td class="col">{{ calendar.description ?? '&mdash;' }}</td>
-                    <td class="col">{{ calendar.createdAt|format_date('short') }}</td>
-                    <td class="col">
-                        <div class="btn-group" role="group" aria-label="Actions">
-                            <a href="{{ path('calendar_show', {'id': calendar.id}) }}" class="btn btn-info">
-                                <i class="fas fa-book-open"></i>
-                            </a>
-                            <a href="{{ path('calendar_edit', {'id': calendar.id}) }}" class="btn btn-primary">
-                                <i class="far fa-edit"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="9">no records found</td>
-                </tr>
-            {% endfor %}
-			</tbody>
-		</table>
-	</div>
-</div>
+      <a class="btn btn-primary" href="{{ path('calendar_new') }}"><i class="fas fa-plus"></i></a>
+    </div>
+  </div>
 
+  <div class="row">
+    <div class="col-sm">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>
+              <a href="{{ path('calendar_index', { page: thisPage ? thisPage : 1, orderBy: 'ticker', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">{{ 'Fullname'|trans }}</a>
+            </th>
+            <th>{{ 'Type'|trans }}</th>
+            <th>
+              <a href="{{ path('calendar_index', { page: thisPage ? thisPage : 1, orderBy: 'paymentDate', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">{{ 'Payment date'|trans }}</a>
+            </th>
+            <th>
+              <a href="{{ path('calendar_index', { page: thisPage ? thisPage : 1, orderBy: 'exDividendDate', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">{{ 'Ex-dividend date'|trans }}</a>
+            </th>
+            <th>{{ 'Cash amount'|trans }}</th>
+            <th>{{ 'Source'|trans }}</th>
+            <th>{{ 'Descr.'|trans }}</th>
+            <th>
+              <a href="{{ path('calendar_index', { page: thisPage ? thisPage : 1, orderBy: 'createdAt', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">{{ 'Created'|trans }}</a>
+            </th>
+            <th>{{ 'actions'|trans }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for calendar in calendars %}
+            <tr class="table">
+              <td class="col">
+                {% if calendar.ticker.positions[0] %}
+                  <a href="{{ path('portfolio_show', { id: calendar.ticker.positions[0].id }) }}" title="{{ calendar.ticker.fullname }}">{{ calendar.ticker.fullname|slice(0, 20) }}{% if (calendar.ticker.fullname|length) > 20 %}...{% endif %}</a>
+                {% else %}
+                  {{ calendar.ticker.fullname }}
+                {% endif %}
+                <br /><small>({{ calendar.ticker.ticker }})</small>
+              </td>
+              <td class="col">{{ (calendar.dividendType ?? 'Regular')|trans }}</td>
+              <td class="col">{{ calendar.paymentDate|format_date('medium') }}</td>
+              <td class="col">{{ calendar.exDividendDate|format_date('medium') }}</td>
+              <td class="col">{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ calendar.cashAmount|format_number({ fraction_digit: 2 }) }}</td>
+              <td class="col">{{ (calendar.source ?? 'manual')|trans }}</td>
+              <td class="col">{{ calendar.description ?? '&mdash;' }}</td>
+              <td class="col">{{ calendar.createdAt|format_date('short') }}</td>
+              <td class="col">
+                <div class="btn-group" role="group" aria-label="Actions">
+                  <a href="{{ path('calendar_show', { id: calendar.id }) }}" class="btn btn-info"><i class="fas fa-book-open"></i></a>
+                  <a href="{{ path('calendar_edit', { id: calendar.id }) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="9">no records found</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-    {% include 'paginator.html.twig' %}
-    
+  {% include 'paginator.html.twig' %}
 {% endblock %}
