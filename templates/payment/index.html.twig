@@ -1,79 +1,79 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ 'Payments'|trans }}
+{% block title %}
+  {{ 'Payments'|trans }}
 {% endblock %}
 
 {% block body %}
-	<h1>{{ 'Payments'|trans }}:
-		{{ startDate}}
-		/
-		{{ endDate}}</h1>
+  <h1>
+    {{ 'Payments'|trans }}:
+    {{ startDate }}
+    /
+    {{ endDate }}
+  </h1>
 
-	{{ form_start(searchForm) }}
-	<div class="form-row">
-		<div class="col">
-			{{form_widget(searchForm.year)}}
-		</div>
-		<div class="col">
-			{{form_widget(searchForm.month)}}
-		</div>
-		<div class="col">
-			{{form_widget(searchForm.quator)}}
-		</div>
-		<div class="col">
-			{{form_widget(searchForm.submit, {'label' : '<i class="fas fa-solid fa-filter"></i>','label_html': true})}}
-		</div>
-	</div>
-	{{ form_end(searchForm) }}
+  {{ form_start(searchForm) }}
+  <div class="form-row">
+    <div class="col">{{ form_widget(searchForm.year) }}</div>
+    <div class="col">{{ form_widget(searchForm.month) }}</div>
+    <div class="col">{{ form_widget(searchForm.quator) }}</div>
+    <div class="col">{{ form_widget(searchForm.submit, { label: '<i class="fas fa-solid fa-filter"></i>', label_html: true }) }}</div>
+  </div>
+  {{ form_end(searchForm) }}
 
-	<br/>
-	{% include '_search_form.html.twig' %}
-	<table class="table">
-		<thead>
-			<tr>
-				<th>{{ 'Pay date'|trans }}</th>
-				<th>{{ 'Company'|trans }}</th>
-				<th>{{ 'Dividend'|trans }}(&euro;)</th>
-				<th>{{ 'Tax'|trans }}</th>
-				<th>{{ 'Type'|trans }}</th>
-				<th>{{ 'Actions'|trans }}</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for payment in payments %}
-				<tr>
-					<td>{{ payment.payDate ? payment.payDate|format_date('medium') : '' }}</td>
-					<td>{{ payment.position.ticker.fullname }}
-						({{ payment.position.ticker.ticker }})<br/>
-						<small>{{ (payment.amount)|format_number({fraction_digit: 7}) }} {{ 'shares'|trans }}</small>
-					</td>
-					<td><strong>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ (payment.dividend)|format_number({fraction_digit: 2}) }}</strong></td>
-					<td><span style="color:red">&euro;{{ (payment.taxes)|format_number({fraction_digit: 2}) }}</span></td>
-					<td>{{ payment.dividendType }}</td>
-					<td>
-						<a href="{{ path('payment_show', {'id': payment.id}) }}" class="btn btn-primary">
-							<i class="fas fa-book-open"></i>
-						</a>
-						<a href="{{ path('payment_edit', {'id': payment.id}) }}" class="btn btn-primary">
-							<i class="far fa-edit"></i>
-						</a>
-					</td>
-				</tr>
-			{% else %}
-				<tr>
-					<td colspan="6">{{ 'no records found'|trans }}</td>
-				</tr>
-			{% endfor %}
-			<tr>
-				<td colspan="1"></td>
-				<td>
-					<span style="font-weight:bold">{{ 'Total dividend'|trans }}</span>
-				</td>
-				<td><span style="font-weight:bold">&euro;{{ dividends|format_number({fraction_digit: 2}) }}</span></td>
-				<td><span style="color:red">&euro;{{ taxes|format_number({fraction_digit: 2}) }}</span></td>
-				<td colspan="3"></td>
-			</tr>
-		</tbody>
-	</table>
-	{% include 'paginator.html.twig' %}
+  <br />
+  {% include '_search_form.html.twig' %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>{{ 'Pay date'|trans }}</th>
+        <th>{{ 'Company'|trans }}</th>
+        <th>{{ 'Dividend'|trans }}(&euro;)</th>
+        <th>{{ 'Tax'|trans }}</th>
+        <th>{{ 'Type'|trans }}</th>
+        <th>{{ 'Actions'|trans }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for payment in payments %}
+        <tr>
+          <td>{{ payment.payDate ? payment.payDate|format_date('medium') : '' }}</td>
+          <td>
+            {{ payment.position.ticker.fullname }}
+            ({{ payment.position.ticker.ticker }})<br />
+            <small>{{ payment.amount|format_number({ fraction_digit: 7 }) }} {{ 'shares'|trans }}</small>
+          </td>
+          <td>
+            <strong>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ payment.dividend|format_number({ fraction_digit: 2 }) }}</strong>
+          </td>
+          <td>
+            <span style="color:red">&euro;{{ payment.taxes|format_number({ fraction_digit: 2 }) }}</span>
+          </td>
+          <td>{{ payment.dividendType }}</td>
+          <td>
+            <a href="{{ path('payment_show', { id: payment.id }) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
+            <a href="{{ path('payment_edit', { id: payment.id }) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="6">{{ 'no records found'|trans }}</td>
+        </tr>
+      {% endfor %}
+      <tr>
+        <td colspan="1"></td>
+        <td>
+          <span style="font-weight:bold">{{ 'Total dividend'|trans }}</span>
+        </td>
+        <td>
+          <span style="font-weight:bold">&euro;{{ dividends|format_number({ fraction_digit: 2 }) }}</span>
+        </td>
+        <td>
+          <span style="color:red">&euro;{{ taxes|format_number({ fraction_digit: 2 }) }}</span>
+        </td>
+        <td colspan="3"></td>
+      </tr>
+    </tbody>
+  </table>
+  {% include 'paginator.html.twig' %}
 {% endblock %}
