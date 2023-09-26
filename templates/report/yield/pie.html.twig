@@ -53,13 +53,14 @@
 			<thead>
 			<tr>
 				<th scope="col"><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'ticker'}) }}">Ticker</a></th>
+				<th scope="col">{{ 'Allocation'|trans }}</th>
 				<th scope="col">{{ 'avgPrice'|trans }}</th>
 				<th scope="col"><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'dividend'}) }}">{{ 'Yearly forward dividend'|trans }}</a></th>
 				<th scope="col">{{ 'Net forward yearly dividend per share'|trans }}</th>
-				<th scope="col">{{ 'Amount'|trans }}</th>
+
 				<th scope="col">{{ 'Net forward dividend per payout'|trans }}</th>
 				<th scope="col">{{ 'Net forward yearly dividend total'|trans }}</th>
-				<th scope="col">{{ 'Allocation'|trans }}</th>
+
 				<th scope="col"><a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'yield'}) }}">{{ 'Yield'|trans }}</a></th>
 				<th scope="col">info</th>
 			</tr>
@@ -70,17 +71,18 @@
 					<td>
 						<div>
 						<span title="{{ item.label }}" data-toggle="tooltip" data-placement="top"><a href="{{ path('portfolio_show', {'id': item.position.id}) }}">{{ item.ticker }}</a></span>
-
 						</div>
+						<small>({{ item.amount }})</small>
 					</td>
+				<td>&euro;{{ item.allocation|format_number({fraction_digit: 2}) }}</td>
 
 					<td>&euro;{{ (item.avgPrice)|format_number({fraction_digit: 2}) }}</td>
 					<td>{% if item.payout > 0 %}{{ item.lastDividendCurrency|raw }}{{ (item.payout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
 					<td><span data-html="true" title="{{ 'Exchangerate'|trans }}: {{ item.exchangeRate }}<br/>{{ 'Tax'|trans }}: {{ item.taxRate }}%" data-toggle="tooltip" data-placement="top">{% if item.netForwardYearlyPayout > 0 %}&euro;{{ (item.netForwardYearlyPayout)|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</span></td>
-					<td>{{ item.amount }}</td>
+
 					<td>{% if item.netTotalPayoutPerPaydate > 0  %}&euro;{{ item.netTotalPayoutPerPaydate|format_number({fraction_digit: 2}) }}{% endif %}</td>
 					<td>{% if item.netTotalForwardYearlyPayout > 0 %}&euro;{{ item.netTotalForwardYearlyPayout|format_number({fraction_digit: 2}) }}{% else %}-{% endif %}</td>
-					<td>&euro;{{ item.allocation|format_number({fraction_digit: 2}) }}</td>
+
 					<td>{% if item.yield > 0 %}{{ item.yield }}%{% else %}-{% endif %}</td>
 					<td>
 					{% set info = '' %}
