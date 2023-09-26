@@ -7,6 +7,9 @@ use App\Repository\PaymentRepository;
 
 class Summary
 {
+    protected PositionRepository $positionRepository;
+    protected PaymentRepository $paymentRepository;
+
     public function __construct(PositionRepository $positionRepository, PaymentRepository $paymentRepository)
     {
         $this->positionRepository = $positionRepository;
