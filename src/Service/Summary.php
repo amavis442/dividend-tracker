@@ -18,11 +18,23 @@ class Summary
 
     public function getSummary(): array
     {
-        $numActivePosition = $this->positionRepository->getTotalPositions();
-        $numTickers = $this->positionRepository->getTotalTickers();
-        $profit = $this->positionRepository->getProfit();
+        /**
+         * @var Array $positions
+         */
+        $positions = $this->positionRepository->getOpenPositions();
+        $numActivePosition = count($positions);
+        $numTickers = $numActivePosition;
+        $profit = 0.0;
+        $allocated = 0.0;
+        /**
+         * @var  \App\Entity\Position  $position
+         */
+        foreach ($positions as $position) {
+            $profit += $position->getProfit();
+            $allocated += $position->getAllocated();
+        }
+
         $totalDividend = $this->paymentRepository->getTotalDividend();
-        $allocated = $this->positionRepository->getSumAllocated();
 
         return [
             $numActivePosition,

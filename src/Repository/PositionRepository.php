@@ -327,6 +327,15 @@ class PositionRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
+    public function getOpenPositions(): array
+    {
+        $result = $this->createQueryBuilder('p')
+            ->where('p.closed <> 1  or p.closed is null')
+            ->getQuery()
+            ->getResult();
+        return $result;
+    }
+
     public function getTotalPositions(): int
     {
         $count = $this->createQueryBuilder('p')
