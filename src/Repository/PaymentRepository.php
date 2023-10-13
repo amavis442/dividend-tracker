@@ -150,7 +150,8 @@ class PaymentRepository extends ServiceEntityRepository
             ->select('SUM(p.dividend) total')
             ->addSelect('t.id')
             ->join('p.ticker', 't')
-            ->where('t IN (:tickerIds)')
+            ->join(Position::class, 'pos', 'WITH', '(pos.ticker = t AND (pos.closed <> 1 or pos.closed is null))')
+            ->where('t IN (:tickerIds) AND p.payDate > pos.createdAt')
             ->groupBy('p.ticker')
             ->setParameter('tickerIds', $tickerIds);
 
