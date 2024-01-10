@@ -197,7 +197,11 @@ class ImportCsvService extends ImportBase
                         break;
                     case 'time':
                         $row['time'] = $val;
-                        $row['transactionDate'] = DateTime::createFromFormat('Y-m-d H:i:s', $val);
+                        $t = substr($val, 0, 19);
+                        $row['transactionDate'] = DateTime::createFromFormat("Y-m-d H:i:s", $t);
+                        if (!$row['transactionDate']) {
+                            dd($cells, $row, $val);
+                        }
                         break;
                     case 'isin':
                         /**
