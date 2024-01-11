@@ -6,7 +6,6 @@ use Symfony\Component\Console\Input\InputOption;
 
 require 'recipe/symfony.php';
 require 'contrib/rsync.php';
-require 'contrib/npm.php';
 
 // Project name
 set('application', 'dividend.prod');
@@ -17,7 +16,6 @@ set('repository', 'git@gitlab.com:amavis442/dividend.git');
 // [Optional] Allocate tty for git clone. Default value is false.
 set('git_tty', true);
 set('keep_releases', 2);
-//set('npm', '/usr/bin/npm');
 set('writable_mode', 'acl');
 
 // Shared files/dirs between deploys
@@ -64,39 +62,31 @@ set('rsync', [
     'timeout'      => 60,
 ]);
 
-// Tasks
-set('bin/npm', function () {
-    return '/usr/bin/node';
+set('nvm', 'source $HOME/.nvm/nvm.sh');
+set('use_nvm', function () {
+    return '{{nvm}} && node --version && nvm use 20';
 });
-after('deploy:update_code', 'npm:install');
-/*
+
+// Tasks
 desc('NPM install'); // For encore and stuff
 task('npm:install', function () {
-    run('cd ' . get('release_path') . ' && {{npm}} install');
+    run('{{use_nvm}} && cd ' . get('release_path') . ' && npm ci');
 });
 
 desc('NPM build');
 task('npm:build', function () {
-    run('cd ' . get('release_path') . ' && {{npm}} run build');
+    run('{{use_nvm}} && cd ' . get('release_path') . ' && npm run build');
 });
 
-
-desc('Reload php-fpm config');
-task('php-fpm:reload', function () {
-    run('sudo /bin/systemctl reload php8.2-fpm');
-});
-*/
 
 desc('Runs npm, migrates the database and install the assets');
 task('deploy:dividend', [
     'database:migrate'
 ]);
 
+after('deploy:update_code', 'npm:install');
+after('npm:install', 'npm:build');
 after('deploy:vendors', 'deploy:dividend');
-
-// Last step after symlink has been added.
-//after('deploy', 'php-fpm:reload');
-
 
 option('source', null, InputOption::VALUE_OPTIONAL, 'Source alias of the current task.');
 option('target', null, InputOption::VALUE_OPTIONAL, 'Target alias of the current task.');
