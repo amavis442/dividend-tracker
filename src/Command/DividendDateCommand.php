@@ -18,8 +18,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name:'app:dividenddate',
-    description:'Get dividend data',
+    name: 'app:dividenddate',
+    description: 'Get dividend data',
 )]
 class DividendDateCommand extends Command
 {
@@ -142,8 +142,7 @@ class DividendDateCommand extends Command
                     if (stripos($payment['Type'], 'Extra') !== false) {
                         $calendar->setDividendType(Calendar::SUPPLEMENT);
                     }
-                    $this->entityManager->persist($calendar);
-                    $this->entityManager->flush();
+                    $this->calendarRepository->save($calendar, true);
 
                     $addedForTicker[] = $ticker->getSymbol();
                     $addedDates++;

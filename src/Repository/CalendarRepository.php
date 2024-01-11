@@ -30,6 +30,24 @@ class CalendarRepository extends ServiceEntityRepository
         parent::__construct($registry, Calendar::class);
     }
 
+    public function save(Calendar $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(Calendar $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
     public function getAll(
         int $page = 1,
         int $limit = 10,
