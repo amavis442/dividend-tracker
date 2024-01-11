@@ -177,18 +177,17 @@ class ImportMail extends ImportBase
                             ->setExchangeRate($row['wisselkoersen'])
                             ->setJobid($row['opdrachtid'])
                             ->setMeta($row['nr'])
-                            ->setImportfile($file)
-                        ;
+                            ->setImportfile($file);
 
                         $position->addTransaction($transaction);
                         $weightedAverage->calc($position);
 
                         if ($position->getAmount() === 0) {
-                            $position->setClosed(1);
+                            $position->setClosed(true);
                         }
 
                         if ($position->getAmount() > -6 && $position->getAmount() < 0) {
-                            $position->setClosed(1);
+                            $position->setClosed(true);
                             $position->setAmount(0);
                         }
 
@@ -220,7 +219,7 @@ class ImportMail extends ImportBase
         TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
         ?\Box\Spout\Reader\CSV\Reader $reader = null
-    ): array{
+    ): array {
         return [];
     }
 }

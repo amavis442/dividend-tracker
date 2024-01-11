@@ -117,7 +117,7 @@ class TransactionController extends AbstractController
             $weightedAverage->calc($position);
 
             if ($position->getAmount() === 0 || $position->getAmount() < 0.0001) {
-                $position->setClosed(1);
+                $position->setClosed(true);
                 $position->setClosedAt((new DateTime()));
             }
             $entityManager->persist($position);
@@ -162,7 +162,7 @@ class TransactionController extends AbstractController
             $position = $transaction->getPosition();
             $weightedAverage->calc($position);
             if ($position->getAmount() === 0) {
-                $position->setClosed(1);
+                $position->setClosed(true);
                 $position->setClosedAt((new DateTime()));
             }
             $entityManager->flush();

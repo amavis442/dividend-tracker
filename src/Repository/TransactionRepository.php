@@ -73,7 +73,7 @@ class TransactionRepository extends ServiceEntityRepository
             ->innerJoin('t.position', 'p')
             ->where('t.ticker = :ticker')
             ->orderBy('t.transactionDate, t.id', 'asc')
-            ->andWhere('p.closed = 0 or p.closed is null')
+            ->andWhere('p.closed = false')
             ->setParameter('ticker', $ticker)
             ->getQuery()
             ->getResult();

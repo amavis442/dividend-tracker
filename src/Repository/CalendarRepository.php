@@ -188,7 +188,7 @@ class CalendarRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('c')
             ->select('c, t, p, tr, pies, cur, tax')
             ->innerJoin('c.ticker', 't')
-            ->innerJoin('t.positions', 'p', 'WITH', '(p.closed is null OR p.closed = 0) OR (p.closedAt > :closedAt and p.closed = 1)')
+            ->innerJoin('t.positions', 'p', 'WITH', '(p.closed = false) OR (p.closedAt > :closedAt and p.closed = true)')
             ->leftJoin('t.tax', 'tax')
             ->leftJoin('p.transactions', 'tr')
             ->leftJoin('p.pies', 'pies')
@@ -196,8 +196,7 @@ class CalendarRepository extends ServiceEntityRepository
             ->where('c.paymentDate >= :start and c.paymentDate <= :end')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
-            ->setParameter('closedAt', (new DateTime('-2 month'))->format('Y-m-d'))
-        ;
+            ->setParameter('closedAt', (new DateTime('-2 month'))->format('Y-m-d'));
 
         if ($pie) {
             $qb->andWhere('pies IN (:pie)')

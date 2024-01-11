@@ -31,38 +31,10 @@ class PieRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('p')
             ->join('p.positions', 'pos')
-            ->where('pos.closed IS NULL or pos.closed = 0')
-            ->andWhere('NOT (pos.ignore_for_dividend IS NOT NULL AND pos.ignore_for_dividend=1)')
+            ->where('pos.closed = false')
+            ->andWhere('pos.ignore_for_dividend = false')
             ->orderBy('p.label', 'ASC')
             ->getQuery()
             ->getResult();
     }
-    // /**
-    //  * @return Pie[] Returns an array of Pie objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Pie
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

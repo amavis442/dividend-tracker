@@ -369,7 +369,7 @@ class ImportCsvService extends ImportBase
                         ($position->getAmount() === 0 || $position->getAmount() < (2 / Constants::AMOUNT_PRECISION)) ||
                         ($position->getAmount() > -6 && $position->getAmount() < (2 / Constants::AMOUNT_PRECISION))
                     ) {
-                        $position->setClosed(1);
+                        $position->setClosed(true);
                         $position->setClosedAt($row['transactionDate']);
                         $position->setAmount(0);
                     }

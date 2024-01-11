@@ -34,7 +34,7 @@ class CalendarDividendType extends AbstractType
                     return $er->createQueryBuilder('pie')
                         ->select('pie, p')
                         ->join('pie.positions', 'p')
-                        ->where('(p.closed = 0 OR p.closed IS NULL)')
+                        ->where('p.closed = false')
                         ->orderBy('pie.label', 'ASC');
                 },
             ]);

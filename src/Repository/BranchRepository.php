@@ -26,8 +26,8 @@ class BranchRepository extends ServiceEntityRepository
     {
         // Create our query
         $query = $this->createQueryBuilder('i')
-        ->orderBy('i.label', 'DESC')
-        ->getQuery();
+            ->orderBy('i.label', 'DESC')
+            ->getQuery();
 
         $paginator = $this->paginate($query, $page, $limit);
 
@@ -37,9 +37,9 @@ class BranchRepository extends ServiceEntityRepository
     public function getSumAssetAllocation(): int
     {
         return $this->createQueryBuilder('i')
-        ->select('SUM(i.assetAllocation)')
-        ->getQuery()
-        ->getSingleScalarResult();
+            ->select('SUM(i.assetAllocation)')
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     public function getAllocationPerSector()
@@ -48,7 +48,7 @@ class BranchRepository extends ServiceEntityRepository
             ->select('s, t, p')
             ->innerJoin('s.tickers', 't')
             ->innerJoin('t.positions', 'p')
-            ->where('p.closed is null OR p.closed = 0')
+            ->where('p.closed = false')
             ->getQuery()
             ->getArrayResult();
 
@@ -57,7 +57,7 @@ class BranchRepository extends ServiceEntityRepository
         foreach ($result as $sector) {
             if (!isset($output[$sector['label']])) {
                 $output[$sector['label']] = [
-                    'sectorTargetAllocation' => round($sector['assetAllocation'] / 100, 2) ,
+                    'sectorTargetAllocation' => round($sector['assetAllocation'] / 100, 2),
                     'sectorAllocation' => 0,
                     'sectorPositions' => []
                 ];

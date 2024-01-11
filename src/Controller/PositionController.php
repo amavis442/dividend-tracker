@@ -116,7 +116,7 @@ class PositionController extends AbstractController
         ?int $closed,
         Referer $referer
     ): Response {
-        if ($closed === 1) {
+        if ($closed === true) {
             $position->setClosed(true);
             $position->setClosedAt((new DateTime()));
         }

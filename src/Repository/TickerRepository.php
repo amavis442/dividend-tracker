@@ -81,7 +81,7 @@ class TickerRepository extends ServiceEntityRepository
             ->addSelect('p.allocation as invested')
             ->join('t.branch', 'i')
             ->join('t.positions', 'p')
-            ->where('p.closed <> 1 OR p.closed is null')
+            ->where('p.closed = false')
             ->groupBy('t.id')
             ->orderBy($order, $sort);
 
@@ -108,7 +108,7 @@ class TickerRepository extends ServiceEntityRepository
             ->leftJoin('t.positions', 'p')
             ->select('SUM(p.amount) as units')
             ->where('t.id = :tickerId')
-            ->andWhere('p.closed <> 1')
+            ->andWhere('p.closed = false')
             ->setParameter('tickerId', $ticker->getId())
             ->getQuery();
         $result = $queryBuilder->getScalarResult();
@@ -121,7 +121,7 @@ class TickerRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('t', 't.ticker')
             ->select('t, p')
             ->innerJoin('t.positions', 'p')
-            ->where("EXISTS (SELECT 1 FROM App\Entity\Position pos WHERE pos.ticker = t.id AND (pos.closed = 0 or pos.closed is null))")
+            ->where("EXISTS (SELECT 1 FROM App\Entity\Position pos WHERE pos.ticker = t.id AND (pos.closed = false))")
             ->groupBy('t.id')
             ->getQuery();
 
@@ -135,7 +135,7 @@ class TickerRepository extends ServiceEntityRepository
             ->innerJoin('t.positions', 'p')
             ->leftJoin('t.dividendMonths', 'dm')
             ->leftJoin('t.calendars', 'c')
-            ->where('p.closed = 0 or p.closed is null')
+            ->where('p.closed = false')
             ->orderBy('t.ticker')
             ->getQuery()
             ->getResult();

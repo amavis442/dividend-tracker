@@ -216,16 +216,11 @@ class PortfolioController extends AbstractController
     public function closePosition(Request $request, EntityManagerInterface $em, Position $position): Response
     {
         if ($this->isCsrfTokenValid('delete' . $position->getId(), $request->request->get('_token'))) {
-            $position->setClosed(1);
+            $position->setClosed(true);
             $position->setClosedAt((new DateTime()));
             $em->persist($position);
             $em->flush();
         }
-        /*
-        $position->setClosed(1);
-        $em->persist($position);
-        $em->flush();
-         */
         return $this->redirectToRoute('portfolio_index');
     }
 }
