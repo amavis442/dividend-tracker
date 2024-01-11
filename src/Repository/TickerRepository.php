@@ -119,7 +119,7 @@ class TickerRepository extends ServiceEntityRepository
     public function getActive()
     {
         $qb = $this->createQueryBuilder('t', 't.ticker')
-            ->select('t, p')
+            ->select('t')
             ->innerJoin('t.positions', 'p')
             ->where("EXISTS (SELECT 1 FROM App\Entity\Position pos WHERE pos.ticker = t.id AND (pos.closed = false))")
             ->groupBy('t.id')
