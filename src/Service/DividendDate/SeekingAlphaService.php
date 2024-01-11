@@ -6,6 +6,8 @@ use App\Contracts\Service\DividendDatePluginInterface;
 use DateTime;
 use RuntimeException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 class SeekingAlphaService implements DividendDatePluginInterface
 {
@@ -92,7 +94,21 @@ class SeekingAlphaService implements DividendDatePluginInterface
             $symbol = $this->translate[$ticker];
         }
 
-        $token = $this->getToken();
+        // Cache it
+        // The callable will only be executed on a cache miss.
+        $pool = new FilesystemAdapter();
+        $token = $pool->get('seeking_alpha_token', function (ItemInterface $item): array {
+            $item->expiresAfter(3600);
+
+            // ... do some HTTP request or heavy computations
+            $computedValue = $this->getToken();
+
+            return $computedValue;
+        });
+
+
+        //$token = $this->getToken();
+
         $tickerData = [];
         $tickerData = $this->getStockHistory($token, $symbol);
         if ($tickerData === null || count($tickerData['CashDividends']) === 0) {
