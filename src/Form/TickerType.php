@@ -52,7 +52,7 @@ class TickerType extends AbstractType
                     return $er->createQueryBuilder('t')
                         ->where('t.validFrom <= :validFrom')
                         ->orderBy('t.taxRate, t.validFrom', 'ASC')
-                        ->groupBy('t.taxRate')
+                        ->groupBy('t.taxRate, t.id')
                         ->setParameter(':validFrom', date('Y-m-d'));
                 },
             ]);
