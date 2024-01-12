@@ -15,33 +15,19 @@ class Attachment
 
     /**
      * NOTE: This is not a mapped field of entity metadata, just a simple property.
-     *
-     *
-     * @var File|null
      */
     private ?File $attachmentFile = null;
 
-    /**
-     * @var string|null
-     */
     #[ORM\Column(type: 'string')]
     private string $attachmentName;
 
-    /**
-     * @var int|null
-     */
-    #[ORM\Column(type: 'bigint', nullable: true)]
-    private ?int $attachmentSize = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
+    #[ORM\Column(type: 'bigint', nullable: true)]
+    private ?string $attachmentSize = null;
+
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $createdAt;
 
