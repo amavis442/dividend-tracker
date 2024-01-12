@@ -19,6 +19,10 @@ final class Version20240112162047 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        $this->addSql('UPDATE position SET closed=false WHERE closed IS NULL');
+        $this->addSql('UPDATE position SET ignore_for_dividend=false WHERE ignore_for_dividend IS NULL');
+
+
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE position ALTER closed SET DEFAULT false');
         $this->addSql('ALTER TABLE position ALTER ignore_for_dividend SET DEFAULT false');
