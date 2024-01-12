@@ -32,8 +32,8 @@ class Position
     #[ORM\JoinColumn(nullable: false)]
     private $ticker;
 
-    #[ORM\Column(type: 'boolean', nullable: true)]
-    private $closed;
+    #[ORM\Column(type: 'boolean', nullable: false, options: ["default" => false])]
+    private bool $closed = false;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     private $profit;
@@ -88,8 +88,8 @@ class Position
     #[ORM\Column(type: 'integer', nullable: true)]
     private $maxAllocation;
 
-    #[ORM\Column(nullable: true)]
-    private ?bool $ignore_for_dividend = null;
+    #[ORM\Column(type: 'boolean', options: ["default" => false])]
+    private bool $ignore_for_dividend = false;
 
     public function __construct()
     {
@@ -154,12 +154,12 @@ class Position
         return $this;
     }
 
-    public function getClosed(): ?bool
+    public function getClosed(): bool
     {
         return $this->closed;
     }
 
-    public function setClosed(?bool $closed): self
+    public function setClosed(bool $closed): self
     {
         $this->closed = $closed;
 
