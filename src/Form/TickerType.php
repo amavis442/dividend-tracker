@@ -26,6 +26,7 @@ class TickerType extends AbstractType
                 'choice_label' => 'dividendMonth',
                 'multiple' => true,
                 'expanded' => true,
+                'help' => 'Pay date'
             ])
             ->add('branch', EntityType::class, [
                 'class' => Branch::class,
