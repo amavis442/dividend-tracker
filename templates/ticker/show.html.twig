@@ -13,7 +13,7 @@
                 <td>{{ ticker.id }}</td>
             </tr>
             <tr>
-                <th>Ticker</th>
+                <th>{{'Ticker'|trans }}</th>
                 <td>{{ ticker.ticker }}</td>
             </tr>
             <tr>
@@ -21,11 +21,23 @@
                 <td>{{ ticker.isin }}</td>
             </tr>
             <tr>
-                <th>Fullname</th>
+                <th>{{'Fullname'|trans }}</th>
                 <td>{{ ticker.fullname }}</td>
             </tr>
             <tr>
-                <th>Research info</th>
+                <th>{{'Dividend currency'|trans }}</th>
+                <td>{{ ticker.currency ? ticker.currency.symbol : 'USD' }}</td>
+            </tr>
+            <tr>
+                <th>{{'Dividend months'|trans }}</th>
+                <td>
+                    {% for m in ticker.dividendMonths %}
+                        {{ m.dividendMonth }},
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <th>{{'Research info'|trans }}</th>
                 <td>
                     {% for research in ticker.researches %}
 
@@ -50,7 +62,7 @@
                                     </a>
                                 </div>
                                 <div class="card-footer text-muted">
-                                    {{ 'Created'|trans }}: {{ research.createdAt ? research.createdAt|date('Y-m-d H:i:s') : '-' }}, 
+                                    {{ 'Created'|trans }}: {{ research.createdAt ? research.createdAt|date('Y-m-d H:i:s') : '-' }},
                                     {{ 'Modified'|trans }}: {{ research.updatedAt ? research.updatedAt|date('Y-m-d H:i:s') : '-' }}
                                 </div>
                             </div>
@@ -67,7 +79,7 @@
         <div class="btn-group mr-2" role="group" aria-label="First group">
             <a href="{{ path('ticker_index') }}" class="btn btn-secondary">
                 <i class="fas fa-angle-double-left"></i>
-                back to list</a>
+                {{'back to list'|trans}}</a>
         </div>
         <div class="btn-group mr-2" role="group" aria-label="Second group">
             <a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit ticker">

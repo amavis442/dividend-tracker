@@ -113,7 +113,7 @@ class DividendDateCommand extends Command
                     $currencySymbol = $payment['Currency'];
                     $currency = $this->currencyRepository->findOneBy(['symbol' => $currencySymbol]);
                     if (!$currency) {
-                        $currency = $defaultCurrency;
+                        $currency = $ticker->getCurrency() ? $ticker->getCurrency() : $defaultCurrency;
                     }
                     try {
                         $payDate = new DateTime($payment['PayDate']);
@@ -142,7 +142,15 @@ class DividendDateCommand extends Command
                     if (stripos($payment['Type'], 'Extra') !== false) {
                         $calendar->setDividendType(Calendar::SUPPLEMENT);
                     }
-                    $this->calendarRepository->save($calendar, true);
+                    try {
+                        $this->calendarRepository->save($calendar, true);
+                    } catch (Exception $e) {
+                        $this->logger->alert('Saving date exception: ' . print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
+                        $this->logger->alert('Saving date exception (data): ' . print_r($data, true));
+                        $this->logger->alert('Saving date exception message:  ' . $e->getMessage());
+
+                        throw $e;
+                    }
 
                     $addedForTicker[] = $ticker->getSymbol();
                     $addedDates++;

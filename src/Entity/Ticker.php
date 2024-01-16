@@ -50,6 +50,9 @@ class Ticker
     #[ORM\ManyToOne(targetEntity: Tax::class, inversedBy: 'tickers')]
     private $tax;
 
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
+    private $currency;
+
     public function __construct()
     {
         $this->calendars = new ArrayCollection();
@@ -157,16 +160,19 @@ class Ticker
             $isRegularDividend = true;
         }
 
-        if (!$isRegularDividend &&
+        if (
+            !$isRegularDividend &&
             $this->calendars[1]->getPaymentDate()->format('Ymd') === $this->calendars[0]->getPaymentDate()->format('Ymd') &&
-            $this->calendars[1]->getDividendType() === Calendar::REGULAR) {
+            $this->calendars[1]->getDividendType() === Calendar::REGULAR
+        ) {
             $index = 1;
             $isRegularDividend = true;
-
         }
-        if (!$isRegularDividend &&
+        if (
+            !$isRegularDividend &&
             $this->calendars[2]->getPaymentDate()->format('Ymd') === $this->calendars[0]->getPaymentDate()->format('Ymd') &&
-            $this->calendars[2]->getDividendType() === Calendar::REGULAR) {
+            $this->calendars[2]->getDividendType() === Calendar::REGULAR
+        ) {
             $index = 2;
             $isRegularDividend = true;
         }
@@ -298,6 +304,18 @@ class Ticker
     public function setTax(?Tax $tax): self
     {
         $this->tax = $tax;
+
+        return $this;
+    }
+
+    public function getCurrency(): ?Currency
+    {
+        return $this->currency;
+    }
+
+    public function setCurrency(?Currency $currency): self
+    {
+        $this->currency = $currency;
 
         return $this;
     }

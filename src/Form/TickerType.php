@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Doctrine\ORM\EntityRepository;
+use App\Entity\Currency;
 
 class TickerType extends AbstractType
 {
@@ -36,6 +37,15 @@ class TickerType extends AbstractType
                     return $er->createQueryBuilder('b')
                         ->orderBy('b.label', 'ASC');
                 },
+            ])
+            ->add('currency', EntityType::class, [
+                'class' => Currency::class,
+                'choice_label' => function ($currency) {
+                    return $currency->getSymbol();
+                },
+                'required' => true,
+                'empty_data' => 'USD',
+                'help' => 'Currency dividend will be paid out',
             ])
             ->add('tax', EntityType::class, [
                 'class' => Tax::class,

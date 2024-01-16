@@ -135,7 +135,7 @@ class Calendar
 
     public function setCashAmount(float $cashAmount): self
     {
-        $this->cashAmount = $cashAmount * Constants::VALUTA_PRECISION;
+        $this->cashAmount = number_format($cashAmount, 3) * Constants::VALUTA_PRECISION;
 
         return $this;
     }
