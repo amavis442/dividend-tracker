@@ -19,14 +19,9 @@ doctrine:
                 enabled: false
         dql:
             datetime_functions:
-                DAY: DoctrineExtensions\Query\Mysql\Day
-                MONTH: DoctrineExtensions\Query\Mysql\Month
-                YEAR: DoctrineExtensions\Query\Mysql\Year
-                #MAX: DoctrineExtensions\Query\Mysql\Max
-                #MIN: DoctrineExtensions\Query\Mysql\Min
-                DATEADD: DoctrineExtensions\Query\Mysql\DateAdd
-                DATESUB: DoctrineExtensions\Query\Mysql\DateSub
-
+                DAY: DoctrineExtensions\Query\Postgresql\Day
+                MONTH: DoctrineExtensions\Query\Postgresql\Month
+                YEAR: DoctrineExtensions\Query\Postgresql\Year
 when@test:
     doctrine:
         dbal:
