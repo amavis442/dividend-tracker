@@ -3,11 +3,11 @@
 namespace App\EventListener;
 
 use DateTime;
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\PrePersistEventArgs;
 
 class CreatedAtTimestamp
 {
-    public function prePersist(LifecycleEventArgs $args)
+    public function prePersist(PrePersistEventArgs $args)
     {
         $entity = $args->getObject();
 

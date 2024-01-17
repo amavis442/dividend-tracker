@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\Referer;
 
 #[Route(path: '/dashboard/ticker')]
 class TickerController extends AbstractController
@@ -70,14 +71,18 @@ class TickerController extends AbstractController
     }
 
     #[Route(path: '/{id}/edit', name: 'ticker_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, EntityManagerInterface $entityManager, Ticker $ticker): Response
+    public function edit(Request $request, Referer $referer, EntityManagerInterface $entityManager, Ticker $ticker): Response
     {
+
         $form = $this->createForm(TickerType::class, $ticker);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
+            if ($referer->get()) {
+                return $this->redirect($referer->get());
+            }
             return $this->redirectToRoute('ticker_index');
         }
 
@@ -88,7 +93,7 @@ class TickerController extends AbstractController
     }
 
     #[Route(path: '/{id}', name: 'ticker_delete', methods: ['DELETE'])]
-    public function delete(Request $request,EntityManagerInterface $entityManager, Ticker $ticker): Response
+    public function delete(Request $request, EntityManagerInterface $entityManager, Ticker $ticker): Response
     {
         if ($this->isCsrfTokenValid('delete' . $ticker->getId(), $request->request->get('_token'))) {
             $entityManager->remove($ticker);

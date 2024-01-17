@@ -7,8 +7,15 @@ import 'summernote/dist/summernote-bs4.css';
 
 const $ = jQuery;
 
-jQuery(function () {
+$(function () {
+  var noteHeight = 450;
+  var noteElement = $('.summernote');
+
+  if (typeof noteElement.data('noteHeight') !== 'undefined') {
+    noteHeight = noteElement.data('noteHeight');
+  }
+
   $(".summernote").summernote({
-    height: 450,   //set editable area's height
+    height: noteHeight,   //set editable area's height
   });
 });

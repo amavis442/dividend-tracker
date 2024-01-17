@@ -12,6 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Doctrine\ORM\EntityRepository;
 use App\Entity\Currency;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class TickerType extends AbstractType
 {
@@ -21,12 +22,9 @@ class TickerType extends AbstractType
             ->add('ticker')
             ->add('fullname')
             ->add('isin')
-            ->add('dividendMonths', EntityType::class, [
-                'class' => DividendMonth::class,
-                'choice_label' => 'dividendMonth',
-                'multiple' => true,
-                'expanded' => true,
-                'help' => 'Pay date'
+            ->add("description", TextareaType::class, [
+                'required' => false,
+                'attr' => ['class' => 'summernote', 'style' => 'display:none;height:100;', 'data-note-height' => '200']
             ])
             ->add('branch', EntityType::class, [
                 'class' => Branch::class,
@@ -47,6 +45,13 @@ class TickerType extends AbstractType
                 'required' => true,
                 'empty_data' => 'USD',
                 'help' => 'Currency dividend will be paid out',
+            ])
+            ->add('dividendMonths', EntityType::class, [
+                'class' => DividendMonth::class,
+                'choice_label' => 'dividendMonth',
+                'multiple' => true,
+                'expanded' => true,
+                'help' => 'Pay date'
             ])
             ->add('tax', EntityType::class, [
                 'class' => Tax::class,

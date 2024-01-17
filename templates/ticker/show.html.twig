@@ -36,6 +36,24 @@
                     {% endfor %}
                 </td>
             </tr>
+                        <tr>
+                <th>{{'Company details'|trans }}</th>
+                <td>
+                    <div class="card" style="width: 100%;">
+                        <div class="card-body">
+                            <p class="card-text">{{ ticker.description|raw }}</p>
+                            <hr/>
+                            <a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="card-link">
+                                <i class="far fa-edit"></i>
+                            </a>
+                        </div>
+                        <div class="card-footer text-muted">
+                            {{ 'Created'|trans }}: {{ ticker.createdAt ? ticker.createdAt|date('Y-m-d H:i:s') : '-' }},
+                            {{ 'Modified'|trans }}: {{ ticker.updatedAt ? ticker.updatedAt|date('Y-m-d H:i:s') : '-' }}
+                        </div>
+                    </div>
+                </td>
+            </tr>
             <tr>
                 <th>{{'Research info'|trans }}</th>
                 <td>

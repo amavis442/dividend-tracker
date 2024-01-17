@@ -1,4 +1,21 @@
 <h2>{{ 'Research info'|trans }}</h2>
+
+<p>
+		<div class="card" style="width: 100%;">
+			<div class="card-body">
+				<h5 class="card-title">{{ 'Company details'|trans }}</h5>
+				<p class="card-text">{{ ticker.description|raw }}</p>
+				<hr/>
+				<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="card-link">
+					<i class="far fa-edit"></i>
+				</a>
+			</div>
+		</div>
+</p>
+
+
+
+
 {% for research in ticker.researches %}
 	<p>
 		<div class="card" style="width: 100%;">
@@ -20,7 +37,7 @@
 				</a>
 			</div>
 			<div class="card-footer text-muted">
-                {{ 'Created'|trans }}: {{ research.createdAt ? research.createdAt|date('Y-m-d H:i:s') : '-' }}, 
+                {{ 'Created'|trans }}: {{ research.createdAt ? research.createdAt|date('Y-m-d H:i:s') : '-' }},
                 {{ 'Modified'|trans }}: {{ research.updatedAt ? research.updatedAt|date('Y-m-d H:i:s') : '-' }}
             </div>
 		</div>
