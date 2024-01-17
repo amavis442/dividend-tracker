@@ -1,26 +1,28 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Pie{% endblock %}
+{% block title %}
+  Pie
+{% endblock %}
 
 {% block body %}
-    <h1>Pie</h1>
+  <h1>Pie</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ pie.id }}</td>
-            </tr>
-            <tr>
-                <th>Label</th>
-                <td>{{ pie.label }}</td>
-            </tr>
-        </tbody>
-    </table>
+  <table class="table">
+    <tbody>
+      <tr>
+        <th>Id</th>
+        <td>{{ pie.id }}</td>
+      </tr>
+      <tr>
+        <th>Label</th>
+        <td>{{ pie.label }}</td>
+      </tr>
+    </tbody>
+  </table>
 
-    <a href="{{ path('pie_index') }}">back to list</a>
+  <a href="{{ path('pie_index') }}" class="btn btn-primary">{{ 'back to list'|trans }}</a>
 
-    <a href="{{ path('pie_edit', {'id': pie.id}) }}">edit</a>
+  <a href="{{ path('pie_edit', { id: pie.id }) }}" class="btn btn-secondary">{{ 'edit'|trans }}</a>
 
-    {{ include('pie/_delete_form.html.twig') }}
+  {{ include('pie/_delete_form.html.twig') }}
 {% endblock %}

@@ -68,7 +68,7 @@ class PieController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'pie_delete', methods: ['DELETE'])]
+    #[Route(path: '/delete/{id}', name: 'pie_delete', methods: ['POST', 'DELETE'])]
     public function delete(Request $request, EntityManagerInterface $entityManager, Pie $pie): Response
     {
         if ($this->isCsrfTokenValid('delete' . $pie->getId(), $request->request->get('_token'))) {
