@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Research;
 use App\Entity\Ticker;
-use App\Entity\Files;
 use App\Entity\Attachment;
 use App\Form\ResearchType;
 use App\Repository\ResearchRepository;
@@ -180,7 +179,7 @@ class ResearchController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'research_delete', methods: ['DELETE'])]
+    #[Route(path: '/delete/{id}', name: 'research_delete', methods: ['POST', 'DELETE'])]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,

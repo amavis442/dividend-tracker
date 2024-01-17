@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\ORM\EntityManagerInterface;
 
 #[Route(path: '/dashboard/tax')]
 class TaxController extends AbstractController
@@ -66,7 +67,7 @@ class TaxController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'tax_delete', methods: ['DELETE'])]
+    #[Route(path: '/delete/{id}', name: 'tax_delete', methods: ['POST', 'DELETE'])]
     public function delete(Request $request, EntityManagerInterface $entityManager, Tax $tax): Response
     {
         if ($this->isCsrfTokenValid('delete' . $tax->getId(), $request->request->get('_token'))) {

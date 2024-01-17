@@ -139,7 +139,7 @@ class PositionController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'position_delete', methods: ['DELETE'])]
+    #[Route(path: '/delte/{id}', name: 'position_delete', methods: ['POST', 'DELETE'])]
     public function delete(Request $request, EntityManagerInterface $entityManager, Position $position): Response
     {
         if ($this->isCsrfTokenValid('delete' . $position->getId(), $request->request->get('_token'))) {

@@ -34,9 +34,9 @@ class TaxonomyController extends AbstractController
             return $this->redirectToRoute('app_taxonomy_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('taxonomy/new.html.twig', [
+        return $this->render('taxonomy/new.html.twig', [
             'taxonomy' => $taxonomy,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -60,16 +60,16 @@ class TaxonomyController extends AbstractController
             return $this->redirectToRoute('app_taxonomy_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('taxonomy/edit.html.twig', [
+        return $this->render('taxonomy/edit.html.twig', [
             'taxonomy' => $taxonomy,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'app_taxonomy_delete', methods: ['POST'])]
+    #[Route(path: '/delete/{id}', name: 'app_taxonomy_delete', methods: ['POST'])]
     public function delete(Request $request, Taxonomy $taxonomy, TaxonomyRepository $taxonomyRepository): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$taxonomy->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $taxonomy->getId(), $request->request->get('_token'))) {
             $taxonomyRepository->remove($taxonomy, true);
         }
 

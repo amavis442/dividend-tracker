@@ -159,7 +159,7 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'calendar_delete', methods: ['POST'])]
+    #[Route(path: '/delete/{id}', name: 'calendar_delete', methods: ['POST'])]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,

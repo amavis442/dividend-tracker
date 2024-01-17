@@ -92,7 +92,7 @@ class TickerController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'ticker_delete', methods: ['DELETE'])]
+    #[Route(path: '/delete/{id}', name: 'ticker_delete', methods: ['POST', 'DELETE'])]
     public function delete(Request $request, EntityManagerInterface $entityManager, Ticker $ticker): Response
     {
         if ($this->isCsrfTokenValid('delete' . $ticker->getId(), $request->request->get('_token'))) {

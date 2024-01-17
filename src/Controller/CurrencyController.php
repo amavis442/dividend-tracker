@@ -68,7 +68,7 @@ class CurrencyController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'currency_delete', methods: ['DELETE'])]
+    #[Route(path: '/delete/{id}', name: 'currency_delete', methods: ['POST', 'DELETE'])]
     public function delete(Request $request, EntityManagerInterface $entityManager, Currency $currency): Response
     {
         if ($this->isCsrfTokenValid('delete' . $currency->getId(), $request->request->get('_token'))) {

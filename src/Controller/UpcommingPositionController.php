@@ -48,7 +48,7 @@ class UpcommingPositionController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'upcomming_position_delete', methods: ['DELETE'])]
+    #[Route(path: '/delete/{id}', name: 'upcomming_position_delete', methods: ['POST', 'DELETE'])]
     public function delete(Request $request, EntityManagerInterface $entityManager, Position $position): Response
     {
         if ($this->isCsrfTokenValid('delete' . $position->getId(), $request->request->get('_token'))) {

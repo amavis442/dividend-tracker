@@ -7,7 +7,7 @@ use App\Entity\Transaction;
 use App\Form\TransactionType;
 use App\Repository\CurrencyRepository;
 use App\Repository\TransactionRepository;
-use App\Service\ExchangeRateService;
+use App\Service\ExchangeRate\ExchangeRateService;
 use App\Service\Referer;
 use App\Service\WeightedAverage;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;

@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/dashboard/branch')]
 class BranchController extends AbstractController
 {
-    #[Route('/list/{page<\d+>?1}', name:'branch_index', methods: ['GET'])]
+    #[Route('/list/{page<\d+>?1}', name: 'branch_index', methods: ['GET'])]
     public function index(BranchRepository $branchRepository, int $page = 1): Response
     {
         $items = $branchRepository->getAll($page);
@@ -34,7 +34,7 @@ class BranchController extends AbstractController
         ]);
     }
 
-    #[Route('/create', name:'branch_new', methods: ['GET', 'POST'])]
+    #[Route('/create', name: 'branch_new', methods: ['GET', 'POST'])]
     public function create(Request $request, BranchRepository $branchRepository, EntityManagerInterface $entityManager): Response
     {
         $branch = new Branch();
@@ -61,7 +61,7 @@ class BranchController extends AbstractController
     }
 
 
-    #[Route('/{id}', name:'branch_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'branch_show', methods: ['GET'])]
     public function show(Branch $branch): Response
     {
         return $this->render('branch/show.html.twig', [
@@ -69,7 +69,7 @@ class BranchController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name:'branch_edit', methods: ['GET','POST'])]
+    #[Route('/{id}/edit', name: 'branch_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -97,7 +97,7 @@ class BranchController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name:'branch_delete', methods: ['DELETE'])]
+    #[Route('/delete/{id}', name: 'branch_delete', methods: ['POST', 'DELETE'])]
     public function delete(Request $request, EntityManagerInterface $entityManager, Branch $branch): Response
     {
         if ($this->isCsrfTokenValid('delete' . $branch->getId(), $request->request->get('_token'))) {

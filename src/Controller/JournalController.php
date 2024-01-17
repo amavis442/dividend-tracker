@@ -95,7 +95,7 @@ class JournalController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'journal_delete', methods: ['DELETE'])]
+    #[Route(path: '/delete/{id}', name: 'journal_delete', methods: ['POST', 'DELETE'])]
     public function delete(Request $request, EntityManagerInterface $entityManager, Journal $journal): Response
     {
         if ($this->isCsrfTokenValid('delete' . $journal->getId(), $request->request->get('_token'))) {

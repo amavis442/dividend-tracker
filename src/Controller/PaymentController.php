@@ -220,7 +220,7 @@ class PaymentController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'payment_delete', methods: ['DELETE'])]
+    #[Route(path: '/delete/{id}', name: 'payment_delete', methods: ['POST', 'DELETE'])]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,
