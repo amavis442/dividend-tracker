@@ -1,9 +1,10 @@
 {% import _self as formMacros %}
 
 {% macro printAttachmentRow(attachmentForm) %}
-<a href="#" class="removeAttachment pull-right">
-    <span class="fa fa-close"></span>
-</a>
+<button class="btn btn-danger removeAttachmentRow pull-right">
+    <i class="fa fa-minus"></i>
+</button>
+
 {{ form_errors(attachmentForm) }}
 <div class="col-sm-4">
 </div>
@@ -39,7 +40,7 @@
 
             <input type="hidden" name="attachments[{{ attachmentForm.vars.value.id}}]" value="{{ attachmentForm.vars.value.id}}">
             <div class="col-sm-4">
-                <a href="{{ asset('uploads/documents/' ~ attachmentForm.vars.value.attachmentName) }}" target='_blank'>
+                <a href="{{ asset('uploads/documents/' ~ attachmentForm.vars.value.attachmentName) }}" target="_blank">
                 {% if attachmentForm.vars.value.label %}
                     {{ attachmentForm.vars.value.label }}
                 {% else %}

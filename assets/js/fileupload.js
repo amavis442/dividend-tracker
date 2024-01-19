@@ -39,7 +39,7 @@ function removeFile(ob) {
   }
 }
 
-function removeAttachment(ob) {
+function removeRow(ob) {
   ob.parent().remove();
 }
 
@@ -65,13 +65,15 @@ jQuery(function () {
     addTagForm(collectionHolder, newLinkLi);
   });
 
-  $('.removeFile').on('click', function () {
+  $('.removeFile').on('click', function (event) {
+    event.preventDefault();
     // add a new tag form (see next code block)
     removeFile($(this));
   });
 
-  $(document).on('click', '.removeAttachment', '', function () {
-    // add a new tag form (see next code block)
-    removeAttachment($(this));
+  $(document).on('click', '.removeAttachmentRow', '', function (event) {
+    event.preventDefault();
+    // remove tag form (see next code block)
+    removeRow($(this));
   });
 });
