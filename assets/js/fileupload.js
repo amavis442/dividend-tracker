@@ -39,6 +39,10 @@ function removeFile(ob) {
   }
 }
 
+function removeAttachment(ob) {
+  ob.parent().remove();
+}
+
 // setup an "add a tag" link
 var addTagButton = $('#addTagButton');
 // var $addTagButton = $('<button type="button" class="btn btn-warning">Add a attachment</button>');
@@ -64,5 +68,10 @@ jQuery(function () {
   $('.removeFile').on('click', function () {
     // add a new tag form (see next code block)
     removeFile($(this));
+  });
+
+  $(document).on('click', '.removeAttachment', '', function () {
+    // add a new tag form (see next code block)
+    removeAttachment($(this));
   });
 });

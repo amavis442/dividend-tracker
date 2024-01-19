@@ -17,7 +17,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ResearchType extends AbstractType
 {
     private $tickerRepository;
-    private $transformer;
 
     public function __construct(TickerRepository $tickerRepository)
     {

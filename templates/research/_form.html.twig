@@ -1,31 +1,31 @@
 {% import _self as formMacros %}
 
-{% macro printGenusScientistRow(genusScientistForm) %}
-<a href="#" class="js-remove-scientist pull-right">
+{% macro printAttachmentRow(attachmentForm) %}
+<a href="#" class="removeAttachment pull-right">
     <span class="fa fa-close"></span>
 </a>
-{{ form_errors(genusScientistForm) }}
+{{ form_errors(attachmentForm) }}
 <div class="col-sm-4">
 </div>
 <div class="col-sm-4">
-    {{ form_widget(genusScientistForm.label) }}
+    {{ form_widget(attachmentForm.label) }}
 </div>
 <div class="col-sm-4">
     <button id="btnUpload__name__" class="btn btn-info">upload</button>
 </div>
 <div style="display:none">
-{{ form_widget(genusScientistForm.attachmentFile) }}
+{{ form_widget(attachmentForm.attachmentFile) }}
 </div>
 {% endmacro %}
-    
+
 
 {{ form_start(form, { 'attr': {'autocomplete': 'off'} }) }}
     {{ form_row(form.ticker) }}
     {{ form_row(form.title) }}
     {{ form_row(form.info) }}
     <hr/>
-    <ul class="attachments list-group" style="list-style: none;" 
-    data-prototype="{{ formMacros.printGenusScientistRow(form.attachments.vars.prototype)|e('html_attr') }}"
+    <ul class="attachments list-group" style="list-style: none;"
+    data-prototype="{{ formMacros.printAttachmentRow(form.attachments.vars.prototype)|e('html_attr') }}"
     data-index="{{ form.attachments|length }}" >
     {% for attachmentForm in form.attachments %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -37,7 +37,7 @@
                 <input type="text" class="form-control" name="attachment_labels[{{ attachmentForm.vars.value.id}}]" value="{{ attachmentForm.vars.value.label }}"/>
             </div>
 
-            <input type="hidden" name="attachments[{{ attachmentForm.vars.value.id}}]" value="{{ attachmentForm.vars.value.id}}"> 
+            <input type="hidden" name="attachments[{{ attachmentForm.vars.value.id}}]" value="{{ attachmentForm.vars.value.id}}">
             <div class="col-sm-4">
                 <a href="{{ asset('uploads/documents/' ~ attachmentForm.vars.value.attachmentName) }}" target='_blank'>
                 {% if attachmentForm.vars.value.label %}
