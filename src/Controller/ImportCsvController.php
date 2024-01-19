@@ -51,7 +51,7 @@ class ImportCsvController extends AbstractController
             // so the CSV file must be processed only when a file is uploaded
             if ($transactionFile) {
                 $currency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
-                $branch = $branchRepository->findOneBy(['label' => 'Tech']);
+                $branch = $branchRepository->findOneBy(['label' => 'Techniek']);
                 try {
                     $result = $importCsv->importFile(
                         $entityManager,

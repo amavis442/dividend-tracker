@@ -7,6 +7,7 @@ use App\Entity\Constants;
 use App\Entity\Currency;
 use App\Entity\Payment;
 use App\Entity\Transaction;
+use App\Entity\Tax;
 use App\Repository\BranchRepository;
 use App\Repository\CalendarRepository;
 use App\Repository\CurrencyRepository;
@@ -305,7 +306,7 @@ class ImportCsvService extends ImportBase
         PositionRepository $positionRepository,
         WeightedAverage $weightedAverage,
         Currency $currency,
-        Branch $branch,
+        ?Branch $branch,
         TransactionRepository $transactionRepository,
         TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
@@ -329,6 +330,21 @@ class ImportCsvService extends ImportBase
         $reader->close();
 
         $defaultTax = $taxRepository->find(1);
+        if (!$defaultTax) {
+            $defaultTax = new Tax();
+            $defaultTax->setTaxRate(15);
+            $entityManager->persist($branch);
+            $entityManager->flush();
+        }
+
+        if (!$branch) {
+            $branch = new Branch();
+            $branch->setLabel('Unassigned');
+            $branch->setDescription('Unassigned');
+            $entityManager->persist($branch);
+            $entityManager->flush();
+        }
+
 
         if (count($rows) > 0) {
             foreach ($rows as $row) {
