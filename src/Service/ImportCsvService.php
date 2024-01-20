@@ -375,6 +375,12 @@ class ImportCsvService extends ImportBase
                         ->setFinraFee($row['finra_fee'] ?? 0)
                         ->setTransactionFee($row['transaction_fee'] ?? 0)
                         ->setTotal($row['total'] ?? 0);
+
+                    $pies = $position->getPies();
+                    if (count($pies) == 1) {
+                        $transaction->setPie($pies[0]);
+                    }
+
                     if ($row['direction'] == Transaction::SELL) {
                         $transaction->setProfit($row['profit']);
                     }
