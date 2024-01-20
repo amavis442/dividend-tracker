@@ -13,7 +13,7 @@ class Payouts
         $labels = [];
         $dates = array_keys($data);
         foreach ($dates as $date) {
-            $labels[] = strftime('%b %Y', strtotime($date . '01'));
+            $labels[] =  (new \DateTime($date . '01'))->format('Y M');
         }
 
         foreach ($data as $item) {

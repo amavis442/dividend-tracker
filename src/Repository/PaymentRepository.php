@@ -6,6 +6,7 @@ use App\Entity\Constants;
 use App\Entity\Payment;
 use App\Entity\Position;
 use App\Entity\Ticker;
+use App\Entity\User;
 use App\Helper\DateHelper;
 use DateTime;
 use DateTimeInterface;
@@ -165,7 +166,7 @@ class PaymentRepository extends ServiceEntityRepository
         return $output;
     }
 
-    public function getDividendsPerInterval(UserInterface $user, string $interval = 'Month'): array
+    public function getDividendsPerInterval(User $user, string $interval = 'Month'): array
     {
         $con = $this->getEntityManager()->getConnection();
         $em = $this->getEntityManager();
@@ -175,7 +176,8 @@ class PaymentRepository extends ServiceEntityRepository
             ->join('p.user', 'u')
             ->where('u.id = :userID')
             ->setParameter('userID', $user->getId())
-            ->groupBy('periodYear, periodMonth');
+            ->groupBy('periodYear, periodMonth')
+            ->orderBy('periodYear, periodMonth');
 
         $result = $qb->getQuery()->getResult();
 
