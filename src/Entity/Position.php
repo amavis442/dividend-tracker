@@ -178,14 +178,6 @@ class Position
         return $this;
     }
 
-    public function getProfitPercentage(): ?float
-    {
-        if ($this->closed == 1 && $this->allocation > 0) {
-            return ((($this->closePrice - $this->price) * $this->amount) / $this->allocation);
-        }
-        return null;
-    }
-
     public function getAllocated(): float
     {
         return round(($this->getAmount() * $this->getPrice()), 3);
