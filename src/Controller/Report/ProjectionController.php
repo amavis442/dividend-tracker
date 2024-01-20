@@ -17,7 +17,7 @@ class ProjectionController extends AbstractController
 {
     public const TAX_DIVIDEND = 0.15; // %
     public const EXCHANGE_RATE = 1.19; // dollar to euro
-    public const YIELD_PIE_KEY = 'yeildpie_searchPie';
+    public const YIELD_PIE_KEY = 'yieldpie_searchPie';
 
     #[Route(path: '/projection/{projectionyear<\d+>?1}', name: 'report_dividend_projection')]
     public function index(

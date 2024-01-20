@@ -41,7 +41,7 @@ class ProjectionModel
     private function calcEstimatePayoutPerMonth(array &$dividendEstimate)
     {
         foreach ($dividendEstimate as $date => &$estimate) {
-            $d = strftime('%B %Y', strtotime($date . '01'));
+            $d = (new \DateTime($date . '01'))->format('F Y');
             $labels[] = $d;
             $estimate['normaldate'] = $d;
         }
@@ -227,7 +227,7 @@ class ProjectionModel
             foreach ($d as $month => $dividendMonth) {
                 $receivedDividendMonth = 0.0;
                 $paydate = sprintf("%4d%02d", $year, $month);
-                $normalDate = strftime('%B %Y', strtotime($paydate . '01'));
+                $normalDate = (new \DateTime($paydate . '01'))->format('F Y');
                 $dataSource[$paydate] = [];
                 if (!isset($dividendEstimate[$paydate])) {
                     $parent->initEmptyDatasourceItem($dataSource, $dividendMonth, $paydate, $normalDate);
