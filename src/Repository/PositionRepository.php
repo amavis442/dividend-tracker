@@ -80,9 +80,9 @@ class PositionRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('p')
             ->innerJoin('p.transactions', 't')
-            ->where('p.closed = false')
-            ->orWhere('p.closed = true and t.transactionDate > :closedAt')
-            ->setParameter('closedAt', (new DateTime('-3 days'))->format('Y-m-d'));
+            ->where('p.closed = false');
+        //->orWhere('p.closed = true and t.transactionDate > :closedAt')
+        //->setParameter('closedAt', (new DateTime('-3 days'))->format('Y-m-d'));
 
         return $queryBuilder->getQuery()->getResult();
     }

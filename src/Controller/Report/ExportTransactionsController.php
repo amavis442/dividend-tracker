@@ -69,7 +69,7 @@ class ExportTransactionsController extends AbstractController
                 $total = $transaction->getTotal();
                 $row['Datum'] = $transaction->getTransactionDate()->format('Y-m-d');
                 $row['Tijd'] = $transaction->getTransactionDate()->format('H:i:s');
-                $row['Type'] = $transaction->getSide() == Transaction::BUY ? 'Koop' : 'Verkoop';
+                $row['Type'] = $transaction->getSide() == Transaction::BUY ? 'Aankoop' : 'Verkoop';
                 $grossValue = $transaction->getAmount() * $transaction->getOriginalPrice();
                 $exchangerate = 1 / $transaction->getExchangeRate();
                 $row['Waarde'] = number_format($total, 2, ',', '.');
@@ -102,7 +102,7 @@ class ExportTransactionsController extends AbstractController
     }
 
 
-        #[Route(path: '/exportdividend', name: 'report_export_dividend')]
+    #[Route(path: '/exportdividend', name: 'report_export_dividend')]
     public function dividend(PaymentRepository $paymentRepository): Response
     {
         $fname = 'export-dividend-' . date('Ymd') . '.csv';
