@@ -231,7 +231,7 @@ class ImportCsvService extends ImportBase
                         $row['original_price_currency'] = $val;
                         break;
                     case 'exchange rate':
-                        $row['wisselkoersen'] = $val;
+                        $row['exchange_rate'] = $val;
                         break;
                     case 'result':
                         $row['profit'] = (float)$val;
@@ -289,9 +289,9 @@ class ImportCsvService extends ImportBase
             };
 
             if (count($row) > 0) {
-                $rawAllocation -= (($row['fx_fee'] ?? 0) + ($row['stampduty'] ?? 0) + ($row['transaction_fee'] ?? 0) + ($row['finra_fee'] ?? 0));
-                $row['allocation'] = $rawAllocation;
-                $row['price'] = round($rawAllocation / $rawAmount, 3);
+                //$rawAllocation -= (($row['fx_fee'] ?? 0) + ($row['stampduty'] ?? 0) + ($row['transaction_fee'] ?? 0) + ($row['finra_fee'] ?? 0));
+                $row['allocation'] = $row['total'];
+                $row['price'] = round($row['original_price'] / $row['exchange_rate'], 3);
                 $rows[$row['nr']] = $row;
             }
             $rowNum++;
@@ -364,7 +364,7 @@ class ImportCsvService extends ImportBase
                         ->setAllocationCurrency($currency)
                         ->setCurrency($currency)
                         ->setPosition($position)
-                        ->setExchangeRate($row['wisselkoersen'])
+                        ->setExchangeRate($row['exchange_rate'])
                         ->setJobid($row['opdrachtid'])
                         ->setMeta($row['nr'])
                         ->setImportfile($file)

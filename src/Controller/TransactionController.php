@@ -61,14 +61,19 @@ class TransactionController extends AbstractController
 
     private function presetMetrics(Transaction $transaction)
     {
-        if ($transaction->getAllocation() && empty($transaction->getPrice())) {
-            $transaction->setPrice($transaction->getAllocation() / $transaction->getAmount());
+        /*if ($transaction->getAllocation() && empty($transaction->getPrice())) {
+            $transaction->setPrice($transaction->getOriginalPrice() / (float)$transaction->getExchangeRate());
             $transaction->setCurrency($transaction->getAllocationCurrency());
         }
         if ($transaction->getPrice() && empty($transaction->getAllocation())) {
-            $transaction->setAllocation($transaction->getPrice() * $transaction->getAmount());
+            $transaction->setAllocation($transaction->getTotal());
             $transaction->setAllocationCurrency($transaction->getCurrency());
-        }
+        }*/
+
+        $transaction->setPrice($transaction->getOriginalPrice() / $transaction->getExchangeRate());
+        $transaction->setCurrency($transaction->getAllocationCurrency());
+        $transaction->setAllocation($transaction->getTotal());
+        $transaction->setAllocationCurrency($transaction->getCurrency());
     }
 
     #[Route(path: '/create/{position}/{side?1}', name: 'transaction_new', methods: ['GET', 'POST'])]

@@ -49,7 +49,7 @@ class WeightedAverage
             $allocation = $transaction->getAllocation();
 
             if ($transaction->getSide() === Transaction::BUY) {
-                $costBase += $allocation;
+                $costBase += $allocation - $transaction->getFxFee() - $transaction->getTransactionFee() - $transaction->getFinraFee();
                 $numShares += $amount;
             }
 
@@ -57,7 +57,7 @@ class WeightedAverage
                 $calcAllocation = $amount * $avgPrice;
                 $profit = $transaction->getProfit(); //round($allocation - $calcAllocation, 3);
                 $numShares -= $amount;
-                $costBase -= $calcAllocation;//$allocation;
+                $costBase -= $calcAllocation; //$allocation;
                 $totalProfit += $profit;
             }
 

@@ -262,9 +262,9 @@ class Transaction
         return $this;
     }
 
-    public function getExchangeRate(): ?string
+    public function getExchangeRate(): ?float
     {
-        return $this->exchangeRate;
+        return (float)$this->exchangeRate;
     }
 
     public function setExchangeRate(?string $exchangeRate): self
