@@ -103,7 +103,9 @@ class Export
     private function getData(Collection $positions): array
     {
         $data = [];
-
+        /**
+         * @var \App\Entity\Position $position
+         */
         foreach ($positions as $position) {
             if ($position->getClosed()) {
                 continue;

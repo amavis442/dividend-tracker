@@ -17,10 +17,19 @@ class DividendTracker
     #[ORM\Column(type: 'date')]
     private $sampleDate;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $principle;
 
-    #[ORM\Column(type: 'integer')]
+
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $dividend;
 
     #[ORM\Column(type: 'datetime')]
@@ -29,11 +38,6 @@ class DividendTracker
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'dividendTrackers')]
     #[ORM\JoinColumn(nullable: false)]
     private $user;
-
-    public function __construct()
-    {
-        $this->user = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -54,24 +58,24 @@ class DividendTracker
 
     public function getPrinciple(): ?float
     {
-        return $this->principle / Constants::VALUTA_PRECISION;
+        return $this->principle;
     }
 
     public function setPrinciple(float $principle): self
     {
-        $this->principle = $principle * Constants::VALUTA_PRECISION;
+        $this->principle = $principle;
 
         return $this;
     }
 
     public function getDividend(): ?float
     {
-        return $this->dividend / Constants::VALUTA_PRECISION;
+        return $this->dividend;
     }
 
     public function setDividend(float $dividend): self
     {
-        $this->dividend = $dividend * Constants::VALUTA_PRECISION;
+        $this->dividend = $dividend;
 
         return $this;
     }

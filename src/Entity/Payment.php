@@ -19,7 +19,11 @@ class Payment
     #[ORM\Column(type: 'datetime', name: 'pay_date')]
     private $payDate;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $dividend;
 
     /**
@@ -49,7 +53,11 @@ class Payment
     #[ORM\JoinColumn(nullable: true)]
     private $position;
 
-    #[ORM\Column(type: 'bigint', nullable: true)]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $amount;
 
     #[ORM\Column(type: 'datetime', name: 'created_at')]
@@ -58,7 +66,11 @@ class Payment
     #[ORM\Column(type: 'datetime', name: 'updated_at', nullable: true)]
     private $updatedAt;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $taxWithold;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -67,7 +79,11 @@ class Payment
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $dividendType;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $dividendPaid;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -92,12 +108,12 @@ class Payment
 
     public function getDividend(): ?float
     {
-        return $this->dividend / Constants::VALUTA_PRECISION;
+        return $this->dividend;
     }
 
     public function setDividend(float $dividend): self
     {
-        $this->dividend = $dividend * Constants::VALUTA_PRECISION;
+        $this->dividend = $dividend;
 
         return $this;
     }
@@ -106,7 +122,7 @@ class Payment
     {
         $this->taxes = ($this->dividend / (100 - Constants::TAX)) * Constants::TAX;
 
-        return $this->taxes / Constants::VALUTA_PRECISION;
+        return $this->taxes;
     }
 
     public function setTicker(?Ticker $ticker): self
@@ -170,14 +186,14 @@ class Payment
         return $this->calendar !== null;
     }
 
-    public function getAmount(): ?string
+    public function getAmount(): ?float
     {
-        return $this->amount / Constants::AMOUNT_PRECISION;
+        return $this->amount;
     }
 
-    public function setAmount(?string $amount): self
+    public function setAmount(?float $amount): self
     {
-        $this->amount = $amount * Constants::AMOUNT_PRECISION;
+        $this->amount = $amount;
 
         return $this;
     }
@@ -238,12 +254,12 @@ class Payment
 
     public function getTaxWithold(): ?float
     {
-        return $this->taxWithold / Constants::VALUTA_PRECISION;
+        return $this->taxWithold;
     }
 
     public function setTaxWithold(?float $taxWithold): self
     {
-        $this->taxWithold = $taxWithold * Constants::VALUTA_PRECISION;
+        $this->taxWithold = $taxWithold;
 
         return $this;
     }
@@ -274,12 +290,12 @@ class Payment
 
     public function getDividendPaid(): ?float
     {
-        return $this->dividendPaid / Constants::VALUTA_PRECISION;
+        return $this->dividendPaid;
     }
 
     public function setDividendPaid(?float $dividendPaid): self
     {
-        $this->dividendPaid = $dividendPaid * Constants::VALUTA_PRECISION;
+        $this->dividendPaid = $dividendPaid;
 
         return $this;
     }

@@ -400,7 +400,7 @@ class PositionRepository extends ServiceEntityRepository
         $allocated = $qb->getQuery()
             ->getSingleScalarResult();
         if ($allocated) {
-            return $allocated / 1000;
+            return $allocated;
         }
         return 0;
     }
@@ -441,8 +441,8 @@ class PositionRepository extends ServiceEntityRepository
                 $output[$item['tickerId']]['allocation'] = 0;
                 $output[$item['tickerId']]['units'] = 0;
             }
-            $price = $item['price'] / 1000;
-            $amount = $item['amount'] / 10000000;
+            $price = $item['price'];
+            $amount = $item['amount'];
 
             $allocation = $price * $amount;
             $output[$item['tickerId']]['allocation'] += $allocation;

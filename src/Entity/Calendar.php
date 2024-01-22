@@ -36,7 +36,12 @@ class Calendar
     #[ORM\Column(type: 'date', name: 'payment_date')]
     private $paymentDate;
 
-    #[ORM\Column(type: 'integer', name: 'cash_amount')]
+    #[ORM\Column(
+        type: 'float',
+        name: 'cash_amount',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $cashAmount;
 
     #[ORM\OneToMany(targetEntity: 'App\Entity\Payment', mappedBy: 'calendar')]
@@ -125,17 +130,17 @@ class Calendar
 
     public function getCashAmount(): ?float
     {
-        return $this->cashAmount / Constants::VALUTA_PRECISION;
+        return $this->cashAmount;
     }
 
     public function getNetCashAmount(): ?float
     {
-        return ($this->cashAmount * (1 - (Constants::TAX / 100)) / Constants::EXCHANGE) / Constants::VALUTA_PRECISION;
+        return ($this->cashAmount * (1 - (Constants::TAX / 100)) / Constants::EXCHANGE);
     }
 
     public function setCashAmount(float $cashAmount): self
     {
-        $this->cashAmount = number_format($cashAmount, 3) * Constants::VALUTA_PRECISION;
+        $this->cashAmount = number_format($cashAmount, 3);
 
         return $this;
     }

@@ -22,10 +22,18 @@ class Position
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $price;
 
-    #[ORM\Column(type: 'bigint')]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $amount;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Ticker', inversedBy: 'positions')]
@@ -35,10 +43,18 @@ class Position
     #[ORM\Column(type: 'boolean', nullable: false, options: ["default" => false])]
     private bool $closed = false;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $profit;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $allocation;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\User', inversedBy: 'positions')]
@@ -121,23 +137,23 @@ class Position
 
     public function getPrice(): ?float
     {
-        return $this->price / Constants::VALUTA_PRECISION;
+        return $this->price;
     }
 
     public function setPrice(?float $price): self
     {
-        $this->price = $price * Constants::VALUTA_PRECISION;
+        $this->price = $price;
         return $this;
     }
 
     public function getAmount(): ?string
     {
-        return $this->amount / Constants::AMOUNT_PRECISION;
+        return $this->amount;
     }
 
     public function setAmount(string $amount): self
     {
-        $this->amount = $amount * Constants::AMOUNT_PRECISION;
+        $this->amount = $amount;
 
         return $this;
     }
@@ -168,12 +184,12 @@ class Position
 
     public function getProfit(): ?float
     {
-        return $this->profit / Constants::VALUTA_PRECISION;
+        return $this->profit;
     }
 
     public function setProfit(int $profit): self
     {
-        $this->profit = $profit * Constants::VALUTA_PRECISION;
+        $this->profit = $profit;
 
         return $this;
     }
@@ -185,12 +201,12 @@ class Position
 
     public function getAllocation(): ?float
     {
-        return $this->allocation / Constants::VALUTA_PRECISION;
+        return $this->allocation;
     }
 
     public function setAllocation(?float $allocation): self
     {
-        $this->allocation = $allocation * Constants::VALUTA_PRECISION;
+        $this->allocation = $allocation;
         return $this;
     }
 

@@ -17,8 +17,8 @@ class Payouts
         }
 
         foreach ($data as $item) {
-            $dividends[] = ($item['dividend'] / 1000);
-            $accumulative[] = ($item['accumulative'] / 1000);
+            $dividends[] = ($item['dividend']);
+            $accumulative[] = ($item['accumulative']);
         }
 
         return [

@@ -142,7 +142,7 @@ class PaymentRepository extends ServiceEntityRepository
         $result = $queryBuilder->getQuery()
             ->getResult();
 
-        return $result[0]['total'] / 1000;
+        return $result[0]['total'];
     }
 
     public function getSumDividends(array $tickerIds)
@@ -160,7 +160,7 @@ class PaymentRepository extends ServiceEntityRepository
             ->getArrayResult();
         $output = [];
         foreach ($result as $item) {
-            $output[$item['id']] = $item['total'] / Constants::VALUTA_PRECISION;
+            $output[$item['id']] = $item['total'];
         }
 
         return $output;

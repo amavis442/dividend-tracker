@@ -29,8 +29,12 @@ class Transaction
     #[ORM\Column(type: 'integer', options: ['default' => 1])]
     private int $side = 1;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $price = null;
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
+    private ?float $price = null;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     #[ORM\JoinColumn(nullable: false)]
@@ -41,16 +45,29 @@ class Transaction
      * 32 bit system sets amount to string for bigint and that will fuck up strong typing and will give a useless 500 error page.
      * @var int
      */
-    #[ORM\Column(type: 'bigint')]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $amount;
 
     #[ORM\Column(type: 'datetime', name: 'transaction_date')]
     private $transactionDate;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        precision: 6,
+        options: ["default" => 0]
+    )]
     private $profit;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $allocation;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
@@ -60,13 +77,21 @@ class Transaction
     #[ORM\JoinColumn(nullable: true)]
     private $position;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $avgprice;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $jobid;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $exchangeRate;
 
     #[ORM\Column(type: 'datetime', name: 'created_at')]
@@ -81,25 +106,49 @@ class Transaction
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $importfile;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $fx_fee;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $originalPrice;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $originalPriceCurrency;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $stampduty;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $transactionFee;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $finraFee;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(
+        type: 'float',
+        nullable: false,
+        options: ["default" => 0]
+    )]
     private $total;
 
     #[ORM\ManyToOne(targetEntity: Pie::class, inversedBy: 'transactions')]
@@ -141,12 +190,12 @@ class Transaction
 
     public function getPrice(): ?float
     {
-        return $this->price / Constants::VALUTA_PRECISION;
+        return $this->price;
     }
 
     public function setPrice(?float $price): self
     {
-        $this->price = $price * Constants::VALUTA_PRECISION;
+        $this->price = $price;
 
         return $this;
     }
@@ -163,14 +212,14 @@ class Transaction
         return $this;
     }
 
-    public function getAmount(): ?string
+    public function getAmount(): ?float
     {
-        return $this->amount / Constants::AMOUNT_PRECISION;
+        return $this->amount;
     }
 
-    public function setAmount($amount): self
+    public function setAmount(float $amount): self
     {
-        $this->amount = $amount * Constants::AMOUNT_PRECISION;
+        $this->amount = $amount;
 
         return $this;
     }
@@ -189,12 +238,12 @@ class Transaction
 
     public function getProfit(): ?float
     {
-        return ($this->profit / Constants::VALUTA_PRECISION) ?: null;
+        return $this->profit  ?: null;
     }
 
     public function setProfit(float $profit): self
     {
-        $this->profit = $profit * Constants::VALUTA_PRECISION;
+        $this->profit = $profit;
         return $this;
     }
 
@@ -205,12 +254,12 @@ class Transaction
 
     public function getAllocation(): ?float
     {
-        return $this->allocation / Constants::VALUTA_PRECISION;
+        return $this->allocation;
     }
 
     public function setAllocation(?float $allocation): self
     {
-        $this->allocation = $allocation * Constants::VALUTA_PRECISION;
+        $this->allocation = $allocation;
         return $this;
     }
 
@@ -240,12 +289,12 @@ class Transaction
 
     public function getAvgprice(): ?float
     {
-        return $this->avgprice / Constants::VALUTA_PRECISION;
+        return $this->avgprice;
     }
 
     public function setAvgprice(?float $avgprice): self
     {
-        $this->avgprice = $avgprice * Constants::VALUTA_PRECISION;
+        $this->avgprice = $avgprice;
 
         return $this;
     }
@@ -267,7 +316,7 @@ class Transaction
         return (float)$this->exchangeRate;
     }
 
-    public function setExchangeRate(?string $exchangeRate): self
+    public function setExchangeRate(?float $exchangeRate): self
     {
         $this->exchangeRate = $exchangeRate;
 
@@ -286,6 +335,8 @@ class Transaction
     public function setCreatedAt(DateTimeInterface $createdAt = null): self
     {
         $this->createdAt = $createdAt ?? new DateTime("now");
+
+        return $this;
     }
 
     public function getCreatedAt(): DateTimeInterface
@@ -340,24 +391,24 @@ class Transaction
 
     public function getFxFee(): ?float
     {
-        return $this->fx_fee / Constants::VALUTA_PRECISION;
+        return $this->fx_fee;
     }
 
     public function setFxFee(?float $fx_fee): self
     {
-        $this->fx_fee = $fx_fee * Constants::VALUTA_PRECISION;
+        $this->fx_fee = $fx_fee;
 
         return $this;
     }
 
     public function getOriginalPrice(): ?float
     {
-        return $this->originalPrice / Constants::VALUTA_PRECISION;
+        return $this->originalPrice;
     }
 
     public function setOriginalPrice(?float $originalPrice): self
     {
-        $this->originalPrice = $originalPrice * Constants::VALUTA_PRECISION;
+        $this->originalPrice = $originalPrice;
 
         return $this;
     }
@@ -376,48 +427,48 @@ class Transaction
 
     public function getStampduty(): ?float
     {
-        return $this->stampduty / Constants::VALUTA_PRECISION;
+        return $this->stampduty;
     }
 
     public function setStampduty(?float $stampduty): self
     {
-        $this->stampduty = $stampduty * Constants::VALUTA_PRECISION;
+        $this->stampduty = $stampduty;
 
         return $this;
     }
 
     public function getTransactionFee(): ?float
     {
-        return $this->transactionFee / Constants::VALUTA_PRECISION;
+        return $this->transactionFee;
     }
 
     public function setTransactionFee(?float $transactionFee): self
     {
-        $this->transactionFee = $transactionFee * Constants::VALUTA_PRECISION;
+        $this->transactionFee = $transactionFee;
 
         return $this;
     }
 
     public function getFinraFee(): ?float
     {
-        return $this->finraFee / Constants::VALUTA_PRECISION;
+        return $this->finraFee;
     }
 
     public function setFinraFee(?float $finraFee): self
     {
-        $this->finraFee = $finraFee * Constants::VALUTA_PRECISION;
+        $this->finraFee = $finraFee;
 
         return $this;
     }
 
     public function getTotal(): ?float
     {
-        return $this->total / Constants::VALUTA_PRECISION;
+        return $this->total;
     }
 
     public function setTotal(float $total): self
     {
-        $this->total = $total * Constants::VALUTA_PRECISION;
+        $this->total = $total;
 
         return $this;
     }
