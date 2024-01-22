@@ -15,8 +15,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name:'app:transaction',
-    description:'Recalculate avg. price position',
+    name: 'app:transaction',
+    description: 'Recalculate avg. price position',
 )]
 class TransactionCommand extends Command
 {
@@ -84,18 +84,23 @@ class TransactionCommand extends Command
             return 0;
         }
 
+        $io->text(
+            'Fullname;Amount;Price;Allocation'
+        );
         foreach ($tickers as $ticker) {
             $position = null;
             if ($ticker) {
                 $position = $ticker->getPositions()->first();
+                if ($position->getClosed()) continue;
                 $this->weightedAverageService->calc($position);
                 $io->text(
-                    $ticker->getFullname() .
-                    ', ' .
-                    $position->getAmount() .
-                    ' shares, ' .
-                    $position->getPrice() .
-                    ' euro'
+                    '"' . $ticker->getFullname() . '"' .
+                        ';' .
+                        $position->getAmount() .
+                        ';' .
+                        $position->getPrice() .
+                        ';' .
+                        $position->getAllocation()
                 );
 
                 if ($overwrite) {

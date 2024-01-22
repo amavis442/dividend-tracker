@@ -38,8 +38,8 @@ class WeightedAverage
         ksort($this->transactions);
 
         $totalProfit = 0;
-        $avgPrice = 0;
-        $costBase = 0.0;
+        $avgPrice = 0.000;
+        $costBase = 0.0000;
         $numShares = 0.0;
         $aPrice = 0;
 

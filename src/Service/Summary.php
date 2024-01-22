@@ -31,9 +31,9 @@ class Summary
          */
         foreach ($positions as $position) {
             $profit += $position->getProfit();
-            $allocated += $position->getAllocated();
+            //$allocated += $position->getAllocation();
         }
-
+        $allocated = $this->getTotalAllocated();
         $totalDividend = $this->paymentRepository->getTotalDividend();
 
         return [
