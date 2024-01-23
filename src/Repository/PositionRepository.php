@@ -241,11 +241,12 @@ class PositionRepository extends ServiceEntityRepository
     public function getAllOpen(int $pieId = null, int $year = null): array
     {
         $qb = $this->createQueryBuilder('p')
-            ->select('p, t, pa, c, dm, cur, tax')
+            ->select('p, t, pa, c, dm, cur, tax, b')
             ->innerJoin('p.ticker', 't')
             ->leftJoin('t.calendars', 'c')
             ->leftJoin('t.dividendMonths', 'dm')
             ->leftJoin('t.tax', 'tax')
+            ->leftJoin('t.branch', 'b')
             ->leftJoin('p.payments', 'pa')
             ->leftJoin('c.currency', 'cur')
             ->where('p.closed = false');
@@ -277,9 +278,11 @@ class PositionRepository extends ServiceEntityRepository
 
         // Create our query
         $queryBuilder = $this->createQueryBuilder('p')
-            ->select('p, t, i, pa, pies, c, dm')
+            ->select('p, t, i, pa, pies, c, dm, tax, cur')
             ->innerJoin('p.ticker', 't')
             ->innerJoin('t.branch', 'i')
+            ->leftJoin('t.tax', 'tax')
+            ->leftJoin('t.currency', 'cur')
             ->leftJoin('p.payments', 'pa')
             ->leftJoin('p.pies', 'pies')
             ->leftJoin('t.calendars', 'c')
