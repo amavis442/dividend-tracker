@@ -27,7 +27,7 @@ Encore
     .autoProvidejQuery()
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
-    .enableStimulusBridge('./assets/controllers.json')
+    //.enableStimulusBridge('./assets/controllers.json')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
@@ -84,7 +84,6 @@ Encore
     .addEntry('linechart', './assets/js/linechart.js')
     .addEntry('summernote', './assets/js/summernote.js')
     .addEntry('stockprices', './assets/js/stockprices.js')
-    .addEntry('vue', './assets/vue/index.js')
 
     //.addEntry('svelteregistercontroller', './assets/svelte/register_controller.ts')
     //.addEntry('svelterendercontroller', './assets/svelte/render_controller.ts')

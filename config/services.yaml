@@ -115,10 +115,6 @@ services:
         tags:
             - { name: doctrine.event_listener, event: prePersist }
 
-    App\Twig\Runtime\SvelteComponentExtensionRuntime:
-        arguments:
-            $stimulusExtension: "@webpack_encore.twig_stimulus_extension"
-
     on_request_listener:
         class: App\EventListener\OnRequestListener
         arguments: ["@doctrine.orm.entity_manager", "@security.token_storage"]
