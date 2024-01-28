@@ -76,6 +76,7 @@ class Compound
      *
      * @var float
      */
+    #[Assert\GreaterThan(0.7)]
     private $exchangeRate = 1.2;
 
     public function setAmount(int $amount): self
