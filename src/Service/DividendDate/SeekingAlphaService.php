@@ -40,9 +40,12 @@ class SeekingAlphaService implements DividendDatePluginInterface
     {
         $response = $this->client->request('GET', self::TOKEN_URL);
         if ($response->getStatusCode() !== 200) {
-            throw new RuntimeException('Can not get token...');
+            throw new RuntimeException("Status code: " . $response->getStatusCode() . '::Can not get token...' . $response->getContent());
         }
-
+        //$token['_token'] = "fd1f4a4e836e3c67486c178d82228ff7d616c6af732d8d8de92c602095f9e20e6986177b9977a842a1fea60908ec3a74c1af6678";
+        //$token['_token_userid'] = 122;
+        //{"_token":"fd1f4a4e836e3c67486c178d82228ff7d616c6af732d8d8de92c602095f9e20e6986177b9977a842a1fea60908ec3a74c1af6678","_token_userid":122}
+        //return $token;
         return $response->toArray();
     }
 
@@ -69,13 +72,13 @@ class SeekingAlphaService implements DividendDatePluginInterface
     private function getTickerNextPayments(array $tickerData): array
     {
         $payments = [];
-        $currentDate = new DateTime();
+        //$currentDate = new DateTime();
         $dividends = $tickerData['CashDividends'];
         foreach ($dividends as $dividend) {
             $payDate = new DateTime($dividend['PayDate']);
-            if ($payDate > $currentDate) {
-                $payments[] = $dividend;
-            }
+            //if ($payDate > $currentDate) {
+            $payments[] = $dividend;
+            //}
         }
         return $payments;
     }
