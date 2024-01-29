@@ -107,7 +107,12 @@ class DividendDateCommand extends Command
                     $this->logger->alert('exDate exception: ' . print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
                     continue;
                 }
-                $calendar = $this->calendarRepository->findOneBy(['ticker' => $ticker, 'exDividendDate' => $exDate]);
+
+                $dividendType = Calendar::REGULAR;
+                if (stripos($payment['Type'], 'Extra') !== false) {
+                    $dividendType = Calendar::SUPPLEMENT;
+                }
+                $calendar = $this->calendarRepository->findOneBy(['ticker' => $ticker, 'exDividendDate' => $exDate, 'dividendType' => $dividendType]);
 
                 if (!$calendar) {
                     $currencySymbol = $payment['Currency'];
@@ -138,10 +143,8 @@ class DividendDateCommand extends Command
                         ->setCurrency($currency)
                         ->setSource(Calendar::SOURCE_SCRIPT)
                         ->setDescription($payment['Type'])
-                        ->setDividendType(Calendar::REGULAR);
-                    if (stripos($payment['Type'], 'Extra') !== false) {
-                        $calendar->setDividendType(Calendar::SUPPLEMENT);
-                    }
+                        ->setDividendType($dividendType);
+
                     try {
                         $this->calendarRepository->save($calendar, true);
                     } catch (Exception $e) {
