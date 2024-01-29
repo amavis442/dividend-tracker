@@ -21,6 +21,16 @@ framework:
     php_errors:
         log: true
 
+    http_client:
+        scoped_clients:
+            seekingalpha.client:
+                scope: 'https://seekingalpha.com'
+                headers:
+                    Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8'
+                    User-Agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+                    Accept-Encoding: 'gzip, deflate, br'
+
+
 when@test:
     framework:
         test: true
