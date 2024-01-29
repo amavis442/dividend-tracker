@@ -374,7 +374,9 @@ class ImportCsvService extends ImportBase
                         ->setOriginalPriceCurrency($row['original_price_currency'])
                         ->setFinraFee($row['finra_fee'] ?? 0)
                         ->setTransactionFee($row['transaction_fee'] ?? 0)
-                        ->setTotal($row['total'] ?? 0);
+                        ->setTotal($row['total'] ?? 0)
+                        ->setAvgprice(0)
+                        ->setProfit(0);
 
                     $pies = $position->getPies();
                     if (count($pies) == 1) {

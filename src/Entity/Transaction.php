@@ -34,7 +34,7 @@ class Transaction
         nullable: false,
         options: ["default" => 0]
     )]
-    private ?float $price = null;
+    private ?float $price = 0.0;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     #[ORM\JoinColumn(nullable: false)]
@@ -50,7 +50,7 @@ class Transaction
         nullable: false,
         options: ["default" => 0]
     )]
-    private $amount;
+    private $amount = 0.0;
 
     #[ORM\Column(type: 'datetime', name: 'transaction_date')]
     private $transactionDate;
@@ -61,14 +61,14 @@ class Transaction
         precision: 6,
         options: ["default" => 0]
     )]
-    private $profit;
+    private $profit = 0.0;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $allocation;
+    private $allocation = 0.0;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     private $allocationCurrency;
@@ -82,7 +82,7 @@ class Transaction
         nullable: false,
         options: ["default" => 0]
     )]
-    private $avgprice;
+    private $avgprice = 0.0;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $jobid;
@@ -92,7 +92,7 @@ class Transaction
         nullable: false,
         options: ["default" => 0]
     )]
-    private $exchangeRate;
+    private $exchangeRate = 1.0;
 
     #[ORM\Column(type: 'datetime', name: 'created_at')]
     private $createdAt;
@@ -111,14 +111,14 @@ class Transaction
         nullable: false,
         options: ["default" => 0]
     )]
-    private $fx_fee;
+    private $fx_fee = 0.0;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $originalPrice;
+    private $originalPrice = 0.0;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $originalPriceCurrency;
@@ -128,28 +128,28 @@ class Transaction
         nullable: false,
         options: ["default" => 0]
     )]
-    private $stampduty;
+    private $stampduty = 0.0;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $transactionFee;
+    private $transactionFee = 0.0;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $finraFee;
+    private $finraFee = 0.0;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $total;
+    private $total = 0.0;
 
     #[ORM\ManyToOne(targetEntity: Pie::class, inversedBy: 'transactions')]
     private $pie;
@@ -236,9 +236,9 @@ class Transaction
         return $this;
     }
 
-    public function getProfit(): ?float
+    public function getProfit(): float
     {
-        return $this->profit  ?: null;
+        return $this->profit  ?: 0;
     }
 
     public function setProfit(float $profit): self
@@ -287,12 +287,12 @@ class Transaction
         return $this;
     }
 
-    public function getAvgprice(): ?float
+    public function getAvgprice(): float
     {
-        return $this->avgprice;
+        return $this->avgprice ?: 0;
     }
 
-    public function setAvgprice(?float $avgprice): self
+    public function setAvgprice(float $avgprice): self
     {
         $this->avgprice = $avgprice;
 
