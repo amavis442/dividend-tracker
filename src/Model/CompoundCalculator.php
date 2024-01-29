@@ -24,6 +24,7 @@ class CompoundCalculator
         $years = $compound->getYears();
         $startCapital = $startAmount * $startPrice;
         $endCapital = 0.0;
+        $extraMoney = $compound->getExtraPerMonth();
 
         $oldShares = $startAmount / 10000000;
         $dividendShares = 0;
@@ -50,6 +51,7 @@ class CompoundCalculator
             $data[$i]['capital'] = 0.0;
             $data[$i]['received_dividend'] = 0.0;
             $data[$i]['dividendyield'] = 0.0;
+            $data[$i]['extra_per_month'] = $extraMoney;
 
             if ($quator > ($payoutFrequency - 1)) {
                 $year++;
@@ -86,7 +88,7 @@ class CompoundCalculator
             if ($i > 0) {
                 $data[$i]['received_dividend'] += $data[$i - 1]['received_dividend'];
             }
-            $newShares = $data[$i]['net_dividend'] / $data[$i]['shareprice'];
+            $newShares = ($data[$i]['net_dividend'] + $data[$i]['extra_per_month']) / $data[$i]['shareprice'];
             $data[$i]['new_amount'] = $newShares;
 
             $data[$i]['extra_dividend'] = $newShares * $netDividend;
@@ -104,9 +106,9 @@ class CompoundCalculator
 
             $netDividendPerShare = $data[$i]['net_dividend'] / $dividendShares;
             $netDividendPerSharePerYear = $netDividendPerShare * $payoutFrequency;
-            
+
             $data[$i]['dividendyield'] = ($netDividendPerSharePerYear / $data[$i]['shareprice']) * 100;
-            
+
             $dividendShares = $oldShares;
 
             //$data[$i]['yoc'] = $data[$i]['net_dividend'] / ($oldShares )

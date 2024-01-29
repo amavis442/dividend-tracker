@@ -30,6 +30,7 @@
 				<th>{{ 'New shares'|trans }}</th>
 				<th>{{ 'Dividend from new shares'|trans }}</th>
 				<th>{{ 'Received dividends'|trans }}</th>
+				<th>{{ 'Extra per month'|trans }}</th>
 				<th>{{ 'Dividend yield'|trans }}</th>
 			</tr>
 		</thead>
@@ -57,6 +58,7 @@
 					<td>{{ item.new_amount }}</td>
 					<td>{{ item.extra_dividend|format_number({fraction_digit: 3}) }}</td>
 					<td>{{ item.received_dividend|format_number({fraction_digit: 3}) }}</td>
+					<td>{{ item.extra_per_month|format_number({fraction_digit: 3}) }}</td>
 					<td>{{ item.dividendyield|format_number({fraction_digit: 2}) }}%</td>
 				</tr>
 				{% set rowcount = rowcount + 1 %}

@@ -61,6 +61,13 @@ class Compound
     private $frequency;
 
     /**
+     * Extra per month
+     *
+     * @var float
+     */
+    private $extraPerMonth = 0.0;
+
+    /**
      *
      * @var int
      */
@@ -126,6 +133,19 @@ class Compound
     {
         return $this->growth;
     }
+
+    public function setExtraPerMonth(float $extraPerMonth): self
+    {
+        $this->extraPerMonth = $extraPerMonth;
+
+        return $this;
+    }
+
+    public function getExtraPerMonth(): float
+    {
+        return $this->extraPerMonth;
+    }
+
 
     /**
      * Get rise of market gain in percentage per year around 7.43%

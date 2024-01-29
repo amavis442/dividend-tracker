@@ -53,6 +53,14 @@ class CompoundType extends AbstractType
                 'scale' => 3,
                 'empty_data' => 1
             ])
+            ->add('extraPerMonth', NumberType::class, [
+                'label' => 'Extra per month',
+                'help' => 'Extra money per month',
+                'required' => true,
+                'input' => 'number',
+                'scale' => 3,
+                'empty_data' => 1
+            ])
             ->add('growth', NumberType::class, [
                 'label' => 'Dividend Annual Growth Rate',
                 'help' => 'First 5 years. Nice target would be 10% and higher',
