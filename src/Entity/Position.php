@@ -187,7 +187,7 @@ class Position
         return $this->profit;
     }
 
-    public function setProfit(int $profit): self
+    public function setProfit(float $profit): self
     {
         $this->profit = $profit;
 
