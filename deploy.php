@@ -41,7 +41,7 @@ host('127.0.0.1')
         'env' => 'prod',
         'stage' => 'prod',
     ])
-    ->set('branch', 'postgres')
+    ->set('branch', 'master')
     ->set('rsync_src', __DIR__)
     ->set('rsync_dest', '{{release_path}}');
 
