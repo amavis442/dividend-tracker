@@ -241,7 +241,7 @@ class Transaction
         return $this->profit  ?: 0;
     }
 
-    public function setProfit(float $profit): self
+    public function setProfit(float $profit = 0.0): self
     {
         $this->profit = $profit;
         return $this;
@@ -292,7 +292,7 @@ class Transaction
         return $this->avgprice ?: 0;
     }
 
-    public function setAvgprice(float $avgprice): self
+    public function setAvgprice(float $avgprice = 0.0): self
     {
         $this->avgprice = $avgprice;
 
