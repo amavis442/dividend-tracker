@@ -172,6 +172,7 @@ class PortfolioController extends AbstractController
 
         $indexUrl = $request->getSession()->get(get_class($this));
 
+
         return $this->render('portfolio/show.html.twig', [
             'ticker' => $ticker,
             'growth' => $growth,

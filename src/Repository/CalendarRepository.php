@@ -96,8 +96,10 @@ class CalendarRepository extends ServiceEntityRepository
             ->innerJoin('c.ticker', 't')
             ->where('t = :ticker')
             ->andWhere('c.paymentDate <= :paydate')
+            ->andWhere('c.dividendType = :dividendType')
             ->setParameter('ticker', $ticker)
             ->setParameter('paydate', $dateTime->format('Y-m-d'))
+            ->setParameter('dividendType', Calendar::REGULAR)
             ->orderBy('c.id', 'DESC')
             ->setMaxResults(1)
             ->getQuery();

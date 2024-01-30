@@ -156,6 +156,7 @@ class CalendarController extends AbstractController
         return $this->render('calendar/edit.html.twig', [
             'calendar' => $calendar,
             'form' => $form->createView(),
+            'referer' => $referer->get() ?: null
         ]);
     }
 
@@ -167,8 +168,12 @@ class CalendarController extends AbstractController
         Referer $referer
     ): Response {
         if ($this->isCsrfTokenValid('delete' . $calendar->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($calendar);
-            $entityManager->flush();
+            if ($calendar->getPayments()->isEmpty()) {
+                $entityManager->remove($calendar);
+                $entityManager->flush();
+            } else {
+                $this->addFlash('notice', 'Can not remove calendar because it has payments linked to it.');
+            }
         }
 
         if ($referer->get()) {

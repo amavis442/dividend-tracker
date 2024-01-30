@@ -58,7 +58,11 @@
             <td>{{ (calendar.dividendType ?? 'Regular')|trans }}</td>
             <td>{{ (calendar.source ?? 'manual')|trans }}</td>
             <td>{{ calendar.description }}</td>
-            <td>{{ calendar.createdAt|format_date('short') }}</td>
+            <td>
+              {{ calendar.createdAt|format_date('short') }}{% if not calendar.payments.isEmpty %}
+                <i class="fa-solid fa-triangle-exclamation" title="Has payments attached"></i>
+              {% endif %}
+            </td>
             <td>
               <a href="{{ path('calendar_edit', { id: calendar.id }) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
             </td>
