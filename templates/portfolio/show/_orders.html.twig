@@ -5,10 +5,6 @@
 			<a class="btn btn-success" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id,'side': 1, }) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Buy'|trans }}">
 				<i class="fas fa-plus"></i>
 			</a>
-			<a href="{{ path('transaction_export', {'position': position.id }) }}" target="_new" class="btn btn-secondary">
-				<i class="fas fa-file-export pr-r"></i>
-				{{ 'Export'|trans }}</a>
-
 			<a class="btn btn-danger" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id, 'side': 2}) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Sell'|trans }}">
 				<i class="fas fa-minus"></i>
 			</a>
