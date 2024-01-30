@@ -11,8 +11,8 @@ use Symfony\Component\Validator\Constraints\Unique;
 class ImportFiles
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, unique: true)]

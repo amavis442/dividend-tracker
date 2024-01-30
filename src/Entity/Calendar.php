@@ -19,8 +19,8 @@ class Calendar
 
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Ticker', inversedBy: 'calendars')]
@@ -42,7 +42,7 @@ class Calendar
         nullable: false,
         options: ["default" => 0]
     )]
-    private $cashAmount;
+    private $cashAmount = 0.0;
 
     #[ORM\OneToMany(targetEntity: 'App\Entity\Payment', mappedBy: 'calendar')]
     #[ORM\JoinColumn(nullable: true)]

@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Taxonomy
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 

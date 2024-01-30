@@ -12,7 +12,7 @@ class Payment
 {
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
@@ -24,7 +24,7 @@ class Payment
         nullable: false,
         options: ["default" => 0]
     )]
-    private $dividend;
+    private $dividend = 0.0;
 
     /**
      * Undocumented variable
@@ -50,7 +50,7 @@ class Payment
     private $currency;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Position', inversedBy: 'payments')]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(nullable: false)]
     private $position;
 
     #[ORM\Column(
@@ -58,7 +58,7 @@ class Payment
         nullable: false,
         options: ["default" => 0]
     )]
-    private $amount;
+    private $amount = 0.0;
 
     #[ORM\Column(type: 'datetime', name: 'created_at')]
     private $createdAt;
@@ -71,7 +71,7 @@ class Payment
         nullable: false,
         options: ["default" => 0]
     )]
-    private $taxWithold;
+    private $taxWithold = 0.0;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $taxCurrency;
@@ -84,7 +84,7 @@ class Payment
         nullable: false,
         options: ["default" => 0]
     )]
-    private $dividendPaid;
+    private $dividendPaid = 0.0;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $dividendPaidCurrency;
@@ -106,7 +106,7 @@ class Payment
         return $this;
     }
 
-    public function getDividend(): ?float
+    public function getDividend(): float
     {
         return $this->dividend;
     }
@@ -118,21 +118,21 @@ class Payment
         return $this;
     }
 
-    public function getTaxes(): ?float
+    public function getTaxes(): float
     {
         $this->taxes = ($this->dividend / (100 - Constants::TAX)) * Constants::TAX;
 
         return $this->taxes;
     }
 
-    public function setTicker(?Ticker $ticker): self
+    public function setTicker(Ticker $ticker): self
     {
         $this->ticker = $ticker;
 
         return $this;
     }
 
-    public function getTicker(): ?Ticker
+    public function getTicker(): Ticker
     {
         return $this->ticker;
     }
@@ -152,7 +152,7 @@ class Payment
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -164,12 +164,12 @@ class Payment
         return $this;
     }
 
-    public function getCurrency(): ?Currency
+    public function getCurrency(): Currency
     {
         return $this->currency;
     }
 
-    public function setCurrency(?Currency $currency): self
+    public function setCurrency(Currency $currency): self
     {
         $this->currency = $currency;
 
@@ -186,12 +186,12 @@ class Payment
         return $this->calendar !== null;
     }
 
-    public function getAmount(): ?float
+    public function getAmount(): float
     {
         return $this->amount;
     }
 
-    public function setAmount(?float $amount): self
+    public function setAmount(float $amount): self
     {
         $this->amount = $amount;
 
@@ -205,7 +205,7 @@ class Payment
         return $this;
     }
 
-    public function getPosition(): ?Position
+    public function getPosition(): Position
     {
         return $this->position;
     }
@@ -252,12 +252,12 @@ class Payment
         return $this->updatedAt;
     }
 
-    public function getTaxWithold(): ?float
+    public function getTaxWithold(): float
     {
         return $this->taxWithold;
     }
 
-    public function setTaxWithold(?float $taxWithold): self
+    public function setTaxWithold(float $taxWithold): self
     {
         $this->taxWithold = $taxWithold;
 
@@ -288,12 +288,12 @@ class Payment
         return $this;
     }
 
-    public function getDividendPaid(): ?float
+    public function getDividendPaid(): float
     {
         return $this->dividendPaid;
     }
 
-    public function setDividendPaid(?float $dividendPaid): self
+    public function setDividendPaid(float $dividendPaid): self
     {
         $this->dividendPaid = $dividendPaid;
 

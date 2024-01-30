@@ -10,7 +10,6 @@ use App\Repository\TransactionRepository;
 use App\Service\ExchangeRate\ExchangeRateService;
 use App\Service\Referer;
 use App\Service\WeightedAverage;
-use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -216,6 +215,7 @@ class TransactionController extends AbstractController
         return $this->redirectToRoute('transaction_index', ['orderBy' => 'transactionDate', 'sort' => 'desc']);
     }
 
+    /* TODO! Need to rewrite export csv function
     #[Route(path: '/export/{position}', name: 'transaction_export', methods: ['GET'])]
     public function export(Position $position): Response
     {
@@ -231,9 +231,6 @@ class TransactionController extends AbstractController
         $writer->setShouldAddBOM(false);
         $writer->openToFile($filename);
 
-        /*
-        Datum;Type;Waarde;Transactievaluta;Brutobedrag;Valuta brutobedrag;Wisselkoers;Kosten;Belastingen;Aandelen;ISIN;WKN;Tickersymbool;Naam effect;Opmerking
-         */
         $headers = [];
         $headers[] = 'Datum';
         $headers[] = 'Tijd';
@@ -293,4 +290,5 @@ class TransactionController extends AbstractController
 
         return $response;
     }
+    */
 }

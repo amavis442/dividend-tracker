@@ -10,8 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
 class DividendTracker
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     private ?int $id = null;
 
     #[ORM\Column(type: 'date')]
@@ -22,7 +22,7 @@ class DividendTracker
         nullable: false,
         options: ["default" => 0]
     )]
-    private $principle;
+    private $principle = 0.0;
 
 
     #[ORM\Column(
@@ -30,7 +30,7 @@ class DividendTracker
         nullable: false,
         options: ["default" => 0]
     )]
-    private $dividend;
+    private $dividend = 0.0;
 
     #[ORM\Column(type: 'datetime')]
     private $createdAt;
@@ -56,7 +56,7 @@ class DividendTracker
         return $this;
     }
 
-    public function getPrinciple(): ?float
+    public function getPrinciple(): float
     {
         return $this->principle;
     }
@@ -68,7 +68,7 @@ class DividendTracker
         return $this;
     }
 
-    public function getDividend(): ?float
+    public function getDividend(): float
     {
         return $this->dividend;
     }
@@ -92,12 +92,12 @@ class DividendTracker
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
 

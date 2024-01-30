@@ -20,28 +20,28 @@ class PortfolioItem
      *
      * @var float
      */
-    private $price;
+    private $price = 0.0;
 
     /**
      * Market price
      *
      * @var float
      */
-    private $marketPrice;
+    private $marketPrice = 0.0;
 
     /**
      * Undocumented variable
      *
      * @var float
      */
-    private $paperProfit;
+    private $paperProfit = 0.0;
 
     /**
      * Undocumented variable
      *
      * @var float
      */
-    private $paperProfitPercentage;
+    private $paperProfitPercentage = 0.0;
 
     /**
      * Undocumented variable
@@ -62,7 +62,7 @@ class PortfolioItem
      *
      * @var float
      */
-    private $cashAmount;
+    private $cashAmount = 0.0;
 
     /**
      * Undocumented variable
@@ -76,28 +76,28 @@ class PortfolioItem
      *
      * @var float
      */
-    private $percentageAllocation;
+    private $percentageAllocation = 0.0;
 
     /**
      * Undocumented variable
      *
      * @var float
      */
-    private $forwardNetDividend;
+    private $forwardNetDividend = 0.0;
 
     /**
      * Undocumented variable
      *
      * @var float
      */
-    private $forwardNetDividendYield;
+    private $forwardNetDividendYield = 0.0;
 
     /**
      * Current dividend yield per share based on current marketprice
      *
      * @var float
      */
-    private $forwardNetDividendYieldPerShare;
+    private $forwardNetDividendYieldPerShare = 0.0;
 
     /**
      * Undocumented variable
@@ -132,21 +132,21 @@ class PortfolioItem
      *
      * @var float
      */
-    private $allocation;
+    private $allocation = 0.0;
 
     /**
      * How many shares
      *
      * @var float
      */
-    private $amount;
+    private $amount = 0.0;
 
     /**
      * Total received dividends
      *
      * @var float
      */
-    private $dividend;
+    private $dividend = 0.0;
 
     /**
      * Ticker id
@@ -173,14 +173,14 @@ class PortfolioItem
      *
      * @var float
      */
-    private $diffPrice;
+    private $diffPrice = 0.0;
 
     /**
      * How times per year will there be a dividend payout
      *
      * @var int
      */
-    private $dividendPayoutFrequency;
+    private $dividendPayoutFrequency = 4;
 
     /**
      * Collection of dividend calenders of future payments
@@ -192,29 +192,30 @@ class PortfolioItem
     /**
      *  Net dividend per share
      *
-     * @var null|float
+     * @var float
      */
-    private $netDividendPerShare;
+    private $netDividendPerShare  = 0.0;
+
     /**
      * What is the treshold for dividend yield start to buying
      *
      * @var float
      */
-    private $dividendTreshold;
+    private $dividendTreshold  = 0.0;
 
     /**
      * Maximum allocation
      *
-     * @var null|int
+     * @var int
      */
-    private $maxAllocation;
+    private $maxAllocation = 0;
 
     /**
      * Has maximum allocation been reached
      *
      * @var bool
      */
-    private $isMaxAllocation;
+    private $isMaxAllocation = false;
 
     public function __construct()
     {
@@ -227,7 +228,7 @@ class PortfolioItem
      *
      * @return  \App\Entity\Position
      */
-    public function getPosition()
+    public function getPosition(): Position
     {
         return $this->position;
     }
@@ -239,7 +240,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setPosition(\App\Entity\Position $position)
+    public function setPosition(\App\Entity\Position $position): self
     {
         $this->position = $position;
 
@@ -251,7 +252,7 @@ class PortfolioItem
      *
      * @return  float
      */
-    public function getPrice()
+    public function getPrice(): float
     {
         return $this->price;
     }
@@ -263,7 +264,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setPrice(float $price)
+    public function setPrice(float $price): self
     {
         $this->price = $price;
 
@@ -275,7 +276,7 @@ class PortfolioItem
      *
      * @return  float
      */
-    public function getPaperProfit()
+    public function getPaperProfit(): float
     {
         return $this->paperProfit;
     }
@@ -287,7 +288,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setPaperProfit(float $paperProfit)
+    public function setPaperProfit(float $paperProfit): self
     {
         $this->paperProfit = $paperProfit;
 
@@ -299,7 +300,7 @@ class PortfolioItem
      *
      * @return  float
      */
-    public function getPaperProfitPercentage()
+    public function getPaperProfitPercentage(): float
     {
         return $this->paperProfitPercentage;
     }
@@ -311,7 +312,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setPaperProfitPercentage(float $paperProfitPercentage)
+    public function setPaperProfitPercentage(float $paperProfitPercentage): self
     {
         $this->paperProfitPercentage = $paperProfitPercentage;
 
@@ -323,7 +324,7 @@ class PortfolioItem
      *
      * @return  DateTime
      */
-    public function getExDividendDate()
+    public function getExDividendDate(): DateTime
     {
         return $this->exDividendDate;
     }
@@ -335,7 +336,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setExDividendDate(DateTime $exDividendDate)
+    public function setExDividendDate(DateTime $exDividendDate): self
     {
         $this->exDividendDate = $exDividendDate;
 
@@ -347,7 +348,7 @@ class PortfolioItem
      *
      * @return  DateTime
      */
-    public function getPaymentDate()
+    public function getPaymentDate(): DateTime
     {
         return $this->paymentDate;
     }
@@ -359,7 +360,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setPaymentDate(DateTime $paymentDate)
+    public function setPaymentDate(DateTime $paymentDate): self
     {
         $this->paymentDate = $paymentDate;
 
@@ -371,7 +372,7 @@ class PortfolioItem
      *
      * @return  float
      */
-    public function getCashAmount()
+    public function getCashAmount(): float
     {
         return $this->cashAmount;
     }
@@ -383,7 +384,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setCashAmount(float $cashAmount)
+    public function setCashAmount(float $cashAmount): self
     {
         $this->cashAmount = $cashAmount;
 
@@ -395,7 +396,7 @@ class PortfolioItem
      *
      * @return  float
      */
-    public function getForwardNetDividend()
+    public function getForwardNetDividend(): float
     {
         return $this->forwardNetDividend;
     }
@@ -407,7 +408,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setForwardNetDividend(float $forwardNetDividend)
+    public function setForwardNetDividend(float $forwardNetDividend): self
     {
         $this->forwardNetDividend = $forwardNetDividend;
 
@@ -419,7 +420,7 @@ class PortfolioItem
      *
      * @return  float
      */
-    public function getForwardNetDividendYield()
+    public function getForwardNetDividendYield(): float
     {
         return $this->forwardNetDividendYield;
     }
@@ -431,7 +432,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setForwardNetDividendYield(float $forwardNetDividendYield)
+    public function setForwardNetDividendYield(float $forwardNetDividendYield): self
     {
         $this->forwardNetDividendYield = $forwardNetDividendYield;
 
@@ -443,7 +444,7 @@ class PortfolioItem
      *
      * @return  Currency
      */
-    public function getCashCurrency()
+    public function getCashCurrency(): Currency
     {
         return $this->cashCurrency;
     }
@@ -455,7 +456,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setCashCurrency(Currency $cashCurrency)
+    public function setCashCurrency(Currency $cashCurrency): self
     {
         $this->cashCurrency = $cashCurrency;
 
@@ -467,7 +468,7 @@ class PortfolioItem
      *
      * @return  float
      */
-    public function getPercentageAllocation()
+    public function getPercentageAllocation(): float
     {
         return $this->percentageAllocation;
     }
@@ -479,7 +480,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setPercentageAllocation(float $percentageAllocation)
+    public function setPercentageAllocation(float $percentageAllocation): self
     {
         $this->percentageAllocation = $percentageAllocation;
 
@@ -491,7 +492,7 @@ class PortfolioItem
      *
      * @return  string
      */
-    public function getSymbol()
+    public function getSymbol(): string
     {
         return $this->symbol;
     }
@@ -503,7 +504,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setSymbol(string $symbol)
+    public function setSymbol(string $symbol): self
     {
         $this->symbol = $symbol;
 
@@ -515,9 +516,9 @@ class PortfolioItem
      *
      * @return  string
      */
-    public function getFullname()
+    public function getFullname(): string
     {
-        return $this->fullname;
+        return $this->fullname ?: '';
     }
 
     /**
@@ -527,7 +528,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setFullname(string $fullname)
+    public function setFullname(string $fullname): self
     {
         $this->fullname = $fullname;
 
@@ -539,7 +540,7 @@ class PortfolioItem
      *
      * @return  float
      */
-    public function getMarketPrice(): ?float
+    public function getMarketPrice(): float
     {
         return $this->marketPrice;
     }
@@ -551,7 +552,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setMarketPrice(?float $marketPrice)
+    public function setMarketPrice(float $marketPrice): self
     {
         $this->marketPrice = $marketPrice;
 
@@ -563,7 +564,7 @@ class PortfolioItem
      *
      * @return  Collection
      */
-    public function getPies()
+    public function getPies(): Collection
     {
         return $this->pies;
     }
@@ -575,7 +576,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setPies(Collection $pies)
+    public function setPies(Collection $pies): self
     {
         $this->pies = $pies;
 
@@ -599,7 +600,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setDivDate(bool $divDate)
+    public function setDivDate(bool $divDate): self
     {
         $this->divDate = $divDate;
 
@@ -611,7 +612,7 @@ class PortfolioItem
      *
      * @return  float
      */
-    public function getAllocation()
+    public function getAllocation(): float
     {
         return $this->allocation;
     }
@@ -623,7 +624,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setAllocation(float $allocation)
+    public function setAllocation(float $allocation): self
     {
         $this->allocation = $allocation;
 
@@ -635,7 +636,7 @@ class PortfolioItem
      *
      * @return  float
      */
-    public function getAmount()
+    public function getAmount(): float
     {
         return $this->amount;
     }
@@ -647,7 +648,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setAmount(float $amount)
+    public function setAmount(float $amount): self
     {
         $this->amount = $amount;
 
@@ -659,7 +660,7 @@ class PortfolioItem
      *
      * @return  float
      */
-    public function getDividend()
+    public function getDividend(): float
     {
         return $this->dividend;
     }
@@ -671,7 +672,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setDividend(float $dividend)
+    public function setDividend(float $dividend): self
     {
         $this->dividend = $dividend;
 
@@ -683,7 +684,7 @@ class PortfolioItem
      *
      * @return  int
      */
-    public function getTickerId()
+    public function getTickerId(): int
     {
         return $this->tickerId;
     }
@@ -695,7 +696,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setTickerId(int $tickerId)
+    public function setTickerId(int $tickerId): self
     {
         $this->tickerId = $tickerId;
 
@@ -719,7 +720,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setIsDividendMonth(bool $isDividendMonth)
+    public function setIsDividendMonth(bool $isDividendMonth): self
     {
         $this->isDividendMonth = $isDividendMonth;
 
@@ -731,7 +732,7 @@ class PortfolioItem
      *
      * @return  int
      */
-    public function getPositionId()
+    public function getPositionId(): int
     {
         return $this->positionId;
     }
@@ -743,7 +744,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setPositionId(int $positionId)
+    public function setPositionId(int $positionId): self
     {
         $this->positionId = $positionId;
 
@@ -755,7 +756,7 @@ class PortfolioItem
      *
      * @return  float
      */
-    public function getDiffPrice()
+    public function getDiffPrice(): float
     {
         return $this->diffPrice;
     }
@@ -767,7 +768,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setDiffPrice(float $diffPrice)
+    public function setDiffPrice(float $diffPrice): self
     {
         $this->diffPrice = $diffPrice;
 
@@ -779,7 +780,7 @@ class PortfolioItem
      *
      * @return  int
      */
-    public function getDividendPayoutFrequency()
+    public function getDividendPayoutFrequency(): int
     {
         return $this->dividendPayoutFrequency;
     }
@@ -791,7 +792,7 @@ class PortfolioItem
      *
      * @return  self
      */
-    public function setDividendPayoutFrequency(int $dividendPayoutFrequency)
+    public function setDividendPayoutFrequency(int $dividendPayoutFrequency): self
     {
         $this->dividendPayoutFrequency = $dividendPayoutFrequency;
 
@@ -853,7 +854,7 @@ class PortfolioItem
      *
      * @return  null|float
      */
-    public function getNetDividendPerShare(): ?float
+    public function getNetDividendPerShare(): float
     {
         return $this->netDividendPerShare ?? 0;
     }
@@ -877,7 +878,7 @@ class PortfolioItem
      *
      * @return  null|float
      */
-    public function getDividendTreshold(): ?float
+    public function getDividendTreshold(): float
     {
         return $this->dividendTreshold;
     }
@@ -899,9 +900,9 @@ class PortfolioItem
     /**
      * Get maximum allocation
      *
-     * @return  null|int
+     * @return  int
      */
-    public function getMaxAllocation(): ?int
+    public function getMaxAllocation(): int
     {
         return $this->maxAllocation;
     }

@@ -11,7 +11,7 @@ use App\Repository\JournalRepository;
 class Journal
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
@@ -96,7 +96,7 @@ class Journal
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -131,5 +131,4 @@ class Journal
 
         return $this;
     }
-
 }

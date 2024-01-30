@@ -22,7 +22,7 @@ class Transaction
     public const AMOUNT_MULTIPLE = 10000000;
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
@@ -389,24 +389,24 @@ class Transaction
         return $this;
     }
 
-    public function getFxFee(): ?float
+    public function getFxFee(): float
     {
         return $this->fx_fee;
     }
 
-    public function setFxFee(?float $fx_fee): self
+    public function setFxFee(float $fx_fee): self
     {
         $this->fx_fee = $fx_fee;
 
         return $this;
     }
 
-    public function getOriginalPrice(): ?float
+    public function getOriginalPrice(): float
     {
         return $this->originalPrice;
     }
 
-    public function setOriginalPrice(?float $originalPrice): self
+    public function setOriginalPrice(float $originalPrice): self
     {
         $this->originalPrice = $originalPrice;
 
@@ -425,43 +425,43 @@ class Transaction
         return $this;
     }
 
-    public function getStampduty(): ?float
+    public function getStampduty(): float
     {
         return $this->stampduty;
     }
 
-    public function setStampduty(?float $stampduty): self
+    public function setStampduty(float $stampduty): self
     {
         $this->stampduty = $stampduty;
 
         return $this;
     }
 
-    public function getTransactionFee(): ?float
+    public function getTransactionFee(): float
     {
         return $this->transactionFee;
     }
 
-    public function setTransactionFee(?float $transactionFee): self
+    public function setTransactionFee(float $transactionFee): self
     {
         $this->transactionFee = $transactionFee;
 
         return $this;
     }
 
-    public function getFinraFee(): ?float
+    public function getFinraFee(): float
     {
         return $this->finraFee;
     }
 
-    public function setFinraFee(?float $finraFee): self
+    public function setFinraFee(float $finraFee): self
     {
         $this->finraFee = $finraFee;
 
         return $this;
     }
 
-    public function getTotal(): ?float
+    public function getTotal(): float
     {
         return $this->total;
     }

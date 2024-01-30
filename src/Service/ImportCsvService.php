@@ -381,8 +381,7 @@ class ImportCsvService extends ImportBase
                     $weightedAverage->calc($position);
 
                     if (
-                        ($position->getAmount() === 0 || $position->getAmount() < 2) ||
-                        ($position->getAmount() > -6 && $position->getAmount() < 2)
+                        ($position->getAmount() === 0 || $position->getAmount() < 0)
                     ) {
                         $position->setClosed(true);
                         $position->setClosedAt($row['transactionDate']);

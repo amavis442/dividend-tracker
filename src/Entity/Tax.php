@@ -12,12 +12,12 @@ use Doctrine\ORM\Mapping as ORM;
 class Tax
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
     #[ORM\Column(type: 'integer')]
-    private $taxRate;
+    private $taxRate = 0;
 
     #[ORM\Column(type: 'datetime')]
     private $createdAt;
@@ -38,7 +38,7 @@ class Tax
         return $this->id;
     }
 
-    public function getTaxRate(): ?float
+    public function getTaxRate(): float
     {
         return $this->taxRate / 100;
     }

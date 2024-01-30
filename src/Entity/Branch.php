@@ -10,8 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
 class Branch
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Branch', inversedBy: 'branches')]
@@ -27,7 +27,7 @@ class Branch
     private Collection $tickers;
 
     #[ORM\Column(type: 'integer', nullable: true, name: 'asset_allocation')]
-    private ?int $assetAllocation = null;
+    private ?int $assetAllocation = 0;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;

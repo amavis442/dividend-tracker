@@ -10,8 +10,8 @@ use Symfony\Component\HttpFoundation\File\File;
 class Files
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
