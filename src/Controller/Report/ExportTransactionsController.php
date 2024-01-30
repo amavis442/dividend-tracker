@@ -8,7 +8,7 @@ use App\Repository\PieRepository;
 use App\Repository\PositionRepository;
 use App\Service\DividendService;
 use App\Service\Export;
-use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
+use App\Service\CsvWriter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\HeaderUtils;
@@ -27,10 +27,10 @@ class ExportTransactionsController extends AbstractController
     {
         $fname = 'export-orders-' . date('Ymd') . '.csv';
         $filename = '/tmp/' . $fname;
-        $writer = WriterEntityFactory::createCSVWriter();
+
+        $writer = new CsvWriter($filename);
         $writer->setFieldDelimiter(';');
-        $writer->setShouldAddBOM(false);
-        $writer->openToFile($filename);
+
         /*
         Datum;Type;Waarde;Transactievaluta;Brutobedrag;Valuta brutobedrag;Wisselkoers;Kosten;Belastingen;Aandelen;ISIN;WKN;Tickersymbool;Naam effect;Opmerking
          */
@@ -50,8 +50,7 @@ class ExportTransactionsController extends AbstractController
         $headers[] = 'Tickersymbool';
         $headers[] = 'Naam effect';
 
-        $headersFromValues = WriterEntityFactory::createRowFromArray(array_values($headers));
-        $writer->addRow($headersFromValues);
+        $writer->setHeaders($headers);
 
         $positions = $positionRepository->findForExport();
 
@@ -85,11 +84,11 @@ class ExportTransactionsController extends AbstractController
                 $row['Tickersymbool'] = $tickerLabel;
                 $row['Naam effect'] = $tickerName;
 
-                $rowFromValues = WriterEntityFactory::createRowFromArray(array_values($row));
+                $rowFromValues = array_values($row);
                 $writer->addRow($rowFromValues);
             }
         }
-        $writer->close();
+        $writer->write();
 
         $response = new BinaryFileResponse($filename);
         $disposition = HeaderUtils::makeDisposition(
@@ -107,10 +106,11 @@ class ExportTransactionsController extends AbstractController
     {
         $fname = 'export-dividend-' . date('Ymd') . '.csv';
         $filename = '/tmp/' . $fname;
-        $writer = WriterEntityFactory::createCSVWriter();
+
+        $writer = new CsvWriter($filename);
+
+
         $writer->setFieldDelimiter(';');
-        $writer->setShouldAddBOM(false);
-        $writer->openToFile($filename);
         /*
         Datum;Type;Waarde;Transactievaluta;Brutobedrag;Valuta brutobedrag;Wisselkoers;Kosten;Belastingen;Aandelen;ISIN;WKN;Tickersymbool;Naam effect;Opmerking
          */
@@ -130,8 +130,8 @@ class ExportTransactionsController extends AbstractController
         $headers[] = 'Tickersymbool';
         $headers[] = 'Naam effect';
 
-        $headersFromValues = WriterEntityFactory::createRowFromArray(array_values($headers));
-        $writer->addRow($headersFromValues);
+        $writer->setHeaders($headers);
+
 
         $payments = $paymentRepository->findForExport();
         if (!$payments) {
@@ -176,10 +176,10 @@ class ExportTransactionsController extends AbstractController
             $row['Tickersymbool'] = $tickerLabel;
             $row['Naam effect'] = $tickerName;
 
-            $rowFromValues = WriterEntityFactory::createRowFromArray(array_values($row));
+            $rowFromValues = array_values($row);
             $writer->addRow($rowFromValues);
         }
-        $writer->close();
+        $writer->write();
 
         $response = new BinaryFileResponse($filename);
         $disposition = HeaderUtils::makeDisposition(
