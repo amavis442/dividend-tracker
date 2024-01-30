@@ -169,11 +169,6 @@ class ImportCsvService extends ImportBase
         }, $csvRows);
 
         foreach ($csvRows as $csvRow) {
-            if ($rowNum === 0) {
-                $rowNum++;
-                continue;
-            }
-
             $cellVal = $csvRow['action'];
 
             if (false !== stripos($cellVal, 'deposit') || false !== stripos($cellVal, 'withdraw') || false !== stripos($cellVal, 'interest')) {
@@ -381,7 +376,7 @@ class ImportCsvService extends ImportBase
                     $weightedAverage->calc($position);
 
                     if (
-                        ($position->getAmount() === 0 || $position->getAmount() < 0)
+                        ($position->getAmount() === 0 || $position->getAmount() <= 0.00000001)
                     ) {
                         $position->setClosed(true);
                         $position->setClosedAt($row['transactionDate']);
