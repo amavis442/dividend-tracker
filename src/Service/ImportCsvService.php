@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use App\Entity\Branch;
-use App\Entity\Constants;
 use App\Entity\Currency;
 use App\Entity\Payment;
 use App\Entity\Transaction;
@@ -17,14 +16,14 @@ use App\Repository\TaxRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
 use App\Service\WeightedAverage;
-use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
-use Box\Spout\Reader\CSV\Sheet;
+use App\Service\CsvReader;
 use DateTime;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\SecurityBundle\Security;
+use DOMNode;
 
 class ImportCsvService extends ImportBase
 {
@@ -97,7 +96,7 @@ class ImportCsvService extends ImportBase
         $this->entityManager = $entityManager;
     }
 
-    protected function formatImportData($data): array
+    protected function formatImportData(array|DOMNode $data): array
     {
         return $this->importData($data);
     }
@@ -157,36 +156,36 @@ class ImportCsvService extends ImportBase
         $this->importedDividendLines++;
     }
 
-    protected function importData(Sheet $sheet): ?array
+    protected function importData(array $csvRows): ?array
     {
         $rows = [];
-        $headers = [];
         $rowNum = 0;
-        foreach ($sheet->getRowIterator() as $csvRow) {
-            $cells = $csvRow->getCells();
+        $csvRows = array_map(function ($row) {
+            $newRow = [];
+            foreach ($row as $header => $value) {
+                $newRow[strtolower($header)] = $value;
+            }
+            return $newRow;
+        }, $csvRows);
 
+        foreach ($csvRows as $csvRow) {
             if ($rowNum === 0) {
-                foreach ($cells as $r => $cell) {
-                    $headers[$r] = strtolower($cell->getValue());
-                }
                 $rowNum++;
                 continue;
             }
-            $cell = $cells[0];
-            $cellVal = $cell->getValue();
+
+            $cellVal = $csvRow['action'];
 
             if (false !== stripos($cellVal, 'deposit') || false !== stripos($cellVal, 'withdraw') || false !== stripos($cellVal, 'interest')) {
                 continue;
             };
 
+
             $row = [];
-            $rawAmount = 0;
-            $rawAllocation = 0;
             $row['stampduty'] = 0.0;
 
-            foreach ($cells as $r => $cell) {
-                $header = strtolower($headers[$r]);
-                $val = $cell->getValue();
+            foreach ($csvRow as $header => $val) {
+                $header = strtolower($header);
                 $row['nr'] = $rowNum;
                 switch ($header) {
                     case 'action':
@@ -202,7 +201,7 @@ class ImportCsvService extends ImportBase
                         $t = substr($val, 0, 19);
                         $row['transactionDate'] = DateTime::createFromFormat("Y-m-d H:i:s", $t);
                         if (!$row['transactionDate']) {
-                            dd($cells, $row, $val);
+                            dd($csvRow, $row, $val);
                         }
                         break;
                     case 'isin':
@@ -241,7 +240,6 @@ class ImportCsvService extends ImportBase
                         $row['profit_currency'] = $val;
                         break;
                     case 'total':
-                        $rawAllocation = $val;
                         $allocation = $val;
                         $row['allocation'] = (float)$allocation;
                         $row['total'] = (float)$val;
@@ -279,7 +277,6 @@ class ImportCsvService extends ImportBase
                     default:
                         $row[] = $val;
                 }
-                $r++;
             }
 
             if (false === stripos($cellVal, 'sell') && false === stripos($cellVal, 'buy')) {
@@ -297,7 +294,6 @@ class ImportCsvService extends ImportBase
             }
             $rowNum++;
         }
-        //dd($rows);
         return $rows;
     }
 
@@ -312,24 +308,17 @@ class ImportCsvService extends ImportBase
         TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
         Security $security,
-        ?\Box\Spout\Reader\CSV\Reader $reader = null
+        CsvReader $reader
     ): array {
         $transactionsAdded = 0;
         $totalTransaction = 0;
         $transactionAlreadyExists = [];
 
         $file = $uploadedFile->getClientOriginalName();
-        $filename = $uploadedFile->getRealPath();
 
-        if (!$reader) {
-            $reader = ReaderEntityFactory::createCSVReader();
-            $reader->setFieldDelimiter(',');
-        }
-        $reader->open($filename);
+        $rows = $reader->getRows();
+        $rows = $this->formatImportData($rows);
 
-        $sheets = $reader->getSheetIterator();
-        $rows = $this->formatImportData($sheets->current());
-        $reader->close();
 
         $defaultTax = $taxRepository->find(1);
         if (!$defaultTax) {
@@ -416,6 +405,8 @@ class ImportCsvService extends ImportBase
             'transactionsAdded' => $transactionsAdded,
             'transactionAlreadyExists' => $transactionAlreadyExists,
             'dividendsImported' => $this->importedDividendLines,
+            'status' => 'ok',
+            'msg' => 'File [' . $uploadedFile->getClientOriginalName() . '] imported.',
         ];
     }
 }

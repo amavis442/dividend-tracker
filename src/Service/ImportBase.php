@@ -15,10 +15,12 @@ use App\Service\WeightedAverage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\SecurityBundle\Security;
+use App\Service\CsvReader;
+use DOMNode;
 
 abstract class ImportBase
 {
-    abstract protected function formatImportData($data): ?array;
+    abstract protected function formatImportData(array|DOMNode $data): ?array;
     abstract public function importFile(
         EntityManagerInterface $entityManager,
         TickerRepository $tickerRepository,
@@ -30,7 +32,7 @@ abstract class ImportBase
         TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
         Security $security,
-        ?\Box\Spout\Reader\CSV\Reader $reader = null
+        CsvReader $reader
     ): array;
 
     protected function getImportFiles(): array

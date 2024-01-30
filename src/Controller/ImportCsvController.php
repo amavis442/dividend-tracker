@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\SecurityBundle\Security;
+use App\Service\CsvReader;
 
 class ImportCsvController extends AbstractController
 {
@@ -44,14 +45,30 @@ class ImportCsvController extends AbstractController
         $form = $this->createForm(FileUploadType::class, $importfile);
         $form->handleRequest($request);
 
-        $imp = $importFilesRepository->findOneBy([], ['id' => 'DESC']);
-
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $transactionFile */
             $transactionFile = $form->get('importfile')->getData();
+
             // this condition is needed because the 'transactionFile' field is not required
             // so the CSV file must be processed only when a file is uploaded
             if ($transactionFile) {
+                $imp = $importFilesRepository->findOneBy(["name" => $transactionFile->getClientOriginalName()]);
+
+                if ($imp) {
+                    return $this->render('import_csv/report.html.twig', [
+                        'controller_name' => 'ImportCsvController',
+                        'data' => [
+                            'totalTransaction' => 0,
+                            'transactionsAdded' => 0,
+                            'transactionAlreadyExists' => 0,
+                            'dividendsImported' => 0,
+                            'status' => 'error',
+                            'msg' => 'File [' . $transactionFile->getClientOriginalName() . '] already imported: '
+                        ],
+                    ]);
+                }
+                $reader = new CsvReader($transactionFile->getRealPath());
+
                 $currency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
                 $branch = $branchRepository->findOneBy(['label' => 'Techniek']);
                 try {
@@ -65,7 +82,8 @@ class ImportCsvController extends AbstractController
                         $transactionRepository,
                         $taxRepository,
                         $transactionFile,
-                        $security
+                        $security,
+                        $reader
                     );
                 } catch (Exception $e) {
                     return $this->render('error_handling/exception.html.twig', [
@@ -74,9 +92,13 @@ class ImportCsvController extends AbstractController
                 }
 
                 $importFiles = new ImportFiles();
-                $importFiles->setName($transactionFile->getClientOriginalName())->setCreatedAt((new \DateTime()));
+                $importFiles
+                    ->setName($transactionFile->getClientOriginalName())
+                    ->setCreatedAt((new \DateTime()));
                 $entityManager->persist($importFiles);
                 $entityManager->flush();
+
+
 
                 return $this->render('import_csv/report.html.twig', [
                     'controller_name' => 'ImportCsvController',
@@ -84,6 +106,7 @@ class ImportCsvController extends AbstractController
                 ]);
             }
         }
+        $imp = $importFilesRepository->findOneBy([], ["id" => 'Desc']);
 
         return $this->render('import_csv/index.html.twig', [
             'controller_name' => 'ImportCsvController',

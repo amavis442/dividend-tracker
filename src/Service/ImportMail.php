@@ -25,7 +25,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 
 class ImportMail extends ImportBase
 {
-    protected function formatImportData($data): array
+    protected function formatImportData(array|DOMNode $data): array
     {
         return $this->importData($data);
     }
@@ -221,7 +221,7 @@ class ImportMail extends ImportBase
         TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
         Security $security,
-        ?\Box\Spout\Reader\CSV\Reader $reader = null
+        \App\Service\CsvReader $reader = null
 
     ): array {
         return [];
