@@ -22,7 +22,7 @@ class Research
     private $title;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private $info;
+    private ?string $info = null;
 
     #[ORM\OneToMany(targetEntity: 'App\Entity\Attachment', mappedBy: 'research', cascade: ['persist'])]
     private $attachments;

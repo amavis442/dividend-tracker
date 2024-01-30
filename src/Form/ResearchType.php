@@ -31,7 +31,14 @@ class ResearchType extends AbstractType
         $builder
             ->add('ticker', HiddenType::class, ['data' => $research->getTicker()->getId()])
             ->add('title')
-            ->add('info', TextareaType::class, ['attr' => ['class' => 'summernote', 'style' => 'display:none;']])
+            ->add('info', TextareaType::class, [
+                'required' => false,
+                'attr' => [
+                    'class' => 'summernote',
+                    'style' => 'display:none;height:100;',
+                    'data-note-height' => '200'
+                ]
+            ])
             ->add('attachments', CollectionType::class, [
                 'entry_type' => AttachmentType::class,
                 'required' => false,

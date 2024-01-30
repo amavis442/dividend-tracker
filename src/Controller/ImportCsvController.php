@@ -70,7 +70,7 @@ class ImportCsvController extends AbstractController
                 $reader = new CsvReader($transactionFile->getRealPath());
 
                 $currency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
-                $branch = $branchRepository->findOneBy(['label' => 'Techniek']);
+                $branch = $branchRepository->findOneBy(['label' => 'Unassigned']);
                 try {
                     $result = $importCsv->importFile(
                         $entityManager,

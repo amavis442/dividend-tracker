@@ -72,6 +72,8 @@ class ResearchController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+
             // $attachments = $form->get('attachments')->getData();
             $attachments = $research->getAttachments();
             if ($attachments) {
