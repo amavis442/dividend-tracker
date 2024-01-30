@@ -27,14 +27,14 @@ class Position
         nullable: false,
         options: ["default" => 0]
     )]
-    private $price;
+    private $price = 0.0;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $amount;
+    private $amount = 0.0;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Ticker', inversedBy: 'positions')]
     #[ORM\JoinColumn(nullable: false)]
@@ -48,14 +48,14 @@ class Position
         nullable: false,
         options: ["default" => 0]
     )]
-    private $profit;
+    private $profit = 0.0;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $allocation;
+    private $allocation = 0.0;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\User', inversedBy: 'positions')]
     #[ORM\JoinColumn(nullable: false)]
@@ -71,9 +71,6 @@ class Position
     #[ORM\OneToMany(targetEntity: 'App\Entity\Transaction', mappedBy: 'position', orphanRemoval: true, cascade: ['persist'])]
     #[ORM\OrderBy(['transactionDate' => 'DESC'])]
     private $transactions;
-
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $posid;
 
     #[ORM\OneToMany(targetEntity: 'App\Entity\Payment', mappedBy: 'position')]
     #[ORM\OrderBy(['payDate' => 'DESC'])]
@@ -96,13 +93,13 @@ class Position
     private $closedAt;
 
     #[ORM\Column(type: 'float', nullable: true)]
-    private $dividendTreshold;
+    private $dividendTreshold = 0.0;
 
     /**
      * What is the maximum allocation this position should be?
      */
     #[ORM\Column(type: 'integer', nullable: true)]
-    private $maxAllocation;
+    private $maxAllocation = 0;
 
     #[ORM\Column(type: 'boolean', options: ["default" => false])]
     private bool $ignore_for_dividend = false;
@@ -135,12 +132,12 @@ class Position
         return $this->id;
     }
 
-    public function getPrice(): ?float
+    public function getPrice(): float
     {
         return $this->price;
     }
 
-    public function setPrice(?float $price): self
+    public function setPrice(float $price): self
     {
         $this->price = $price;
         return $this;
@@ -158,12 +155,12 @@ class Position
         return $this;
     }
 
-    public function getTicker(): ?Ticker
+    public function getTicker(): Ticker
     {
         return $this->ticker;
     }
 
-    public function setTicker(?Ticker $ticker): self
+    public function setTicker(Ticker $ticker): self
     {
         $this->ticker = $ticker;
 
@@ -182,7 +179,7 @@ class Position
         return $this;
     }
 
-    public function getProfit(): ?float
+    public function getProfit(): float
     {
         return $this->profit;
     }
@@ -204,13 +201,13 @@ class Position
         return $this->allocation;
     }
 
-    public function setAllocation(?float $allocation): self
+    public function setAllocation(float $allocation): self
     {
         $this->allocation = $allocation;
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -222,12 +219,12 @@ class Position
         return $this;
     }
 
-    public function getCurrency(): ?Currency
+    public function getCurrency(): Currency
     {
         return $this->currency;
     }
 
-    public function setCurrency(?Currency $currency): self
+    public function setCurrency(Currency $currency): self
     {
         $this->currency = $currency;
 
@@ -300,18 +297,6 @@ class Position
         if ($this->payments->contains($payment)) {
             $this->payments->removeElement($payment);
         }
-
-        return $this;
-    }
-
-    public function getPosid(): ?string
-    {
-        return $this->posid;
-    }
-
-    public function setPosid(?string $posid): self
-    {
-        $this->posid = $posid;
 
         return $this;
     }

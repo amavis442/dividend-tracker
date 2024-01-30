@@ -24,6 +24,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class ImportCsvService extends ImportBase
 {
@@ -310,6 +311,7 @@ class ImportCsvService extends ImportBase
         TransactionRepository $transactionRepository,
         TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
+        Security $security,
         ?\Box\Spout\Reader\CSV\Reader $reader = null
     ): array {
         $transactionsAdded = 0;
@@ -352,7 +354,7 @@ class ImportCsvService extends ImportBase
                 $transaction = $transactionRepository->findOneBy(['jobid' => $row['opdrachtid']]);
 
                 if (!$transaction) {
-                    $position = $this->preImportCheckPosition($entityManager, $ticker, $currency, $positionRepository, $row);
+                    $position = $this->preImportCheckPosition($entityManager, $ticker, $currency, $positionRepository, $security, $row);
 
                     $transaction = new Transaction();
                     $transaction

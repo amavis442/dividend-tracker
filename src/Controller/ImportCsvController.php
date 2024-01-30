@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class ImportCsvController extends AbstractController
 {
@@ -36,7 +37,8 @@ class ImportCsvController extends AbstractController
         TransactionRepository $transactionRepository,
         ImportCsvService $importCsv,
         TaxRepository $taxRepository,
-        ImportFilesRepository $importFilesRepository
+        ImportFilesRepository $importFilesRepository,
+        Security $security
     ): Response {
         $importfile = new fileUpload();
         $form = $this->createForm(FileUploadType::class, $importfile);
@@ -62,7 +64,8 @@ class ImportCsvController extends AbstractController
                         $branch,
                         $transactionRepository,
                         $taxRepository,
-                        $transactionFile
+                        $transactionFile,
+                        $security
                     );
                 } catch (Exception $e) {
                     return $this->render('error_handling/exception.html.twig', [

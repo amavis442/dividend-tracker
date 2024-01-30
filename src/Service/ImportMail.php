@@ -21,6 +21,7 @@ use DOMElement;
 use DOMNode;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use ZBateson\MailMimeParser\MailMimeParser;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class ImportMail extends ImportBase
 {
@@ -124,7 +125,8 @@ class ImportMail extends ImportBase
         BranchRepository $branchRepository,
         TransactionRepository $transactionRepository,
         TaxRepository $taxRepository,
-        EntityManager $entityManager
+        EntityManager $entityManager,
+        Security $security
     ): void {
         ini_set('max_execution_time', 3000);
 
@@ -144,7 +146,7 @@ class ImportMail extends ImportBase
             $totalTransaction = 0;
 
             $handle = fopen(dirname(__DIR__) . '/../import/' . $file, 'r');
-            $message = $mailParser->parse($handle);
+            $message = $mailParser->parse($handle, false);
             $htmlContent = '<html>' . $message->getHtmlContent() . '</html>';
 
             $DOM = new DOMDocument();
@@ -160,7 +162,7 @@ class ImportMail extends ImportBase
 
                 foreach ($rows as $row) {
                     $ticker = $this->preImportCheckTicker($entityManager, $branch, $tickerRepository, $defaultTax, $row);
-                    $position = $this->preImportCheckPosition($entityManager, $ticker, $currency, $positionRepository, $row);
+                    $position = $this->preImportCheckPosition($entityManager, $ticker, $currency, $positionRepository, $security, $row);
                     $transaction = $transactionRepository->findOneBy(['transactionDate' => $row['transactionDate'], 'position' => $position, 'meta' => $row['nr']]);
 
                     if (!$transaction) {
@@ -218,7 +220,9 @@ class ImportMail extends ImportBase
         TransactionRepository $transactionRepository,
         TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
+        Security $security,
         ?\Box\Spout\Reader\CSV\Reader $reader = null
+
     ): array {
         return [];
     }

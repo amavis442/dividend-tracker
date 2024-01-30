@@ -14,6 +14,7 @@ use App\Repository\TransactionRepository;
 use App\Service\WeightedAverage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Bundle\SecurityBundle\Security;
 
 abstract class ImportBase
 {
@@ -28,6 +29,7 @@ abstract class ImportBase
         TransactionRepository $transactionRepository,
         TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
+        Security $security,
         ?\Box\Spout\Reader\CSV\Reader $reader = null
     ): array;
 
@@ -55,29 +57,26 @@ abstract class ImportBase
         Ticker $ticker,
         Currency $currency,
         PositionRepository $positionRepository,
+        Security $security,
         array $data
     ): Position {
+        $user = $security->getUser();
         $transactionDate = $data['transactionDate'];
         $position = $positionRepository->findOneByTickerAndDate($ticker, $transactionDate);
 
         if (!$position) {
             $position = new Position();
             $position->setTicker($ticker)
-                ->setAmount(0)
+                ->setUser($user)
                 ->setCurrency($currency)
-                ->setPosid($data['opdrachtid'])
-                ->setAllocationCurrency($currency)
-            ;
+                ->setAllocationCurrency($currency);
             $entityManager->persist($position);
             $entityManager->flush();
         }
 
         if ($position) {
-            if (!$position->getPosid() || $position->getPosid() === '') {
-                $position->setPosid($data['opdrachtid']);
-                $entityManager->persist($position);
-                $entityManager->flush();
-            }
+            $entityManager->persist($position);
+            $entityManager->flush();
         }
 
         return $position;
