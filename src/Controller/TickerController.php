@@ -96,8 +96,13 @@ class TickerController extends AbstractController
     public function delete(Request $request, EntityManagerInterface $entityManager, Ticker $ticker): Response
     {
         if ($this->isCsrfTokenValid('delete' . $ticker->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($ticker);
-            $entityManager->flush();
+            if ($ticker->getPositions()->isEmpty()) {
+                $entityManager->remove($ticker);
+                $entityManager->flush();
+                return $this->redirectToRoute('ticker_index');
+            }
+
+            $this->addFlash('notice', 'Can not delete. Ticker is connected to open positions.');
         }
 
         return $this->redirectToRoute('ticker_index');
