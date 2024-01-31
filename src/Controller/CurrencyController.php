@@ -4,7 +4,11 @@ namespace App\Controller;
 
 use App\Entity\Currency;
 use App\Form\CurrencyType;
+use App\Repository\CalendarRepository;
 use App\Repository\CurrencyRepository;
+use App\Repository\PaymentRepository;
+use App\Repository\PositionRepository;
+use App\Repository\TickerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -69,11 +73,29 @@ class CurrencyController extends AbstractController
     }
 
     #[Route(path: '/delete/{id}', name: 'currency_delete', methods: ['POST', 'DELETE'])]
-    public function delete(Request $request, EntityManagerInterface $entityManager, Currency $currency): Response
-    {
+    public function delete(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        Currency $currency,
+        TickerRepository $tickerRepository,
+        PositionRepository $positionRepository,
+        PaymentRepository $paymentRepository,
+        CalendarRepository $calendarRepository
+    ): Response {
         if ($this->isCsrfTokenValid('delete' . $currency->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($currency);
-            $entityManager->flush();
+            // Need to check tickers, positions, payments, calendars if there is a mandatory link so you can not remove
+            // this item before decoupling them first. Boy oh boy lots of work.
+            if (($tickerRepository->findOneBy(['currency_id' =>  $currency->getId()]) &&
+                $positionRepository->findOneBy(['currency_id' => $currency->getId()]) &&
+                $paymentRepository->findOneBy(['currency_id' => $currency->getId()]) &&
+                $calendarRepository->findOneBy(['currency_id' => $currency->getId()])) == null) {
+
+                $entityManager->remove($currency);
+                $entityManager->flush();
+
+                return $this->redirectToRoute('currency_index');
+            }
+            $this->addFlash('notice', 'Can not remove currency. It has connections to either ticker, position, calendar and /or payment');
         }
 
         return $this->redirectToRoute('currency_index');
