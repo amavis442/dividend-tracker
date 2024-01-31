@@ -6,7 +6,10 @@
 
 {% block body %}
   <h1>Industry</h1>
-
+  {% for notice in app.flashes('notice') %}
+    <br />
+    <div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
+  {% endfor %}
   <table class="table">
     <thead>
       <tr>

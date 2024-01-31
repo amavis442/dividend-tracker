@@ -6,6 +6,10 @@
 
 {% block body %}
 	<h1>{{ 'Journal'|trans }}</h1>
+	  {% for notice in app.flashes('notice') %}
+    <br />
+    <div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
+  {% endfor %}
 	<div>
 		<a href="{{ path('journal_new') }}" class="btn btn-primary" role="button">
 			<i class="far fa-file"></i>

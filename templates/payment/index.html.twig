@@ -11,7 +11,10 @@
     /
     {{ endDate }}
   </h1>
-
+  {% for notice in app.flashes('notice') %}
+    <br />
+    <div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
+  {% endfor %}
   {{ form_start(searchForm) }}
   <div class="form-row">
     <div class="col">{{ form_widget(searchForm.year) }}</div>

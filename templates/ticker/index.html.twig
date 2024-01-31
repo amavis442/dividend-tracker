@@ -6,6 +6,11 @@
 
 {% block body %}
   <h1>Tickers</h1>
+  {% for notice in app.flashes('notice') %}
+    <br />
+    <div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
+  {% endfor %}
+
   {% include '_search_form.html.twig' %}
   <table class="table">
     <thead>

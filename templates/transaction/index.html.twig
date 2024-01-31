@@ -1,76 +1,73 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Transactions
+{% block title %}
+  Transactions
 {% endblock %}
 
 {% block body %}
-	<h1>Transactions</h1>
-	<br/>
-	<br/>
-	{% include '_search_form.html.twig' %}
+  <h1>Transactions</h1>
+  {% for notice in app.flashes('notice') %}
+    <br />
+    <div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
+  {% endfor %}
+  <br />
+  <br />
+  {% include '_search_form.html.twig' %}
 
-	<table class="table">
-		<thead>
-			<tr>
-				<th>
-					Side
-				</th>
-				<th>
-					<a href="{{ path('transaction_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'transactionDate', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Transaction date</a>
-				</th>
-				<th>
-					<a href="{{ path('transaction_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a>
-				</th>
-				<th>Industry</th>
-				<th>Units</th>
-				<th>Price</th>
-				<th>Allocation</th>
-				<th style="width:20%">actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for transaction in transactions %}
-				{% set currentDividendData = transaction.position.ticker.getRecentDividendDate %}
-				{% set dividendDaysLeft = currentDividendData ? currentDividendData.getDaysLeft : -1 %}
-				{% set side = (transaction.side == 1 ? 'Buy' : 'Sell') %}
-				<tr>
-					<td>
-						<span class="badge badge-{% if transaction.side == 1 %}success{% else %}danger{% endif %}">
-							{{ side }}
-						</span>
-					</td>
-					<td>
-						{{ transaction.transactionDate|date("d-m-Y") }}
-					</td>
-					<td>
-						{{ transaction.position.ticker.ticker }}
-					</td>
-					<td>{{ transaction.position.ticker.branch.label }}</td>
-					<td>{{ (transaction.amount)|format_number({fraction_digit: 7}) }}</td>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Side</th>
+        <th>
+          <a href="{{ path('transaction_index', { page: thisPage ? thisPage : 1, orderBy: 'transactionDate', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">Transaction date</a>
+        </th>
+        <th>
+          <a href="{{ path('transaction_index', { page: thisPage ? thisPage : 1, orderBy: 'ticker', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">Ticker</a>
+        </th>
+        <th>Industry</th>
+        <th>Units</th>
+        <th>Price</th>
+        <th>Allocation</th>
+        <th style="width:20%">actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for transaction in transactions %}
+        {% set currentDividendData = transaction.position.ticker.getRecentDividendDate %}
+        {% set dividendDaysLeft = currentDividendData ? currentDividendData.getDaysLeft : - 1 %}
+        {% set side = transaction.side == 1 ? 'Buy' : 'Sell' %}
+        <tr>
+          <td>
+            <span class="badge badge-{% if transaction.side == 1 %}
 
-					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ (transaction.price)|format_number({fraction_digit: 2}) }}</td>
-					<td>{{ (transaction.allocationCurrency ? transaction.allocationCurrency.sign : '$')|raw }}{{ (transaction.allocation)|format_number({fraction_digit: 2}) }}</td>
+              {% endif %}">
+              {{ side }}
+            </span>
+          </td>
+          <td>{{ transaction.transactionDate|date('d-m-Y') }}</td>
+          <td>{{ transaction.position.ticker.ticker }}</td>
+          <td>{{ transaction.position.ticker.branch.label }}</td>
+          <td>{{ transaction.amount|format_number({ fraction_digit: 7 }) }}</td>
 
-					<td>
-						<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-							<div class="btn-group mr-2" role="group" aria-label="First group">
-								<a href="{{ path('transaction_show', {'id': transaction.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details transaction">
-									<i class="fas fa-book-open"></i>
-								</a>
-								<a href="{{ path('transaction_edit', {'id': transaction.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit transaction">
-									<i class="far fa-edit"></i>
-								</a>
-							</div>
-						</div>
-					</td>
-				</tr>
-			{% else %}
-				<tr>
-					<td colspan="11">no records found</td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+          <td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ transaction.price|format_number({ fraction_digit: 2 }) }}</td>
+          <td>{{ (transaction.allocationCurrency ? transaction.allocationCurrency.sign : '$')|raw }}{{ transaction.allocation|format_number({ fraction_digit: 2 }) }}</td>
 
-	{% include 'paginator.html.twig' %}
+          <td>
+            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+              <div class="btn-group mr-2" role="group" aria-label="First group">
+                <a href="{{ path('transaction_show', { id: transaction.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details transaction"><i class="fas fa-book-open"></i></a>
+                <a href="{{ path('transaction_edit', { id: transaction.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit transaction"><i class="far fa-edit"></i></a>
+              </div>
+            </div>
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="11">no records found</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% include 'paginator.html.twig' %}
 {% endblock %}

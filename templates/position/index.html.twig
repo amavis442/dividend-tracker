@@ -1,84 +1,76 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Positions
+{% block title %}
+  Positions
 {% endblock %}
 
 {% block body %}
-    <h1>Positions</h1>
+  <h1>Positions</h1>
+  {% for notice in app.flashes('notice') %}
+    <br />
+    <div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
+  {% endfor %}
+  {% include '_summary.html.twig' %}
 
-    {% include '_summary.html.twig' %}
+  <br />
+  <br />
+  {% include '_search_form.html.twig' %}
 
-    <br/>
-    <br/>
-    {% include '_search_form.html.twig' %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>
+          <a href="{{ path('position_index', { page: thisPage ? thisPage : 1, tab: tab, orderBy: 'ticker', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">Ticker</a>
+        </th>
+        <th>Name</th>
+        <th>Industry</th>
+        <th>Amount</th>
+        <th>Average price</th>
+        <th>Allocation</th>
+        <th>Pos id</th>
+        <th>Closed at</th>
+        <th>Status</th>
+        <th style="width:20%">actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for position in positions %}
+        {% set currentDividendData = position.ticker.getRecentDividendDate %}
+        {% set dividendDaysLeft = currentDividendData ? currentDividendData.getDaysLeft : - 1 %}
+        <tr>
+          <td>{{ position.id }}</td>
+          <td>{{ position.ticker.ticker }}</td>
+          <td>{{ position.ticker.fullname }}</td>
+          <td>{{ position.ticker.branch.label }}</td>
+          <td>{{ position.amount|format_number({ fraction_digit: 2 }) }}</td>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    #
-                </th>
-                <th>
-                    <a href="{{ path('position_index', {'page': thisPage ? thisPage : 1, 'tab': tab, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a>
-                </th>
-                <th>Name</th>
-                <th>Industry</th>
-                <th>Amount</th>
-                <th>Average price</th>
-                <th>Allocation</th>
-                <th>Pos id</th>
-                <th>Closed at</th>
-                <th>Status</th>
-                <th style="width:20%">actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for position in positions %}
-                {% set currentDividendData = position.ticker.getRecentDividendDate %}
-                {% set dividendDaysLeft = currentDividendData ? currentDividendData.getDaysLeft : -1 %}
-                <tr>
-                    <td>
-                        {{ position.id }}
-                    </td>
-                    <td>
-                        {{ position.ticker.ticker }}
-                    </td>
-                    <td>
-                        {{ position.ticker.fullname }}
-                    </td>
-                    <td>{{ position.ticker.branch.label }}</td>
-                    <td>{{ (position.amount)|format_number({fraction_digit: 2}) }}</td>
-                    
-                    <td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price)|format_number({fraction_digit: 2}) }}</td>
-                    <td>{{ (position.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}</td>
-                    <td>{{ position.posid }}</td>
-                    <td>{{ position.updatedAt ? position.updatedAt|date("d/m/Y") : '' }}</td>
-                    <td>{{ position.closed == 2 ? 'closed' : 'open'}}</td>
-                    <td>
-                        <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-                            <div class="btn-group mr-2" role="group" aria-label="First group">
-                                <a href="{{ path('position_show', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details position">
-                                    <i class="fas fa-book-open"></i>
-                                </a>
-                                <a class="btn btn-success" href="{{ path('payment_new', {'position': position.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment"><i class="far fa-money-bill-alt"></i></a>
-                            
-                                <a href="{{ path('position_edit', {'id': position.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit position">
-                                    <i class="far fa-edit"></i>
-                                </a>
-                                {% if not position.closed %}
-                                    <a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id, 'closed': true}) }}" data-toggle="tooltip" data-placement="top" title="Close position"><span class="fas fa-folder-minus"/></a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="11">no records found</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+          <td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ position.price|format_number({ fraction_digit: 2 }) }}</td>
+          <td>{{ (position.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ position.allocation|format_number({ fraction_digit: 2 }) }}</td>
+          <td>{{ position.posid }}</td>
+          <td>{{ position.updatedAt ? position.updatedAt|date('d/m/Y') : '' }}</td>
+          <td>{{ position.closed == 2 ? 'closed' : 'open' }}</td>
+          <td>
+            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+              <div class="btn-group mr-2" role="group" aria-label="First group">
+                <a href="{{ path('position_show', { id: position.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details position"><i class="fas fa-book-open"></i></a>
+                <a class="btn btn-success" href="{{ path('payment_new', { position: position.id }) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment"><i class="far fa-money-bill-alt"></i></a>
 
-    {% include 'paginator.html.twig' %}
+                <a href="{{ path('position_edit', { id: position.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit position"><i class="far fa-edit"></i></a>
+                {% if not position.closed %}
+                  <a class="btn btn-primary" href="{{ path('position_edit', { id: position.id, closed: true }) }}" data-toggle="tooltip" data-placement="top" title="Close position"><span class="fas fa-folder-minus" /></a>
+                {% endif %}
+              </div>
+            </div>
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="11">no records found</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% include 'paginator.html.twig' %}
 {% endblock %}
