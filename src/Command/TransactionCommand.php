@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
 use App\Service\WeightedAverage;
@@ -32,6 +33,12 @@ class TransactionCommand extends Command
     protected $tickerRepository;
     /**
      *
+     * @var PositionRepository
+     */
+    protected $positionRepository;
+
+    /**
+     *
      * @var EntityManagerInterface
      */
     protected $em;
@@ -46,6 +53,7 @@ class TransactionCommand extends Command
         EntityManagerInterface $em,
         TransactionRepository $transactionRepository,
         TickerRepository $tickerRepository,
+        PositionRepository $positionRepository,
         WeightedAverage $weightedAverageService
     ) {
         parent::__construct();
@@ -53,6 +61,7 @@ class TransactionCommand extends Command
         $this->em = $em;
         $this->transactionRepository = $transactionRepository;
         $this->tickerRepository = $tickerRepository;
+        $this->positionRepository = $positionRepository;
         $this->weightedAverageService = $weightedAverageService;
     }
 
@@ -90,8 +99,14 @@ class TransactionCommand extends Command
         foreach ($tickers as $ticker) {
             $position = null;
             if ($ticker) {
-                $position = $ticker->getPositions()->first();
-                if ($position->getClosed()) continue;
+                $position = $this->positionRepository->findOneBy(['ticker' => $ticker, 'closed' => false]);
+                /*
+                $orderValue = $row['total'];
+                $stockValue = $orderValue - (($row['fx_fee'] ?? 0) + ($row['stampduty'] ?? 0) + ($row['transaction_fee'] ?? 0) + ($row['finra_fee'] ?? 0));
+                */
+
+                //$position = $ticker->getPositions()->first();
+                //if ($position->getClosed()) continue;
                 $this->weightedAverageService->calc($position);
                 $io->text(
                     '"' . $ticker->getFullname() . '"' .

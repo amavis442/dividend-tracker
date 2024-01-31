@@ -4,13 +4,16 @@ namespace App\Service;
 
 use App\Entity\Transaction;
 use App\Entity\Position;
+use Doctrine\ORM\EntityManagerInterface;
 
 class WeightedAverage
 {
     protected $transactions = [];
+    protected EntityManagerInterface $entityManager;
 
-    public function __construct()
+    public function __construct(EntityManagerInterface $entityManager)
     {
+        $this->entityManager = $entityManager;
     }
 
     public function addTransaction(Transaction $transaction, int $index)
@@ -28,9 +31,14 @@ class WeightedAverage
         $transactions = $position->getTransactions();
         $n = 1;
         foreach ($transactions as $transaction) {
+            $orderValue = $transaction->getTotal();
+            $stockValue = $orderValue - $transaction->getFxFee() - $transaction->getStampduty() - $transaction->getTransactionFee() - $transaction->getFinraFee();
+            $transaction->setAllocation($stockValue);
+            $this->entityManager->persist($transaction);
             $this->addTransaction($transaction, $n);
             $n++;
         }
+        //$this->entityManager->flush();
 
         if (count($this->transactions) === 0) {
             return;
@@ -46,10 +54,10 @@ class WeightedAverage
         foreach ($this->transactions as $timeStamp => $transaction) {
             $profit = 0.0;
             $amount = $transaction->getAmount();
-            $allocation = $transaction->getAllocation();
+            $allocation = $transaction->getAllocation(); // This one should be total - all the costs
 
             if ($transaction->getSide() === Transaction::BUY) {
-                $costBase += $allocation - $transaction->getFxFee() - $transaction->getTransactionFee() - $transaction->getFinraFee();
+                $costBase += $allocation; // - $transaction->getFxFee() - $transaction->getTransactionFee() - $transaction->getFinraFee();
                 $numShares += $amount;
             }
 

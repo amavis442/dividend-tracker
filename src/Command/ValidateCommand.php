@@ -22,8 +22,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name:'validate',
-    description:'Validate and fix transactions based on supplioed file',
+    name: 'validate',
+    description: 'Validate and fix transactions based on supplied file',
 )]
 class ValidateCommand extends Command
 {
@@ -59,8 +59,7 @@ class ValidateCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('filename', InputArgument::REQUIRED, 'Argument description')
-        ;
+            ->addArgument('filename', InputArgument::REQUIRED, 'Argument description');
     }
 
     protected function importData(Sheet $sheet, OutputInterface $output): void

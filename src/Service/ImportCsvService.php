@@ -282,8 +282,10 @@ class ImportCsvService extends ImportBase
             };
 
             if (count($row) > 0) {
-                //$rawAllocation -= (($row['fx_fee'] ?? 0) + ($row['stampduty'] ?? 0) + ($row['transaction_fee'] ?? 0) + ($row['finra_fee'] ?? 0));
-                $row['allocation'] = $row['total'];
+                $orderValue = $row['total'];
+                $stockValue = $orderValue - (($row['fx_fee'] ?? 0) + ($row['stampduty'] ?? 0) + ($row['transaction_fee'] ?? 0) + ($row['finra_fee'] ?? 0));
+
+                $row['allocation'] = $stockValue;
                 $row['price'] = round($row['original_price'] / $row['exchange_rate'], 3);
                 $rows[$row['nr']] = $row;
             }
