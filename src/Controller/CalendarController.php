@@ -145,6 +145,7 @@ class CalendarController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($calendar);
             $entityManager->flush();
 
             if ($referer->get()) {

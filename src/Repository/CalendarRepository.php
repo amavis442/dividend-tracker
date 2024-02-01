@@ -89,7 +89,7 @@ class CalendarRepository extends ServiceEntityRepository
         return $queryBuilder->getOneOrNullResult();
     }
 
-    public function findByDate(DateTimeInterface $dateTime, Ticker $ticker): ?Calendar
+    public function findByDate(DateTimeInterface $dateTime, Ticker $ticker, string $dividendType = Calendar::REGULAR): ?Calendar
     {
         $queryBuilder = $this->createQueryBuilder('c')
             ->select('c')
@@ -99,7 +99,7 @@ class CalendarRepository extends ServiceEntityRepository
             ->andWhere('c.dividendType = :dividendType')
             ->setParameter('ticker', $ticker)
             ->setParameter('paydate', $dateTime->format('Y-m-d'))
-            ->setParameter('dividendType', Calendar::REGULAR)
+            ->setParameter('dividendType', $dividendType)
             ->orderBy('c.id', 'DESC')
             ->setMaxResults(1)
             ->getQuery();

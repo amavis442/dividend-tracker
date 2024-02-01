@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Branch;
+use App\Entity\Calendar;
 use App\Entity\Currency;
 use App\Entity\Payment;
 use App\Entity\Transaction;
@@ -124,7 +125,12 @@ class ImportCsvService extends ImportBase
             return;
         }
 
-        $calendar = $this->calendarRepository->findByDate($transactionDate, $ticker);
+        $divType = Calendar::REGULAR;
+        if (stripos($dividendType, 'Extra') !== false) {
+            $divType = Calendar::SUPPLEMENT;
+        }
+
+        $calendar = $this->calendarRepository->findByDate($transactionDate, $ticker, $divType);
         $position = $ticker->getPositions()->last();
         if (!$position instanceof \App\Entity\Position) {
             throw new RuntimeException('There is no position for this dividend payment to link to. Are you sure you have the right account?');
