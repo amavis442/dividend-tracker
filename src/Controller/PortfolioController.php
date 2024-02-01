@@ -165,7 +165,7 @@ class PortfolioController extends AbstractController
             $percentageAllocation = ($position->getAllocation() / $allocated) * 100;
         }
 
-        $calendars = $ticker->getCalendars()->slice(0, 10);
+        $calendars = $ticker->getCalendars()->slice(0, 30);
         $calendarsCount = $ticker->getCalendars()->count();
 
         $referer->set('portfolio_show', ['id' => $position->getId()]);
