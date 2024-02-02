@@ -129,6 +129,9 @@ class ImportCsvService extends ImportBase
         if (stripos($dividendType, 'Extra') !== false) {
             $divType = Calendar::SUPPLEMENT;
         }
+        if (stripos($dividendType, 'Return') !== false) {
+            $divType = Calendar::SPECIAL;
+        }
 
         $calendar = $this->calendarRepository->findByDate($transactionDate, $ticker, $divType);
         $position = $ticker->getPositions()->last();

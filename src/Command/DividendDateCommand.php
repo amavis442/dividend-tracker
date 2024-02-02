@@ -112,6 +112,9 @@ class DividendDateCommand extends Command
                 if (stripos($payment['Type'], 'Extra') !== false) {
                     $dividendType = Calendar::SUPPLEMENT;
                 }
+                if (stripos($payment['Type'], 'Return') !== false) {
+                    $dividendType = Calendar::SPECIAL;
+                }
                 $calendar = $this->calendarRepository->findOneBy(['ticker' => $ticker, 'exDividendDate' => $exDate, 'dividendType' => $dividendType]);
 
                 if (!$calendar) {
