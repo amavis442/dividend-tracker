@@ -103,7 +103,7 @@ class PaymentController extends AbstractController
         if (isset($data['quator']) && $data['quator'] !== 0) {
             [$startDate, $endDate] = (new DateHelper())->quaterToDates($data['quator'], $data['year']);
         }
-        $totalDividend = $paymentRepository->getTotalDividend($startDate, $endDate);
+        $totalDividend = $paymentRepository->getTotalDividend($startDate . " 00:00:00", $endDate . " 23:59:59");
         $taxes = ($totalDividend / 85) * 15;
         $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
         $items = $paymentRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria, $startDate, $endDate);
