@@ -36,7 +36,7 @@ class DividendTracker
     private $createdAt;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'dividendTrackers')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private $user;
 
     public function getId(): ?int
@@ -97,7 +97,7 @@ class DividendTracker
         return $this->user;
     }
 
-    public function setUser(User $user): self
+    public function setUser(?User $user): self
     {
         $this->user = $user;
 

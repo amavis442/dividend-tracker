@@ -23,7 +23,7 @@ class Pie
     private $positions;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'pies')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private $user;
 
     #[ORM\OneToMany(targetEntity: 'App\Entity\Transaction', mappedBy: 'pie')]
@@ -91,7 +91,7 @@ class Pie
         return $this->user;
     }
 
-    public function setUser(User $user): self
+    public function setUser(?User $user): self
     {
         $this->user = $user;
 
