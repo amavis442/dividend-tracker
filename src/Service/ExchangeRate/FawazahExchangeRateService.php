@@ -27,8 +27,6 @@ class FawazahExchangeRateService implements ExchangeRateInterface
 
         $client = $this->client;
 
-
-        $this->exchangerateCache->delete("exchangerates");
         $data = $this->exchangerateCache->get('exchangerates', function (ItemInterface $item) use ($client, $apiCallUrl) {
             $item->expiresAfter(600);
             $response = $client->request(
