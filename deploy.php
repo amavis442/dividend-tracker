@@ -8,7 +8,7 @@ require 'recipe/symfony.php';
 require 'contrib/rsync.php';
 
 // Project name
-set('application', 'dividend.prod');
+set('application', 'dividend');
 
 // Project repository
 set('repository', 'git@gitlab.com:amavis442/dividend.git');
@@ -24,26 +24,26 @@ set('allow_anonymous_stats', false);
 
 // Hosts
 
-host('192.168.2.220')
+/*host('192.168.2.220')
     ->setRemoteUser('deployer')
-    ->setDeployPath('/var/www/dividend.banpagi.com')
+    ->setDeployPath('/var/www/prod/dividend')
     ->setLabels([
         'type' => 'web',
         'env' => 'prod',
         'stage' => 'prod',
     ]);
-
+*/
 host('127.0.0.1')
     ->setRemoteUser('deployer')
-    ->setDeployPath('/var/www/{{application}}')
+    ->setDeployPath('/var/www/prod/{{application}}')
     ->setLabels([
         'type' => 'local',
         'env' => 'prod',
         'stage' => 'prod',
-    ])
-    ->set('branch', 'master')
-    ->set('rsync_src', __DIR__)
-    ->set('rsync_dest', '{{release_path}}');
+    ]);
+    //->set('branch', 'master')
+    //->set('rsync_src', __DIR__)
+    //->set('rsync_dest', '{{release_path}}');
 
 
 set('rsync', [
