@@ -10,6 +10,7 @@ use App\Entity\Transaction;
 use App\Repository\TaxRepository;
 use App\Service\ExchangeRate\FawazahExchangeRateService as ExchangeRateService;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DividendService
 {
@@ -52,11 +53,14 @@ class DividendService
      */
     protected $cummulateDividendAmount = true;
 
-    public function __construct(ExchangeRateService $exchangeRateService, TaxRepository $taxRepository)
+    protected TranslatorInterface $translator;
+
+    public function __construct(ExchangeRateService $exchangeRateService, TaxRepository $taxRepository, TranslatorInterface $translator)
     {
         $this->exchangeRateService = $exchangeRateService;
         $this->taxRepository = $taxRepository;
         $this->netDividendPerShare = null;
+        $this->translator = $translator;
     }
 
     /**
@@ -68,6 +72,12 @@ class DividendService
     public function getExchangeRate(Calendar $calendar): ?float
     {
         $rates = $this->exchangeRateService->getRates();
+        if (count($rates) < 1 && $calendar->getCurrency()->getSymbol() != 'EUR' || !isset($rates[$calendar->getCurrency()->getSymbol()])) {
+            $msg = $this->translator->trans('tickerSymbol:: Exchange rate for [Symbol] is currently unavailable. Available are: jsonSymbol',['tickerSymbol' => $calendar->getTicker()->getTicker(),
+            'Symbol' => $calendar->getCurrency()->getSymbol(), 'jsonSymbol' => json_encode($rates)]);
+
+            throw new \Exception($msg);
+        }
         switch ($calendar->getCurrency()->getSymbol()) {
             case 'EUR':
                 $exchangeRate = 1;

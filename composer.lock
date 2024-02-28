@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "14700f95648466c8b3e94e5106b5b8d2",
+    "content-hash": "4983cf8afefc75bfd361e62021fb4ec6",
     "packages": [
         {
             "name": "beberlei/doctrineextensions",
@@ -1725,6 +1725,56 @@
             "time": "2023-12-03T20:05:35+00:00"
         },
         {
+            "name": "hellonico/brotli",
+            "version": "1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nlemoine/brotli-php.git",
+                "reference": "a7c98525c48763b8c14bd9dc2f694d70e7c17d3e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nlemoine/brotli-php/zipball/a7c98525c48763b8c14bd9dc2f694d70e7c17d3e",
+                "reference": "a7c98525c48763b8c14bd9dc2f694d70e7c17d3e",
+                "shasum": ""
+            },
+            "require": {
+                "loophp/phposinfo": "^1.7",
+                "php": "^7.4 || ^8.0",
+                "symfony/process": "^5.0 || ^6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.0 || ^9.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/functions.php"
+                ],
+                "psr-4": {
+                    "HelloNico\\Brotli\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Lemoine",
+                    "email": "tech@niconico.fr"
+                }
+            ],
+            "description": "Add brotli compress/uncompress functions to PHP. Batteries included.",
+            "keywords": [
+                "brotli"
+            ],
+            "support": {
+                "source": "https://github.com/nlemoine/brotli-php/tree/1.2.0"
+            },
+            "time": "2022-06-08T12:12:01+00:00"
+        },
+        {
             "name": "laminas/laminas-code",
             "version": "4.13.0",
             "source": {
@@ -1786,6 +1836,63 @@
                 }
             ],
             "time": "2023-10-18T10:00:55+00:00"
+        },
+        {
+            "name": "loophp/phposinfo",
+            "version": "1.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/loophp/phposinfo.git",
+                "reference": "9faccbfbf5364fd34fbc230961fa6fc51cc66b8f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/loophp/phposinfo/zipball/9faccbfbf5364fd34fbc230961fa6fc51cc66b8f",
+                "reference": "9faccbfbf5364fd34fbc230961fa6fc51cc66b8f",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8"
+            },
+            "require-dev": {
+                "drupol/php-conventions": "^5.0.0",
+                "ext-pcov": "*",
+                "friends-of-phpspec/phpspec-code-coverage": "^6",
+                "infection/infection": "^0.26",
+                "infection/phpspec-adapter": "^0.2.0",
+                "phpspec/phpspec": "^7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "loophp\\phposinfo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Pol Dellaiera",
+                    "email": "pol.dellaiera@protonmail.com"
+                }
+            ],
+            "description": "Try to guess the host operating system.",
+            "keywords": [
+                "operating system detection"
+            ],
+            "support": {
+                "issues": "https://github.com/loophp/phposinfo/issues",
+                "source": "https://github.com/loophp/phposinfo"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/drupol",
+                    "type": "github"
+                }
+            ],
+            "time": "2022-12-20T20:21:10+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -10585,5 +10692,5 @@
         "ext-iconv": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }

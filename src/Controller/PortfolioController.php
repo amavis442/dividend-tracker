@@ -59,28 +59,31 @@ class PortfolioController extends AbstractController
         [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
         $referer->set('portfolio_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
 
+        try {
+            $pageData = $model->getPage(
+                $positionRepository,
+                $dividendService,
+                $paymentRepository,
+                $allocated,
+                $page,
+                $orderBy,
+                $sort,
+                $searchCriteria,
+                $pieSelected,
+            );
 
-        $pageData = $model->getPage(
-            $positionRepository,
-            $dividendService,
-            $paymentRepository,
-            $allocated,
-            $page,
-            $orderBy,
-            $sort,
-            $searchCriteria,
-            $pieSelected,
-        );
-
-
+        } catch (\Exception $e){
+            $this->addFlash('notice', $e->getMessage());
+        }
+        //dd($pageData);
         $request->getSession()->set(get_class($this), $request->getRequestUri());
 
 
         return $this->render('portfolio/index.html.twig', [
-            'portfolioItems' => $pageData->getPortfolioItems(),
-            'cacheTimestamp' => (new DateTime())->setTimestamp($pageData->getCacheTimestamp() ?: 0),
+            'portfolioItems' => isset($pageData) ? $pageData->getPortfolioItems(): null,
+            'cacheTimestamp' => isset($pageData) ? (new DateTime())->setTimestamp($pageData->getCacheTimestamp() ?: 0) : 0,
             'limit' => $limit,
-            'maxPages' => $pageData->getMaxPages(),
+            'maxPages' => isset($pageData) ? $pageData->getMaxPages() : 0,
             'thisPage' => $thisPage,
             'order' => $orderBy,
             'sort' => $sort,

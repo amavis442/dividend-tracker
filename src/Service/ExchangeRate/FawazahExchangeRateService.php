@@ -11,13 +11,13 @@ class FawazahExchangeRateService implements ExchangeRateInterface
     public const USD_EXCHANGERATE = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur/usd.json';
     public const GPB_EXCHANGERATE = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur/gbp.json';
 
-    private $exchangerateCache;
-    private $client;
+    private CacheInterface $exchangerateCache;
+    private HttpClientInterface $client;
 
-    public function __construct(HttpClientInterface $client, CacheInterface $exchangerateCache)
+    public function __construct(HttpClientInterface $jsdelivrClient, CacheInterface $exchangerateCache)
     {
         $this->exchangerateCache = $exchangerateCache;
-        $this->client = $client;
+        $this->client = $jsdelivrClient;
     }
 
     public function getRates(): array
@@ -27,8 +27,10 @@ class FawazahExchangeRateService implements ExchangeRateInterface
 
         $client = $this->client;
 
+
+        $this->exchangerateCache->delete("exchangerates");
         $data = $this->exchangerateCache->get('exchangerates', function (ItemInterface $item) use ($client, $apiCallUrl) {
-            $item->expiresAfter(3600);
+            $item->expiresAfter(600);
             $response = $client->request(
                 'GET',
                 $apiCallUrl['usd'],
@@ -38,7 +40,7 @@ class FawazahExchangeRateService implements ExchangeRateInterface
                     'verify_host' => false
                 ] // Needed t o solve "SSL: no alternative certificate subject name matches target host name" error
             );
-            $content['usd'] = $response->getContent(false);
+            $content['usd'] = brotli_uncompress($response->getContent(false));
             $response = $client->request(
                 'GET',
                 $apiCallUrl['gbp'],
@@ -48,7 +50,8 @@ class FawazahExchangeRateService implements ExchangeRateInterface
                     'verify_host' => false
                 ]
             );
-            $content['gbp'] = $response->getContent(false);
+            $content['gbp'] = brotli_uncompress($response->getContent(false));
+            //dd($response, $response->getInfo(), $content);
             return $content;
         });
 

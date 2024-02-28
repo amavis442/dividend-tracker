@@ -5,6 +5,10 @@
 
 {% block body %}
 	<h1>Portfolio</h1>
+	{% for notice in app.flashes('notice') %}
+    <br />
+    <div class="alert alert-primary" role="alert">{{ notice }}</div>
+  {% endfor %}
 
 	{% include '_summary.html.twig' %}
 
