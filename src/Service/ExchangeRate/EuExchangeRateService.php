@@ -15,10 +15,10 @@ class EuExchangeRateService implements ExchangeRateInterface
     private $exchangerateCache;
     private $client;
 
-    public function __construct(HttpClientInterface $client, CacheInterface $exchangerateCache)
+    public function __construct(HttpClientInterface $euClient, CacheInterface $exchangerateCache)
     {
         $this->exchangerateCache = $exchangerateCache;
-        $this->client = $client;
+        $this->client = $euClient;
     }
 
     public function getRates(): array
@@ -27,16 +27,23 @@ class EuExchangeRateService implements ExchangeRateInterface
         $client = $this->client;
 
         $data = $this->exchangerateCache->get('exchangerates', function (ItemInterface $item) use ($client, $apiCallUrl) {
-            $item->expiresAfter(3600);
+            $item->expiresAfter(15 * 60);
+            $content = "";
             $response = $client->request(
                 'GET',
                 $apiCallUrl
             );
-            $content = $response->getContent(false);
+            if ($response->getStatusCode() === 200) {
+                $content = $response->getContent(false);
+            }
+
+            $headers = $response->getHeaders();
+            if ($headers['content-encoding'][0] == 'gzip') {
+                $content = gzdecode($content);
+            }
             return $content;
         });
 
-        dd($data);
         $internalErrors = libxml_use_internal_errors(true);
         $dom = new DOMDocument();
         $dom->loadHTML($data);
@@ -44,7 +51,7 @@ class EuExchangeRateService implements ExchangeRateInterface
         $rates = $this->parseToArray($xpath, 'forextable');
         libxml_use_internal_errors($internalErrors);
 
-        dd($rates, $internalErrors);
+        //dd($rates, $internalErrors);
 
         $rates['GBX'] = $rates['GBP'] * 100;
 

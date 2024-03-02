@@ -8,7 +8,7 @@ use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Transaction;
 use App\Repository\TaxRepository;
-use App\Service\ExchangeRate\FawazahExchangeRateService as ExchangeRateService;
+use App\Service\ExchangeRate\EuExchangeRateService as ExchangeRateService;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -73,8 +73,11 @@ class DividendService
     {
         $rates = $this->exchangeRateService->getRates();
         if (count($rates) < 1 && $calendar->getCurrency()->getSymbol() != 'EUR' || !isset($rates[$calendar->getCurrency()->getSymbol()])) {
-            $msg = $this->translator->trans('tickerSymbol:: Exchange rate for [Symbol] is currently unavailable. Available are: jsonSymbol',['tickerSymbol' => $calendar->getTicker()->getTicker(),
-            'Symbol' => $calendar->getCurrency()->getSymbol(), 'jsonSymbol' => json_encode($rates)]);
+            $msg = $this->translator->trans('tickerSymbol:: Exchange rate for [Symbol] is currently unavailable. Available are: jsonSymbol', [
+                'tickerSymbol' => $calendar->getTicker()->getTicker(),
+                'Symbol' => $calendar->getCurrency()->getSymbol(),
+                'jsonSymbol' => json_encode($rates)
+            ]);
 
             throw new \Exception($msg);
         }
