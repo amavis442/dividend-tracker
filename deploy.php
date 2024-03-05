@@ -41,25 +41,25 @@ host('127.0.0.1')
         'env' => 'prod',
         'stage' => 'prod',
     ]);
-    //->set('branch', 'master')
-    //->set('rsync_src', __DIR__)
-    //->set('rsync_dest', '{{release_path}}');
+//->set('branch', 'master')
+//->set('rsync_src', __DIR__)
+//->set('rsync_dest', '{{release_path}}');
 
 
 set('rsync', [
-    'exclude'      => [
+    'exclude' => [
         '.git',
         'deploy.php',
     ],
     'exclude-file' => false,
-    'include'      => [],
+    'include' => [],
     'include-file' => false,
-    'filter'       => [],
-    'filter-file'  => false,
+    'filter' => [],
+    'filter-file' => false,
     'filter-perdir' => false,
-    'flags'        => 'rz', // Recursive, with compress
-    'options'      => ['delete'],
-    'timeout'      => 60,
+    'flags' => 'rz', // Recursive, with compress
+    'options' => ['delete'],
+    'timeout' => 60,
 ]);
 
 set('nvm', 'source $HOME/.nvm/nvm.sh');
@@ -84,17 +84,22 @@ task('deploy:dividend', [
     'database:migrate'
 ]);
 
+task("composer:dump", function () {
+    run('cd ' . get('release_path') . " && composer dump-autoload --no-dev --classmap-authoritative");
+});
+
 after('deploy:update_code', 'npm:install');
 after('npm:install', 'npm:build');
 after('deploy:vendors', 'deploy:dividend');
+after('deploy:dividend', 'composer:dump');
 
 option('source', null, InputOption::VALUE_OPTIONAL, 'Source alias of the current task.');
 option('target', null, InputOption::VALUE_OPTIONAL, 'Target alias of the current task.');
 
 task('upload:file', function () {
     /*
-    * Usage: dep upload:file --source="some_destination/file.txt" --target="some_destination/" host
-    */
+     * Usage: dep upload:file --source="some_destination/file.txt" --target="some_destination/" host
+     */
 
     $source = null;
     $target = null;
