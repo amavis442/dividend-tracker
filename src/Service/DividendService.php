@@ -19,31 +19,31 @@ class DividendService
      *
      * @var null|float
      */
-    protected $forwardNetDividend;
+    protected null|float $forwardNetDividend;
     /**
      * Position
      *
      * @var Position
      */
-    protected $position;
+    protected Position $position;
     /**
      * Current exchangerate
      *
      * @var ExchangeRateService
      */
-    protected $exchangeRateService;
+    protected ExchangeRateService $exchangeRateService;
     /**
      * Dividend tax withhold
      *
      * @var TaxRepository
      */
-    protected $taxRepository;
+    protected TaxRepository $taxRepository;
     /**
      * What is the net dividend per payout per share
      *
      * @var null|float
      */
-    protected $netDividendPerShare;
+    protected null|float $netDividendPerShare;
 
     /**
      * Should all dividend paid on same day to same ticker be accumulated?
@@ -51,9 +51,11 @@ class DividendService
      *
      * @var boolean
      */
-    protected $cummulateDividendAmount = true;
+    protected bool $cummulateDividendAmount = true;
 
     protected TranslatorInterface $translator;
+
+    protected float $netDividendYield = 0;
 
     public function __construct(ExchangeRateService $exchangeRateService, TaxRepository $taxRepository, TranslatorInterface $translator)
     {

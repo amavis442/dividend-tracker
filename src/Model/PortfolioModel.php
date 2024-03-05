@@ -9,6 +9,7 @@ use App\Repository\PositionRepository;
 use App\Service\DividendService;
 use DateTime;
 use RuntimeException;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 class PortfolioModel
 {
@@ -17,33 +18,38 @@ class PortfolioModel
      *
      * @var boolean
      */
-    private $initialized = false;
+    private bool $initialized = false;
 
     /**
      * Undocumented variable
      *
-     * @var PositionItems[]
+     * @var array
      */
-    private $portfolioItems = [];
+    private array $portfolioItems = [];
     /**
      * Unique ticker ids
      *
      * @var array
      */
-    private $tickerIds = [];
+    private array $tickerIds = [];
     /**
      * num Pages
      *
      * @var integer
      */
-    private $maxPages = 1;
+    private int $maxPages = 1;
 
     /**
      * When was the quote cache last updated
      *
      * @var int
      */
-    private $timestamp;
+    private int $timestamp = 0;
+
+    public function __construct(
+        private Stopwatch $stopwatch,
+    ) {
+    }
 
     /**
      * Get 1 page of many with position data
@@ -70,6 +76,9 @@ class PortfolioModel
         string $searchCriteria = '',
         ?string $pieSelected = null
     ): self {
+        $this->stopwatch->start('portfoliomodel-getpage');
+
+
         $currentDate = new DateTime();
 
         $order = 't.ticker';
@@ -180,13 +189,14 @@ class PortfolioModel
         $this->tickerIds = $tickerIds;
         $this->initialized = true;
 
+        $this->stopwatch->stop('portfoliomodel-getpage');
         return $this;
     }
 
     /**
      * Get undocumented variable
      *
-     * @return  PositionItems[]
+     * @return  array
      */
     public function getPortfolioItems(): array
     {

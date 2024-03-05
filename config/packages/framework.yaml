@@ -16,6 +16,8 @@ framework:
     annotations:
         enabled: false
 
+    enabled_locales: ["en", "nl"]
+
     #esi: true
     #fragments: true
     php_errors:
