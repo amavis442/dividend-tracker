@@ -49,6 +49,7 @@ class PositionRepository extends ServiceEntityRepository
         }
         if ($pies) {
             $queryBuilder
+                ->leftJoin('p.pies', 'pies')
                 ->andWhere('pies IN (:pies)')
                 ->setParameter('pies', $pies);
         }
@@ -173,10 +174,12 @@ class PositionRepository extends ServiceEntityRepository
             ->orderBy('p.closedAt', $sort);
 
         if (!empty($search)) {
-            $queryBuilder->andWhere($queryBuilder->expr()->orX(
-                $queryBuilder->expr()->like('t.ticker', ':search'),
-                $queryBuilder->expr()->like('i.label', ':search')
-            ));
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->like('t.ticker', ':search'),
+                    $queryBuilder->expr()->like('i.label', ':search')
+                )
+            );
             $queryBuilder->setParameter('search', $search . '%');
         }
         $queryBuilder->andWhere('p.closed = true');
@@ -278,23 +281,27 @@ class PositionRepository extends ServiceEntityRepository
 
         // Create our query
         $queryBuilder = $this->createQueryBuilder('p')
-            ->select('p, t, i, pa, pies, c, dm, tax, cur')
+            //->select('p, t, b, pa, pies, c, dm, tax, cur')
+            ->select('p, t ')
             ->innerJoin('p.ticker', 't')
-            ->innerJoin('t.branch', 'i')
-            ->leftJoin('t.tax', 'tax')
-            ->leftJoin('t.currency', 'cur')
             ->leftJoin('p.payments', 'pa')
-            ->leftJoin('p.pies', 'pies')
+            //->leftJoin('p.pies', 'pies')
+            //->innerJoin('t.branch', 'b')
+            ->leftJoin('t.tax', 'tax')
+            //->leftJoin('t.currency', 'cur')
             ->leftJoin('t.calendars', 'c')
-            ->leftJoin('t.dividendMonths', 'dm')
+            //->leftJoin('t.dividendMonths', 'dm')
             ->orderBy($order, $sort);
 
         if (!empty($search)) {
-            $queryBuilder->andWhere($queryBuilder->expr()->orX(
-                $queryBuilder->expr()->like('LOWER(t.ticker)', 'LOWER(:search)'),
-                $queryBuilder->expr()->like('LOWER(t.fullname)', 'LOWER(:search)'),
-                $queryBuilder->expr()->like('LOWER(i.label)', 'LOWER(:search)')
-            ));
+            $queryBuilder->innerJoin('t.branch', 'b');
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->like('LOWER(t.ticker)', 'LOWER(:search)'),
+                    $queryBuilder->expr()->like('LOWER(t.fullname)', 'LOWER(:search)'),
+                    $queryBuilder->expr()->like('LOWER(b.label)', 'LOWER(:search)')
+                )
+            );
             $queryBuilder->setParameter('search', $search . '%');
         }
         return $queryBuilder;

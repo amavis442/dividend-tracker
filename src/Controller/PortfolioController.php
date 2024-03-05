@@ -18,12 +18,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 #[Route(path: '/dashboard/portfolio')]
 class PortfolioController extends AbstractController
 {
     public const SEARCH_KEY = 'portfolio_searchCriteria';
     public const PIE_KEY = 'portfolio_searchPie';
+
+
+    public function __construct(
+        private Stopwatch $stopwatch,
+    ) {
+    }
 
     #[Route(path: '/list/{page<\d+>?1}/{orderBy?fullname}/{sort?asc}', name: 'portfolio_index', methods: ['GET'])]
     public function index(
@@ -60,6 +67,7 @@ class PortfolioController extends AbstractController
         $referer->set('portfolio_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
 
         try {
+            $this->stopwatch->start('portfoliomodel-getpage');
             $pageData = $model->getPage(
                 $positionRepository,
                 $dividendService,
@@ -71,8 +79,8 @@ class PortfolioController extends AbstractController
                 $searchCriteria,
                 $pieSelected,
             );
-
-        } catch (\Exception $e){
+            $this->stopwatch->stop('portfoliomodel-getpage');
+        } catch (\Exception $e) {
             $this->addFlash('notice', $e->getMessage());
         }
         //dd($pageData);
@@ -80,7 +88,7 @@ class PortfolioController extends AbstractController
 
 
         return $this->render('portfolio/index.html.twig', [
-            'portfolioItems' => isset($pageData) ? $pageData->getPortfolioItems(): null,
+            'portfolioItems' => isset($pageData) ? $pageData->getPortfolioItems() : null,
             'cacheTimestamp' => isset($pageData) ? (new DateTime())->setTimestamp($pageData->getCacheTimestamp() ?: 0) : 0,
             'limit' => $limit,
             'maxPages' => isset($pageData) ? $pageData->getMaxPages() : 0,

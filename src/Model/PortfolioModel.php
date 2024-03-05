@@ -76,9 +76,6 @@ class PortfolioModel
         string $searchCriteria = '',
         ?string $pieSelected = null
     ): self {
-        $this->stopwatch->start('portfoliomodel-getpage');
-
-
         $currentDate = new DateTime();
 
         $order = 't.ticker';
@@ -92,6 +89,7 @@ class PortfolioModel
             $sort = 'asc';
         }
 
+        $this->stopwatch->start('portfoliomodel-getpage-get-iter');
         $limit = 20;
         if ($pieSelected && $pieSelected != '-') {
             $items = $positionRepository->getAll($page, $limit, $order, $sort, $searchCriteria, PositionRepository::OPEN, [$pieSelected]);
@@ -102,10 +100,11 @@ class PortfolioModel
         $this->maxPages = (int) ceil($items->count() / $limit);
         $iter = $items->getIterator();
         $tickerIds = [];
-
+        $this->stopwatch->stop('portfoliomodel-getpage-get-iter');
         /**
          * @var Position $position
          */
+        $this->stopwatch->start('portfoliomodel-getpage-main-foreach');
         foreach ($iter as $position) {
             $ticker = $position->getTicker();
             $avgPrice = $position->getPrice();
@@ -178,7 +177,9 @@ class PortfolioModel
                 $tickerIds[] = $position->getTicker()->getId();
             }
         }
+        $this->stopwatch->stop('portfoliomodel-getpage-main-foreach');
 
+        $this->stopwatch->start('portfoliomodel-getpage-dividend-foreach');
         $dividends = $paymentRepository->getSumDividends($tickerIds);
         foreach ($this->portfolioItems as &$portfolioItem) {
             $tickerId = $portfolioItem->getTickerId();
@@ -186,10 +187,11 @@ class PortfolioModel
                 $portfolioItem->setDividend($dividends[$tickerId]);
             }
         }
+        $this->stopwatch->stop('portfoliomodel-getpage-dividend-foreach');
+
         $this->tickerIds = $tickerIds;
         $this->initialized = true;
 
-        $this->stopwatch->stop('portfoliomodel-getpage');
         return $this;
     }
 

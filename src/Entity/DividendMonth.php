@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: 'App\Repository\DividendMonthRepository')]
+#[ORM\Index(columns: ['dividend_month'], name: 'dividend_month_idx')]
 class DividendMonth
 {
     #[ORM\Id]
@@ -14,7 +15,7 @@ class DividendMonth
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'integer', )]
     private $dividendMonth;
 
     #[ORM\ManyToMany(targetEntity: 'App\Entity\Ticker', mappedBy: 'dividendMonths')]

@@ -14,208 +14,208 @@ class PortfolioItem
      *
      * @var \App\Entity\Position
      */
-    private $position;
+    private \App\Entity\Position $position;
     /**
      * position avg price
      *
      * @var float
      */
-    private $price = 0.0;
+    private float $price = 0.0;
 
     /**
      * Market price
      *
      * @var float
      */
-    private $marketPrice = 0.0;
+    private float $marketPrice = 0.0;
 
     /**
      * Undocumented variable
      *
      * @var float
      */
-    private $paperProfit = 0.0;
+    private float $paperProfit = 0.0;
 
     /**
      * Undocumented variable
      *
      * @var float
      */
-    private $paperProfitPercentage = 0.0;
+    private float $paperProfitPercentage = 0.0;
 
     /**
      * Undocumented variable
      *
      * @var DateTime
      */
-    private $exDividendDate;
+    private DateTime $exDividendDate;
 
     /**
      * Undocumented variable
      *
      * @var DateTime
      */
-    private $paymentDate;
+    private DateTime $paymentDate;
 
     /**
      * Undocumented variable
      *
      * @var float
      */
-    private $cashAmount = 0.0;
+    private float $cashAmount = 0.0;
 
     /**
      * Undocumented variable
      *
      * @var Currency
      */
-    private $cashCurrency;
+    private Currency $cashCurrency;
 
     /**
      * Undocumented variable
      *
      * @var float
      */
-    private $percentageAllocation = 0.0;
+    private float $percentageAllocation = 0.0;
 
     /**
      * Undocumented variable
      *
      * @var float
      */
-    private $forwardNetDividend = 0.0;
+    private float $forwardNetDividend = 0.0;
 
     /**
      * Undocumented variable
      *
      * @var float
      */
-    private $forwardNetDividendYield = 0.0;
+    private float $forwardNetDividendYield = 0.0;
 
     /**
      * Current dividend yield per share based on current marketprice
      *
      * @var float
      */
-    private $forwardNetDividendYieldPerShare = 0.0;
+    private float $forwardNetDividendYieldPerShare = 0.0;
 
     /**
      * Undocumented variable
      *
      * @var string
      */
-    private $symbol;
+    private string $symbol;
 
     /**
      * Undocumented variable
      *
      * @var string
      */
-    private $fullname;
+    private string $fullname;
 
     /**
      * Pies
      *
      * @var Collection
      */
-    private $pies;
+    private Collection $pies;
 
     /**
      * Has a calendar entry
      *
      * @var bool
      */
-    private $divDate = false;
+    private bool $divDate = false;
 
     /**
      * Position allocation
      *
      * @var float
      */
-    private $allocation = 0.0;
+    private float $allocation = 0.0;
 
     /**
      * How many shares
      *
      * @var float
      */
-    private $amount = 0.0;
+    private float $amount = 0.0;
 
     /**
      * Total received dividends
      *
      * @var float
      */
-    private $dividend = 0.0;
+    private float $dividend = 0.0;
 
     /**
      * Ticker id
      *
      * @var int
      */
-    private $tickerId;
+    private int $tickerId;
 
     /**
      * Position id
      *
      * @var int
      */
-    private $positionId;
+    private int $positionId;
 
     /**
      * Current dividend month?
      *
      * @var boolean
      */
-    private $isDividendMonth = false;
+    private bool $isDividendMonth = false;
     /**
      * Diffrence between avg price and market price
      *
      * @var float
      */
-    private $diffPrice = 0.0;
+    private float $diffPrice = 0.0;
 
     /**
      * How times per year will there be a dividend payout
      *
      * @var int
      */
-    private $dividendPayoutFrequency = 4;
+    private int $dividendPayoutFrequency = 4;
 
     /**
      * Collection of dividend calenders of future payments
      *
      * @var Collection
      */
-    private $dividendCalendars;
+    private Collection $dividendCalendars;
 
     /**
      *  Net dividend per share
      *
      * @var float
      */
-    private $netDividendPerShare  = 0.0;
+    private float $netDividendPerShare  = 0.0;
 
     /**
      * What is the treshold for dividend yield start to buying
      *
      * @var float
      */
-    private $dividendTreshold  = 0.0;
+    private float $dividendTreshold  = 0.0;
 
     /**
      * Maximum allocation
      *
      * @var int
      */
-    private $maxAllocation = 0;
+    private int $maxAllocation = 0;
 
     /**
      * Has maximum allocation been reached
      *
      * @var bool
      */
-    private $isMaxAllocation = false;
+    private bool $isMaxAllocation = false;
 
     public function __construct()
     {
