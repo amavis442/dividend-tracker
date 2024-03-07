@@ -182,7 +182,8 @@ class ImportCsvService extends ImportBase
 
             if (false !== stripos($cellVal, 'deposit') || false !== stripos($cellVal, 'withdraw') || false !== stripos($cellVal, 'interest')) {
                 continue;
-            };
+            }
+            ;
 
 
             $row = [];
@@ -229,24 +230,24 @@ class ImportCsvService extends ImportBase
                         $row['amount'] = $val;
                         break;
                     case 'price / share':
-                        $row['original_price'] = $val;
+                        $row['original_price'] = (float) $val;
                         break;
                     case 'currency (price / share)':
                         $row['original_price_currency'] = $val;
                         break;
                     case 'exchange rate':
-                        $row['exchange_rate'] = $val;
+                        $row['exchange_rate'] = (float) $val;
                         break;
                     case 'result':
-                        $row['profit'] = (float)$val;
+                        $row['profit'] = (float) $val;
                         break;
                     case 'currency (result)':
                         $row['profit_currency'] = $val;
                         break;
                     case 'total':
                         $allocation = $val;
-                        $row['allocation'] = (float)$allocation;
-                        $row['total'] = (float)$val;
+                        $row['allocation'] = (float) $allocation;
+                        $row['total'] = (float) $val;
                         break;
                     case 'currency (total)':
                         $row['allocation_currency'] = $val;
@@ -288,14 +289,25 @@ class ImportCsvService extends ImportBase
                     $this->importDividend($row);
                 }
                 continue;
-            };
+            }
+            ;
 
             if (count($row) > 0) {
                 $orderValue = $row['total'];
                 $stockValue = $orderValue - (($row['fx_fee'] ?? 0) + ($row['stampduty'] ?? 0) + ($row['transaction_fee'] ?? 0) + ($row['finra_fee'] ?? 0));
 
                 $row['allocation'] = $stockValue;
-                $row['price'] = round($row['original_price'] / $row['exchange_rate'], 3);
+
+                try {
+                    if ($row['exchange_rate'] == 0 || $row['original_price'] == 0) {
+                        continue; // Some conversion has happend that you get 1 share for another which is crap.
+                    } else {
+                        $row['price'] = round($row['original_price'] / $row['exchange_rate'], 3);
+                    }
+                } catch (\Exception $e) {
+                    throw new \Exception($e->getMessage() + print_r($csvRow));
+                }
+
                 $rows[$row['nr']] = $row;
             }
             $rowNum++;
