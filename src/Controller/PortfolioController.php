@@ -223,7 +223,7 @@ class PortfolioController extends AbstractController
         return $this->redirectToRoute('portfolio_index');
     }
 
-    #[Route(path: '/close/{position}', name: 'portfolio_position_close', methods: ['DELETE'])]
+    #[Route(path: '/close/{position}', name: 'portfolio_position_close', methods: ['DELETE', 'POST'])]
     public function closePosition(Request $request, EntityManagerInterface $em, Position $position): Response
     {
         if ($this->isCsrfTokenValid('delete' . $position->getId(), $request->request->get('_token'))) {
