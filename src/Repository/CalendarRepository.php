@@ -59,6 +59,12 @@ class CalendarRepository extends ServiceEntityRepository
         if ($orderBy === 'ticker') {
             $order = 't.ticker';
         }
+        $queryBuilder2 = $this->getEntityManager()->createQueryBuilder()
+            ->select("tp.id")
+            ->from("\App\Entity\Ticker", "tp")
+            ->innerJoin("\App\Entity\Position", "p")
+            ->where("p.ticker = tp and p.closed = false");
+
         // Create our query
         $queryBuilder = $this->createQueryBuilder('c')
             ->select('c')
@@ -68,6 +74,7 @@ class CalendarRepository extends ServiceEntityRepository
             $queryBuilder->where('t.ticker LIKE :search');
             $queryBuilder->setParameter('search', $search . '%');
         }
+        $queryBuilder->where($queryBuilder->expr()->in('t.id', $queryBuilder2->getDQL()));
 
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);
