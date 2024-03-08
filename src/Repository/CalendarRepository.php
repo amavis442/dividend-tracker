@@ -172,7 +172,6 @@ class CalendarRepository extends ServiceEntityRepository
             }
 
             $amount = $this->getPositionSize($transactions, $calendar);
-            $amount = $amount;
 
             $netPayment = 0.0;
             foreach ($calendar->getPayments() as $payment) {
