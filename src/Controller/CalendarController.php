@@ -28,7 +28,7 @@ class CalendarController extends AbstractController
         CalendarRepository $calendarRepository,
         Referer $referer,
         int $page = 1,
-        string $orderBy = 'createdAt',
+        string $orderBy = 'paymentDate',
         string $sort = 'DESC'
     ): Response {
         if (!in_array($orderBy, ['paymentDate', 'ticker', 'exDividendDate', 'createdAt'])) {
