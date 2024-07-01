@@ -105,7 +105,7 @@ class ImportCsvService extends ImportBase
     /**
      * Import Dividends even when position is closed.
      *
-     * @param \Box\Spout\Common\Entity\Cell[] array $cells
+     * @param array $cells
      * @return void
      */
     protected function importDividend(array $row)
@@ -160,7 +160,7 @@ class ImportCsvService extends ImportBase
         }
 
         $this->entityManager->persist($payment);
-        $this->entityManager->flush($payment);
+        $this->entityManager->flush();
 
         $this->importedDividendLines++;
     }
@@ -320,8 +320,8 @@ class ImportCsvService extends ImportBase
         TickerRepository $tickerRepository,
         PositionRepository $positionRepository,
         WeightedAverage $weightedAverage,
-        Currency $currency,
-        ?Branch $branch,
+        CurrencyRepository $currencyRepository,
+        BranchRepository $branchRepository,
         TransactionRepository $transactionRepository,
         TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
@@ -337,31 +337,33 @@ class ImportCsvService extends ImportBase
         $rows = $reader->getRows();
         $rows = $this->formatImportData($rows);
 
+        $defaultCurrency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
 
         $defaultTax = $taxRepository->find(1);
         if (!$defaultTax) {
             $defaultTax = new Tax();
             $defaultTax->setTaxRate(15);
-            $entityManager->persist($branch);
+            $entityManager->persist($defaultTax);
             $entityManager->flush();
         }
 
-        if (!$branch) {
-            $branch = new Branch();
-            $branch->setLabel('Unassigned');
-            $branch->setDescription('Unassigned');
-            $entityManager->persist($branch);
+        $defaultBranch = $branchRepository->findOneBy(['label' => 'Unassigned']);
+        if (!$defaultBranch) {
+            $defaultBranch = new Branch();
+            $defaultBranch->setLabel('Unassigned');
+            $defaultBranch->setDescription('Unassigned');
+            $entityManager->persist($defaultBranch);
             $entityManager->flush();
         }
 
 
         if (count($rows) > 0) {
             foreach ($rows as $row) {
-                $ticker = $this->preImportCheckTicker($entityManager, $branch, $tickerRepository, $defaultTax, $row);
+                $ticker = $this->preImportCheckTicker($entityManager, $defaultBranch, $tickerRepository, $defaultTax, $row);
                 $transaction = $transactionRepository->findOneBy(['jobid' => $row['opdrachtid']]);
 
                 if (!$transaction) {
-                    $position = $this->preImportCheckPosition($entityManager, $ticker, $currency, $positionRepository, $security, $row);
+                    $position = $this->preImportCheckPosition($entityManager, $ticker, $defaultCurrency, $positionRepository, $security, $row);
 
                     $transaction = new Transaction();
                     $transaction
@@ -370,8 +372,8 @@ class ImportCsvService extends ImportBase
                         ->setAllocation($row['allocation'])
                         ->setAmount($row['amount'])
                         ->setTransactionDate($row['transactionDate'])
-                        ->setAllocationCurrency($currency)
-                        ->setCurrency($currency)
+                        ->setAllocationCurrency($defaultCurrency)
+                        ->setCurrency($defaultCurrency)
                         ->setPosition($position)
                         ->setExchangeRate($row['exchange_rate'])
                         ->setJobid($row['opdrachtid'])

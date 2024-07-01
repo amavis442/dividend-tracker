@@ -7,6 +7,8 @@ use App\Entity\Currency;
 use App\Entity\Position;
 use App\Entity\Tax;
 use App\Entity\Ticker;
+use App\Repository\BranchRepository;
+use App\Repository\CurrencyRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TaxRepository;
 use App\Repository\TickerRepository;
@@ -26,8 +28,8 @@ abstract class ImportBase
         TickerRepository $tickerRepository,
         PositionRepository $positionRepository,
         WeightedAverage $weightedAverage,
-        Currency $currency,
-        Branch $branch,
+        CurrencyRepository $currencyRepository,
+        BranchRepository $branchRepository,
         TransactionRepository $transactionRepository,
         TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
