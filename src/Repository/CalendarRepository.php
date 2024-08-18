@@ -224,12 +224,13 @@ class CalendarRepository extends ServiceEntityRepository
             ->setParameter('end', $endDate)
             ->setParameter('closedAt', (new DateTime('-2 month'))->format('Y-m-d'));
 
-        if ($pie) {
+        if ($pie && $pie->getId() != null) {
             $qb->andWhere('pies IN (:pie)')
                 ->setParameter('pie', [$pie->getId()]);
         }
         $result = $qb->getQuery()
             ->getResult();
+
         if (!$result) {
             return null;
         }
