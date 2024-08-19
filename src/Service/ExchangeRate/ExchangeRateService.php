@@ -37,14 +37,14 @@ class ExchangeRateService implements ExchangeRateInterface
         });
 
         $rates = [];
-        if(false !== $data) {
-            try {
-                $response = json_decode($data);
-                if($response->success === true) {
-                    $rates = (array)$response->rates;
-                }
-            } catch(Exception $e) {
-                throw $e;
+        if (false !== $data) {
+            $response = json_decode($data);
+            if ($response == null) {
+                throw new \RuntimeException("Data for exchangerate is empty or can not be read");
+            }
+
+            if ($response->success === true) {
+                $rates = (array) $response->rates;
             }
         }
         $rates['GBX'] = $rates['GBP'] * 100;
