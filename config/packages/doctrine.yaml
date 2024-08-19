@@ -16,7 +16,7 @@ doctrine:
         filters:
             user_filter:
                 class: App\Repository\Filter\UserFilter
-                enabled: false
+                enabled: true
         dql:
             datetime_functions:
                 DAY: DoctrineExtensions\Query\Postgresql\Day
