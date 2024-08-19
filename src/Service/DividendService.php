@@ -81,28 +81,17 @@ class DividendService
                 'jsonSymbol' => json_encode($rates)
             ]);
 
-            throw new \Exception($msg);
+            throw new \RuntimeException($msg);
         }
-        switch ($calendar->getCurrency()->getSymbol()) {
-            case 'EUR':
-                $exchangeRate = 1;
-                break;
-            case 'USD':
-                $exchangeRate = 1 / $rates['USD'];
-                break;
-            case 'GB':
-                $exchangeRate = 1 / $rates['GBP'];
-                break;
-            case 'CAD':
-                $exchangeRate = 1 / $rates['CAD'];
-                break;
-            case 'CHF':
-                $exchangeRate = 1 / $rates['CHF'];
-                break;
-            default:
-                $exchangeRate = 1 / $rates['USD'];
-                break;
-        }
+
+        $exchangeRate = match ($calendar->getCurrency()->getSymbol()) {
+            'EUR' => 1,
+            'USD' => 1 / $rates['USD'],
+            'GB' => 1 / $rates['GBP'],
+            'CAD' => 1 / $rates['CAD'],
+            'CHF' => 1 / $rates['CHF'],
+            default => 1 / $rates['USD']
+        };
 
         return $exchangeRate;
     }
@@ -170,7 +159,7 @@ class DividendService
      *
      * @param Collection $transactions
      * @param Calendar $calendar
-     * @return void
+     * @return null|float
      */
     public function getPositionSize(Collection $transactions, Calendar $calendar): ?float
     {
@@ -229,9 +218,7 @@ class DividendService
         $ticker = $calendar->getTicker();
         $position = $ticker->getPositions()->first();
         if ($position) {
-            if ($position) {
-                $amount = $this->getPositionSize($position->getTransactions(), $calendar);
-            }
+            $amount = $this->getPositionSize($position->getTransactions(), $calendar);
         }
         return $amount > 0 ? $amount : 0.0;
     }
@@ -267,7 +254,7 @@ class DividendService
 
         $ticker = $calendar->getTicker();
         $positions = $ticker->getPositions();
-        if ($positions) {
+        if (count($positions) > 0) {
             $position = $positions->first();
             if ($position) {
                 $amount = $this->getPositionSize($position->getTransactions(), $calendar);
@@ -290,7 +277,7 @@ class DividendService
     {
         $cashAmount = 0;
         $calendars = $ticker->getCalendars();
-        if ($calendars) {
+        if (count($calendars) > 0) {
             /**
              * @var \App\Entity\Calendar $calendar
              */
@@ -315,7 +302,7 @@ class DividendService
         $forwardNetDividend = 0.0;
         $ticker = $position->getTicker();
         $calendars = $ticker->getCalendars();
-        if ($calendars) {
+        if (count($calendars) > 0) {
             /**
              * @var \App\Entity\Calendar $calendar
              */
@@ -329,7 +316,7 @@ class DividendService
                 $dividendTax = $ticker->getTax() ? $ticker->getTax()->getTaxRate() : Constants::TAX / 100;
                 $exchangeRate = $this->getExchangeRate($calendar);
                 $this->netDividendPerShare = $cashAmount * $exchangeRate * (1 - $dividendTax);
-                $forwardNetDividend = $amount * $cashAmount * $exchangeRate * (1 - $dividendTax);
+                $forwardNetDividend = (float) $amount * $cashAmount * $exchangeRate * (1 - $dividendTax);
             }
         }
         $this->forwardNetDividend = $forwardNetDividend;

@@ -7,6 +7,7 @@ use App\Entity\Currency;
 use App\Entity\Position;
 use App\Entity\Tax;
 use App\Entity\Ticker;
+use App\Entity\User;
 use App\Repository\BranchRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\PositionRepository;
@@ -63,7 +64,11 @@ abstract class ImportBase
         Security $security,
         array $data
     ): Position {
+
         $user = $security->getUser();
+        if (!$user instanceof User) {
+            throw new \RuntimeException("No user available");
+        }
         $transactionDate = $data['transactionDate'];
         $position = $positionRepository->findOneByTickerAndDate($ticker, $transactionDate);
 
@@ -77,7 +82,7 @@ abstract class ImportBase
             $entityManager->flush();
         }
 
-        if ($position) {
+        if ($position != null) {
             $entityManager->persist($position);
             $entityManager->flush();
         }

@@ -59,7 +59,7 @@ class LondonService implements StockPricePluginInterface
                 $children = $dom->getElementsByTagName('span');
 
                 /**
-                 * @var $child \DOMElement
+                 * @var \DOMElement $child
                  */
                 foreach ($children as $child) {
                     if ($child->hasAttribute('class')) {
@@ -72,7 +72,7 @@ class LondonService implements StockPricePluginInterface
 
                 $children = $dom->getElementsByTagName('div');
                 /**
-                 * @var $child \DOMElement
+                 * @var \DOMElement $child
                  */
                 foreach ($children as $child) {
                     if ($child->hasAttribute('class')) {

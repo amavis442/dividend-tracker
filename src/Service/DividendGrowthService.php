@@ -14,7 +14,7 @@ class DividendGrowthService
         $payout = [];
         $values = [];
 
-        if ($calendars) {
+        if (count($calendars) > 0) {
             $oldValue = 0.0;
             $payoutFreq = $ticker->getPayoutFrequency();
 

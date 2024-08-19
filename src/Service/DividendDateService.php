@@ -17,21 +17,21 @@ class DividendDateService
      *
      * @var HttpClientInterface
      */
-    private $client;
+    private HttpClientInterface $client;
 
     /**
      * Initialized services
      *
-     * @var Array
+     * @var array
      */
-    private $services;
+    private array $services;
 
     /**
      * Which service is linked to ticker
      *
      * @var array
      */
-    private $linkToService;
+    private array $linkToService;
 
     public function __construct(HttpClientInterface $client)
     {
@@ -115,7 +115,7 @@ class DividendDateService
      * Get a service which is explitly linked
      *
      * @param string $symbol
-     * @return StockPriceInterface
+     * @return null|DividendDatePluginInterface
      */
     public function getService(string $symbol): ?DividendDatePluginInterface
     {

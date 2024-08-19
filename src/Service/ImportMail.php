@@ -184,13 +184,13 @@ class ImportMail extends ImportBase
                         $position->addTransaction($transaction);
                         $weightedAverage->calc($position);
 
-                        if ($position->getAmount() === 0) {
+                        if ((float) $position->getAmount() == 0) {
                             $position->setClosed(true);
                         }
 
                         if ($position->getAmount() > -6 && $position->getAmount() < 0) {
                             $position->setClosed(true);
-                            $position->setAmount(0);
+                            $position->setAmount('0');
                         }
 
                         $entityManager->persist($position);

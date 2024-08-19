@@ -9,7 +9,7 @@ use DateTime;
 
 class PositionService
 {
-    protected $entityManager;
+    protected EntityManagerInterface $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
@@ -18,12 +18,12 @@ class PositionService
 
     private function presetMetrics(Position $position): void
     {
-        if ($position->getAllocation() && empty($position->getPrice())) {
-            $position->setPrice($position->getAllocation() / $position->getAmount());
+        if ($position->getAllocation() && empty($position->getPrice()) && $position->getAmount()) {
+            $position->setPrice($position->getAllocation() / (float) $position->getAmount());
             $position->setCurrency($position->getAllocationCurrency());
         }
-        if ($position->getPrice() && empty($position->getAllocation())) {
-            $position->setAllocation($position->getPrice() * $position->getAmount());
+        if ($position->getPrice() && empty($position->getAllocation()) && $position->getAmount()) {
+            $position->setAllocation($position->getPrice() * (float) $position->getAmount());
             $position->setAllocationCurrency($position->getCurrency());
         }
 
@@ -39,16 +39,20 @@ class PositionService
 
         $transaction = new Transaction();
         $transaction->setSide(Transaction::BUY)
-            ->setAmount($position->getAmount())
+            ->setAmount((float) $position->getAmount())
             ->setPrice($position->getPrice())
             ->setCurrency($position->getCurrency())
             ->setAllocation($position->getAllocation())
             ->setAllocationCurrency($position->getAllocationCurrency())
             ->setTransactionDate($currentDate);
 
+        if ($position->getAmount()) {
+            $transaction->setAmount((float) $position->getAmount());
+        }
+
         $position->addTransaction($transaction);
 
-        $position->setClosed(0);
+        $position->setClosed(false);
         $this->entityManager->persist($transaction);
         $this->entityManager->persist($position);
         $this->entityManager->flush();

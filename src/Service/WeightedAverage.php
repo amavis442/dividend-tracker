@@ -18,7 +18,7 @@ class WeightedAverage
 
     public function addTransaction(Transaction $transaction, int $index)
     {
-        $timeStamp = (int)$transaction->getTransactionDate()->format('YmdHis');
+        $timeStamp = (int) $transaction->getTransactionDate()->format('YmdHis');
         if (isset($this->transactions[$timeStamp])) {
             $timeStamp += $index;
         }
@@ -40,7 +40,7 @@ class WeightedAverage
         }
         //$this->entityManager->flush();
 
-        if (count($this->transactions) === 0) {
+        if (empty($this->transactions) || count($this->transactions) === 0) {
             return;
         }
         ksort($this->transactions);
@@ -51,7 +51,7 @@ class WeightedAverage
         $numShares = 0.0;
         $aPrice = 0;
 
-        foreach ($this->transactions as $timeStamp => $transaction) {
+        foreach (array_values($this->transactions) as $transaction) {
             $profit = 0.0;
             $amount = $transaction->getAmount();
             $allocation = $transaction->getAllocation(); // This one should be total - all the costs
@@ -77,7 +77,7 @@ class WeightedAverage
         }
 
         $position->setAllocation(round($costBase, 3))
-            ->setAmount($numShares)
+            ->setAmount((string) $numShares)
             ->setPrice($aPrice)
             ->setProfit(round($totalProfit, 3));
     }

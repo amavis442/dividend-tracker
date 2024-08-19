@@ -16,43 +16,43 @@ class StockPriceService
      *
      * @var array
      */
-    protected $services;
+    protected array $services;
     /**
      * Explicit symbol to service links
      *
      * @var array
      */
-    protected $linkTickerToService;
+    protected array $linkTickerToService;
     /**
      * Get the current exchange rates
      *
      * @var ExchangeRateInterface
      */
-    protected $exchangeRateService;
+    protected ExchangeRateInterface $exchangeRateService;
     /**
      * Get data from external sources
      *
      * @var HttpClientInterface
      */
-    protected $client;
+    protected HttpClientInterface $client;
     /**
      * Cache the data, else it will be very slow
      *
      * @var CacheInterface
      */
-    protected $stockCache;
+    protected CacheInterface $stockCache;
     /**
      * Timestamp
      *
      * @var integer
      */
-    private $cacheTimeStamp;
+    private int $cacheTimeStamp;
     /**
      * Holder
      *
      * @var array
      */
-    private $data;
+    private array $data;
 
     /**
      *
@@ -120,7 +120,7 @@ class StockPriceService
         $this->services[$serviceClass] = $service;
         if ($symbols) {
             foreach ($symbols as $symbol) {
-                $this->linkServiceToTicker[$symbol] = $serviceClass;
+                $this->linkTickerToService[$symbol] = $serviceClass;
             }
         }
 
@@ -149,7 +149,7 @@ class StockPriceService
      * Get a service which is explitly linked
      *
      * @param string $symbol
-     * @return StockPriceInterface
+     * @return StockPricePluginInterface
      */
     public function getService(string $symbol): StockPricePluginInterface
     {

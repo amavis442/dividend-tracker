@@ -31,69 +31,76 @@ class ImportCsvService extends ImportBase
     /**
      * @var TickerRepository
      */
-    protected $tickerRepository;
+    protected TickerRepository $tickerRepository;
 
     /**
      * Undocumented variable
      *
      * @var CurrencyRepository
      */
-    protected $currencyRepository;
+    protected CurrencyRepository $currencyRepository;
     /**
      * Undocumented variable
      *
      * @var PositionRepository
      */
-    protected $positionRepository;
+    protected PositionRepository $positionRepository;
     /**
      * Undocumented variable
      *
      * @var WeightedAverage
      */
-    protected $weightedAverage;
+    protected WeightedAverage $weightedAverage;
     /**
      * Undocumented variable
      *
      * @var BranchRepository
      */
-    protected $branchRepository;
+    protected BranchRepository $branchRepository;
     /**
      * Undocumented variable
      *
      * @var TransactionRepository
      */
-    protected $transactionRepository;
+    protected TransactionRepository $transactionRepository;
     /**
      * Undocumented variable
      *
      * @var PaymentRepository
      */
-    protected $paymentRepository;
+    protected PaymentRepository $paymentRepository;
     /**
      * Undocumented variable
      *
      * @var CalendarRepository
      */
-    protected $calendarRepository;
+    protected CalendarRepository $calendarRepository;
     /**
      * Undocumented variable
      *
      * @var EntityManagerInterface
      */
-    protected $entityManager;
+    protected EntityManagerInterface $entityManager;
 
-    private $importedDividendLines = 0;
+    private int $importedDividendLines = 0;
 
     public function __construct(
+        TickerRepository $tickerRepository,
+        CurrencyRepository $currencyRepository,
+        PositionRepository $positionRepository,
+        BranchRepository $branchRepository,
+        TransactionRepository $transactionRepository,
+        PaymentRepository $paymentRepository,
+        CalendarRepository $calendarRepository,
         EntityManager $entityManager
     ) {
-        $this->tickerRepository = $entityManager->getRepository('App\Entity\Ticker');
-        $this->currencyRepository = $entityManager->getRepository('App\Entity\Currency');
-        $this->positionRepository = $entityManager->getRepository('App\Entity\Position');
-        $this->branchRepository = $entityManager->getRepository('App\Entity\Branch');
-        $this->transactionRepository = $entityManager->getRepository('App\Entity\Transaction');
-        $this->paymentRepository = $entityManager->getRepository('App\Entity\Payment');
-        $this->calendarRepository = $entityManager->getRepository('App\Entity\Calendar');
+        $this->tickerRepository = $tickerRepository;
+        $this->currencyRepository = $currencyRepository;
+        $this->positionRepository = $positionRepository;
+        $this->branchRepository = $branchRepository;
+        $this->transactionRepository = $transactionRepository;
+        $this->paymentRepository = $paymentRepository;
+        $this->calendarRepository = $calendarRepository;
         $this->entityManager = $entityManager;
     }
 
@@ -105,7 +112,7 @@ class ImportCsvService extends ImportBase
     /**
      * Import Dividends even when position is closed.
      *
-     * @param array $cells
+     * @param array $row
      * @return void
      */
     protected function importDividend(array $row)
@@ -253,7 +260,7 @@ class ImportCsvService extends ImportBase
                         $row['allocation_currency'] = $val;
                         break;
                     case 'withholding tax':
-                        $row['tax'] = (float) $val ?? null;
+                        $row['tax'] = (float) $val ?: 0.0;
                         break;
                     case 'currency (withholding tax)':
                         $row['tax_currency'] = $val;
@@ -262,16 +269,16 @@ class ImportCsvService extends ImportBase
                         $row['opdrachtid'] = $val;
                         break;
                     case 'currency conversion fee':
-                        $row['fx_fee'] = (float) $val ?? null;
+                        $row['fx_fee'] = (float) $val ?: 0.0;
                         break;
                     case 'currency (currency conversion fee)':
-                        $row['fx_fee_currency'] = (float) $val ?? null;
+                        $row['fx_fee_currency'] = (float) $val ?: 0.0;
                         break;
                     case 'stamp duty reserve tax (eur)':
-                        $row['stampduty'] += (float) $val ?? null;
+                        $row['stampduty'] += (float) $val ?: 0.0;
                         break;
                     case 'stamp duty (eur)':
-                        $row['stampduty'] += (float) $val ?? null;
+                        $row['stampduty'] += (float) $val ?: 0.0;
                         break;
                     case 'transaction fee (eur)':
                         $row['transaction_fee'] = $val;
@@ -305,7 +312,7 @@ class ImportCsvService extends ImportBase
                         $row['price'] = round($row['original_price'] / $row['exchange_rate'], 3);
                     }
                 } catch (\Exception $e) {
-                    throw new \Exception($e->getMessage() + print_r($csvRow));
+                    throw new RuntimeException($e->getMessage() . ':: ' . print_r($csvRow, true), 0, $e);
                 }
 
                 $rows[$row['nr']] = $row;
@@ -400,11 +407,11 @@ class ImportCsvService extends ImportBase
                     $weightedAverage->calc($position);
 
                     if (
-                        ($position->getAmount() === 0 || $position->getAmount() <= 0.00000001)
+                        ((float) $position->getAmount() == 0 || (float) $position->getAmount() <= 0.00000001)
                     ) {
                         $position->setClosed(true);
                         $position->setClosedAt($row['transactionDate']);
-                        $position->setAmount(0);
+                        $position->setAmount('0');
                     }
 
                     $entityManager->persist($position);

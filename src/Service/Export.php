@@ -5,11 +5,13 @@ namespace App\Service;
 use App\Entity\Pie;
 use App\Repository\PieRepository;
 use App\Repository\PositionRepository;
-use Box\Spout\Common\Entity\Style\CellAlignment;
-use Box\Spout\Common\Entity\Style\Color;
-use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
-use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
+use OpenSpout\Common\Entity\Style\CellAlignment;
+use OpenSpout\Writer\XLSX\Writer;
+use OpenSpout\Common\Entity\Style\Style;
+use OpenSpout\Common\Entity\Style\Color;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use OpenSpout\Common\Entity\Row;
 
 class Export
 {
@@ -17,17 +19,17 @@ class Export
      *
      * @var DividendService
      */
-    private $dividendService;
+    private DividendService $dividendService;
     /**
      *
      * @var PositionRepository
      */
-    private $positionRepository;
+    private PositionRepository $positionRepository;
     /**
      *
      * @var PieRepository;
      */
-    private $pieRepository;
+    private PieRepository $pieRepository;
 
     public function __construct(PositionRepository $positionRepository, DividendService $dividendService, PieRepository $pieRepository)
     {
@@ -39,24 +41,24 @@ class Export
     public function export(): string
     {
         $filename = '/tmp/export-' . date('Ymd') . '.xlxs';
-        $writer = WriterEntityFactory::createXLSXWriter();
+        $writer = new Writer();
         $writer->openToFile($filename);
 
-        $style = (new StyleBuilder())
+        $style = (new Style())
             ->setFontBold()
             ->setFontSize(15)
             ->setFontColor(Color::BLUE)
             ->setShouldWrapText()
             ->setCellAlignment(CellAlignment::RIGHT)
             ->setBackgroundColor(Color::YELLOW)
-            ->build();
+        ;
 
-        $styleData = (new StyleBuilder())
+        $styleData = (new Style())
             ->setFontSize(10)
             ->setFontName('Liberation Sans')
             ->setShouldWrapText()
             ->setCellAlignment(CellAlignment::RIGHT)
-            ->build();
+        ;
 
         $data = [];
         $pies = $this->pieRepository->findAll();
@@ -72,7 +74,7 @@ class Export
             }
         } else {
             $positions = $this->positionRepository->getAllOpen();
-            $colPositions = new Collection($positions);
+            $colPositions = new ArrayCollection($positions);
             $data['default'] = $this->getData($colPositions);
         }
 
@@ -80,14 +82,14 @@ class Export
         foreach ($data as $pie => $rows) {
             $firstRow = true;
             $sheet->setName($pie);
-            foreach ($rows as $ticker => $row) {
+            foreach (array_values($rows) as $row) {
                 if ($firstRow) {
                     $headers = array_keys($row);
-                    $rowFromValues = WriterEntityFactory::createRowFromArray($headers, $style);
+                    $rowFromValues = Row::fromValues($headers, $style);
                     $writer->addRow($rowFromValues);
                 }
 
-                $rowFromValues = WriterEntityFactory::createRowFromArray(array_values($row), $styleData);
+                $rowFromValues = Row::fromValues(array_values($row), $styleData);
                 $writer->addRow($rowFromValues);
                 $firstRow = false;
             }
@@ -155,7 +157,7 @@ class Export
                     $indexBy = 'Maand ' . $m;
                     $row[$indexBy] = 0;
                     if ($dividendMonths->containsKey($m)) {
-                        $row[$indexBy] = round($netDividend * $position->getAmount(), 2);
+                        $row[$indexBy] = round($netDividend * (float) $position->getAmount(), 2);
                     }
                 }
 

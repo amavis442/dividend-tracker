@@ -22,11 +22,12 @@ class YieldsService
         $orderKey = 0;
         $totalNetYearlyDividend = 0.0;
 
-        $positions = $positionRepository->getAllOpen($pieId, null, true);
+        $positions = $positionRepository->getAllOpen($pieId, null);
         $allocated = $positionRepository->getSumAllocated($pieId);
 
         foreach ($positions as $position) {
-            if ($position->isIgnoreForDividend()) continue;
+            if ($position->isIgnoreForDividend())
+                continue;
 
             $ticker = $position->getTicker();
             $avgPrice = $position->getPrice();
@@ -69,10 +70,10 @@ class YieldsService
             $data[$tickerLabel] = $dividendYield;
 
             if ($orderBy === 'yield') {
-                $orderKey = str_pad($dividendYield * 100, 10, '0', STR_PAD_LEFT) . $ticker->getTicker();
+                $orderKey = str_pad((string) ($dividendYield * 100), 10, '0', STR_PAD_LEFT) . $ticker->getTicker();
             }
             if ($orderBy === 'dividend') {
-                $orderKey = str_pad($dividendPerYear * 100, 10, '0', STR_PAD_LEFT) . $ticker->getTicker();
+                $orderKey = str_pad((string) ($dividendPerYear * 100), 10, '0', STR_PAD_LEFT) . $ticker->getTicker();
             }
             if ($orderBy === 'ticker') {
                 $orderKey = $ticker->getTicker();
