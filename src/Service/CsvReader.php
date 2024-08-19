@@ -8,7 +8,14 @@ class CsvReader
   private string $delimiter = ",";
   private bool $hasHeader = true;
 
-  public function __construct(string $filename)
+  public function __construct(?string $filename)
+  {
+    if (isset($filename)) {
+      $this->setFilename($filename);
+    }
+  }
+
+  public function setFilename(string $filename)
   {
     $this->filename = $filename;
     if (!file_exists($filename)) {

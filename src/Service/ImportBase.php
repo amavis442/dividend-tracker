@@ -33,8 +33,7 @@ abstract class ImportBase
         TransactionRepository $transactionRepository,
         TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
-        Security $security,
-        CsvReader $reader
+        Security $security
     ): array;
 
     protected function getImportFiles(): array

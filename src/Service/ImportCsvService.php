@@ -325,15 +325,14 @@ class ImportCsvService extends ImportBase
         TransactionRepository $transactionRepository,
         TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
-        Security $security,
-        CsvReader $reader
+        Security $security
     ): array {
         $transactionsAdded = 0;
         $totalTransaction = 0;
         $transactionAlreadyExists = [];
 
-        $file = $uploadedFile->getClientOriginalName();
-
+        $filename = $uploadedFile->getClientOriginalName();
+        $reader = new CsvReader($uploadedFile->getRealPath());
         $rows = $reader->getRows();
         $rows = $this->formatImportData($rows);
 
@@ -378,7 +377,7 @@ class ImportCsvService extends ImportBase
                         ->setExchangeRate($row['exchange_rate'])
                         ->setJobid($row['opdrachtid'])
                         ->setMeta($row['nr'])
-                        ->setImportfile($file)
+                        ->setImportfile($filename)
                         ->setStampduty($row['stampduty'] ?? 0)
                         ->setFxFee($row['fx_fee'] ?? 0)
                         ->setOriginalPrice($row['original_price'])

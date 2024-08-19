@@ -42,8 +42,7 @@ class ValidateCommand extends Command
         PositionRepository $positionRepository,
         WeightedAverage $weightedAverage,
         BranchRepository $branchRepository,
-        TransactionRepository $transactionRepository,
-        CsvReader $csvReader
+        TransactionRepository $transactionRepository
     ) {
         parent::__construct();
 
@@ -54,7 +53,6 @@ class ValidateCommand extends Command
         $this->weightedAverage = $weightedAverage;
         $this->branchRepository = $branchRepository;
         $this->transactionRepository = $transactionRepository;
-        $this->csvReader = $csvReader;
     }
 
     protected function configure(): void
@@ -237,7 +235,7 @@ class ValidateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $filename = $input->getArgument('filename');
+        $filename = (string) $input->getArgument('filename');
 
         $this->csvReader = new CsvReader($filename);
         $cvsRows = $this->csvReader->getRows();
