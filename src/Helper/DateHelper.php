@@ -30,9 +30,12 @@ class DateHelper
         return [$startDate, $endDate];
     }
 
-    public function lastQuater(DateTime $currentDate)
+    public function lastQuater(DateTime $currentDate): DateTime
     {
         $currentMonth = $currentDate->format('m');
+        if ($currentMonth < 1 || $currentMonth > 12) {
+            throw new \OutOfBoundsException("current month is 1 < and > 12");
+        }
 
         if ($currentMonth >= 1 && $currentMonth <= 3) {
             $startDate = new DateTime('first day of january');
@@ -46,12 +49,15 @@ class DateHelper
         if ($currentMonth >= 10 && $currentMonth <= 12) {
             $startDate = new DateTime('first day of october');
         }
-
-        return $startDate;
+        return $startDate ?? null;
     }
 
     public function quaterToDates(int $quator, int $year): array
     {
+        if ($quator < 1 || $quator > 4) {
+            throw new \OutOfBoundsException("Quator is out of bound. Make sure it is between 1 and 4");
+        }
+
         if ($quator === 1) {
             $startDate = new DateTime('first day of january ' . $year);
             $endDate = new DateTime('last day of march ' . $year);
@@ -67,6 +73,9 @@ class DateHelper
         if ($quator === 4) {
             $startDate = new DateTime('first day of october ' . $year);
             $endDate = new DateTime('last day of december ' . $year);
+        }
+        if (!isset($startDate) || !isset($endDate)) {
+            throw new \RuntimeException("Can't get the dates for the quator. Make sure quator is between 1 and 4");
         }
 
         return [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')];
@@ -122,6 +131,10 @@ class DateHelper
             $startDate = new DateTime('first day of december ' . $year);
             $endDate = new DateTime('last day of december ' . $year);
         }
+        if (!isset($startDate) || !isset($endDate)) {
+            throw new \RuntimeException("Can't get the dates for the months. Make sure month is between 1 and 12");
+        }
+
         return [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')];
     }
 }
