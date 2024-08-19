@@ -15,15 +15,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name:'app:dividend-tracker',
-    description:'Tracks the growth or demise of the expected dividend',
+    name: 'app:dividend-tracker',
+    description: 'Tracks the growth or demise of the expected dividend',
 )]
 class DividendTrackerCommand extends Command
 {
-    protected $userRepository;
-    protected $dividendService;
-    protected $positionRepository;
-    protected $entityManager;
+    protected UserRepository $userRepository;
+    protected DividendService $dividendService;
+    protected PositionRepository $positionRepository;
+    protected EntityManagerInterface $entityManager;
 
     public function __construct(
         EntityManagerInterface $entityManager,

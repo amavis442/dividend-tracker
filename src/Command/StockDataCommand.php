@@ -11,12 +11,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name:'app:yahoodata',
-    description:'Get stockdata from yahoo for all open positions when posible and put them in a cache',
+    name: 'app:yahoodata',
+    description: 'Get stockdata from yahoo for all open positions when posible and put them in a cache',
 )]
 class StockDataCommand extends Command
 {
-    protected $stockPriceService;
+    protected StockPriceService $stockPriceService;
 
     public function __construct(StockPriceService $stockPriceService)
     {
@@ -30,7 +30,7 @@ class StockDataCommand extends Command
         $this
             ->addArgument('symbol', InputArgument::REQUIRED, 'Ticker symbol')
             /*    ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-         */;
+             */ ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

@@ -11,13 +11,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name:'app:update:stockdata',
-    description:'Get stockdata for all open positions when posible and put them in a cache',
+    name: 'app:update:stockdata',
+    description: 'Get stockdata for all open positions when posible and put them in a cache',
 )]
 class UpdateStockDataCommand extends Command
 {
-    protected $stockPriceService;
-    protected $tickerRepository;
+    protected StockPriceService $stockPriceService;
+    protected TickerRepository $tickerRepository;
 
     public function __construct(StockPriceService $stockPriceService, TickerRepository $tickerRepository)
     {

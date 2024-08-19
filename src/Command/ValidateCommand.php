@@ -9,8 +9,6 @@ use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
 use App\Service\WeightedAverage;
-use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
-use Box\Spout\Reader\CSV\Sheet;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
@@ -20,6 +18,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use App\Service\CsvReader;
 
 #[AsCommand(
     name: 'validate',
@@ -27,14 +26,14 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class ValidateCommand extends Command
 {
-    protected $tickerRepository;
-    protected $currencyRepository;
-    protected $positionRepository;
-    protected $weightedAverage;
-    protected $branchRepository;
-    protected $transactionRepository;
-    protected $importValidate;
-    protected $entityManager;
+    protected TickerRepository $tickerRepository;
+    protected CurrencyRepository $currencyRepository;
+    protected PositionRepository $positionRepository;
+    protected WeightedAverage $weightedAverage;
+    protected BranchRepository $branchRepository;
+    protected TransactionRepository $transactionRepository;
+    protected EntityManagerInterface $entityManager;
+    protected CsvReader $csvReader;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -43,7 +42,8 @@ class ValidateCommand extends Command
         PositionRepository $positionRepository,
         WeightedAverage $weightedAverage,
         BranchRepository $branchRepository,
-        TransactionRepository $transactionRepository
+        TransactionRepository $transactionRepository,
+        CsvReader $csvReader
     ) {
         parent::__construct();
 
@@ -54,6 +54,7 @@ class ValidateCommand extends Command
         $this->weightedAverage = $weightedAverage;
         $this->branchRepository = $branchRepository;
         $this->transactionRepository = $transactionRepository;
+        $this->csvReader = $csvReader;
     }
 
     protected function configure(): void
@@ -61,37 +62,36 @@ class ValidateCommand extends Command
         $this
             ->addArgument('filename', InputArgument::REQUIRED, 'Argument description');
     }
-
-    protected function importData(Sheet $sheet, OutputInterface $output): void
+    /**
+     * @param array<string, array> $csvRows
+     */
+    protected function importData(array $csvRows, OutputInterface $output): void
     {
-        $headers = [];
         $rowNum = 0;
+        $csvRows = array_map(function ($row) {
+            $newRow = [];
+            foreach ($row as $header => $value) {
+                $newRow[strtolower($header)] = $value;
+            }
+            return $newRow;
+        }, $csvRows);
 
-        foreach ($sheet->getRowIterator() as $csvRow) {
-            $cells = $csvRow->getCells();
 
-            if ($rowNum === 0) {
-                foreach ($cells as $r => $cell) {
-                    $headers[$r] = strtolower($cell->getValue());
-                }
-                $rowNum++;
+        foreach ($csvRows as $csvRow) {
+            $cellVal = $csvRow['action'];
+
+            if (false !== stripos($cellVal, 'deposit') || false !== stripos($cellVal, 'withdraw') || false !== stripos($cellVal, 'interest')) {
                 continue;
             }
-            $cell = $cells[0];
-            $cellVal = $cell->getValue();
-
-            if (false !== stripos($cellVal, 'deposit') || false !== stripos($cellVal, 'withdraw')) {
-                continue;
-            };
+            ;
 
             $row = [];
             $rawAmount = 0;
             $rawAllocation = 0;
             $row['stampduty'] = 0.0;
 
-            foreach ($cells as $r => $cell) {
-                $header = $headers[$r];
-                $val = $cell->getValue();
+            foreach ($csvRow as $header => $val) {
+                $header = strtolower($header);
                 $row['nr'] = $rowNum;
                 switch ($header) {
                     case 'action':
@@ -104,7 +104,11 @@ class ValidateCommand extends Command
                         break;
                     case 'time':
                         $row['time'] = $val;
-                        $row['transactionDate'] = DateTime::createFromFormat('Y-m-d H:i:s', $val);
+                        $t = substr($val, 0, 19);
+                        $row['transactionDate'] = DateTime::createFromFormat("Y-m-d H:i:s", $t);
+                        if (!$row['transactionDate']) {
+                            dd($csvRow, $row, $val);
+                        }
                         break;
                     case 'isin':
                         /**
@@ -112,7 +116,7 @@ class ValidateCommand extends Command
                          */
                         $row['isin'] = $val;
                         $isin = $val;
-                        if (!preg_match('/^([A-Z]{2})(\d{1})(\w+)/i', $isin, $matches)) {
+                        if (!preg_match('/^([A-Z]{2})(\d{1})(\w+)/i', $isin, $matches) && !preg_match('/^([A-Z]{4})(\d{1})(\w+)/i', $isin, $matches)) {
                             throw new RuntimeException('ISIN Number not correct: ' . $isin);
                         }
                         break;
@@ -122,61 +126,69 @@ class ValidateCommand extends Command
                     case 'name':
                         $row['name'] = $val;
                         break;
-                    case 'result (eur)':
-                        $row['profit'] = $val;
-                        break;
-                    case 'price / share':
-                        $row['original_price'] = $val;
-                        break;
-                    case 'currency (price / share)':
-                        $row['original_price_currency'] = $val;
-                        break;
                     case 'no. of shares':
                         $rawAmount = $val;
                         $row['amount'] = $val;
                         break;
+                    case 'price / share':
+                        $row['original_price'] = (float) $val;
+                        break;
+                    case 'currency (price / share)':
+                        $row['original_price_currency'] = $val;
+                        break;
                     case 'exchange rate':
-                        $row['wisselkoersen'] = $val;
+                        $row['exchange_rate'] = (float) $val;
                         break;
-                    case 'total (eur)':
-                        $rawAllocation = $val;
+                    case 'result':
+                        $row['profit'] = (float) $val;
+                        break;
+                    case 'currency (result)':
+                        $row['profit_currency'] = $val;
+                        break;
+                    case 'total':
                         $allocation = $val;
-                        $row['allocation'] = $allocation;
-                        $row['total'] = $val;
+                        $row['allocation'] = (float) $allocation;
+                        $row['total'] = (float) $val;
                         break;
-                    case 'id':
-                        $row['opdrachtid'] = $val;
+                    case 'currency (total)':
+                        $row['allocation_currency'] = $val;
                         break;
                     case 'withholding tax':
-                        $row['tax'] = (float) $val ?? null;
+                        $row['tax'] = (float) ((!isset($val) || $val == "") ?: 0.0);
                         break;
                     case 'currency (withholding tax)':
                         $row['tax_currency'] = $val;
                         break;
+                    case 'id':
+                        $row['opdrachtid'] = $val;
+                        break;
+                    case 'currency conversion fee':
+                        $row['fx_fee'] = (float) ((!isset($val) || $val == "") ?: 0.0);
+                        break;
+                    case 'currency (currency conversion fee)':
+                        $row['fx_fee_currency'] = (float) ((!isset($val) || $val == "") ?: 0.0);
+                        break;
                     case 'stamp duty reserve tax (eur)':
-                        $row['stampduty'] += (float) $val ?? null;
+                        $row['stampduty'] += (float) ((!isset($val) || $val == "") ?: 0.0);
                         break;
                     case 'stamp duty (eur)':
-                        $row['stampduty'] += (float) $val ?? null;
+                        $row['stampduty'] += (float) ((!isset($val) || $val == "") ?: 0.0);
                         break;
-                    case 'currency conversion fee (eur)':
-                        $row['fx_fee'] = (float) $val ?? null;
-                        break;
-                    case 'Transaction fee (EUR)':
+                    case 'transaction fee (eur)':
                         $row['transaction_fee'] = $val;
                         break;
-                    case 'Finra fee (EUR)':
+                    case 'finra fee (eur)':
                         $row['finra_fee'] = $val;
                         break;
                     default:
                         $row[] = $val;
                 }
-                $r++;
             }
 
             if (false === stripos($cellVal, 'sell') && false === stripos($cellVal, 'buy')) {
                 continue;
-            };
+            }
+            ;
 
             if (count($row) > 0) {
                 $rawAllocation -= (
@@ -227,14 +239,11 @@ class ValidateCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $filename = $input->getArgument('filename');
 
-        $reader = ReaderEntityFactory::createCSVReader();
-        $reader->setFieldDelimiter(',');
+        $this->csvReader = new CsvReader($filename);
+        $cvsRows = $this->csvReader->getRows();
 
-        $reader->open($filename);
+        $this->importData($cvsRows, $output);
 
-        $sheets = $reader->getSheetIterator();
-        $this->importData($sheets->current(), $output);
-        $reader->close();
 
         $io->success('Done.');
 

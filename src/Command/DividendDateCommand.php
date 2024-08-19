@@ -103,7 +103,7 @@ class DividendDateCommand extends Command
                 }
                 try {
                     $exDate = new DateTime($payment['ExDate']);
-                } catch (Exception $ex) {
+                } catch (\DateMalformedStringException $ex) {
                     $this->logger->alert('exDate exception: ' . print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
                     continue;
                 }
@@ -125,13 +125,13 @@ class DividendDateCommand extends Command
                     }
                     try {
                         $payDate = new DateTime($payment['PayDate']);
-                    } catch (Exception $ex) {
+                    } catch (\DateMalformedStringException $ex) {
                         $this->logger->alert('payDate exception: ' . print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
                         continue;
                     }
                     try {
                         $recordDate = new DateTime($payment['RecordDate']);
-                    } catch (Exception $ex) {
+                    } catch (\DateMalformedStringException $ex) {
                         $this->logger->alert('recordDate exception: ' . print_r($payment, true) . ' ' . $ticker->getFullname() . ' ' . $ticker->getSymbol());
                         continue;
                     }
