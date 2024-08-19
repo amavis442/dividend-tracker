@@ -13,32 +13,27 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 class ProjectionModel
 {
-    /**
-     * Undocumented variable
-     *
-     * @var DividendService
-     */
-    protected $dividendService;
+    protected DividendService $dividendService;
     /**
      * Heavy operation which does not change that much so we cache it for speed.
-     *
-     * @var CacheInterface
      */
-    protected $cache;
+    protected CacheInterface $cache;
     /**
      * User to use for cache
-     *
-     * @var User
      */
-    protected $user;
+    protected User $user;
 
     public function __construct(CacheInterface $cache, Security $security)
     {
         $this->cache = $cache;
-        $this->user = $security->getUser();
+        $user = $security->getUser();
+        if (!$user instanceof User) {
+            throw new \RuntimeException("User unknown");
+        }
+        $this->user = $user;
     }
 
-    private function calcEstimatePayoutPerMonth(array &$dividendEstimate)
+    private function calcEstimatePayoutPerMonth(array &$dividendEstimate): void
     {
         foreach ($dividendEstimate as $date => &$estimate) {
             $d = (new \DateTime($date . '01'))->format('F Y');
@@ -52,7 +47,7 @@ class ProjectionModel
         DividendMonth &$dividendMonth,
         string $paydate,
         string $normalDate
-    ) {
+    ): void {
         $dataSource[$paydate]['grossTotalPayment'] = 0.0;
         $dataSource[$paydate]['estimatedNetTotalPayment'] = 0.0;
         $dataSource[$paydate]['normaldate'] = $normalDate;
@@ -82,7 +77,7 @@ class ProjectionModel
         string $normalDate,
         array &$data,
         array &$labels
-    ) {
+    ): void {
         $item = $dividendEstimate[$paydate];
         $dataSource[$paydate]['grossTotalPayment'] = $item['grossTotalPayment'];
         $dataSource[$paydate]['estimatedNetTotalPayment'] = 0.0;
@@ -136,13 +131,7 @@ class ProjectionModel
 
         $cacheKey = 'projection_' . $year . '_' . $this->user->getId();
         $parent = $this;
-        $data = $this->cache->get($cacheKey, function (ItemInterface $item) use (
-            $year,
-            $parent,
-            $positionRepository,
-            $dividendMonthRepository,
-            $dividendService
-        ) {
+        $data = $this->cache->get($cacheKey, function (ItemInterface $item) use ($year, $parent, $positionRepository, $dividendMonthRepository, $dividendService) {
             $item->expiresAfter(600);
 
             $labels = [];

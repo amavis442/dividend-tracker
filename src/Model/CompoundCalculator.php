@@ -33,7 +33,7 @@ class CompoundCalculator
         $dividend = (float) $startDividend;
         $year = 0;
         $quator = 0;
-        $startYear = date('Y');
+        $startYear = (int) date('Y');
         if (date('m') > 9) {
             $startYear++;
         }

@@ -3,7 +3,6 @@
 namespace App\Model;
 
 use App\Entity\PortfolioItem;
-use App\Entity\Position;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
 use App\Service\DividendService;
@@ -13,36 +12,13 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class PortfolioModel
 {
-    /**
-     * Undocumented variable
-     *
-     * @var boolean
-     */
     private bool $initialized = false;
-
-    /**
-     * Undocumented variable
-     *
-     * @var array
-     */
     private array $portfolioItems = [];
-    /**
-     * Unique ticker ids
-     *
-     * @var array
-     */
     private array $tickerIds = [];
-    /**
-     * num Pages
-     *
-     * @var integer
-     */
     private int $maxPages = 1;
 
     /**
      * When was the quote cache last updated
-     *
-     * @var int
      */
     private int $timestamp = 0;
 
@@ -101,9 +77,7 @@ class PortfolioModel
         $iter = $items->getIterator();
         $tickerIds = [];
         $this->stopwatch->stop('portfoliomodel-getpage-get-iter');
-        /**
-         * @var Position $position
-         */
+
         $this->stopwatch->start('portfoliomodel-getpage-main-foreach');
         foreach ($iter as $position) {
             $ticker = $position->getTicker();
@@ -150,8 +124,6 @@ class PortfolioModel
 
                 $portfolioItem
                     ->setDivDate(true)
-                    ->setExDividendDate($calendar->getExDividendDate())
-                    ->setPaymentDate($calendar->getPaymentDate())
                     ->setCashAmount($calendar->getCashAmount())
                     ->setCashCurrency($calendar->getCurrency())
                     ->setForwardNetDividend($forwardNetDividend)
@@ -159,6 +131,12 @@ class PortfolioModel
                     ->setForwardNetDividendYieldPerShare($forwardNetDividendYieldPerShare)
                     ->setNetDividendPerShare($netDividendPerShare)
                 ;
+                if ($calendar->getExDividendDate() instanceof DateTime) {
+                    $portfolioItem->setExDividendDate($calendar->getExDividendDate());
+                }
+                if ($calendar->getPaymentDate() instanceof DateTime) {
+                    $portfolioItem->setPaymentDate($calendar->getPaymentDate());
+                }
 
                 foreach ($position->getTicker()->getCalendars() as $currentCalendar) {
                     if ($currentCalendar->getPaymentDate() >= $currentDate) {
@@ -239,7 +217,7 @@ class PortfolioModel
      *
      * @return  int
      */
-    public function getCacheTimestamp()
+    public function getCacheTimestamp(): int
     {
         if (!$this->initialized) {
             throw new RuntimeException('First call PortfolioModel::getPage()');
