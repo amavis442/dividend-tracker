@@ -8,13 +8,12 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use App\Entity\StockPrice;
 use App\Repository\TickerRepository;
-use App\Service\DividendService;
 use App\Service\StockPriceService;
 
 final class StockPriceItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
-    private $tickerRepository;
-    private $stockPriceService;
+    private TickerRepository $tickerRepository;
+    private StockPriceService $stockPriceService;
 
     public function __construct(TickerRepository $tickerRepository, StockPriceService $stockPriceService)
     {
@@ -34,6 +33,10 @@ final class StockPriceItemDataProvider implements ItemDataProviderInterface, Res
             $symbol = $ticker->getSymbol();
             $symbols[] = $symbol;
         }
+        if (!isset($symbols)) {
+            return null;
+        }
+
         $this->stockPriceService->getQuotes($symbols);
 
         $marketPrice = $this->stockPriceService->getMarketPrice($id);

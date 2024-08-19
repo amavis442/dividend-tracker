@@ -10,8 +10,8 @@ use App\Service\StockPriceService;
 
 final class StockPriceCollectionDataProvider
 {
-    private $tickerRepository;
-    private $stockPriceService;
+    private TickerRepository $tickerRepository;
+    private StockPriceService $stockPriceService;
 
     public function __construct(TickerRepository $tickerRepository, StockPriceService $stockPriceService)
     {
@@ -26,7 +26,12 @@ final class StockPriceCollectionDataProvider
             $symbol = $ticker->getSymbol();
             $symbols[] = $symbol;
         }
+        if (!isset($symbols)) {
+            return [];
+        }
+
         $this->stockPriceService->getQuotes($symbols);
+
         $data = [];
         foreach ($symbols as $symbol) {
             $marketPrice = $this->stockPriceService->getMarketPrice($symbol);
