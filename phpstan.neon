@@ -4,3 +4,4 @@ parameters:
     excludePaths:
         - %currentWorkingDirectory%/migrations/*.php
         - %currentWorkingDirectory%/src/Kernel.php
+    treatPhpDocTypesAsCertain: false
