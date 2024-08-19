@@ -10,16 +10,33 @@ class CsvWriter
   private array $rows = [];
   private array $headers = [];
 
-  public function __construct(string $filename)
+  public function __construct(?string $filename)
+  {
+    if (isset($filename)) {
+      $this->setFilename($filename);
+    }
+  }
+
+  public function setFilename(string $filename): self
   {
     $this->filename = $filename;
+
+    return $this;
   }
 
-  public function setFieldDelimiter($delimiter)
+  public function setFieldDelimiter($delimiter): self
   {
     $this->delimiter = $delimiter;
+
+    return $this;
   }
 
+  public function setHasHeader(bool $hasHeader): self
+  {
+    $this->hasHeader = $hasHeader;
+
+    return $this;
+  }
   function setHeaders(array $headers): self
   {
     $this->headers = $headers;
@@ -32,17 +49,18 @@ class CsvWriter
     return $this;
   }
 
-  public function write()
+  public function write(): void
   {
-    $rows = [];
-    $f = fopen($this->filename, "w");
-    if ($f) {
-      $headers = "";
-      foreach ($this->headers as $header) {
-        $headers .= $header . $this->delimiter;
+    $fh = fopen($this->filename, "w");
+    if ($fh) {
+      if ($this->hasHeader) {
+        $headers = "";
+        foreach ($this->headers as $header) {
+          $headers .= $header . $this->delimiter;
+        }
+        $headers = trim($headers, $this->delimiter) . "\n";
+        fwrite($fh, $headers, strlen($headers));
       }
-      $headers = trim($headers, $this->delimiter) . "\n";
-      fwrite($f, $headers, strlen($headers));
 
       $line = "";
       foreach ($this->rows as $row) {
@@ -51,9 +69,9 @@ class CsvWriter
           $line .= $escape . $value . $escape . $this->delimiter;
         }
         $line = trim($line, $this->delimiter) . "\n";
-        fwrite($f, $line, strlen($line));
+        fwrite($fh, $line, strlen($line));
       }
-      fclose($f);
+      fclose($fh);
     }
   }
 }

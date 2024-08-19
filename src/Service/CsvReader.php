@@ -15,17 +15,28 @@ class CsvReader
     }
   }
 
-  public function setFilename(string $filename)
+  public function setFilename(string $filename): self
   {
     $this->filename = $filename;
     if (!file_exists($filename)) {
-      throw new \Exception("Csv filename does not exist");
+      throw new \RuntimeException("Csv filename does not exist");
     }
+
+    return $this;
   }
 
-  public function setFieldDelimiter($delimiter)
+  public function setHasHeader(bool $hasHeader): self
+  {
+    $this->hasHeader = $hasHeader;
+
+    return $this;
+  }
+
+  public function setFieldDelimiter($delimiter): self
   {
     $this->delimiter = $delimiter;
+
+    return $this;
   }
 
   public function getRows(): array
