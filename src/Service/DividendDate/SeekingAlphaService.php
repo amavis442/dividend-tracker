@@ -18,18 +18,7 @@ class SeekingAlphaService implements DividendDatePluginInterface
         'NESN' => 'NSRGY',
     ];
 
-    /**
-     * Http client
-     *
-     * @var HttpClientInterface
-     */
-    private $client;
-    /**
-     *
-     * @var string
-     */
-    private $usedUrl = '';
-    private $dividenData = [];
+    private HttpClientInterface $client;
 
     public function __construct(HttpClientInterface $client)
     {
@@ -56,7 +45,6 @@ class SeekingAlphaService implements DividendDatePluginInterface
             . "&StartDate=01/01/" . (date('Y') - 3) . "&EndDate=12/30/" . (date('Y') + 3) . "&"
             . "IdentifierAsOfDate=&CorporateActionsAdjusted=true&_token="
             . $token['_token'] . "&_token_userid=" . $token['_token_userid'];
-        $this->usedUrl = $url;
 
         $response = $this->client->request('GET', $url);
         if ($response->getStatusCode() !== 200) {
@@ -64,7 +52,6 @@ class SeekingAlphaService implements DividendDatePluginInterface
         }
         $data = $response->toArray();
         if ($data['Outcome'] == 'Success') {
-            $this->dividenData = $data['CashDividends'];
             return $data;
         }
     }
@@ -84,10 +71,7 @@ class SeekingAlphaService implements DividendDatePluginInterface
     }
 
     /**
-     * Undocumented function
-     *
-     * @param string $ticker
-     * @return void
+     * Get dividend data from site seekingalpha
      */
     public function getData(string $ticker): ?array
     {

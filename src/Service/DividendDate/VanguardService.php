@@ -66,7 +66,7 @@ class VanguardService implements DividendDatePluginInterface
             return null;
         }
 
-        $url = str_replace('[PORTID]', $portid, self::URL);
+        $url = str_replace('[PORTID]', (string) $portid, self::URL);
         $response = $this->client->request(
             'GET',
             $url

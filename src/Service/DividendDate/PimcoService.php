@@ -3,7 +3,7 @@
 namespace App\Service\DividendDate;
 
 use App\Contracts\Service\DividendDatePluginInterface;
-use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+use OpenSpout\Reader\Common\Creator\ReaderEntityFactory;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use DateTime;
 use DateInterval;
@@ -70,13 +70,13 @@ class PimcoService implements DividendDatePluginInterface
         $content = $response->getContent(true);
         $items = [];
         if (file_put_contents($filename, $content)) {
-            $reader = ReaderEntityFactory::createXLSXReader();
+            $reader = new \OpenSpout\Reader\XLSX\Reader();
             $reader->open($filename);
 
             foreach ($reader->getSheetIterator() as $sheet) {
                 foreach ($sheet->getRowIterator() as $rowid => $row) {
                     /**
-                     * @var \Box\Spout\Common\Entity\Cell[] $cells
+                     * @var \OpenSpout\Common\Entity\Cell[] $cells
                      */
                     $cells = $row->getCells();
                     if ($rowid == 3) {
@@ -102,13 +102,13 @@ class PimcoService implements DividendDatePluginInterface
                             $timestamp = $d->format('Ymd');
                             $month = $d->format('F');
                             $year = $d->format('Y');
-                            $lastWeekday = "last weekday ".$month." ".$year;
+                            $lastWeekday = "last weekday " . $month . " " . $year;
                             //echo $lastWeekday. " ";
                             $pDay = new DateTime($lastWeekday); // Bug even when you say last weekday of December it show the month November and not December
                             $interval = new DateInterval('P1M');
                             $p = $pDay->add($interval)->format('Y-m-d');
                             $payDate = $p;
-                            $timestampCutoff = date('Ymd', strtotime("first weekday ".date('F')." ".date('Y')));
+                            $timestampCutoff = date('Ymd', strtotime("first weekday " . date('F') . " " . date('Y')));
 
                             if ($timestamp > $timestampCutoff) {
                                 $interval = new DateInterval('P1D');
