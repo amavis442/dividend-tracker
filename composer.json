@@ -51,6 +51,7 @@
         "zbateson/mail-mime-parser": "^2.2"
     },
     "require-dev": {
+        "behat/behat": "^3.14",
         "deployer/deployer": "^7.0",
         "doctrine/coding-standard": "^9.0",
         "phpstan/phpstan": "^1.6",
