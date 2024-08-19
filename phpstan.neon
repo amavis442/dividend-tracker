@@ -1,6 +1,6 @@
 includes:
     - vendor/thecodingmachine/phpstan-strict-rules/phpstan-strict-rules.neon
 parameters:
-    excludes_analyse:
+    excludePaths:
         - %currentWorkingDirectory%/migrations/*.php
-        - %currentWorkingDirectory%/src/Kernel.php    
+        - %currentWorkingDirectory%/src/Kernel.php
