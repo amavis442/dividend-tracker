@@ -27,14 +27,14 @@ class Position
         nullable: false,
         options: ["default" => 0]
     )]
-    private $price = 0.0;
+    private float $price = 0.0;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $amount = 0.0;
+    private float $amount = 0.0;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Ticker', inversedBy: 'positions')]
     #[ORM\JoinColumn(nullable: false)]
@@ -48,14 +48,14 @@ class Position
         nullable: false,
         options: ["default" => 0]
     )]
-    private $profit = 0.0;
+    private float $profit = 0.0;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $allocation = 0.0;
+    private float $allocation = 0.0;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\User', inversedBy: 'positions')]
     #[ORM\JoinColumn(nullable: false)]
@@ -77,10 +77,10 @@ class Position
     private $payments;
 
     #[ORM\Column(type: 'datetime', name: 'created_at')]
-    private $createdAt;
+    private DateTime $createdAt;
 
     #[ORM\Column(type: 'datetime', name: 'updated_at', nullable: true)]
-    private $updatedAt;
+    private ?DateTime $updatedAt;
 
     #[ORM\JoinTable(name: 'pie_position')]
     #[ORM\JoinColumn(name: 'position_id', referencedColumnName: 'id')]
@@ -90,16 +90,16 @@ class Position
     private $pies;
 
     #[ORM\Column(type: 'datetime', name: 'closed_at', nullable: true)]
-    private $closedAt;
+    private ?DateTime $closedAt;
 
     #[ORM\Column(type: 'float', nullable: true)]
-    private $dividendTreshold = 0.0;
+    private ?float $dividendTreshold = 0.0;
 
     /**
      * What is the maximum allocation this position should be?
      */
     #[ORM\Column(type: 'integer', nullable: true)]
-    private $maxAllocation = 0;
+    private ?int $maxAllocation = 0;
 
     #[ORM\Column(type: 'boolean', options: ["default" => false])]
     private bool $ignore_for_dividend = false;
@@ -143,12 +143,12 @@ class Position
         return $this;
     }
 
-    public function getAmount(): ?string
+    public function getAmount(): ?float
     {
         return $this->amount;
     }
 
-    public function setAmount(string $amount): self
+    public function setAmount(float $amount): self
     {
         $this->amount = $amount;
 
@@ -193,7 +193,7 @@ class Position
 
     public function getAllocated(): float
     {
-        return round(($this->getAmount() * $this->getPrice()), 3);
+        return round((float) $this->getAmount() * $this->getPrice(), 3);
     }
 
     public function getAllocation(): ?float
@@ -303,7 +303,7 @@ class Position
 
     public function isDividendPayMonth(): bool
     {
-        $currentMonth = date('m');
+        $currentMonth = (int) date('m');
         return $this->getTicker()->isDividendPayMonth($currentMonth);
     }
 
@@ -318,7 +318,7 @@ class Position
 
     public function setCreatedAt(DateTimeInterface $createdAt = null): self
     {
-        $this->createdAt = $createdAt ?? new DateTime("now");
+        $this->createdAt = ($createdAt instanceof DateTime) ? $createdAt : new DateTime("now");
 
         return $this;
     }
@@ -339,7 +339,7 @@ class Position
 
     public function setUpdatedAt(DateTimeInterface $updatedAt = null): self
     {
-        $this->updatedAt = $updatedAt ?? new DateTime("now");
+        $this->updatedAt = ($updatedAt instanceof DateTime) ? $updatedAt : new DateTime("now");
 
         return $this;
     }
@@ -410,7 +410,7 @@ class Position
 
     public function setClosedAt(?\DateTimeInterface $closedAt): self
     {
-        $this->closedAt = $closedAt;
+        $this->closedAt = ($closedAt instanceof DateTime) ? $closedAt : new DateTime("now");
 
         return $this;
     }

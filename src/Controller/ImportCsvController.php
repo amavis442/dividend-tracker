@@ -67,27 +67,19 @@ class ImportCsvController extends AbstractController
                         ],
                     ]);
                 }
-                $reader = new CsvReader($transactionFile->getRealPath());
 
-                try {
-                    $result = $importCsv->importFile(
-                        $entityManager,
-                        $tickerRepository,
-                        $positionRepository,
-                        $weightedAverage,
-                        $currencyRepository,
-                        $branchRepository,
-                        $transactionRepository,
-                        $taxRepository,
-                        $transactionFile,
-                        $security,
-                        $reader
-                    );
-                } catch (Exception $e) {
-                    return $this->render('error_handling/exception.html.twig', [
-                        'errorMessage' => $e->getMessage(),
-                    ]);
-                }
+                $result = $importCsv->importFile(
+                    $entityManager,
+                    $tickerRepository,
+                    $positionRepository,
+                    $weightedAverage,
+                    $currencyRepository,
+                    $branchRepository,
+                    $transactionRepository,
+                    $taxRepository,
+                    $transactionFile,
+                    $security
+                );
 
                 $importFiles = new ImportFiles();
                 $importFiles

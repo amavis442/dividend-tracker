@@ -13,9 +13,10 @@ use Twig\TwigFilter;
 class TypeCastingExtension extends AbstractExtension
 {
     /**
-     * @return array|\Twig_Filter[]
+     * Summary of getFilters
+     * @return array
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('int', function ($value) {

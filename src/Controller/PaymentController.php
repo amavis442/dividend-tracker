@@ -44,10 +44,11 @@ class PaymentController extends AbstractController
 
         $defaultData = $request->getSession()->get(self::SEARCHFORM_KEY);
         if ($defaultData === null) {
-            $defaultData['year'] = date('Y');
+            $defaultData['year'] = (int) date('Y');
         }
 
-        $currentYear = date('Y');
+        $currentYear = (int) date('Y');
+        $years = [];
         for ($i = 2019; $i <= $currentYear; $i++) {
             $years[$i] = $i;
         }
@@ -57,31 +58,37 @@ class PaymentController extends AbstractController
                 ChoiceType::class,
                 ['label' => 'Year', 'choices' => $years, 'choice_translation_domain' => false,]
             )
-            ->add('month', ChoiceType::class, ['choices' => [
-                '-' => 0,
-                'Jan' => 1,
-                'Feb' => 2,
-                'Ma' => 3,
-                'Apr' => 4,
-                'May' => 5,
-                'Jun' => 6,
-                'Jul' => 7,
-                'Aug' => 8,
-                'Sept' => 9,
-                'Oct' => 10,
-                'Nov' => 11,
-                'Dec' => 12,
-            ], 'choice_translation_domain' => false,])
+            ->add('month', ChoiceType::class, [
+                'choices' => [
+                    '-' => 0,
+                    'Jan' => 1,
+                    'Feb' => 2,
+                    'Ma' => 3,
+                    'Apr' => 4,
+                    'May' => 5,
+                    'Jun' => 6,
+                    'Jul' => 7,
+                    'Aug' => 8,
+                    'Sept' => 9,
+                    'Oct' => 10,
+                    'Nov' => 11,
+                    'Dec' => 12,
+                ],
+                'choice_translation_domain' => false,
+            ])
             ->add(
                 'quator',
                 ChoiceType::class,
-                ['choices' => [
-                    '-' => 0,
-                    'Q1' => 1,
-                    'Q2' => 2,
-                    'Q3' => 3,
-                    'Q4' => 4,
-                ], 'choice_translation_domain' => false,]
+                [
+                    'choices' => [
+                        '-' => 0,
+                        'Q1' => 1,
+                        'Q2' => 2,
+                        'Q3' => 3,
+                        'Q4' => 4,
+                    ],
+                    'choice_translation_domain' => false,
+                ]
             )
             ->add('submit', SubmitType::class)
             ->getForm();
@@ -142,11 +149,11 @@ class PaymentController extends AbstractController
     ): Response {
         $ticker = $position->getTicker();
         if ($timestamp) {
-            $year = substr($timestamp, 0, 4);
-            $month = substr($timestamp, 5, 2);
+            $year = (int) substr($timestamp, 0, 4);
+            $month = (int) substr($timestamp, 5, 2);
         } else {
-            $year = date('Y');
-            $month = date('m');
+            $year = (int) date('Y');
+            $month = (int) date('m');
         }
 
         $positionDividendEstimate = $calendarRepository->getDividendEstimate($position, $year);

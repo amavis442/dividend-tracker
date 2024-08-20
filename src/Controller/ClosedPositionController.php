@@ -43,7 +43,7 @@ class ClosedPositionController extends AbstractController
             'maxPages' => $maxPages,
             'thisPage' => $thisPage,
             'sort' => $sort,
-            'searchCriteria' => $searchCriteria ?? '',
+            'searchCriteria' => $searchCriteria,
             'routeName' => 'closed_position_index',
             'searchPath' => 'closed_position_search'
         ]);

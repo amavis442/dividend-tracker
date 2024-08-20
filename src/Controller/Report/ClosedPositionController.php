@@ -37,7 +37,7 @@ class ClosedPositionController extends AbstractController
         $totalDividend = $paymentRepository->getTotalDividend();
 
         $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
-        $items = $positionRepository->getAllClosed($page, 10, $orderBy, $sort, $searchCriteria);
+        $items = $positionRepository->getAllClosed($page, 10, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;

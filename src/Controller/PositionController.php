@@ -33,6 +33,7 @@ class PositionController extends AbstractController
         string $sort = 'asc',
         int $status = PositionRepository::CLOSED
     ): Response {
+        $order = '';
         if (!in_array($orderBy, ['profit'])) {
             $order = 'p.' . $orderBy;
         }
@@ -76,7 +77,7 @@ class PositionController extends AbstractController
     }
 
     #[Route(path: '/create/{ticker?}', name: 'position_new', methods: ['GET', 'POST'])]
-    public function create(Request $request,  PositionService $positionService, ?Ticker $ticker = null): Response
+    public function create(Request $request, PositionService $positionService, ?Ticker $ticker = null): Response
     {
         $position = new Position();
 
@@ -108,19 +109,13 @@ class PositionController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}/edit/{closed<\d+>?0}', name: 'position_edit', methods: ['GET', 'POST'])]
+    #[Route(path: '/{id}/edit', name: 'position_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
         Position $position,
         PositionService $positionService,
-        ?int $closed,
         Referer $referer
     ): Response {
-        if ($closed === true) {
-            $position->setClosed(true);
-            $position->setClosedAt((new DateTime()));
-        }
-
         $form = $this->createForm(PositionType::class, $position);
         $form->handleRequest($request);
 

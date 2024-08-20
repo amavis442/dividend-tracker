@@ -161,7 +161,7 @@ class Calendar
     }
 
     /**
-     * @return Collenction|Payment[]
+     * @return Collection|Payment[]
      */
     public function getPayments(): Collection
     {

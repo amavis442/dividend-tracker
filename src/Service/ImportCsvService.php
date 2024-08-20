@@ -411,7 +411,7 @@ class ImportCsvService extends ImportBase
                     ) {
                         $position->setClosed(true);
                         $position->setClosedAt($row['transactionDate']);
-                        $position->setAmount('0');
+                        $position->setAmount(0);
                     }
 
                     $entityManager->persist($position);

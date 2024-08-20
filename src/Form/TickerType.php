@@ -56,11 +56,10 @@ class TickerType extends AbstractType
             ->add('tax', EntityType::class, [
                 'class' => Tax::class,
                 'label' => 'Tax',
-                'choice_label' => 'label',
                 'required' => false,
                 'placeholder' => 'Please choose a tax',
                 'empty_data' => null,
-                'multiple'    => false,
+                'multiple' => false,
                 'choice_label' => function ($tax) {
                     return ($tax->getTaxRate() * 100) . '%';
                 },

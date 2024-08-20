@@ -14,9 +14,10 @@ use Twig\TwigFilter;
 class MonthNumberToNameExtension extends AbstractExtension
 {
     /**
-     * @return array|\Twig_Filter[]
+     * Summary of getFilters
+     * @return array
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('monthToName', function ($value) {

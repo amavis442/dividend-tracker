@@ -111,7 +111,7 @@ class CalendarController extends AbstractController
 
         $calendars = $calendarRepository->groupByMonth(
             $dividendService,
-            $year,
+            (int) $year,
             $dateSelect->getStartdate()->format('Y-m-d'),
             $dateSelect->getEnddate()->format('Y-m-d'),
             $dateSelect->getPie()

@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 #[ORM\Entity]
 class Attachment
@@ -16,14 +16,14 @@ class Attachment
     /**
      * NOTE: This is not a mapped field of entity metadata, just a simple property.
      */
-    private ?File $attachmentFile = null;
+    private ?UploadedFile $attachmentFile = null;
 
     #[ORM\Column(type: 'string')]
     private string $attachmentName;
 
 
     #[ORM\Column(type: 'bigint', nullable: true)]
-    private ?string $attachmentSize = null;
+    private ?int $attachmentSize = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
@@ -55,9 +55,9 @@ class Attachment
      * must be able to accept an instance of 'File' as the bundle will inject one here
      * during Doctrine hydration.
      *
-     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile|null $attachmentFile
+     * @param \Symfony\Component\HttpFoundation\File\UploadedFile|null $attachmentFile
      */
-    public function setAttachmentFile(?File $attachmentFile = null): void
+    public function setAttachmentFile(?UploadedFile $attachmentFile = null): void
     {
         $this->attachmentFile = $attachmentFile;
 
@@ -68,7 +68,7 @@ class Attachment
         }
     }
 
-    public function getAttachmentFile(): ?File
+    public function getAttachmentFile(): ?UploadedFile
     {
         return $this->attachmentFile;
     }
@@ -94,7 +94,7 @@ class Attachment
 
     public function getAttachmentSize(): ?int
     {
-        return $this->attachmentSize;
+        return $this->attachmentSize > 0 ? $this->attachmentSize : 0;
     }
 
     public function getUpdatedAt(): ?\DateTimeInterface

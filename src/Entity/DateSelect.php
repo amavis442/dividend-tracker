@@ -76,24 +76,12 @@ class DateSelect
         return $this;
     }
 
-    /**
-     * Get all, Undocumented variable
-     *
-     * @return  Pie
-     */
     public function getPie(): ?Pie
     {
         return $this->pie;
     }
 
-    /**
-     * Set all, Undocumented variable
-     *
-     * @param  string  $pie  All, Undocumented variable
-     *
-     * @return  self
-     */
-    public function setPie(Pie $pie)
+    public function setPie(Pie $pie): self
     {
         $this->pie = $pie;
 

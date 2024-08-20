@@ -160,7 +160,7 @@ class Compound
     /**
      * Set rise of market gain in percentage per year around 7.43%
      *
-     * @param  int|null  $priceAppreciation  Rise of market gain in percentage per year around 7.43%
+     * @param  int  $priceAppreciation  Rise of market gain in percentage per year around 7.43%
      *
      * @return  self
      */
@@ -184,7 +184,7 @@ class Compound
     /**
      * Set growth after 5 years and into infinity will normally be around 3%
      *
-     * @param  int|null  $growthAfter5Years  Growth after 5 years and into infinity will normally be around 3%
+     * @param  int $growthAfter5Years  Growth after 5 years and into infinity will normally be around 3%
      *
      * @return  self
      */

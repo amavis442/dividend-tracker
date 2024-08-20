@@ -64,8 +64,9 @@ class TickerRepository extends ServiceEntityRepository
         string $sort = 'ASC',
         string $search = ''
     ): Paginator {
-        [$orderTable, $orderColumn]  = explode('.', $orderBy);
+        [$orderTable, $orderColumn] = explode('.', $orderBy);
 
+        $order = 't.' . $orderColumn;
         if ($orderTable == 'ticker') {
             $order = 't.' . $orderColumn;
         }

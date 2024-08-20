@@ -110,7 +110,7 @@ class TransactionController extends AbstractController
             if ($transaction->getSide() === Transaction::SELL) {
                 $transaction->setTotal($transaction->getAllocation());
                 $transaction->setAllocation($transaction->getAllocation() - $transaction->getTransactionFee());
-                if ($transaction->getProfit() === null) {
+                if ($transaction->getProfit() == 0) {
                     $avgPrice = $position->getPrice();
                     $profit = ($transaction->getPrice() - $avgPrice) * $transaction->getAmount();
                     $transaction->setProfit($profit);
@@ -120,7 +120,7 @@ class TransactionController extends AbstractController
             $position->addTransaction($transaction);
             $weightedAverage->calc($position);
 
-            if ($position->getAmount() === 0 || $position->getAmount() < 0.0001) {
+            if ($position->getAmount() == 0 || $position->getAmount() < 0.0001) {
                 $position->setClosed(true);
                 $position->setClosedAt((new DateTime()));
             }
@@ -165,7 +165,7 @@ class TransactionController extends AbstractController
             $this->presetMetrics($transaction);
             $position = $transaction->getPosition();
             $weightedAverage->calc($position);
-            if ($position->getAmount() === 0) {
+            if ($position->getAmount() == 0) {
                 $position->setClosed(true);
                 $position->setClosedAt((new DateTime()));
             }

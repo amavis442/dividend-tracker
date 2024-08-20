@@ -202,9 +202,9 @@ class Ticker
         return false;
     }
 
-    public function getPayoutFrequency(): ?int
+    public function getPayoutFrequency(): int
     {
-        return count($this->getDividendMonths()) ?? 0;
+        return count($this->getDividendMonths()) ?: 0;
     }
 
     /**

@@ -190,7 +190,7 @@ class ImportMail extends ImportBase
 
                         if ($position->getAmount() > -6 && $position->getAmount() < 0) {
                             $position->setClosed(true);
-                            $position->setAmount('0');
+                            $position->setAmount(0);
                         }
 
                         $entityManager->persist($position);

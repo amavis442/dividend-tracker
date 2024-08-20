@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\Constants;
 use App\Entity\Payment;
 use App\Entity\Position;
 use App\Entity\Ticker;
@@ -14,8 +13,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Doctrine\ORM\Query\ResultSetMapping;
 
 /**
  * @method Payment|null find($id, $lockMode = null, $lockVersion = null)
@@ -32,11 +29,13 @@ class PaymentRepository extends ServiceEntityRepository
         parent::__construct($registry, Payment::class);
     }
 
+    /*
     private function getInterval(QueryBuilder $queryBuilder, string $interval)
     {
         [$startDate, $endDate] = (new DateHelper())->getInterval($interval);
         $this->setDateRange($queryBuilder, $startDate, $endDate);
     }
+    */
 
     private function setDateRange(QueryBuilder $queryBuilder, string $startDate, string $endDate)
     {

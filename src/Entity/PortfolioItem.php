@@ -194,14 +194,14 @@ class PortfolioItem
      *
      * @var float
      */
-    private float $netDividendPerShare  = 0.0;
+    private float $netDividendPerShare = 0.0;
 
     /**
      * What is the treshold for dividend yield start to buying
      *
      * @var float
      */
-    private float $dividendTreshold  = 0.0;
+    private float $dividendTreshold = 0.0;
 
     /**
      * Maximum allocation
@@ -852,7 +852,7 @@ class PortfolioItem
     /**
      * Get net dividend per share
      *
-     * @return  null|float
+     * @return  float
      */
     public function getNetDividendPerShare(): float
     {
@@ -876,7 +876,7 @@ class PortfolioItem
     /**
      * Get what is the treshold for dividend yield start to buying
      *
-     * @return  null|float
+     * @return  float
      */
     public function getDividendTreshold(): float
     {

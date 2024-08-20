@@ -43,17 +43,17 @@ class Transaction
     /**
      * @see https://github.com/doctrine/dbal/issues/3690
      * 32 bit system sets amount to string for bigint and that will fuck up strong typing and will give a useless 500 error page.
-     * @var int
+     * @var float
      */
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $amount = 0.0;
+    private float $amount = 0.0;
 
     #[ORM\Column(type: 'datetime', name: 'transaction_date')]
-    private $transactionDate;
+    private DateTime $transactionDate;
 
     #[ORM\Column(
         type: 'float',
@@ -61,14 +61,14 @@ class Transaction
         precision: 6,
         options: ["default" => 0]
     )]
-    private $profit = 0.0;
+    private float $profit = 0.0;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $allocation = 0.0;
+    private float $allocation = 0.0;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     private $allocationCurrency;
@@ -82,74 +82,74 @@ class Transaction
         nullable: false,
         options: ["default" => 0]
     )]
-    private $avgprice = 0.0;
+    private float $avgprice = 0.0;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $jobid;
+    private string $jobid;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $exchangeRate = 1.0;
+    private float $exchangeRate = 1.0;
 
     #[ORM\Column(type: 'datetime', name: 'created_at')]
-    private $createdAt;
+    private DateTime $createdAt;
 
     #[ORM\Column(type: 'datetime', name: 'updated_at', nullable: true)]
-    private $updatedAt;
+    private DateTime $updatedAt;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $meta;
+    private string $meta;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $importfile;
+    private string $importfile;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $fx_fee = 0.0;
+    private float $fx_fee = 0.0;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $originalPrice = 0.0;
+    private float $originalPrice = 0.0;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $originalPriceCurrency;
+    private string $originalPriceCurrency;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $stampduty = 0.0;
+    private float $stampduty = 0.0;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $transactionFee = 0.0;
+    private float $transactionFee = 0.0;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $finraFee = 0.0;
+    private float $finraFee = 0.0;
 
     #[ORM\Column(
         type: 'float',
         nullable: false,
         options: ["default" => 0]
     )]
-    private $total = 0.0;
+    private float $total = 0.0;
 
     #[ORM\ManyToOne(targetEntity: Pie::class, inversedBy: 'transactions')]
     private $pie;
@@ -163,7 +163,7 @@ class Transaction
                 ->addViolation();
         }
 
-        if (empty($this->amount) || $this->amount === 0) {
+        if (empty($this->amount) || $this->amount == 0) {
             $context->buildViolation('Amount can not be empty or zero!')
                 ->atPath('amount')
                 ->addViolation();
@@ -181,7 +181,7 @@ class Transaction
     public function setSide(int $side): self
     {
         if (!in_array($side, [1, 2])) {
-            throw new Exception('Value should be 1 for buy or 2 for sell.');
+            throw new \OutOfBoundsException('Value should be 1 for buy or 2 for sell.');
         }
         $this->side = $side;
 
@@ -224,13 +224,16 @@ class Transaction
         return $this;
     }
 
-    public function getTransactionDate(): ?\DateTimeInterface
+    public function getTransactionDate(): ?DateTimeInterface
     {
         return $this->transactionDate;
     }
 
-    public function setTransactionDate(\DateTimeInterface $transactionDate): self
+    public function setTransactionDate(DateTimeInterface $transactionDate): self
     {
+        if (!$transactionDate instanceof DateTime) {
+            throw new \RuntimeException("Transaction date is not of class DateTime");
+        }
         $this->transactionDate = $transactionDate;
 
         return $this;
@@ -238,7 +241,7 @@ class Transaction
 
     public function getProfit(): float
     {
-        return $this->profit  ?: 0;
+        return $this->profit ?: 0;
     }
 
     public function setProfit(float $profit = 0.0): self
@@ -313,7 +316,7 @@ class Transaction
 
     public function getExchangeRate(): ?float
     {
-        return (float)$this->exchangeRate;
+        return (float) $this->exchangeRate;
     }
 
     public function setExchangeRate(?float $exchangeRate): self
@@ -334,7 +337,7 @@ class Transaction
 
     public function setCreatedAt(DateTimeInterface $createdAt = null): self
     {
-        $this->createdAt = $createdAt ?? new DateTime("now");
+        $this->createdAt = ($createdAt instanceof DateTime) ? $createdAt : new DateTime("now");
 
         return $this;
     }
@@ -355,7 +358,7 @@ class Transaction
 
     public function setUpdatedAt(DateTimeInterface $updatedAt = null): self
     {
-        $this->updatedAt = $updatedAt ?? new DateTime("now");
+        $this->updatedAt = ($updatedAt instanceof DateTime) ? $updatedAt : new DateTime("now");
 
         return $this;
     }

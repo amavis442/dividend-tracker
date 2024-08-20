@@ -9,13 +9,18 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Entity\User;
 
 class AccountController extends AbstractController
 {
-    #[Route('/dashboard/account/update', name:'app_account_update')]
-    public function update(Request $request, UserPasswordHasherInterface  $passwordHasher, EntityManagerInterface $entityManager): Response
+    #[Route('/dashboard/account/update', name: 'app_account_update')]
+    public function update(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw new \RuntimeException("User unknown");
+        }
+
         $form = $this->createForm(AccountFormType::class, $user);
         $form->handleRequest($request);
 

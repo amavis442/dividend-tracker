@@ -76,7 +76,7 @@ class ResearchController extends AbstractController
 
             // $attachments = $form->get('attachments')->getData();
             $attachments = $research->getAttachments();
-            if ($attachments) {
+            if (count($attachments) > 0) {
                 foreach ($attachments as $attachment) {
                     if ($attachment->getAttachmentFile()) {
                         $attachmentFile = $attachment->getAttachmentFile();
@@ -154,12 +154,14 @@ class ResearchController extends AbstractController
 
             // add new attachments
             $attachments = $research->getAttachments();
-            if ($attachments) {
+            if (count($attachments) > 0) {
                 foreach ($attachments as $attachment) {
                     if ($attachment->getAttachmentFile()) {
                         $attachmentFile = $attachment->getAttachmentFile();
                         $attachment->setAttachmentSize($attachmentFile->getSize());
+
                         $attachmentName = $fileUploader->upload($attachmentFile);
+
                         $attachment->setAttachmentName($attachmentName);
 
                         $research->addAttachment($attachment);

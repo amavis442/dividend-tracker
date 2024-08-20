@@ -77,7 +77,7 @@ class WeightedAverage
         }
 
         $position->setAllocation(round($costBase, 3))
-            ->setAmount((string) $numShares)
+            ->setAmount((float) $numShares)
             ->setPrice($aPrice)
             ->setProfit(round($totalProfit, 3));
     }
