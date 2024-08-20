@@ -13,7 +13,7 @@
         "doctrine/doctrine-bundle": "^2.11",
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^2.17",
-        "hellonico/brotli": "^1.2",
+        "hellonico/brotli-php": "^1.2",
         "nelmio/cors-bundle": "^2.3",
         "openspout/openspout": "^4.24",
         "sabre/xml": "^4.0",
@@ -44,10 +44,12 @@
         "symfony/validator": "6.4.*",
         "symfony/web-link": "6.4.*",
         "symfony/yaml": "6.4.*",
+        "symfony/webpack-encore-bundle": "^2.1",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/intl-extra": "^3.3",
         "twig/twig": "^2.12|^3.0",
-        "zbateson/mail-mime-parser": "^2.2"
+        "zbateson/mail-mime-parser": "^2.2",
+        "symfony/stopwatch": "6.4.*"
     },
     "require-dev": {
         "behat/behat": "^3.14",
@@ -61,9 +63,7 @@
         "squizlabs/php_codesniffer": "^3.6",
         "symfony/maker-bundle": "^1.48",
         "symfony/var-dumper": "6.4.*",
-        "symfony/webpack-encore-bundle": "^2.1",
         "symfony/phpunit-bridge": "6.4.*",
-        "symfony/stopwatch": "6.4.*",
         "symfony/web-profiler-bundle": "6.4.*",
         "thecodingmachine/phpstan-strict-rules": "^1.0"
     },
