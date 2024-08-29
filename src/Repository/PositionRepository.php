@@ -9,7 +9,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
-use DoctrineExtensions\Query\Mysql\Date;
 
 /**
  * @method Position|null find($id, $lockMode = null, $lockVersion = null)
@@ -87,7 +86,6 @@ class PositionRepository extends ServiceEntityRepository
 
         return $queryBuilder->getQuery()->getResult();
     }
-
 
     public function findOneByTickerAndTransactionDate(Ticker $ticker, ?DateTime $transactionDate = null): ?Position
     {
@@ -240,15 +238,14 @@ class PositionRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-
     public function getAllOpen(int $pieId = null, int $year = null): array
     {
         $qb = $this->createQueryBuilder('p')
-            //->select('p, t, pa, c, dm, cur, tax, b')
+        //->select('p, t, pa, c, dm, cur, tax, b')
             ->select('p, t')
             ->innerJoin('p.ticker', 't')
             ->leftJoin('t.calendars', 'c')
-            //->leftJoin('t.dividendMonths', 'dm')
+        //->leftJoin('t.dividendMonths', 'dm')
             ->leftJoin('t.tax', 'tax')
             ->leftJoin('t.branch', 'b')
             ->leftJoin('p.payments', 'pa')
@@ -282,16 +279,16 @@ class PositionRepository extends ServiceEntityRepository
 
         // Create our query
         $queryBuilder = $this->createQueryBuilder('p')
-            //->select('p, t, b, pa, pies, c, dm, tax, cur')
+        //->select('p, t, b, pa, pies, c, dm, tax, cur')
             ->select('p, t ')
             ->innerJoin('p.ticker', 't')
             ->leftJoin('p.payments', 'pa')
-            //->leftJoin('p.pies', 'pies')
-            //->innerJoin('t.branch', 'b')
+        //->leftJoin('p.pies', 'pies')
+        //->innerJoin('t.branch', 'b')
             ->leftJoin('t.tax', 'tax')
-            //->leftJoin('t.currency', 'cur')
+        //->leftJoin('t.currency', 'cur')
             ->leftJoin('t.calendars', 'c')
-            //->leftJoin('t.dividendMonths', 'dm')
+        //->leftJoin('t.dividendMonths', 'dm')
             ->orderBy($order, $sort);
 
         if (!empty($search)) {

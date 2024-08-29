@@ -11,7 +11,7 @@ use App\Repository\PositionRepository;
 use App\Service\DividendGrowthService;
 use App\Service\DividendService;
 use App\Service\Referer;
-use App\Service\Summary;
+use App\Service\SummaryService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,7 +26,6 @@ class PortfolioController extends AbstractController
     public const SEARCH_KEY = 'portfolio_searchCriteria';
     public const PIE_KEY = 'portfolio_searchPie';
 
-
     public function __construct(
         private Stopwatch $stopwatch,
     ) {
@@ -38,7 +37,7 @@ class PortfolioController extends AbstractController
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
         PieRepository $pieRepository,
-        Summary $summary,
+        SummaryService $summaryService,
         DividendService $dividendService,
         Referer $referer,
         PortfolioModel $model,
@@ -54,16 +53,14 @@ class PortfolioController extends AbstractController
         $pies = $pieRepository->findLinked();
         $searchCriteria = '';
         $pieSelected = null;
-        if (!$request->hasSession()) {
-            dump('Nope');
+
+        if ($request->hasSession()) {
+            $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
+            $pieSelected = $request->getSession()->get(self::PIE_KEY, null);
         }
 
-        $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
-        $pieSelected = $request->getSession()->get(self::PIE_KEY, null);
-
-
         $thisPage = $page;
-        [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
+        $summary = $summaryService->getSummary();
         $referer->set('portfolio_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
 
         $this->stopwatch->start('portfoliomodel-getpage');
@@ -71,7 +68,7 @@ class PortfolioController extends AbstractController
             $positionRepository,
             $dividendService,
             $paymentRepository,
-            $allocated,
+            $summary->getAllocated(),
             $page,
             $orderBy,
             $sort,
@@ -83,10 +80,9 @@ class PortfolioController extends AbstractController
         //dd($pageData);
         $request->getSession()->set(get_class($this), $request->getRequestUri());
 
-
         return $this->render('portfolio/index.html.twig', [
             'portfolioItems' => $pageData != null ? $pageData->getPortfolioItems() : null,
-            'cacheTimestamp' => $pageData != null ? (new DateTime())->setTimestamp($pageData->getCacheTimestamp() ?: 0) : 0,
+            'cacheTimestamp' => $pageData != null ? (new DateTime())->setTimestamp($pageData->getCacheTimestamp() ?: 0): 0,
             'limit' => $limit,
             'maxPages' => $pageData != null ? $pageData->getMaxPages() : 0,
             'thisPage' => $thisPage,
@@ -98,12 +94,12 @@ class PortfolioController extends AbstractController
             'piePath' => 'portfolio_pie',
             'pies' => $pies,
             'pieSelected' => $pieSelected ?? 1,
-            'numActivePosition' => $numActivePosition,
-            'numPosition' => $numActivePosition,
-            'numTickers' => $numTickers,
-            'profit' => $profit,
-            'totalDividend' => $totalDividend,
-            'totalInvested' => $allocated,
+            'numActivePosition' => $summary->getNumActivePosition(),
+            'numPosition' => $summary->getNumActivePosition(),
+            'numTickers' => $summary->getNumTickers(),
+            'profit' => $summary->getProfit(),
+            'totalDividend' => $summary->getTotalDividend(),
+            'totalInvested' => $summary->getAllocated(),
         ]);
 
         //return new Response('We komen ergens');
@@ -116,7 +112,7 @@ class PortfolioController extends AbstractController
         Position $position,
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
-        Summary $summary,
+        SummaryService $summaryService,
         DividendGrowthService $dividendGrowth,
         DividendService $dividendService,
         Referer $referer
@@ -132,7 +128,6 @@ class PortfolioController extends AbstractController
             $netCashAmount = $calendarRecentDividendDate->getCashAmount() * $exchangeRate * (1 - $dividendTax);
             $amountPerDate = $position->getAmountPerDate($calendarRecentDividendDate->getExDividendDate());
         }
-
 
         $position = $positionRepository->getForPosition($position);
         $netYearlyDividend = 0.0;
@@ -166,7 +161,7 @@ class PortfolioController extends AbstractController
         }
         $growth = $dividendGrowth->getData($ticker);
 
-        $allocated = $summary->getTotalAllocated();
+        $allocated = $summaryService->getTotalAllocated();
         $percentageAllocation = 0;
 
         if ($allocated > 0) {
@@ -179,7 +174,6 @@ class PortfolioController extends AbstractController
         $referer->set('portfolio_show', ['id' => $position->getId()]);
 
         $indexUrl = $request->getSession()->get(get_class($this));
-
 
         return $this->render('portfolio/show.html.twig', [
             'ticker' => $ticker,

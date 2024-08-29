@@ -2,10 +2,11 @@
 
 namespace App\Service;
 
-use App\Repository\PositionRepository;
+use App\Entity\Summary;
 use App\Repository\PaymentRepository;
+use App\Repository\PositionRepository;
 
-class Summary
+class SummaryService
 {
     protected PositionRepository $positionRepository;
     protected PaymentRepository $paymentRepository;
@@ -16,7 +17,7 @@ class Summary
         $this->paymentRepository = $paymentRepository;
     }
 
-    public function getSummary(): array
+    public function getSummary(): Summary
     {
         /**
          * @var Array $positions
@@ -31,18 +32,21 @@ class Summary
          */
         foreach ($positions as $position) {
             $profit += $position->getProfit();
-            //$allocated += $position->getAllocation();
+            $allocated += $position->getAllocation();
         }
-        $allocated = $this->getTotalAllocated();
+        //$allocated = $this->getTotalAllocated();
         $totalDividend = $this->paymentRepository->getTotalDividend();
 
-        return [
-            $numActivePosition,
-            $numTickers,
-            $profit,
-            $totalDividend,
-            $allocated
-        ];
+        $summary = new Summary();
+        $summary
+            ->setNumActivePosition($numActivePosition)
+            ->setNumTickers($numTickers)
+            ->setProfit($profit)
+            ->setTotalDividend($totalDividend)
+            ->setAllocated($allocated)
+        ;
+
+        return $summary;
     }
 
     public function getTotalAllocated(): float

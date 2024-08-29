@@ -2,9 +2,9 @@
 
 namespace App\Controller\Report;
 
-use App\Repository\PositionRepository;
 use App\Model\AllocationModel;
-use App\Service\Summary;
+use App\Repository\PositionRepository;
+use App\Service\SummaryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -16,9 +16,9 @@ class AllocationPerPositionController extends AbstractController
     public const YIELD_PIE_KEY = 'yeildpie_searchPie';
 
     #[Route(path: '/allocation/position', name: 'report_allocation_position')]
-    public function index(PositionRepository $positionRepository, Summary $summary, AllocationModel $allocation)
+    public function index(PositionRepository $positionRepository, SummaryService $summaryService, AllocationModel $allocation)
     {
-        $result = $allocation->position($positionRepository, $summary);
+        $result = $allocation->position($positionRepository, $summaryService);
 
         return $this->render('report/allocation/position.html.twig', array_merge($result, ['controller_name' => 'ReportController']));
     }

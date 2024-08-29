@@ -8,8 +8,7 @@ use App\Form\PositionType;
 use App\Repository\PositionRepository;
 use App\Service\PositionService;
 use App\Service\Referer;
-use App\Service\Summary;
-use DateTime;
+use App\Service\SummaryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +23,7 @@ class PositionController extends AbstractController
     #[Route(path: '/list/{page}/{tab}/{orderBy}/{sort}/{status}', name: 'position_index', methods: ['GET'])]
     public function index(
         Request $request,
-        Summary $summary,
+        SummaryService $summaryService,
         PositionRepository $positionRepository,
         Referer $referer,
         int $page = 1,
@@ -47,7 +46,7 @@ class PositionController extends AbstractController
 
         $referer->set('position_index', ['status' => $status]);
 
-        [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
+        $summary = $summaryService->getSummary();
 
         $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
         $items = $positionRepository->getAll($page, 10, $order, $sort, $searchCriteria, $status);
@@ -67,12 +66,12 @@ class PositionController extends AbstractController
             'routeName' => 'position_index',
             'searchPath' => 'position_search',
             'tab' => $tab,
-            'numActivePosition' => $numActivePosition,
-            'numPosition' => $numActivePosition,
-            'numTickers' => $numTickers,
-            'profit' => $profit,
-            'totalDividend' => $totalDividend,
-            'totalInvested' => $allocated,
+            'numActivePosition' => $summary->getNumActivePosition(),
+            'numPosition' => $summary->getNumActivePosition(),
+            'numTickers' => $summary->getNumTickers(),
+            'profit' => $summary->getProfit(),
+            'totalDividend' => $summary->getTotalDividend(),
+            'totalInvested' => $summary->getAllocated(),
         ]);
     }
 

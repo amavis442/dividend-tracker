@@ -4,7 +4,7 @@ namespace App\Model;
 
 use App\Repository\BranchRepository;
 use App\Repository\PositionRepository;
-use App\Service\Summary;
+use App\Service\SummaryService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AllocationModel
@@ -13,7 +13,6 @@ class AllocationModel
         PositionRepository $positionRepository,
         TranslatorInterface $translator
     ): array {
-        $allocated = $positionRepository->getSumAllocated();
         $positions = $positionRepository->getAllOpen();
 
         $data = [];
@@ -36,7 +35,7 @@ class AllocationModel
             $data[$branch] = round($allocationPercentage, 2);
         }
 
-        return  [
+        return [
             'data' => array_values($data),
             'labels' => array_keys($items),
         ];
@@ -45,10 +44,10 @@ class AllocationModel
     public function sector(
         PositionRepository $positionRepository,
         BranchRepository $branchRepository,
-        Summary $summary,
+        SummaryService $summaryService,
         TranslatorInterface $translator
     ): array {
-        [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
+        $summary = $summaryService->getSummary();
 
         $sectors = $branchRepository->getAllocationPerSector();
         $totalAllocated = $positionRepository->getSumAllocated();
@@ -62,24 +61,24 @@ class AllocationModel
             $data[] = round(($allocation / $totalAllocated) * 100, 2);
         }
 
-        return  [
+        return [
             'data' => $data,
             'labels' => $labels,
             'sectors' => $sectors,
-            'numActivePosition' => $numActivePosition,
-            'numPosition' => $numActivePosition,
-            'numTickers' => $numTickers,
-            'profit' => $profit,
-            'totalDividend' => $totalDividend,
-            'totalInvested' => $allocated
+            'numActivePosition' => $summary->getNumActivePosition(),
+            'numPosition' => $summary->getNumActivePosition(),
+            'numTickers' => $summary->getNumTickers(),
+            'profit' => $summary->getProfit(),
+            'totalDividend' => $summary->getTotalDividend(),
+            'totalInvested' => $summary->getAllocated(),
         ];
     }
 
     public function position(
         PositionRepository $positionRepository,
-        Summary $summary
+        SummaryService $summaryService
     ): array {
-        [$numActivePosition, $numTickers, $profit, $totalDividend, $allocated] = $summary->getSummary();
+        $summary = $summaryService->getSummary();
 
         $totalAllocated = $positionRepository->getSumAllocated();
 
@@ -95,12 +94,12 @@ class AllocationModel
         return [
             'data' => $data,
             'labels' => $labels,
-            'numActivePosition' => $numActivePosition,
-            'numPosition' => $numActivePosition,
-            'numTickers' => $numTickers,
-            'profit' => $profit,
-            'totalDividend' => $totalDividend,
-            'totalInvested' => $allocated,
+            'numActivePosition' => $summary->getNumActivePosition(),
+            'numPosition' => $summary->getNumActivePosition(),
+            'numTickers' => $summary->getNumTickers(),
+            'profit' => $summary->getProfit(),
+            'totalDividend' => $summary->getTotalDividend(),
+            'totalInvested' => $summary->getAllocated(),
         ];
     }
 }
