@@ -50,7 +50,8 @@ class PositionRepository extends ServiceEntityRepository
             $queryBuilder
                 ->leftJoin('p.pies', 'pies')
                 ->andWhere('pies IN (:pies)')
-                ->setParameter('pies', $pies);
+                ->setParameter('pies', $pies)
+                ->addSelect('pies');
         }
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);
@@ -241,11 +242,11 @@ class PositionRepository extends ServiceEntityRepository
     public function getAllOpen(int $pieId = null, int $year = null): array
     {
         $qb = $this->createQueryBuilder('p')
-        //->select('p, t, pa, c, dm, cur, tax, b')
+            //->select('p, t, pa, c, dm, cur, tax, b')
             ->select('p, t')
             ->innerJoin('p.ticker', 't')
             ->leftJoin('t.calendars', 'c')
-        //->leftJoin('t.dividendMonths', 'dm')
+            //->leftJoin('t.dividendMonths', 'dm')
             ->leftJoin('t.tax', 'tax')
             ->leftJoin('t.branch', 'b')
             ->leftJoin('p.payments', 'pa')
@@ -279,19 +280,19 @@ class PositionRepository extends ServiceEntityRepository
 
         // Create our query
         $queryBuilder = $this->createQueryBuilder('p')
-        //->select('p, t, b, pa, pies, c, dm, tax, cur')
-            ->select('p, t ')
+            ->select('p')
             ->innerJoin('p.ticker', 't')
+            ->addSelect('t')
             ->leftJoin('p.payments', 'pa')
-        //->leftJoin('p.pies', 'pies')
-        //->innerJoin('t.branch', 'b')
+            ->addSelect('pa')
             ->leftJoin('t.tax', 'tax')
-        //->leftJoin('t.currency', 'cur')
+            ->addSelect('tax')
             ->leftJoin('t.calendars', 'c')
-        //->leftJoin('t.dividendMonths', 'dm')
+            ->addSelect('c')
             ->orderBy($order, $sort);
 
         if (!empty($search)) {
+            $queryBuilder->addSelect('b');
             $queryBuilder->innerJoin('t.branch', 'b');
             $queryBuilder->andWhere(
                 $queryBuilder->expr()->orX(
