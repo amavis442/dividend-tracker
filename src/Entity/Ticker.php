@@ -191,20 +191,17 @@ class Ticker
 
     public function isDividendPayMonth(int $currentMonth): bool
     {
-        if ($this->getDividendMonths()) {
-            $months = $this->getDividendMonths()->getValues();
-            foreach ($months as $dividendMonth) {
-                if ($dividendMonth->isDividendPayMonth($currentMonth)) {
-                    return true;
-                }
-            }
+        if ($this->getDividendMonths() instanceof Collection && !$this->getDividendMonths()->isEmpty()) {
+            return $this->getDividendMonths()->exists(function ($key, \App\Entity\DividendMonth $dividendMonth) use ($currentMonth): bool {
+                return (int)$dividendMonth->getDividendMonth() === $currentMonth;
+            });
         }
         return false;
     }
 
     public function getPayoutFrequency(): int
     {
-        return count($this->getDividendMonths()) ?: 0;
+        return $this->getDividendMonths()->count() ?: 0;
     }
 
     /**
