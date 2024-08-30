@@ -24,62 +24,45 @@ class PortfolioModel
 
     public function __construct(
         private Stopwatch $stopwatch,
-    ) {
+    ) {}
+
+    private function getDividends(PaymentRepository $paymentRepository, array $tickerIds): void
+    {
+        $this->stopwatch->start('portfoliomodel-getDividends');
+        $dividends = $paymentRepository->getSumDividends($tickerIds);
+        foreach ($this->portfolioItems as &$portfolioItem) {
+            $tickerId = $portfolioItem->getTickerId();
+            if (isset($dividends[$tickerId])) {
+                $portfolioItem->setDividend($dividends[$tickerId]);
+            }
+        }
+        $this->stopwatch->stop('portfoliomodel-getDividends');
     }
 
     /**
-     * Get 1 page of many with position data
-     *
-     * @param PositionRepository $positionRepository
-     * @param DividendService $dividendService
-     * @param PaymentRepository $paymentRepository
-     * @param float $totalInvested
-     * @param integer $page
-     * @param string $orderBy
-     * @param string $sort
-     * @param string $searchCriteria
-     * @param string|null $pieSelected
-     * @return self
+     * @var \Traversable<Position> $positions
      */
-    public function getPage(
-        PositionRepository $positionRepository,
-        DividendService $dividendService,
-        PaymentRepository $paymentRepository,
+    private function createPortfolioItem(
+        \Traversable $positions,
         float $totalInvested,
-        int $page = 1,
-        string $orderBy = 'ticker',
-        string $sort = 'asc',
-        string $searchCriteria = '',
-        ?string $pieSelected = null
-    ): self {
+        DividendService $dividendService
+    ): array {
+
+        $this->stopwatch->start('portfoliomodel-createPortfolioItem');
+
         $currentDate = new DateTime();
 
-        $order = 't.ticker';
-        if (in_array($orderBy, ['industry'])) {
-            $order = 'i.label';
-        }
-        if (in_array($orderBy, ['ticker', 'fullname'])) {
-            $order = 't.' . $orderBy;
-        }
-        if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
-            $sort = 'asc';
-        }
+        // Need all Position ids and all Ticker ids
 
-        $this->stopwatch->start('portfoliomodel-getpage-get-iter');
-        $limit = 20;
-        if ($pieSelected && $pieSelected != '-') {
-            $items = $positionRepository->getAll($page, $limit, $order, $sort, $searchCriteria, PositionRepository::OPEN, [$pieSelected]);
-        } else {
-            $items = $positionRepository->getAll($page, $limit, $order, $sort, $searchCriteria, PositionRepository::OPEN);
-        }
-
-        $this->maxPages = (int) ceil($items->count() / $limit);
-        $iter = $items->getIterator();
         $tickerIds = [];
-        $this->stopwatch->stop('portfoliomodel-getpage-get-iter');
 
-        $this->stopwatch->start('portfoliomodel-getpage-main-foreach');
-        foreach ($iter as $position) {
+        /**
+         * @var \App\Entity\Position $position
+         */
+        foreach ($positions as $position) {
+            /**
+             * @var \App\Entity\Ticker $ticker
+             */
             $ticker = $position->getTicker();
             $avgPrice = $position->getPrice();
             $allocation = $position->getAllocation();
@@ -98,7 +81,6 @@ class PortfolioModel
                 ->setAmount($position->getAmount())
                 ->setPercentageAllocation($percentageAllocation)
                 ->setPies($position->getPies())
-                ->setIsDividendMonth($position->isDividendPayMonth())
                 ->setDividendPayoutFrequency($payoutFrequency)
                 ->setDividendTreshold(0.03)
             ;
@@ -150,22 +132,67 @@ class PortfolioModel
             $this->portfolioItems[] = $portfolioItem;
 
             $id = $position->getTicker()->getId();
-
-            if (!in_array($id, $tickerIds)) {
-                $tickerIds[] = $position->getTicker()->getId();
+            if (isset($id) && !in_array($id, $tickerIds)) {
+                $tickerIds[] = $id;
             }
         }
-        $this->stopwatch->stop('portfoliomodel-getpage-main-foreach');
+        $this->stopwatch->stop('portfoliomodel-createPortfolioItem');
 
-        $this->stopwatch->start('portfoliomodel-getpage-dividend-foreach');
-        $dividends = $paymentRepository->getSumDividends($tickerIds);
-        foreach ($this->portfolioItems as &$portfolioItem) {
-            $tickerId = $portfolioItem->getTickerId();
-            if (isset($dividends[$tickerId])) {
-                $portfolioItem->setDividend($dividends[$tickerId]);
-            }
+        return $tickerIds;
+    }
+
+    /**
+     * Get 1 page of many with position data
+     *
+     * @param PositionRepository $positionRepository
+     * @param DividendService $dividendService
+     * @param PaymentRepository $paymentRepository
+     * @param float $totalInvested
+     * @param integer $page
+     * @param string $orderBy
+     * @param string $sort
+     * @param string $searchCriteria
+     * @param string|null $pieSelected
+     * @return self
+     */
+    public function getPage(
+        PositionRepository $positionRepository,
+        DividendService $dividendService,
+        PaymentRepository $paymentRepository,
+        float $totalInvested = 0.0,
+        int $page = 1,
+        string $orderBy = 'ticker',
+        string $sort = 'asc',
+        string $searchCriteria = '',
+        ?string $pieSelected = null
+    ): self {
+
+        $order = 't.ticker';
+        if (in_array($orderBy, ['industry'])) {
+            $order = 'i.label';
         }
-        $this->stopwatch->stop('portfoliomodel-getpage-dividend-foreach');
+        if (in_array($orderBy, ['ticker', 'fullname'])) {
+            $order = 't.' . $orderBy;
+        }
+        if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
+            $sort = 'asc';
+        }
+
+        $this->stopwatch->start('portfoliomodel-getpage');
+        $limit = 20;
+        if ($pieSelected && $pieSelected != '-') {
+            $items = $positionRepository->getAll($page, $limit, $order, $sort, $searchCriteria, PositionRepository::OPEN, [$pieSelected]);
+        } else {
+            $items = $positionRepository->getAll($page, $limit, $order, $sort, $searchCriteria, PositionRepository::OPEN);
+        }
+
+        $this->maxPages = (int) ceil($items->count() / $limit);
+        $iter = $items->getIterator();
+        $tickerIds = [];
+        $this->stopwatch->stop('portfoliomodel-getpage');
+
+        $tickerIds = $this->createPortfolioItem($iter, $totalInvested, $dividendService, $tickerIds);
+        $this->getDividends($paymentRepository, $tickerIds);
 
         $this->tickerIds = $tickerIds;
         $this->initialized = true;
