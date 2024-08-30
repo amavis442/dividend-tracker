@@ -7,6 +7,7 @@ use App\Entity\Payment;
 use App\Entity\Position;
 use App\Form\PaymentType;
 use App\Helper\DateHelper;
+use App\Model\PortfolioModel;
 use App\Repository\CalendarRepository;
 use App\Repository\PaymentRepository;
 use App\Service\Referer;
@@ -183,6 +184,8 @@ class PaymentController extends AbstractController
             $entityManager->persist($payment);
             $entityManager->flush();
 
+            PortfolioModel::clearCache();
+
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
@@ -215,6 +218,9 @@ class PaymentController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
+
+            PortfolioModel::clearCache();
+
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }

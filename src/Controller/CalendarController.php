@@ -7,6 +7,7 @@ use App\Entity\DateSelect;
 use App\Entity\Ticker;
 use App\Form\CalendarDividendType;
 use App\Form\CalendarType;
+use App\Model\PortfolioModel;
 use App\Repository\CalendarRepository;
 use App\Service\DividendService;
 use App\Service\Referer;
@@ -78,6 +79,8 @@ class CalendarController extends AbstractController
             $entityManager->persist($calendar);
             $entityManager->flush();
 
+            PortfolioModel::clearCache();
+
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
@@ -147,6 +150,8 @@ class CalendarController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($calendar);
             $entityManager->flush();
+
+            PortfolioModel::clearCache();
 
             if ($referer->get()) {
                 return $this->redirect($referer->get());

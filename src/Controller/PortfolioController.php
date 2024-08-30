@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Contracts\Cache\ItemInterface;
 
 #[Route(path: '/dashboard/portfolio')]
 class PortfolioController extends AbstractController
@@ -28,8 +30,7 @@ class PortfolioController extends AbstractController
 
     public function __construct(
         private Stopwatch $stopwatch,
-    ) {
-    }
+    ) {}
 
     #[Route(path: '/list/{page<\d+>?1}/{orderBy?fullname}/{sort?asc}', name: 'portfolio_index', methods: ['GET'])]
     public function index(
@@ -64,6 +65,40 @@ class PortfolioController extends AbstractController
         $referer->set('portfolio_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
 
         $this->stopwatch->start('portfoliomodel-getpage');
+
+        $cache = new FilesystemAdapter();
+
+        $pageData = $cache->get(PortfolioModel::CACHE_KEY, function (ItemInterface $item) use (
+            $model,
+            $positionRepository,
+            $dividendService,
+            $paymentRepository,
+            $summary,
+            $page,
+            $orderBy,
+            $sort,
+            $searchCriteria,
+            $pieSelected
+        ): PortfolioModel {
+
+            $item->expiresAfter(3600);
+
+            $page = $model->getPage(
+                $positionRepository,
+                $dividendService,
+                $paymentRepository,
+                $summary->getAllocated(),
+                $page,
+                $orderBy,
+                $sort,
+                $searchCriteria,
+                $pieSelected,
+            );
+
+            return $page;
+        });
+
+        /*
         $pageData = $model->getPage(
             $positionRepository,
             $dividendService,
@@ -75,6 +110,9 @@ class PortfolioController extends AbstractController
             $searchCriteria,
             $pieSelected,
         );
+        */
+
+
         $this->stopwatch->stop('portfoliomodel-getpage');
 
         //dd($pageData);
@@ -82,7 +120,7 @@ class PortfolioController extends AbstractController
 
         return $this->render('portfolio/index.html.twig', [
             'portfolioItems' => $pageData != null ? $pageData->getPortfolioItems() : null,
-            'cacheTimestamp' => $pageData != null ? (new DateTime())->setTimestamp($pageData->getCacheTimestamp() ?: 0): 0,
+            'cacheTimestamp' => $pageData != null ? (new DateTime())->setTimestamp($pageData->getCacheTimestamp() ?: 0) : 0,
             'limit' => $limit,
             'maxPages' => $pageData != null ? $pageData->getMaxPages() : 0,
             'thisPage' => $thisPage,

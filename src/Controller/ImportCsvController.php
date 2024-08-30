@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\FileUpload;
 use App\Entity\ImportFiles;
 use App\Form\FileUploadType;
+use App\Model\PortfolioModel;
 use App\Repository\BranchRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\ImportFilesRepository;
@@ -15,14 +16,13 @@ use App\Repository\TransactionRepository;
 use App\Service\ImportCsvService;
 use App\Service\WeightedAverage;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\SecurityBundle\Security;
-use App\Service\CsvReader;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 class ImportCsvController extends AbstractController
 {
@@ -41,6 +41,7 @@ class ImportCsvController extends AbstractController
         ImportFilesRepository $importFilesRepository,
         Security $security
     ): Response {
+
         $importfile = new fileUpload();
         $form = $this->createForm(FileUploadType::class, $importfile);
         $form->handleRequest($request);
@@ -89,6 +90,11 @@ class ImportCsvController extends AbstractController
                 $entityManager->flush();
 
 
+
+                // Clear the portfolioModel cache, when we have new data.
+                PortfolioModel::clearCache();
+                //$cache = new FilesystemAdapter();
+                //$cache->delete('portfolio_model_cache_key');
 
                 return $this->render('import_csv/report.html.twig', [
                     'controller_name' => 'ImportCsvController',

@@ -9,9 +9,11 @@ use App\Service\DividendService;
 use DateTime;
 use RuntimeException;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 class PortfolioModel
 {
+    public const CACHE_KEY = 'portfolio_model_cache_key';
     private bool $initialized = false;
     private array $portfolioItems = [];
     private array $tickerIds = [];
@@ -166,7 +168,6 @@ class PortfolioModel
         string $searchCriteria = '',
         ?string $pieSelected = null
     ): self {
-
         $order = 't.ticker';
         if (in_array($orderBy, ['industry'])) {
             $order = 'i.label';
@@ -250,5 +251,12 @@ class PortfolioModel
             throw new RuntimeException('First call PortfolioModel::getPage()');
         }
         return $this->timestamp;
+    }
+
+    public static function clearCache(): void
+    {
+        // Clear the portfolioModel cache, when we have new data.
+        $cache = new FilesystemAdapter();
+        $cache->delete(self::CACHE_KEY);
     }
 }

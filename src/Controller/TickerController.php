@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Ticker;
 use App\Form\TickerType;
+use App\Model\PortfolioModel;
 use App\Repository\TickerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -53,6 +54,8 @@ class TickerController extends AbstractController
             $entityManager->persist($ticker);
             $entityManager->flush();
 
+            PortfolioModel::clearCache();
+
             return $this->redirectToRoute('ticker_index');
         }
 
@@ -79,6 +82,8 @@ class TickerController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
+
+            PortfolioModel::clearCache();
 
             if ($referer->get()) {
                 return $this->redirect($referer->get());

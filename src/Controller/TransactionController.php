@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Position;
 use App\Entity\Transaction;
 use App\Form\TransactionType;
+use App\Model\PortfolioModel;
 use App\Repository\CurrencyRepository;
 use App\Repository\TransactionRepository;
 use App\Service\ExchangeRate\ExchangeRateService;
@@ -130,6 +131,8 @@ class TransactionController extends AbstractController
             $request->getSession()->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
             $request->getSession()->set(PortfolioController::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
 
+            PortfolioModel::clearCache();
+
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
@@ -171,6 +174,8 @@ class TransactionController extends AbstractController
             }
             $entityManager->flush();
             $request->getSession()->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
+
+            PortfolioModel::clearCache();
 
             if ($referer->get()) {
                 return $this->redirect($referer->get());

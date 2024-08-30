@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Form\PositionType;
+use App\Model\PortfolioModel;
 use App\Repository\PositionRepository;
 use App\Service\PositionService;
 use App\Service\Referer;
@@ -90,6 +91,9 @@ class PositionController extends AbstractController
             $positionService->create($position);
             $request->getSession()->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
             $request->getSession()->set(PortfolioController::SEARCH_KEY, $position->getTicker()->getTicker());
+
+            PortfolioModel::clearCache();
+
             return $this->redirectToRoute('portfolio_index');
         }
 
@@ -121,6 +125,9 @@ class PositionController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $positionService->update($position);
             $request->getSession()->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
+
+            PortfolioModel::clearCache();
+
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
@@ -133,7 +140,7 @@ class PositionController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/delte/{id}', name: 'position_delete', methods: ['POST', 'DELETE'])]
+    #[Route(path: '/delete/{id}', name: 'position_delete', methods: ['POST', 'DELETE'])]
     public function delete(Request $request, EntityManagerInterface $entityManager, Position $position): Response
     {
         if ($this->isCsrfTokenValid('delete' . $position->getId(), $request->request->get('_token'))) {
