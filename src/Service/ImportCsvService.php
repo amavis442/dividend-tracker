@@ -25,6 +25,7 @@ use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\SecurityBundle\Security;
 use DOMNode;
+use Symfony\Component\Uid\Uuid;
 
 class ImportCsvService extends ImportBase
 {
@@ -189,8 +190,7 @@ class ImportCsvService extends ImportBase
 
             if (false !== stripos($cellVal, 'deposit') || false !== stripos($cellVal, 'withdraw') || false !== stripos($cellVal, 'interest')) {
                 continue;
-            }
-            ;
+            };
 
 
             $row = [];
@@ -296,8 +296,7 @@ class ImportCsvService extends ImportBase
                     $this->importDividend($row);
                 }
                 continue;
-            }
-            ;
+            };
 
             if (count($row) > 0) {
                 $orderValue = $row['total'];
@@ -370,6 +369,7 @@ class ImportCsvService extends ImportBase
 
                 if (!$transaction) {
                     $position = $this->preImportCheckPosition($entityManager, $ticker, $defaultCurrency, $positionRepository, $security, $row);
+                    $uuid = Uuid::v4();
 
                     $transaction = new Transaction();
                     $transaction
@@ -393,7 +393,9 @@ class ImportCsvService extends ImportBase
                         ->setTransactionFee($row['transaction_fee'] ?? 0)
                         ->setTotal($row['total'] ?? 0)
                         ->setAvgprice(0.0)
-                        ->setProfit(0.0);
+                        ->setProfit(0.0)
+                        ->setUuid($uuid)
+                    ;
 
                     $pies = $position->getPies();
                     if (count($pies) == 1) {

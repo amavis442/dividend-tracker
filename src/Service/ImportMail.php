@@ -22,6 +22,7 @@ use DOMNode;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use ZBateson\MailMimeParser\MailMimeParser;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Uid\Uuid;
 
 class ImportMail extends ImportBase
 {
@@ -167,6 +168,7 @@ class ImportMail extends ImportBase
 
                     if (!$transaction) {
                         $transaction = new Transaction();
+                        $uuid = Uuid::v4();
                         $transaction
                             ->setSide($row['direction'])
                             ->setPrice($row['price'])
@@ -179,7 +181,8 @@ class ImportMail extends ImportBase
                             ->setExchangeRate($row['wisselkoersen'])
                             ->setJobid($row['opdrachtid'])
                             ->setMeta($row['nr'])
-                            ->setImportfile($file);
+                            ->setImportfile($file)
+                            ->setUuid($uuid);
 
                         $position->addTransaction($transaction);
                         $weightedAverage->calc($position);

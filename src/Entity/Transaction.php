@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Exception;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use DateTimeInterface;
@@ -25,6 +25,9 @@ class Transaction
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\Column(type: Types::GUID, nullable: true)]
+    private ?string $uuid = null;
 
     #[ORM\Column(type: 'integer', options: ['default' => 1])]
     private int $side = 1;
@@ -491,5 +494,17 @@ class Transaction
     public function netOrderValue(): float
     {
         return $this->getAllocation() + $this->getFinraFee() + $this->getStampduty() + $this->getFxFee() + $this->getTransactionFee();
+    }
+
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(?string $uuid): static
+    {
+        $this->uuid = $uuid;
+
+        return $this;
     }
 }

@@ -14,8 +14,7 @@ use App\Service\WeightedAverage;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\HeaderUtils;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -117,6 +116,8 @@ class TransactionController extends AbstractController
                     $transaction->setProfit($profit);
                 }
             }
+            $uuid = Uuid::v4();
+            $transaction->setUuid($uuid);
 
             $position->addTransaction($transaction);
             $weightedAverage->calc($position);
@@ -172,6 +173,7 @@ class TransactionController extends AbstractController
                 $position->setClosed(true);
                 $position->setClosedAt((new DateTime()));
             }
+
             $entityManager->flush();
             $request->getSession()->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
 
