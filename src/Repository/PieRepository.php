@@ -44,13 +44,21 @@ class PieRepository extends ServiceEntityRepository
             ->getConnection()
             ->prepare('
         SELECT p.id, p.label
-        FROM pie p, transaction t
-        INNER JOIN position pos ON pos.id = t.position_id
-        WHERE p.id = t.pie_id
-        AND pos.closed = FALSE AND pos.ignore_for_dividend = FALSE
-        GROUP BY p.id, p.label')
-            ->execute()
-            ->fetchAll();
+            FROM pie p, transaction t
+            INNER JOIN position pos ON pos.id = t.position_id
+            WHERE p.id = t.pie_id
+            AND pos.closed = FALSE AND pos.ignore_for_dividend = FALSE
+            GROUP BY p.id, p.label
+        UNION
+	    SELECT p.id, p.label
+            FROM pie p, pie_position pp
+            INNER JOIN position pos ON pos.id = pp.position_id
+            WHERE pp.pie_id = p.id
+            AND pos.closed = FALSE AND pos.ignore_for_dividend = FALSE
+            GROUP BY p.id, p.label;
+            ')
+            ->executeQuery()
+            ->fetchAllAssociative();
 
         $pies = [];
         $pieDefault = (new Pie())->setLabel("Please choose a Pie");
@@ -59,8 +67,7 @@ class PieRepository extends ServiceEntityRepository
             $pieIds[] = $data['id'];
         }
 
-        $pies = $this->createQueryBuilder('pie')->
-            where('pie.id in (:pie)')
+        $pies = $this->createQueryBuilder('pie')->where('pie.id in (:pie)')
             ->setParameter('pie', $pieIds)->getQuery()->getResult();
 
         $pies = array_merge([$pieDefault], $pies);
