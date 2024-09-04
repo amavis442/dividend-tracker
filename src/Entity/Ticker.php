@@ -2,21 +2,27 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: 'App\Repository\TickerRepository')]
 #[UniqueEntity('isin')]
 class Ticker
 {
+    #[ApiProperty(identifier: false)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
+
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
     private $ticker;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -44,6 +50,8 @@ class Ticker
     #[ORM\ManyToMany(targetEntity: 'App\Entity\DividendMonth', inversedBy: 'tickers', indexBy: 'dividendMonth')]
     private $dividendMonths;
 
+    #[Assert\Unique()]
+    #[ApiProperty(identifier: true)]
     #[ORM\Column(type: 'string', length: 255, nullable: false, unique: true)]
     private $isin;
 
@@ -61,6 +69,9 @@ class Ticker
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updatedAt;
+
+    #[ORM\Column(type: 'uuid', nullable: true)]
+    private ?Uuid $uuid = null;
 
     public function __construct()
     {
@@ -358,6 +369,18 @@ class Ticker
     public function setUpdatedAt(\DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getUuid(): ?Uuid
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(?Uuid $uuid): static
+    {
+        $this->uuid = $uuid;
 
         return $this;
     }
