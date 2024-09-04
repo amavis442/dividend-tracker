@@ -5,6 +5,7 @@ namespace App\Entity;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: 'App\Repository\PaymentRepository')]
 #[ORM\HasLifecycleCallbacks]
@@ -26,11 +27,6 @@ class Payment
     )]
     private $dividend = 0.0;
 
-    /**
-     * Undocumented variable
-     *
-     * @var float
-     */
     private $taxes;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Ticker', inversedBy: 'payments')]
@@ -88,6 +84,12 @@ class Payment
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $dividendPaidCurrency;
+
+    #[ORM\Column(type: 'uuid', nullable: true)]
+    private ?Uuid $uuid = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $importfile = null;
 
     public function getId(): ?int
     {
@@ -308,6 +310,30 @@ class Payment
     public function setDividendPaidCurrency(?string $dividendPaidCurrency): self
     {
         $this->dividendPaidCurrency = $dividendPaidCurrency;
+
+        return $this;
+    }
+
+    public function getUuid(): ?Uuid
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(?Uuid $uuid): static
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    public function getImportfile(): ?string
+    {
+        return $this->importfile;
+    }
+
+    public function setImportfile(?string $importfile): static
+    {
+        $this->importfile = $importfile;
 
         return $this;
     }
