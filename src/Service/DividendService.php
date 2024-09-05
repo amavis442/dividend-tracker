@@ -76,7 +76,7 @@ class DividendService
         $rates = $this->exchangeRateService->getRates();
         if (count($rates) < 1 && $calendar->getCurrency()->getSymbol() != 'EUR' || !isset($rates[$calendar->getCurrency()->getSymbol()])) {
             $msg = $this->translator->trans('tickerSymbol:: Exchange rate for [Symbol] is currently unavailable. Available are: jsonSymbol', [
-                'tickerSymbol' => $calendar->getTicker()->getTicker(),
+                'tickerSymbol' => $calendar->getTicker()->getSymbol(),
                 'Symbol' => $calendar->getCurrency()->getSymbol(),
                 'jsonSymbol' => json_encode($rates)
             ]);

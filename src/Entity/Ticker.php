@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Rector\Core\Exception\DeprecatedException;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,7 +24,7 @@ class Ticker
 
 
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    private $ticker;
+    private $symbol;
 
     #[ORM\Column(type: 'string', length: 255)]
     private $fullname;
@@ -87,22 +88,30 @@ class Ticker
         return $this->id;
     }
 
-    public function getTicker(): ?string
+    public function getSymbol(): ?string
     {
-        return $this->ticker;
+        return $this->symbol;
     }
 
-    public function setTicker(string $ticker): self
+    public function setSymbol(string $symbol): self
     {
-        $this->ticker = strtoupper($ticker);
+        $this->symbol = strtoupper($symbol);
 
         return $this;
     }
 
-    public function getSymbol(): ?string
+    public function setTicker(string $symbol): static
     {
-        return $this->ticker;
+        throw new DeprecatedException('Use setSymbol() instead');
+
+        return $this;
     }
+
+    public function getTicker(): void
+    {
+        throw new DeprecatedException('Use getSymbol() instead');
+    }
+
 
     public function getFullname(): ?string
     {

@@ -50,15 +50,13 @@ class Export
             ->setFontColor(Color::BLUE)
             ->setShouldWrapText()
             ->setCellAlignment(CellAlignment::RIGHT)
-            ->setBackgroundColor(Color::YELLOW)
-        ;
+            ->setBackgroundColor(Color::YELLOW);
 
         $styleData = (new Style())
             ->setFontSize(10)
             ->setFontName('Liberation Sans')
             ->setShouldWrapText()
-            ->setCellAlignment(CellAlignment::RIGHT)
-        ;
+            ->setCellAlignment(CellAlignment::RIGHT);
 
         $data = [];
         $pies = $this->pieRepository->findAll();
@@ -117,7 +115,7 @@ class Export
              * @var \App\Entity\Ticker $ticker
              */
             $ticker = $position->getTicker();
-            $row['Ticker'] = $ticker->getTicker();
+            $row['Ticker'] = $ticker->getSymbol();
             $row['Company'] = $ticker->getFullname();
             $row['Branch'] = $ticker->getBranch()->getLabel();
             $row['Shares'] = $position->getAmount();
@@ -170,7 +168,7 @@ class Export
             }
 
 
-            $data[$position->getTicker()->getTicker()] = $row;
+            $data[$position->getTicker()->getSymbol()] = $row;
         }
         ksort($data);
         /* foreach ($data as $symbol => &$rows) {

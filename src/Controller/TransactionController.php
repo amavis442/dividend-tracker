@@ -129,8 +129,8 @@ class TransactionController extends AbstractController
             $entityManager->persist($position);
             $entityManager->flush();
 
-            $request->getSession()->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
-            $request->getSession()->set(PortfolioController::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
+            $request->getSession()->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getSymbol());
+            $request->getSession()->set(PortfolioController::SEARCH_KEY, $transaction->getPosition()->getTicker()->getSymbol());
 
             PortfolioModel::clearCache();
 
@@ -175,7 +175,7 @@ class TransactionController extends AbstractController
             }
 
             $entityManager->flush();
-            $request->getSession()->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getTicker());
+            $request->getSession()->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getSymbol());
 
             PortfolioModel::clearCache();
 

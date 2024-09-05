@@ -89,8 +89,8 @@ class PositionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $positionService->create($position);
-            $request->getSession()->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
-            $request->getSession()->set(PortfolioController::SEARCH_KEY, $position->getTicker()->getTicker());
+            $request->getSession()->set(self::SEARCH_KEY, $position->getTicker()->getSymbol());
+            $request->getSession()->set(PortfolioController::SEARCH_KEY, $position->getTicker()->getSymbol());
 
             PortfolioModel::clearCache();
 
@@ -124,7 +124,7 @@ class PositionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $positionService->update($position);
-            $request->getSession()->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
+            $request->getSession()->set(self::SEARCH_KEY, $position->getTicker()->getSymbol());
 
             PortfolioModel::clearCache();
 

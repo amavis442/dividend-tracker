@@ -164,8 +164,8 @@ class CalendarRepository extends ServiceEntityRepository
                 $output[$paydate] = [];
             }
 
-            if (!isset($output[$paydate][$ticker->getTicker()])) {
-                $output[$paydate]['tickers'][$ticker->getTicker()] = [];
+            if (!isset($output[$paydate][$ticker->getSymbol()])) {
+                $output[$paydate]['tickers'][$ticker->getSymbol()] = [];
             }
             if (!isset($output[$paydate]['grossTotalPayment'])) {
                 $output[$paydate]['grossTotalPayment'] = 0.0;
@@ -179,7 +179,7 @@ class CalendarRepository extends ServiceEntityRepository
             }
 
             $dividend = $calendar->getCashAmount();
-            $output[$paydate]['tickers'][$ticker->getTicker()] = [
+            $output[$paydate]['tickers'][$ticker->getSymbol()] = [
                 'amount' => $amount,
                 'dividend' => $dividend,
                 'payoutdate' => $calendar->getPaymentDate()->format('d-m-Y'),
@@ -220,6 +220,7 @@ class CalendarRepository extends ServiceEntityRepository
             ->leftJoin('p.pies', 'pies')
             ->leftJoin('c.currency', 'cur')
             ->where('c.paymentDate >= :start and c.paymentDate <= :end')
+
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
             ->setParameter('closedAt', (new DateTime('-2 month'))->format('Y-m-d'));
@@ -237,6 +238,7 @@ class CalendarRepository extends ServiceEntityRepository
 
         $data = [];
         $dividendService->setCummulateDividendAmount(false);
+
         foreach ($result as $item) {
             $positionAmount = $dividendService->getPositionAmount($item);
             if ($positionAmount < 0.001) { // filter out ones that have no amount of stocks for dividend payout

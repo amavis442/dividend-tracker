@@ -159,7 +159,7 @@ class PaymentController extends AbstractController
 
         $positionDividendEstimate = $calendarRepository->getDividendEstimate($position, $year);
         if (isset($positionDividendEstimate[$timestamp])) {
-            $data = $positionDividendEstimate[$timestamp]['tickers'][$ticker->getTicker()];
+            $data = $positionDividendEstimate[$timestamp]['tickers'][$ticker->getSymbol()];
             $amount = $data['amount'];
             $calendar = $data['calendar'];
         } else {

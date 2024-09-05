@@ -77,7 +77,7 @@ class ClosedPositionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $positionService->update($position);
-            $request->getSession()->set(self::SEARCH_KEY, $position->getTicker()->getTicker());
+            $request->getSession()->set(self::SEARCH_KEY, $position->getTicker()->getSymbol());
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }

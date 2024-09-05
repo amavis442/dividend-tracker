@@ -54,7 +54,7 @@ class ProjectionModel
         $dataSource[$paydate]['timestamp'] = null;
         $dataSource[$paydate]['tickers'] = [];
         foreach ($dividendMonth->getTickers() as $ticker) {
-            $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
+            $dataSource[$paydate]['tickers'][$ticker->getSymbol()] = [
                 'amount' => 0.0,
                 'dividend' => 0.0,
                 'payoutdate' => '',
@@ -86,26 +86,26 @@ class ProjectionModel
 
         $dataSource[$paydate]['tickers'] = [];
         foreach ($dividendMonth->getTickers() as $ticker) {
-            if (isset($item['tickers'][$ticker->getTicker()])) {
-                $tickerData = $item['tickers'][$ticker->getTicker()];
-                $dataSource[$paydate]['tickers'][$ticker->getTicker()] = $tickerData;
+            if (isset($item['tickers'][$ticker->getSymbol()])) {
+                $tickerData = $item['tickers'][$ticker->getSymbol()];
+                $dataSource[$paydate]['tickers'][$ticker->getSymbol()] = $tickerData;
                 $position = $ticker->getPositions()->first();
 
                 $calendar = $tickerData['calendar'];
                 [$exchangeRate, $taxDividend] = $this->dividendService->getExchangeAndTax($position, $calendar);
                 $receivedDividendMonth += $tickerData['netPayment'];
-                $amount = $dataSource[$paydate]['tickers'][$ticker->getTicker()]['amount'];
-                $dividend = $dataSource[$paydate]['tickers'][$ticker->getTicker()]['dividend'];
+                $amount = $dataSource[$paydate]['tickers'][$ticker->getSymbol()]['amount'];
+                $dividend = $dataSource[$paydate]['tickers'][$ticker->getSymbol()]['dividend'];
 
                 $estimatedPayment = $amount * $dividend * (1 - $taxDividend) * $exchangeRate;
 
-                $dataSource[$paydate]['tickers'][$ticker->getTicker()]['estimatedPayment'] = round($estimatedPayment, 2);
+                $dataSource[$paydate]['tickers'][$ticker->getSymbol()]['estimatedPayment'] = round($estimatedPayment, 2);
 
                 $dataSource[$paydate]['estimatedNetTotalPayment'] += round($estimatedPayment, 2);
             }
 
-            if (!isset($item['tickers'][$ticker->getTicker()])) {
-                $dataSource[$paydate]['tickers'][$ticker->getTicker()] = [
+            if (!isset($item['tickers'][$ticker->getSymbol()])) {
+                $dataSource[$paydate]['tickers'][$ticker->getSymbol()] = [
                     'amount' => 0.0,
                     'dividend' => 0.0,
                     'payoutdate' => '',
