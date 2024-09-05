@@ -296,7 +296,7 @@ class PositionRepository extends ServiceEntityRepository
             $queryBuilder->innerJoin('t.branch', 'b');
             $queryBuilder->andWhere(
                 $queryBuilder->expr()->orX(
-                    $queryBuilder->expr()->like('LOWER(t.ticker)', 'LOWER(:search)'),
+                    $queryBuilder->expr()->like('LOWER(t.symbol)', 'LOWER(:search)'),
                     $queryBuilder->expr()->like('LOWER(t.fullname)', 'LOWER(:search)'),
                     $queryBuilder->expr()->like('LOWER(b.label)', 'LOWER(:search)')
                 )

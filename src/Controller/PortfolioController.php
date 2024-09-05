@@ -68,7 +68,7 @@ class PortfolioController extends AbstractController
 
         $cache = new FilesystemAdapter(PortfolioModel::CACHE_NAMESPACE);
 
-        $pageData = $cache->get(PortfolioModel::CACHE_KEY . '_' . $page, function (ItemInterface $item) use (
+        $pageData = $cache->get(PortfolioModel::CACHE_KEY . '_' . $page . ($pieSelected ? '_' . $pieSelected : '') . md5($searchCriteria), function (ItemInterface $item) use (
             $model,
             $positionRepository,
             $dividendService,
