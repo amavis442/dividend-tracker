@@ -1,67 +1,76 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Position{% endblock %}
+{% block title %}Position
+{% endblock %}
 
 {% block body %}
-    <h1>Position</h1>
+	<h1>Position</h1>
 
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
+	<ul class="nav nav-tabs" id="myTab" role="tablist">
 		<li class="nav-item">
 			<a class="nav-link active" id="position-tab" data-toggle="tab" href="#position" role="tab" aria-controls="position" aria-selected="true">Position</a>
 		</li>
 		<li class="nav-item">
 			<a class="nav-link" id="transactions-tab" data-toggle="tab" href="#transactions" role="tab" aria-controls="transactions" aria-selected="true">Transactions</a>
 		</li>
-    </ul>
+	</ul>
 
-    <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="position" role="tabpanel" aria-labelledby="position-tab">
-            <table class="table">
-                <tbody>
-                    <tr>
-                        <th>Ticker</th>
-                        <td>{{ position.ticker.ticker }}</td>
-                    </tr>
-                    <tr>
-                        <th>Name</th>
-                        <td>{{ position.ticker.fullname }}</td>
-                    </tr>
-                    <tr>
-                        <th>Industry</th>
-                        <td>{{ position.ticker.branch.label }}</td>
-                    </tr>
-                    <tr>
-                        <th>Units</th>
-                        <td>{{ (position.amount)|format_number({fraction_digit: 2}) }}</td>
-                    </tr>
-                    <tr>
-                        <th>Average price</th>
-                        <td>{{ position.currency.sign|raw }}{{ (position.price)|format_number({fraction_digit: 2}) }}</td>
-                    </tr>
-                    <tr>
-                        <th>Allocation</th>
-                        <td>{{ position.allocationCurrency.sign|raw }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}</td>
-                    </tr>
-                    <tr>
-                        <th>Status</th>
-                        <td>{{ position.closed ? 'Closed' : 'Open' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Profit / Loss</th>
-                        <td>{% if position.profit %}&euro;{{ (position.profit)|format_number({fraction_digit: 2}) }}{% endif %}</td>
-                    </tr>
-                </tbody>
-            </table> 
-        </div>
-        <div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="transactions-tab">
+	<div class="tab-content" id="myTabContent">
+		<div class="tab-pane fade show active" id="position" role="tabpanel" aria-labelledby="position-tab">
+			<table class="table">
+				<tbody>
+					<tr>
+						<th>Ticker</th>
+						<td>{{ position.ticker.symbol }}</td>
+					</tr>
+					<tr>
+						<th>Name</th>
+						<td>{{ position.ticker.fullname }}</td>
+					</tr>
+					<tr>
+						<th>Industry</th>
+						<td>{{ position.ticker.branch.label }}</td>
+					</tr>
+					<tr>
+						<th>Units</th>
+						<td>{{ (position.amount)|format_number({fraction_digit: 2}) }}</td>
+					</tr>
+					<tr>
+						<th>Average price</th>
+						<td>{{ position.currency.sign|raw }}{{ (position.price)|format_number({fraction_digit: 2}) }}</td>
+					</tr>
+					<tr>
+						<th>Allocation</th>
+						<td>{{ position.allocationCurrency.sign|raw }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}</td>
+					</tr>
+					<tr>
+						<th>Status</th>
+						<td>{{ position.closed ? 'Closed' : 'Open' }}</td>
+					</tr>
+					<tr>
+						<th>Profit / Loss</th>
+						<td>
+							{% if position.profit %}&euro;{{ (position.profit)|format_number({fraction_digit: 2}) }}
+							{% endif %}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="transactions-tab">
 			<br/>
 			{% include 'portfolio/show/_transaction.html.twig' %}
 		</div>
-    </div>
+	</div>
 
-    <a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id}) }}"><i class="far fa-edit"></i></a> | 
+	<a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id}) }}">
+		<i class="far fa-edit"></i>
+	</a>
+	|
 
-    <a class="btn btn-primary" href="{{ path('position_index') }}"><i class="fas fa-angle-double-left"></i> back to list</a>
-    <hr/>
-    
+	<a class="btn btn-primary" href="{{ path('position_index') }}">
+		<i class="fas fa-angle-double-left"></i>
+		back to list</a>
+	<hr/>
+
 {% endblock %}

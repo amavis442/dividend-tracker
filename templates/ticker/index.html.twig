@@ -1,66 +1,78 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-  Tickers
+	Tickers
 {% endblock %}
 
 {% block body %}
-  <h1>Tickers</h1>
-  {% for notice in app.flashes('notice') %}
-    <br />
-    <div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
-  {% endfor %}
+	<h1>Tickers</h1>
+	{% for notice in app.flashes('notice') %}
+		<br/>
+		<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
+	{% endfor %}
 
-  {% include '_search_form.html.twig' %}
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Id</th>
-        <th>{{ 'Ticker'|trans }}</th>
-        <th>ISIN</th>
-        <th>{{ 'Fullname'|trans }}</th>
-        <th>{{ 'Industry'|trans }}</th>
-        <th>{{ 'Research'|trans }}</th>
-        <th>{{ 'Dividend currency'|trans }}</th>
-        <th>{{ 'Dividend months'|trans }}</th>
-        <th>{{ 'actions'|trans }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for ticker in tickers %}
-        <tr>
-          <td>{{ ticker.id }}</td>
-          <td>{{ ticker.ticker }}</td>
-          <td>{{ ticker.isin }}</td>
-          <td>{{ ticker.fullname }}</td>
-          <td>{{ ticker.branch.label }}</td>
-          <td>{{ ticker.hasResearch ? 'Y' : 'N' }}</td>
-          <td>{{ ticker.currency ? ticker.currency.symbol : 'USD' }}</td>
-          <td>
-            {% for m in ticker.dividendMonths %}
-              {{ m.dividendMonth }},
-            {% endfor %}
-          </td>
+	{% include '_search_form.html.twig' %}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>{{ 'Ticker'|trans }}</th>
+				<th>ISIN</th>
+				<th>{{ 'Fullname'|trans }}</th>
+				<th>{{ 'Industry'|trans }}</th>
+				<th>{{ 'Research'|trans }}</th>
+				<th>{{ 'Dividend currency'|trans }}</th>
+				<th>{{ 'Dividend months'|trans }}</th>
+				<th>{{ 'actions'|trans }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for ticker in tickers %}
+				<tr>
+					<td>{{ ticker.id }}</td>
+					<td>{{ ticker.symbol }}</td>
+					<td>{{ ticker.isin }}</td>
+					<td>{{ ticker.fullname }}</td>
+					<td>{{ ticker.branch.label }}</td>
+					<td>{{ ticker.hasResearch ? 'Y' : 'N' }}</td>
+					<td>{{ ticker.currency ? ticker.currency.symbol : 'USD' }}</td>
+					<td>
+						{% for m in ticker.dividendMonths %}
+							{{ m.dividendMonth }},
+						{% endfor %}
+					</td>
 
-          <td>
-            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-              <div class="btn-group mr-2" role="group" aria-label="First group">
-                <a class="btn btn-secondary" href="{{ path('position_new', { ticker: ticker.id }) }}" data-toggle="tooltip" data-placement="top" title="add new position"><i class="fas fa-plus"></i></a>
-                <a href="{{ path('ticker_show', { id: ticker.id }) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
-                <a href="{{ path('ticker_edit', { id: ticker.id }) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
-                <a class="btn btn-secondary" href="{{ path('calendar_new', { ticker: ticker.id }) }}" data-toggle="tooltip" data-placement="top" title="add dividend date"><i class="far fa-calendar-alt"></i></a>
-                <a class="btn btn-secondary" href="{{ path('research_new', { ticker: ticker.id }) }}" data-toggle="tooltip" data-placement="top" title="add/edit research"><i class="fab fa-searchengin"></i></a>
-              </div>
-            </div>
-          </td>
-        </tr>
-      {% else %}
-        <tr>
-          <td colspan="7">no records found</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% include 'paginator.html.twig' %}
-  <a class="btn btn-primary" href="{{ path('ticker_new') }}"><i class="fas fa-plus"></i></a>
+					<td>
+						<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+							<div class="btn-group mr-2" role="group" aria-label="First group">
+								<a class="btn btn-secondary" href="{{ path('position_new', { ticker: ticker.id }) }}" data-toggle="tooltip" data-placement="top" title="add new position">
+									<i class="fas fa-plus"></i>
+								</a>
+								<a href="{{ path('ticker_show', { id: ticker.id }) }}" class="btn btn-primary">
+									<i class="fas fa-book-open"></i>
+								</a>
+								<a href="{{ path('ticker_edit', { id: ticker.id }) }}" class="btn btn-primary">
+									<i class="far fa-edit"></i>
+								</a>
+								<a class="btn btn-secondary" href="{{ path('calendar_new', { ticker: ticker.id }) }}" data-toggle="tooltip" data-placement="top" title="add dividend date">
+									<i class="far fa-calendar-alt"></i>
+								</a>
+								<a class="btn btn-secondary" href="{{ path('research_new', { ticker: ticker.id }) }}" data-toggle="tooltip" data-placement="top" title="add/edit research">
+									<i class="fab fa-searchengin"></i>
+								</a>
+							</div>
+						</div>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="7">no records found</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% include 'paginator.html.twig' %}
+	<a class="btn btn-primary" href="{{ path('ticker_new') }}">
+		<i class="fas fa-plus"></i>
+	</a>
 {% endblock %}

@@ -1,53 +1,59 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-  Research index
+	Research index
 {% endblock %}
 
 {% block body %}
-  <h1>Research index</h1>
-  {% for notice in app.flashes('notice') %}
-    <br />
-    <div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
-  {% endfor %}
+	<h1>Research index</h1>
+	{% for notice in app.flashes('notice') %}
+		<br/>
+		<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
+	{% endfor %}
 
-  {% include '_search_form.html.twig' %}
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Id</th>
-        <th>Ticker</th>
-        <th>Title</th>
-        <th>Info</th>
-        <th>Files</th>
-        <th>actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for research in researches %}
-        <tr>
-          <td>{{ research.id }}</td>
-          <td>{{ research.ticker.ticker }}</td>
-          <td>{{ research.title }}</td>
-          <td>{{ research.info|raw }}</td>
-          <td>
-            {% for doc in research.attachments %}
-              <a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}" target="_blank"><i class="fa fa-download"></i> {{ doc.label }}</a><br />
-            {% else %}
-              no records found
-            {% endfor %}
-          </td>
-          <td>
-            <a href="{{ path('research_show', { id: research.id }) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
-            <a href="{{ path('research_edit', { id: research.id }) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
-          </td>
-        </tr>
-      {% else %}
-        <tr>
-          <td colspan="4">no records found</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% include 'paginator.html.twig' %}
+	{% include '_search_form.html.twig' %}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Ticker</th>
+				<th>Title</th>
+				<th>Info</th>
+				<th>Files</th>
+				<th>actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for research in researches %}
+				<tr>
+					<td>{{ research.id }}</td>
+					<td>{{ research.ticker.symbol }}</td>
+					<td>{{ research.title }}</td>
+					<td>{{ research.info|raw }}</td>
+					<td>
+						{% for doc in research.attachments %}
+							<a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}" target="_blank">
+								<i class="fa fa-download"></i>
+								{{ doc.label }}</a><br/>
+						{% else %}
+							no records found
+						{% endfor %}
+					</td>
+					<td>
+						<a href="{{ path('research_show', { id: research.id }) }}" class="btn btn-primary">
+							<i class="fas fa-book-open"></i>
+						</a>
+						<a href="{{ path('research_edit', { id: research.id }) }}" class="btn btn-primary">
+							<i class="far fa-edit"></i>
+						</a>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="4">no records found</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% include 'paginator.html.twig' %}
 {% endblock %}

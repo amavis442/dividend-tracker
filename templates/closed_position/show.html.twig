@@ -1,57 +1,65 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Closed Position {{ position.ticker.ticker }}{% endblock %}
+{% block title %}Closed Position
+	{{ position.ticker.symbol }}
+{% endblock %}
 
 {% block body %}
-    <h1>Closed Position: {{ position.ticker.fullname }}</h1>
+	<h1>Closed Position:
+		{{ position.ticker.fullname }}</h1>
 
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
+	<ul class="nav nav-tabs" id="myTab" role="tablist">
 		<li class="nav-item">
 			<a class="nav-link active" id="position-tab" data-toggle="tab" href="#position" role="tab" aria-controls="position" aria-selected="true">Position</a>
 		</li>
 		<li class="nav-item">
 			<a class="nav-link" id="orders-tab" data-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="true">Orders</a>
 		</li>
-    </ul>
+	</ul>
 
-    <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="position" role="tabpanel" aria-labelledby="position-tab">
-            <table class="table">
-                <tbody>
-                    <tr>
-                        <th>Ticker</th>
-                        <td>{{ position.ticker.ticker }}</td>
-                    </tr>
-                    <tr>
-                        <th>Name</th>
-                        <td>{{ position.ticker.fullname }}</td>
-                    </tr>
-                    <tr>
-                        <th>Industry</th>
-                        <td>{{ position.ticker.branch.label }}</td>
-                    </tr>
-                    <tr>
-                        <th>Closed At</th>
-                        <td>{{ position.closedAt|date('d-m-Y') }}</td>
-                    </tr>
-                    <tr>
-                        <th>Profit / Loss</th>
-                        <td>
-                            <span class="alert alert-{% if position.profit > 0 %}success{% else %}danger{% endif %}">&euro;{{ (position.profit)|format_number({fraction_digit: 2}) }}</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table> 
-        </div>
-        <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+	<div class="tab-content" id="myTabContent">
+		<div class="tab-pane fade show active" id="position" role="tabpanel" aria-labelledby="position-tab">
+			<table class="table">
+				<tbody>
+					<tr>
+						<th>Ticker</th>
+						<td>{{ position.ticker.symbol }}</td>
+					</tr>
+					<tr>
+						<th>Name</th>
+						<td>{{ position.ticker.fullname }}</td>
+					</tr>
+					<tr>
+						<th>Industry</th>
+						<td>{{ position.ticker.branch.label }}</td>
+					</tr>
+					<tr>
+						<th>Closed At</th>
+						<td>{{ position.closedAt|date('d-m-Y') }}</td>
+					</tr>
+					<tr>
+						<th>Profit / Loss</th>
+						<td>
+							<span class="alert alert-{% if position.profit > 0 %}success{% else %}danger{% endif %}">&euro;{{ (position.profit)|format_number({fraction_digit: 2}) }}</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
 			<br/>
 			{% include 'portfolio/show/_orders.html.twig' %}
 		</div>
-    </div>
+	</div>
 
-    <a class="btn btn-primary" href="{{ path('closed_position_edit', {'id': position.id}) }}"><i class="far fa-edit"></i></a> | 
+	<a class="btn btn-primary" href="{{ path('closed_position_edit', {'id': position.id}) }}">
+		<i class="far fa-edit"></i>
+	</a>
+	|
 
-    <a class="btn btn-primary" href="{{ path('closed_position_index') }}"><i class="fas fa-angle-double-left"></i> back to list</a>
-    <hr/>
-    
+	<a class="btn btn-primary" href="{{ path('closed_position_index') }}">
+		<i class="fas fa-angle-double-left"></i>
+		back to list</a>
+	<hr/>
+
 {% endblock %}

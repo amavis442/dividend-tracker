@@ -4,38 +4,38 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Closed positions</h1>
+	<h1>Closed positions</h1>
 
-    {% include '_summary.html.twig' %}
-    <br/>
-    <br/>
-    {% include '_search_form.html.twig' %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    <a href="{{ path('report_closed_positions_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a>
-                </th>
-                <th>Industry</th>
-                <th>Profit / Loss</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for position in positions %}
-                <tr>
-                    <td>
-                        {{ position.ticker.ticker }}
-                    </td>
-                    <td>{{ position.ticker.branch.label }}</td>
-                    <td>&euro;{{ (position.getProfit)|format_number({fraction_digit: 2}) }}</td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="7">no records found</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+	{% include '_summary.html.twig' %}
+	<br/>
+	<br/>
+	{% include '_search_form.html.twig' %}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>
+					<a href="{{ path('report_closed_positions_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'ticker', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">Ticker</a>
+				</th>
+				<th>Industry</th>
+				<th>Profit / Loss</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for position in positions %}
+				<tr>
+					<td>
+						{{ position.ticker.symbol }}
+					</td>
+					<td>{{ position.ticker.branch.label }}</td>
+					<td>&euro;{{ (position.getProfit)|format_number({fraction_digit: 2}) }}</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="7">no records found</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 
-    {% include 'paginator.html.twig' %}
+	{% include 'paginator.html.twig' %}
 {% endblock %}

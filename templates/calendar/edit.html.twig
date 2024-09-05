@@ -1,63 +1,72 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-  Edit Calendar
+	Edit Calendar
 {% endblock %}
 
 {% block body %}
-  <h1>Edit Calendar</h1>
+	<h1>Edit Calendar</h1>
 
-  {{ include('calendar/_form.html.twig', { button_label: 'Update' }) }}
-  <br />
-  {% if calendar.payments %}
-    <h3>{{ 'Payments'|trans }}</h3>
+	{{ include('calendar/_form.html.twig', { button_label: 'Update' }) }}
+	<br/>
+	{% if calendar.payments %}
+		<h3>{{ 'Payments'|trans }}</h3>
 
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>{{ 'Pay date'|trans }}</th>
-          <th>{{ 'Company'|trans }}</th>
-          <th>{{ 'Dividend'|trans }}(&euro;)</th>
-          <th>{{ 'Tax'|trans }}</th>
-          <th>{{ 'Type'|trans }}</th>
-          <th>{{ 'Actions'|trans }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for payment in calendar.payments %}
-          <tr>
-            <td>{{ payment.payDate ? payment.payDate|format_date('medium') : '' }}</td>
-            <td>
-              {{ payment.position.ticker.fullname }}
-              ({{ payment.position.ticker.ticker }})<br />
-              <small>{{ payment.amount|format_number({ fraction_digit: 7 }) }} {{ 'shares'|trans }}</small>
-            </td>
-            <td>
-              <strong>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ payment.dividend|format_number({ fraction_digit: 2 }) }}</strong>
-            </td>
-            <td>
-              <span style="color:red">&euro;{{ payment.taxes|format_number({ fraction_digit: 2 }) }}</span>
-            </td>
-            <td>{{ payment.dividendType }}</td>
-            <td>
-              <a href="{{ path('payment_show', { id: payment.id }) }}" class="btn btn-primary"><i class="fas fa-book-open"></i></a>
-              <a href="{{ path('payment_edit', { id: payment.id }) }}" class="btn btn-primary"><i class="far fa-edit"></i></a>
-            </td>
-          </tr>
-        {% else %}
-          <tr>
-            <td colspan="6">{{ 'no records found'|trans }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% endif %}
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>{{ 'Pay date'|trans }}</th>
+					<th>{{ 'Company'|trans }}</th>
+					<th>{{ 'Dividend'|trans }}(&euro;)</th>
+					<th>{{ 'Tax'|trans }}</th>
+					<th>{{ 'Type'|trans }}</th>
+					<th>{{ 'Actions'|trans }}</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for payment in calendar.payments %}
+					<tr>
+						<td>{{ payment.payDate ? payment.payDate|format_date('medium') : '' }}</td>
+						<td>
+							{{ payment.position.ticker.fullname }}
+							({{ payment.position.ticker.symbol }})<br/>
+							<small>{{ payment.amount|format_number({ fraction_digit: 7 }) }}
+								{{ 'shares'|trans }}</small>
+						</td>
+						<td>
+							<strong>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ payment.dividend|format_number({ fraction_digit: 2 }) }}</strong>
+						</td>
+						<td>
+							<span style="color:red">&euro;{{ payment.taxes|format_number({ fraction_digit: 2 }) }}</span>
+						</td>
+						<td>{{ payment.dividendType }}</td>
+						<td>
+							<a href="{{ path('payment_show', { id: payment.id }) }}" class="btn btn-primary">
+								<i class="fas fa-book-open"></i>
+							</a>
+							<a href="{{ path('payment_edit', { id: payment.id }) }}" class="btn btn-primary">
+								<i class="far fa-edit"></i>
+							</a>
+						</td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="6">{{ 'no records found'|trans }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{% endif %}
 
-  {% if referer %}
-    <a href="{{ referer }}" class="btn btn-primary"><i class="fas fa-angle-double-left"></i> {{ 'back'|trans }}</a>
-  {% else %}
-    <a href="{{ path('calendar_index') }}" class="btn btn-primary"><i class="fas fa-angle-double-left"></i> {{ 'back to list'|trans }}</a>
-  {% endif %}
-  <hr />
-  {{ include('calendar/_delete_form.html.twig') }}
+	{% if referer %}
+		<a href="{{ referer }}" class="btn btn-primary">
+			<i class="fas fa-angle-double-left"></i>
+			{{ 'back'|trans }}</a>
+	{% else %}
+		<a href="{{ path('calendar_index') }}" class="btn btn-primary">
+			<i class="fas fa-angle-double-left"></i>
+			{{ 'back to list'|trans }}</a>
+	{% endif %}
+	<hr/>
+	{{ include('calendar/_delete_form.html.twig') }}
 {% endblock %}

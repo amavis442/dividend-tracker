@@ -4,110 +4,114 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Ticker</h1>
+	<h1>Ticker</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ ticker.id }}</td>
-            </tr>
-            <tr>
-                <th>{{'Ticker'|trans }}</th>
-                <td>{{ ticker.ticker }}</td>
-            </tr>
-            <tr>
-                <th>ISIN</th>
-                <td>{{ ticker.isin }}</td>
-            </tr>
-            <tr>
-                <th>{{'Fullname'|trans }}</th>
-                <td>{{ ticker.fullname }}</td>
-            </tr>
-            <tr>
-                <th>{{'Dividend currency'|trans }}</th>
-                <td>{{ ticker.currency ? ticker.currency.symbol : 'USD' }}</td>
-            </tr>
-            <tr>
-                <th>{{'Dividend months'|trans }}</th>
-                <td>
-                    {% for m in ticker.dividendMonths %}
-                        {{ m.dividendMonth }},
-                    {% endfor %}
-                </td>
-            </tr>
-                        <tr>
-                <th>{{'Company details'|trans }}</th>
-                <td>
-                    <div class="card" style="width: 100%;">
-                        <div class="card-body">
-                            <p class="card-text">{{ ticker.description|raw }}</p>
-                            <hr/>
-                            <a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="card-link">
-                                <i class="far fa-edit"></i>
-                            </a>
-                        </div>
-                        <div class="card-footer text-muted">
-                            {{ 'Created'|trans }}: {{ ticker.createdAt ? ticker.createdAt|date('Y-m-d H:i:s') : '-' }},
-                            {{ 'Modified'|trans }}: {{ ticker.updatedAt ? ticker.updatedAt|date('Y-m-d H:i:s') : '-' }}
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <th>{{'Research info'|trans }}</th>
-                <td>
-                    {% for research in ticker.researches %}
+	<table class="table">
+		<tbody>
+			<tr>
+				<th>Id</th>
+				<td>{{ ticker.id }}</td>
+			</tr>
+			<tr>
+				<th>{{'Ticker'|trans }}</th>
+				<td>{{ ticker.symbol }}</td>
+			</tr>
+			<tr>
+				<th>ISIN</th>
+				<td>{{ ticker.isin }}</td>
+			</tr>
+			<tr>
+				<th>{{'Fullname'|trans }}</th>
+				<td>{{ ticker.fullname }}</td>
+			</tr>
+			<tr>
+				<th>{{'Dividend currency'|trans }}</th>
+				<td>{{ ticker.currency ? ticker.currency.symbol : 'USD' }}</td>
+			</tr>
+			<tr>
+				<th>{{'Dividend months'|trans }}</th>
+				<td>
+					{% for m in ticker.dividendMonths %}
+						{{ m.dividendMonth }},
+					{% endfor %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{'Company details'|trans }}</th>
+				<td>
+					<div class="card" style="width: 100%;">
+						<div class="card-body">
+							<p class="card-text">{{ ticker.description|raw }}</p>
+							<hr/>
+							<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="card-link">
+								<i class="far fa-edit"></i>
+							</a>
+						</div>
+						<div class="card-footer text-muted">
+							{{ 'Created'|trans }}:
+							{{ ticker.createdAt ? ticker.createdAt|date('Y-m-d H:i:s') : '-' }},
+							{{ 'Modified'|trans }}:
+							{{ ticker.updatedAt ? ticker.updatedAt|date('Y-m-d H:i:s') : '-' }}
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th>{{'Research info'|trans }}</th>
+				<td>
+					{% for research in ticker.researches %}
 
-                        <p>
-                            <div class="card" style="width: 100%;">
-                                <div class="card-body">
-                                    <h5 class="card-title">
-                                        {{ research.title }}</h5>
-                                    <p class="card-text">{{ research.info|raw }}</p>
-                                    {% if research.attachments %}
-                                    <p>
-                                        {% for doc in research.attachments %}
-                                            <a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}" target='_blank'>
-                                                <i class="fa fa-download"></i>
-                                                {{ doc.label }}</a><br/>
-                                        {% endfor %}
-                                    </p>
-                                    {% endif %}
-                                    <hr/>
-                                    <a href="{{ path('research_edit', {'id': research.id}) }}" class="card-link">
-                                        <i class="far fa-edit"></i>
-                                    </a>
-                                </div>
-                                <div class="card-footer text-muted">
-                                    {{ 'Created'|trans }}: {{ research.createdAt ? research.createdAt|date('Y-m-d H:i:s') : '-' }},
-                                    {{ 'Modified'|trans }}: {{ research.updatedAt ? research.updatedAt|date('Y-m-d H:i:s') : '-' }}
-                                </div>
-                            </div>
-                        </p>
-                    {% else %}
-                        no records found
-                    {% endfor %}
-                </td>
-            </tr>
-        </tbody>
-    </table>
+						<p>
+							<div class="card" style="width: 100%;">
+								<div class="card-body">
+									<h5 class="card-title">
+										{{ research.title }}</h5>
+									<p class="card-text">{{ research.info|raw }}</p>
+									{% if research.attachments %}
+										<p>
+											{% for doc in research.attachments %}
+												<a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}" target='_blank'>
+													<i class="fa fa-download"></i>
+													{{ doc.label }}</a><br/>
+											{% endfor %}
+										</p>
+									{% endif %}
+									<hr/>
+									<a href="{{ path('research_edit', {'id': research.id}) }}" class="card-link">
+										<i class="far fa-edit"></i>
+									</a>
+								</div>
+								<div class="card-footer text-muted">
+									{{ 'Created'|trans }}:
+									{{ research.createdAt ? research.createdAt|date('Y-m-d H:i:s') : '-' }},
+									{{ 'Modified'|trans }}:
+									{{ research.updatedAt ? research.updatedAt|date('Y-m-d H:i:s') : '-' }}
+								</div>
+							</div>
+						</p>
+					{% else %}
+						no records found
+					{% endfor %}
+				</td>
+			</tr>
+		</tbody>
+	</table>
 
-    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-        <div class="btn-group mr-2" role="group" aria-label="First group">
-            <a href="{{ path('ticker_index') }}" class="btn btn-secondary">
-                <i class="fas fa-angle-double-left"></i>
-                {{'back to list'|trans}}</a>
-        </div>
-        <div class="btn-group mr-2" role="group" aria-label="Second group">
-            <a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit ticker">
-                <i class="far fa-edit"></i>
-            </a>
-            <a class="btn btn-primary" href="{{ path('research_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add research">
-                <i class="fab fa-searchengin"></i>
-            </a>
-        </div>
-    </div>
-    <hr/>
-    {{ include('ticker/_delete_form.html.twig') }}
+	<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+		<div class="btn-group mr-2" role="group" aria-label="First group">
+			<a href="{{ path('ticker_index') }}" class="btn btn-secondary">
+				<i class="fas fa-angle-double-left"></i>
+				{{'back to list'|trans}}</a>
+		</div>
+		<div class="btn-group mr-2" role="group" aria-label="Second group">
+			<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit ticker">
+				<i class="far fa-edit"></i>
+			</a>
+			<a class="btn btn-primary" href="{{ path('research_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add research">
+				<i class="fab fa-searchengin"></i>
+			</a>
+		</div>
+	</div>
+	<hr/>
+	{{ include('ticker/_delete_form.html.twig') }}
 {% endblock %}

@@ -9,7 +9,7 @@
 			</th>
 			<td>
 				<strong>{{ ticker.fullname }}
-					({{ ticker.ticker }})
+					({{ ticker.symbol }})
 				</strong>
 			</td>
 		</tr>
@@ -25,9 +25,9 @@
 			<th>{{ 'Dividend payment months'|trans }}</th>
 			<td>
 				<ul class="list-group">
-				{% for month in ticker.dividendMonths %}
-					<li class="list-group-item">{{ month.getDividendMonthName|trans }}</li>
-				{% endfor %}
+					{% for month in ticker.dividendMonths %}
+						<li class="list-group-item">{{ month.getDividendMonthName|trans }}</li>
+					{% endfor %}
 				</ul>
 
 			</td>
@@ -41,7 +41,8 @@
 			</td>
 		</tr>
 		<tr>
-			<th>{{ 'Amount'|trans }} #</th>
+			<th>{{ 'Amount'|trans }}
+				#</th>
 			<td>{{ (position.amount)|format_number({fraction_digit: 7}) }}</td>
 		</tr>
 		<tr>
@@ -71,15 +72,18 @@
 		<tr>
 			<th>{{ 'Next dividend (Ex-div / payout)'|trans }}</th>
 			<td>
-				<span class="badge badge-primary">{{ calendarRecentDividendDate.getExDividendDate|date('Y-m-d') }}</span> /
-				 <span class="badge badge-warning">{{ calendarRecentDividendDate.getPaymentDate|date('Y-m-d') }}</span>
+				<span class="badge badge-primary">{{ calendarRecentDividendDate.getExDividendDate|date('Y-m-d') }}</span>
+				/
+				<span class="badge badge-warning">{{ calendarRecentDividendDate.getPaymentDate|date('Y-m-d') }}</span>
 
 			</td>
 		</tr>
 		<tr>
 			<th>{{ 'Expected next payout'|trans }}</th>
 			<td>
-				#{{ amountPerDate }} x  &euro;{{ netCashAmount|format_number({fraction_digit: 2}) }} = &euro;{{ expectedPayout|format_number({fraction_digit: 2}) }}
+				#{{ amountPerDate }}
+				x  &euro;{{ netCashAmount|format_number({fraction_digit: 2}) }}
+				= &euro;{{ expectedPayout|format_number({fraction_digit: 2}) }}
 			</td>
 		</tr>
 		<tr>
@@ -96,9 +100,10 @@
 		</tr>
 		<tr>
 			<th>{{ 'Pies'|trans }}</th>
-			<td>{% for pie in position.pies %}
-                        <span class="badge badge-primary">{{ pie.label }}</span>
-                    {% endfor %}
+			<td>
+				{% for pie in position.pies %}
+					<span class="badge badge-primary">{{ pie.label }}</span>
+				{% endfor %}
 			</td>
 		</tr>
 	</tbody>

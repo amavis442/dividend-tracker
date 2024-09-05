@@ -1,49 +1,55 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Transaction{% endblock %}
+{% block title %}Transaction
+{% endblock %}
 
 {% block body %}
-    <h1>Position</h1>
-    {% set side = (transaction.side == 1 ? 'Buy' : 'Sell') %}
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Side</th>
-                <td>{{ side }}
-            </tr>
-            <tr>
-                <th>Ticker</th>
-                <td>{{ transaction.position.ticker.ticker }}</td>
-            </tr>
-            <tr>
-                <th>Name</th>
-                <td>{{ transaction.position.ticker.fullname }}</td>
-            </tr>
-            <tr>
-                <th>Industry</th>
-                <td>{{ transaction.position.ticker.branch.label }}</td>
-            </tr>
-            <tr>
-                <th>Buydate</th>
-                <td>{{ transaction.transactionDate|date("d-m-Y") }}</td>
-            </tr>
-            <tr>
-                <th>Units</th>
-                <td>{{ (transaction.amount)|format_number({fraction_digit: 7}) }}</td>
-            </tr>
-            <tr>
-                <th>Price</th>
-                <td>{{ transaction.currency.sign|raw }}{{ (transaction.price)|format_number({fraction_digit: 2}) }}</td>
-            </tr>
-            <tr>
-                <th>Allocation</th>
-                <td>{{ transaction.allocationCurrency.sign|raw }}{{ (transaction.allocation)|format_number({fraction_digit: 2}) }}</td>
-            </tr>
-        </tbody>
-    </table>
-    <a class="btn btn-primary" href="{{ path('transaction_edit', {'id': transaction.id}) }}"><i class="far fa-edit"></i></a> | 
+	<h1>Position</h1>
+	{% set side = (transaction.side == 1 ? 'Buy' : 'Sell') %}
+	<table class="table">
+		<tbody>
+			<tr>
+				<th>Side</th>
+				<td>{{ side }}</td>
+			</tr>
+			<tr>
+				<th>Ticker</th>
+				<td>{{ transaction.position.ticker.symbol }}</td>
+			</tr>
+			<tr>
+				<th>Name</th>
+				<td>{{ transaction.position.ticker.fullname }}</td>
+			</tr>
+			<tr>
+				<th>Industry</th>
+				<td>{{ transaction.position.ticker.branch.label }}</td>
+			</tr>
+			<tr>
+				<th>Buydate</th>
+				<td>{{ transaction.transactionDate|date("d-m-Y") }}</td>
+			</tr>
+			<tr>
+				<th>Units</th>
+				<td>{{ (transaction.amount)|format_number({fraction_digit: 7}) }}</td>
+			</tr>
+			<tr>
+				<th>Price</th>
+				<td>{{ transaction.currency.sign|raw }}{{ (transaction.price)|format_number({fraction_digit: 2}) }}</td>
+			</tr>
+			<tr>
+				<th>Allocation</th>
+				<td>{{ transaction.allocationCurrency.sign|raw }}{{ (transaction.allocation)|format_number({fraction_digit: 2}) }}</td>
+			</tr>
+		</tbody>
+	</table>
+	<a class="btn btn-primary" href="{{ path('transaction_edit', {'id': transaction.id}) }}">
+		<i class="far fa-edit"></i>
+	</a>
+	|
 
-    <a class="btn btn-primary" href="{{ path('transaction_index', {'orderBy':'transactionDate','sort' :'DESC'}) }}"><i class="fas fa-angle-double-left"></i> back to list</a>
-    <hr/>
-    
+	<a class="btn btn-primary" href="{{ path('transaction_index', {'orderBy':'transactionDate','sort' :'DESC'}) }}">
+		<i class="fas fa-angle-double-left"></i>
+		back to list</a>
+	<hr/>
+
 {% endblock %}
