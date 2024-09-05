@@ -66,9 +66,9 @@ class PortfolioController extends AbstractController
 
         $this->stopwatch->start('portfoliomodel-getpage');
 
-        $cache = new FilesystemAdapter();
+        $cache = new FilesystemAdapter(PortfolioModel::CACHE_NAMESPACE);
 
-        $pageData = $cache->get(PortfolioModel::CACHE_KEY, function (ItemInterface $item) use (
+        $pageData = $cache->get(PortfolioModel::CACHE_KEY . '_' . $page, function (ItemInterface $item) use (
             $model,
             $positionRepository,
             $dividendService,
@@ -98,24 +98,8 @@ class PortfolioController extends AbstractController
             return $page;
         });
 
-        /*
-        $pageData = $model->getPage(
-            $positionRepository,
-            $dividendService,
-            $paymentRepository,
-            $summary->getAllocated(),
-            $page,
-            $orderBy,
-            $sort,
-            $searchCriteria,
-            $pieSelected,
-        );
-        */
-
-
         $this->stopwatch->stop('portfoliomodel-getpage');
 
-        //dd($pageData);
         $request->getSession()->set(get_class($this), $request->getRequestUri());
 
         return $this->render('portfolio/index.html.twig', [
@@ -139,9 +123,6 @@ class PortfolioController extends AbstractController
             'totalDividend' => $summary->getTotalDividend(),
             'totalInvested' => $summary->getAllocated(),
         ]);
-
-        //return new Response('We komen ergens');
-
     }
 
     #[Route(path: '/{id}', name: 'portfolio_show', methods: ['GET'])]

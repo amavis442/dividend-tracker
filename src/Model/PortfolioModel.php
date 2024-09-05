@@ -14,6 +14,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 class PortfolioModel
 {
     public const CACHE_KEY = 'portfolio_model_cache_key';
+    public const CACHE_NAMESPACE = 'portfolio.cache';
     private bool $initialized = false;
     private array $portfolioItems = [];
     private array $tickerIds = [];
@@ -256,7 +257,8 @@ class PortfolioModel
     public static function clearCache(): void
     {
         // Clear the portfolioModel cache, when we have new data.
-        $cache = new FilesystemAdapter();
-        $cache->delete(self::CACHE_KEY);
+        $cache = new FilesystemAdapter(self::CACHE_NAMESPACE);
+
+        $cache->clear();
     }
 }
