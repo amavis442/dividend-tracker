@@ -51,7 +51,7 @@ class Ticker
     #[ORM\ManyToMany(targetEntity: 'App\Entity\DividendMonth', inversedBy: 'tickers', indexBy: 'dividendMonth')]
     private $dividendMonths;
 
-    #[Assert\Unique()]
+    #[Assert\Isin]
     #[ApiProperty(identifier: true)]
     #[ORM\Column(type: 'string', length: 255, nullable: false, unique: true)]
     private $isin;
