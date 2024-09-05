@@ -14,6 +14,7 @@ use App\Service\Referer;
 use App\Service\SummaryService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +22,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
+
 
 #[Route(path: '/dashboard/portfolio')]
 class PortfolioController extends AbstractController
@@ -140,7 +142,10 @@ class PortfolioController extends AbstractController
         $calendarRecentDividendDate = $ticker->getRecentDividendDate();
         $netCashAmount = 0.0;
         $amountPerDate = 0.0;
-        $cals = $ticker->getCalendars();
+        /**
+         * @var Collection<Calendar> $calenders
+         */
+        $calenders = $ticker->getCalendars();
 
         if ($calendarRecentDividendDate) {
             [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax($position, $calendarRecentDividendDate);
@@ -151,7 +156,7 @@ class PortfolioController extends AbstractController
         $position = $positionRepository->getForPosition($position);
         $netYearlyDividend = 0.0;
 
-        if (count($cals) > 0) {
+        if (count($calenders) > 0) {
             $cal = $dividendService->getRegularCalendar($ticker);
             [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax($position, $cal);
             $dividendFrequentie = $ticker->getPayoutFrequency();
@@ -159,16 +164,19 @@ class PortfolioController extends AbstractController
         }
         $dividendRaises = [];
 
-        $reverseCals = array_reverse($cals->toArray(), true);
+        $reverseCalendars = array_reverse($calenders->toArray(), true);
         // Cals start with latest and descent
-        foreach ($reverseCals as $index => $cal) {
+        /**
+         * @var Calendar $calendar
+         */
+        foreach ($reverseCalendars as $index => $calendar) {
             $dividendRaises[$index] = 0;
-            if ($cal->getDividendType() === Calendar::REGULAR && stripos($cal->getDescription(), 'Extra') === false) {
-                if (isset($oldCal)) {
+            if ($calendar->getDividendType() === Calendar::REGULAR && stripos($calendar->getDescription(), 'Extra') === false) {
+                if (isset($oldCal) && $oldCal->getCashAmount() > 0) {
                     $oldCash = $oldCal->getCashAmount(); // previous
-                    $dividendRaises[$index] = (($cal->getCashAmount() - $oldCash) / $oldCash) * 100;
+                    $dividendRaises[$index] = (($calendar->getCashAmount() - $oldCash) / $oldCash) * 100;
                 }
-                $oldCal = $cal;
+                $oldCal = $calendar;
             }
         }
 
