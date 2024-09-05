@@ -138,7 +138,7 @@ class Ticker
     }
 
     /**
-     * @return Collection|Calendar[]
+     * @return Collection
      */
     public function getCalendars(): Collection
     {
