@@ -226,7 +226,7 @@ class CalendarRepository extends ServiceEntityRepository
             ->setParameter('closedAt', (new DateTime('-2 month'))->format('Y-m-d'));
 
         if ($pie && $pie->getId() != null) {
-            $qb->andWhere('pies IN (:pie)')
+            $qb->andWhere('tr.pie IN (:pie) OR pies IN (:pie)')
                 ->setParameter('pie', [$pie->getId()]);
         }
         $result = $qb->getQuery()
@@ -249,7 +249,7 @@ class CalendarRepository extends ServiceEntityRepository
                 continue;
             }
 
-            $ticker = $item->getTicker()->getTicker();
+            $ticker = $item->getTicker()->getSymbol();
 
             $taxRate = $dividendService->getTaxRate($item);
             $exchangeRate = $dividendService->getExchangeRate($item);

@@ -165,8 +165,8 @@ class ProjectionModel
                         $output[$paydate] = [];
                     }
 
-                    if (!isset($output[$paydate][$ticker->getTicker()])) {
-                        $output[$paydate]['tickers'][$ticker->getTicker()] = [];
+                    if (!isset($output[$paydate][$ticker->getSymbol()])) {
+                        $output[$paydate]['tickers'][$ticker->getSymbol()] = [];
                     }
                     if (!isset($output[$paydate]['grossTotalPayment'])) {
                         $output[$paydate]['grossTotalPayment'] = 0.0;
@@ -176,7 +176,7 @@ class ProjectionModel
                     $amount = $amount;
 
                     $dividend = $calendar->getCashAmount();
-                    $output[$paydate]['tickers'][$ticker->getTicker()] = [
+                    $output[$paydate]['tickers'][$ticker->getSymbol()] = [
                         'amount' => $amount,
                         'dividend' => $dividend,
                         'payoutdate' => $calendar->getPaymentDate()->format('d-m-Y'),

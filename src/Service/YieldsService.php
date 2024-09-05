@@ -65,21 +65,21 @@ class YieldsService
             }
             $dividendPerYear = $numPayoutsPerYear * $lastCash;
 
-            $tickerLabel = $ticker->getTicker();
-            $labels[$tickerLabel] = sprintf("%s (%s)", substr(addslashes(str_replace(["'", '"'], ["", ""], $ticker->getFullname())), 0, 8), $ticker->getTicker());
+            $tickerLabel = $ticker->getSymbol();
+            $labels[$tickerLabel] = sprintf("%s (%s)", substr(addslashes(str_replace(["'", '"'], ["", ""], $ticker->getFullname())), 0, 8), $ticker->getSymbol());
             $data[$tickerLabel] = $dividendYield;
 
             if ($orderBy === 'yield') {
-                $orderKey = str_pad((string) ($dividendYield * 100), 10, '0', STR_PAD_LEFT) . $ticker->getTicker();
+                $orderKey = str_pad((string) ($dividendYield * 100), 10, '0', STR_PAD_LEFT) . $ticker->getSymbol();
             }
             if ($orderBy === 'dividend') {
-                $orderKey = str_pad((string) ($dividendPerYear * 100), 10, '0', STR_PAD_LEFT) . $ticker->getTicker();
+                $orderKey = str_pad((string) ($dividendPerYear * 100), 10, '0', STR_PAD_LEFT) . $ticker->getSymbol();
             }
             if ($orderBy === 'ticker') {
-                $orderKey = $ticker->getTicker();
+                $orderKey = $ticker->getSymbol();
             }
             $dataSource[$orderKey] = [
-                'ticker' => $ticker->getTicker(),
+                'ticker' => $ticker->getSymbol(),
                 'tickerId' => $ticker->getId(),
                 'position' => $position,
                 'label' => $ticker->getFullname(),
