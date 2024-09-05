@@ -29,7 +29,7 @@ class CalendarType extends AbstractType
                 'empty_data' => null,
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('t')
-                        ->orderBy('t.ticker', 'ASC');
+                        ->orderBy('t.symbol', 'ASC');
                 },
             ])
             ->add('ex_dividend_date', DateType::class, [

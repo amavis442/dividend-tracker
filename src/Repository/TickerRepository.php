@@ -42,10 +42,10 @@ class TickerRepository extends ServiceEntityRepository
             ->orderBy($order, $sort);
 
         if (!empty($search)) {
-            $queryBuilder->where('LOWER(t.ticker) LIKE LOWER(:search)');
+            $queryBuilder->where('LOWER(t.symbol) LIKE LOWER(:search)');
             $queryBuilder->orWhere('LOWER(i.label) LIKE LOWER(:search)');
             $queryBuilder->orWhere('LOWER(t.fullname) LIKE LOWER(:search)');
-            $queryBuilder->groupBy('t.id, t.ticker');
+            $queryBuilder->groupBy('t.id, t.symbol');
             $queryBuilder->setParameter('search', $search . '%');
         }
         $query = $queryBuilder->getQuery();
@@ -89,12 +89,12 @@ class TickerRepository extends ServiceEntityRepository
         if (!empty($search)) {
             $queryBuilder->andWhere(
                 $queryBuilder->expr()->orX(
-                    't.ticker LIKE :search',
+                    't.symbol LIKE :search',
                     'i.label LIKE :search',
                     't.fullname LIKE :search'
                 )
             );
-            $queryBuilder->groupBy('t.ticker');
+            $queryBuilder->groupBy('t.symbol');
             $queryBuilder->setParameter('search', $search . '%');
         }
         $query = $queryBuilder->getQuery();
@@ -119,7 +119,7 @@ class TickerRepository extends ServiceEntityRepository
 
     public function getActive()
     {
-        $qb = $this->createQueryBuilder('t', 't.ticker')
+        $qb = $this->createQueryBuilder('t', 't.symbol')
             ->select('t')
             ->innerJoin('t.positions', 'p')
             ->where("EXISTS (SELECT 1 FROM App\Entity\Position pos WHERE pos.ticker = t.id AND (pos.closed = false))")
@@ -137,7 +137,7 @@ class TickerRepository extends ServiceEntityRepository
             ->leftJoin('t.dividendMonths', 'dm')
             ->leftJoin('t.calendars', 'c')
             ->where('p.closed = false')
-            ->orderBy('t.ticker')
+            ->orderBy('t.symbol')
             ->getQuery()
             ->getResult();
     }

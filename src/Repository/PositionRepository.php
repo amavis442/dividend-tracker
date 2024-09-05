@@ -32,7 +32,7 @@ class PositionRepository extends ServiceEntityRepository
     public function getAll(
         int $page = 1,
         int $limit = 10,
-        string $orderBy = 't.ticker',
+        string $orderBy = 't.symbol',
         string $sort = 'ASC',
         string $search = '',
         int $status = self::OPEN,
@@ -175,7 +175,7 @@ class PositionRepository extends ServiceEntityRepository
         if (!empty($search)) {
             $queryBuilder->andWhere(
                 $queryBuilder->expr()->orX(
-                    $queryBuilder->expr()->like('t.ticker', ':search'),
+                    $queryBuilder->expr()->like('t.symbol', ':search'),
                     $queryBuilder->expr()->like('i.label', ':search')
                 )
             );
@@ -269,12 +269,12 @@ class PositionRepository extends ServiceEntityRepository
     }
 
     private function getQueryBuilder(
-        string $orderBy = 't.ticker',
+        string $orderBy = 't.symbol',
         string $sort = 'ASC',
         string $search = ''
     ): QueryBuilder {
-        $order = 't.ticker';
-        if (in_array($orderBy, ['t.ticker', 't.fullname', 'i.label'])) {
+        $order = 't.symbol';
+        if (in_array($orderBy, ['t.symbol', 't.fullname', 'i.label'])) {
             $order = $orderBy;
         }
 
@@ -307,17 +307,17 @@ class PositionRepository extends ServiceEntityRepository
     }
 
     public function getSummary(
-        string $orderBy = 'ticker',
+        string $orderBy = 'symbol',
         string $sort = 'ASC',
         string $search = ''
     ): ?array {
         $order = 'p.' . $orderBy;
-        if ($orderBy === 'ticker') {
-            $order = 't.ticker';
+        if ($orderBy === 'symbol') {
+            $order = 't.symbol';
         }
         $queryBuilder = $this->createQueryBuilder('p')
             ->select([
-                't.ticker',
+                't.symbol',
                 'COUNT(p) as totalPositions',
                 'SUM(p.allocation) sumAllocation',
                 'SUM(p.amount) sumAmount',
@@ -326,11 +326,11 @@ class PositionRepository extends ServiceEntityRepository
             ])
             ->innerJoin('p.ticker', 't')
             ->leftJoin('t.payments', 'pa')
-            ->groupBy('t.ticker')
+            ->groupBy('t.symbol')
             ->orderBy($order, $sort)
             ->where('p.closed = false');
         if (!empty($search)) {
-            $queryBuilder->andWhere('t.ticker LIKE :search');
+            $queryBuilder->andWhere('t.symbol LIKE :search');
             $queryBuilder->setParameter('search', $search . '%');
         }
         return $queryBuilder->getQuery()->getResult();
@@ -482,7 +482,7 @@ class PositionRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('p')
             ->select([
-                't.ticker',
+                't.symbol',
                 'p.allocation',
             ])
             ->innerJoin('p.ticker', 't')

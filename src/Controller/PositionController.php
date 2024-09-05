@@ -29,7 +29,7 @@ class PositionController extends AbstractController
         Referer $referer,
         int $page = 1,
         string $tab = 'All',
-        string $orderBy = 'ticker',
+        string $orderBy = 'symbol',
         string $sort = 'asc',
         int $status = PositionRepository::CLOSED
     ): Response {
@@ -37,8 +37,8 @@ class PositionController extends AbstractController
         if (!in_array($orderBy, ['profit'])) {
             $order = 'p.' . $orderBy;
         }
-        if (!in_array($orderBy, ['ticker'])) {
-            $order = 't.ticker';
+        if (!in_array($orderBy, ['symbol'])) {
+            $order = 't.symbol';
         }
 
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {

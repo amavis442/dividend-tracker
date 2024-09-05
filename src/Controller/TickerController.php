@@ -23,7 +23,7 @@ class TickerController extends AbstractController
         Request $request,
         TickerRepository $tickerRepository,
         int $page = 1,
-        string $orderBy = 'ticker',
+        string $orderBy = 'symbol',
         string $sort = 'asc'
     ): Response {
         $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');

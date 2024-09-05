@@ -30,8 +30,8 @@ class TransactionRepository extends ServiceEntityRepository
         string $search = ''
     ): QueryBuilder {
         $order = 'tr.' . $orderBy;
-        if ($orderBy === 'ticker') {
-            $order = 't.ticker';
+        if ($orderBy === 'symbol') {
+            $order = 't.symbol';
         }
 
         // Create our query
@@ -44,7 +44,7 @@ class TransactionRepository extends ServiceEntityRepository
 
         if (!empty($search)) {
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
-                $queryBuilder->expr()->like('t.ticker', ':search'),
+                $queryBuilder->expr()->like('t.symbol', ':search'),
                 $queryBuilder->expr()->like('i.label', ':search')
             ));
             $queryBuilder->setParameter('search', $search . '%');

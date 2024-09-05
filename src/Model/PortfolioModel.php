@@ -164,12 +164,12 @@ class PortfolioModel
         PaymentRepository $paymentRepository,
         float $totalInvested = 0.0,
         int $page = 1,
-        string $orderBy = 'ticker',
+        string $orderBy = 'symbol',
         string $sort = 'asc',
         string $searchCriteria = '',
         ?string $pieSelected = null
     ): self {
-        $order = 't.ticker';
+        $order = 't.symbol';
         if (in_array($orderBy, ['industry'])) {
             $order = 'i.label';
         }

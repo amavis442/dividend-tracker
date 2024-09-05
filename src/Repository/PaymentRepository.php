@@ -53,8 +53,8 @@ class PaymentRepository extends ServiceEntityRepository
         string $endDate = null
     ): Paginator {
         $order = 'p.' . $orderBy;
-        if ($orderBy === 'ticker') {
-            $order = 't.ticker';
+        if ($orderBy === 'symbol') {
+            $order = 't.symbol';
         }
         if ($orderBy === 'exDividendDate') {
             $order = 'c.exDividendDate';
@@ -71,7 +71,7 @@ class PaymentRepository extends ServiceEntityRepository
         }
 
         if (!empty($search)) {
-            $queryBuilder->andWhere('t.ticker LIKE :search');
+            $queryBuilder->andWhere('t.symbol LIKE :search');
             $queryBuilder->setParameter('search', $search . '%');
         }
         $query = $queryBuilder->getQuery();

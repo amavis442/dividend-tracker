@@ -56,8 +56,8 @@ class CalendarRepository extends ServiceEntityRepository
         string $search = ''
     ): Paginator {
         $order = 'c.' . $orderBy;
-        if ($orderBy === 'ticker') {
-            $order = 't.ticker';
+        if ($orderBy === 'symbol') {
+            $order = 't.symbol';
         }
         $queryBuilder2 = $this->getEntityManager()->createQueryBuilder()
             ->select("tp.id")
@@ -71,7 +71,7 @@ class CalendarRepository extends ServiceEntityRepository
             ->innerJoin('c.ticker', 't')
             ->orderBy($order, $sort);
         if (!empty($search)) {
-            $queryBuilder->where('t.ticker LIKE :search');
+            $queryBuilder->where('t.symbol LIKE :search');
             $queryBuilder->setParameter('search', $search . '%');
         }
         $queryBuilder->where($queryBuilder->expr()->in('t.id', $queryBuilder2->getDQL()));

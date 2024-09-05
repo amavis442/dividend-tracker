@@ -45,7 +45,7 @@ class ResearchRepository extends ServiceEntityRepository
     ): QueryBuilder {
         $order = 'r.' . $orderBy;
         if ($orderBy === 'ticker') {
-            $order = 't.ticker';
+            $order = 't.symbol';
         }
 
         // Create our query
@@ -56,7 +56,7 @@ class ResearchRepository extends ServiceEntityRepository
 
         if (!empty($search)) {
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
-                $queryBuilder->expr()->like('t.ticker', ':search'),
+                $queryBuilder->expr()->like('t.symbol', ':search'),
                 $queryBuilder->expr()->like('r.info', ':search')
             ));
             $queryBuilder->setParameter('search', $search . '%');
