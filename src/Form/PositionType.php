@@ -21,7 +21,7 @@ class PositionType extends AbstractType
         $builder
             ->add('ticker', EntityType::class, [
                 'class' => Ticker::class,
-                'choice_label' => 'ticker',
+                'choice_label' => 'symbol',
                 'required' => true,
                 'placeholder' => 'Please choose a ticker',
                 'empty_data' => null,
