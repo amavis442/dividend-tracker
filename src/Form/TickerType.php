@@ -19,7 +19,7 @@ class TickerType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('ticker')
+            ->add('symbol')
             ->add('fullname')
             ->add('isin')
             ->add("description", TextareaType::class, [
