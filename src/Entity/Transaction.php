@@ -88,7 +88,7 @@ class Transaction
     private float $avgprice = 0.0;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private string $jobid;
+    private ?string $jobid = '';
 
     #[ORM\Column(
         type: 'float',
@@ -104,10 +104,10 @@ class Transaction
     private DateTime $updatedAt;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private string $meta;
+    private ?string $meta = '';
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private string $importfile;
+    private ?string $importfile = '';
 
     #[ORM\Column(
         type: 'float',
@@ -124,7 +124,7 @@ class Transaction
     private float $originalPrice = 0.0;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private string $originalPriceCurrency;
+    private ?string $originalPriceCurrency = '';
 
     #[ORM\Column(
         type: 'float',
@@ -305,12 +305,12 @@ class Transaction
         return $this;
     }
 
-    public function getJobid(): ?string
+    public function getJobid(): string
     {
-        return $this->jobid;
+        return $this->jobid ?: '';
     }
 
-    public function setJobid(?string $jobid): self
+    public function setJobid(?string $jobid = ''): self
     {
         $this->jobid = $jobid;
 
