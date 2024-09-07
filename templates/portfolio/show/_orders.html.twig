@@ -1,4 +1,3 @@
-
 <div class="row float-right">
 	<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 		<div class="btn-group mr-2" role="group" aria-label="First group">
@@ -12,91 +11,101 @@
 	</div>
 </div>
 
-<h3>{{ 'Orders'|trans }} <small>({{ allocationSign|raw }}{{ (position.allocation)|format_number({fraction_digit: 2}) }})</small></h3>
+<h3>{{ 'Orders'|trans }}
+	<small>({{ allocationSign|raw }}{{ (position.allocation)|format_number({fraction_digit: 2}) }})</small>
+</h3>
 
 <div class="table-responsive-xl">
-<table class="table table-striped">
-	<thead>
-		<tr>
-			<th>ID</th>
-			<th>{{ 'Side'|trans }}</th>
-			<th>{{ 'Order date'|trans }}</th>
-			<th>{{ 'Amount'|trans }}</th>
-			<th>{{ 'Price'|trans }}</th>
-			<th>{{ 'avgPrice'|trans }}</th>
-			<th>{{ 'Allocation'|trans }}</th>
-			<th>{{ 'Total costs'|trans }}</th>
-			<th>{{ 'Net order value'|trans }}</th>
-			<th>{{ 'Profit / Loss'|trans }}</th>
-			<th>{{ 'Dividend yield'|trans }}</th>
-			<th>{{ 'Actions'|trans }}</th>
-		</tr>
-	</thead>
-	<tbody>
-		{% if position and position.transactions %}
-			{% set totalAmount = position.amount %}
-			{% set currentAmount = totalAmount %}
-			{% set oldAmount = totalAmount %}
-			{% for transaction in position.transactions %}
-				{% set side = (transaction.side == 1 ? 'Buy' : 'Sell') %}
-				{% set currentAmount = oldAmount %}
-				{% if transaction.side == 1 %}
-					{% set oldAmount = oldAmount - transaction.amount %}
-					{% set dividendYield = (netYearlyDividend / transaction.price) * 100 %}
-				{% else %}
-					{% set oldAmount = oldAmount + transaction.amount %}
-					{% set dividendYield = 0 %}
-				{% endif %}
-				<tr>
-					<td>{{ transaction.jobid }}</td>
-					<td>
-						<span class="badge badge-{% if transaction.side == 1 %}success{% else %}danger{% endif %}">
-							{{ side }}
-						</span>
-					</td>
-					<td>{{ transaction.transactionDate|date("d-m-Y") }}</td>
-					<td>{{ transaction.amount|format_number({fraction_digit: 7}) }}</td>
-					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ transaction.price|format_number({fraction_digit: 2}) }}</td>
-					<td>{{ currentAmount }} @ {{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ transaction.avgprice|format_number({fraction_digit: 2}) }}</td>
-					<td>{{ (transaction.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ transaction.allocation|format_number({fraction_digit: 2}) }}</td>
-					<td>&euro;{{ (transaction.stampduty + transaction.fxFee + transaction.finraFee + transaction.transactionFee)|format_number({fraction_digit: 2}) }}</td>
-					<td>&euro;{{ transaction.netOrderValue|format_number({fraction_digit: 2}) }}</td>
-					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}
-						<span class="badge badge-{% if transaction.profit > 0 %}success{% else %}danger{% endif %}">
-						{{ transaction.profit|format_number({fraction_digit: 2}) }}
-						</span>
-					</td>
-					<td>{% if transaction.side == 1 %}{{ dividendYield|format_number({fraction_digit: 2}) }}% {% endif %}</td>
-					<td>
-						{% set transactionInfo %}
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>{{ 'Side'|trans }}</th>
+				<th>{{ 'Order date'|trans }}</th>
+				<th>{{ 'Amount'|trans }}</th>
+				<th>{{ 'Price'|trans }}</th>
+				<th>{{ 'avgPrice'|trans }}</th>
+				<th>{{ 'Allocation'|trans }}</th>
+				<th>{{ 'Total costs'|trans }}</th>
+				<th>{{ 'Net order value'|trans }}</th>
+				<th>{{ 'Profit / Loss'|trans }}</th>
+				<th>{{ 'Dividend yield'|trans }}</th>
+				<th>{{ 'Actions'|trans }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% if position and position.transactions %}
+				{% set totalAmount = position.amount %}
+				{% set currentAmount = totalAmount %}
+				{% set oldAmount = totalAmount %}
+				{% for transaction in position.transactions %}
+					{% set side = (transaction.side == 1 ? 'Buy' : 'Sell') %}
+					{% set currentAmount = oldAmount %}
+					{% if transaction.side == 1 %}
+						{% set oldAmount = oldAmount - transaction.amount %}
+						{% set dividendYield = (netYearlyDividend / transaction.price) * 100 %}
+					{% else %}
+						{% set oldAmount = oldAmount + transaction.amount %}
+						{% set dividendYield = 0 %}
+					{% endif %}
+					<tr>
+						<td>{{ transaction.jobid ?: '' }}</td>
+						<td>
+							<span class="badge badge-{% if transaction.side == 1 %}success{% else %}danger{% endif %}">
+								{{ side }}
+							</span>
+						</td>
+						<td>{{ transaction.transactionDate|date("d-m-Y") }}</td>
+						<td>{{ transaction.amount|format_number({fraction_digit: 7}) }}</td>
+						<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ transaction.price|format_number({fraction_digit: 2}) }}</td>
+						<td>{{ currentAmount }}
+							@
+							{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ transaction.avgprice|format_number({fraction_digit: 2}) }}</td>
+						<td>{{ (transaction.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ transaction.allocation|format_number({fraction_digit: 2}) }}</td>
+						<td>&euro;{{ (transaction.stampduty + transaction.fxFee + transaction.finraFee + transaction.transactionFee)|format_number({fraction_digit: 2}) }}</td>
+						<td>&euro;{{ transaction.netOrderValue|format_number({fraction_digit: 2}) }}</td>
+						<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}
+							<span class="badge badge-{% if transaction.profit > 0 %}success{% else %}danger{% endif %}">
+								{{ transaction.profit|format_number({fraction_digit: 2}) }}
+							</span>
+						</td>
+						<td>
+							{% if transaction.side == 1 %}
+								{{ dividendYield|format_number({fraction_digit: 2}) }}%
+							{% endif %}
+						</td>
+						<td>
+							{% set transactionInfo %}
 							<ul class="list-group">
-								<li class="list-group-item">{{ 'Pie'|trans }}: {{ transaction.pie ? transaction.pie.label : '-' }}</li>
+								<li class="list-group-item">{{ 'Pie'|trans }}:
+									{{ transaction.pie ? transaction.pie.label : '-' }}</li>
 								<li class="list-group-item">{{ 'Original price'|trans }}: &euro;{{ transaction.originalPrice }}</li>
 								<li class="list-group-item">{{ 'Stamduty'|trans }}: &euro;{{ transaction.stampduty }}</li>
 								<li class="list-group-item">{{ 'fx fee'|trans }}: &euro;{{ transaction.fxFee }}</li>
-								<li class="list-group-item">{{ 'Exchange rate'|trans }}: {{ transaction.exchangeRate }}</li>
-								<li class="list-group-item">{{ 'Import file'|trans }}: {{ transaction.importfile }}</li>
+								<li class="list-group-item">{{ 'Exchange rate'|trans }}:
+									{{ transaction.exchangeRate }}</li>
+								<li class="list-group-item">{{ 'Import file'|trans }}:
+									{{ transaction.importfile }}</li>
 							</ul>
-						{% endset %}
+							{% endset %}
 
-						<div class="btn-group" role="group" aria-label="Actions">
+							<div class="btn-group" role="group" aria-label="Actions">
 								<a href="{{ path('transaction_edit', {'id': transaction.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="{{ 'Edit order'|trans }}">
 									<i class="far fa-edit"></i>
 								</a>
-								<button class="btn btn-info" data-toggle="popover" data-placement="right" title="{{ 'Order info'|trans }}"
-                    					data-content='{{ transactionInfo }}' data-html="true">
-										<i class="fas fa-info-circle"></i>
+								<button class="btn btn-info" data-toggle="popover" data-placement="right" title="{{ 'Order info'|trans }}" data-content='{{ transactionInfo }}' data-html="true">
+									<i class="fas fa-info-circle"></i>
 								</button>
-						</div>
-					</td>
-				</tr>
-			{% endfor %}
+							</div>
+						</td>
+					</tr>
+				{% endfor %}
 
-		{% else %}
-			<tr>
-				<td colspan="7">no records found</td>
-			</tr>
-		{% endif %}
-	</tbody>
-</table>
+			{% else %}
+				<tr>
+					<td colspan="7">no records found</td>
+				</tr>
+			{% endif %}
+		</tbody>
+	</table>
 </div>
