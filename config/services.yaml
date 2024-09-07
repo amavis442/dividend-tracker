@@ -40,6 +40,9 @@ services:
         arguments:
             $entityManager: "@doctrine.orm.entity_manager"
 
+    App\Service\ExchangeRate\EuExchangeRateService: ~
+    App\Service\ExchangeRate\ExchangeRateInterface: '@App\Service\ExchangeRate\EuExchangeRateService'
+
     App\Service\ExchangeRate\ExchangeRateService:
         arguments:
             $client: "@http_client"

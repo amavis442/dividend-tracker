@@ -8,7 +8,7 @@ use App\Form\TransactionType;
 use App\Model\PortfolioModel;
 use App\Repository\CurrencyRepository;
 use App\Repository\TransactionRepository;
-use App\Service\ExchangeRate\ExchangeRateService;
+use App\Service\ExchangeRate\ExchangeRateInterface;
 use App\Service\Referer;
 use App\Service\WeightedAverage;
 use DateTime;
@@ -60,15 +60,6 @@ class TransactionController extends AbstractController
 
     private function presetMetrics(Transaction $transaction)
     {
-        /*if ($transaction->getAllocation() && empty($transaction->getPrice())) {
-            $transaction->setPrice($transaction->getOriginalPrice() / (float)$transaction->getExchangeRate());
-            $transaction->setCurrency($transaction->getAllocationCurrency());
-        }
-        if ($transaction->getPrice() && empty($transaction->getAllocation())) {
-            $transaction->setAllocation($transaction->getTotal());
-            $transaction->setAllocationCurrency($transaction->getCurrency());
-        }*/
-
         $transaction->setPrice($transaction->getOriginalPrice() / $transaction->getExchangeRate());
         $transaction->setCurrency($transaction->getAllocationCurrency());
         $transaction->setAllocation($transaction->getTotal());
@@ -84,15 +75,15 @@ class TransactionController extends AbstractController
         CurrencyRepository $currencyRepository,
         WeightedAverage $weightedAverage,
         Referer $referer,
-        ExchangeRateService $exchangeRateService
+        ExchangeRateInterface $euExchangeRateService
     ): Response {
         $transaction = new Transaction();
         $currentDate = new DateTime();
         $transaction->setTransactionDate($currentDate);
-        $transaction->setSide($side);
+        //$transaction->setSide($side);
         $transaction->setPosition($position);
 
-        $rates = $exchangeRateService->getRates();
+        $rates = $euExchangeRateService->getRates();
 
         $transaction->setExchangeRate($rates['USD']);
 
@@ -221,81 +212,4 @@ class TransactionController extends AbstractController
 
         return $this->redirectToRoute('transaction_index', ['orderBy' => 'transactionDate', 'sort' => 'desc']);
     }
-
-    /* TODO! Need to rewrite export csv function
-    #[Route(path: '/export/{position}', name: 'transaction_export', methods: ['GET'])]
-    public function export(Position $position): Response
-    {
-        $transactions = $position->getTransactions();
-        $tickerLabel = $position->getTicker()->getSymbol();
-        $tickerName = $position->getTicker()->getFullname();
-        $tickerIsin = $position->getTicker()->getIsin();
-
-        $fname = 'export-' . $tickerLabel . '-orders-' . date('Ymd') . '.csv';
-        $filename = '/tmp/' . $fname;
-        $writer = WriterEntityFactory::createCSVWriter();
-        $writer->setFieldDelimiter(';');
-        $writer->setShouldAddBOM(false);
-        $writer->openToFile($filename);
-
-        $headers = [];
-        $headers[] = 'Datum';
-        $headers[] = 'Tijd';
-        $headers[] = 'Type';
-        $headers[] = 'Waarde';
-        $headers[] = 'Transactievaluta';
-        $headers[] = 'Brutobedrag';
-        $headers[] = 'Valuta brutobedrag';
-        $headers[] = 'Wisselkoers';
-        $headers[] = 'Kosten';
-        $headers[] = 'Belastingen';
-        $headers[] = 'Aandelen';
-        $headers[] = 'ISIN';
-        $headers[] = 'Tickersymbool';
-        $headers[] = 'Naam effect';
-
-        $headersFromValues = WriterEntityFactory::createRowFromArray(array_values($headers));
-        $writer->addRow($headersFromValues);
-
-        $row = [];
-        foreach ($transactions as $transaction) {
-            $row = [];
-            $costs = $transaction->getFxFee() + $transaction->getStampduty() + $transaction->getFinrafee();
-            $total = $transaction->getTotal();
-            $row['Datum'] = $transaction->getTransactionDate()->format('Y-m-d');
-            $row['Tijd'] = $transaction->getTransactionDate()->format('H:i:s');
-            $row['Type'] = $transaction->getSide() == Transaction::BUY ? 'Koop' : 'Verkoop';
-
-            $grossValue = $transaction->getAmount() * $transaction->getOriginalPrice();
-            $exchangerate = $transaction->getExchangeRate();
-            $row['Waarde'] = number_format($total, 2, ',', '.');
-            $row['Transactievaluta'] = 'EUR';
-            $row['Brutobedrag'] = number_format($grossValue, 2, ',', '.');
-
-            $exchangerate = $transaction->getExchangeRate();
-            $currency = $transaction->getOriginalPriceCurrency();
-            $row['Valuta brutobedrag'] = $currency ?? 'USD';
-            $row['Wisselkoers'] = number_format($exchangerate, 8, ',', '.');
-            $row['Kosten'] = number_format($costs, 2, ',', '.');
-            $row['Belastingen'] = 0;
-            $row['Aandelen'] = number_format($transaction->getAmount(), 8, ',', '.');
-            $row['ISIN'] = $tickerIsin;
-            $row['Tickersymbool'] = $tickerLabel;
-            $row['Naam effect'] = $tickerName;
-
-            $rowFromValues = WriterEntityFactory::createRowFromArray(array_values($row));
-            $writer->addRow($rowFromValues);
-        }
-        $writer->close();
-
-        $response = new BinaryFileResponse($filename);
-        $disposition = HeaderUtils::makeDisposition(
-            HeaderUtils::DISPOSITION_ATTACHMENT,
-            $fname
-        );
-        $response->headers->set('Content-Disposition', $disposition);
-
-        return $response;
-    }
-    */
 }

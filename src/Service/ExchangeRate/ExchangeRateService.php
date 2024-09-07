@@ -2,8 +2,6 @@
 
 namespace App\Service\ExchangeRate;
 
-use DOMDocument;
-use DOMXPath;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
