@@ -60,9 +60,13 @@ class TransactionController extends AbstractController
 
     private function presetMetrics(Transaction $transaction)
     {
-        $transaction->setPrice($transaction->getOriginalPrice() / $transaction->getExchangeRate());
+        if ($transaction->getOriginalPrice() > 0) {
+            $transaction->setPrice($transaction->getOriginalPrice() / $transaction->getExchangeRate());
+        }
+        $transaction->setAllocation($transaction->getPrice() * $transaction->getAmount());
+        $transaction->setTotal($transaction->getPrice() * $transaction->getAmount());
         $transaction->setCurrency($transaction->getAllocationCurrency());
-        $transaction->setAllocation($transaction->getTotal());
+
         $transaction->setAllocationCurrency($transaction->getCurrency());
     }
 
@@ -164,8 +168,8 @@ class TransactionController extends AbstractController
                 $position->setClosed(true);
                 $position->setClosedAt((new DateTime()));
             }
-
             $entityManager->flush();
+
             $request->getSession()->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getSymbol());
 
             PortfolioModel::clearCache();
