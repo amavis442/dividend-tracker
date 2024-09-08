@@ -299,21 +299,6 @@ class ImportCsvService extends ImportBase
             };
 
             if (count($row) > 0) {
-                $orderValue = $row['total'];
-                $stockValue = $orderValue - (($row['fx_fee'] ?? 0) + ($row['stampduty'] ?? 0) + ($row['transaction_fee'] ?? 0) + ($row['finra_fee'] ?? 0));
-
-                $row['allocation'] = $stockValue;
-
-                try {
-                    if ($row['exchange_rate'] == 0 || $row['original_price'] == 0) {
-                        continue; // Some conversion has happend that you get 1 share for another which is crap.
-                    } else {
-                        $row['price'] = round($row['original_price'] / $row['exchange_rate'], 3);
-                    }
-                } catch (\Exception $e) {
-                    throw new RuntimeException($e->getMessage() . ':: ' . print_r($csvRow, true), 0, $e);
-                }
-
                 $rows[$row['nr']] = $row;
             }
             $rowNum++;
@@ -371,11 +356,13 @@ class ImportCsvService extends ImportBase
                     $position = $this->preImportCheckPosition($entityManager, $ticker, $defaultCurrency, $positionRepository, $security, $row);
                     $uuid = Uuid::v4();
 
+                    $originalPriceCurrency = $currencyRepository->findOneBy(['symbol' => $row['original_price_currency']]);
+
                     $transaction = new Transaction();
                     $transaction
                         ->setSide($row['direction'])
-                        ->setPrice($row['price'])
-                        ->setAllocation($row['allocation'])
+                        //->setPrice($row['price'])
+                        //->setAllocation($row['allocation'])
                         ->setAmount($row['amount'])
                         ->setTransactionDate($row['transactionDate'])
                         ->setAllocationCurrency($defaultCurrency)
@@ -396,6 +383,11 @@ class ImportCsvService extends ImportBase
                         ->setProfit(0.0)
                         ->setUuid($uuid)
                     ;
+
+                    $transaction->calcAllocation();
+                    $transaction->calcPrice();
+                    $transaction->setCurrencyOriginalPrice($originalPriceCurrency);
+
 
                     $pies = $position->getPies();
                     if (count($pies) == 1) {

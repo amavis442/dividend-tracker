@@ -60,15 +60,16 @@ class TransactionController extends AbstractController
 
     private function presetMetrics(Transaction $transaction)
     {
-        if ($transaction->getOriginalPrice() > 0) {
-            $transaction->setPrice($transaction->getOriginalPrice() / $transaction->getExchangeRate());
-        }
-        $transaction->setAllocation($transaction->getPrice() * $transaction->getAmount());
-        $transaction->setTotal($transaction->getPrice() * $transaction->getAmount());
+        $transaction->calcAllocation();
+        $transaction->calcPrice();
+        $transaction->setOriginalPriceCurrency($transaction->getCurrencyOriginalPrice()->getSymbol());
         $transaction->setCurrency($transaction->getAllocationCurrency());
 
-        $transaction->setAllocationCurrency($transaction->getCurrency());
+        if ($transaction->getSide() == Transaction::BUY) {
+            $transaction->setProfit(0.0);
+        }
     }
+
 
     #[Route(path: '/create/{position}/{side?1}', name: 'transaction_new', methods: ['GET', 'POST'])]
     public function create(
@@ -84,7 +85,6 @@ class TransactionController extends AbstractController
         $transaction = new Transaction();
         $currentDate = new DateTime();
         $transaction->setTransactionDate($currentDate);
-        //$transaction->setSide($side);
         $transaction->setPosition($position);
 
         $rates = $euExchangeRateService->getRates();
@@ -98,6 +98,8 @@ class TransactionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->presetMetrics($transaction);
+            $transaction->setJobid(Transaction::MANUAL_ENTRY);
+            $transaction->setImportfile(Transaction::MANUAL_ENTRY);
             if ($transaction->getSide() === Transaction::BUY) {
                 $transaction->setTotal($transaction->getAllocation() + $transaction->getTransactionFee());
             }
@@ -155,8 +157,17 @@ class TransactionController extends AbstractController
         EntityManagerInterface $entityManager,
         Transaction $transaction,
         WeightedAverage $weightedAverage,
-        Referer $referer
+        Referer $referer,
+        CurrencyRepository $currencyRepository
     ): Response {
+        if ($transaction->getCurrencyOriginalPrice() == null) {
+            $currencyRepository->findOneBy(['symbol' => $transaction->getOriginalPriceCurrency()]);
+        }
+        if ($transaction->getUuid() == null) {
+            $uuid = Uuid::v4();
+            $transaction->setUuid($uuid);
+        }
+
         $form = $this->createForm(TransactionType::class, $transaction);
         $form->handleRequest($request);
 

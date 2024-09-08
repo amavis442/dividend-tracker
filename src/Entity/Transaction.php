@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use DateTimeInterface;
 use DateTime;
+use RuntimeException;
 
 //use Doctrine\ORM\Mapping\Index;
 #[ORM\Table]
@@ -20,6 +21,7 @@ class Transaction
     public const SELL = 2;
     public const AMOUNT_DIGITS = 7;
     public const AMOUNT_MULTIPLE = 10000000;
+    public const MANUAL_ENTRY = 'Manuel entry';
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
@@ -157,18 +159,21 @@ class Transaction
     #[ORM\ManyToOne(targetEntity: Pie::class, inversedBy: 'transactions')]
     private $pie;
 
+    #[ORM\ManyToOne]
+    private ?Currency $currencyOriginalPrice = null;
+
     #[Assert\Callback]
     public function validate(ExecutionContextInterface $context, $payload)
     {
-        if (empty($this->getPrice()) && empty($this->getAllocation())) {
-            $context->buildViolation('Price and/or allocation should be filled!')
-                ->atPath('price')
+        if (empty($this->getOriginalPrice()) && empty($this->getTotal())) {
+            $context->buildViolation('Original Price and/or total should be filled!')
+                ->atPath('originalPrice')
                 ->addViolation();
         }
 
-        if (empty($this->amount) || $this->amount == 0) {
-            $context->buildViolation('Amount can not be empty or zero!')
-                ->atPath('amount')
+        if (empty($this->total) || $this->total == 0) {
+            $context->buildViolation('Total can not be empty or zero!')
+                ->atPath('total')
                 ->addViolation();
         }
     }
@@ -266,6 +271,7 @@ class Transaction
     public function setAllocation(?float $allocation): self
     {
         $this->allocation = $allocation;
+
         return $this;
     }
 
@@ -476,6 +482,9 @@ class Transaction
     {
         $this->total = $total;
 
+        //$totalCosts = $this->fx_fee + $this->stampduty + $this->transactionFee + $this->finraFee;
+        //$this->allocation = $this->total - $totalCosts;
+
         return $this;
     }
 
@@ -504,6 +513,37 @@ class Transaction
     public function setUuid(?string $uuid): static
     {
         $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    public function calcAllocation(): void
+    {
+        if ($this->total == 0.0) {
+            throw new RuntimeException("Only use this function when total has been set.");
+        }
+
+        $totalCosts = $this->fx_fee + $this->stampduty + $this->transactionFee + $this->finraFee;
+        $this->allocation = $this->total - $totalCosts;
+    }
+
+    public function calcPrice(): void
+    {
+        if ($this->originalPrice == 0.0 || $this->exchangeRate == 0.0) {
+            throw new RuntimeException("Only call this function when both original price and exchange rate are set");
+        }
+
+        $this->price = round($this->originalPrice / $this->exchangeRate, 3);
+    }
+
+    public function getCurrencyOriginalPrice(): ?Currency
+    {
+        return $this->currencyOriginalPrice;
+    }
+
+    public function setCurrencyOriginalPrice(?Currency $currencyOriginalPrice): static
+    {
+        $this->currencyOriginalPrice = $currencyOriginalPrice;
 
         return $this;
     }
