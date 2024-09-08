@@ -166,7 +166,7 @@ class Payment
         return $this;
     }
 
-    public function getCurrency(): Currency
+    public function getCurrency(): ?Currency
     {
         return $this->currency;
     }
