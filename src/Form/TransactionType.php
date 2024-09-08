@@ -5,10 +5,10 @@ namespace App\Form;
 use App\Entity\Currency;
 use App\Entity\Pie;
 use App\Entity\Transaction;
-use Doctrine\DBAL\Types\TextType;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -36,25 +36,18 @@ class TransactionType extends AbstractType
                     'Sell' => Transaction::SELL,
                 ],
             ])
-            ->add('price', NumberType::class, [
-                'label' => 'Price',
-                'required' => false,
-                'help' => 'What was the stock price and not what you paid',
-                'input' => 'number',
-                'scale' => 3,
-            ])
-            ->add('currency', EntityType::class, [
+            ->add('currency_original_price', EntityType::class, [
                 'class' => Currency::class,
                 'choice_label' => function ($currency) {
                     return $currency->getSymbol();
                 },
                 'required' => true,
-                'empty_data' => 'EUR',
+                'empty_data' => 'USD'
             ])
-            ->add('allocation', NumberType::class, [
-                'label' => 'Allocation',
+            ->add('original_price', NumberType::class, [
+                'label' => 'Original Price',
                 'required' => false,
-                'help' => 'What was what you paid in total for this transaction',
+                'help' => 'Original price before fx',
                 'input' => 'number',
                 'scale' => 3,
             ])
@@ -65,6 +58,12 @@ class TransactionType extends AbstractType
                 },
                 'required' => true,
                 'empty_data' => 'EUR',
+            ])
+            ->add('total', NumberType::class, [
+                'help' => 'Total transaction cost (all fees + price * amount)',
+                'label' => 'Total',
+                'input' => 'number',
+                'scale' => 7,
             ])
             ->add(
                 'exchangerate',
@@ -84,6 +83,29 @@ class TransactionType extends AbstractType
                 'input' => 'number',
                 'scale' => 2,
             ])
+            ->add('fx_fee', NumberType::class, [
+                'label' => 'Forex fee',
+                'required' => false,
+                'help' => 'forex',
+                'input' => 'number',
+                'scale' => 2,
+            ])
+            ->add('stampduty', NumberType::class, [
+                'label' => 'Stampduty',
+                'required' => false,
+                'help' => 'forex',
+                'input' => 'number',
+                'scale' => 2,
+            ])
+            ->add('finra_fee', NumberType::class, [
+                'label' => 'Finra fee',
+                'required' => false,
+                'help' => 'forex',
+                'input' => 'number',
+                'scale' => 2,
+            ])
+
+
             ->add('pie', EntityType::class, [
                 'class' => Pie::class,
                 'label' => 'Pie',

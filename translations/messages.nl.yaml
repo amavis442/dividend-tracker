@@ -293,3 +293,12 @@ Can not remove calendar because it has payments linked to it.: Er is een uitkeri
 back: terug
 Ticker is connected to open positions: Ticker heeft gekoppelde posities. Ontkoppel deze eerst.
 "tickerSymbol:: Exchange rate for [Symbol] is currently unavailable. Available are: jsonSymbol": "tickerSymbol:: Wisselkoers voor [Symbol] is momenteel niet beschikbaar. Beschikbaar is: jsonSymbol"
+Original Price: Originele prijs
+Original price before fx: Originele prijs voor koers aanpassing
+Original price currency: Valuta originele prijs
+Forex fee: Forex tarief
+forex: wisselkoers
+Stampduty: Zegelrecht
+Finra fee: Finra tarief
+Total transaction cost (all fees + price * amount): Totale transactie kosten (alle onkosten + prijs * aantal aandelen)
+Fees: Tarieven
