@@ -68,6 +68,16 @@ set('use_nvm', function () {
 });
 
 // Tasks
+desc('Dumps composer autoloader');
+task("composer:dump", function () {
+    run('cd ' . get('release_path') . " && composer dump-autoload --no-dev --classmap-authoritative");
+});
+
+desc('Migrates the database and install the assets');
+task('deploy:migrate_db_dividend', [
+    'database:migrate'
+]);
+
 desc('NPM install'); // For encore and stuff
 task('npm:install', function () {
     run('{{use_nvm}} && cd ' . get('release_path') . ' && npm ci');
@@ -78,24 +88,8 @@ task('npm:build', function () {
     run('{{use_nvm}} && cd ' . get('release_path') . ' && npm run build');
 });
 
-
-desc('Runs npm, migrates the database and install the assets');
-task('deploy:dividend', [
-    'database:migrate'
-]);
-
-task("composer:dump", function () {
-    run('cd ' . get('release_path') . " && composer dump-autoload --no-dev --classmap-authoritative");
-});
-
-after('deploy:update_code', 'npm:install');
-after('npm:install', 'npm:build');
-after('deploy:vendors', 'deploy:dividend');
-after('deploy:dividend', 'composer:dump');
-
 option('source', null, InputOption::VALUE_OPTIONAL, 'Source alias of the current task.');
 option('target', null, InputOption::VALUE_OPTIONAL, 'Target alias of the current task.');
-
 task('upload:file', function () {
     /*
      * Usage: dep upload:file --source="some_destination/file.txt" --target="some_destination/" host
@@ -115,3 +109,10 @@ task('upload:file', function () {
         upload('/< some place >' . $source, '{{release_path}}/' . $target);
     }
 });
+
+
+after('deploy:update_code', 'deploy:vendors');
+after('deploy:vendors', 'composer:dump');
+after('composer:dump', 'deploy:migrate_db_dividend');
+after('deploy:migrate_db_dividend', 'npm:install');
+after('npm:install', 'npm:build');
