@@ -111,8 +111,7 @@ task('upload:file', function () {
 });
 
 
-after('deploy:update_code', 'deploy:vendors');
-after('deploy:vendors', 'composer:dump');
-after('composer:dump', 'deploy:migrate_db_dividend');
+after('deploy:cache:clear', 'deploy:migrate_db_dividend');
 after('deploy:migrate_db_dividend', 'npm:install');
 after('npm:install', 'npm:build');
+after('npm:build', 'composer:dump');
