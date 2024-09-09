@@ -30,7 +30,7 @@ class ResearchController extends AbstractController
         string $orderBy = 'id',
         string $sort = 'asc'
     ): Response {
-        if (!in_array($orderBy, ['id', 'ticker'])) {
+        if (!in_array($orderBy, ['id', 'symbol'])) {
             $orderBy = 'id';
         }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {

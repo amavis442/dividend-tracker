@@ -22,7 +22,7 @@
 					<a href="{{ path('transaction_index', { page: thisPage ? thisPage : 1, orderBy: 'transactionDate', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">Transaction date</a>
 				</th>
 				<th>
-					<a href="{{ path('transaction_index', { page: thisPage ? thisPage : 1, orderBy: 'ticker', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">Ticker</a>
+					<a href="{{ path('transaction_index', { page: thisPage ? thisPage : 1, orderBy: 'symbol', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">Ticker</a>
 				</th>
 				<th>Industry</th>
 				<th>Units</th>
@@ -40,7 +40,7 @@
 					<td>
 						<span class="badge badge-{% if transaction.side == 1 %}
 								
-								              {% endif %}">
+																              {% endif %}">
 							{{ side }}
 						</span>
 					</td>

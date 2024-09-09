@@ -3,65 +3,87 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Rector\Core\Exception\DeprecatedException;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
+#[ApiResource(
+    normalizationContext: ['groups' => ['ticker:read', 'ticker:read:item']],
+    denormalizationContext: ['groups' => ['ticker:write']],
+    security: 'is_granted("ROLE_USER")',
+    operations: [
+        new Get(),
+        new GetCollection()
+    ]
+)]
 #[ORM\Entity(repositoryClass: 'App\Repository\TickerRepository')]
 #[UniqueEntity('isin')]
 class Ticker
 {
-    #[ApiProperty(identifier: false)]
+    //#[ApiProperty(identifier: false)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-
+    #[Groups(['ticker:read', 'ticker:write'])]
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
     private $symbol;
 
+    #[Groups(['ticker:read', 'ticker:write'])]
     #[ORM\Column(type: 'string', length: 255)]
     private $fullname;
 
+    #[Groups(['ticker:read', 'ticker:write'])]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Branch', inversedBy: 'tickers')]
     #[ORM\JoinColumn(nullable: false)]
     private $branch;
 
+    //#[Groups(['ticker:read', 'ticker:write'])]
     #[ORM\OneToMany(targetEntity: 'App\Entity\Calendar', mappedBy: 'ticker')]
     #[ORM\OrderBy(['paymentDate' => 'DESC'])]
     private $calendars;
 
+    //#[Groups(['ticker:read', 'ticker:write'])]
     #[ORM\OneToMany(targetEntity: 'App\Entity\Research', mappedBy: 'ticker')]
     private $researches;
 
+    //#[Groups(['ticker:read', 'ticker:write'])]
     #[ORM\OneToMany(targetEntity: 'App\Entity\Payment', mappedBy: 'ticker')]
     #[ORM\OrderBy(['payDate' => 'DESC'])]
     private $payments;
 
+    #[Groups(['ticker:read', 'ticker:write'])]
     #[ORM\OneToMany(targetEntity: 'App\Entity\Position', mappedBy: 'ticker')]
     #[ORM\OrderBy(['id' => 'DESC'])]
     private $positions;
 
+    //#[Groups(['ticker:read', 'ticker:write'])]
     #[ORM\ManyToMany(targetEntity: 'App\Entity\DividendMonth', inversedBy: 'tickers', indexBy: 'dividendMonth')]
     private $dividendMonths;
 
+    #[Groups(['ticker:read', 'ticker:write'])]
     #[Assert\Isin]
-    #[ApiProperty(identifier: true)]
+    //#[ApiProperty(identifier: true)]
     #[ORM\Column(type: 'string', length: 255, nullable: false, unique: true)]
     private $isin;
 
     #[ORM\ManyToOne(targetEntity: Tax::class, inversedBy: 'tickers')]
     private $tax;
 
+    #[Groups(['ticker:read', 'ticker:write'])]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     private $currency;
 
+    #[Groups(['ticker:read', 'ticker:write'])]
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
@@ -71,6 +93,7 @@ class Ticker
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updatedAt;
 
+    #[Groups(['ticker:read', 'ticker:write'])]
     #[ORM\Column(type: 'uuid', nullable: true)]
     private ?Uuid $uuid = null;
 
@@ -99,19 +122,6 @@ class Ticker
 
         return $this;
     }
-
-    public function setTicker(string $symbol): static
-    {
-        throw new DeprecatedException('Use setSymbol() instead');
-
-        return $this;
-    }
-
-    public function getTicker(): void
-    {
-        throw new DeprecatedException('Use getSymbol() instead');
-    }
-
 
     public function getFullname(): ?string
     {

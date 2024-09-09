@@ -2,9 +2,22 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource(
+    normalizationContext: ['groups' => ['attachment:read']],
+    denormalizationContext: ['groups' => ['attachment:write']],
+    security: 'is_granted("ROLE_USER")',
+    operations: [
+        new Get(),
+        new GetCollection()
+    ]
+)]
 #[ORM\Entity]
 class Attachment
 {
@@ -18,10 +31,11 @@ class Attachment
      */
     private ?UploadedFile $attachmentFile = null;
 
+    #[Groups('attachment:read', 'attachment:write', 'research:read:item')]
     #[ORM\Column(type: 'string')]
     private string $attachmentName;
 
-
+    #[Groups('attachment:read', 'attachment:write', 'research:read:item')]
     #[ORM\Column(type: 'bigint', nullable: true)]
     private ?int $attachmentSize = null;
 
@@ -34,6 +48,7 @@ class Attachment
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Research', inversedBy: 'attachments')]
     private $research;
 
+    #[Groups('attachment:read', 'attachment:write', 'research:read:item')]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $label = null;
 

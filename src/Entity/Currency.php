@@ -2,8 +2,21 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource(
+    normalizationContext: ['groups' => ['currency:read']],
+    denormalizationContext: ['groups' => ['currency:write']],
+    security: 'is_granted("ROLE_USER")',
+    operations: [
+        new Get(),
+        new GetCollection()
+    ]
+)]
 #[ORM\Entity(repositoryClass: 'App\Repository\CurrencyRepository')]
 class Currency
 {
@@ -12,12 +25,15 @@ class Currency
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     private ?int $id = null;
 
+    #[Groups(['currency:read', 'currency:write', 'ticker:read:item', 'position:read:item', 'transaction:read', 'calendar:read'])]
     #[ORM\Column(type: 'string', length: 10)]
     private $symbol;
 
+    #[Groups(['currency:read', 'currency:write', 'ticker:read:item', 'position:read:item', 'transaction:read', 'calendar:read'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $description;
 
+    #[Groups(['currency:read', 'currency:write', 'ticker:read:item', 'position:read:item', 'transaction:read', 'calendar:read'])]
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
     private $sign;
 

@@ -2,10 +2,23 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource(
+    normalizationContext: ['groups' => ['dividendmonth:read']],
+    denormalizationContext: ['groups' => ['dividendmonth:write']],
+    security: 'is_granted("ROLE_USER")',
+    operations: [
+        new Get(),
+        new GetCollection()
+    ]
+)]
 #[ORM\Entity(repositoryClass: 'App\Repository\DividendMonthRepository')]
 #[ORM\Index(columns: ['dividend_month'], name: 'dividend_month_idx')]
 class DividendMonth
@@ -15,7 +28,8 @@ class DividendMonth
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'integer', )]
+    #[Groups('dividendmonth:read', 'dividendmonth:write', 'ticker:read:item', 'position:read:item')]
+    #[ORM\Column(type: 'integer',)]
     private $dividendMonth;
 
     #[ORM\ManyToMany(targetEntity: 'App\Entity\Ticker', mappedBy: 'dividendMonths')]

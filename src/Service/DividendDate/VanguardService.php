@@ -30,11 +30,11 @@ class VanguardService implements DividendDatePluginInterface
         $this->client = $client;
     }
 
-    public function getData(string $ticker): ?array
+    public function getData(string $symbol): ?array
     {
         $url = '';
         $currency = 'USD';
-        switch ($ticker) {
+        switch ($symbol) {
             case 'VMID':
                 $portid = self::VMID_PORTID;
                 $currency = 'USD';

@@ -20,11 +20,11 @@ class ClosedPositionController extends AbstractController
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
         int $page = 1,
-        string $orderBy = 'ticker',
+        string $orderBy = 'symbol',
         string $sort = 'asc'
     ): Response {
-        if (!in_array($orderBy, ['profit', 'ticker'])) {
-            $orderBy = 'ticker';
+        if (!in_array($orderBy, ['profit', 'symbol'])) {
+            $orderBy = 'symbol';
         }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';

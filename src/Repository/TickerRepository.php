@@ -26,7 +26,7 @@ class TickerRepository extends ServiceEntityRepository
     public function getAll(
         int $page = 1,
         int $limit = 10,
-        string $orderBy = 'ticker',
+        string $orderBy = 'symbol',
         string $sort = 'ASC',
         string $search = ''
     ): Paginator {

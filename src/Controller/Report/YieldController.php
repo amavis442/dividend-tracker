@@ -21,7 +21,7 @@ class YieldController extends AbstractController
         PositionRepository $positionRepository,
         YieldsService $yields,
         DividendService $dividendService,
-        string $orderBy = 'ticker'
+        string $orderBy = 'symbol'
     ): Response {
         $result = $yields->yield($positionRepository, $dividendService, $orderBy);
 

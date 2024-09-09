@@ -173,7 +173,7 @@ class PortfolioModel
         if (in_array($orderBy, ['industry'])) {
             $order = 'i.label';
         }
-        if (in_array($orderBy, ['ticker', 'fullname'])) {
+        if (in_array($orderBy, ['symbol', 'fullname'])) {
             $order = 't.' . $orderBy;
         }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {

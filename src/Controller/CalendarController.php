@@ -32,7 +32,7 @@ class CalendarController extends AbstractController
         string $orderBy = 'paymentDate',
         string $sort = 'DESC'
     ): Response {
-        if (!in_array($orderBy, ['paymentDate', 'ticker', 'exDividendDate', 'createdAt'])) {
+        if (!in_array($orderBy, ['paymentDate', 'symbol', 'exDividendDate', 'createdAt'])) {
             $orderBy = 'paymentDate';
         }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {

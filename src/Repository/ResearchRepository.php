@@ -44,7 +44,7 @@ class ResearchRepository extends ServiceEntityRepository
         string $search = ''
     ): QueryBuilder {
         $order = 'r.' . $orderBy;
-        if ($orderBy === 'ticker') {
+        if ($orderBy === 'symbol') {
             $order = 't.symbol';
         }
 

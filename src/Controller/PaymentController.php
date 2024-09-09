@@ -36,7 +36,7 @@ class PaymentController extends AbstractController
         string $orderBy = 'payDate',
         string $sort = 'DESC'
     ): Response {
-        if (!in_array($orderBy, ['payDate', 'ticker'])) {
+        if (!in_array($orderBy, ['payDate', 'symbol'])) {
             $orderBy = 'exDividendDate';
         }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {

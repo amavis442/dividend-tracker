@@ -1,7 +1,11 @@
-div.header {
-    display: flex;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.purple {
+    background-color: #1B1022;
 }
 
-div.item {
-    flex: 1 1 0px;
+.book {
+    background-color: #D0B294;
 }

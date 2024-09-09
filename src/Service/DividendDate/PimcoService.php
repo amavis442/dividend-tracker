@@ -37,11 +37,11 @@ class PimcoService implements DividendDatePluginInterface
         $this->client = $client;
     }
 
-    public function getData(string $ticker): ?array
+    public function getData(string $symbol): ?array
     {
         $url = '';
         $currency = 'USD';
-        switch ($ticker) {
+        switch ($symbol) {
             case 'SSHY':
                 $url = self::SSHY_FEED;
                 $currency = 'USD';
@@ -65,7 +65,7 @@ class PimcoService implements DividendDatePluginInterface
         if ($response->getStatusCode() !== 200) {
             return null;
         }
-        $filename = '/tmp/' . $ticker . '.xlsx';
+        $filename = '/tmp/' . $symbol . '.xlsx';
 
         $content = $response->getContent(true);
         $items = [];
@@ -125,7 +125,6 @@ class PimcoService implements DividendDatePluginInterface
                                 //echo serialize($item);
                                 $items[] = $item;
                             }
-
                         }
                         break;
                     }

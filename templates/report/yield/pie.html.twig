@@ -13,7 +13,7 @@
 				<br/>
 				&euro;{{ totalNetYearlyDividend|format_number({fraction_digit: 2}) }}
 				/
-																			  	&euro;{{ allocated|format_number({fraction_digit: 2}) }}<br/>
+																							  	&euro;{{ allocated|format_number({fraction_digit: 2}) }}<br/>
 
 			</p>
 		</div>
@@ -53,7 +53,7 @@
 			<thead>
 				<tr>
 					<th scope="col">
-						<a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'ticker'}) }}">Ticker</a>
+						<a href="{{ path('report_dividend_yield_by_pie', {'orderBy': 'symbol'}) }}">Ticker</a>
 					</th>
 					<th scope="col">{{ 'Allocation'|trans }}</th>
 					<th scope="col">{{ 'avgPrice'|trans }}</th>

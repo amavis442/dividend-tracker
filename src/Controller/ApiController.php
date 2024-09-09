@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use App\DataProvider\StockPriceCollectionDataProvider;
 
-#[Route('/api')]
+
 class ApiController extends AbstractController
 {
   #[Route('/stock_prices/{stock}', name: 'api_stockprice')]

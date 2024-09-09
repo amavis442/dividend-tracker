@@ -1,6 +1,4 @@
 const Encore = require('@symfony/webpack-encore');
-const webpack = require('webpack');
-const ESLintPlugin = require('eslint-webpack-plugin');
 const path = require('path');
 
 // Manually configure the runtime environment if not already configured yet by the "encore" command.
@@ -9,74 +7,21 @@ if (!Encore.isRuntimeEnvironmentConfigured()) {
     Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
 }
 
-const myEslintOptions = {
-    extensions: [`js`, `jsx`, `ts`],
-    exclude: [`node_modules`],
-    fix: true,
-    emitError: true,
-    emitWarning: true,
-};
-
 Encore
     // directory where compiled assets will be stored
     .setOutputPath('public/build/')
     // public path used by the web server to access the output path
     .setPublicPath('/build')
-    // only needed for CDN's or sub-directory deploy
+    // only needed for CDN's or subdirectory deploy
     //.setManifestKeyPrefix('build/')
-    .autoProvidejQuery()
-
-    // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
-    //.enableStimulusBridge('./assets/controllers.json')
-
-    // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
-    .splitEntryChunks()
-
-    // will require an extra script tag for runtime.js
-    // but, you probably want this, unless you're building a single-page app
-    .enableSingleRuntimeChunk()
-    //.disableSingleRuntimeChunk()
-    .cleanupOutputBeforeBuild()
-    .enableBuildNotifications()
-    .enableSourceMaps(!Encore.isProduction())
-    // enables hashed filenames (e.g. app.abc123.css)
-    .enableVersioning(Encore.isProduction())
-
-    .configureBabel((config) => {
-        config.plugins.push('@babel/plugin-proposal-class-properties');
-        config.plugins.push('@babel/plugin-transform-runtime');
-    })
-
-    // enables @babel/preset-env polyfills
-    .configureBabelPresetEnv((config) => {
-        config.useBuiltIns = 'usage';
-        config.corejs = 3;
-    })
-
-    // enables Sass/SCSS support
-    .enableSassLoader()
-    .enableVueLoader(() => { }, { runtimeCompilerBuild: true })
-    // uncomment if you use TypeScript
-    .enableTypeScriptLoader()
-    .addAliases({
-        'jQuery': path.join(__dirname, 'node_modules/jquery/dist/jquery.js')
-    })
-    // uncomment to get integrity="..." attributes on your script & link tags
-    // requires WebpackEncoreBundle 1.4 or higher
-    .enableIntegrityHashes(Encore.isProduction())
 
     /*
      * ENTRY CONFIG
      *
-     * Add 1 entry for each "page" of your app
-     * (including one that's included on every page - e.g. "app")
-     *
      * Each entry will result in one JavaScript file (e.g. app.js)
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
-    //.enableReactPreset()
     .addEntry('app', './assets/app.js')
-    //.addEntry('webfonts', './assets/js/webfonts.js')
     .addEntry('fileupload', './assets/js/fileupload.js')
     .addEntry('piechart', './assets/js/piechart.js')
     .addEntry('barchart', './assets/js/barchart.js')
@@ -85,28 +30,75 @@ Encore
     .addEntry('summernote', './assets/js/summernote.js')
     .addEntry('stockprices', './assets/js/stockprices.js')
 
-    //.addEntry('svelteregistercontroller', './assets/svelte/register_controller.ts')
-    //.addEntry('svelterendercontroller', './assets/svelte/render_controller.ts')
+    // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
+    .splitEntryChunks()
 
+    // uncomment if you use React
+    .enableReactPreset()
 
-    .addPlugin(new webpack.DefinePlugin({
-        ENV_API_ENDPOINT: JSON.stringify(process.env.API_ENDPOINT),
-        __VUE_OPTIONS_API__: true,
-        __VUE_PROD_DEVTOOLS__: false,
-    }))
-    // enable ESLint
-    .addPlugin(new ESLintPlugin(myEslintOptions))
-    /*.addLoader({
-        enforce: 'pre',
-        test: /\.(js|vue)$/,
-        loader: 'eslint-webpack-plugin',
-        exclude: /node_modules/,
-        options: {
-            fix: true,
-            emitError: true,
-            emitWarning: true,
-        },
-    })*/
+    // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
+    .enableStimulusBridge('./assets/controllers.json')
+
+    // will require an extra script tag for runtime.js
+    // but, you probably want this, unless you're building a single-page app
+    .enableSingleRuntimeChunk()
+
+    /*
+     * FEATURE CONFIG
+     *
+     * Enable & configure other features below. For a full
+     * list of features, see:
+     * https://symfony.com/doc/current/frontend.html#adding-more-features
+     */
+    .cleanupOutputBeforeBuild()
+    .enableBuildNotifications()
+    .enableSourceMaps(!Encore.isProduction())
+    // enables hashed filenames (e.g. app.abc123.css)
+    .enableVersioning(Encore.isProduction())
+
+    // configure Babel
+    // .configureBabel((config) => {
+    //     config.plugins.push('@babel/a-babel-plugin');
+    // })
+
+    // enables and configure @babel/preset-env polyfills
+    .configureBabelPresetEnv((config) => {
+        config.useBuiltIns = 'usage';
+        config.corejs = '3.23';
+    })
+
+    // enables Sass/SCSS support
+    .enableSassLoader()
+
+    // uncomment if you use TypeScript
+    .enableTypeScriptLoader()
+
+    .enableVueLoader()
+    .configureDefinePlugin((options) => {
+        options.ENV_API_ENDPOINT = JSON.stringify(process.env.API_ENDPOINT);
+        options.__VUE_OPTIONS_API__ = false;
+        options.__VUE_PROD_DEVTOOLS__ = false;
+    })
+
+    // uncomment to get integrity="..." attributes on your script & link tags
+    // requires WebpackEncoreBundle 1.4 or higher
+    //.enableIntegrityHashes(Encore.isProduction())
+
+    // uncomment if you're having problems with a jQuery plugin
+    // uncomment if you use TypeScript
+    .addAliases({
+        'jQuery': path.join(__dirname, 'node_modules/jquery/dist/jquery.js')
+    })
+    .autoProvidejQuery()
+    .autoProvideVariables({
+        $: 'jquery',
+        jQuery: 'jquery',
+        'window.jQuery': 'jquery',
+    })
+
+    .enablePostCssLoader()
+
+    .autoProvideVariables()
     ;
 
-module.exports = Encore.getWebpackConfig()
+module.exports = Encore.getWebpackConfig();
