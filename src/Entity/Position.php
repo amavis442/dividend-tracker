@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -9,7 +12,17 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource(
+    normalizationContext: ['groups' => ['position:read', 'position:read:item']],
+    denormalizationContext: ['groups' => ['position:write']],
+    security: 'is_granted("ROLE_USER")',
+    operations: [
+        new Get(),
+        new GetCollection(),
+    ]
+)]
 #[ORM\Entity(repositoryClass: 'App\Repository\PositionRepository')]
 #[ORM\HasLifecycleCallbacks]
 class Position
@@ -22,6 +35,7 @@ class Position
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
+    #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -29,6 +43,7 @@ class Position
     )]
     private float $price = 0.0;
 
+    #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -36,13 +51,16 @@ class Position
     )]
     private float $amount = 0.0;
 
+    #[Groups(['position:read', 'position:write'])]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Ticker', inversedBy: 'positions')]
     #[ORM\JoinColumn(nullable: false)]
     private $ticker;
 
+    #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
     #[ORM\Column(type: 'boolean', nullable: false, options: ["default" => false])]
     private bool $closed = false;
 
+    #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -50,6 +68,7 @@ class Position
     )]
     private float $profit = 0.0;
 
+    #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -61,17 +80,21 @@ class Position
     #[ORM\JoinColumn(nullable: false)]
     private $user;
 
+    #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     #[ORM\JoinColumn(nullable: false)]
     private $currency;
 
+    #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     private $allocationCurrency;
 
+    #[Groups(['position:read', 'position:write'])]
     #[ORM\OneToMany(targetEntity: 'App\Entity\Transaction', mappedBy: 'position', orphanRemoval: true, cascade: ['persist'])]
     #[ORM\OrderBy(['transactionDate' => 'DESC'])]
     private $transactions;
 
+    #[Groups(['position:read', 'position:write'])]
     #[ORM\OneToMany(targetEntity: 'App\Entity\Payment', mappedBy: 'position')]
     #[ORM\OrderBy(['payDate' => 'DESC'])]
     private $payments;
@@ -82,6 +105,7 @@ class Position
     #[ORM\Column(type: 'datetime', name: 'updated_at', nullable: true)]
     private ?DateTime $updatedAt;
 
+    #[Groups(['position:read', 'position:write'])]
     #[ORM\JoinTable(name: 'pie_position')]
     #[ORM\JoinColumn(name: 'position_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'pie_id', referencedColumnName: 'id')]
@@ -89,18 +113,22 @@ class Position
     #[ORM\OrderBy(['label' => 'DESC'])]
     private $pies;
 
+    #[Groups(['position:read', 'position:write'])]
     #[ORM\Column(type: 'datetime', name: 'closed_at', nullable: true)]
     private ?DateTime $closedAt;
 
+    #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
     #[ORM\Column(type: 'float', nullable: true)]
     private ?float $dividendTreshold = 0.0;
 
     /**
      * What is the maximum allocation this position should be?
      */
+    #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $maxAllocation = 0;
 
+    #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
     #[ORM\Column(type: 'boolean', options: ["default" => false])]
     private bool $ignore_for_dividend = false;
 

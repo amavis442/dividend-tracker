@@ -24,7 +24,7 @@
 					<div class="col">
 						{{ form_label(form.original_price) }}
 						<div class="input-group mb-2">
-							<div class="input-group-prepend">{{ form_widget(form.currency_original_price) }}</div>
+							<div class="input-group-prepend">{{ form_widget(form.currency_original_price, {'attr': {'class': 'p-10'}}) }}</div>
 							<div class="form-group ">{{ form_widget(form.original_price, {'attr': {'class': 'w-50'}}) }}
 								{{ form_help(form.original_price) }}</div>
 						</div>

@@ -23,7 +23,7 @@ class NullService implements DividendDatePluginInterface
         $this->client = $client;
     }
 
-    public function getData(string $ticker): ?array
+    public function getData(string $symbol): ?array
     {
         return null;
     }

@@ -65,7 +65,7 @@ class BranchRepository extends ServiceEntityRepository
             $sectorAllocation = 0;
             foreach ($sector['tickers'] as $ticker) {
                 $positionData = [];
-                $positionData['positionSymbol'] = $ticker['ticker'];
+                $positionData['positionSymbol'] = $ticker['symbol'];
                 $positionData['positionLabel'] = $ticker['fullname'];
                 $positionData['positionAmount'] = 0;
                 $positionData['positionAllocation'] = 0;

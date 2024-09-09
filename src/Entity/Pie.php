@@ -2,11 +2,32 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Entity\Position;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource(
+    normalizationContext: ['groups' => ['pie:read']],
+    denormalizationContext: ['groups' => ['pie:write']],
+    security: 'is_granted("ROLE_USER")',
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(),
+        new Delete(),
+        new Put(),
+        new Patch()
+    ]
+)]
 #[ORM\Table(name: 'pie')]
 #[ORM\Entity(repositoryClass: 'App\Repository\PieRepository')]
 class Pie
@@ -16,6 +37,7 @@ class Pie
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
+    #[Groups('pie:read', 'pie:write', 'position:read:item', 'transaction:read:item')]
     #[ORM\Column(type: 'string', length: 255)]
     private $label;
 

@@ -2,8 +2,7 @@ security:
     password_hashers:
         # Use native password hasher, which auto-selects and migrates the best
         # possible hashing algorithm (starting from Symfony 5.3 this is "bcrypt")
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: "auto"
 
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
@@ -20,13 +19,18 @@ security:
             lazy: true
             provider: app_user_provider
             remember_me:
-                secret:   '%kernel.secret%'
+                secret: "%kernel.secret%"
                 lifetime: 604800 # 1 week in seconds
-                path:     /
+                path:
+                    /
                     # by default, the feature is enabled by checking a
                     # checkbox in the login form (see below), uncomment the
                     # following line to always enable it.
                     #always_remember_me: true
+            json_login:
+                check_path: app_login_json_result
+                username_path: email
+                password_path: password
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication
@@ -48,6 +52,10 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/login$, roles: PUBLIC_ACCESS }
+
+        - { path: ^/json/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/jsonlogin$, roles: PUBLIC_ACCESS }
+
         - { path: ^/admin, roles: ROLE_ADMIN }
         #- { path: ^/profile, roles: ROLE_USER }
         - { path: ^/dashboard, roles: ROLE_USER }

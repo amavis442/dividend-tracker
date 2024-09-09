@@ -26,7 +26,7 @@ class YieldByPieController extends AbstractController
         PieRepository $pieRepository,
         YieldsService $yields,
         DividendService $dividendService,
-        string $orderBy = 'ticker'
+        string $orderBy = 'symbol'
     ): Response {
 
         $pieSelected = $request->getSession()->get(self::YIELD_PIE_KEY, null);
@@ -34,7 +34,10 @@ class YieldByPieController extends AbstractController
         $pies = $pieRepository->findLinked();
 
         return $this->render('report/yield/pie.html.twig', array_merge($result, [
-            'controller_name' => 'ReportController', 'pies' => $pies, 'pieSelected' => $pieSelected]));
+            'controller_name' => 'ReportController',
+            'pies' => $pies,
+            'pieSelected' => $pieSelected
+        ]));
     }
 
     #[Route(path: '/pieyieldform', name: 'report_dividend_yield_by_pie_form', methods: ['POST'])]

@@ -2,13 +2,33 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Serializer\Filter\PropertyFilter;
+use App\State\UserPostProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource(
+    normalizationContext: ['groups' => ['user:read']],
+    denormalizationContext: ['groups' => ['user:write']],
+    security: 'is_granted("ROLE_USER")',
+    operations: [
+        new Post(
+            security: 'is_granted("PUBLIC_ACCESS")',
+            processor: UserPostProcessor::class
+        ),
+        new Get(),
+    ]
+)]
+#[ApiFilter(PropertyFilter::class)]
 #[ORM\Entity(repositoryClass: 'App\Repository\UserRepository')]
 #[ORM\Table("users")]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
@@ -21,18 +41,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
+    #[Groups(['user:read', 'user:write'])]
     #[ORM\Column(type: 'string', unique: true, nullable: true)]
     private ?string $apiToken = null;
 
+    #[Groups(['user:read', 'user:write'])]
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     private string $email;
 
     /**
      * @var string The hashed password
      */
+    #[Groups(['user:read', 'user:write'])]
     #[ORM\Column(type: 'string')]
     private string $password;
 
+    //#[Groups(['user:read', 'user:write'])]
     #[ORM\Column(type: 'json')]
     private $roles = [];
 

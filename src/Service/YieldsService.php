@@ -10,7 +10,7 @@ class YieldsService
     public function yield(
         PositionRepository $positionRepository,
         DividendService $dividendService,
-        string $orderBy = 'ticker',
+        string $orderBy = 'symbol',
         int $pieId = null
     ): array {
         $labels = [];
@@ -75,7 +75,7 @@ class YieldsService
             if ($orderBy === 'dividend') {
                 $orderKey = str_pad((string) ($dividendPerYear * 100), 10, '0', STR_PAD_LEFT) . $ticker->getSymbol();
             }
-            if ($orderBy === 'ticker') {
+            if ($orderBy === 'symbol') {
                 $orderKey = $ticker->getSymbol();
             }
             $dataSource[$orderKey] = [

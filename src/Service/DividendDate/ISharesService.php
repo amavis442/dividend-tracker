@@ -27,11 +27,11 @@ class ISharesService implements DividendDatePluginInterface
         $this->client = $client;
     }
 
-    public function getData(string $ticker): ?array
+    public function getData(string $symbol): ?array
     {
         $url = '';
         $currency = 'USD';
-        switch ($ticker) {
+        switch ($symbol) {
             case 'SEMB':
                 $url = self::SEMB_FEED;
                 break;

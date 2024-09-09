@@ -53,7 +53,7 @@ class ImportMail extends ImportBase
                                             break;
                                         case 2:
                                             [$ticker, $isin] = explode('/', $val);
-                                            $row['ticker'] = $ticker;
+                                            $row['symbol'] = $ticker;
                                             $row['isin'] = $isin;
                                             break;
                                         case 3:

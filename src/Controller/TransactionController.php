@@ -32,7 +32,7 @@ class TransactionController extends AbstractController
         string $orderBy = 'transactionDate',
         string $sort = 'desc'
     ): Response {
-        if (!in_array($orderBy, ['transactionDate', 'ticker'])) {
+        if (!in_array($orderBy, ['transactionDate', 'symbol'])) {
             $orderBy = 'transactionDate';
         }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {

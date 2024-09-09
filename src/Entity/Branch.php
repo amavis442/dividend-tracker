@@ -2,10 +2,23 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource(
+    normalizationContext: ['groups' => ['branch:read']],
+    denormalizationContext: ['groups' => ['branch:write']],
+    security: 'is_granted("ROLE_USER")',
+    operations: [
+        new Get(),
+        new GetCollection()
+    ]
+)]
 #[ORM\Entity(repositoryClass: 'App\Repository\BranchRepository')]
 class Branch
 {
@@ -14,21 +27,26 @@ class Branch
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     private ?int $id = null;
 
+    #[Groups('branch:read', 'branch:write', 'ticker:read:item')]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Branch', inversedBy: 'branches')]
     private $parent;
 
+    #[Groups('branch:read', 'branch:write', 'ticker:read:item')]
     #[ORM\OneToMany(targetEntity: 'App\Entity\Branch', mappedBy: 'parent')]
     private Collection $branches;
 
+    #[Groups(['branch:read', 'branch:write', 'ticker:read:item'])]
     #[ORM\Column(type: 'string', length: 255)]
     private string $label;
 
     #[ORM\OneToMany(targetEntity: 'App\Entity\Ticker', mappedBy: 'branch')]
     private Collection $tickers;
 
+    #[Groups('branch:read', 'branch:write', 'ticker:read:item')]
     #[ORM\Column(type: 'integer', nullable: true, name: 'asset_allocation')]
     private ?int $assetAllocation = 0;
 
+    #[Groups(['branch:read', 'branch:write', 'ticker:read:item'])]
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 

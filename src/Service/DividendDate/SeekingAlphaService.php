@@ -73,12 +73,11 @@ class SeekingAlphaService implements DividendDatePluginInterface
     /**
      * Get dividend data from site seekingalpha
      */
-    public function getData(string $ticker): ?array
+    public function getData(string $symbol): ?array
     {
         $tickerNextPayments = [];
-        $symbol = $ticker;
-        if (isset($this->translate[$ticker])) {
-            $symbol = $this->translate[$ticker];
+        if (isset($this->translate[$symbol])) {
+            $symbol = $this->translate[$symbol];
         }
 
         // Cache it

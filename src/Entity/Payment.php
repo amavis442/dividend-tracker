@@ -2,11 +2,24 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
+#[ApiResource(
+    normalizationContext: ['groups' => ['payment:read']],
+    denormalizationContext: ['groups' => ['payment:write']],
+    security: 'is_granted("ROLE_USER")',
+    operations: [
+        new Get(),
+        new GetCollection()
+    ]
+)]
 #[ORM\Entity(repositoryClass: 'App\Repository\PaymentRepository')]
 #[ORM\HasLifecycleCallbacks]
 class Payment
@@ -17,9 +30,11 @@ class Payment
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
+    #[Groups('payment:read', 'payment:write', 'position:read:item')]
     #[ORM\Column(type: 'datetime', name: 'pay_date')]
     private $payDate;
 
+    #[Groups('payment:read', 'payment:write', 'position:read:item')]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -41,6 +56,7 @@ class Payment
     #[ORM\JoinColumn(nullable: false)]
     private $user;
 
+    #[Groups('payment:read', 'payment:write', 'position:read:item')]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     #[ORM\JoinColumn(nullable: false)]
     private $currency;
@@ -49,6 +65,7 @@ class Payment
     #[ORM\JoinColumn(nullable: false)]
     private $position;
 
+    #[Groups('payment:read', 'payment:write', 'position:read:item')]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -62,6 +79,7 @@ class Payment
     #[ORM\Column(type: 'datetime', name: 'updated_at', nullable: true)]
     private $updatedAt;
 
+    #[Groups('payment:read', 'payment:write', 'position:read:item')]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -69,12 +87,15 @@ class Payment
     )]
     private $taxWithold = 0.0;
 
+    #[Groups('payment:read', 'payment:write', 'position:read:item')]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $taxCurrency;
 
+    #[Groups('payment:read', 'payment:write', 'position:read:item')]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $dividendType;
 
+    #[Groups('payment:read', 'payment:write', 'position:read:item')]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -82,12 +103,15 @@ class Payment
     )]
     private $dividendPaid = 0.0;
 
+    #[Groups('payment:read', 'payment:write', 'position:read:item')]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $dividendPaidCurrency;
 
+    #[Groups('payment:read', 'payment:write', 'position:read:item')]
     #[ORM\Column(type: 'uuid', nullable: true)]
     private ?Uuid $uuid = null;
 
+    #[Groups('payment:read', 'payment:write', 'position:read:item')]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $importfile = null;
 

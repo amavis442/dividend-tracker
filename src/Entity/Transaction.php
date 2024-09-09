@@ -2,6 +2,10 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -9,8 +13,19 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use DateTimeInterface;
 use DateTime;
 use RuntimeException;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-//use Doctrine\ORM\Mapping\Index;
+#[ApiResource(
+    normalizationContext: ['groups' => ['transaction:read', 'transaction:read:item']],
+    denormalizationContext: ['groups' => ['transaction:write']],
+    security: 'is_granted("ROLE_USER")',
+    description: 'All the transactions made by this user for a position',
+    operations: [
+        new Post(),
+        new Get(),
+        new GetCollection()
+    ]
+)]
 #[ORM\Table]
 #[ORM\Index(columns: ['meta', 'transaction_date'])]
 #[ORM\Entity(repositoryClass: 'App\Repository\TransactionRepository')]
@@ -28,12 +43,15 @@ class Transaction
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(type: Types::GUID, nullable: true)]
     private ?string $uuid = null;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(type: 'integer', options: ['default' => 1])]
     private int $side = 1;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -41,6 +59,7 @@ class Transaction
     )]
     private ?float $price = 0.0;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     #[ORM\JoinColumn(nullable: false)]
     private $currency;
@@ -50,6 +69,7 @@ class Transaction
      * 32 bit system sets amount to string for bigint and that will fuck up strong typing and will give a useless 500 error page.
      * @var float
      */
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -57,9 +77,11 @@ class Transaction
     )]
     private float $amount = 0.0;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(type: 'datetime', name: 'transaction_date')]
     private DateTime $transactionDate;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -68,6 +90,7 @@ class Transaction
     )]
     private float $profit = 0.0;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -75,6 +98,7 @@ class Transaction
     )]
     private float $allocation = 0.0;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     private $allocationCurrency;
 
@@ -82,6 +106,7 @@ class Transaction
     #[ORM\JoinColumn(nullable: true)]
     private $position;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -89,9 +114,11 @@ class Transaction
     )]
     private float $avgprice = 0.0;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $jobid = '';
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -105,12 +132,15 @@ class Transaction
     #[ORM\Column(type: 'datetime', name: 'updated_at', nullable: true)]
     private DateTime $updatedAt;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $meta = '';
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $importfile = '';
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -118,6 +148,7 @@ class Transaction
     )]
     private float $fx_fee = 0.0;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -125,9 +156,11 @@ class Transaction
     )]
     private float $originalPrice = 0.0;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $originalPriceCurrency = '';
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -135,6 +168,7 @@ class Transaction
     )]
     private float $stampduty = 0.0;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -142,6 +176,7 @@ class Transaction
     )]
     private float $transactionFee = 0.0;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -149,6 +184,7 @@ class Transaction
     )]
     private float $finraFee = 0.0;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -159,6 +195,7 @@ class Transaction
     #[ORM\ManyToOne(targetEntity: Pie::class, inversedBy: 'transactions')]
     private $pie;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\ManyToOne]
     private ?Currency $currencyOriginalPrice = null;
 

@@ -40,6 +40,7 @@ services:
         arguments:
             $entityManager: "@doctrine.orm.entity_manager"
 
+    # Setup alias for the ExchangeRateInterface so autowire understand it
     App\Service\ExchangeRate\EuExchangeRateService: ~
     App\Service\ExchangeRate\ExchangeRateInterface: '@App\Service\ExchangeRate\EuExchangeRateService'
 
