@@ -1,11 +1,8 @@
 <div class="row float-right">
 	<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 		<div class="btn-group mr-2" role="group" aria-label="First group">
-			<a class="btn btn-success" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id,'side': 1, }) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Buy'|trans }}">
+			<a class="btn btn-success" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id, }) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Buy or Sell'|trans }}">
 				<i class="fas fa-plus"></i>
-			</a>
-			<a class="btn btn-danger" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id, 'side': 2}) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Sell'|trans }}">
-				<i class="fas fa-minus"></i>
 			</a>
 		</div>
 	</div>

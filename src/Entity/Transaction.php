@@ -199,6 +199,10 @@ class Transaction
     #[ORM\ManyToOne]
     private ?Currency $currencyOriginalPrice = null;
 
+    #[Groups(['transaction:read', 'transaction:write'])]
+    #[ORM\ManyToOne]
+    private ?Currency $totalCurrency = null;
+
     #[Assert\Callback]
     public function validate(ExecutionContextInterface $context, $payload)
     {
@@ -581,6 +585,18 @@ class Transaction
     public function setCurrencyOriginalPrice(?Currency $currencyOriginalPrice): static
     {
         $this->currencyOriginalPrice = $currencyOriginalPrice;
+
+        return $this;
+    }
+
+    public function getTotalCurrency(): ?Currency
+    {
+        return $this->totalCurrency;
+    }
+
+    public function setTotalCurrency(?Currency $totalCurrency): static
+    {
+        $this->totalCurrency = $totalCurrency;
 
         return $this;
     }

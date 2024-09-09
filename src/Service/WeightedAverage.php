@@ -6,6 +6,10 @@ use App\Entity\Transaction;
 use App\Entity\Position;
 use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * Todo: needs to be renamed to make it clear it is for the position only.
+ * So should be called PositionWeightedAverage
+ */
 class WeightedAverage
 {
     protected $transactions = [];
@@ -31,14 +35,9 @@ class WeightedAverage
         $transactions = $position->getTransactions();
         $n = 1;
         foreach ($transactions as $transaction) {
-            $orderValue = $transaction->getTotal();
-            $stockValue = $orderValue - $transaction->getFxFee() - $transaction->getStampduty() - $transaction->getTransactionFee() - $transaction->getFinraFee();
-            $transaction->setAllocation($stockValue);
-            $this->entityManager->persist($transaction);
             $this->addTransaction($transaction, $n);
             $n++;
         }
-        //$this->entityManager->flush();
 
         if (empty($this->transactions) || count($this->transactions) === 0) {
             return;

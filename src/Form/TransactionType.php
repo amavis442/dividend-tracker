@@ -51,7 +51,7 @@ class TransactionType extends AbstractType
                 'input' => 'number',
                 'scale' => 3,
             ])
-            ->add('allocation_currency', EntityType::class, [
+            ->add('total_currency', EntityType::class, [
                 'class' => Currency::class,
                 'choice_label' => function ($currency) {
                     return $currency->getSymbol();

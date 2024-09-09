@@ -258,6 +258,7 @@ class ImportCsvService extends ImportBase
                         break;
                     case 'currency (total)':
                         $row['allocation_currency'] = $val;
+                        $row['total_currency'] = $val;
                         break;
                     case 'withholding tax':
                         $row['tax'] = (float) $val ?: 0.0;
@@ -357,6 +358,7 @@ class ImportCsvService extends ImportBase
                     $uuid = Uuid::v4();
 
                     $originalPriceCurrency = $currencyRepository->findOneBy(['symbol' => $row['original_price_currency']]);
+                    $totalCurrency = $currencyRepository->findOneBy(['symbol' => $row['total_currency']]);
 
                     $transaction = new Transaction();
                     $transaction
@@ -379,6 +381,7 @@ class ImportCsvService extends ImportBase
                         ->setFinraFee($row['finra_fee'] ?? 0)
                         ->setTransactionFee($row['transaction_fee'] ?? 0)
                         ->setTotal($row['total'] ?? 0)
+                        ->setTotalCurrency($totalCurrency)
                         ->setAvgprice(0.0)
                         ->setProfit(0.0)
                         ->setUuid($uuid)

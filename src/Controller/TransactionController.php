@@ -63,6 +63,7 @@ class TransactionController extends AbstractController
         $transaction->calcAllocation();
         $transaction->calcPrice();
         $transaction->setOriginalPriceCurrency($transaction->getCurrencyOriginalPrice()->getSymbol());
+        $transaction->setAllocationCurrency($transaction->getTotalCurrency());
         $transaction->setCurrency($transaction->getAllocationCurrency());
 
         if ($transaction->getSide() == Transaction::BUY) {
@@ -71,13 +72,11 @@ class TransactionController extends AbstractController
     }
 
 
-    #[Route(path: '/create/{position}/{side?1}', name: 'transaction_new', methods: ['GET', 'POST'])]
+    #[Route(path: '/create/{position}', name: 'transaction_new', methods: ['GET', 'POST'])]
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
         Position $position,
-        int $side,
-        CurrencyRepository $currencyRepository,
         WeightedAverage $weightedAverage,
         Referer $referer,
         ExchangeRateInterface $euExchangeRateService
@@ -91,8 +90,6 @@ class TransactionController extends AbstractController
 
         $transaction->setExchangeRate($rates['USD']);
 
-        $currency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
-        $transaction->setAllocationCurrency($currency);
         $form = $this->createForm(TransactionType::class, $transaction);
         $form->handleRequest($request);
 
@@ -100,19 +97,14 @@ class TransactionController extends AbstractController
             $this->presetMetrics($transaction);
             $transaction->setJobid(Transaction::MANUAL_ENTRY);
             $transaction->setImportfile(Transaction::MANUAL_ENTRY);
-            if ($transaction->getSide() === Transaction::BUY) {
-                $transaction->setTotal($transaction->getAllocation() + $transaction->getTransactionFee());
-            }
-
             if ($transaction->getSide() === Transaction::SELL) {
-                $transaction->setTotal($transaction->getAllocation());
-                $transaction->setAllocation($transaction->getAllocation() - $transaction->getTransactionFee());
                 if ($transaction->getProfit() == 0) {
                     $avgPrice = $position->getPrice();
                     $profit = ($transaction->getPrice() - $avgPrice) * $transaction->getAmount();
                     $transaction->setProfit($profit);
                 }
             }
+
             $uuid = Uuid::v4();
             $transaction->setUuid($uuid);
 
@@ -157,12 +149,8 @@ class TransactionController extends AbstractController
         EntityManagerInterface $entityManager,
         Transaction $transaction,
         WeightedAverage $weightedAverage,
-        Referer $referer,
-        CurrencyRepository $currencyRepository
+        Referer $referer
     ): Response {
-        if ($transaction->getCurrencyOriginalPrice() == null) {
-            $currencyRepository->findOneBy(['symbol' => $transaction->getOriginalPriceCurrency()]);
-        }
         if ($transaction->getUuid() == null) {
             $uuid = Uuid::v4();
             $transaction->setUuid($uuid);
