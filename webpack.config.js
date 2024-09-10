@@ -96,7 +96,7 @@ Encore
         'window.jQuery': 'jquery',
     })
 
-    .enablePostCssLoader()
+    //.enablePostCssLoader()
 
     .autoProvideVariables()
     ;

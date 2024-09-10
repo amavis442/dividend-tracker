@@ -1,10 +1,8 @@
 import jQuery from 'jquery';
-import 'popper.js';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'summernote/dist/summernote-bs4';
-import 'summernote/dist/summernote-bs4.css';
-//import { createPopper } from '@popperjs/core';
+import 'summernote/dist/summernote-bs5';
+import 'summernote/dist/summernote-bs5.css';
 
 const $ = jQuery;
 

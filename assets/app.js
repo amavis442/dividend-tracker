@@ -1,29 +1,28 @@
 import { registerVueControllerComponents } from '@symfony/ux-vue';
 import { registerReactControllerComponents } from '@symfony/ux-react';
-import 'bootstrap';
+import * as bootstrap from 'bootstrap';
 import './bootstrap.js';
-/*
- * Welcome to your app's main JavaScript file!
- *
- * We recommend including the built version of this JavaScript file
- * (and its CSS file) in your base layout (base.html.twig).
- */
-
-// any CSS you import will output into a single css file (app.css in this case)
 import './styles/global.scss';
 import './styles/app.css';
 import bsCustomFileInput from 'bs-custom-file-input';
 import jQuery from 'jquery';
 
 const $ = jQuery;
-
+window.bootstrap = bootstrap;
 
 jQuery(function () {
   $('[data-toggle="popover"]').popover();
   $('[data-toggle="tooltip"]').tooltip();
   bsCustomFileInput.init();
+
+  //$('[data-bs-toggle="popover"]').popover()
+
+  //const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+  //const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
 });
 
+const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
 
 registerReactControllerComponents(require.context('./react/controllers', true, /\.(j|t)sx?$/));
 registerVueControllerComponents(require.context('./vue/controllers', true, /\.vue$/));
