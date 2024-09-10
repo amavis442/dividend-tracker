@@ -1,8 +1,7 @@
-<h3>Info</h3>
-<table class="table">
+<table class="table border">
 	<tbody>
 		<tr>
-			<th>{{ 'Instrument'|trans }}
+			<th scope="row">{{ 'Instrument'|trans }}
 				<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Edit ticker / months'|trans }}">
 					<i class="far fa-edit"></i>
 				</a>
@@ -14,15 +13,15 @@
 			</td>
 		</tr>
 		<tr>
-			<th>{{ 'Industry'|trans }}</th>
+			<th scope="row">{{ 'Industry'|trans }}</th>
 			<td>{{ ticker.branch.label }}</td>
 		</tr>
 		<tr>
-			<th>ISIN</th>
+			<th scope="row">ISIN</th>
 			<td>{{ ticker.isin }}</td>
 		</tr>
 		<tr>
-			<th>{{ 'Dividend payment months'|trans }}</th>
+			<th scope="row">{{ 'Dividend payment months'|trans }}</th>
 			<td>
 				<ul class="list-group">
 					{% for month in ticker.dividendMonths %}
@@ -33,53 +32,53 @@
 			</td>
 		</tr>
 		<tr>
-			<th>{{ 'Total dividend received'|trans }}</th>
+			<th scope="row">{{ 'Total dividend received'|trans }}</th>
 			<td>
-				<span class="alert alert-primary" role="alert">
+				<span class="badge text-bg-primary">
 					<strong>&euro;{{ dividend|format_number({fraction_digit: 2}) }}</string>
 				</span>
 			</td>
 		</tr>
 		<tr>
-			<th>{{ 'Amount'|trans }}
+			<th scope="row">{{ 'Amount'|trans }}
 				#</th>
 			<td>{{ (position.amount)|format_number({fraction_digit: 7}) }}</td>
 		</tr>
 		<tr>
-			<th>{{ 'Dividend frequency'|trans }}</th>
+			<th scope="row">{{ 'Dividend frequency'|trans }}</th>
 			<td>
 				{{ position.ticker.getPayoutFrequency }}
 			</td>
 		</tr>
 		<tr>
-			<th>{{ 'Yearly forward dividend payout'|trans }}</th>
+			<th scope="row">{{ 'Yearly forward dividend payout'|trans }}</th>
 			<td>
-				&euro;{{ (position.ticker.getPayoutFrequency * dividendService.getForwardNetDividend(position))|format_number({fraction_digit: 2}) }}
+				&euro;{{ yearlyForwardDividendPayout|format_number({fraction_digit: 2}) }}
 			</td>
 		</tr>
 		<tr>
-			<th>{{ 'Single time forward dividend payout'|trans }}</th>
+			<th scope="row">{{ 'Single time forward dividend payout'|trans }}</th>
 			<td>
-				&euro;{{ dividendService.getForwardNetDividend(position)|format_number({fraction_digit: 2}) }}
+				&euro;{{ singleTimeForwarddividendPayout|format_number({fraction_digit: 2}) }}
 			</td>
 		</tr>
 		<tr>
-			<th>{{ 'Dividend yield'|trans }}</th>
+			<th scope="row">{{ 'Dividend yield'|trans }}</th>
 			<td>
-				{{ dividendService.getForwardNetDividendYield(position)|format_number({fraction_digit: 2}) }}%
+				{{ dividendYield|format_number({fraction_digit: 2}) }}%
 			</td>
 		</tr>
 		<tr>
-			<th>{{ 'Next dividend (Ex-div / payout)'|trans }}</th>
+			<th scope="row">{{ 'Next dividend (Ex-div / payout)'|trans }}</th>
 			<td>
-				<span class="badge badge-primary">{{ calendarRecentDividendDate.getExDividendDate|date('Y-m-d') }}</span>
+				<span class="badge text-bg-primary">{% if nextDividendExDiv is defined and nextDividendExDiv is not null %}{{ nextDividendExDiv|date('Y-m-d') }}{% endif %}</span>
 				/
-				<span class="badge badge-warning">{{ calendarRecentDividendDate.getPaymentDate|date('Y-m-d') }}</span>
+				<span class="badge text-bg-warning">{% if nextDividendPayout is defined and nextDividendPayout is not null %}{{ nextDividendPayout|date('Y-m-d') }}{% endif %}</span>
 
 			</td>
 		</tr>
 		<tr>
-			<th>{{ 'Expected next payout'|trans }}</th>
+			<th scope="row">{{ 'Expected next payout'|trans }}</th>
 			<td>
 				#{{ amountPerDate }}
 				x  &euro;{{ netCashAmount|format_number({fraction_digit: 2}) }}
@@ -87,19 +86,19 @@
 			</td>
 		</tr>
 		<tr>
-			<th>{{ 'Weighted average price'|trans }}</th>
+			<th scope="row">{{ 'Weighted average price'|trans }}</th>
 			<td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price)|format_number({fraction_digit: 2}) }}</td>
 		</tr>
 		<tr>
-			<th>{{ 'Allocation'|trans }}</th>
+			<th scope="row">{{ 'Allocation'|trans }}</th>
 			<td>{{ allocationSign|raw }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}</td>
 		</tr>
 		<tr>
-			<th>{{ 'Allocation'|trans }}(%)</th>
+			<th scope="row">{{ 'Allocation'|trans }}(%)</th>
 			<td>{{ percentageAllocated|format_number({fraction_digit: 2}) }}%</td>
 		</tr>
 		<tr>
-			<th>{{ 'Pies'|trans }}</th>
+			<th scope="row">{{ 'Pies'|trans }}</th>
 			<td>
 				{% for pie in position.pies %}
 					<span class="badge badge-primary">{{ pie.label }}</span>

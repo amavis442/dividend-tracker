@@ -1,22 +1,29 @@
-<div style='width:900px;height:600px' class="col col-xs-12">
-	<canvas id="myChart" class="chart"
-			data-chart-data='{{ growth.data|json_encode|raw }}' 
-			data-chart-labels='{{ growth.labels|json_encode|raw }}'
-			data-chart-title='Yield'
-			data-chart-sub-title='Dividend yield'
-			data-chart-sign='%'></canvas>
+
+<div class="d-flex justify-content-center">
+	<div class="d-flex flex-column">
+		<div class="row">
+			<div class="col" style='width:900px'>
+				<canvas id="myChart" class="chart"
+						data-chart-data='{{ growth.data|json_encode|raw }}'
+						data-chart-labels='{{ growth.labels|json_encode|raw }}'
+						data-chart-title='Yield'
+						data-chart-sub-title='Dividend yield'
+						data-chart-sign='%'></canvas>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col" style='width:900px'>
+				<canvas id="myChartPayout" class="chart"
+						data-chart-data='{{ growth.payout|json_encode|raw }}'
+						data-chart-labels='{{ growth.labels|json_encode|raw }}'
+						data-chart-title='Dividend payout'
+						data-chart-sub-title='Dividend forward'
+						data-chart-sign='€'></canvas>
+			</div>
+		</div>
+	</div>
 </div>
 
-<div style='width:900px;height:600px' class="col col-xs-12">
-	<canvas id="myChartPayout" class="chart"
-			data-chart-data='{{ growth.payout|json_encode|raw }}' 
-			data-chart-labels='{{ growth.labels|json_encode|raw }}'
-			data-chart-title='Dividend payout'
-			data-chart-sub-title='Dividend forward'
-			data-chart-sign='€'></canvas>
-</div>
-
-    
 {% block javascripts %}
     {{ encore_entry_script_tags('barchart') }}
 {% endblock %}

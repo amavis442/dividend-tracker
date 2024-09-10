@@ -147,10 +147,16 @@ class PortfolioController extends AbstractController
          */
         $calenders = $ticker->getCalendars();
 
+        $nextDividendExDiv = null;
+        $nextDividendPayout = null;
+
         if ($calendarRecentDividendDate) {
             [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax($position, $calendarRecentDividendDate);
             $netCashAmount = $calendarRecentDividendDate->getCashAmount() * $exchangeRate * (1 - $dividendTax);
             $amountPerDate = $position->getAmountPerDate($calendarRecentDividendDate->getExDividendDate());
+
+            $nextDividendExDiv = $calendarRecentDividendDate->getExDividendDate();
+            $nextDividendPayout = $nextDividendPayout = $calendarRecentDividendDate->getPaymentDate();
         }
 
         $position = $positionRepository->getForPosition($position);
@@ -198,6 +204,11 @@ class PortfolioController extends AbstractController
         $calendars = $ticker->getCalendars()->slice(0, 30);
         $calendarsCount = $ticker->getCalendars()->count();
 
+
+        $yearlyForwardDividendPayout = $position->getTicker()->getPayoutFrequency() * $dividendService->getForwardNetDividend($position);
+        $singleTimeForwarddividendPayout = $dividendService->getForwardNetDividend($position);
+        $dividendYield = $dividendService->getForwardNetDividendYield($position);
+
         $referer->set('portfolio_show', ['id' => $position->getId()]);
 
         $indexUrl = $request->getSession()->get(get_class($this));
@@ -208,7 +219,6 @@ class PortfolioController extends AbstractController
             'position' => $position,
             'payments' => $payments,
             'dividend' => $dividend,
-            'dividendService' => $dividendService,
             'calendars' => $calendars,
             'calendarsCount' => $calendarsCount,
             'dividendRaises' => $dividendRaises,
@@ -218,7 +228,11 @@ class PortfolioController extends AbstractController
             'netCashAmount' => $netCashAmount,
             'amountPerDate' => $amountPerDate,
             'expectedPayout' => $netCashAmount * $amountPerDate,
-            'calendarRecentDividendDate' => $calendarRecentDividendDate ?? new Calendar(),
+            'yearlyForwardDividendPayout' => $yearlyForwardDividendPayout,
+            'singleTimeForwarddividendPayout' => $singleTimeForwarddividendPayout,
+            'dividendYield' => $dividendYield,
+            'nextDividendExDiv' => $nextDividendExDiv,
+            'nextDividendPayout' => $nextDividendPayout,
             'indexUrl' => $indexUrl,
         ]);
     }

@@ -1,5 +1,4 @@
-<h3>{{ 'Position'|trans }}</h3>
-<table class="table">
+<table class="table rounded border">
   <thead>
     <tr>
       <th></th>
@@ -12,7 +11,7 @@
       <th>{{ 'Actions'|trans }}</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody class="table-group-divider">
     {% if position %}
       <tr class="table-success">
         <td>
@@ -29,16 +28,15 @@
         </td>
         <td>{{ position.ignoreForDividend ? '<i class="fa-regular fa-circle-check"></i>'|raw:'' }}</td>
         <td>
-          <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-            <div class="btn-group mr-2" role="group" aria-label="First group">
-              <a href="{{ path('position_edit', { id: position.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="{{ 'Edit position'|trans }}"><i class="far fa-edit"></i></a>
+          <div class="btn-group" role="group" aria-label="Edit position">
+              <button type="button" onclick="location.href='{{ path('position_edit', { id: position.id }) }}';" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="{{ 'Edit position'|trans }}"><i class="far fa-edit"></i></a>
 
-              <form method="post" action="{{ path('portfolio_position_close', { position: position.id }) }}" class="form-inline" onsubmit="return confirm('Are you sure you want to close this position?');">
+              <form method="post" action="{{ path('portfolio_position_close', { position: position.id }) }}" onsubmit="return confirm('Are you sure you want to close this position?');">
                 <input type="hidden" name="_method" value="DELETE" />
                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ position.id) }}" />
-                <button class="btn btn-danger"><i class="fas fa-window-close"></i></button>
+                <button type="button" class="btn btn-danger"><i class="fas fa-window-close"></i></button>
               </form>
-            </div>
+
           </div>
         </td>
       </tr>

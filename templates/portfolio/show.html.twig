@@ -12,86 +12,89 @@
 		<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
 	{% endfor %}
 
+<div class="d-flex justify-content-center">
+<div class="row w-auto pb-2">
 	<h1 class="display-4">
 		Instrument:
 		{{ ticker.fullname }}
 	</h1>
+</div>
+</div>
 
+<div class="d-flex  justify-content-center">
+	<div class="row xxl:w-75 sm:w-100 pb-2">
 	<ul class="nav nav-tabs" id="myTab" role="tablist">
-		<li class="nav-item">
-			<a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true">
+		<li class="nav-item" role="presentation">
+			<button type="button" class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" role="tab" aria-controls="info" aria-selected="true">
 				<i class="fas fa-info-circle"></i>
-				{{ 'Info'|trans }}</a>
+				{{ 'Info'|trans }}</button>
 		</li>
-		<li class="nav-item">
-			<a class="nav-link" id="position-tab" data-toggle="tab" href="#position" role="tab" aria-controls="position" aria-selected="true">{{ 'Position'|trans }}</a>
+		<li class="nav-item" role="presentation">
+			<button type="button" class="nav-link" id="position-tab" data-bs-toggle="tab" data-bs-target="#position" role="tab" aria-controls="position" aria-selected="true">{{ 'Position'|trans }}</button>
 		</li>
-		<li class="nav-item">
-			<a class="nav-link" id="orders-tab" data-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="true">
+		<li class="nav-item" role="presentation">
+			<button type="button" class="nav-link" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" role="tab" aria-controls="orders" aria-selected="true">
 				<i class="fas fa-receipt"></i>
-				{{ 'Orders'|trans }}</a>
+				{{ 'Orders'|trans }}</button>
 		</li>
-		<li class="nav-item">
-			<a class="nav-link" id="payout-tab" data-toggle="tab" href="#payout" role="tab" aria-controls="payout" aria-selected="false">
+		<li class="nav-item" role="presentation">
+			<button type="button" class="nav-link" id="payout-tab" data-bs-toggle="tab" data-bs-target="#payout" role="tab" aria-controls="payout" aria-selected="false">
 				<i class="fas fa-coins"></i>
-				{{ 'Payout'|trans }}</a>
+				{{ 'Payout'|trans }}</button>
 		</li>
-		<li class="nav-item">
-			<a class="nav-link" id="dividend-tab" data-toggle="tab" href="#dividend" role="tab" aria-controls="dividend" aria-selected="false">
+		<li class="nav-item" role="presentation">
+			<button type="button" class="nav-link" id="dividend-tab" data-bs-toggle="tab" data-bs-target="#dividend" role="tab" aria-controls="dividend" aria-selected="false">
 				<i class="far fa-calendar-alt"></i>
-				{{ 'Dividend'|trans }}</a>
+				{{ 'Dividend'|trans }}</button>
 		</li>
-		<li class="nav-item">
-			<a class="nav-link" id="growth-tab" data-toggle="tab" href="#growth" role="tab" aria-controls="growth" aria-selected="false">
+		<li class="nav-item" role="presentation">
+			<button type="button" class="nav-link" id="growth-tab" data-bs-toggle="tab" data-bs-target="#growth" role="tab" aria-controls="growth" aria-selected="false">
 				<i class="fas fa-chart-line"></i>
-				{{ 'Dividend growth'|trans }}</a>
+				{{ 'Dividend growth'|trans }}</button>
 		</li>
-		<!--      //
-						<li class="nav-item">
-							<a class="nav-link" id="fundamental-tab" data-toggle="tab" href="#fundamental" role="tab" aria-controls="fundamental" aria-selected="false">{{ 'Fundamental'|trans }}</a>
-						</li>
-						//      -->
-		<li class="nav-item">
-			<a class="nav-link" id="research-tab" data-toggle="tab" href="#research" role="tab" aria-controls="research" aria-selected="false">
+		<li class="nav-item" role="presentation">
+			<button type="button" class="nav-link" id="research-tab" data-bs-toggle="tab" data-bs-target="#research" role="tab" aria-controls="research" aria-selected="false">
 				<i class="fas fa-search-dollar"></i>
-				{{ 'Research'|trans }}</a>
+				{{ 'Research'|trans }}</button>
 		</li>
 	</ul>
-	<div class="tab-content" id="myTabContent">
-		<div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+	<div class="tab-content shadow-sm p-3 mb-5 bg-body-tertiary rounded" id="myTabContent">
+		<div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
 			<br/>
 			{% include 'portfolio/show/_info.html.twig' %}
 		</div>
-		<div class="tab-pane fade" id="position" role="tabpanel" aria-labelledby="position-tab">
+		<div class="tab-pane fade" id="position" role="tabpanel" aria-labelledby="position-tab" tabindex="0">
 			<br/>
 			{% include 'portfolio/show/_position.html.twig' %}
 		</div>
-		<div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+		<div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab" tabindex="0">
 			<br/>
 			{% include 'portfolio/show/_orders.html.twig' %}
 		</div>
-		<div class="tab-pane fade" id="payout" role="tabpanel" aria-labelledby="payout-tab">
+		<div class="tab-pane fade" id="payout" role="tabpanel" aria-labelledby="payout-tab" tabindex="0">
 			<br/>
 			{% include 'portfolio/show/_payout.html.twig' %}
 		</div>
-		<div class="tab-pane fade" id="dividend" role="tabpanel" aria-labelledby="dividend-tab">
+		<div class="tab-pane fade" id="dividend" role="tabpanel" aria-labelledby="dividend-tab" tabindex="0">
 			<br/>
 			{% include 'portfolio/show/_dividend.html.twig' %}
 		</div>
-		<div class="tab-pane fade" id="growth" role="tabpanel" aria-labelledby="growth-tab">
+		<div class="tab-pane fade" id="growth" role="tabpanel" aria-labelledby="growth-tab" tabindex="0">
 			<br/>
 			{% include 'portfolio/show/_growth.html.twig' %}
 		</div>
-		<div class="tab-pane fade" id="fundamental" role="tabpanel" aria-labelledby="fundamental-tab">
+		<div class="tab-pane fade" id="fundamental" role="tabpanel" aria-labelledby="fundamental-tab" tabindex="0">
 			<br/>
 			{% include 'portfolio/show/_fundamental.html.twig' %}
 		</div>
-		<div class="tab-pane fade" id="research" role="tabpanel" aria-labelledby="research-tab">
+		<div class="tab-pane fade" id="research" role="tabpanel" aria-labelledby="research-tab" tabindex="0">
 			<br/>
 			{% include 'portfolio/show/_research.html.twig' %}
 			<hr/>
 		</div>
 	</div>
+
+
 
 	<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 		<div class="btn-group mr-2" role="group" aria-label="First group">
@@ -99,5 +102,7 @@
 				<i class="fas fa-angle-double-left"></i>
 				{{ 'back to list'|trans }}</a>
 		</div>
+	</div>
+</div>
 	</div>
 {% endblock %}
