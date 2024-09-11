@@ -77,8 +77,8 @@
 										<td>
 											{% set tickerInfo  = '' %}
 											{% set tickerInfo %}
-											Ticker:
-											{{ calData.ticker }}<br/>
+											<h3>Ticker:
+												{{ calData.ticker }}</h3>
 											{{ 'Tax rate'|trans }}:
 											{{ calData.taxRate * 100 }}%
 											<br/>
@@ -86,14 +86,16 @@
 											{{ calData.exchangeRate|format_number({fraction_digit: 4}) }}<br/>
 											{{ 'Tax'|trans }}: &euro;{{ (calData.tax * estimatedAmount)|format_number({fraction_digit: 2}) }}<br/>
 											Ex-div:
-											{{ calData.calendar.exDividendDate|date('D d-m-Y') }}
+											<span class='badge text-bg-info'>
+												{{ calData.calendar.exDividendDate|date('D, d-m-Y')|format_date('full',locale='nl') }}
+											</span>
 											{% endset %}
 											{% if cal.ticker.positions[0] %}
 												<a href="{{ path('portfolio_show', {id: cal.ticker.positions[0].id}) }}">{{ cal.ticker.fullname }}</a>
 											{% else %}
 												{{ cal.ticker.fullname }}
 											{% endif %}
-											<i class="fas fa-info-circle" data-toggle="tooltip" data-html="true" data-placement="right" title="{{ tickerInfo }}"></i>
+											<i class="fas fa-info-circle" data-bs-toggle="popover" data-bs-html="true" data-bs-placement="right" data-bs-content="{{ tickerInfo }}"></i>
 											<br/>
 											<small>{{ estimatedAmount|format_number({fraction_digit: 7}) }}
 												{{ 'shares'|trans }}</small>
