@@ -1,18 +1,41 @@
-{{ form_start(form) }}
-    {{ form_row(form.ticker) }}
-    {{ form_row(form.dividend_type) }}
-    {{ form_row(form.ex_dividend_date) }}
-    {{ form_row(form.payment_date) }}
-    <div class="row">
-        <div class="col">
-            {{ form_label(form.cash_amount) }} 
-            <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        {{ form_widget(form.currency) }}
-                    </div>
-                    {{ form_widget(form.cash_amount) }}
-            </div>
-        </div>
-    </div>
-    <button class="btn btn-primary"><i class="far fa-save"></i></button>
-{{ form_end(form) }}
+<div class="d-flex justify-content-center">
+	{{ form_start(form, {'attr':{'class':'border p-2 rounded'}}) }}
+	<div class="row">
+		<div class="col-auto">
+			{{ form_row(form.ticker) }}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-auto">
+			{{ form_row(form.dividend_type) }}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-auto">
+			{{ form_row(form.ex_dividend_date) }}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-auto">
+			{{ form_row(form.payment_date) }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-auto">
+			{{ form_label(form.cash_amount) }}
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					{{ form_widget(form.currency) }}
+				</div>
+				{{ form_widget(form.cash_amount) }}
+			</div>
+		</div>
+	</div>
+	<button class="btn btn-primary">
+		<i class="far fa-save"></i>
+	</button>
+	{{ form_end(form) }}
+</div>

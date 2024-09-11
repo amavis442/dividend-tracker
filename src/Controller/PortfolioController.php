@@ -70,7 +70,7 @@ class PortfolioController extends AbstractController
 
         $cache = new FilesystemAdapter(PortfolioModel::CACHE_NAMESPACE);
 
-        $pageData = $cache->get(PortfolioModel::CACHE_KEY . '_' . $page . ($pieSelected ? '_' . $pieSelected : '') . md5($searchCriteria), function (ItemInterface $item) use (
+        $portfolioModel = $cache->get(PortfolioModel::CACHE_KEY . '_' . $page . ($pieSelected ? '_' . $pieSelected : '') . md5($searchCriteria), function (ItemInterface $item) use (
             $model,
             $positionRepository,
             $dividendService,
@@ -85,7 +85,7 @@ class PortfolioController extends AbstractController
 
             $item->expiresAfter(3600);
 
-            $page = $model->getPage(
+            $portfolioModel = $model->getPage(
                 $positionRepository,
                 $dividendService,
                 $paymentRepository,
@@ -97,18 +97,19 @@ class PortfolioController extends AbstractController
                 $pieSelected,
             );
 
-            return $page;
+            return $portfolioModel;
         });
+
 
         $this->stopwatch->stop('portfoliomodel-getpage');
 
         $request->getSession()->set(get_class($this), $request->getRequestUri());
 
         return $this->render('portfolio/index.html.twig', [
-            'portfolioItems' => $pageData != null ? $pageData->getPortfolioItems() : null,
-            'cacheTimestamp' => $pageData != null ? (new DateTime())->setTimestamp($pageData->getCacheTimestamp() ?: 0) : 0,
+            'portfolioItems' => $portfolioModel != null ? $portfolioModel->getPortfolioItems() : null,
+            'cacheTimestamp' => $portfolioModel != null ? (new DateTime())->setTimestamp($portfolioModel->getCacheTimestamp() ?: 0) : 0,
             'limit' => $limit,
-            'maxPages' => $pageData != null ? $pageData->getMaxPages() : 0,
+            'maxPages' => $portfolioModel != null ? $portfolioModel->getMaxPages() : 0,
             'thisPage' => $thisPage,
             'order' => $orderBy,
             'sort' => $sort,

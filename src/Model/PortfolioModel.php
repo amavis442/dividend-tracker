@@ -168,7 +168,7 @@ class PortfolioModel
         string $sort = 'asc',
         string $searchCriteria = '',
         ?string $pieSelected = null
-    ): self {
+    ): static {
         $order = 't.symbol';
         if (in_array($orderBy, ['industry'])) {
             $order = 'i.label';
@@ -183,13 +183,13 @@ class PortfolioModel
         $this->stopwatch->start('portfoliomodel-getpage');
         $limit = 20;
         if ($pieSelected && $pieSelected != '-') {
-            $items = $positionRepository->getAll($page, $limit, $order, $sort, $searchCriteria, PositionRepository::OPEN, [$pieSelected]);
+            $pager = $positionRepository->getAll($page, $limit, $order, $sort, $searchCriteria, PositionRepository::OPEN, [$pieSelected]);
         } else {
-            $items = $positionRepository->getAll($page, $limit, $order, $sort, $searchCriteria, PositionRepository::OPEN);
+            $pager = $positionRepository->getAll($page, $limit, $order, $sort, $searchCriteria, PositionRepository::OPEN);
         }
 
-        $this->maxPages = (int) ceil($items->count() / $limit);
-        $iter = $items->getIterator();
+        $this->maxPages = (int) ceil($pager->count() / $limit);
+        $iter = $pager->getIterator();
         $tickerIds = [];
         $this->stopwatch->stop('portfoliomodel-getpage');
 

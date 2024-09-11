@@ -128,19 +128,24 @@
 							{% endif %}
 						</td>
 					</tr>
-		{% else %}
-			<tr>
-				<td colspan="9">no records found</td>
-			</tr>
-		{% endfor %}
-	</tbody>
-	<tfoot>
-		<tr>
-			<td colspan="8"></td>
-		</tr>
-	</tfoot>
-</table>
-{% include 'paginator.html.twig' %}</div></div>{% endblock %}
+					{% else %}
+					<tr>
+						<td colspan="9">no records found</td>
+					</tr>
+				{% endfor %}
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="8"></td>
+					</tr>
+				</tfoot>
+			</table>
+
+			{% include 'paginator.html.twig' %}
+	</div>
+</div>
+{% endblock %}
+
 {% block javascripts %}
 {{ parent() }}
 {% endblock %}

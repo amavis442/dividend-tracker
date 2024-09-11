@@ -3,8 +3,6 @@
 {% block title %}Edit Payment{% endblock %}
 
 {% block body %}
-    <h1>Edit Payment: {{ payment.ticker.fullname }}</h1>
-
     {{ include('payment/_form.html.twig', {'button_label': 'Update'}) }}
     <br/>
     <a href="{{ path('payment_index') }}" class="btn btn-primary"><i class="fas fa-angle-double-left"></i> {{ 'back to list'|trans }}</a>
