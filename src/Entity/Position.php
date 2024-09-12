@@ -99,11 +99,11 @@ class Position
     #[ORM\OrderBy(['payDate' => 'DESC'])]
     private $payments;
 
-    #[ORM\Column(type: 'datetime', name: 'created_at')]
-    private DateTime $createdAt;
+    #[ORM\Column(name: 'created_at')]
+    private \DateTimeImmutable $createdAt;
 
-    #[ORM\Column(type: 'datetime', name: 'updated_at', nullable: true)]
-    private ?DateTime $updatedAt;
+    #[ORM\Column(name: 'updated_at', nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     #[Groups(['position:read', 'position:write'])]
     #[ORM\JoinTable(name: 'pie_position')]
@@ -348,23 +348,9 @@ class Position
         return $this->getTicker()->isDividendPayMonth($currentMonth);
     }
 
-    public function setCreatedAt(DateTimeInterface $createdAt = null): self
-    {
-        $this->createdAt = ($createdAt instanceof DateTime) ? $createdAt : new DateTime("now");
-
-        return $this;
-    }
-
     public function getCreatedAt(): DateTimeInterface
     {
         return $this->createdAt;
-    }
-
-    public function setUpdatedAt(DateTimeInterface $updatedAt = null): self
-    {
-        $this->updatedAt = ($updatedAt instanceof DateTime) ? $updatedAt : new DateTime("now");
-
-        return $this;
     }
 
     public function getUpdatedAt(): ?DateTimeInterface

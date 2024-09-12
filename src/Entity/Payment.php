@@ -73,11 +73,11 @@ class Payment
     )]
     private $amount = 0.0;
 
-    #[ORM\Column(type: 'datetime', name: 'created_at')]
-    private $createdAt;
+    #[ORM\Column(name: 'created_at')]
+    private \DateTimeImmutable $createdAt;
 
-    #[ORM\Column(type: 'datetime', name: 'updated_at', nullable: true)]
-    private $updatedAt;
+    #[ORM\Column(name: 'updated_at', nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     #[Groups('payment:read', 'payment:write', 'position:read:item')]
     #[ORM\Column(
@@ -247,13 +247,6 @@ class Payment
     public function getPosition(): Position
     {
         return $this->position;
-    }
-
-    public function setCreatedAt(DateTimeInterface $createdAt = null): self
-    {
-        $this->createdAt = $createdAt ?? new DateTime("now");
-
-        return $this;
     }
 
     public function getCreatedAt(): DateTimeInterface

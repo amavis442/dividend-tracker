@@ -84,8 +84,7 @@ class ImportCsvController extends AbstractController
 
                 $importFiles = new ImportFiles();
                 $importFiles
-                    ->setName($transactionFile->getClientOriginalName())
-                    ->setCreatedAt((new \DateTime()));
+                    ->setName($transactionFile->getClientOriginalName());
                 $entityManager->persist($importFiles);
                 $entityManager->flush();
 

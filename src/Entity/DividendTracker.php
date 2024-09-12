@@ -34,8 +34,8 @@ class DividendTracker
     )]
     private $dividend = 0.0;
 
-    #[ORM\Column(type: 'datetime')]
-    private $createdAt;
+    #[ORM\Column()]
+    private \DateTimeImmutable $createdAt;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'dividendTrackers')]
     #[ORM\JoinColumn(nullable: true)]
@@ -91,13 +91,6 @@ class DividendTracker
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
     }
 
     public function getUser(): ?User

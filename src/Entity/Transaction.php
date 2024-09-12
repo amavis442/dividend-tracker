@@ -126,11 +126,11 @@ class Transaction
     )]
     private float $exchangeRate = 1.0;
 
-    #[ORM\Column(type: 'datetime', name: 'created_at')]
-    private DateTime $createdAt;
+    #[ORM\Column(name: 'created_at')]
+    private \DateTimeImmutable $createdAt;
 
-    #[ORM\Column(type: 'datetime', name: 'updated_at', nullable: true)]
-    private DateTime $updatedAt;
+    #[ORM\Column(name: 'updated_at', nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -386,13 +386,6 @@ class Transaction
     public function setExchangeRate(?float $exchangeRate): self
     {
         $this->exchangeRate = $exchangeRate;
-
-        return $this;
-    }
-
-    public function setCreatedAt(DateTimeInterface $createdAt = null): self
-    {
-        $this->createdAt = ($createdAt instanceof DateTime) ? $createdAt : new DateTime("now");
 
         return $this;
     }

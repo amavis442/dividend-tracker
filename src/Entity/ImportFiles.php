@@ -20,8 +20,8 @@ class ImportFiles
     #[ORM\Column(length: 255, unique: true)]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column]
+    private \DateTimeImmutable $created_at;
 
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
@@ -49,12 +49,5 @@ class ImportFiles
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->created_at;
-    }
-
-    public function setCreatedAt(\DateTimeInterface $created_at): static
-    {
-        $this->created_at = $created_at;
-
-        return $this;
     }
 }

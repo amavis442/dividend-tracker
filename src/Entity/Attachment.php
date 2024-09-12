@@ -41,11 +41,11 @@ class Attachment
     #[ORM\Column(type: 'bigint', nullable: true)]
     private ?int $attachmentSize = null;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $updatedAt = null;
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(type: 'datetime')]
-    private \DateTimeInterface $createdAt;
+    #[ORM\Column]
+    private \DateTimeImmutable $createdAt;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Research', inversedBy: 'attachments')]
     private $research;
@@ -154,13 +154,6 @@ class Attachment
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
     }
 
     public function getLabel(): ?string
