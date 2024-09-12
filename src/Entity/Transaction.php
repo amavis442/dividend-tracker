@@ -395,13 +395,6 @@ class Transaction
         return $this->createdAt;
     }
 
-    public function setUpdatedAt(DateTimeInterface $updatedAt = null): self
-    {
-        $this->updatedAt = ($updatedAt instanceof DateTime) ? $updatedAt : new DateTime("now");
-
-        return $this;
-    }
-
     public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updatedAt;

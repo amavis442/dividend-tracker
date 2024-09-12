@@ -109,13 +109,6 @@ class Journal
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeInterface $updatedAt): self
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
     public function getTitle(): ?string
     {
         return $this->title;

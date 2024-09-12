@@ -132,13 +132,6 @@ class Attachment
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeInterface $updatedAt): self
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
     public function getResearch(): ?Research
     {
         return $this->research;

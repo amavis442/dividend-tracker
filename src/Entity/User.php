@@ -334,22 +334,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->pies;
     }
 
-    public function addPy(Pie $py): self
+    public function addPie(Pie $pie): self
     {
-        if (!$this->pies->contains($py)) {
-            $this->pies[] = $py;
-            $py->setUser($this);
+        if (!$this->pies->contains($pie)) {
+            $this->pies[] = $pie;
+            $pie->setUser($this);
         }
 
         return $this;
     }
 
-    public function removePy(Pie $py): self
+    public function removePie(Pie $pie): self
     {
-        if ($this->pies->removeElement($py)) {
+        if ($this->pies->removeElement($pie)) {
             // set the owning side to null (unless already changed)
-            if ($py->getUser() === $this) {
-                $py->setUser(null);
+            if ($pie->getUser() === $this) {
+                $pie->setUser(null);
             }
         }
 
@@ -364,12 +364,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
     }
 }

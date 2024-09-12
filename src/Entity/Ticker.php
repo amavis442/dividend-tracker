@@ -393,13 +393,6 @@ class Ticker
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeInterface $updatedAt): self
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
     public function getUuid(): ?Uuid
     {
         return $this->uuid;
