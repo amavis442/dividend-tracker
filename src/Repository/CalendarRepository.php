@@ -214,7 +214,7 @@ class CalendarRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('c')
             ->select('c, t, p, tr, pies, cur, tax')
             ->innerJoin('c.ticker', 't')
-            ->innerJoin('t.positions', 'p', 'WITH', '(p.closed = false) OR (p.closedAt > :closedAt and p.closed = true)')
+            ->innerJoin('t.positions', 'p', 'WITH', '(p.closed = false) OR (p.closedAt > :closedAt and p.closed = true AND p.ignore_for_dividend = false)')
             ->leftJoin('t.tax', 'tax')
             ->leftJoin('p.transactions', 'tr')
             ->leftJoin('p.pies', 'pies')

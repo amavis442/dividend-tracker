@@ -334,6 +334,10 @@ class DividendService
      */
     public function getForwardNetDividendYield(Position $position): ?float
     {
+        if ($position->getClosed() == true) {
+            return null;
+        }
+
         $netDividendYield = 0.0;
         $forwardNetDividend = $this->forwardNetDividend;
         if ($this->position !== $position) {
