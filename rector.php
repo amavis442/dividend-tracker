@@ -17,6 +17,7 @@ return static function (RectorConfig $rectorConfig): void {
         //__DIR__ . '/tests',
     ]);
 
+    $rectorConfig->import('vendor/fakerphp/faker/rector-migrate.php');
 
     $rectorConfig->sets([
         DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,

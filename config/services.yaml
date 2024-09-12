@@ -26,6 +26,16 @@ services:
             - "../src/Kernel.php"
             - "../src/Tests/"
 
+    on_request_listener:
+        class: App\EventListener\OnRequestListener
+        arguments: ["@doctrine.orm.entity_manager", "@security.token_storage"]
+        tags:
+            - {
+                  name: kernel.event_listener,
+                  event: kernel.request,
+                  method: onKernelRequest,
+              }
+
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
     App\Controller\:
@@ -124,12 +134,6 @@ services:
         tags:
             - { name: doctrine.event_listener, event: prePersist }
 
-    on_request_listener:
-        class: App\EventListener\OnRequestListener
-        arguments: ["@doctrine.orm.entity_manager", "@security.token_storage"]
-        tags:
-            - {
-                  name: kernel.event_listener,
-                  event: kernel.request,
-                  method: onKernelRequest,
-              }
+    App\Serializer\AdminGroupsContextBuilder:
+        decorates: "api_platform.serializer.context_builder"
+        arguments: ['@App\Serializer\AdminGroupsContextBuilder.inner']
