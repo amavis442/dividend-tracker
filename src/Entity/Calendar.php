@@ -89,6 +89,25 @@ class Calendar
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updatedAt;
 
+    /**
+     * Gets triggered only on insert
+     */
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->setUpdatedAtValue();
+    }
+
+    /**
+     * Gets triggered every time on update
+     */
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
     public function __construct()
     {
         $this->payments = new ArrayCollection();
@@ -280,23 +299,5 @@ class Calendar
         $this->updatedAt = $updatedAt;
 
         return $this;
-    }
-
-    /**
-     * Gets triggered only on insert
-     */
-    #[ORM\PrePersist]
-    public function onPrePersist()
-    {
-        $this->createdAt = new \DateTime("now");
-    }
-
-    /**
-     * Gets triggered every time on update
-     */
-    #[ORM\PreUpdate]
-    public function onPreUpdate()
-    {
-        $this->updatedAt = new \DateTime("now");
     }
 }

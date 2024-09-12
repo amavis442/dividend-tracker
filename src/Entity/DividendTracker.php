@@ -5,8 +5,10 @@ namespace App\Entity;
 use App\Repository\DividendTrackerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 
 #[ORM\Entity(repositoryClass: DividendTrackerRepository::class)]
+#[HasLifecycleCallbacks]
 class DividendTracker
 {
     #[ORM\Id]
@@ -38,6 +40,12 @@ class DividendTracker
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'dividendTrackers')]
     #[ORM\JoinColumn(nullable: true)]
     private $user;
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {

@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -19,6 +20,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new GetCollection()
     ]
 )]
+#[HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: 'App\Repository\ResearchRepository')]
 class Research
 {
@@ -48,6 +50,19 @@ class Research
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updatedAt;
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->setUpdatedAtValue();
+    }
+
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
 
     public function __construct()
     {

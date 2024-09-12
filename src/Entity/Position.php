@@ -132,11 +132,17 @@ class Position
     #[ORM\Column(type: 'boolean', options: ["default" => false])]
     private bool $ignore_for_dividend = false;
 
-    public function __construct()
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
     {
-        $this->transactions = new ArrayCollection();
-        $this->payments = new ArrayCollection();
-        $this->pies = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->setUpdatedAtValue();
+    }
+
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     #[Assert\Callback]
@@ -153,6 +159,13 @@ class Position
                 ->atPath('amount')
                 ->addViolation();
         }
+    }
+
+    public function __construct()
+    {
+        $this->transactions = new ArrayCollection();
+        $this->payments = new ArrayCollection();
+        $this->pies = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -335,15 +348,6 @@ class Position
         return $this->getTicker()->isDividendPayMonth($currentMonth);
     }
 
-    /**
-     * Gets triggered only on insert
-     */
-    #[ORM\PrePersist]
-    public function onPrePersist()
-    {
-        $this->createdAt = new \DateTime("now");
-    }
-
     public function setCreatedAt(DateTimeInterface $createdAt = null): self
     {
         $this->createdAt = ($createdAt instanceof DateTime) ? $createdAt : new DateTime("now");
@@ -354,15 +358,6 @@ class Position
     public function getCreatedAt(): DateTimeInterface
     {
         return $this->createdAt;
-    }
-
-    /**
-     * Gets triggered every time on update
-     */
-    #[ORM\PreUpdate]
-    public function onPreUpdate()
-    {
-        $this->updatedAt = new \DateTime("now");
     }
 
     public function setUpdatedAt(DateTimeInterface $updatedAt = null): self

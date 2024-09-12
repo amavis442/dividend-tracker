@@ -115,6 +115,19 @@ class Payment
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $importfile = null;
 
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->setUpdatedAtValue();
+    }
+
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -236,15 +249,6 @@ class Payment
         return $this->position;
     }
 
-    /**
-     * Gets triggered only on insert
-     */
-    #[ORM\PrePersist]
-    public function onPrePersist()
-    {
-        $this->createdAt = new \DateTime("now");
-    }
-
     public function setCreatedAt(DateTimeInterface $createdAt = null): self
     {
         $this->createdAt = $createdAt ?? new DateTime("now");
@@ -255,15 +259,6 @@ class Payment
     public function getCreatedAt(): DateTimeInterface
     {
         return $this->createdAt;
-    }
-
-    /**
-     * Gets triggered every time on update
-     */
-    #[ORM\PreUpdate]
-    public function onPreUpdate()
-    {
-        $this->updatedAt = new \DateTime("now");
     }
 
     public function setUpdatedAt(DateTimeInterface $updatedAt = null): self

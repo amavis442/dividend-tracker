@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -18,6 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new GetCollection()
     ]
 )]
+#[HasLifecycleCallbacks]
 #[ORM\Entity]
 class Attachment
 {
@@ -56,6 +58,19 @@ class Attachment
     {
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
+    }
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->setUpdatedAtValue();
+    }
+
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int

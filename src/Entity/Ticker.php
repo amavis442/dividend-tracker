@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
@@ -26,6 +27,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ORM\Entity(repositoryClass: 'App\Repository\TickerRepository')]
 #[UniqueEntity('isin')]
+#[HasLifecycleCallbacks]
 class Ticker
 {
     //#[ApiProperty(identifier: false)]
@@ -96,6 +98,19 @@ class Ticker
     #[Groups(['ticker:read', 'ticker:write'])]
     #[ORM\Column(type: 'uuid', nullable: true)]
     private ?Uuid $uuid = null;
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->setUpdatedAtValue();
+    }
+
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
 
     public function __construct()
     {

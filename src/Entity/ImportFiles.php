@@ -6,8 +6,9 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ImportFilesRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints\Unique;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 
+#[HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: ImportFilesRepository::class)]
 class ImportFiles
 {
@@ -21,6 +22,12 @@ class ImportFiles
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->created_at = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {

@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\JournalRepository;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -28,6 +29,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Delete()
     ]
 )]
+#[HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: JournalRepository::class)]
 class Journal
 {
@@ -61,6 +63,19 @@ class Journal
     #[ORM\ManyToMany(targetEntity: Taxonomy::class, inversedBy: 'journals')]
     #[ORM\OrderBy(['title' => 'DESC'])]
     private $taxonomy;
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->setUpdatedAtValue();
+    }
+
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
 
     public function __construct()
     {
