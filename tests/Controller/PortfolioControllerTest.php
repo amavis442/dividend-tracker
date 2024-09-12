@@ -9,7 +9,7 @@ class PortfolioControllerTest extends WebTestCase
     public function testHomePage(): void
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', 'http://dividend.local/');
+        $crawler = $client->request('GET', '/');
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1', 'Dividend tracker');
