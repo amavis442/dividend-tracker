@@ -64,8 +64,7 @@ class DividendTrackerCommand extends Command
                 ->setUser($user)
                 ->setPrinciple($principle)
                 ->setDividend($totalDividend)
-                ->setSampleDate(new DateTime())
-                ->setCreatedAt(new DateTime());
+                ->setSampleDate(new DateTime());
 
             $this->entityManager->persist($dividendTracker);
             $this->entityManager->flush();
