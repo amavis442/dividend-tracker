@@ -178,7 +178,7 @@ class PortfolioController extends AbstractController
          */
         foreach ($reverseCalendars as $index => $calendar) {
             $dividendRaises[$index] = 0;
-            if ($calendar->getDividendType() === Calendar::REGULAR && stripos($calendar->getDescription(), 'Extra') === false) {
+            if ($calendar->getDividendType() === Calendar::REGULAR && stripos($calendar->getDescription() ?? '', 'Extra') === false) {
                 if (isset($oldCal) && $oldCal->getCashAmount() > 0) {
                     $oldCash = $oldCal->getCashAmount(); // previous
                     $dividendRaises[$index] = (($calendar->getCashAmount() - $oldCash) / $oldCash) * 100;
