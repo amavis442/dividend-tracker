@@ -2,25 +2,24 @@
 
 namespace App\Factory;
 
-use App\Entity\User;
+use App\Entity\Attachment;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
- * @extends PersistentProxyObjectFactory<User>
+ * @extends PersistentProxyObjectFactory<Attachment>
  */
-final class UserFactory extends PersistentProxyObjectFactory
+final class AttachmentFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
      *
      * @todo inject services if required
      */
-    public function __construct(private UserPasswordHasherInterface $passwordHasher) {}
+    public function __construct() {}
 
     public static function class(): string
     {
-        return User::class;
+        return Attachment::class;
     }
 
     /**
@@ -31,9 +30,8 @@ final class UserFactory extends PersistentProxyObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'email' => self::faker()->email(),
-            'password' => self::faker()->text(20),
-            'roles' => [],
+            'attachmentName' => self::faker()->words(1, true),
+            'createdAt' => self::faker()->dateTime(),
         ];
     }
 
@@ -42,11 +40,8 @@ final class UserFactory extends PersistentProxyObjectFactory
      */
     protected function initialize(): static
     {
-        return $this->afterInstantiate(function (User $user): void {
-            $user->setPassword($this->passwordHasher->hashPassword(
-                $user,
-                $user->getPassword()
-            ));
-        });
+        return $this
+            // ->afterInstantiate(function(Attachment $attachment): void {})
+        ;
     }
 }

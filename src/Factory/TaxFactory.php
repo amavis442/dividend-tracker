@@ -13,16 +13,6 @@ use function Zenstruck\Foundry\faker;
  */
 final class TaxFactory extends PersistentProxyObjectFactory
 {
-    private const USERNAMES = [
-        'FlamingInferno',
-        'ScaleSorcerer',
-        'TheDragonWithBadBreath',
-        'BurnedOut',
-        'ForgotMyOwnName',
-        'ClumsyClaws',
-        'HoarderOfUselessTrinkets',
-    ];
-
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
      *

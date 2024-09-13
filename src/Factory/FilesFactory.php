@@ -2,25 +2,26 @@
 
 namespace App\Factory;
 
-use App\Entity\User;
+use App\Entity\Files;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
- * @extends PersistentProxyObjectFactory<User>
+ * @extends PersistentProxyObjectFactory<Files>
  */
-final class UserFactory extends PersistentProxyObjectFactory
+final class FilesFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
      *
      * @todo inject services if required
      */
-    public function __construct(private UserPasswordHasherInterface $passwordHasher) {}
+    public function __construct()
+    {
+    }
 
     public static function class(): string
     {
-        return User::class;
+        return Files::class;
     }
 
     /**
@@ -31,9 +32,7 @@ final class UserFactory extends PersistentProxyObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'email' => self::faker()->email(),
-            'password' => self::faker()->text(20),
-            'roles' => [],
+            'filename' => self::faker()->text(255),
         ];
     }
 
@@ -42,11 +41,8 @@ final class UserFactory extends PersistentProxyObjectFactory
      */
     protected function initialize(): static
     {
-        return $this->afterInstantiate(function (User $user): void {
-            $user->setPassword($this->passwordHasher->hashPassword(
-                $user,
-                $user->getPassword()
-            ));
-        });
+        return $this
+            // ->afterInstantiate(function(Files $files): void {})
+        ;
     }
 }
