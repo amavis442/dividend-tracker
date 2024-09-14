@@ -29,6 +29,9 @@ class PortfolioModel
         private Stopwatch $stopwatch,
     ) {}
 
+    /**
+     * Add the dividend
+     */
     private function getDividends(PaymentRepository $paymentRepository, array $tickerIds): void
     {
         $this->stopwatch->start('portfoliomodel-getDividends');
@@ -43,6 +46,8 @@ class PortfolioModel
     }
 
     /**
+     * Page Decorator
+     *
      * @var \Traversable<Position> $positions
      */
     private function createPortfolioItem(
@@ -56,7 +61,6 @@ class PortfolioModel
         $currentDate = new DateTime();
 
         // Need all Position ids and all Ticker ids
-
         $tickerIds = [];
 
         /**
@@ -170,7 +174,7 @@ class PortfolioModel
         ?string $pieSelected = null
     ): static {
         $order = 't.symbol';
-        if (in_array($orderBy, ['industry'])) {
+        if ($orderBy == 'industry') {
             $order = 'i.label';
         }
         if (in_array($orderBy, ['symbol', 'fullname'])) {
@@ -189,11 +193,10 @@ class PortfolioModel
         }
 
         $this->maxPages = (int) ceil($pager->count() / $limit);
-        $iter = $pager->getIterator();
         $tickerIds = [];
         $this->stopwatch->stop('portfoliomodel-getpage');
 
-        $tickerIds = $this->createPortfolioItem($iter, $totalInvested, $dividendService, $tickerIds);
+        $tickerIds = $this->createPortfolioItem($pager, $totalInvested, $dividendService, $tickerIds);
         $this->getDividends($paymentRepository, $tickerIds);
 
         $this->tickerIds = $tickerIds;

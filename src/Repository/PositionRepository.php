@@ -38,7 +38,6 @@ class PositionRepository extends ServiceEntityRepository
         int $status = self::OPEN,
         array $pies = null
     ): Paginator {
-
         $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
         if ($status === self::OPEN) {
             $queryBuilder->andWhere('p.closed = false');
