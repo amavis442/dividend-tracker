@@ -54,12 +54,6 @@ class Attachment
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $label = null;
 
-    public function __construct()
-    {
-        $this->createdAt = new \DateTime();
-        $this->updatedAt = new \DateTime();
-    }
-
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
     {
