@@ -59,3 +59,4 @@ when@prod:
                 type: stream
                 channels: [deprecation]
                 path: "%kernel.logs_dir%/%kernel.environment%.log"
+                formatter: monolog.formatter.json
