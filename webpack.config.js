@@ -102,4 +102,3 @@ Encore
     ;
 
 module.exports = Encore.getWebpackConfig();
-const Encore = require('@symfony/webpack-encore');
