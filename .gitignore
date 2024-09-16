@@ -39,3 +39,7 @@ yarn-error.log
 ###< phpunit/phpunit ###
 
 /**/*.bck
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###
