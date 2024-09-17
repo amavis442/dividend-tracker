@@ -2,7 +2,7 @@
   "intelephense.environment.phpVersion": "8.2.0",
   "editor.insertSpaces": true,
   "editor.formatOnSave": true,
-  "editor.tabSize": 2,
+  "editor.tabSize": 4,
   "eslint.alwaysShowStatus": true,
   "files.trimTrailingWhitespace": true,
   "files.exclude": {},
