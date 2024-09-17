@@ -26,6 +26,13 @@ services:
             - "../src/Kernel.php"
             - "../src/Tests/"
 
+    # controllers are imported separately to make sure services can be injected
+    # as action arguments even if you don't extend any base controller class
+    App\Controller\:
+        resource: "../src/Controller"
+        tags: ["controller.service_arguments"]
+
+    # Listeners
     on_request_listener:
         class: App\EventListener\OnRequestListener
         arguments: ["@doctrine.orm.entity_manager", "@security.token_storage"]
@@ -35,20 +42,6 @@ services:
                   event: kernel.request,
                   method: onKernelRequest,
               }
-
-    # controllers are imported separately to make sure services can be injected
-    # as action arguments even if you don't extend any base controller class
-    App\Controller\:
-        resource: "../src/Controller"
-        tags: ["controller.service_arguments"]
-
-    App\Service\FileUploader:
-        arguments:
-            $targetDirectory: "%documents_directory%"
-
-    App\Service\PositionService:
-        arguments:
-            $entityManager: "@doctrine.orm.entity_manager"
 
     # Setup alias for the ExchangeRateInterface so autowire understand it
     App\Service\ExchangeRate\EuExchangeRateService: ~
@@ -126,9 +119,9 @@ services:
     #    tags:
     #        - { name: doctrine.event_listener, event: prePersist }
 
-    App\EventListener\UpdatedAtTimestamp:
-        tags:
-            - { name: doctrine.event_listener, event: preUpdate }
+    #App\EventListener\UpdatedAtTimestamp:
+    #    tags:
+    #        - { name: doctrine.event_listener, event: preUpdate }
 
     App\EventListener\AddUser:
         tags:
