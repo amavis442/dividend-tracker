@@ -1,5 +1,12 @@
-<form method="post" action="{{ path('transaction_delete', {'id': transaction.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+<form method="post" action="{{ path('transaction_delete', {'id': transaction.id}) }}"
+{{ stimulus_controller('delete-confirm',{ title: 'Remove this item?'|trans,
+                                          icon: 'warning',
+                                          confirmButtonText: 'Yes, remove it'|trans,
+                                          cancelButtonText: 'Cancel'|trans,
+                                          }) }}
+{{ stimulus_action('delete-confirm','onSubmit') }}
+>
     <input type="hidden" name="_method" value="DELETE">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ transaction.id) }}">
-    <button class="btn btn-danger"><i class="fas fa-trash"></i></button>
+    <button class="btn btn-danger" id="deleteBtn"><i class="fas fa-trash"></i></button>
 </form>
