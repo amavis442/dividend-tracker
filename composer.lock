@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3264c8ded3f6bd24fcb81d9f81a82e99",
+    "content-hash": "e3dcd62e9807190e1759bee11a90a8c7",
     "packages": [
         {
             "name": "api-platform/core",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/api-platform/core.git",
-                "reference": "e2eeb6b710f96542b75357a13d8d69ed4d8be5e2"
+                "reference": "d08d4dd2227c8f528b15d8d2513a647b1aebabc7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/api-platform/core/zipball/e2eeb6b710f96542b75357a13d8d69ed4d8be5e2",
-                "reference": "e2eeb6b710f96542b75357a13d8d69ed4d8be5e2",
+                "url": "https://api.github.com/repos/api-platform/core/zipball/d08d4dd2227c8f528b15d8d2513a647b1aebabc7",
+                "reference": "d08d4dd2227c8f528b15d8d2513a647b1aebabc7",
                 "shasum": ""
             },
             "require": {
@@ -190,9 +190,9 @@
             ],
             "support": {
                 "issues": "https://github.com/api-platform/core/issues",
-                "source": "https://github.com/api-platform/core/tree/v3.3.12"
+                "source": "https://github.com/api-platform/core/tree/v3.3.13"
             },
-            "time": "2024-08-30T14:44:44+00:00"
+            "time": "2024-09-15T08:23:39+00:00"
         },
         {
             "name": "beberlei/doctrineextensions",
@@ -8061,30 +8061,50 @@
             "time": "2024-08-12T09:55:28+00:00"
         },
         {
-            "name": "symfony/ux-react",
-            "version": "v2.19.3",
+            "name": "symfony/ux-autocomplete",
+            "version": "v2.19.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/ux-react.git",
-                "reference": "6518cecc62c800b1ece02b70d1dec0067d012495"
+                "url": "https://github.com/symfony/ux-autocomplete.git",
+                "reference": "ef15862c55e15a2225587e8b226df21561d36c7c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ux-react/zipball/6518cecc62c800b1ece02b70d1dec0067d012495",
-                "reference": "6518cecc62c800b1ece02b70d1dec0067d012495",
+                "url": "https://api.github.com/repos/symfony/ux-autocomplete/zipball/ef15862c55e15a2225587e8b226df21561d36c7c",
+                "reference": "ef15862c55e15a2225587e8b226df21561d36c7c",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.1",
-                "symfony/stimulus-bundle": "^2.9.1"
+                "symfony/dependency-injection": "^6.3|^7.0",
+                "symfony/deprecation-contracts": "^2.5|^3",
+                "symfony/http-foundation": "^6.3|^7.0",
+                "symfony/http-kernel": "^6.3|^7.0",
+                "symfony/property-access": "^6.3|^7.0",
+                "symfony/string": "^6.3|^7.0"
+            },
+            "conflict": {
+                "doctrine/orm": "2.9.0 || 2.9.1"
             },
             "require-dev": {
-                "symfony/asset-mapper": "^6.3|^7.0",
-                "symfony/finder": "^5.4|^6.0|^7.0",
-                "symfony/framework-bundle": "^5.4|^6.0|^7.0",
-                "symfony/phpunit-bridge": "^5.4|^6.0|^7.0",
-                "symfony/twig-bundle": "^5.4|^6.0|^7.0",
-                "symfony/var-dumper": "^5.4|^6.0|^7.0"
+                "doctrine/collections": "^1.6.8|^2.0",
+                "doctrine/doctrine-bundle": "^2.4.3",
+                "doctrine/orm": "^2.9.4|^3.0",
+                "fakerphp/faker": "^1.22",
+                "mtdowling/jmespath.php": "^2.6",
+                "symfony/form": "^6.3|^7.0",
+                "symfony/framework-bundle": "^6.3|^7.0",
+                "symfony/maker-bundle": "^1.40",
+                "symfony/options-resolver": "^6.3|^7.0",
+                "symfony/phpunit-bridge": "^6.3|^7.0",
+                "symfony/process": "^6.3|^7.0",
+                "symfony/security-bundle": "^6.3|^7.0",
+                "symfony/security-csrf": "^6.3|^7.0",
+                "symfony/twig-bundle": "^6.3|^7.0",
+                "symfony/uid": "^6.3|^7.0",
+                "twig/twig": "^2.14.7|^3.0.4",
+                "zenstruck/browser": "^1.1",
+                "zenstruck/foundry": "1.37.*"
             },
             "type": "symfony-bundle",
             "extra": {
@@ -8095,7 +8115,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony\\UX\\React\\": "src/"
+                    "Symfony\\UX\\Autocomplete\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -8104,21 +8124,17 @@
             ],
             "authors": [
                 {
-                    "name": "Titouan Galopin",
-                    "email": "galopintitouan@gmail.com"
-                },
-                {
                     "name": "Symfony Community",
                     "homepage": "https://symfony.com/contributors"
                 }
             ],
-            "description": "Integration of React in Symfony",
+            "description": "JavaScript Autocomplete functionality for Symfony",
             "homepage": "https://symfony.com",
             "keywords": [
                 "symfony-ux"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-react/tree/v2.19.3"
+                "source": "https://github.com/symfony/ux-autocomplete/tree/v2.19.2"
             },
             "funding": [
                 {
@@ -8134,7 +8150,91 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-08-14T04:55:38+00:00"
+            "time": "2024-08-13T14:54:57+00:00"
+        },
+        {
+            "name": "symfony/ux-twig-component",
+            "version": "v2.19.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/ux-twig-component.git",
+                "reference": "7f8d4891e8e3a3303de11bfc7224b176a23a2c1c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/ux-twig-component/zipball/7f8d4891e8e3a3303de11bfc7224b176a23a2c1c",
+                "reference": "7f8d4891e8e3a3303de11bfc7224b176a23a2c1c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "symfony/dependency-injection": "^5.4|^6.0|^7.0",
+                "symfony/deprecation-contracts": "^2.2|^3.0",
+                "symfony/event-dispatcher": "^5.4|^6.0|^7.0",
+                "symfony/property-access": "^5.4|^6.0|^7.0",
+                "twig/twig": "^3.8"
+            },
+            "conflict": {
+                "symfony/config": "<5.4.0"
+            },
+            "require-dev": {
+                "symfony/console": "^5.4|^6.0|^7.0",
+                "symfony/css-selector": "^5.4|^6.0|^7.0",
+                "symfony/dom-crawler": "^5.4|^6.0|^7.0",
+                "symfony/framework-bundle": "^5.4|^6.0|^7.0",
+                "symfony/phpunit-bridge": "^6.0|^7.0",
+                "symfony/stimulus-bundle": "^2.9.1",
+                "symfony/stopwatch": "^5.4|^6.0|^7.0",
+                "symfony/twig-bundle": "^5.4|^6.0|^7.0",
+                "symfony/webpack-encore-bundle": "^1.15"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "thanks": {
+                    "name": "symfony/ux",
+                    "url": "https://github.com/symfony/ux"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\UX\\TwigComponent\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Twig components for Symfony",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "components",
+                "symfony-ux",
+                "twig"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/ux-twig-component/tree/v2.19.2"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2024-08-13T03:00:01+00:00"
         },
         {
             "name": "symfony/ux-vue",
@@ -10185,16 +10285,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v5.1.0",
+            "version": "v5.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "683130c2ff8c2739f4822ff7ac5c873ec529abd1"
+                "reference": "23c79fbbfb725fb92af9bcf41065c8e9a0d49ddb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/683130c2ff8c2739f4822ff7ac5c873ec529abd1",
-                "reference": "683130c2ff8c2739f4822ff7ac5c873ec529abd1",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/23c79fbbfb725fb92af9bcf41065c8e9a0d49ddb",
+                "reference": "23c79fbbfb725fb92af9bcf41065c8e9a0d49ddb",
                 "shasum": ""
             },
             "require": {
@@ -10237,9 +10337,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
-                "source": "https://github.com/nikic/PHP-Parser/tree/v5.1.0"
+                "source": "https://github.com/nikic/PHP-Parser/tree/v5.2.0"
             },
-            "time": "2024-07-01T20:03:41+00:00"
+            "time": "2024-09-15T16:40:33+00:00"
         },
         {
             "name": "phar-io/manifest",
