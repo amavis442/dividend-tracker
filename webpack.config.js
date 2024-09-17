@@ -22,6 +22,7 @@ Encore
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
     .addEntry('app', './assets/app.js')
+
     .addEntry('fileupload', './assets/js/fileupload.js')
     .addEntry('piechart', './assets/js/piechart.js')
     .addEntry('barchart', './assets/js/barchart.js')
@@ -33,8 +34,6 @@ Encore
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
 
-    // uncomment if you use React
-    .enableReactPreset()
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     .enableStimulusBridge('./assets/controllers.json')
@@ -68,37 +67,31 @@ Encore
     })
 
     // enables Sass/SCSS support
-    .enableSassLoader()
+    //.enableSassLoader()
 
     // uncomment if you use TypeScript
     .enableTypeScriptLoader()
 
-    .enableVueLoader()
-    .configureDefinePlugin((options) => {
-        options.ENV_API_ENDPOINT = JSON.stringify(process.env.API_ENDPOINT);
-        options.__VUE_OPTIONS_API__ = false;
-        options.__VUE_PROD_DEVTOOLS__ = false;
-    })
+    // uncomment if you use React
+    //.enableReactPreset()
 
     // uncomment to get integrity="..." attributes on your script & link tags
     // requires WebpackEncoreBundle 1.4 or higher
     //.enableIntegrityHashes(Encore.isProduction())
 
+    .enableVueLoader()
     // uncomment if you're having problems with a jQuery plugin
     // uncomment if you use TypeScript
+
     .addAliases({
         'jQuery': path.join(__dirname, 'node_modules/jquery/dist/jquery.js')
     })
-    .autoProvidejQuery()
-    .autoProvideVariables({
-        $: 'jquery',
-        jQuery: 'jquery',
-        'window.jQuery': 'jquery',
-    })
 
+
+    .autoProvidejQuery() // Necessary for summernote
     //.enablePostCssLoader()
 
-    .autoProvideVariables()
+    //.autoProvideVariables()
     ;
 
 module.exports = Encore.getWebpackConfig();
