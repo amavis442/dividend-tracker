@@ -35,7 +35,7 @@
 							</select>
 						</div>
 						<div class="col">
-							<button class="btn btn-secondary mb-2" data-toggle="tooltip" data-placement="top" title="Search Ticker">
+							<button class="btn btn-secondary mb-2" data-bs-toggle="tooltip" data-placement="top" title="Search Ticker">
 								<i class="fas fa-solid fa-filter"></i>
 							</button>
 							</div>
@@ -54,7 +54,7 @@
 						<th scope="col">{{ 'Allocation'|trans }}</th>
 						<th scope="col">
 							{{ 'Received dividend'|trans }}
-							<span title="{{'Dividend per position'|trans }}" data-toggle="tooltip" data-placement="top">
+							<span title="{{'Dividend per position'|trans }}" data-bs-toggle="tooltip" data-placement="top">
 								<i class="fas fa-question-circle"></i>
 							</span>
 
@@ -65,7 +65,7 @@
 							{{ 'Payout'|trans }}
 						</th>
 						<th scope="col">{{ 'Forward dividend'|trans }}
-							<span title="{{'Dividend yield based on cost basis'|trans }}" data-toggle="tooltip" data-placement="top">
+							<span title="{{'Dividend yield based on cost basis'|trans }}" data-bs-toggle="tooltip" data-placement="top">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
@@ -78,7 +78,7 @@
 							<td>
 
 								<div>
-									<span {% if portfolioItem.fullname|length > 20 %} data-toggle="tooltip" data-placement="top" title="{{ portfolioItem.fullname }} ({{ portfolioItem.symbol }})" {% endif %}>
+									<span {% if portfolioItem.fullname|length > 20 %} data-bs-toggle="tooltip" data-placement="top" title="{{ portfolioItem.fullname }} ({{ portfolioItem.symbol }})" {% endif %}>
 										<a href="{{ path('portfolio_show', {'id': portfolioItem.positionId}) }}">{{ portfolioItem.fullname|slice(0, 20) }}
 											{% if portfolioItem.fullname|length > 20 %}...
 											{% endif %}

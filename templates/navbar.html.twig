@@ -1,104 +1,85 @@
-<nav class="tw-bg-gray-800">
-	<div class="tw-mx-auto tw-max-w-7xl tw-px-2 sm:tw-px-6 lg:tw-px-8">
-		<div class="tw-relative tw-flex tw-h-16 tw-items-center tw-justify-between">
-			<div
-				class="tw-absolute tw-inset-y-0 tw-left-0 tw-flex tw-items-center sm:tw-hidden">
-				<!-- Mobile menu button-->
-				<button type="button" class="tw-relative tw-inline-flex tw-items-center
-																tw-justify-center tw-rounded-md tw-p-2
-																tw-text-gray-400 hover:tw-bg-gray-700 hover:tw-text-white focus:tw-outline-none focus:tw-ring-2
-																focus:tw-ring-inset focus:tw-ring-white" aria-controls="mobile-menu" aria-expanded="false">
-					<span class="tw-absolute -tw-inset-0.5"></span>
-					<span class="tw-sr-only">Open main menu</span>
-					<!--
-						Icon when menu is closed.
+{% block menu %}
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
 
-						Menu open: "hidden", Menu closed: "block"
-					-->
-					<svg class="tw-block tw-h-6 tw-w-6" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
-					</svg>
-					<!--
-																																																																																																																																																																																														            Icon when menu is open.
+    <a class="navbar-brand" href="#">Dividend tracker</a>
 
-																																																																																																																																																																																														            Menu open: "block", Menu closed: "hidden"
-																																																																																																																																																																																														          -->
-					<svg class="tw-hidden tw-h-6 tw-w-6" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-					</svg>
-				</button>
-			</div>
-			<div class="t-flex tw-flex-1 tw-items-center tw-justify-center sm:tw-items-stretch sm:tw-justify-start">
-				<div class="tw-flex tw-flex-shrink-0 tw-items-center">
-					<img class="tw-h-8 tw-w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company">
-				</div>
-				<div class="tw-hidden sm:tw-ml-6 sm:tw-block">
-					<div
-						class="tw-flex tw-space-x-4">
-						<!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-						<a href="#" class="tw-rounded-md tw-bg-gray-900 tw-px-3 tw-py-2 tw-text-sm tw-font-medium tw-text-white" aria-current="page">Dashboard</a>
-						<a href="#" class="tw-rounded-md tw-px-3 tw-py-2 tw-text-sm tw-font-medium tw-text-gray-300 hover:tw-bg-gray-700 hover:tw-text-white">Team</a>
-						<a href="#" class="tw-rounded-md tw-px-3 tw-py-2 tw-text-sm tw-font-medium tw-text-gray-300 hover:tw-bg-gray-700 hover:tw-text-white">Projects</a>
-						<a href="#" class="tw-rounded-md tw-px-3 tw-py-2 tw-text-sm tw-font-medium tw-text-gray-300 hover:tw-bg-gray-700 hover:tw-text-white">Calendar</a>
-					</div>
-				</div>
-			</div>
-			<div class="tw-absolute tw-inset-y-0 tw-right-0 tw-flex tw-items-center tw-pr-2 sm:tw-static sm:tw-inset-auto sm:tw-ml-6 sm:tw-pr-0">
-				<button type="button" class="tw-relative tw-rounded-full tw-bg-gray-800
-																																																																																																																								        tw-p-1 tw-text-gray-400 hover:tw-text-white focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-white
-																																																																																																																		                    focus:tw-ring-offset-2 focus:tw-ring-offset-gray-800">
-					<span class="tw-absolute -tw-inset-1.5"></span>
-					<span class="tw-sr-only">View notifications</span>
-					<svg class="tw-h-6 tw-w-6" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
-					</svg>
-				</button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
 
-				<!-- Profile dropdown -->
-				<div class="tw-relative tw-ml-3">
-					<div>
-						<button type="button" class="tw-relative tw-flex tw-rounded-full tw-bg-gray-800 tw-text-sm
-																																																															                          focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-white
-																																																															                          focus:tw-ring-offset-2 focus:tw-ring-offset-gray-800" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
-							<span class="tw-absolute -inset-1.5"></span>
-							<span class="tw-sr-only">Open user menu</span>
-							<img class="tw-h-8 tw-w-8 tw-rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
-						</button>
-					</div>
+    <ul class="navbar-nav mr-auto">
+      {% if is_granted('ROLE_USER') %}
+        <li class="nav-item dropdown">
 
-					<!--
-																																																																																  Dropdown menu, show/hide based on menu state.
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown1" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-cog"></i> {{ 'Admin'|trans }}
+          </a>
 
-																																																																																  Entering: "transition ease-out duration-100"
-																																																																																    From: "transform opacity-0 scale-95"
-																																																																																    To: "transform opacity-100 scale-100"
-																																																																																  Leaving: "transition ease-in duration-75"
-																																																																																    From: "transform opacity-100 scale-100"
-																																																																																    To: "transform opacity-0 scale-95"
-																																																																																-->
-					<div
-						class="tw-absolute tw-right-0 tw-z-10 tw-mt-2 tw-w-48 tw-origin-top-right
-																																																																																																																							            tw-rounded-md tw-bg-white tw-py-1 tw-shadow-lg tw-ring-1
-																																																																																																																                          tw-ring-black tw-ring-opacity-5 focus:tw-outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
-						<!-- Active: "bg-gray-100", Not Active: "" -->
-						<a href="#" class="tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-0">Your Profile</a>
-						<a href="#" class="tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-1">Settings</a>
-						<a href="#" class="tw-block tw-px-4 tw-py-2 tw-text-sm tw-text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-2">Sign out</a>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
+            <a href="{{ url('branch_index', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="fas fa-industry pr-2"></i> {{ 'Industry'|trans }}</a>
+            <a href="{{ url('ticker_index', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="fas fa-ticket-alt pr-2"></i> Tickers</a>
+            <a href="{{ url('research_index', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="fas fa-search-plus pr-2"></i> {{ 'Research on Tickers'|trans }}</a>
+            <a href="{{ url('closed_position_index', parameters = { status: 2 }, schemeRelative = false) }}" class="dropdown-item"><i class="fas fa-store-alt-slash pr-2"></i> {{ 'Closed positions'|trans }}</a>
+            <div class="dropdown-divider"></div>
+            <a href="{{ url('pie_index', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="fas fa-chart-pie pr-2"></i> {{ 'Pies'|trans }}</a>
+            <div class="dropdown-divider"></div>
+            <a href="{{ url('csv_import', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="fas fa-file-import pr-2"></i> {{ 'Import csv'|trans }}</a>
+            <div class="dropdown-divider"></div>
+            <a href="{{ url('journal_index', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="fas fa-blog pr-2"></i> {{ 'Journal'|trans }}</a>
+            <div class="dropdown-divider"></div>
+            <a href="{{ url('app_account_update', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="far fa-user-circle pr-2"></i> {{ 'Account'|trans }}</a>
+            <div class="dropdown-divider"></div>
+            <a href="{{ url('app_taxonomy_index', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="fa-solid fa-thumbtack pr-2"></i> {{ 'Taxonomy'|trans }}</a>
+            <div class="dropdown-divider"></div>
+            <a href="{{ url('currency_index', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="fas fa-money-bill-alt pr-2"></i> {{ 'Currency'|trans }}</a>
+            <a href="{{ url('tax_index', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="fas fa-percent pr-2"></i> {{ 'Taxtarifs'|trans }}</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a href="{{ url('portfolio_index', parameters = [], schemeRelative = false) }}" class="nav-link"><i class="fas fa-landmark pr-2"></i> {{ 'Portfolio'|trans }}</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown3" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="far fa-calendar-alt"></i> Dividend</a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown3">
+            <a href="{{ url('payment_index', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="far fa-money-bill-alt pr-2"></i> {{ 'Payments'|trans }}</a>
+            <div class="dropdown-divider"></div>
+            <a href="{{ url('calendar_index', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="far fa-calendar-alt pr-2"></i> {{ 'Calendar'|trans }}</a>
+            <a href="{{ url('calendar_per_date_table', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="fas fa-calendar-alt pr-2"></i> {{ 'Calendar per date printout'|trans }}</a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown4" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-bullseye"></i> {{ 'Reports'|trans }}</a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown4">
+            <a href="{{ url('dividend_tracker', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="fas fa-chart-line pr-2"></i> {{ 'Dividend Tracker'|trans }}</a>
+            <div class="dropdown-divider"></div>
+            <a href="{{ url('report_allocation_sector', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="fas fa-chart-pie pr-2"></i> {{ 'Sector allocation'|trans }}</a>
+            <a href="{{ url('report_allocation_position', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="fas fa-chart-pie pr-2"></i> {{ 'Position allocation'|trans }}</a>
+            <div class="dropdown-divider"></div>
+            <a href="{{ url('dividend_month_index', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Dividend month Tickers'|trans }}</a>
+            <a href="{{ url('report_payout', parameters = [], schemeRelative = false) }}" class="dropdown-item">{{ 'Dividend payout'|trans }}</a>
+            <div class="dropdown-divider"></div>
+            <a href="{{ url('report_dividend_yield_by_pie', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="fas fa-chart-bar pr-2"></i> {{ 'Dividend yield'|trans }}</a>
+            <div class="dropdown-divider"></div>
+            <a href="{{ url('compound_prediction', parameters = [], schemeRelative = false) }}" class="dropdown-item"><i class="fas fa-calculator pr-2"></i> {{ 'Compound calc'|trans }}</a>
+            <div class="dropdown-divider"></div>
+            <a href="{{ url('report_export_transactions', parameters = [], schemeRelative = false) }}" class="dropdown-item" target="_new"><i class="fas fa-file-export pr-r"></i> {{ 'Export transactions'|trans }}</a>
+            <a href="{{ url('report_export_dividend', parameters = [], schemeRelative = false) }}" class="dropdown-item" target="_new"><i class="fas fa-file-export pr-r"></i> {{ 'Export dividend'|trans }}</a>
+          </div>
+        </li>
+      {% endif %}
+    </ul>
+</div>
+    {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+      <div class="my-2 my-lg-0 d-flex">
+        <span class="navbar-text p-2">
+          Email:
+          {{ app.user.email }}
+        </span>
+        <a href="{{ path('app_logout') }}" class="btn btn-primary">{{ 'Logout'|trans }}</a>
+      </div>
+    {% else %}
+      <a href="{{ path('app_login') }}" class="btn btn-primary">{{ 'Login'|trans }}</a>
+    {% endif %}
 
-	<!-- Mobile menu, show/hide based on menu state. -->
-	<div class="sm:tw-hidden" id="mobile-menu">
-		<div
-			class="tw-space-y-1 tw-px-2 tw-pb-3 tw-pt-2">
-			<!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-			<a href="#" class="tw-block tw-rounded-md tw-bg-gray-900 tw-px-3 tw-py-2 tw-text-base tw-font-medium tw-text-white" aria-current="page">Dashboard</a>
-			<a href="#" class="tw-block tw-rounded-md tw-px-3 tw-py-2 tw-text-base tw-font-medium tw-text-gray-300 hover:tw-bg-gray-700 hover:tw-text-white">Team</a>
-			<a href="#" class="tw-block tw-rounded-md tw-px-3 tw-py-2 tw-text-base tw-font-medium tw-text-gray-300 hover:tw-bg-gray-700 hover:tw-text-white">Projects</a>
-			<a href="#" class="tw-block tw-rounded-md tw-px-3 tw-py-2 tw-text-base tw-font-medium tw-text-gray-300 hover:tw-bg-gray-700 hover:tw-text-white">Calendar</a>
-		</div>
-	</div>
-</nav>
+    </div>
+  </nav>
+{% endblock %}
