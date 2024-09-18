@@ -62,7 +62,7 @@ set('rsync', [
     'timeout' => 60,
 ]);
 
-set('nvm', 'source $HOME/.nvm/nvm.sh');
+set('nvm', 'source $HOME/.nvm/nvm.sh'); // Yarn still needs this to work (maybe sh messes things up)
 set('use_nvm', function () {
     return '{{nvm}} && node --version && nvm use 20';
 });
@@ -80,12 +80,12 @@ task('deploy:migrate_db_dividend', [
 
 desc('Yarn install'); // For encore and stuff
 task('yarn:install', function () {
-    run('cd ' . get('release_path') . ' && yarn install');
+    run('{{use_nvm}} && cd ' . get('release_path') . ' && $HOME/.yarn/bin/yarn install');
 });
 
 desc('Yarn build');
 task('yarn:build', function () {
-    run('cd ' . get('release_path') . ' && yarn build');
+    run('{{use_nvm}} && cd ' . get('release_path') . ' && $HOME/.yarn/bin/yarn build');
 });
 
 option('source', null, InputOption::VALUE_OPTIONAL, 'Source alias of the current task.');
