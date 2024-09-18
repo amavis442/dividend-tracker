@@ -11,6 +11,7 @@ use App\Model\PortfolioModel;
 use App\Repository\CalendarRepository;
 use App\Service\DividendService;
 use App\Service\Referer;
+use App\Traits\TickerAutocompleteTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,9 +22,11 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route(path: '/dashboard/calendar')]
 class CalendarController extends AbstractController
 {
+    use TickerAutocompleteTrait;
+
     public const SEARCH_KEY = 'calendar_searchCriteria';
 
-    #[Route(path: '/list/{page}/{orderBy}/{sort}', name: 'calendar_index', methods: ['GET'])]
+    #[Route(path: '/list/{page}/{orderBy}/{sort}', name: 'calendar_index', methods: ['GET', 'POST'])]
     public function index(
         Request $request,
         CalendarRepository $calendarRepository,
@@ -40,6 +43,8 @@ class CalendarController extends AbstractController
         }
         $session = $request->getSession();
         $searchCriteria = $session->get(self::SEARCH_KEY, '');
+        [$form, $searchCriteria] = $this->searchTicker($request, self::SEARCH_KEY, true);
+
         $items = $calendarRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit) > 10 ? 10 : ceil($items->count() / $limit);
@@ -57,6 +62,7 @@ class CalendarController extends AbstractController
             'routeName' => 'calendar_index',
             'searchCriteria' => $searchCriteria ?? '',
             'searchPath' => 'calendar_search',
+            'autoCompleteForm' => $form,
         ]);
     }
 

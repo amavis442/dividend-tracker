@@ -6,7 +6,13 @@
 {% block body %}
 	<h1>Positions</h1>
 	<br/>
-	{% include '_search_form.html.twig' %}
+
+	<div class="row g2">
+		<div class="col">
+		{% include '_search_form.html.twig' %}
+		</div>
+		<div class="col"></div>
+	</div>
 
 	<table class="table">
 		<thead>
@@ -26,7 +32,9 @@
 			{% for position in positions %}
 				<tr>
 					<td>
-						<div class="alert alert-primary">{{ position.closedAt ? position.closedAt|date("d-m-Y H:i:s") : '' }}</div>
+						<span class="badge bg-primary">
+							{{ position.closedAt ? position.closedAt|date("d-m-Y H:i:s") : '' }}
+						</span>
 					</td>
 					<td>
 						{{ position.ticker.symbol }}
@@ -36,9 +44,11 @@
 					</td>
 					<td>{{ position.ticker.branch.label }}</td>
 					<td>
-						<span class="alert alert-{% if position.profit > 0 %}success{% else %}danger{% endif %}">&euro;{{ (position.profit)|format_number({fraction_digit: 2}) }}</span>
+						<span class="badge bg-{% if position.profit > 0 %}success{% else %}danger{% endif %}">
+							&euro;{{ (position.profit)|format_number({fraction_digit: 2}) }}
+						</span>
 					</td>
-					<td>{{ position.posid }}</td>
+					<td>{{ position.id }}</td>
 					<td>
 						<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 							<div class="btn-group mr-2" role="group" aria-label="First group">

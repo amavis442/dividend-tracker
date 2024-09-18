@@ -48,6 +48,9 @@ class CalendarRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * TODO: Refactor query
+     */
     public function getAll(
         int $page = 1,
         int $limit = 10,
@@ -70,11 +73,19 @@ class CalendarRepository extends ServiceEntityRepository
             ->select('c')
             ->innerJoin('c.ticker', 't')
             ->orderBy($order, $sort);
-        if (!empty($search)) {
-            $queryBuilder->where('t.symbol LIKE :search');
-            $queryBuilder->setParameter('search', $search . '%');
+
+        $queryBuilder
+            ->where(
+                $queryBuilder->expr()->in('t.id', $queryBuilder2->getDQL())
+            );
+
+        if ($search != '') {
+            $queryBuilder
+                ->where(
+                    $queryBuilder->expr()->like('LOWER(t.isin)', 'LOWER(:search)'),
+                )
+                ->setParameter('search', $search . '%');
         }
-        $queryBuilder->where($queryBuilder->expr()->in('t.id', $queryBuilder2->getDQL()));
 
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);

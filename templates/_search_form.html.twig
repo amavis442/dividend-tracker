@@ -1,10 +1,11 @@
-<form action="{{ path(searchPath) }}" method="post" class="row g-2">
-    <input type="hidden" name="_method" value="POST">
-
-    <div class="col-auto">
-       <input class="form-control" type="text" name="searchCriteria" id="text_search" value="{{ searchCriteria ?? ''}}" placeholder="{{ 'Search ticker'|trans }}"/>
-    </div>
-    <div class="col-auto">
-        <button class="btn btn-secondary mb-2" data-toggle="tooltip" data-placement="top" title="{{ 'Search ticker'|trans }}"><i class="fas fa-search"></i></button>
-    </div>
-</form>
+{{ form_start(autoCompleteForm, { 'method': 'POST', 'attr': { 'class' : 'row g-2', 'autocomplete' : 'off' }}) }}
+	<div class="col">
+		{{ form_errors(autoCompleteForm) }}
+		{{ form_widget(autoCompleteForm.ticker) }}
+	</div>
+	<div class="col-auto">
+		<button class="btn btn-secondary mb-2" data-toggle="tooltip" data-placement="top" title="{{ 'Search ticker'|trans }}">
+			<i class="fas fa-search"></i>
+		</button>
+	</div>
+{{ form_end(autoCompleteForm) }}

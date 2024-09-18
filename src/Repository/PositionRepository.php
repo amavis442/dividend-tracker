@@ -169,14 +169,12 @@ class PositionRepository extends ServiceEntityRepository
             ->select('p, t, i')
             ->innerJoin('p.ticker', 't')
             ->innerJoin('t.branch', 'i')
+            ->where('p.closedAt IS NOT NULL')
             ->orderBy('p.closedAt', $sort);
 
         if (!empty($search)) {
             $queryBuilder->andWhere(
-                $queryBuilder->expr()->orX(
-                    $queryBuilder->expr()->like('t.symbol', ':search'),
-                    $queryBuilder->expr()->like('i.label', ':search')
-                )
+                $queryBuilder->expr()->like('t.isin', ':search'),
             );
             $queryBuilder->setParameter('search', $search . '%');
         }
@@ -295,9 +293,10 @@ class PositionRepository extends ServiceEntityRepository
             $queryBuilder->innerJoin('t.branch', 'b');
             $queryBuilder->andWhere(
                 $queryBuilder->expr()->orX(
-                    $queryBuilder->expr()->like('LOWER(t.symbol)', 'LOWER(:search)'),
+                    $queryBuilder->expr()->like('LOWER(t.isin)', 'LOWER(:search)'),
+                    /* $queryBuilder->expr()->like('LOWER(t.symbol)', 'LOWER(:search)'),
                     $queryBuilder->expr()->like('LOWER(t.fullname)', 'LOWER(:search)'),
-                    $queryBuilder->expr()->like('LOWER(b.label)', 'LOWER(:search)')
+                    $queryBuilder->expr()->like('LOWER(b.label)', 'LOWER(:search)') */
                 )
             );
             $queryBuilder->setParameter('search', $search . '%');

@@ -55,10 +55,9 @@ class ResearchRepository extends ServiceEntityRepository
             ->orderBy($order, $sort);
 
         if (!empty($search)) {
-            $queryBuilder->andWhere($queryBuilder->expr()->orX(
-                $queryBuilder->expr()->like('t.symbol', ':search'),
-                $queryBuilder->expr()->like('r.info', ':search')
-            ));
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->like('t.isin', ':search'),
+            );
             $queryBuilder->setParameter('search', $search . '%');
         }
         return $queryBuilder;

@@ -12,13 +12,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Referer;
+use App\Traits\TickerAutocompleteTrait;
 
 #[Route(path: '/dashboard/ticker')]
 class TickerController extends AbstractController
 {
+    use TickerAutocompleteTrait;
+
     public const SEARCH_KEY = 'ticker_searchCriteria';
 
-    #[Route(path: '/list/{page<\d+>?1}', name: 'ticker_index', methods: ['GET'])]
+    #[Route(path: '/list/{page<\d+>?1}', name: 'ticker_index', methods: ['GET', 'POST'])]
     public function index(
         Request $request,
         TickerRepository $tickerRepository,
@@ -27,19 +30,21 @@ class TickerController extends AbstractController
         string $sort = 'asc'
     ): Response {
         $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
+        [$form, $searchCriteria] = $this->searchTicker($request, self::SEARCH_KEY, true);
+
         $items = $tickerRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
 
         return $this->render('ticker/index.html.twig', [
-            'tickers' => $items->getIterator(),
+            'tickers' => $items,
             'limit' => $limit,
             'maxPages' => $maxPages,
             'thisPage' => $thisPage,
-            'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'ticker_index',
-            'searchPath' => 'ticker_search'
+            'searchPath' => 'ticker_search',
+            'autoCompleteForm' => $form,
         ]);
     }
 
