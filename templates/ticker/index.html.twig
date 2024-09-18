@@ -11,7 +11,14 @@
 		<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
 	{% endfor %}
 
-	{% include '_search_form.html.twig' %}
+	<div class="row">
+		<div class="col">
+			{% include '_search_form.html.twig' %}
+		</div>
+		<div class="col">
+		</div>
+	</div>
+
 	<table class="table">
 		<thead>
 			<tr>

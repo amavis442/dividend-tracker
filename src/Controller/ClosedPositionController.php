@@ -7,6 +7,7 @@ use App\Form\PositionType;
 use App\Repository\PositionRepository;
 use App\Service\PositionService;
 use App\Service\Referer;
+use App\Traits\TickerAutocompleteTrait;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,9 +17,11 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route(path: '/dashboard/closed/position')]
 class ClosedPositionController extends AbstractController
 {
+    use TickerAutocompleteTrait;
+
     public const SEARCH_KEY = 'closed_position_searchCriteria';
 
-    #[Route(path: '/list/{page}/{sort}', name: 'closed_position_index', methods: ['GET'])]
+    #[Route(path: '/list/{page}/{sort}', name: 'closed_position_index', methods: ['GET', 'POST'])]
     public function index(
         Request $request,
         PositionRepository $positionRepository,
@@ -32,6 +35,8 @@ class ClosedPositionController extends AbstractController
 
         $referer->set('closed_position_index', ['status' => PositionRepository::CLOSED]);
         $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '') ?? '';
+        [$form, $searchCriteria] = $this->searchTicker($request, self::SEARCH_KEY, true);
+
         $items = $positionRepository->getAllClosed($page, 10, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
@@ -45,7 +50,8 @@ class ClosedPositionController extends AbstractController
             'sort' => $sort,
             'searchCriteria' => $searchCriteria,
             'routeName' => 'closed_position_index',
-            'searchPath' => 'closed_position_search'
+            'searchPath' => 'closed_position_search',
+            'autoCompleteForm' => $form
         ]);
     }
 

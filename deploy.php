@@ -78,14 +78,14 @@ task('deploy:migrate_db_dividend', [
     'database:migrate'
 ]);
 
-desc('NPM install'); // For encore and stuff
-task('npm:install', function () {
-    run('{{use_nvm}} && cd ' . get('release_path') . ' && npm ci');
+desc('Yarn install'); // For encore and stuff
+task('yarn:install', function () {
+    run('cd ' . get('release_path') . ' && yarn install');
 });
 
-desc('NPM build');
-task('npm:build', function () {
-    run('{{use_nvm}} && cd ' . get('release_path') . ' && npm run build');
+desc('Yarn build');
+task('yarn:build', function () {
+    run('cd ' . get('release_path') . ' && yarn build');
 });
 
 option('source', null, InputOption::VALUE_OPTIONAL, 'Source alias of the current task.');
@@ -112,6 +112,6 @@ task('upload:file', function () {
 
 
 after('deploy:cache:clear', 'deploy:migrate_db_dividend');
-after('deploy:migrate_db_dividend', 'npm:install');
-after('npm:install', 'npm:build');
-after('npm:build', 'composer:dump');
+after('deploy:migrate_db_dividend', 'yarn:install');
+after('yarn:install', 'yarn:build');
+after('yarn:build', 'composer:dump');

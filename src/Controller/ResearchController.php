@@ -14,15 +14,18 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\FileUploader;
 use App\Service\Referer;
+use App\Traits\TickerAutocompleteTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 #[Route(path: '/dashboard/research')]
 class ResearchController extends AbstractController
 {
+    use TickerAutocompleteTrait;
+
     public const SEARCH_KEY = 'research_searchCriteria';
 
-    #[Route(path: '/list/{page}/{orderBy}/{sort}', name: 'research_index', methods: ['GET'])]
+    #[Route(path: '/list/{page}/{orderBy}/{sort}', name: 'research_index', methods: ['GET', 'POST'])]
     public function index(
         Request $request,
         ResearchRepository $researchRepository,
@@ -38,6 +41,8 @@ class ResearchController extends AbstractController
         }
 
         $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
+        [$form, $searchCriteria] = $this->searchTicker($request, self::SEARCH_KEY, true);
+
         $items = $researchRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
@@ -52,7 +57,8 @@ class ResearchController extends AbstractController
             'sort' => $sort,
             'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'research_index',
-            'searchPath' => 'research_search'
+            'searchPath' => 'research_search',
+            'autoCompleteForm' => $form
         ]);
     }
 

@@ -2,18 +2,18 @@
 
 namespace App\Service;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 class FileUploader
 {
-    private $targetDirectory;
-    private $slugger;
-
-    public function __construct(string $targetDirectory, SluggerInterface $slugger)
-    {
+    public function __construct(
+        #[Autowire('%documents_directory%')]
+        private string $targetDirectory,
+        private SluggerInterface $slugger
+    ) {
         $this->targetDirectory = $targetDirectory;
         $this->slugger = $slugger;
     }

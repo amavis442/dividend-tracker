@@ -6,13 +6,14 @@ use App\Entity\Position;
 use App\Entity\Transaction;
 use Doctrine\ORM\EntityManagerInterface;
 use DateTime;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class PositionService
 {
-    protected EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        #[Autowire("@doctrine.orm.entity_manager")]
+        private EntityManagerInterface $entityManager
+    ) {
         $this->entityManager = $entityManager;
     }
 

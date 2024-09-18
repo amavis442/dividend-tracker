@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use ApiPlatform\Core\Filter\Validator\Enum;
+use App\Entity\Constants;
 use App\Entity\Payment;
 use App\Entity\Position;
 use App\Form\PaymentType;
@@ -11,6 +11,7 @@ use App\Model\PortfolioModel;
 use App\Repository\CalendarRepository;
 use App\Repository\PaymentRepository;
 use App\Service\Referer;
+use App\Traits\TickerAutocompleteTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,6 +24,8 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route(path: '/dashboard/payment')]
 class PaymentController extends AbstractController
 {
+    use TickerAutocompleteTrait;
+
     public const SEARCH_KEY = 'payment_searchCriteria';
     public const SEARCHFORM_KEY = 'payment_searchForm';
     public const INTERVAL_KEY = 'payment_interval';
@@ -94,6 +97,10 @@ class PaymentController extends AbstractController
             ->add('submit', SubmitType::class)
             ->getForm();
 
+        $searchCriteria = '';
+        [$autoCompleteForm, $searchCriteria] = $this->searchTicker($request, self::SEARCH_KEY);
+
+
         $form->handleRequest($request);
         $data = $defaultData;
         if ($form->isSubmitted() && $form->isValid()) {
@@ -111,8 +118,10 @@ class PaymentController extends AbstractController
         if (isset($data['quator']) && $data['quator'] !== 0) {
             [$startDate, $endDate] = (new DateHelper())->quaterToDates($data['quator'], $data['year']);
         }
-        $totalDividend = $paymentRepository->getTotalDividend($startDate . " 00:00:00", $endDate . " 23:59:59");
-        $taxes = ($totalDividend / 85) * 15;
+        $totalDividend = $paymentRepository->getTotalDividend($startDate . " 00:00:00", $endDate . " 23:59:59", $searchCriteria);
+
+        $taxes = ($totalDividend / (100 - Constants::TAX)) * Constants::TAX; // TODO: Make this dynamic because not all stocks have 15% dividend tax
+
         $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
         $items = $paymentRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria, $startDate, $endDate);
         $limit = 10;
@@ -122,7 +131,7 @@ class PaymentController extends AbstractController
         $referer->set('payment_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
 
         return $this->render('payment/index.html.twig', [
-            'searchForm' => $form->createView(),
+            'searchForm' => $form,
             'payments' => $items->getIterator(),
             'dividends' => $totalDividend,
             'taxes' => $taxes,
@@ -136,6 +145,7 @@ class PaymentController extends AbstractController
             'searchPath' => 'payment_search',
             'startDate' => $startDate,
             'endDate' => $endDate,
+            'autoCompleteForm' => $autoCompleteForm,
         ]);
     }
 

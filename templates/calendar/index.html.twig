@@ -11,7 +11,13 @@
 		<br/>
 		<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
 	{% endfor %}
-	{% include '_search_form.html.twig' %}
+
+	<div class="row g2">
+		<div class="col">
+		{% include '_search_form.html.twig' %}
+		</div>
+		<div class="col"></div>
+	</div>
 
 	<div class="row mb-3">
 		<div class="col text-right">
@@ -47,8 +53,8 @@
 				</thead>
 				<tbody class="table-group-divider">
 					{% for calendar in calendars %}
-						<tr class="table">
-							<td class="col">
+						<tr>
+							<td>
 								{% if calendar.ticker.positions[0] %}
 									<a href="{{ path('portfolio_show', { id: calendar.ticker.positions[0].id }) }}" data-toggle="tooltip" data-placement="top" title="{{ calendar.ticker.fullname }}">{{ calendar.ticker.fullname|slice(0, 20) }}
 										{% if (calendar.ticker.fullname|length) > 20 %}...
@@ -67,7 +73,7 @@
 							<td>{{ calendar.description ?? '&mdash;' }}</td>
 							<td>{{ calendar.createdAt|format_date('short') }}</td>
 							<td>
-								<div class="btn-group" role="group" aria-label="Actions">
+								<div class="btn-group" role="group">
 									<a href="{{ path('calendar_show', { id: calendar.id }) }}" class="btn btn-info">
 										<i class="fas fa-book-open"></i>
 									</a>

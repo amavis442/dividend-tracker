@@ -42,9 +42,9 @@ class TickerRepository extends ServiceEntityRepository
             ->orderBy($order, $sort);
 
         if (!empty($search)) {
-            $queryBuilder->where('LOWER(t.symbol) LIKE LOWER(:search)');
-            $queryBuilder->orWhere('LOWER(i.label) LIKE LOWER(:search)');
-            $queryBuilder->orWhere('LOWER(t.fullname) LIKE LOWER(:search)');
+            $queryBuilder->where(
+                $queryBuilder->expr()->like('LOWER(t.isin)', 'LOWER(:search)'),
+            );
             $queryBuilder->groupBy('t.id, t.symbol');
             $queryBuilder->setParameter('search', $search . '%');
         }

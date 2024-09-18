@@ -71,7 +71,9 @@ class PaymentRepository extends ServiceEntityRepository
         }
 
         if (!empty($search)) {
-            $queryBuilder->andWhere('t.symbol LIKE :search');
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->like('LOWER(t.isin)', 'LOWER(:search)'),
+            );
             $queryBuilder->setParameter('search', $search . '%');
         }
         $query = $queryBuilder->getQuery();
@@ -128,14 +130,20 @@ class PaymentRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getTotalDividend(string $startDate = null, string $endDate = null): ?float
+    public function getTotalDividend(string $startDate = null, string $endDate = null, string $search = ''): ?float
     {
 
         $queryBuilder = $this->createQueryBuilder('p')
-            ->select('SUM(p.dividend) total');
+            ->select('SUM(p.dividend) total')
+            ->join('p.ticker', 't');
 
         if ($startDate !== null) {
             $this->setDateRange($queryBuilder, $startDate, $endDate);
+        }
+
+        if (!empty($search)) {
+            $queryBuilder->andWhere('t.isin LIKE :search');
+            $queryBuilder->setParameter('search', $search . '%');
         }
 
         $result = $queryBuilder->getQuery()

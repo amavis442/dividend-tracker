@@ -2,10 +2,6 @@
 @import '~@fortawesome/fontawesome-free/css/all.css';
 @import '~summernote/dist/summernote-bs4.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 .purple {
     background-color: #1B1022;
 }

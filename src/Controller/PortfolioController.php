@@ -12,6 +12,7 @@ use App\Service\DividendGrowthService;
 use App\Service\DividendService;
 use App\Service\Referer;
 use App\Service\SummaryService;
+use App\Traits\TickerAutocompleteTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Common\Collections\Collection;
@@ -27,6 +28,8 @@ use Symfony\Contracts\Cache\ItemInterface;
 #[Route(path: '/dashboard/portfolio')]
 class PortfolioController extends AbstractController
 {
+    use TickerAutocompleteTrait;
+
     public const SEARCH_KEY = 'portfolio_searchCriteria';
     public const PIE_KEY = 'portfolio_searchPie';
 
@@ -34,7 +37,7 @@ class PortfolioController extends AbstractController
         private Stopwatch $stopwatch,
     ) {}
 
-    #[Route(path: '/list/{page<\d+>?1}/{orderBy?fullname}/{sort?asc}', name: 'portfolio_index', methods: ['GET'])]
+    #[Route(path: '/list/{page<\d+>?1}/{orderBy?fullname}/{sort?asc}', name: 'portfolio_index', methods: ['GET', 'POST'])]
     public function index(
         Request $request,
         PositionRepository $positionRepository,
@@ -58,9 +61,10 @@ class PortfolioController extends AbstractController
         $pieSelected = null;
 
         if ($request->hasSession()) {
-            $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
             $pieSelected = $request->getSession()->get(self::PIE_KEY, null);
         }
+
+        [$form, $searchCriteria] = $this->searchTicker($request, self::SEARCH_KEY);
 
         $thisPage = $page;
         $summary = $summaryService->getSummary();
@@ -125,6 +129,7 @@ class PortfolioController extends AbstractController
             'profit' => $summary->getProfit(),
             'totalDividend' => $summary->getTotalDividend(),
             'totalInvested' => $summary->getAllocated(),
+            'autoCompleteForm' => $form,
         ]);
     }
 
@@ -236,15 +241,6 @@ class PortfolioController extends AbstractController
             'nextDividendPayout' => $nextDividendPayout,
             'indexUrl' => $indexUrl,
         ]);
-    }
-
-    #[Route(path: '/search', name: 'portfolio_search', methods: ['POST'])]
-    public function search(Request $request): Response
-    {
-        $searchCriteria = $request->request->get('searchCriteria');
-        $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
-
-        return $this->redirectToRoute('portfolio_index');
     }
 
     #[Route(path: '/pie', name: 'portfolio_pie', methods: ['POST'])]
