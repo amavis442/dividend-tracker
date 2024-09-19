@@ -38,8 +38,7 @@ phpunit:
     - php composer.phar install -o
     - php composer.phar require --dev symfony/phpunit-bridge
     - sh ci/php_test_run.sh
-  when: manual
-  
+
 deployment:
   stage: deployment
   environment:
