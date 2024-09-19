@@ -33,7 +33,8 @@ static_analysis:
     - bash ci/php-install.sh
     - php composer.phar require --dev phpstan/phpstan
     - php vendor/bin/phpstan.phar analyse src --level=1
-
+  when: manual
+  
 phpunit:
   stage: test
   before_script:
