@@ -193,10 +193,10 @@ class PortfolioModel
         }
 
         $this->maxPages = (int) ceil($pager->count() / $limit);
-        $tickerIds = [];
+
         $this->stopwatch->stop('portfoliomodel-getpage');
 
-        $tickerIds = $this->createPortfolioItem($pager, $totalInvested, $dividendService, $tickerIds);
+        $tickerIds = $this->createPortfolioItem($pager, $totalInvested, $dividendService);
         $this->getDividends($paymentRepository, $tickerIds);
 
         $this->tickerIds = $tickerIds;

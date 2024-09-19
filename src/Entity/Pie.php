@@ -37,7 +37,7 @@ class Pie
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[Groups('pie:read', 'pie:write', 'position:read:item', 'transaction:read:item')]
+    #[Groups(['pie:read', 'pie:write', 'position:read:item', 'transaction:read:item'])]
     #[ORM\Column(type: 'string', length: 255)]
     private $label;
 

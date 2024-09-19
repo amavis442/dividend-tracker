@@ -27,11 +27,11 @@ class Branch
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     private ?int $id = null;
 
-    #[Groups('branch:read', 'branch:write', 'ticker:read:item')]
+    #[Groups(['branch:read', 'branch:write', 'ticker:read:item'])]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Branch', inversedBy: 'branches')]
     private $parent;
 
-    #[Groups('branch:read', 'branch:write', 'ticker:read:item')]
+    #[Groups(['branch:read', 'branch:write', 'ticker:read:item'])]
     #[ORM\OneToMany(targetEntity: 'App\Entity\Branch', mappedBy: 'parent')]
     private Collection $branches;
 
@@ -42,7 +42,7 @@ class Branch
     #[ORM\OneToMany(targetEntity: 'App\Entity\Ticker', mappedBy: 'branch')]
     private Collection $tickers;
 
-    #[Groups('branch:read', 'branch:write', 'ticker:read:item')]
+    #[Groups(['branch:read', 'branch:write', 'ticker:read:item'])]
     #[ORM\Column(type: 'integer', nullable: true, name: 'asset_allocation')]
     private ?int $assetAllocation = 0;
 

@@ -40,19 +40,19 @@ class Calendar
     #[ORM\JoinColumn(nullable: false)]
     private $ticker;
 
-    #[Groups('calendar:read', 'calendar:write', 'ticker:read:item', 'position:read:item', 'transaction:read')]
+    #[Groups(['calendar:read', 'calendar:write', 'ticker:read:item', 'position:read:item', 'transaction:read'])]
     #[ORM\Column(type: 'date', name: 'ex_dividend_date')]
     private $exDividendDate;
 
-    #[Groups('calendar:read', 'calendar:write', 'ticker:read:item', 'position:read:item', 'transaction:read')]
+    #[Groups(['calendar:read', 'calendar:write', 'ticker:read:item', 'position:read:item', 'transaction:read'])]
     #[ORM\Column(type: 'date', name: 'record_date')]
     private $recordDate;
 
-    #[Groups('calendar:read', 'calendar:write', 'ticker:read:item', 'position:read:item', 'transaction:read')]
+    #[Groups(['calendar:read', 'calendar:write', 'ticker:read:item', 'position:read:item', 'transaction:read'])]
     #[ORM\Column(type: 'date', name: 'payment_date')]
     private $paymentDate;
 
-    #[Groups('calendar:read', 'calendar:write', 'ticker:read:item', 'position:read:item', 'transaction:read')]
+    #[Groups(['calendar:read', 'calendar:write', 'ticker:read:item', 'position:read:item', 'transaction:read'])]
     #[ORM\Column(
         type: 'float',
         name: 'cash_amount',
@@ -66,11 +66,11 @@ class Calendar
     #[ORM\OrderBy(['payDate' => 'DESC'])]
     private $payments;
 
-    #[Groups('calendar:read', 'calendar:write', 'ticker:read:item', 'position:read:item', 'transaction:read')]
+    #[Groups(['calendar:read', 'calendar:write', 'ticker:read:item', 'position:read:item', 'transaction:read'])]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     private $currency;
 
-    #[Groups('calendar:read', 'calendar:write', 'ticker:read:item', 'position:read:item', 'transaction:read')]
+    #[Groups(['calendar:read', 'calendar:write', 'ticker:read:item', 'position:read:item', 'transaction:read'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $dividendType;
 

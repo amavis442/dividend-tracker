@@ -33,15 +33,15 @@ class Research
     #[ORM\JoinColumn(nullable: false)]
     private $ticker;
 
-    #[Groups('research:read', 'research:write')]
+    #[Groups(['research:read', 'research:write'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $title;
 
-    #[Groups('research:read', 'research:write')]
+    #[Groups(['research:read', 'research:write'])]
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $info = null;
 
-    #[Groups('research:read', 'research:write')]
+    #[Groups(['research:read', 'research:write'])]
     #[ORM\OneToMany(targetEntity: 'App\Entity\Attachment', mappedBy: 'research', cascade: ['persist'])]
     private $attachments;
 

@@ -29,7 +29,7 @@ trait TickerAutocompleteTrait
         if ($form->isSubmitted() && $form->isValid()) {
             $request->getSession()->set($searchKey, '');
 
-            if (isset($searchTicker) && $searchTicker->getTicker()) {
+            if ($searchTicker->getTicker()) {
                 $searchCriteria = $searchTicker->getTicker()->getIsin();
                 $request->getSession()->set($searchKey, $searchCriteria);
             }

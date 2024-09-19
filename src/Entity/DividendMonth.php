@@ -28,7 +28,7 @@ class DividendMonth
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     private ?int $id = null;
 
-    #[Groups('dividendmonth:read', 'dividendmonth:write', 'ticker:read:item', 'position:read:item')]
+    #[Groups(['dividendmonth:read', 'dividendmonth:write', 'ticker:read:item', 'position:read:item'])]
     #[ORM\Column(type: 'integer',)]
     private $dividendMonth;
 

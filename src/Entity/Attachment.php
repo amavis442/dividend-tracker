@@ -33,11 +33,11 @@ class Attachment
      */
     private ?UploadedFile $attachmentFile = null;
 
-    #[Groups('attachment:read', 'attachment:write', 'research:read:item')]
+    #[Groups(['attachment:read', 'attachment:write', 'research:read:item'])]
     #[ORM\Column(type: 'string')]
     private string $attachmentName;
 
-    #[Groups('attachment:read', 'attachment:write', 'research:read:item')]
+    #[Groups(['attachment:read', 'attachment:write', 'research:read:item'])]
     #[ORM\Column(type: 'bigint', nullable: true)]
     private ?int $attachmentSize = null;
 
@@ -50,7 +50,7 @@ class Attachment
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Research', inversedBy: 'attachments')]
     private $research;
 
-    #[Groups('attachment:read', 'attachment:write', 'research:read:item')]
+    #[Groups(['attachment:read', 'attachment:write', 'research:read:item'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $label = null;
 

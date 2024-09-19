@@ -38,7 +38,7 @@ class Journal
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[Groups('journal:read', 'journal:write')]
+    #[Groups(['journal:read', 'journal:write'])]
     #[ORM\Column(type: 'text')]
     private $content;
 
@@ -48,7 +48,7 @@ class Journal
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[Groups('journal:read', 'journal:write')]
+    #[Groups(['journal:read', 'journal:write'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $title;
 
@@ -56,7 +56,7 @@ class Journal
     #[ORM\JoinColumn(nullable: false)]
     private $user;
 
-    #[Groups('journal:read', 'journal:write')]
+    #[Groups(['journal:read', 'journal:write'])]
     #[ORM\JoinTable(name: 'journal_taxonomy')]
     #[ORM\JoinColumn(name: 'journal_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'taxonomy_id', referencedColumnName: 'id')]

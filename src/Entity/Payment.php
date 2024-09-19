@@ -30,11 +30,11 @@ class Payment
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[Groups('payment:read', 'payment:write', 'position:read:item')]
+    #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(type: 'datetime', name: 'pay_date')]
     private $payDate;
 
-    #[Groups('payment:read', 'payment:write', 'position:read:item')]
+    #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -56,7 +56,7 @@ class Payment
     #[ORM\JoinColumn(nullable: false)]
     private $user;
 
-    #[Groups('payment:read', 'payment:write', 'position:read:item')]
+    #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     #[ORM\JoinColumn(nullable: false)]
     private $currency;
@@ -65,7 +65,7 @@ class Payment
     #[ORM\JoinColumn(nullable: false)]
     private $position;
 
-    #[Groups('payment:read', 'payment:write', 'position:read:item')]
+    #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -79,7 +79,7 @@ class Payment
     #[ORM\Column(name: 'updated_at', nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[Groups('payment:read', 'payment:write', 'position:read:item')]
+    #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -87,15 +87,15 @@ class Payment
     )]
     private $taxWithold = 0.0;
 
-    #[Groups('payment:read', 'payment:write', 'position:read:item')]
+    #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $taxCurrency;
 
-    #[Groups('payment:read', 'payment:write', 'position:read:item')]
+    #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $dividendType;
 
-    #[Groups('payment:read', 'payment:write', 'position:read:item')]
+    #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(
         type: 'float',
         nullable: false,
@@ -103,15 +103,15 @@ class Payment
     )]
     private $dividendPaid = 0.0;
 
-    #[Groups('payment:read', 'payment:write', 'position:read:item')]
+    #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $dividendPaidCurrency;
 
-    #[Groups('payment:read', 'payment:write', 'position:read:item')]
+    #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(type: 'uuid', nullable: true)]
     private ?Uuid $uuid = null;
 
-    #[Groups('payment:read', 'payment:write', 'position:read:item')]
+    #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $importfile = null;
 
