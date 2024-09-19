@@ -45,7 +45,8 @@ phpunit:
     - "[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\""
     - nvm install --lts
     - nvm use --lts
-    - npm install yarn
+    - npm install --global yarn
+    - yarn set version berry
     - export PATH=$HOME/.yarn/bin:$PATH
   script:
     - bash ci/php-install.sh
