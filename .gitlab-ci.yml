@@ -33,7 +33,6 @@ static_analysis:
     - bash ci/php-install.sh
     - php composer.phar require --dev phpstan/phpstan
     - php vendor/bin/phpstan.phar analyse src --level=1
-  when: manual
 
 phpunit:
   stage: test
@@ -46,22 +45,22 @@ phpunit:
     - nvm install --lts
     - nvm use --lts
     - npm install --global yarn
-    - export YARN_DIR="$HOME/.yarn"
-    - "[ -s \"$YARN_DIR/yarn\" ] && \\. \"$YARN_DIR/yarn.sh\""
-    - yarn set version berry
+    - which yarn
+    - echo $NVM_BIN
+    - $NVM_BIN/yarn set version berry
   script:
-    #- bash ci/php-install.sh
-    #- php composer.phar install -o
-    #- php composer.phar require --dev symfony/phpunit-bridge
-    - yarn install
-    - yarn build
-    #- sh ci/php_test_run.sh
+    - bash ci/php-install.sh
+    - php composer.phar install -o
+    - php composer.phar require --dev symfony/phpunit-bridge
+    - $NVM_BIN/yarn config get enableImmutableInstalls
+    - $NVM_BIN/yarn install
+    - $NVM_BIN/yarn build
+    - sh ci/php_test_run.sh
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     policy: pull-push
     paths:
       - node_modules
-      - 'packages/*/node_modules'
 
 deployment:
   stage: deployment
