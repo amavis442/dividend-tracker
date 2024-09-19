@@ -40,6 +40,8 @@ phpunit:
     # installs nvm (Node Version Manager)
     - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
     - ". ~/.bashrc"
+    - export NVM_DIR="$HOME/.nvm"
+    - "[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\""
     - nvm install --lts
     - nvm use --lts
     - npm install yarn
