@@ -11,9 +11,12 @@ default:
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
+  policy: pull
   paths:
     - vendor/
     - node_modules/
+    - .yarn
+    - .nvm
 
 variables:
   POSTGRES_DB: theapplication
@@ -33,11 +36,29 @@ static_analysis:
 
 phpunit:
   stage: test
+  before_script:
+    # installs nvm (Node Version Manager)
+    - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+    - ". ~/.bashrc"
+    - nvm install --lts
+    - nvm use --lts
+    - npm install yarn
+    - export PATH=$HOME/.yarn/bin:$PATH
   script:
     - bash ci/php-install.sh
     - php composer.phar install -o
     - php composer.phar require --dev symfony/phpunit-bridge
+    - yarn install
+    - yarn build
     - sh ci/php_test_run.sh
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    policy: pull-push
+    paths:
+      - .nvm
+      - .yarn
+      - node_modules
+      - 'packages/*/node_modules'
 
 deployment:
   stage: deployment
