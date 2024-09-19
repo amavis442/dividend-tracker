@@ -1,8 +1,13 @@
-FROM phpdockerio/php:8.3-fpm
-WORKDIR "/application"
+#!/bin/bash
 
-RUN apt-get update \
-    && apt-get -y --no-install-recommends install \
+# We need to install dependencies only for Docker
+[[ ! -e /.dockerenv ]] && exit 0
+
+set -xe
+
+apt-get update \
+&& apt-get -y --no-install-recommends install \
+        curl \
         git \
         php8.3-bcmath \
         php8.3-bz2 \
@@ -30,5 +35,9 @@ RUN apt-get update \
         php8.3-xsl \
         php8.3-yaml \
 		php8.3-zip \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+        zip \
+&& apt-get clean \
+&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* \
+&& curl -sS https://get.symfony.com/cli/installer | bash \
+&& mv /root/.symfony5/bin/symfony /usr/local/bin/symfony \
+&& curl -sS https://getcomposer.org/installer | php
