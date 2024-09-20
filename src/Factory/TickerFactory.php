@@ -32,7 +32,7 @@ final class TickerFactory extends PersistentProxyObjectFactory
         return [
             'branch' => BranchFactory::new(),
             'fullname' => self::faker()->text(255),
-            'isin' => self::faker()->isin(255), // Will not work because of validator isin format
+            //'isin' => self::faker()->isin(255), // Will not work because of validator isin format
             'symbol' => self::faker()->text(255),
         ];
     }

@@ -23,6 +23,7 @@ class PieSelectType extends AbstractType
             'choice_label' => function (?Pie $pie): string {
                 return $pie ? ucfirst($pie->getLabel()) : '';
             },
+            'placeholder' => 'Please choose a Pie'
         ]);
     }
 

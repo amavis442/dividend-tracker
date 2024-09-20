@@ -61,7 +61,6 @@ class PieRepository extends ServiceEntityRepository
             ->fetchAllAssociative();
 
         $pies = [];
-        $pieDefault = (new Pie())->setLabel("Please choose a Pie");
         $pieIds = [];
         foreach ($pieData as $id => $data) {
             $pieIds[] = $data['id'];
@@ -69,8 +68,6 @@ class PieRepository extends ServiceEntityRepository
 
         $pies = $this->createQueryBuilder('pie')->where('pie.id in (:pie)')
             ->setParameter('pie', $pieIds)->getQuery()->getResult();
-
-        $pies = array_merge([$pieDefault], $pies);
 
         return $pies;
     }

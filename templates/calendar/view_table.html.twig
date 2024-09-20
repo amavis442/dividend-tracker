@@ -11,7 +11,7 @@
 					{{ year }}
 				</h3>
 				<small class="text-muted">({{'Current date'|trans }}:
-					{{ timestamp|format_date('full') }})</small>
+					{{ date()|format_date('full') }})</small>
 			</div>
 		</div>
 	</div>
@@ -19,7 +19,7 @@
 	<div class="container mb-2 p-3">
 		<div class="border p-2">
 
-			{{ form_start(form ) }}
+			{{ form_start(form, {'action': path('calendar_index') } ) }}
 			<div class="row g-3">
 				<div class="col-auto">
 					{{ form_widget(form.startdate) }}

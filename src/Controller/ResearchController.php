@@ -41,15 +41,15 @@ class ResearchController extends AbstractController
         }
 
         $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
-        [$form, $searchCriteria] = $this->searchTicker($request, self::SEARCH_KEY, true);
+        [$form, $ticker] = $this->searchTicker($request, self::SEARCH_KEY, true);
 
-        $items = $researchRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
+        $items = $researchRepository->getAll($page, 10, $orderBy, $sort, $ticker);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
 
         return $this->render('research/index.html.twig', [
-            'researches' => $items->getIterator(),
+            'researches' => $items,
             'limit' => $limit,
             'maxPages' => $maxPages,
             'thisPage' => $thisPage,

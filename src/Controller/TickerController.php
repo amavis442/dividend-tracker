@@ -29,10 +29,9 @@ class TickerController extends AbstractController
         string $orderBy = 'symbol',
         string $sort = 'asc'
     ): Response {
-        $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
-        [$form, $searchCriteria] = $this->searchTicker($request, self::SEARCH_KEY, true);
+        [$form, $ticker] = $this->searchTicker($request, self::SEARCH_KEY, true);
 
-        $items = $tickerRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
+        $items = $tickerRepository->getAll($page, 10, $orderBy, $sort, $ticker);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;

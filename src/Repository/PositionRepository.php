@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Position;
+use App\Entity\Pie;
 use App\Entity\Ticker;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -34,22 +35,22 @@ class PositionRepository extends ServiceEntityRepository
         int $limit = 10,
         string $orderBy = 't.symbol',
         string $sort = 'ASC',
-        string $search = '',
+        ?Ticker $ticker = null,
         int $status = self::OPEN,
-        array $pies = null
+        ?Pie $pie = null
     ): Paginator {
-        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
+        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $ticker);
         if ($status === self::OPEN) {
             $queryBuilder->andWhere('p.closed = false');
         }
         if ($status === self::CLOSED) {
             $queryBuilder->andWhere('p.closed = true');
         }
-        if ($pies) {
+        if ($pie && $pie->getId()) {
             $queryBuilder
                 ->leftJoin('p.pies', 'pies')
                 ->andWhere('pies IN (:pies)')
-                ->setParameter('pies', $pies)
+                ->setParameter('pies', $pie->getId())
                 ->addSelect('pies');
         }
         $query = $queryBuilder->getQuery();
@@ -163,7 +164,7 @@ class PositionRepository extends ServiceEntityRepository
         int $page = 1,
         int $limit = 10,
         string $sort = 'DESC',
-        string $search = ''
+        ?Ticker $ticker = null
     ): Paginator {
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('p, t, i')
@@ -172,11 +173,11 @@ class PositionRepository extends ServiceEntityRepository
             ->where('p.closedAt IS NOT NULL')
             ->orderBy('p.closedAt', $sort);
 
-        if (!empty($search)) {
+        if ($ticker && $ticker->getId()) {
             $queryBuilder->andWhere(
-                $queryBuilder->expr()->like('t.isin', ':search'),
+                't = :ticker'
             );
-            $queryBuilder->setParameter('search', $search . '%');
+            $queryBuilder->setParameter('ticker', $ticker->getId());
         }
         $queryBuilder->andWhere('p.closed = true');
         $query = $queryBuilder->getQuery();
@@ -268,7 +269,7 @@ class PositionRepository extends ServiceEntityRepository
     private function getQueryBuilder(
         string $orderBy = 't.symbol',
         string $sort = 'ASC',
-        string $search = ''
+        ?Ticker $ticker = null
     ): QueryBuilder {
         $order = 't.symbol';
         if (in_array($orderBy, ['t.symbol', 't.fullname', 'i.label'])) {
@@ -288,18 +289,11 @@ class PositionRepository extends ServiceEntityRepository
             ->addSelect('c')
             ->orderBy($order, $sort);
 
-        if (!empty($search)) {
+        if ($ticker && $ticker->getId()) {
             $queryBuilder->addSelect('b');
             $queryBuilder->innerJoin('t.branch', 'b');
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->orX(
-                    $queryBuilder->expr()->like('LOWER(t.isin)', 'LOWER(:search)'),
-                    /* $queryBuilder->expr()->like('LOWER(t.symbol)', 'LOWER(:search)'),
-                    $queryBuilder->expr()->like('LOWER(t.fullname)', 'LOWER(:search)'),
-                    $queryBuilder->expr()->like('LOWER(b.label)', 'LOWER(:search)') */
-                )
-            );
-            $queryBuilder->setParameter('search', $search . '%');
+            $queryBuilder->andWhere('t = :ticker');
+            $queryBuilder->setParameter('ticker', $ticker->getId());
         }
         return $queryBuilder;
     }

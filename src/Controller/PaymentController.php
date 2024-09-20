@@ -98,7 +98,7 @@ class PaymentController extends AbstractController
             ->getForm();
 
         $searchCriteria = '';
-        [$autoCompleteForm, $searchCriteria] = $this->searchTicker($request, self::SEARCH_KEY);
+        [$autoCompleteForm, $ticker] = $this->searchTicker($request, self::SEARCH_KEY);
 
 
         $form->handleRequest($request);
@@ -118,12 +118,12 @@ class PaymentController extends AbstractController
         if (isset($data['quator']) && $data['quator'] !== 0) {
             [$startDate, $endDate] = (new DateHelper())->quaterToDates($data['quator'], $data['year']);
         }
-        $totalDividend = $paymentRepository->getTotalDividend($startDate . " 00:00:00", $endDate . " 23:59:59", $searchCriteria);
+        $totalDividend = $paymentRepository->getTotalDividend($startDate . " 00:00:00", $endDate . " 23:59:59", $ticker);
 
         $taxes = ($totalDividend / (100 - Constants::TAX)) * Constants::TAX; // TODO: Make this dynamic because not all stocks have 15% dividend tax
 
         $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
-        $items = $paymentRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria, $startDate, $endDate);
+        $items = $paymentRepository->getAll($page, 10, $orderBy, $sort, $ticker, $startDate, $endDate);
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;

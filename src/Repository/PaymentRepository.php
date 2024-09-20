@@ -48,7 +48,7 @@ class PaymentRepository extends ServiceEntityRepository
         int $limit = 10,
         string $orderBy = 'exDividendDate',
         string $sort = 'DESC',
-        string $search = '',
+        ?Ticker $ticker = null,
         string $startDate = null,
         string $endDate = null
     ): Paginator {
@@ -70,11 +70,11 @@ class PaymentRepository extends ServiceEntityRepository
             $this->setDateRange($queryBuilder, $startDate . " 00:00:00", $endDate . " 23:59:59");
         }
 
-        if (!empty($search)) {
+        if ($ticker && $ticker->getId()) {
             $queryBuilder->andWhere(
-                $queryBuilder->expr()->like('LOWER(t.isin)', 'LOWER(:search)'),
+                't = :ticker'
             );
-            $queryBuilder->setParameter('search', $search . '%');
+            $queryBuilder->setParameter('ticker', $ticker->getId());
         }
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);
@@ -130,7 +130,7 @@ class PaymentRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getTotalDividend(string $startDate = null, string $endDate = null, string $search = ''): ?float
+    public function getTotalDividend(string $startDate = null, string $endDate = null, ?Ticker $ticker = null): ?float
     {
 
         $queryBuilder = $this->createQueryBuilder('p')
@@ -141,9 +141,9 @@ class PaymentRepository extends ServiceEntityRepository
             $this->setDateRange($queryBuilder, $startDate, $endDate);
         }
 
-        if (!empty($search)) {
-            $queryBuilder->andWhere('t.isin LIKE :search');
-            $queryBuilder->setParameter('search', $search . '%');
+        if ($ticker && $ticker->getId()) {
+            $queryBuilder->andWhere('t = :ticker');
+            $queryBuilder->setParameter('ticker', $ticker->getId());
         }
 
         $result = $queryBuilder->getQuery()
