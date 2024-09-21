@@ -4,12 +4,9 @@ namespace App\Factory;
 
 use App\Entity\Tax;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-
-use function Zenstruck\Foundry\faker;
 
 /**
- * @extends PersistentProxyObjectFactory<User>
+ * @extends PersistentProxyObjectFactory<Tax>
  */
 final class TaxFactory extends PersistentProxyObjectFactory
 {
@@ -18,7 +15,7 @@ final class TaxFactory extends PersistentProxyObjectFactory
      *
      * @todo inject services if required
      */
-    public function __construct(private UserPasswordHasherInterface $passwordHasher) {}
+    public function __construct() {}
 
     public static function class(): string
     {
@@ -45,8 +42,6 @@ final class TaxFactory extends PersistentProxyObjectFactory
      */
     protected function initialize(): static
     {
-        return $this->afterInstantiate(function (Tax $tax): void {})
-            // ->afterInstantiate(function(User $user): void {})
-        ;
+        return $this;
     }
 }

@@ -2146,6 +2146,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@prettier/plugin-php@npm:^0.22.2":
+  version: 0.22.2
+  resolution: "@prettier/plugin-php@npm:0.22.2"
+  dependencies:
+    linguist-languages: "npm:^7.27.0"
+    php-parser: "npm:^3.1.5"
+  peerDependencies:
+    prettier: ^3.0.0
+  checksum: 10c0/8fc6b429e5efcaa3f5f469fb8129452306adc5cd49d319701924dca94dbd05e0b2934cb9ba191d36e9aabd20058c71a938ecb757cfc1de24d548d5293326e975
+  languageName: node
+  linkType: hard
+
 "@remix-run/router@npm:1.19.2":
   version: 1.19.2
   resolution: "@remix-run/router@npm:1.19.2"
@@ -4432,6 +4444,7 @@ __metadata:
     "@fullcalendar/vue3": "npm:^6.1.0"
     "@hotwired/stimulus": "npm:^3.2.2"
     "@popperjs/core": "npm:^2.11.8"
+    "@prettier/plugin-php": "npm:^0.22.2"
     "@symfony/stimulus-bridge": "npm:^3.2.2"
     "@symfony/ux-autocomplete": "file:vendor/symfony/ux-autocomplete/assets"
     "@symfony/ux-vue": "file:vendor/symfony/ux-vue/assets"
@@ -6423,6 +6436,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"linguist-languages@npm:^7.27.0":
+  version: 7.27.0
+  resolution: "linguist-languages@npm:7.27.0"
+  checksum: 10c0/a4d4d63785155332736a59d58fe72310a4e449199e1ae7d7ba2334a81b9a10a249693d67e54af812ab36091d6396090e69b0370a3655a49f434e7e968516b714
+  languageName: node
+  linkType: hard
+
 "loader-runner@npm:^4.2.0":
   version: 4.3.0
   resolution: "loader-runner@npm:4.3.0"
@@ -7373,6 +7393,13 @@ __metadata:
     estree-walker: "npm:^3.0.0"
     is-reference: "npm:^3.0.0"
   checksum: 10c0/fb5ce7cd810c49254cdf1cd3892811e6dd1a1dfbdf5f10a0a33fb7141baac36443c4cad4f0e2b30abd4eac613f6ab845c2bc1b7ce66ae9694c7321e6ada5bd96
+  languageName: node
+  linkType: hard
+
+"php-parser@npm:^3.1.5":
+  version: 3.1.5
+  resolution: "php-parser@npm:3.1.5"
+  checksum: 10c0/356b7c8d84c055f0f3838d4906edf8100fc022bd5651d81d86d705027253c3ab8a4d8f1569365e88c286e39c9d10011a1f4f86eb8afec95dad99b35f574bd7bd
   languageName: node
   linkType: hard
 

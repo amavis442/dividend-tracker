@@ -2,6 +2,7 @@
 
 namespace App\Controller\Report;
 
+use App\Entity\PieSelect;
 use App\Repository\PieRepository;
 use App\Repository\PositionRepository;
 use App\Service\DividendService;
@@ -11,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\RequestStack;
+use App\Form\PieSelectFormType;
 
 #[Route(path: '/dashboard/report')]
 class YieldByPieController extends AbstractController
@@ -23,29 +25,31 @@ class YieldByPieController extends AbstractController
     public function index(
         Request $request,
         PositionRepository $positionRepository,
-        PieRepository $pieRepository,
         YieldsService $yields,
         DividendService $dividendService,
         string $orderBy = 'symbol'
     ): Response {
 
+        $pie = null;
+        $pieSelect = new PieSelect();
+        $form = $this->createForm(PieSelectFormType::class, $pieSelect);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $pieSelect = $form->getData();
+            $request->getSession()->set(self::YIELD_PIE_KEY, $pieSelect);
+            if ($pieSelect && $pieSelect->getPie()) {
+                $pie = $pieSelect->getPie();
+            }
+        }
+
         $pieSelected = $request->getSession()->get(self::YIELD_PIE_KEY, null);
-        $result = $yields->yield($positionRepository, $dividendService, $orderBy, $pieSelected);
-        $pies = $pieRepository->findLinked();
+        $result = $yields->yield($positionRepository, $dividendService, $orderBy, $pie);
 
         return $this->render('report/yield/pie.html.twig', array_merge($result, [
             'controller_name' => 'ReportController',
-            'pies' => $pies,
+            //'pies' => $pies,
+            'form' => $form,
             'pieSelected' => $pieSelected
         ]));
-    }
-
-    #[Route(path: '/pieyieldform', name: 'report_dividend_yield_by_pie_form', methods: ['POST'])]
-    public function pieSelect(Request $request): Response
-    {
-        $pie = $request->request->get('pie');
-        $request->getSession()->set(self::YIELD_PIE_KEY, $pie);
-
-        return $this->redirectToRoute('report_dividend_yield_by_pie');
     }
 }

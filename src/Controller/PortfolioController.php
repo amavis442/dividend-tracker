@@ -4,10 +4,16 @@ namespace App\Controller;
 
 use App\Entity\Calendar;
 use App\Entity\Position;
+use App\Entity\PieSelect;
+use App\Entity\Pie;
+use App\Entity\Ticker;
+use App\Entity\SearchForm;
+use App\Form\PieSelectFormType;
 use App\Model\PortfolioModel;
 use App\Repository\PaymentRepository;
 use App\Repository\PieRepository;
 use App\Repository\PositionRepository;
+use App\Repository\TickerRepository;
 use App\Service\DividendGrowthService;
 use App\Service\DividendService;
 use App\Service\Referer;
@@ -24,116 +30,145 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 
-
-#[Route(path: '/dashboard/portfolio')]
+#[Route(path: "/dashboard/portfolio")]
 class PortfolioController extends AbstractController
 {
     use TickerAutocompleteTrait;
 
-    public const SEARCH_KEY = 'portfolio_searchCriteria';
-    public const PIE_KEY = 'portfolio_searchPie';
+    public const SEARCH_KEY = "portfolio_searchCriteria";
+    public const PIE_KEY = "portfolio_searchPie";
+    public const CACHE_SEARCH = "cache_search";
+    public const CACHE_PIE = "cache_pie";
+    public const CACHE_TICKER = "cache_ticker";
 
-    public function __construct(
-        private Stopwatch $stopwatch,
-    ) {}
+    public function __construct(private Stopwatch $stopwatch)
+    {
+    }
 
-    #[Route(path: '/list/{page<\d+>?1}/{orderBy?fullname}/{sort?asc}', name: 'portfolio_index', methods: ['GET', 'POST'])]
+    #[
+        Route(
+            path: "/list/{page<\d+>?1}/{orderBy?fullname}/{sort?asc}",
+            name: "portfolio_index",
+            methods: ["GET"]
+        )
+    ]
     public function index(
         Request $request,
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
+        TickerRepository $tickerRepository,
         PieRepository $pieRepository,
         SummaryService $summaryService,
         DividendService $dividendService,
         Referer $referer,
         PortfolioModel $model,
         int $page = 1,
-        string $orderBy = 'fullname',
-        string $sort = 'asc'
+        string $orderBy = "fullname",
+        string $sort = "asc"
     ): Response {
-
-        if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
-            $sort = 'asc';
+        if (!in_array($sort, ["asc", "desc", "ASC", "DESC"])) {
+            $sort = "asc";
         }
         $limit = 20;
-        $pies = $pieRepository->findLinked();
-        $searchCriteria = '';
-        $pieSelected = null;
-
-        if ($request->hasSession()) {
-            $pieSelected = $request->getSession()->get(self::PIE_KEY, null);
-        }
-
-        [$form, $searchCriteria] = $this->searchTicker($request, self::SEARCH_KEY);
+        [$form, $ticker, $pie] = $this->searchTickerAndPie(
+            $request,
+            $tickerRepository,
+            $pieRepository,
+            self::CACHE_SEARCH
+        );
 
         $thisPage = $page;
         $summary = $summaryService->getSummary();
-        $referer->set('portfolio_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
+        $referer->set("portfolio_index", [
+            "page" => $page,
+            "orderBy" => $orderBy,
+            "sort" => $sort,
+        ]);
 
-        $this->stopwatch->start('portfoliomodel-getpage');
+        $this->stopwatch->start("portfoliomodel-getpage");
 
         $cache = new FilesystemAdapter(PortfolioModel::CACHE_NAMESPACE);
 
-        $portfolioModel = $cache->get(PortfolioModel::CACHE_KEY . '_' . $page . ($pieSelected ? '_' . $pieSelected : '') . md5($searchCriteria), function (ItemInterface $item) use (
-            $model,
-            $positionRepository,
-            $dividendService,
-            $paymentRepository,
-            $summary,
-            $page,
-            $orderBy,
-            $sort,
-            $searchCriteria,
-            $pieSelected
-        ): PortfolioModel {
-
-            $item->expiresAfter(3600);
-
-            $portfolioModel = $model->getPage(
+        $tickerCacheHash = "_empty";
+        if ($ticker && $ticker->getId()) {
+            $tickerCacheHash = md5($ticker->getIsin());
+        }
+        $pieCacheHash = "_empty";
+        if ($pie && $pie->getId()) {
+            $pieCacheHash = "_" . $pie->getId();
+        }
+        $portfolioModel = $cache->get(
+            PortfolioModel::CACHE_KEY .
+                "_" .
+                $page .
+                $pieCacheHash .
+                $tickerCacheHash,
+            function (ItemInterface $item) use (
+                $model,
                 $positionRepository,
                 $dividendService,
                 $paymentRepository,
-                $summary->getAllocated(),
+                $summary,
                 $page,
                 $orderBy,
                 $sort,
-                $searchCriteria,
-                $pieSelected,
-            );
+                $ticker,
+                $pie
+            ): PortfolioModel {
+                $item->expiresAfter(3600);
 
-            return $portfolioModel;
-        });
+                $portfolioModel = $model->getPage(
+                    $positionRepository,
+                    $dividendService,
+                    $paymentRepository,
+                    $summary->getAllocated(),
+                    $page,
+                    $orderBy,
+                    $sort,
+                    $ticker,
+                    $pie
+                );
 
+                return $portfolioModel;
+            }
+        );
 
-        $this->stopwatch->stop('portfoliomodel-getpage');
+        $this->stopwatch->stop("portfoliomodel-getpage");
 
-        $request->getSession()->set(get_class($this), $request->getRequestUri());
+        $request
+            ->getSession()
+            ->set(get_class($this), $request->getRequestUri());
 
-        return $this->render('portfolio/index.html.twig', [
-            'portfolioItems' => $portfolioModel != null ? $portfolioModel->getPortfolioItems() : null,
-            'cacheTimestamp' => $portfolioModel != null ? (new DateTime())->setTimestamp($portfolioModel->getCacheTimestamp() ?: 0) : 0,
-            'limit' => $limit,
-            'maxPages' => $portfolioModel != null ? $portfolioModel->getMaxPages() : 0,
-            'thisPage' => $thisPage,
-            'order' => $orderBy,
-            'sort' => $sort,
-            'searchCriteria' => $searchCriteria ?? '',
-            'routeName' => 'portfolio_index',
-            'searchPath' => 'portfolio_search',
-            'piePath' => 'portfolio_pie',
-            'pies' => $pies,
-            'pieSelected' => $pieSelected ?? 1,
-            'numActivePosition' => $summary->getNumActivePosition(),
-            'numPosition' => $summary->getNumActivePosition(),
-            'numTickers' => $summary->getNumTickers(),
-            'profit' => $summary->getProfit(),
-            'totalDividend' => $summary->getTotalDividend(),
-            'totalInvested' => $summary->getAllocated(),
-            'autoCompleteForm' => $form,
+        return $this->render("portfolio/index.html.twig", [
+            "portfolioItems" =>
+                $portfolioModel != null
+                    ? $portfolioModel->getPortfolioItems()
+                    : null,
+            "cacheTimestamp" =>
+                $portfolioModel != null
+                    ? (new DateTime())->setTimestamp(
+                        $portfolioModel->getCacheTimestamp() ?: 0
+                    )
+                    : 0,
+            "limit" => $limit,
+            "maxPages" =>
+                $portfolioModel != null ? $portfolioModel->getMaxPages() : 0,
+            "thisPage" => $thisPage,
+            "order" => $orderBy,
+            "sort" => $sort,
+            "routeName" => "portfolio_index",
+            "numActivePosition" => $summary->getNumActivePosition(),
+            "numPosition" => $summary->getNumActivePosition(),
+            "numTickers" => $summary->getNumTickers(),
+            "profit" => $summary->getProfit(),
+            "totalDividend" => $summary->getTotalDividend(),
+            "totalInvested" => $summary->getAllocated(),
+            "autoCompleteForm" => $form,
+            //"pieSelectForm" => $pieSelectForm,
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'portfolio_show', methods: ['GET'])]
+    #[Route(path: "/{id}", name: "portfolio_show", methods: ["GET"])]
     public function show(
         Request $request,
         Position $position,
@@ -157,9 +192,17 @@ class PortfolioController extends AbstractController
         $nextDividendPayout = null;
 
         if ($calendarRecentDividendDate) {
-            [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax($position, $calendarRecentDividendDate);
-            $netCashAmount = $calendarRecentDividendDate->getCashAmount() * $exchangeRate * (1 - $dividendTax);
-            $amountPerDate = $position->getAmountPerDate($calendarRecentDividendDate->getExDividendDate());
+            [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax(
+                $position,
+                $calendarRecentDividendDate
+            );
+            $netCashAmount =
+                $calendarRecentDividendDate->getCashAmount() *
+                $exchangeRate *
+                (1 - $dividendTax);
+            $amountPerDate = $position->getAmountPerDate(
+                $calendarRecentDividendDate->getExDividendDate()
+            );
 
             $nextDividendExDiv = $calendarRecentDividendDate->getExDividendDate();
             $nextDividendPayout = $nextDividendPayout = $calendarRecentDividendDate->getPaymentDate();
@@ -170,9 +213,16 @@ class PortfolioController extends AbstractController
 
         if (count($calenders) > 0) {
             $cal = $dividendService->getRegularCalendar($ticker);
-            [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax($position, $cal);
+            [$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax(
+                $position,
+                $cal
+            );
             $dividendFrequentie = $ticker->getPayoutFrequency();
-            $netYearlyDividend = (($dividendFrequentie * $cal->getCashAmount()) * $exchangeRate) * (1 - $dividendTax);
+            $netYearlyDividend =
+                $dividendFrequentie *
+                $cal->getCashAmount() *
+                $exchangeRate *
+                (1 - $dividendTax);
         }
         $dividendRaises = [];
 
@@ -183,10 +233,15 @@ class PortfolioController extends AbstractController
          */
         foreach ($reverseCalendars as $index => $calendar) {
             $dividendRaises[$index] = 0;
-            if ($calendar->getDividendType() === Calendar::REGULAR && stripos($calendar->getDescription() ?? '', 'Extra') === false) {
+            if (
+                $calendar->getDividendType() === Calendar::REGULAR &&
+                stripos($calendar->getDescription() ?? "", "Extra") === false
+            ) {
                 if (isset($oldCal) && $oldCal->getCashAmount() > 0) {
                     $oldCash = $oldCal->getCashAmount(); // previous
-                    $dividendRaises[$index] = (($calendar->getCashAmount() - $oldCash) / $oldCash) * 100;
+                    $dividendRaises[$index] =
+                        (($calendar->getCashAmount() - $oldCash) / $oldCash) *
+                        100;
                 }
                 $oldCal = $calendar;
             }
@@ -204,63 +259,74 @@ class PortfolioController extends AbstractController
         $percentageAllocation = 0;
 
         if ($allocated > 0) {
-            $percentageAllocation = ($position->getAllocation() / $allocated) * 100;
+            $percentageAllocation =
+                ($position->getAllocation() / $allocated) * 100;
         }
 
         $calendars = $ticker->getCalendars()->slice(0, 30);
         $calendarsCount = $ticker->getCalendars()->count();
 
+        $yearlyForwardDividendPayout =
+            $position->getTicker()->getPayoutFrequency() *
+            $dividendService->getForwardNetDividend($position);
+        $singleTimeForwarddividendPayout = $dividendService->getForwardNetDividend(
+            $position
+        );
+        $dividendYield = $dividendService->getForwardNetDividendYield(
+            $position
+        );
 
-        $yearlyForwardDividendPayout = $position->getTicker()->getPayoutFrequency() * $dividendService->getForwardNetDividend($position);
-        $singleTimeForwarddividendPayout = $dividendService->getForwardNetDividend($position);
-        $dividendYield = $dividendService->getForwardNetDividendYield($position);
-
-        $referer->set('portfolio_show', ['id' => $position->getId()]);
+        $referer->set("portfolio_show", ["id" => $position->getId()]);
 
         $indexUrl = $request->getSession()->get(get_class($this));
 
-        return $this->render('portfolio/show.html.twig', [
-            'ticker' => $ticker,
-            'growth' => $growth,
-            'position' => $position,
-            'payments' => $payments,
-            'dividend' => $dividend,
-            'calendars' => $calendars,
-            'calendarsCount' => $calendarsCount,
-            'dividendRaises' => $dividendRaises,
-            'totalInvested' => $allocated,
-            'netYearlyDividend' => $netYearlyDividend,
-            'percentageAllocated' => $percentageAllocation,
-            'netCashAmount' => $netCashAmount,
-            'amountPerDate' => $amountPerDate,
-            'expectedPayout' => $netCashAmount * $amountPerDate,
-            'yearlyForwardDividendPayout' => $yearlyForwardDividendPayout,
-            'singleTimeForwarddividendPayout' => $singleTimeForwarddividendPayout,
-            'dividendYield' => $dividendYield,
-            'nextDividendExDiv' => $nextDividendExDiv,
-            'nextDividendPayout' => $nextDividendPayout,
-            'indexUrl' => $indexUrl,
+        return $this->render("portfolio/show.html.twig", [
+            "ticker" => $ticker,
+            "growth" => $growth,
+            "position" => $position,
+            "payments" => $payments,
+            "dividend" => $dividend,
+            "calendars" => $calendars,
+            "calendarsCount" => $calendarsCount,
+            "dividendRaises" => $dividendRaises,
+            "totalInvested" => $allocated,
+            "netYearlyDividend" => $netYearlyDividend,
+            "percentageAllocated" => $percentageAllocation,
+            "netCashAmount" => $netCashAmount,
+            "amountPerDate" => $amountPerDate,
+            "expectedPayout" => $netCashAmount * $amountPerDate,
+            "yearlyForwardDividendPayout" => $yearlyForwardDividendPayout,
+            "singleTimeForwarddividendPayout" => $singleTimeForwarddividendPayout,
+            "dividendYield" => $dividendYield,
+            "nextDividendExDiv" => $nextDividendExDiv,
+            "nextDividendPayout" => $nextDividendPayout,
+            "indexUrl" => $indexUrl,
         ]);
     }
 
-    #[Route(path: '/pie', name: 'portfolio_pie', methods: ['POST'])]
-    public function pie(Request $request): Response
-    {
-        $pie = $request->request->get('pie');
-        $request->getSession()->set(self::PIE_KEY, $pie);
-
-        return $this->redirectToRoute('portfolio_index');
-    }
-
-    #[Route(path: '/close/{position}', name: 'portfolio_position_close', methods: ['DELETE', 'POST'])]
-    public function closePosition(Request $request, EntityManagerInterface $em, Position $position): Response
-    {
-        if ($this->isCsrfTokenValid('delete' . $position->getId(), $request->request->get('_token'))) {
+    #[
+        Route(
+            path: "/close/{position}",
+            name: "portfolio_position_close",
+            methods: ["DELETE", "POST"]
+        )
+    ]
+    public function closePosition(
+        Request $request,
+        EntityManagerInterface $em,
+        Position $position
+    ): Response {
+        if (
+            $this->isCsrfTokenValid(
+                "delete" . $position->getId(),
+                $request->request->get("_token")
+            )
+        ) {
             $position->setClosed(true);
-            $position->setClosedAt((new DateTime()));
+            $position->setClosedAt(new DateTime());
             $em->persist($position);
             $em->flush();
         }
-        return $this->redirectToRoute('portfolio_index');
+        return $this->redirectToRoute("portfolio_index");
     }
 }

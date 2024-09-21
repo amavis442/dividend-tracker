@@ -44,10 +44,10 @@ class TickerAutocompleteField extends AbstractType
                     if ([] !== $includeAllTickers && !$includeAllTickers) {
                         $qb->join('t.positions', 'p', 'WITH', 'p.closed = false');
                     }
+
                     return $qb;
                 };
-            },
-
+            }
         ]);
     }
 

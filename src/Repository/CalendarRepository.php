@@ -56,7 +56,7 @@ class CalendarRepository extends ServiceEntityRepository
         int $limit = 10,
         string $orderBy = 'exDividendDate',
         string $sort = 'DESC',
-        string $search = ''
+        ?Ticker $ticker = null
     ): Paginator {
         $order = 'c.' . $orderBy;
         if ($orderBy === 'symbol') {
@@ -79,12 +79,12 @@ class CalendarRepository extends ServiceEntityRepository
                 $queryBuilder->expr()->in('t.id', $queryBuilder2->getDQL())
             );
 
-        if ($search != '') {
+        if ($ticker && $ticker->getId()) {
             $queryBuilder
                 ->where(
-                    $queryBuilder->expr()->like('LOWER(t.isin)', 'LOWER(:search)'),
+                    't = :ticker'
                 )
-                ->setParameter('search', $search . '%');
+                ->setParameter('ticker', $ticker->getId());
         }
 
         $query = $queryBuilder->getQuery();

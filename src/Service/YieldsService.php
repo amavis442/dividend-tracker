@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Pie;
 use App\Entity\Constants;
 use App\Repository\PositionRepository;
 
@@ -10,8 +11,8 @@ class YieldsService
     public function yield(
         PositionRepository $positionRepository,
         DividendService $dividendService,
-        string $orderBy = 'symbol',
-        int $pieId = null
+        string $orderBy = "symbol",
+        ?Pie $pie = null
     ): array {
         $labels = [];
         $data = [];
@@ -22,12 +23,13 @@ class YieldsService
         $orderKey = 0;
         $totalNetYearlyDividend = 0.0;
 
-        $positions = $positionRepository->getAllOpen($pieId, null);
-        $allocated = $positionRepository->getSumAllocated($pieId);
+        $positions = $positionRepository->getAllOpen($pie, null);
+        $allocated = $positionRepository->getSumAllocated($pie);
 
         foreach ($positions as $position) {
-            if ($position->isIgnoreForDividend())
+            if ($position->isIgnoreForDividend()) {
                 continue;
+            }
 
             $ticker = $position->getTicker();
             $avgPrice = $position->getPrice();
@@ -46,57 +48,98 @@ class YieldsService
             $netTotalPayoutPerPaydate = 0;
             $lastCash = 0;
             $lastCashCurrency = '$';
-            $taxRate = $ticker->getTax() ? $ticker->getTax()->getTaxRate() * 100 : Constants::TAX;
-            $exchangeRate = $firstCalendarEntry ? $dividendService->getExchangeRate($firstCalendarEntry) : 0;
-
+            $taxRate = $ticker->getTax()
+                ? $ticker->getTax()->getTaxRate() * 100
+                : Constants::TAX;
+            $exchangeRate = $firstCalendarEntry
+                ? $dividendService->getExchangeRate($firstCalendarEntry)
+                : 0;
 
             if ($firstCalendarEntry) {
                 $lastCash = $dividendService->getCashAmount($ticker); // $firstCalendarEntry->getCashAmount();
-                $lastCashCurrency = $firstCalendarEntry->getCurrency()->getSign();
+                $lastCashCurrency = $firstCalendarEntry
+                    ->getCurrency()
+                    ->getSign();
                 $lastDividendDate = $firstCalendarEntry->getPaymentDate();
 
-                $netTotalForwardYearlyPayout = $numPayoutsPerYear * $dividendService->getForwardNetDividend($position);
-                $netForwardYearlyPayout = $numPayoutsPerYear * $dividendService->getNetDividend($position, $firstCalendarEntry);
-                $dividendYield = $dividendService->getForwardNetDividendYield($position);
+                $netTotalForwardYearlyPayout =
+                    $numPayoutsPerYear *
+                    $dividendService->getForwardNetDividend($position);
+                $netForwardYearlyPayout =
+                    $numPayoutsPerYear *
+                    $dividendService->getNetDividend(
+                        $position,
+                        $firstCalendarEntry
+                    );
+                $dividendYield = $dividendService->getForwardNetDividendYield(
+                    $position
+                );
                 $netTotalPayoutPerPaydate = 0;
                 if ($numPayoutsPerYear > 0) {
-                    $netTotalPayoutPerPaydate = $netTotalForwardYearlyPayout / $numPayoutsPerYear;
+                    $netTotalPayoutPerPaydate =
+                        $netTotalForwardYearlyPayout / $numPayoutsPerYear;
                 }
             }
             $dividendPerYear = $numPayoutsPerYear * $lastCash;
 
             $tickerLabel = $ticker->getSymbol();
-            $labels[$tickerLabel] = sprintf("%s (%s)", substr(addslashes(str_replace(["'", '"'], ["", ""], $ticker->getFullname())), 0, 8), $ticker->getSymbol());
+            $labels[$tickerLabel] = sprintf(
+                "%s (%s)",
+                substr(
+                    addslashes(
+                        str_replace(
+                            ["'", '"'],
+                            ["", ""],
+                            $ticker->getFullname()
+                        )
+                    ),
+                    0,
+                    8
+                ),
+                $ticker->getSymbol()
+            );
             $data[$tickerLabel] = $dividendYield;
 
-            if ($orderBy === 'yield') {
-                $orderKey = str_pad((string) ($dividendYield * 100), 10, '0', STR_PAD_LEFT) . $ticker->getSymbol();
+            if ($orderBy === "yield") {
+                $orderKey =
+                    str_pad(
+                        (string) ($dividendYield * 100),
+                        10,
+                        "0",
+                        STR_PAD_LEFT
+                    ) . $ticker->getSymbol();
             }
-            if ($orderBy === 'dividend') {
-                $orderKey = str_pad((string) ($dividendPerYear * 100), 10, '0', STR_PAD_LEFT) . $ticker->getSymbol();
+            if ($orderBy === "dividend") {
+                $orderKey =
+                    str_pad(
+                        (string) ($dividendPerYear * 100),
+                        10,
+                        "0",
+                        STR_PAD_LEFT
+                    ) . $ticker->getSymbol();
             }
-            if ($orderBy === 'symbol') {
+            if ($orderBy === "symbol") {
                 $orderKey = $ticker->getSymbol();
             }
             $dataSource[$orderKey] = [
-                'ticker' => $ticker->getSymbol(),
-                'tickerId' => $ticker->getId(),
-                'position' => $position,
-                'label' => $ticker->getFullname(),
-                'yield' => $dividendYield,
-                'payout' => $dividendPerYear,
-                'allocation' => $allocation,
-                'netTotalPayoutPerPaydate' => $netTotalPayoutPerPaydate,
-                'netForwardYearlyPayout' => $netForwardYearlyPayout,
-                'netTotalForwardYearlyPayout' => $netTotalForwardYearlyPayout,
-                'avgPrice' => $avgPrice,
-                'lastDividend' => $lastCash,
-                'lastDividendCurrency' => $lastCashCurrency,
-                'lastDividendDate' => $lastDividendDate,
-                'numPayoutsPerYear' => $numPayoutsPerYear,
-                'amount' => $amount,
-                'taxRate' => $taxRate,
-                'exchangeRate' => $exchangeRate
+                "ticker" => $ticker->getSymbol(),
+                "tickerId" => $ticker->getId(),
+                "position" => $position,
+                "label" => $ticker->getFullname(),
+                "yield" => $dividendYield,
+                "payout" => $dividendPerYear,
+                "allocation" => $allocation,
+                "netTotalPayoutPerPaydate" => $netTotalPayoutPerPaydate,
+                "netForwardYearlyPayout" => $netForwardYearlyPayout,
+                "netTotalForwardYearlyPayout" => $netTotalForwardYearlyPayout,
+                "avgPrice" => $avgPrice,
+                "lastDividend" => $lastCash,
+                "lastDividendCurrency" => $lastCashCurrency,
+                "lastDividendDate" => $lastDividendDate,
+                "numPayoutsPerYear" => $numPayoutsPerYear,
+                "amount" => $amount,
+                "taxRate" => $taxRate,
+                "exchangeRate" => $exchangeRate,
             ];
             $totalNetYearlyDividend += $netTotalForwardYearlyPayout;
             $sumAvgPrice += $avgPrice;
@@ -106,7 +149,7 @@ class YieldsService
         ksort($labels);
         ksort($data);
 
-        if ($orderBy === 'yield' || $orderBy === 'dividend') {
+        if ($orderBy === "yield" || $orderBy === "dividend") {
             krsort($dataSource);
         } else {
             ksort($dataSource);
@@ -122,14 +165,14 @@ class YieldsService
         }
 
         return [
-            'data' => array_values($data),
-            'labels' => array_values($labels),
-            'datasource' => $dataSource,
-            'totalAvgYield' => $totalAvgYield,
-            'dividendYieldOnCost' => $dividendYieldOnCost,
-            'allocated' => $allocated,
-            'totalDividend' => $totalDividend,
-            'totalNetYearlyDividend' => $totalNetYearlyDividend,
+            "data" => array_values($data),
+            "labels" => array_values($labels),
+            "datasource" => $dataSource,
+            "totalAvgYield" => $totalAvgYield,
+            "dividendYieldOnCost" => $dividendYieldOnCost,
+            "allocated" => $allocated,
+            "totalDividend" => $totalDividend,
+            "totalNetYearlyDividend" => $totalNetYearlyDividend,
         ];
     }
 }

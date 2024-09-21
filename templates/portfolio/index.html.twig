@@ -18,28 +18,22 @@
 
 		<div class="border p-2 shadow p-3 mb-5 bg-body-tertiary rounded">
 			<div class="row">
+				<div class="col mb-2">
 
-				<div class="col">
-					{% include '_search_form.html.twig' %}
-				</div>
-
-				<div class="col">
-					<form action="{{ path(piePath) }}" method="POST" class="row g2">
-						<input type="hidden" name="_method" value="POST">
+					{{ form_start(autoCompleteForm, {'action': path('portfolio_index'), 'attr':{'class': 'row g2'}}) }}
 						<div class="col">
-							<select name='pie' class="form-select" aria-label="Choose pie">
-								<option value='0'>-</option>
-								{% for p in pies %}
-									<option value="{{ p.id }}" {% if pieSelected == p.id %} selected {% endif %}>{{ p.label }}</option>
-								{% endfor %}
-							</select>
+							{{ form_widget(autoCompleteForm.pie) }}
+						</div>
+						<div class="col">
+							{{ form_widget(autoCompleteForm.ticker) }}
 						</div>
 						<div class="col-auto">
-							<button class="btn btn-secondary mb-2" data-bs-toggle="tooltip" data-placement="top" title="Search Ticker">
-								<i class="fas fa-solid fa-filter"></i>
+							<button class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Search Ticker">
+								<i class="fas fa-search"></i>
 							</button>
 						</div>
-					</form>
+					{{ form_end(autoCompleteForm) }}
+
 				</div>
 			</div>
 

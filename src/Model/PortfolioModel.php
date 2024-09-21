@@ -2,6 +2,9 @@
 
 namespace App\Model;
 
+use App\Entity\Pie;
+use App\Entity\Ticker;
+use App\Entity\Position;
 use App\Entity\PortfolioItem;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
@@ -13,8 +16,8 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 class PortfolioModel
 {
-    public const CACHE_KEY = 'portfolio_model_cache_key';
-    public const CACHE_NAMESPACE = 'portfolio.cache';
+    public const CACHE_KEY = "portfolio_model_cache_key";
+    public const CACHE_NAMESPACE = "portfolio.cache";
     private bool $initialized = false;
     private array $portfolioItems = [];
     private array $tickerIds = [];
@@ -25,16 +28,18 @@ class PortfolioModel
      */
     private int $timestamp = 0;
 
-    public function __construct(
-        private Stopwatch $stopwatch,
-    ) {}
+    public function __construct(private Stopwatch $stopwatch)
+    {
+    }
 
     /**
      * Add the dividend
      */
-    private function getDividends(PaymentRepository $paymentRepository, array $tickerIds): void
-    {
-        $this->stopwatch->start('portfoliomodel-getDividends');
+    private function getDividends(
+        PaymentRepository $paymentRepository,
+        array $tickerIds
+    ): void {
+        $this->stopwatch->start("portfoliomodel-getDividends");
         $dividends = $paymentRepository->getSumDividends($tickerIds);
         foreach ($this->portfolioItems as &$portfolioItem) {
             $tickerId = $portfolioItem->getTickerId();
@@ -42,21 +47,21 @@ class PortfolioModel
                 $portfolioItem->setDividend($dividends[$tickerId]);
             }
         }
-        $this->stopwatch->stop('portfoliomodel-getDividends');
+        $this->stopwatch->stop("portfoliomodel-getDividends");
     }
 
     /**
      * Page Decorator
-     *
-     * @var \Traversable<Position> $positions
      */
     private function createPortfolioItem(
+        /**
+         * @var \Traversable<Position> $positions
+         */
         \Traversable $positions,
         float $totalInvested,
         DividendService $dividendService
     ): array {
-
-        $this->stopwatch->start('portfoliomodel-createPortfolioItem');
+        $this->stopwatch->start("portfoliomodel-createPortfolioItem");
 
         $currentDate = new DateTime();
 
@@ -64,11 +69,11 @@ class PortfolioModel
         $tickerIds = [];
 
         /**
-         * @var \App\Entity\Position $position
+         * @var Position $position
          */
         foreach ($positions as $position) {
             /**
-             * @var \App\Entity\Ticker $ticker
+             * @var Ticker $ticker
              */
             $ticker = $position->getTicker();
             $avgPrice = $position->getPrice();
@@ -89,27 +94,40 @@ class PortfolioModel
                 ->setPercentageAllocation($percentageAllocation)
                 ->setPies($position->getPies())
                 ->setDividendPayoutFrequency($payoutFrequency)
-                ->setDividendTreshold(0.03)
-            ;
+                ->setDividendTreshold(0.03);
             if ($position->getDividendTreshold()) {
-                $portfolioItem->setDividendTreshold($position->getDividendTreshold() / 100);
+                $portfolioItem->setDividendTreshold(
+                    $position->getDividendTreshold() / 100
+                );
             }
 
             if ($position->getMaxAllocation() !== null) {
                 $portfolioItem->setMaxAllocation($position->getMaxAllocation());
-                if ($position->getAllocation() > $position->getMaxAllocation()) {
+                if (
+                    $position->getAllocation() > $position->getMaxAllocation()
+                ) {
                     $portfolioItem->setIsMaxAllocation(true);
-                    $portfolioItem->setMaxAllocation($position->getMaxAllocation());
+                    $portfolioItem->setMaxAllocation(
+                        $position->getMaxAllocation()
+                    );
                 }
             }
 
             // Dividend part
-            $calendar = $dividendService->getRegularCalendar($position->getTicker());
+            $calendar = $dividendService->getRegularCalendar(
+                $position->getTicker()
+            );
             if ($calendar) {
-                $forwardNetDividend = $dividendService->getForwardNetDividend($position);
-                $forwardNetDividendYield = $dividendService->getForwardNetDividendYield($position);
+                $forwardNetDividend = $dividendService->getForwardNetDividend(
+                    $position
+                );
+                $forwardNetDividendYield = $dividendService->getForwardNetDividendYield(
+                    $position
+                );
                 $forwardNetDividendYieldPerShare = 0;
-                $netDividendPerShare = $dividendService->getNetDividendPerShare($position);
+                $netDividendPerShare = $dividendService->getNetDividendPerShare(
+                    $position
+                );
 
                 $portfolioItem
                     ->setDivDate(true)
@@ -117,17 +135,23 @@ class PortfolioModel
                     ->setCashCurrency($calendar->getCurrency())
                     ->setForwardNetDividend($forwardNetDividend)
                     ->setForwardNetDividendYield($forwardNetDividendYield)
-                    ->setForwardNetDividendYieldPerShare($forwardNetDividendYieldPerShare)
-                    ->setNetDividendPerShare($netDividendPerShare)
-                ;
+                    ->setForwardNetDividendYieldPerShare(
+                        $forwardNetDividendYieldPerShare
+                    )
+                    ->setNetDividendPerShare($netDividendPerShare);
                 if ($calendar->getExDividendDate() instanceof DateTime) {
-                    $portfolioItem->setExDividendDate($calendar->getExDividendDate());
+                    $portfolioItem->setExDividendDate(
+                        $calendar->getExDividendDate()
+                    );
                 }
                 if ($calendar->getPaymentDate() instanceof DateTime) {
                     $portfolioItem->setPaymentDate($calendar->getPaymentDate());
                 }
 
-                foreach ($position->getTicker()->getCalendars() as $currentCalendar) {
+                foreach (
+                    $position->getTicker()->getCalendars()
+                    as $currentCalendar
+                ) {
                     if ($currentCalendar->getPaymentDate() >= $currentDate) {
                         $portfolioItem->addDividendCalendar($currentCalendar);
                     }
@@ -143,7 +167,7 @@ class PortfolioModel
                 $tickerIds[] = $id;
             }
         }
-        $this->stopwatch->stop('portfoliomodel-createPortfolioItem');
+        $this->stopwatch->stop("portfoliomodel-createPortfolioItem");
 
         return $tickerIds;
     }
@@ -158,9 +182,9 @@ class PortfolioModel
      * @param integer $page
      * @param string $orderBy
      * @param string $sort
-     * @param string $searchCriteria
-     * @param string|null $pieSelected
-     * @return self
+     * @param Ticker|null $ticker
+     * @param Pie|null $pie
+     * @return static
      */
     public function getPage(
         PositionRepository $positionRepository,
@@ -168,35 +192,54 @@ class PortfolioModel
         PaymentRepository $paymentRepository,
         float $totalInvested = 0.0,
         int $page = 1,
-        string $orderBy = 'symbol',
-        string $sort = 'asc',
-        string $searchCriteria = '',
-        ?string $pieSelected = null
+        string $orderBy = "symbol",
+        string $sort = "asc",
+        ?Ticker $ticker = null,
+        ?Pie $pie = null
     ): static {
-        $order = 't.symbol';
-        if ($orderBy == 'industry') {
-            $order = 'i.label';
+        $order = "t.symbol";
+        if ($orderBy == "industry") {
+            $order = "i.label";
         }
-        if (in_array($orderBy, ['symbol', 'fullname'])) {
-            $order = 't.' . $orderBy;
+        if (in_array($orderBy, ["symbol", "fullname"])) {
+            $order = "t." . $orderBy;
         }
-        if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
-            $sort = 'asc';
+        if (!in_array($sort, ["asc", "desc", "ASC", "DESC"])) {
+            $sort = "asc";
         }
 
-        $this->stopwatch->start('portfoliomodel-getpage');
+        $this->stopwatch->start("portfoliomodel-getpage");
         $limit = 20;
-        if ($pieSelected && $pieSelected != '-') {
-            $pager = $positionRepository->getAll($page, $limit, $order, $sort, $searchCriteria, PositionRepository::OPEN, [$pieSelected]);
+        if ($pie && $pie->getId()) {
+            $pager = $positionRepository->getAll(
+                $page,
+                $limit,
+                $order,
+                $sort,
+                $ticker,
+                PositionRepository::OPEN,
+                $pie
+            );
         } else {
-            $pager = $positionRepository->getAll($page, $limit, $order, $sort, $searchCriteria, PositionRepository::OPEN);
+            $pager = $positionRepository->getAll(
+                $page,
+                $limit,
+                $order,
+                $sort,
+                $ticker,
+                PositionRepository::OPEN
+            );
         }
 
         $this->maxPages = (int) ceil($pager->count() / $limit);
 
-        $this->stopwatch->stop('portfoliomodel-getpage');
+        $this->stopwatch->stop("portfoliomodel-getpage");
 
-        $tickerIds = $this->createPortfolioItem($pager, $totalInvested, $dividendService);
+        $tickerIds = $this->createPortfolioItem(
+            $pager,
+            $totalInvested,
+            $dividendService
+        );
         $this->getDividends($paymentRepository, $tickerIds);
 
         $this->tickerIds = $tickerIds;
@@ -213,7 +256,7 @@ class PortfolioModel
     public function getPortfolioItems(): array
     {
         if (!$this->initialized) {
-            throw new RuntimeException('First call PortfolioModel::getPage()');
+            throw new RuntimeException("First call PortfolioModel::getPage()");
         }
         return $this->portfolioItems;
     }
@@ -226,7 +269,7 @@ class PortfolioModel
     public function getTickerIds(): array
     {
         if (!$this->initialized) {
-            throw new RuntimeException('First call PortfolioModel::getPage()');
+            throw new RuntimeException("First call PortfolioModel::getPage()");
         }
         return $this->tickerIds;
     }
@@ -239,7 +282,7 @@ class PortfolioModel
     public function getMaxPages(): int
     {
         if (!$this->initialized) {
-            throw new RuntimeException('First call PortfolioModel::getPage()');
+            throw new RuntimeException("First call PortfolioModel::getPage()");
         }
         return $this->maxPages;
     }
@@ -252,7 +295,7 @@ class PortfolioModel
     public function getCacheTimestamp(): int
     {
         if (!$this->initialized) {
-            throw new RuntimeException('First call PortfolioModel::getPage()');
+            throw new RuntimeException("First call PortfolioModel::getPage()");
         }
         return $this->timestamp;
     }

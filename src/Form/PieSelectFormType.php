@@ -2,30 +2,27 @@
 
 namespace App\Form;
 
-use App\Form\Type\TickerAutocompleteField;
+use App\Entity\PieSelect;
+use App\Form\Type\PieSelectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class TickerAutocompleteType extends AbstractType
+class PieSelectFormType extends AbstractType
 {
     public function buildForm(
         FormBuilderInterface $builder,
         array $options
     ): void {
-        $builder->add("ticker", TickerAutocompleteField::class, [
-            "extra_options" => [
-                "include_all_tickers" =>
-                    $options["extra_options"]["include_all_tickers"],
-            ],
+        $builder->add("pie", PieSelectType::class, [
+            "required" => false,
         ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            "searchCriteria" => "",
-            "extra_options" => [],
+            "data_class" => PieSelect::class,
             "method" => "GET",
         ]);
     }

@@ -60,8 +60,6 @@ class CalendarController extends AbstractController
             'order' => $orderBy,
             'sort' => $sort,
             'routeName' => 'calendar_index',
-            'searchCriteria' => $searchCriteria ?? '',
-            'searchPath' => 'calendar_search',
             'autoCompleteForm' => $form,
         ]);
     }
@@ -105,7 +103,7 @@ class CalendarController extends AbstractController
         CalendarRepository $calendarRepository,
         DividendService $dividendService
     ): Response {
-        $year = date('Y');
+        $year = (int) date('Y');
         $endDate = $year . '-12-31';
 
         $dateSelect = new DateSelect();
@@ -120,7 +118,7 @@ class CalendarController extends AbstractController
 
         $calendars = $calendarRepository->groupByMonth(
             $dividendService,
-            (int) $year,
+            $year,
             $dateSelect->getStartdate()->format('Y-m-d'),
             $dateSelect->getEnddate()->format('Y-m-d'),
             $dateSelect->getPie()
@@ -129,9 +127,7 @@ class CalendarController extends AbstractController
         return $this->render('calendar/view_table.html.twig', [
             'calendars' => $calendars,
             'year' => $year,
-            'dateSelect' => $dateSelect,
             'form' => $form->createView(),
-            'timestamp' => new DateTime(),
         ]);
     }
 
@@ -191,16 +187,6 @@ class CalendarController extends AbstractController
         if ($referer->get()) {
             return $this->redirect($referer->get());
         }
-        return $this->redirectToRoute('calendar_index');
-    }
-
-    #[Route(path: '/search', name: 'calendar_search', methods: ['POST'])]
-    public function search(
-        Request $request
-    ): Response {
-        $searchCriteria = $request->request->get('searchCriteria');
-        $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
-
         return $this->redirectToRoute('calendar_index');
     }
 }

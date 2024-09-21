@@ -4,30 +4,62 @@
 namespace App\Form\Type;
 
 use App\Entity\Pie;
-use App\Repository\PieRepository;
+use Doctrine\ORM\EntityRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PieSelectType extends AbstractType
 {
-    public function __construct(private PieRepository $pieRepository) {}
-
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $pieLabels = $this->pieRepository->getActiveLabels();
-
         $resolver->setDefaults([
-            'choices' => $pieLabels,
-            'choice_value' => 'label',
-            'choice_label' => function (?Pie $pie): string {
-                return $pie ? ucfirst($pie->getLabel()) : '';
+            "class" => Pie::class,
+            "choice_label" => function ($pie) {
+                return $pie->getLabel();
+            },
+            "choice_value" => "id",
+            "placeholder" => "Please choose a Pie",
+            "query_builder" => function (EntityRepository $er) {
+                $resultTransactions = $er
+                    ->createQueryBuilder("pie")
+                    ->select("pie.id")
+                    ->join("pie.transactions", "t")
+                    ->join("t.position", "pos")
+                    ->where("pos.closed = false")
+                    ->andWhere("pos.ignore_for_dividend = false")
+                    ->groupBy("pie.id")
+                    ->getQuery()
+                    ->getArrayResult();
+
+                $resultPositions = $er
+                    ->createQueryBuilder("pie")
+                    ->select("pie.id")
+                    ->join("pie.positions", "pos")
+                    ->where("pos.closed = false")
+                    ->andWhere("pos.ignore_for_dividend = false")
+                    ->groupBy("pie.id")
+                    ->getQuery()
+                    ->getArrayResult();
+
+                $pieIds = array_merge($resultTransactions, $resultPositions);
+                $finalPieIds = [];
+                foreach ($pieIds as $pie) {
+                    $finalPieIds[] = $pie['id'];
+                }
+                $finalPieIds = array_unique($finalPieIds);
+
+                return $er
+                    ->createQueryBuilder("pie")
+                    ->where("pie.id in (:pies)")
+                    ->orderBy("pie.label", "ASC")
+                    ->setParameter("pies", $finalPieIds);
             },
         ]);
     }
 
     public function getParent(): string
     {
-        return ChoiceType::class;
+        return EntityType::class;
     }
 }

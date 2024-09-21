@@ -3,11 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\Research;
+use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\ORM\QueryBuilder;
-use DateTime;
+
 
 /**
  * @method Research|null find($id, $lockMode = null, $lockVersion = null)
@@ -29,9 +30,9 @@ class ResearchRepository extends ServiceEntityRepository
         int $limit = 10,
         string $orderBy = 'id',
         string $sort = 'ASC',
-        string $search = ''
+        ?Ticker $ticker = null
     ): Paginator {
-        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
+        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $ticker);
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);
 
@@ -41,7 +42,7 @@ class ResearchRepository extends ServiceEntityRepository
     private function getQueryBuilder(
         string $orderBy = 'id',
         string $sort = 'ASC',
-        string $search = ''
+        ?Ticker $ticker = null
     ): QueryBuilder {
         $order = 'r.' . $orderBy;
         if ($orderBy === 'symbol') {
@@ -54,11 +55,10 @@ class ResearchRepository extends ServiceEntityRepository
             ->innerJoin('r.ticker', 't')
             ->orderBy($order, $sort);
 
-        if (!empty($search)) {
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->like('t.isin', ':search'),
+        if ($ticker && $ticker->getId()) {
+            $queryBuilder->andWhere('t = :ticker'
             );
-            $queryBuilder->setParameter('search', $search . '%');
+            $queryBuilder->setParameter('ticker', $ticker->getId());
         }
         return $queryBuilder;
     }

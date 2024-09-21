@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -38,11 +39,11 @@ class Ticker
 
     #[Groups(['ticker:read', 'ticker:write'])]
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    private $symbol;
+    private string $symbol;
 
     #[Groups(['ticker:read', 'ticker:write'])]
     #[ORM\Column(type: 'string', length: 255)]
-    private $fullname;
+    private string $fullname;
 
     #[Groups(['ticker:read', 'ticker:write'])]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Branch', inversedBy: 'tickers')]
@@ -76,7 +77,7 @@ class Ticker
     #[Assert\Isin]
     //#[ApiProperty(identifier: true)]
     #[ORM\Column(type: 'string', length: 255, nullable: false, unique: true)]
-    private $isin;
+    private string $isin;
 
     #[ORM\ManyToOne(targetEntity: Tax::class, inversedBy: 'tickers')]
     private $tax;
@@ -90,7 +91,7 @@ class Ticker
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
-    private \DateTimeImmutable $createdAt;
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;

@@ -20,13 +20,16 @@ class CalendarDividendType extends AbstractType
             ->add('enddate', DateType::class, [
                 'widget' => 'single_text',
             ])
-            ->add('pie', PieSelectType::class);
+            ->add('pie', PieSelectType::class, [
+                'required' => false
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => DateSelect::class,
+            'method' => 'GET',
         ]);
     }
 }

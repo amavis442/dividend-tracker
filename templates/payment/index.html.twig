@@ -15,22 +15,16 @@
 		<br/>
 		<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
 	{% endfor %}
+
 	{{ form_start(searchForm, {'attr': {'class' : 'row g-3 mb-2 mt-2'}}) }}
 
 		<div class="col-auto">{{ form_widget(searchForm.year, { 'attr': {'class' : 'myclass'}}) }}</div>
 		<div class="col-auto">{{ form_widget(searchForm.month) }}</div>
 		<div class="col-auto">{{ form_widget(searchForm.quator) }}</div>
-		<div class="col-auto">{{ form_widget(searchForm.submit, { label: '<i class="fas fa-solid fa-filter"></i>', label_html: true }) }}</div>
-	{{ form_end(searchForm) }}
-
-
-	<div class="row g2">
-		<div class="col">
-			{% include '_search_form.html.twig' %}
-		</div>
+		<div class="col">{{ form_widget(searchForm.ticker) }}</div>
+		<div class="col-auto">{{ form_widget(searchForm.submit) }}</div>
 		<div class="col"></div>
-	</div>
-
+	{{ form_end(searchForm) }}
 
 	<table class="table table-striped border table-hover">
 		<thead>
