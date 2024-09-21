@@ -15,6 +15,7 @@
         "n5s/brotli": "^2.0",
         "nelmio/cors-bundle": "^2.3",
         "nesbot/carbon": "^3.8",
+        "nikic/php-parser": "^5.2",
         "openspout/openspout": "^4.24",
         "pagerfanta/doctrine-orm-adapter": "^4.7",
         "pagerfanta/twig": "^4.7",
