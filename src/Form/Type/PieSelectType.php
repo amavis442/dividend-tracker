@@ -4,7 +4,6 @@
 namespace App\Form\Type;
 
 use App\Entity\Pie;
-use App\Repository\PieRepository;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -12,10 +11,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PieSelectType extends AbstractType
 {
-    public function __construct(private PieRepository $pieRepository)
-    {
-    }
-
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -24,9 +19,6 @@ class PieSelectType extends AbstractType
                 return $pie->getLabel();
             },
             "choice_value" => "id",
-            "choice_label" => function (?Pie $pie): string {
-                return $pie ? ucfirst($pie->getLabel()) : "";
-            },
             "placeholder" => "Please choose a Pie",
             "query_builder" => function (EntityRepository $er) {
                 $resultTransactions = $er

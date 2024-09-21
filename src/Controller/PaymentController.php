@@ -119,7 +119,6 @@ class PaymentController extends AbstractController
             "thisPage" => $thisPage,
             "order" => $orderBy,
             "sort" => $sort,
-            "searchCriteria" => $searchCriteria ?? "",
             "routeName" => "payment_index",
             "searchPath" => "payment_search",
             "startDate" => $startDate,
