@@ -25,25 +25,25 @@ class YieldByPieController extends AbstractController
     public function index(
         Request $request,
         PositionRepository $positionRepository,
-        PieRepository $pieRepository,
         YieldsService $yields,
         DividendService $dividendService,
         string $orderBy = 'symbol'
     ): Response {
 
-        $pieSelectedId = 0;
+        $pie = null;
         $pieSelect = new PieSelect();
         $form = $this->createForm(PieSelectFormType::class, $pieSelect);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $pieSelect = $form->getData();
             $request->getSession()->set(self::YIELD_PIE_KEY, $pieSelect);
-            $pieSelectedId = $pieSelect->getPie()->getId();
+            if ($pieSelect && $pieSelect->getPie()) {
+                $pie = $pieSelect->getPie();
+            }
         }
 
         $pieSelected = $request->getSession()->get(self::YIELD_PIE_KEY, null);
-        $result = $yields->yield($positionRepository, $dividendService, $orderBy, $pieSelectedId);
-        //$pies = $pieRepository->findLinked();
+        $result = $yields->yield($positionRepository, $dividendService, $orderBy, $pie);
 
         return $this->render('report/yield/pie.html.twig', array_merge($result, [
             'controller_name' => 'ReportController',

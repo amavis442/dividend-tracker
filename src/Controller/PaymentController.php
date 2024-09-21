@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Constants;
+use App\Entity\DateIntervalSelect;
 use App\Entity\Payment;
 use App\Entity\Position;
+use App\Form\DateIntervalFormType;
 use App\Form\PaymentType;
 use App\Helper\DateHelper;
 use App\Model\PortfolioModel;
@@ -21,135 +23,117 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(path: '/dashboard/payment')]
+#[Route(path: "/dashboard/payment")]
 class PaymentController extends AbstractController
 {
-    use TickerAutocompleteTrait;
+    public const SEARCH_KEY = "payment_searchCriteria";
+    public const SEARCHFORM_KEY = "payment_searchForm";
+    public const INTERVAL_KEY = "payment_interval";
 
-    public const SEARCH_KEY = 'payment_searchCriteria';
-    public const SEARCHFORM_KEY = 'payment_searchForm';
-    public const INTERVAL_KEY = 'payment_interval';
-
-    #[Route(path: '/list/{page?1}/{orderBy?payDate}/{sort?DESC}', name: 'payment_index', methods: ['GET', 'POST'])]
+    #[Route(path: "/list/{page?1}", name: "payment_index", methods: ["GET"])]
     public function index(
         Request $request,
         PaymentRepository $paymentRepository,
         Referer $referer,
-        int $page = 1,
-        string $orderBy = 'payDate',
-        string $sort = 'DESC'
+        int $page = 1
     ): Response {
-        if (!in_array($orderBy, ['payDate', 'symbol'])) {
-            $orderBy = 'exDividendDate';
-        }
-        if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
-            $sort = 'DESC';
-        }
+        $orderBy = "payDate";
+        $sort = "DESC";
 
-        $defaultData = $request->getSession()->get(self::SEARCHFORM_KEY);
-        if ($defaultData === null) {
-            $defaultData['year'] = (int) date('Y');
-        }
+        $dateIntervalSelect = new DateIntervalSelect();
+        $dateIntervalSelect->setYear((int) date("Y"));
 
-        $currentYear = (int) date('Y');
-        $years = [];
-        for ($i = 2019; $i <= $currentYear; $i++) {
-            $years[$i] = $i;
-        }
-        $form = $this->createFormBuilder($defaultData)
-            ->add(
-                'year',
-                ChoiceType::class,
-                ['label' => 'Year', 'choices' => $years, 'choice_translation_domain' => false,]
-            )
-            ->add('month', ChoiceType::class, [
-                'choices' => [
-                    '-' => 0,
-                    'Jan' => 1,
-                    'Feb' => 2,
-                    'Ma' => 3,
-                    'Apr' => 4,
-                    'May' => 5,
-                    'Jun' => 6,
-                    'Jul' => 7,
-                    'Aug' => 8,
-                    'Sept' => 9,
-                    'Oct' => 10,
-                    'Nov' => 11,
-                    'Dec' => 12,
-                ],
-                'choice_translation_domain' => false,
-            ])
-            ->add(
-                'quator',
-                ChoiceType::class,
-                [
-                    'choices' => [
-                        '-' => 0,
-                        'Q1' => 1,
-                        'Q2' => 2,
-                        'Q3' => 3,
-                        'Q4' => 4,
-                    ],
-                    'choice_translation_domain' => false,
-                ]
-            )
-            ->add('submit', SubmitType::class)
-            ->getForm();
+        $form = $this->createForm(
+            DateIntervalFormType::class,
+            $dateIntervalSelect,
+            [
+                "startYear" => 2019,
+                "extra_options" => ["include_all_tickers" => false],
+            ]
+        );
 
-        $searchCriteria = '';
-        [$autoCompleteForm, $ticker] = $this->searchTicker($request, self::SEARCH_KEY);
-
-
+        $ticker = null;
+        $year = (int) date("Y");
+        $month = null;
+        $qautor = null;
         $form->handleRequest($request);
-        $data = $defaultData;
+
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $request->getSession()->set(self::SEARCHFORM_KEY, $data);
             $page = 1;
+            $year = $dateIntervalSelect->getYear();
+            $month = $dateIntervalSelect->getMonth();
+            $qautor = $dateIntervalSelect->getQuator();
+            $ticker = $dateIntervalSelect->getTicker();
         }
 
-        $year = $data['year'];
-        [$startDate, $endDate] = [$year . '-01-01', $year . '-12-31'];
-        if (isset($data['month']) && $data['month'] !== 0) {
-            [$startDate, $endDate] = (new DateHelper())->monthToDates($data['month'], $data['year']);
+        [$startDate, $endDate] = [$year . "-01-01", $year . "-12-31"];
+        if ($month && $month !== 0) {
+            [$startDate, $endDate] = (new DateHelper())->monthToDates(
+                $month,
+                $year
+            );
         }
 
-        if (isset($data['quator']) && $data['quator'] !== 0) {
-            [$startDate, $endDate] = (new DateHelper())->quaterToDates($data['quator'], $data['year']);
+        if ($qautor) {
+            [$startDate, $endDate] = (new DateHelper())->quaterToDates(
+                $qautor,
+                $year
+            );
         }
-        $totalDividend = $paymentRepository->getTotalDividend($startDate . " 00:00:00", $endDate . " 23:59:59", $ticker);
+        $totalDividend = $paymentRepository->getTotalDividend(
+            $startDate . " 00:00:00",
+            $endDate . " 23:59:59",
+            $ticker
+        );
 
-        $taxes = ($totalDividend / (100 - Constants::TAX)) * Constants::TAX; // TODO: Make this dynamic because not all stocks have 15% dividend tax
+        // TODO: Make this dynamic because not all stocks have 15% dividend tax
+        $taxes = ($totalDividend / (100 - Constants::TAX)) * Constants::TAX;
 
-        $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
-        $items = $paymentRepository->getAll($page, 10, $orderBy, $sort, $ticker, $startDate, $endDate);
+        //$searchCriteria = $request->getSession()->get(self::SEARCH_KEY, "");
+        $items = $paymentRepository->getAll(
+            $page,
+            10,
+            $orderBy,
+            $sort,
+            $ticker,
+            $startDate,
+            $endDate
+        );
         $limit = 10;
         $maxPages = ceil($items->count() / $limit);
         $thisPage = $page;
 
-        $referer->set('payment_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
+        $referer->set("payment_index", [
+            "page" => $page,
+            "orderBy" => $orderBy,
+            "sort" => $sort,
+        ]);
 
-        return $this->render('payment/index.html.twig', [
-            'searchForm' => $form,
-            'payments' => $items->getIterator(),
-            'dividends' => $totalDividend,
-            'taxes' => $taxes,
-            'limit' => $limit,
-            'maxPages' => $maxPages,
-            'thisPage' => $thisPage,
-            'order' => $orderBy,
-            'sort' => $sort,
-            'searchCriteria' => $searchCriteria ?? '',
-            'routeName' => 'payment_index',
-            'searchPath' => 'payment_search',
-            'startDate' => $startDate,
-            'endDate' => $endDate,
-            'autoCompleteForm' => $autoCompleteForm,
+        return $this->render("payment/index.html.twig", [
+            "searchForm" => $form,
+            "payments" => $items,
+            "dividends" => $totalDividend,
+            "taxes" => $taxes,
+            "limit" => $limit,
+            "maxPages" => $maxPages,
+            "thisPage" => $thisPage,
+            "order" => $orderBy,
+            "sort" => $sort,
+            "searchCriteria" => $searchCriteria ?? "",
+            "routeName" => "payment_index",
+            "searchPath" => "payment_search",
+            "startDate" => $startDate,
+            "endDate" => $endDate,
         ]);
     }
 
-    #[Route(path: '/create/{position}/{timestamp?}', name: 'payment_new', methods: ['GET', 'POST'])]
+    #[
+        Route(
+            path: "/create/{position}/{timestamp?}",
+            name: "payment_new",
+            methods: ["GET", "POST"]
+        )
+    ]
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -163,15 +147,21 @@ class PaymentController extends AbstractController
             $year = (int) substr($timestamp, 0, 4);
             $month = (int) substr($timestamp, 5, 2);
         } else {
-            $year = (int) date('Y');
-            $month = (int) date('m');
+            $year = (int) date("Y");
+            $month = (int) date("m");
         }
 
-        $positionDividendEstimate = $calendarRepository->getDividendEstimate($position, $year);
+        $positionDividendEstimate = $calendarRepository->getDividendEstimate(
+            $position,
+            $year
+        );
         if (isset($positionDividendEstimate[$timestamp])) {
-            $data = $positionDividendEstimate[$timestamp]['tickers'][$ticker->getSymbol()];
-            $amount = $data['amount'];
-            $calendar = $data['calendar'];
+            $data =
+                $positionDividendEstimate[$timestamp]["tickers"][
+                    $ticker->getSymbol()
+                ];
+            $amount = $data["amount"];
+            $calendar = $data["calendar"];
         } else {
             $amount = $position->getAmount();
             $calendar = $calendarRepository->getLastDividend($ticker);
@@ -199,24 +189,24 @@ class PaymentController extends AbstractController
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
-            return $this->redirectToRoute('payment_index');
+            return $this->redirectToRoute("payment_index");
         }
 
-        return $this->render('payment/new.html.twig', [
-            'payment' => $payment,
-            'form' => $form->createView(),
+        return $this->render("payment/new.html.twig", [
+            "payment" => $payment,
+            "form" => $form->createView(),
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'payment_show', methods: ['GET'])]
+    #[Route(path: "/{id}", name: "payment_show", methods: ["GET"])]
     public function show(Payment $payment): Response
     {
-        return $this->render('payment/show.html.twig', [
-            'payment' => $payment,
+        return $this->render("payment/show.html.twig", [
+            "payment" => $payment,
         ]);
     }
 
-    #[Route(path: '/{id}/edit', name: 'payment_edit', methods: ['GET', 'POST'])]
+    #[Route(path: "/{id}/edit", name: "payment_edit", methods: ["GET", "POST"])]
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -234,23 +224,34 @@ class PaymentController extends AbstractController
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
-            return $this->redirectToRoute('payment_index');
+            return $this->redirectToRoute("payment_index");
         }
 
-        return $this->render('payment/edit.html.twig', [
-            'payment' => $payment,
-            'form' => $form->createView(),
+        return $this->render("payment/edit.html.twig", [
+            "payment" => $payment,
+            "form" => $form->createView(),
         ]);
     }
 
-    #[Route(path: '/delete/{id}', name: 'payment_delete', methods: ['POST', 'DELETE'])]
+    #[
+        Route(
+            path: "/delete/{id}",
+            name: "payment_delete",
+            methods: ["POST", "DELETE"]
+        )
+    ]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,
         Payment $payment,
         Referer $referer
     ): Response {
-        if ($this->isCsrfTokenValid('delete' . $payment->getId(), $request->request->get('_token'))) {
+        if (
+            $this->isCsrfTokenValid(
+                "delete" . $payment->getId(),
+                $request->request->get("_token")
+            )
+        ) {
             $entityManager->remove($payment);
             $entityManager->flush();
         }
@@ -258,15 +259,18 @@ class PaymentController extends AbstractController
         if ($referer->get()) {
             return $this->redirect($referer->get());
         }
-        return $this->redirectToRoute('payment_index');
+        return $this->redirectToRoute("payment_index");
     }
 
-    #[Route(path: '/search', name: 'payment_search', methods: ['POST'])]
+    #[Route(path: "/search", name: "payment_search", methods: ["POST"])]
     public function search(Request $request): Response
     {
-        $searchCriteria = $request->request->get('searchCriteria');
+        $searchCriteria = $request->request->get("searchCriteria");
         $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
 
-        return $this->redirectToRoute('payment_index', ['orderBy' => 'payDate', 'sort' => 'desc']);
+        return $this->redirectToRoute("payment_index", [
+            "orderBy" => "payDate",
+            "sort" => "desc",
+        ]);
     }
 }

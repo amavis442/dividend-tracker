@@ -2,11 +2,8 @@
 
 namespace App\Entity;
 
-use DateTimeInterface;
-
 class PieSelect
 {
-
     /**
      *
      * @var Pie
@@ -20,7 +17,7 @@ class PieSelect
 
     public function setPie(?Pie $pie): self
     {
-        $this->pie = $pie ?? (new Pie());
+        $this->pie = $pie ?? new Pie();
 
         return $this;
     }
