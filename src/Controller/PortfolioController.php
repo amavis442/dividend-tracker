@@ -49,7 +49,7 @@ class PortfolioController extends AbstractController
         Route(
             path: "/list/{page<\d+>?1}/{orderBy?fullname}/{sort?asc}",
             name: "portfolio_index",
-            methods: ["GET", "POST"]
+            methods: ["GET"]
         )
     ]
     public function index(
@@ -70,7 +70,12 @@ class PortfolioController extends AbstractController
             $sort = "asc";
         }
         $limit = 20;
-        [$form, $ticker, $pie] = $this->searchTickerAndPie($request, $tickerRepository, $pieRepository, self::CACHE_SEARCH);
+        [$form, $ticker, $pie] = $this->searchTickerAndPie(
+            $request,
+            $tickerRepository,
+            $pieRepository,
+            self::CACHE_SEARCH
+        );
 
         $thisPage = $page;
         $summary = $summaryService->getSummary();
@@ -84,11 +89,11 @@ class PortfolioController extends AbstractController
 
         $cache = new FilesystemAdapter(PortfolioModel::CACHE_NAMESPACE);
 
-        $tickerCacheHash = '_empty';
+        $tickerCacheHash = "_empty";
         if ($ticker && $ticker->getId()) {
             $tickerCacheHash = md5($ticker->getIsin());
         }
-        $pieCacheHash = '_empty';
+        $pieCacheHash = "_empty";
         if ($pie && $pie->getId()) {
             $pieCacheHash = "_" . $pie->getId();
         }

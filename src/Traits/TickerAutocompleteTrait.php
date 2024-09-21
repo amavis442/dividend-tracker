@@ -122,7 +122,10 @@ trait TickerAutocompleteTrait
             $ticker = $searchFormData->getTicker();
             $request
                 ->getSession()
-                ->set($cacheKey, [$ticker ? $ticker->getId():null, $pie ? $pie->getId(): null]);
+                ->set($cacheKey, [
+                    $ticker ? $ticker->getId() : null,
+                    $pie ? $pie->getId() : null,
+                ]);
         }
 
         return [$searchForm, $ticker, $pie];

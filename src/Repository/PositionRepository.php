@@ -237,7 +237,7 @@ class PositionRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getAllOpen(int $pieId = null, int $year = null): array
+    public function getAllOpen(?Pie $pie = null, int $year = null): array
     {
         $qb = $this->createQueryBuilder('p')
             //->select('p, t, pa, c, dm, cur, tax, b')
@@ -251,10 +251,10 @@ class PositionRepository extends ServiceEntityRepository
             ->leftJoin('c.currency', 'cur')
             ->where('p.closed = false');
 
-        if ($pieId) {
+        if ($pie && $pie->getId()) {
             $qb->join("p.pies", 'pie')
                 ->andWhere('pie IN (:pieIds)')
-                ->setParameter('pieIds', [$pieId]);
+                ->setParameter('pieIds', [$pie->getId()]);
         }
 
         if ($year) {
@@ -386,16 +386,16 @@ class PositionRepository extends ServiceEntityRepository
         return $profit ?? 0;
     }
 
-    public function getSumAllocated(int $pieId = null): float
+    public function getSumAllocated(?Pie $pie = null): float
     {
         $qb = $this->createQueryBuilder('p')
             ->select('SUM(p.allocation)')
             ->where('p.closed = false');
 
-        if ($pieId) {
+        if ($pie && $pie->getId()) {
             $qb->join("p.pies", 'pie')
                 ->andWhere('pie IN (:pieIds)')
-                ->setParameter('pieIds', [$pieId]);
+                ->setParameter('pieIds', [$pie->getId()]);
         }
 
         $allocated = $qb->getQuery()

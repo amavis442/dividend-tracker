@@ -27,9 +27,10 @@
 
 	<div class="col col-12 border p-2 mb-2">
 
-		<div class="row g2">
+		<div class="row g-2">
 			<div class="col">
-				{{ form_start(form, {'action' : path('report_dividend_yield_by_pie_form'), 'attr':{'class': 'row'}}) }}
+
+				{{ form_start(form, {'attr':{'class': 'row g-2'}}) }}
 					<div class="col">
 					{{ form_widget(form.pie) }}
 					</div>
@@ -39,6 +40,7 @@
 						</button>
 					</div>
 				{{ form_end(form) }}
+
 			</div>
 			<div class="col">
 			</div>
