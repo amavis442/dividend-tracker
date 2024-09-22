@@ -20,7 +20,8 @@ set('bin/npm', function () {
 add('shared_files', ['.env.local', 'public/uploads']);
 
 // Hosts
-host('127.0.0.1')
+host('prod')
+    ->set('hostname', '127.0.0.1')
     ->setRemoteUser('deployer')
     ->setDeployPath('/var/www/prod/{{application}}')
     ->setLabels([
@@ -29,8 +30,8 @@ host('127.0.0.1')
         'stage' => 'prod',
     ]);
 
-
-host('127.0.0.1')
+host('test')
+    ->set('hostname', '127.0.0.1')
     ->setRemoteUser('deployer')
     ->setDeployPath('/var/www/test/{{application}}')
     ->setLabels([
@@ -38,7 +39,6 @@ host('127.0.0.1')
         'env' => 'test',
         'stage' => 'test',
     ]);
-
 
 // Tasks
 desc('Install npm packages');
@@ -69,6 +69,10 @@ task("composer:dump", function () {
 desc('Add assets with assetmapper');
 task('assetmap:compile', function () {
     run('{{bin/console}} asset-map:compile');
+});
+
+task('info', function () {
+    writeln('type:' . get('labels')['type'] . ' env:' . get('labels')['env']);
 });
 
 // Hooks
