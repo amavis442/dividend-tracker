@@ -15,8 +15,6 @@ cache:
   paths:
     - vendor/
     - node_modules/
-    - .yarn
-    - .nvm
 
 variables:
   POSTGRES_DB: theapplication
@@ -36,25 +34,11 @@ static_analysis:
 
 phpunit:
   stage: test
-  before_script:
-    # installs nvm (Node Version Manager)
-    - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
-    - ". ~/.bashrc"
-    - export NVM_DIR="$HOME/.nvm"
-    - "[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\""
-    - nvm install --lts
-    - nvm use --lts
-    - npm install --global yarn
-    - which yarn
-    - echo $NVM_BIN
-    - $NVM_BIN/yarn set version berry
   script:
     - bash ci/php-install.sh
     - php composer.phar install -o
     - php composer.phar require --dev symfony/phpunit-bridge
-    - $NVM_BIN/yarn config get enableImmutableInstalls
-    - $NVM_BIN/yarn install
-    - $NVM_BIN/yarn build
+    - php bin/console asset-map:compile
     - sh ci/php_test_run.sh
   cache:
     key: ${CI_COMMIT_REF_SLUG}

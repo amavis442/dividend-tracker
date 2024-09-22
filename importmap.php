@@ -262,7 +262,4 @@ return [
     'color-name' => [
         'version' => '1.1.4',
     ],
-    'axios' => [
-        'version' => '1.7.7',
-    ],
 ];
