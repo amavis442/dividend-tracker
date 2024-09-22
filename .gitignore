@@ -8,6 +8,9 @@
 /vendor/
 /import/
 ###< symfony/framework-bundle ###
+!*/.gitkeep
+/public/uploads/
+/.npm
 
 ###> symfony/webpack-encore-bundle ###
 /node_modules/
@@ -15,9 +18,6 @@
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
-!*/.gitkeep
-/public/uploads/
-/.npm
 
 ###> symfony/phpunit-bridge ###
 .phpunit.result.cache
@@ -44,11 +44,7 @@ yarn-error.log
 phpstan.neon
 ###< phpstan/phpstan ###
 
-# Yarn stuff
-.yarn/*
-!.yarn/patches
-!.yarn/releases
-!.yarn/plugins
-!.yarn/sdks
-!.yarn/versions
-.pnp.*
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###

@@ -4,11 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Calendar;
 use App\Entity\Position;
-use App\Entity\PieSelect;
-use App\Entity\Pie;
-use App\Entity\Ticker;
-use App\Entity\SearchForm;
-use App\Form\PieSelectFormType;
 use App\Model\PortfolioModel;
 use App\Repository\PaymentRepository;
 use App\Repository\PieRepository;
@@ -29,6 +24,9 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
+use App\Helper\Colors;
+use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
+use Symfony\UX\Chartjs\Model\Chart;
 
 #[Route(path: "/dashboard/portfolio")]
 class PortfolioController extends AbstractController
@@ -177,7 +175,8 @@ class PortfolioController extends AbstractController
         SummaryService $summaryService,
         DividendGrowthService $dividendGrowth,
         DividendService $dividendService,
-        Referer $referer
+        Referer $referer,
+        ChartBuilderInterface $chartBuilder,
     ): Response {
         $ticker = $position->getTicker();
         $calendarRecentDividendDate = $ticker->getRecentDividendDate();
@@ -280,6 +279,72 @@ class PortfolioController extends AbstractController
 
         $indexUrl = $request->getSession()->get(get_class($this));
 
+
+        $colors = Colors::COLORS;
+
+
+        $chartPayout = $chartBuilder->createChart(Chart::TYPE_BAR);
+
+        $chartPayout->setData([
+            "labels" => $growth["labels"],
+            "datasets" => [
+                [
+                    "label" => "Dividend payout",
+                    "backgroundColor" => $colors,
+                    "borderColor" => $colors,
+                    "data" => $growth["payout"],
+                ],
+            ],
+        ]);
+
+        $chartPayout->setOptions([
+            "maintainAspectRatio" => false,
+            "responsive" => true,
+            "plugins" => [
+                "title" => [
+                    "display" => true,
+                    "text" => "Dividend forward",
+                    "font" => [
+                        "size" => 24,
+                    ],
+                ],
+                "legend" => [
+                    "position" => "top",
+                ],
+            ],
+        ]);
+
+        $chartYield = $chartBuilder->createChart(Chart::TYPE_BAR);
+
+        $chartYield->setData([
+            "labels" => $growth["labels"],
+            "datasets" => [
+                [
+                    "label" => "Dividend yield",
+                    "backgroundColor" => $colors,
+                    "borderColor" => $colors,
+                    "data" => $growth["data"],
+                ],
+            ],
+        ]);
+
+        $chartYield->setOptions([
+            "maintainAspectRatio" => false,
+            "responsive" => true,
+            "plugins" => [
+                "title" => [
+                    "display" => true,
+                    "text" => "Yield",
+                    "font" => [
+                        "size" => 24,
+                    ],
+                ],
+                "legend" => [
+                    "position" => "top",
+                ],
+            ],
+        ]);
+
         return $this->render("portfolio/show.html.twig", [
             "ticker" => $ticker,
             "growth" => $growth,
@@ -301,6 +366,9 @@ class PortfolioController extends AbstractController
             "nextDividendExDiv" => $nextDividendExDiv,
             "nextDividendPayout" => $nextDividendPayout,
             "indexUrl" => $indexUrl,
+            'chartYield' => $chartYield,
+            'chartPayout' => $chartPayout,
+
         ]);
     }
 

@@ -2,37 +2,24 @@
 
 namespace Deployer;
 
-use Symfony\Component\Console\Input\InputOption;
-
 require 'recipe/symfony.php';
-require 'contrib/rsync.php';
 
-// Project name
+// Config
+
 set('application', 'dividend');
-
-// Project repository
 set('repository', 'git@gitlab.com:amavis442/dividend.git');
-
-// [Optional] Allocate tty for git clone. Default value is false.
 set('git_tty', true);
-set('keep_releases', 2);
+set('keep_releases', 5);
 set('writable_mode', 'acl');
+set('allow_anonymous_stats', false);
+set('bin/npm', function () {
+    return run('which npm');
+});
 
 // Shared files/dirs between deploys
 add('shared_files', ['.env.local', 'public/uploads']);
-set('allow_anonymous_stats', false);
 
 // Hosts
-
-/*host('192.168.2.220')
-    ->setRemoteUser('deployer')
-    ->setDeployPath('/var/www/prod/dividend')
-    ->setLabels([
-        'type' => 'web',
-        'env' => 'prod',
-        'stage' => 'prod',
-    ]);
-*/
 host('127.0.0.1')
     ->setRemoteUser('deployer')
     ->setDeployPath('/var/www/prod/{{application}}')
@@ -41,77 +28,50 @@ host('127.0.0.1')
         'env' => 'prod',
         'stage' => 'prod',
     ]);
-//->set('branch', 'master')
-//->set('rsync_src', __DIR__)
-//->set('rsync_dest', '{{release_path}}');
 
 
-set('rsync', [
-    'exclude' => [
-        '.git',
-        'deploy.php',
-    ],
-    'exclude-file' => false,
-    'include' => [],
-    'include-file' => false,
-    'filter' => [],
-    'filter-file' => false,
-    'filter-perdir' => false,
-    'flags' => 'rz', // Recursive, with compress
-    'options' => ['delete'],
-    'timeout' => 60,
-]);
+host('127.0.0.1')
+    ->setRemoteUser('deployer')
+    ->setDeployPath('/var/www/test/{{application}}')
+    ->setLabels([
+        'type' => 'local',
+        'env' => 'test',
+        'stage' => 'test',
+    ]);
 
-set('nvm', 'source $HOME/.nvm/nvm.sh'); // Yarn still needs this to work (maybe sh messes things up)
-set('use_nvm', function () {
-    return '{{nvm}} && node --version && nvm use 20';
-});
 
 // Tasks
+desc('Install npm packages');
+task('npm:install', function () {
+    if (has('previous_release')) {
+        if (test('[ -d {{previous_release}}/node_modules ]')) {
+            run('cp -R {{previous_release}}/node_modules {{release_path}}');
+
+            // If package.json is unmodified, then skip running `npm install`
+            if (!run('diff {{previous_release}}/package.json {{release_path}}/package.json')) {
+                return;
+            }
+        }
+    }
+    run("cd {{release_path}} && {{bin/npm}} install");
+});
+
+desc('Install npm packages with a clean slate');
+task('npm:ci', function () {
+    run("cd {{release_path}} && {{bin/npm}} ci");
+});
+
 desc('Dumps composer autoloader');
 task("composer:dump", function () {
-    run('cd ' . get('release_path') . " && composer dump-autoload --no-dev --classmap-authoritative");
+    run('cd {{release_or_current_path}} && composer dump-autoload --no-dev --classmap-authoritative');
 });
 
-desc('Migrates the database and install the assets');
-task('deploy:migrate_db_dividend', [
-    'database:migrate'
-]);
-
-desc('Yarn install'); // For encore and stuff
-task('yarn:install', function () {
-    run('{{use_nvm}} && cd ' . get('release_path') . ' && $HOME/.yarn/bin/yarn install');
+desc('Add assets with assetmapper');
+task('assetmap:compile', function () {
+    run('{{bin/console}} asset-map:compile');
 });
 
-desc('Yarn build');
-task('yarn:build', function () {
-    run('{{use_nvm}} && cd ' . get('release_path') . ' && $HOME/.yarn/bin/yarn build');
-});
-
-option('source', null, InputOption::VALUE_OPTIONAL, 'Source alias of the current task.');
-option('target', null, InputOption::VALUE_OPTIONAL, 'Target alias of the current task.');
-task('upload:file', function () {
-    /*
-     * Usage: dep upload:file --source="some_destination/file.txt" --target="some_destination/" host
-     */
-
-    $source = null;
-    $target = null;
-
-    if (input()->hasOption('source')) {
-        $source = input()->getOption('source');
-    }
-
-    if (input()->hasOption('target')) {
-        $target = input()->getOption('target');
-    }
-    if (askConfirmation('Upload file ' . $source . ' to release/' . $target . ' ?')) {
-        upload('/< some place >' . $source, '{{release_path}}/' . $target);
-    }
-});
-
-
-after('deploy:cache:clear', 'deploy:migrate_db_dividend');
-after('deploy:migrate_db_dividend', 'yarn:install');
-after('yarn:install', 'yarn:build');
-after('yarn:build', 'composer:dump');
+// Hooks
+after('deploy:cache:clear', 'database:migrate');
+after('database:migrate', 'assetmap:compile');
+after('deploy:failed', 'deploy:unlock');

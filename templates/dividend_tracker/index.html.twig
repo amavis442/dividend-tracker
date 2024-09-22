@@ -3,17 +3,11 @@
 {% block title %}Dividend Tracker!{% endblock %}
 
 {% block body %}
-    <div style='width:1000px;height:600px' class="col col-xs-12">
-        <canvas id="barChartCanvas" class="chart"
-			data-chart-data='{{ data|json_encode|raw }}' 
-			data-chart-labels='{{ labels|json_encode|raw }}'
-			data-chart-title='Expected yearly dividend'
-			data-chart-sub-title='Dividend'
-			data-chart-sign='€'></canvas>
-    </div>
-{% endblock %}
 
-{% block javascripts %}
-	{{ parent() }}
-	{{ encore_entry_script_tags('barchart_with_labels') }}
+	<div style="width:900px;height:600px">
+        {{ render_chart(chart, {
+                    'data-controller': 'chartjs-add-euro-sign'
+                }) }}
+    </div>
+
 {% endblock %}

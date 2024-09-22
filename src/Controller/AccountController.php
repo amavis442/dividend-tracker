@@ -14,11 +14,14 @@ use App\Entity\User;
 class AccountController extends AbstractController
 {
     #[Route('/dashboard/account/update', name: 'app_account_update')]
-    public function update(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
-    {
+    public function update(
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $entityManager
+    ): Response {
         $user = $this->getUser();
         if (!$user instanceof User) {
-            throw new \RuntimeException("User unknown");
+            throw new \RuntimeException('User unknown');
         }
 
         $form = $this->createForm(AccountFormType::class, $user);

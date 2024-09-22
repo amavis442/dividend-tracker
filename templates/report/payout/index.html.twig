@@ -3,16 +3,11 @@
 {% block title %}Tickers per month dividendschema!
 {% endblock %}
 
-
-
 {% block body %}
-    <div style='width:900px;height:600px' class="col col-xs-12">
-        <canvas id="myChart" class="chart"
-			data-chart-data='[{"label": "Dividend payout", "data" : {{ dividends|json_encode|raw }}}, {"label": "Accumulative", "data" : {{ accumulative|json_encode|raw }}}]' 
-			data-chart-labels='{{ labels|json_encode|raw }}'
-			data-chart-title='Dividends received in euro'
-			data-chart-sub-title='Dividends received in euro'
-			data-chart-sign='€'></canvas>
+	<div style="width:900px;height:600px">
+        {{ render_chart(chart, {
+                    'data-controller': 'chartjs-add-euro-sign'
+                }) }}
     </div>
 {% endblock %}
 
