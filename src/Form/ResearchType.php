@@ -34,7 +34,7 @@ class ResearchType extends AbstractType
             ->add('info', TextareaType::class, [
                 'required' => false,
                 'attr' => [
-                    'class' => 'summernote',
+                'class' => 'ckeditor5',
                     'style' => 'display:none;height:100;',
                     'data-note-height' => '200'
                 ]
