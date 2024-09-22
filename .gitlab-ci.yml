@@ -38,7 +38,7 @@ phpunit:
     - bash ci/php-install.sh
     - php composer.phar install -o
     - php composer.phar require --dev symfony/phpunit-bridge
-    - php bin/console asset-map:compile
+    - php bin/console asset-map:compile --no-debug
     - sh ci/php_test_run.sh
   cache:
     key: ${CI_COMMIT_REF_SLUG}
