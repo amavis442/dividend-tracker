@@ -24,7 +24,7 @@ class TickerType extends AbstractType
             ->add('isin')
             ->add("description", TextareaType::class, [
                 'required' => false,
-                'attr' => ['class' => 'summernote', 'style' => 'display:none;height:100;', 'data-note-height' => '200']
+                'attr' => ['class' => 'ckeditor5', 'style' => 'display:none;height:100;', 'data-note-height' => '200']
             ])
             ->add('branch', EntityType::class, [
                 'class' => Branch::class,

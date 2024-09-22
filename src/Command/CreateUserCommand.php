@@ -12,10 +12,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(
-    name: 'app:create-user',
-    description: 'Create a new user',
-)]
+#[AsCommand(name: 'app:create-user', description: 'Create a new user')]
 class CreateUserCommand extends Command
 {
     private UserManager $userManager;
@@ -26,8 +23,10 @@ class CreateUserCommand extends Command
         parent::__construct();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output
+    ): int {
         $userManager = $this->userManager;
 
         $helper = $this->getHelper('question');
@@ -42,15 +41,11 @@ class CreateUserCommand extends Command
         $questionEmail->setValidator(function ($answer) use ($userManager) {
             $answer = trim($answer);
             if ((int) strlen($answer) < 3 || $answer == '') {
-                throw new \RuntimeException(
-                    'Email to short or not present.'
-                );
+                throw new \RuntimeException('Email to short or not present.');
             }
 
             if ($userManager->isUserDuplicate($answer)) {
-                throw new \RuntimeException(
-                    'Email already exists.'
-                );
+                throw new \RuntimeException('Email already exists.');
             }
             return $answer;
         });
@@ -71,11 +66,11 @@ class CreateUserCommand extends Command
             // $value can be null here
             return $value ? trim($value) : '';
         });
-        $questionPasswordRepeat->setValidator(function ($passwordRepeat) use ($password) {
+        $questionPasswordRepeat->setValidator(function ($passwordRepeat) use (
+            $password
+        ) {
             if ($password !== $passwordRepeat) {
-                throw new \RuntimeException(
-                    'Entered passwords do not match.'
-                );
+                throw new \RuntimeException('Entered passwords do not match.');
             }
 
             return $passwordRepeat;
@@ -83,9 +78,16 @@ class CreateUserCommand extends Command
         $questionPasswordRepeat->setHidden(true);
         $questionPasswordRepeat->setHiddenFallback(false);
         $questionPasswordRepeat->setMaxAttempts(2);
-        $passwordRepeat = $helper->ask($input, $output, $questionPasswordRepeat);
+        $passwordRepeat = $helper->ask(
+            $input,
+            $output,
+            $questionPasswordRepeat
+        );
 
-        $questionRoles = new Question('Please enter roles (comma separated): ', 'user');
+        $questionRoles = new Question(
+            'Please enter roles (comma separated): ',
+            'user'
+        );
         $questionRoles->setNormalizer(function ($value) {
             // $value can be null here
             return $value ? strtolower(trim($value)) : '';

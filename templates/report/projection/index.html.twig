@@ -16,15 +16,12 @@
 	</div>
 	<hr/>
 
-	<div style='width:900px;height:600px' class="col col-xs-12">
-		<canvas id="barChartCanvas" class="chart"  
-			data-chart-data='{{ data|json_encode|raw }}' 
-			data-chart-labels='{{ labels|json_encode|raw }}'
-			data-chart-title='Projection'
-			data-chart-sub-title='Dividend projection'
-			data-chart-sign='€'
-			></canvas>
-	</div>
+
+	<div style="width:900px;height:600px">
+        {{ render_chart(chart, {
+                    'data-controller': 'chartjs-add-euro-sign'
+                }) }}
+    </div>
 
 	<div class="accordion" id="accordionExample">
 		{% set collapseId = 0 %}
@@ -34,7 +31,11 @@
 				<div class="card-header" id="heading{{ collapseId }}">
 					<div class="d-flex flex-row bd-highlight">
 						<div class="item">
-							<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ collapseId }}" aria-expanded="true" aria-controls="collapse{{ collapseId }}">{{ item.normaldate }}</button>
+							<button class="btn btn-link" type="button" data-toggle="collapse"
+								data-target="#collapse{{ collapseId }}" aria-expanded="true"
+								aria-controls="collapse{{ collapseId }}">
+									{{ item.normaldate }}
+							</button>
 						</div>
 						<div class="item">${{ item.grossTotalPayment }}</div>
 						<div class="item"><span class="badge badge-warning">&euro;{{ item.estimatedNetTotalPayment }}</span> / <span class="badge badge-success">&euro;{{ item.netTotalPayment }}</span></div>
@@ -66,10 +67,10 @@
 												</a>
 											{% else %}
 												{{ positionLabel }}
-											{% endif %}	
+											{% endif %}
 										</td>
 										<td>{{ position.amount }}</td>
-										<td> {% if position.calendar %} {{ position.calendar.currency.sign|raw }}{% endif %}{{ position.dividend }} </td>										
+										<td> {% if position.calendar %} {{ position.calendar.currency.sign|raw }}{% endif %}{{ position.dividend }} </td>
 										<td>&euro;{{ position.estimatedPayment }} / &euro;{{ payment ? payment : '0' }}</td>
 										<td>
 											<span class="badge badge-warning">{{ position.exdividend }}</span>
@@ -87,7 +88,7 @@
 														<i class="far fa-money-bill-alt"></i>
 													</a>
 													{% endif %}
-													{% if not position.calendar %}	
+													{% if not position.calendar %}
 													<a class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': ticker.id }) }}" data-toggle="tooltip" data-placement="top" title="add dividend date">
 														<i class="far fa-calendar-alt"></i>
 													</a>
@@ -115,11 +116,4 @@
     	<small>Projection cache updated: {{ cacheTimestamp|format_datetime('full') }}</small>
     </div>
 
-{% endblock %}
-
-
-
-{% block javascripts %}
-	{{ parent() }}
-	{{ encore_entry_script_tags('barchart') }}
 {% endblock %}

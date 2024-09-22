@@ -11,8 +11,8 @@
                 }
             }
         },
-        "@symfony/ux-vue": {
-            "vue": {
+        "@symfony/ux-chartjs": {
+            "chart": {
                 "enabled": true,
                 "fetch": "eager"
             }

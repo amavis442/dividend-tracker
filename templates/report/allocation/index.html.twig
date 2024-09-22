@@ -6,14 +6,7 @@
 {% block body %}
 	<p class="h1">Allocation information</p>
 
-	<div style='width:900px;height:600px' class="col col-xs-12">
-		<canvas id="pieChartCanvas" data-chart-data='{{ data|json_encode|raw }}' data-chart-labels='{{ labels|json_encode|raw }}' 
-		data-chart-title="Allocation" data-chart-subtitle="Allocation per sector"></canvas>
-	</div>
-
-{% endblock %}
-
-{% block javascripts %}
-	{{ parent() }}
-	{{ encore_entry_script_tags('piechart') }}
+    <div style="width:900px;height:600px">
+        {{ render_chart(chart) }}
+    </div>
 {% endblock %}

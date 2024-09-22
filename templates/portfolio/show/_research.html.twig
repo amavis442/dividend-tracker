@@ -33,9 +33,9 @@
 			</div>
 			<div class="card-footer text-muted">
 				{{ 'Created'|trans }}:
-				{{ research.createdAt ? research.createdAt|date('Y-m-d H:i:s')|format_datetime(locale: 'nl') : '-' }},
+				<strong>{{ research.createdAt ? research.createdAt|date('Y-m-d H:i:s', "Europe/Amsterdam")|format_datetime('full','medium', locale: 'nl') : '-' }}</strong>.
 				{{ 'Modified'|trans }}:
-				{{ research.updatedAt ? research.updatedAt|date('Y-m-d H:i:s')|format_datetime(locale: 'nl') : '-' }}
+				<strong>{{ research.updatedAt ? research.updatedAt|date('Y-m-d H:i:s', "Europe/Amsterdam")|format_datetime('full','medium', locale: 'nl') : '-' }}</strong>
 			</div>
 		</div>
 	</p>

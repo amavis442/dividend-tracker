@@ -1,4 +1,4 @@
-import chartColors from './chartcolors';
+import chartColors from './chartcolors.js';
 import jQuery from 'jquery';
 import Chart from 'chart.js/auto';
 

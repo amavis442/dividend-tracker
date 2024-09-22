@@ -46,8 +46,11 @@
 			</div>
 		</div>
 
-
-		<canvas id="barChartCanvas" class="chart" data-chart-data='{{ data|json_encode|raw }}' data-chart-labels='{{ labels|json_encode|raw }}' data-chart-title='{{ 'Yield'|trans }}' data-chart-sub-title='Dividend yield' data-chart-sign='%'></canvas>
+		<div style="width:900px;height:600px">
+			{{ render_chart(chart, {
+						'data-controller': 'chartjs-add-percentage'
+					}) }}
+		</div>
 	</div>
 
 	<div class="col col-12 border p-2 mb-2">

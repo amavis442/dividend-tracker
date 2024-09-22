@@ -16,6 +16,7 @@
 			{{ 'Create new'|trans }}</a>
 	</div>
 	<br/>
+	<!-- TODO: create a formType for this -->
 	<form action="{{ path('journal_taxonomy') }}" method="POST" class="form-inline">
 		<input type="hidden" name="_method" value="POST">
 
@@ -41,8 +42,11 @@
 		<div class="card" style="width: 60rem;">
 			<div class="card-header">
 				<h3>
-					<span class="badge badge-info">{{ journal.createdAt ? journal.createdAt|date('l')|trans ~ ', ' ~ journal.createdAt|date('d') ~ ' ' ~ journal.createdAt|date('F')|trans ~ ' ' ~ journal.createdAt|date('Y') }}</span>
-					{{ journal.title }}</h3>
+					<span class="badge bg-info">
+						{{ journal.createdAt ? journal.createdAt|date('l')|trans ~ ', ' ~ journal.createdAt|date('d') ~ ' ' ~ journal.createdAt|date('F')|trans ~ ' ' ~ journal.createdAt|date('Y') }}
+					</span>
+					{{ journal.title }}
+				</h3>
 			</div>
 			<div class="card-body">
 				<span class="card-text">{{ journal.content|raw }}
@@ -52,10 +56,10 @@
 				</div>
 				<div class="card-footer text-muted">
 					{{ 'Created'|trans }}:
-					{{ journal.createdAt ? journal.createdAt|date('Y-m-d H:i:s') : '-' }},
+					{{ journal.createdAt ? journal.createdAt|date('Y-m-d H:i:s', "Europe/Amsterdam") : '-' }},
 					{{ 'Modified'|trans }}:
 					{% if journal.updatedAt is not null %}
-						{{ journal.updatedAt ? journal.updatedAt|date('Y-m-d H:i:s') : '-' }}
+						{{ journal.updatedAt ? journal.updatedAt|date('Y-m-d H:i:s', "Europe/Amsterdam") : '-' }}
 					{% endif %}
 					{% for taxonomy in journal.taxonomy %}
 						<span class="badge bg-secondary text-white">{{ taxonomy.title }}</span>

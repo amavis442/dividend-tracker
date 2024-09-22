@@ -2,24 +2,75 @@
 
 namespace App\Controller\Report;
 
+use App\Helper\Colors;
 use App\Model\AllocationModel;
 use App\Repository\PositionRepository;
 use App\Service\SummaryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
+use Symfony\UX\Chartjs\Model\Chart;
 
-#[Route(path: '/dashboard/report')]
+#[Route(path: "/dashboard/report")]
 class AllocationPerPositionController extends AbstractController
 {
     public const TAX_DIVIDEND = 0.15; // %
     public const EXCHANGE_RATE = 1.19; // dollar to euro
-    public const YIELD_PIE_KEY = 'yeildpie_searchPie';
+    public const YIELD_PIE_KEY = "yeildpie_searchPie";
 
-    #[Route(path: '/allocation/position', name: 'report_allocation_position')]
-    public function index(PositionRepository $positionRepository, SummaryService $summaryService, AllocationModel $allocation)
-    {
+    #[Route(path: "/allocation/position", name: "report_allocation_position")]
+    public function index(
+        PositionRepository $positionRepository,
+        SummaryService $summaryService,
+        AllocationModel $allocation,
+        ChartBuilderInterface $chartBuilder
+    ) {
         $result = $allocation->position($positionRepository, $summaryService);
+        $colors = Colors::COLORS;
 
-        return $this->render('report/allocation/position.html.twig', array_merge($result, ['controller_name' => 'ReportController']));
+        $chart = $chartBuilder->createChart(Chart::TYPE_PIE);
+
+        $chart->setData([
+            "labels" => $result["labels"],
+            "datasets" => [
+                [
+                    "label" => "Allocation",
+                    "backgroundColor" => $colors,
+                    "borderColor" => $colors,
+                    "data" => $result["data"],
+                ],
+            ],
+        ]);
+
+        $chart->setOptions([
+            "maintainAspectRatio" => false,
+            "responsive" => true,
+            "plugins" => [
+                "title" => [
+                    "display" => true,
+                    "text" => "Allocation per position",
+                    "font" => [
+                        "size" => 24,
+                    ],
+                ],
+                "legend" => [
+                    "position" => "top",
+                ],
+            ],
+        ]);
+
+        return $this->render(
+            "report/allocation/position.html.twig",
+            [
+                "numActivePosition" => $result["numActivePosition"],
+                "numPosition" => $result["numPosition"],
+                "numTickers" => $result["numTickers"],
+                "profit" => $result["profit"],
+                "totalDividend" => $result["totalDividend"],
+                "totalInvested" => $result["totalInvested"],
+                "controller_name" => "ReportController",
+                "chart" => $chart,
+            ]
+        );
     }
 }

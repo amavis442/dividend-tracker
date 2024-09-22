@@ -1,6 +1,4 @@
-import jQuery from 'jquery';
-
-const $ = jQuery;
+import $ from 'jquery';
 
 function addTagForm(collectionHolder, newLinkLi) {
   // Get the data-prototype explained earlier
@@ -48,7 +46,7 @@ var addTagButton = $('#addTagButton');
 // var $addTagButton = $('<button type="button" class="btn btn-warning">Add a attachment</button>');
 var newLinkLi = $('<li class="list-group-item d-flex justify-content-between align-items-center"></li>').append(addTagButton);
 
-jQuery(function () {
+$(function () {
   //var fileCount = 0;
   //createAddFile(fileCount++);
 
