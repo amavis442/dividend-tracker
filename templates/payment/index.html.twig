@@ -16,15 +16,14 @@
 		<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
 	{% endfor %}
 
-	{{ form_start(searchForm, {'attr': {'class' : 'row g-3 mb-2 mt-2'}}) }}
-
-		<div class="col-auto">{{ form_widget(searchForm.year, { 'attr': {'class' : 'myclass'}}) }}</div>
-		<div class="col-auto">{{ form_widget(searchForm.month) }}</div>
-		<div class="col-auto">{{ form_widget(searchForm.quator) }}</div>
-		<div class="col">{{ form_widget(searchForm.ticker) }}</div>
-		<div class="col-auto">{{ form_widget(searchForm.submit) }}</div>
+	{{ form_start(form, {'attr': {'class' : 'row g-3 mb-2 mt-2'}}) }}
+		<div class="col-auto">{{ form_widget(form.year, { 'attr': {'class' : 'myclass'}}) }}</div>
+		<div class="col-auto">{{ form_widget(form.month) }}</div>
+		<div class="col-auto">{{ form_widget(form.quator) }}</div>
+		<div class="col">{{ form_widget(form.ticker) }}</div>
+		<div class="col-auto">{{ form_widget(form.submit) }}</div>
 		<div class="col"></div>
-	{{ form_end(searchForm) }}
+	{{ form_end(form) }}
 
 	<table class="table table-striped border table-hover">
 		<thead>
@@ -38,7 +37,7 @@
 			</tr>
 		</thead>
 		<tbody class="table-group-divider">
-			{% for payment in payments %}
+			{% for payment in pager %}
 				<tr>
 					<td>{{ payment.payDate ? payment.payDate|format_date('medium') : '' }}</td>
 					<td>
@@ -83,5 +82,5 @@
 			</tr>
 		</tbody>
 	</table>
-	{% include 'paginator.html.twig' %}
+	   {{ pagerfanta(pager) }}
 {% endblock %}

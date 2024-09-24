@@ -6,11 +6,12 @@ use App\Entity\Position;
 use App\Entity\Transaction;
 use App\Form\TransactionType;
 use App\Model\PortfolioModel;
-use App\Repository\CurrencyRepository;
+use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
 use App\Service\ExchangeRate\ExchangeRateInterface;
 use App\Service\Referer;
 use App\Service\WeightedAverage;
+use App\Traits\TickerAutocompleteTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,16 +19,27 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
 
 #[Route(path: '/dashboard/transaction')]
 class TransactionController extends AbstractController
 {
+    use TickerAutocompleteTrait;
+
     public const SEARCH_KEY = 'transaction_searchCriteria';
 
-    #[Route(path: '/list/{page?1}/{orderBy?transactionDate}/{sort?ASC}', name: 'transaction_index', methods: ['GET'])]
+    #[
+        Route(
+            path: '/list/{page?1}/{orderBy?transactionDate}/{sort?ASC}',
+            name: 'transaction_index',
+            methods: ['GET', 'POST']
+        )
+    ]
     public function index(
         Request $request,
         TransactionRepository $transactionRepository,
+        TickerRepository $tickerRepository,
         int $page = 1,
         string $orderBy = 'transactionDate',
         string $sort = 'desc'
@@ -39,22 +51,32 @@ class TransactionController extends AbstractController
             $sort = 'desc';
         }
 
-        $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
-        $items = $transactionRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
-        $limit = 10;
-        $maxPages = ceil($items->count() / $limit);
-        $thisPage = $page;
+        [$form, $ticker] = $this->searchTicker(
+            $request,
+            $tickerRepository,
+            self::SEARCH_KEY,
+            true
+        );
+
+        $queryBuilder = $transactionRepository->getAllQuery(
+            $orderBy,
+            $sort,
+            $ticker
+        );
+
+        $adapter = new QueryAdapter($queryBuilder);
+        $pager = new Pagerfanta($adapter);
+        $pager->setMaxPerPage(10);
+        $pager->setCurrentPage($page);
 
         return $this->render('transaction/index.html.twig', [
-            'transactions' => $items->getIterator(),
-            'limit' => $limit,
-            'maxPages' => $maxPages,
-            'thisPage' => $thisPage,
+            'pager' => $pager,
+            'thisPage' => $page,
             'order' => $orderBy,
             'sort' => $sort,
-            'searchCriteria' => $searchCriteria ?? '',
             'routeName' => 'transaction_index',
             'searchPath' => 'transaction_search',
+            'autoCompleteForm' => $form,
         ]);
     }
 
@@ -62,7 +84,9 @@ class TransactionController extends AbstractController
     {
         $transaction->calcAllocation();
         $transaction->calcPrice();
-        $transaction->setOriginalPriceCurrency($transaction->getCurrencyOriginalPrice()->getSymbol());
+        $transaction->setOriginalPriceCurrency(
+            $transaction->getCurrencyOriginalPrice()->getSymbol()
+        );
         $transaction->setAllocationCurrency($transaction->getTotalCurrency());
         $transaction->setCurrency($transaction->getAllocationCurrency());
 
@@ -71,8 +95,13 @@ class TransactionController extends AbstractController
         }
     }
 
-
-    #[Route(path: '/create/{position}', name: 'transaction_new', methods: ['GET', 'POST'])]
+    #[
+        Route(
+            path: '/create/{position}',
+            name: 'transaction_new',
+            methods: ['GET', 'POST']
+        )
+    ]
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -100,7 +129,9 @@ class TransactionController extends AbstractController
             if ($transaction->getSide() === Transaction::SELL) {
                 if ($transaction->getProfit() == 0) {
                     $avgPrice = $position->getPrice();
-                    $profit = ($transaction->getPrice() - $avgPrice) * $transaction->getAmount();
+                    $profit =
+                        ($transaction->getPrice() - $avgPrice) *
+                        $transaction->getAmount();
                     $transaction->setProfit($profit);
                 }
             }
@@ -111,17 +142,28 @@ class TransactionController extends AbstractController
             $position->addTransaction($transaction);
             $weightedAverage->calc($position);
 
-            if ($position->getAmount() == 0 || $position->getAmount() < 0.0001) {
+            if (
+                $position->getAmount() == 0 ||
+                $position->getAmount() < 0.0001
+            ) {
                 $position->setClosed(true);
-                $position->setClosedAt((new DateTime()));
+                $position->setClosedAt(new DateTime());
             }
             $entityManager->persist($position);
             $entityManager->flush();
 
-            $request->getSession()->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getSymbol());
-            $request->getSession()->set(PortfolioController::SEARCH_KEY, $transaction->getPosition()->getTicker()->getSymbol());
-
-            PortfolioModel::clearCache();
+            $request
+                ->getSession()
+                ->set(
+                    self::SEARCH_KEY,
+                    $transaction->getPosition()->getTicker()->getSymbol()
+                );
+            $request
+                ->getSession()
+                ->set(
+                    PortfolioController::SESSION_KEY,
+                    $transaction->getPosition()->getTicker()->getSymbol()
+                );
 
             if ($referer->get()) {
                 return $this->redirect($referer->get());
@@ -143,7 +185,13 @@ class TransactionController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}/edit/{closed<\d+>?0}', name: 'transaction_edit', methods: ['GET', 'POST'])]
+    #[
+        Route(
+            path: '/{id}/edit/{closed<\d+>?0}',
+            name: 'transaction_edit',
+            methods: ['GET', 'POST']
+        )
+    ]
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -165,13 +213,16 @@ class TransactionController extends AbstractController
             $weightedAverage->calc($position);
             if ($position->getAmount() == 0) {
                 $position->setClosed(true);
-                $position->setClosedAt((new DateTime()));
+                $position->setClosedAt(new DateTime());
             }
             $entityManager->flush();
 
-            $request->getSession()->set(self::SEARCH_KEY, $transaction->getPosition()->getTicker()->getSymbol());
-
-            PortfolioModel::clearCache();
+            $request
+                ->getSession()
+                ->set(
+                    self::SEARCH_KEY,
+                    $transaction->getPosition()->getTicker()->getSymbol()
+                );
 
             if ($referer->get()) {
                 return $this->redirect($referer->get());
@@ -194,7 +245,12 @@ class TransactionController extends AbstractController
         WeightedAverage $weightedAverage,
         Referer $referer
     ): Response {
-        if ($this->isCsrfTokenValid('delete' . $transaction->getId(), $request->request->get('_token'))) {
+        if (
+            $this->isCsrfTokenValid(
+                'delete' . $transaction->getId(),
+                $request->request->get('_token')
+            )
+        ) {
             $position = $transaction->getPosition();
             $position->removeTransaction($transaction);
             $weightedAverage->calc($position);
@@ -213,6 +269,9 @@ class TransactionController extends AbstractController
         $searchCriteria = $request->request->get('searchCriteria');
         $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
 
-        return $this->redirectToRoute('transaction_index', ['orderBy' => 'transactionDate', 'sort' => 'desc']);
+        return $this->redirectToRoute('transaction_index', [
+            'orderBy' => 'transactionDate',
+            'sort' => 'desc',
+        ]);
     }
 }

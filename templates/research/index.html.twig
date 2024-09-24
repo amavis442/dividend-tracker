@@ -30,7 +30,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{% for research in researches %}
+			{% for research in pager %}
 				<tr>
 					<td>{{ research.id }}</td>
 					<td>{{ research.ticker.symbol }}</td>
@@ -61,5 +61,5 @@
 			{% endfor %}
 		</tbody>
 	</table>
-	{% include 'paginator.html.twig' %}
+		{{ pagerfanta(pager) }}
 {% endblock %}

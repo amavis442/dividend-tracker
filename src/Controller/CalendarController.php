@@ -9,6 +9,7 @@ use App\Form\CalendarDividendType;
 use App\Form\CalendarType;
 use App\Model\PortfolioModel;
 use App\Repository\CalendarRepository;
+use App\Repository\TickerRepository;
 use App\Service\DividendService;
 use App\Service\Referer;
 use App\Traits\TickerAutocompleteTrait;
@@ -18,6 +19,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
 
 #[Route(path: '/dashboard/calendar')]
 class CalendarController extends AbstractController
@@ -26,37 +29,62 @@ class CalendarController extends AbstractController
 
     public const SEARCH_KEY = 'calendar_searchCriteria';
 
-    #[Route(path: '/list/{page}/{orderBy}/{sort}', name: 'calendar_index', methods: ['GET', 'POST'])]
+    #[
+        Route(
+            path: '/list/{page}/{orderBy}/{sort}',
+            name: 'calendar_index',
+            methods: ['GET', 'POST']
+        )
+    ]
     public function index(
         Request $request,
         CalendarRepository $calendarRepository,
+        TickerRepository $tickerRepository,
         Referer $referer,
         int $page = 1,
         string $orderBy = 'paymentDate',
         string $sort = 'DESC'
     ): Response {
-        if (!in_array($orderBy, ['paymentDate', 'symbol', 'exDividendDate', 'createdAt'])) {
+        if (
+            !in_array($orderBy, [
+                'paymentDate',
+                'symbol',
+                'exDividendDate',
+                'createdAt',
+            ])
+        ) {
             $orderBy = 'paymentDate';
         }
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'DESC';
         }
-        $session = $request->getSession();
-        $searchCriteria = $session->get(self::SEARCH_KEY, '');
-        [$form, $searchCriteria] = $this->searchTicker($request, self::SEARCH_KEY, true);
 
-        $items = $calendarRepository->getAll($page, 10, $orderBy, $sort, $searchCriteria);
-        $limit = 10;
-        $maxPages = ceil($items->count() / $limit) > 10 ? 10 : ceil($items->count() / $limit);
-        $thisPage = $page;
+        [$form, $Ticker] = $this->searchTicker(
+            $request,
+            $tickerRepository,
+            self::SEARCH_KEY,
+            true
+        );
 
-        $referer->set('calendar_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
+        $queryBuilder = $calendarRepository->getAllQuery(
+            $orderBy,
+            $sort,
+            $Ticker
+        );
+        $adapter = new QueryAdapter($queryBuilder);
+        $pager = new Pagerfanta($adapter);
+        $pager->setMaxPerPage(10);
+        $pager->setCurrentPage($page);
+
+        $referer->set('calendar_index', [
+            'page' => $page,
+            'orderBy' => $orderBy,
+            'sort' => $sort,
+        ]);
 
         return $this->render('calendar/index.html.twig', [
-            'calendars' => $items,
-            'limit' => $limit,
-            'maxPages' => $maxPages,
-            'thisPage' => $thisPage,
+            'pager' => $pager,
+            'thisPage' => $page,
             'order' => $orderBy,
             'sort' => $sort,
             'routeName' => 'calendar_index',
@@ -64,7 +92,13 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/create/{ticker?}', name: 'calendar_new', methods: ['GET', 'POST'])]
+    #[
+        Route(
+            path: '/create/{ticker?}',
+            name: 'calendar_new',
+            methods: ['GET', 'POST']
+        )
+    ]
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -83,8 +117,6 @@ class CalendarController extends AbstractController
             $entityManager->persist($calendar);
             $entityManager->flush();
 
-            PortfolioModel::clearCache();
-
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
@@ -97,7 +129,13 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/calendarperdatetable', name: 'calendar_per_date_table', methods: ['GET', 'POST'])]
+    #[
+        Route(
+            path: '/calendarperdatetable',
+            name: 'calendar_per_date_table',
+            methods: ['GET', 'POST']
+        )
+    ]
     public function viewCalendarTable(
         Request $request,
         CalendarRepository $calendarRepository,
@@ -107,8 +145,9 @@ class CalendarController extends AbstractController
         $endDate = $year . '-12-31';
 
         $dateSelect = new DateSelect();
-        $dateSelect->setStartdate((new DateTime('now')))
-            ->setEnddate((new DateTime($endDate)));
+        $dateSelect
+            ->setStartdate(new DateTime('now'))
+            ->setEnddate(new DateTime($endDate));
         $form = $this->createForm(CalendarDividendType::class, $dateSelect);
         $form->handleRequest($request);
 
@@ -139,7 +178,13 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}/edit', name: 'calendar_edit', methods: ['GET', 'POST'])]
+    #[
+        Route(
+            path: '/{id}/edit',
+            name: 'calendar_edit',
+            methods: ['GET', 'POST']
+        )
+    ]
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -153,8 +198,6 @@ class CalendarController extends AbstractController
             $entityManager->persist($calendar);
             $entityManager->flush();
 
-            PortfolioModel::clearCache();
-
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
@@ -164,7 +207,7 @@ class CalendarController extends AbstractController
         return $this->render('calendar/edit.html.twig', [
             'calendar' => $calendar,
             'form' => $form->createView(),
-            'referer' => $referer->get() ?: null
+            'referer' => $referer->get() ?: null,
         ]);
     }
 
@@ -175,12 +218,20 @@ class CalendarController extends AbstractController
         Calendar $calendar,
         Referer $referer
     ): Response {
-        if ($this->isCsrfTokenValid('delete' . $calendar->getId(), $request->request->get('_token'))) {
+        if (
+            $this->isCsrfTokenValid(
+                'delete' . $calendar->getId(),
+                $request->request->get('_token')
+            )
+        ) {
             if ($calendar->getPayments()->isEmpty()) {
                 $entityManager->remove($calendar);
                 $entityManager->flush();
             } else {
-                $this->addFlash('notice', 'Can not remove calendar because it has payments linked to it.');
+                $this->addFlash(
+                    'notice',
+                    'Can not remove calendar because it has payments linked to it.'
+                );
             }
         }
 

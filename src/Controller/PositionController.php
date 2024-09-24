@@ -7,25 +7,38 @@ use App\Entity\Ticker;
 use App\Form\PositionType;
 use App\Model\PortfolioModel;
 use App\Repository\PositionRepository;
+use App\Repository\TickerRepository;
 use App\Service\PositionService;
 use App\Service\Referer;
 use App\Service\SummaryService;
+use App\Traits\TickerAutocompleteTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
 
 #[Route(path: '/dashboard/position')]
 class PositionController extends AbstractController
 {
-    public const SEARCH_KEY = 'position_searchCriteria';
+    use TickerAutocompleteTrait;
 
-    #[Route(path: '/list/{page}/{tab}/{orderBy}/{sort}/{status}', name: 'position_index', methods: ['GET'])]
+    public const SESSION_KEY = 'positioncontroller_session';
+
+    #[
+        Route(
+            path: '/list/{page}/{tab}/{orderBy}/{sort}/{status}',
+            name: 'position_index',
+            methods: ['GET', 'POST']
+        )
+    ]
     public function index(
         Request $request,
         SummaryService $summaryService,
         PositionRepository $positionRepository,
+        TickerRepository $tickerRepository,
         Referer $referer,
         int $page = 1,
         string $tab = 'All',
@@ -45,24 +58,29 @@ class PositionController extends AbstractController
             $sort = 'asc';
         }
 
+        [$form, $ticker] = $this->searchTicker(
+            $request,
+            $tickerRepository,
+            self::SESSION_KEY,
+            true
+        );
+
         $referer->set('position_index', ['status' => $status]);
 
         $summary = $summaryService->getSummary();
 
-        $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
-        $items = $positionRepository->getAll($page, 10, $order, $sort, $searchCriteria, $status);
-        $limit = 10;
-        $maxPages = ceil($items->count() / $limit);
-        $thisPage = $page;
+        $queryBuilder = $positionRepository->getAllQuery();
+        $adapter = new QueryAdapter($queryBuilder);
+        $pager = new Pagerfanta($adapter);
+        $pager->setMaxPerPage(10);
+        $pager->setCurrentPage($page);
 
         return $this->render('position/index.html.twig', [
-            'positions' => $items->getIterator(),
-            'limit' => $limit,
-            'maxPages' => $maxPages,
-            'thisPage' => $thisPage,
+            'pager' => $pager,
+            'autoCompleteForm' => $form,
+            'thisPage' => $page,
             'order' => $orderBy,
             'sort' => $sort,
-            'searchCriteria' => $searchCriteria ?? '',
             'status' => $status,
             'routeName' => 'position_index',
             'searchPath' => 'position_search',
@@ -76,9 +94,18 @@ class PositionController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/create/{ticker?}', name: 'position_new', methods: ['GET', 'POST'])]
-    public function create(Request $request, PositionService $positionService, ?Ticker $ticker = null): Response
-    {
+    #[
+        Route(
+            path: '/create/{ticker?}',
+            name: 'position_new',
+            methods: ['GET', 'POST']
+        )
+    ]
+    public function create(
+        Request $request,
+        PositionService $positionService,
+        ?Ticker $ticker = null
+    ): Response {
         $position = new Position();
 
         if ($ticker != null) {
@@ -89,10 +116,15 @@ class PositionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $positionService->create($position);
-            $request->getSession()->set(self::SEARCH_KEY, $position->getTicker()->getSymbol());
-            $request->getSession()->set(PortfolioController::SEARCH_KEY, $position->getTicker()->getSymbol());
-
-            PortfolioModel::clearCache();
+            $request
+                ->getSession()
+                ->set(self::SESSION_KEY, $position->getTicker()->getSymbol());
+            $request
+                ->getSession()
+                ->set(
+                    PortfolioController::SESSION_KEY,
+                    $position->getTicker()->getSymbol()
+                );
 
             return $this->redirectToRoute('portfolio_index');
         }
@@ -108,11 +140,18 @@ class PositionController extends AbstractController
     {
         return $this->render('position/show.html.twig', [
             'position' => $position,
+            'ticker' => $position->getTicker(),
             'netYearlyDividend' => 0.0,
         ]);
     }
 
-    #[Route(path: '/{id}/edit', name: 'position_edit', methods: ['GET', 'POST'])]
+    #[
+        Route(
+            path: '/{id}/edit',
+            name: 'position_edit',
+            methods: ['GET', 'POST']
+        )
+    ]
     public function edit(
         Request $request,
         Position $position,
@@ -124,10 +163,9 @@ class PositionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $positionService->update($position);
-            $request->getSession()->set(self::SEARCH_KEY, $position->getTicker()->getSymbol());
-
-            PortfolioModel::clearCache();
-
+            $request
+                ->getSession()
+                ->set(self::SESSION_KEY, $position->getTicker()->getSymbol());
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
@@ -140,23 +178,28 @@ class PositionController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/delete/{id}', name: 'position_delete', methods: ['POST', 'DELETE'])]
-    public function delete(Request $request, EntityManagerInterface $entityManager, Position $position): Response
-    {
-        if ($this->isCsrfTokenValid('delete' . $position->getId(), $request->request->get('_token'))) {
+    #[
+        Route(
+            path: '/delete/{id}',
+            name: 'position_delete',
+            methods: ['POST', 'DELETE']
+        )
+    ]
+    public function delete(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        Position $position
+    ): Response {
+        if (
+            $this->isCsrfTokenValid(
+                'delete' . $position->getId(),
+                $request->request->get('_token')
+            )
+        ) {
             $entityManager->remove($position);
             $entityManager->flush();
         }
 
         return $this->redirectToRoute('position_index');
-    }
-
-    #[Route(path: '/search', name: 'position_search', methods: ['POST'])]
-    public function search(Request $request): Response
-    {
-        $searchCriteria = $request->request->get('searchCriteria');
-        $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
-
-        return $this->redirectToRoute('position_index', ['orderBy' => 'buyDate', 'sort' => 'desc']);
     }
 }

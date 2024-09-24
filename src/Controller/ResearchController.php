@@ -8,6 +8,7 @@ use App\Entity\Attachment;
 use App\Form\ResearchType;
 use App\Repository\ResearchRepository;
 use App\Repository\AttachmentRepository;
+use App\Repository\TickerRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,38 +18,42 @@ use App\Service\Referer;
 use App\Traits\TickerAutocompleteTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
 
-#[Route(path: "/dashboard/research")]
+#[Route(path: '/dashboard/research')]
 class ResearchController extends AbstractController
 {
     use TickerAutocompleteTrait;
 
-    public const SEARCH_KEY = "research_searchCriteria";
+    public const SEARCH_KEY = 'research_searchCriteria';
 
     #[
         Route(
-            path: "/list/{page}/{orderBy}/{sort}",
-            name: "research_index",
-            methods: ["GET"]
+            path: '/list/{page}/{orderBy}/{sort}',
+            name: 'research_index',
+            methods: ['GET', 'POST']
         )
     ]
     public function index(
         Request $request,
         ResearchRepository $researchRepository,
+        TickerRepository $tickerRepository,
         int $page = 1,
-        string $orderBy = "id",
-        string $sort = "asc"
+        string $orderBy = 'id',
+        string $sort = 'asc'
     ): Response {
-        if (!in_array($orderBy, ["id", "symbol"])) {
-            $orderBy = "id";
+        if (!in_array($orderBy, ['id', 'symbol'])) {
+            $orderBy = 'id';
         }
-        if (!in_array($sort, ["asc", "desc", "ASC", "DESC"])) {
-            $sort = "asc";
+        if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
+            $sort = 'asc';
         }
 
-        $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, "");
+        $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
         [$form, $ticker] = $this->searchTicker(
             $request,
+            $tickerRepository,
             self::SEARCH_KEY,
             true
         );
@@ -60,29 +65,36 @@ class ResearchController extends AbstractController
             $sort,
             $ticker
         );
-        $limit = 10;
-        $maxPages = ceil($items->count() / $limit);
+
+        $queryBuilder = $researchRepository->getAllQuery(
+            $orderBy,
+            $sort,
+            $ticker
+        );
+        $adapter = new QueryAdapter($queryBuilder);
+        $pager = new Pagerfanta($adapter);
+        $pager->setMaxPerPage(10);
+        $pager->setCurrentPage($page);
+
         $thisPage = $page;
 
-        return $this->render("research/index.html.twig", [
-            "researches" => $items,
-            "limit" => $limit,
-            "maxPages" => $maxPages,
-            "thisPage" => $thisPage,
-            "order" => $orderBy,
-            "sort" => $sort,
-            "searchCriteria" => $searchCriteria ?? "",
-            "routeName" => "research_index",
-            "searchPath" => "research_search",
-            "autoCompleteForm" => $form,
+        return $this->render('research/index.html.twig', [
+            'pager' => $pager,
+            'thisPage' => $thisPage,
+            'order' => $orderBy,
+            'sort' => $sort,
+            'searchCriteria' => $searchCriteria ?? '',
+            'routeName' => 'research_index',
+            'searchPath' => 'research_search',
+            'autoCompleteForm' => $form,
         ]);
     }
 
     #[
         Route(
-            path: "/create/{ticker?}",
-            name: "research_new",
-            methods: ["GET", "POST"]
+            path: '/create/{ticker?}',
+            name: 'research_new',
+            methods: ['GET', 'POST']
         )
     ]
     public function create(
@@ -124,30 +136,30 @@ class ResearchController extends AbstractController
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
-            return $this->redirectToRoute("research_index");
+            return $this->redirectToRoute('research_index');
         }
 
         $referer->set();
 
-        return $this->render("research/new.html.twig", [
-            "research" => $research,
-            "form" => $form->createView(),
+        return $this->render('research/new.html.twig', [
+            'research' => $research,
+            'form' => $form->createView(),
         ]);
     }
 
-    #[Route(path: "/{id}", name: "research_show", methods: ["GET"])]
+    #[Route(path: '/{id}', name: 'research_show', methods: ['GET'])]
     public function show(Research $research): Response
     {
-        return $this->render("research/show.html.twig", [
-            "research" => $research,
+        return $this->render('research/show.html.twig', [
+            'research' => $research,
         ]);
     }
 
     #[
         Route(
-            path: "/{id}/edit",
-            name: "research_edit",
-            methods: ["GET", "POST"]
+            path: '/{id}/edit',
+            name: 'research_edit',
+            methods: ['GET', 'POST']
         )
     ]
     public function edit(
@@ -160,14 +172,14 @@ class ResearchController extends AbstractController
     ): Response {
         $form = $this->createForm(ResearchType::class, $research);
         $form->handleRequest($request);
-        $documentDirectory = $this->getParameter("documents_directory");
+        $documentDirectory = $this->getParameter('documents_directory');
 
-        $oldAttachments = $request->get("attachments");
-        $oldAttachmentLabels = $request->get("attachment_labels");
+        $oldAttachments = $request->get('attachments');
+        $oldAttachmentLabels = $request->get('attachment_labels');
 
         if ($form->isSubmitted() && $form->isValid()) {
             $existingAttachments = $attachmentRepository->findBy([
-                "research" => $research->getId(),
+                'research' => $research->getId(),
             ]);
 
             if ($existingAttachments) {
@@ -188,7 +200,7 @@ class ResearchController extends AbstractController
                         $entityManager->remove($existingAttachment);
                         $fileOnDisk =
                             $documentDirectory .
-                            "/" .
+                            '/' .
                             $existingAttachment->getAttachmentName();
                         if ($filesystem->exists($fileOnDisk)) {
                             $filesystem->remove([$fileOnDisk]);
@@ -221,22 +233,22 @@ class ResearchController extends AbstractController
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
-            return $this->redirectToRoute("research_index");
+            return $this->redirectToRoute('research_index');
         }
 
         $referer->set();
 
-        return $this->render("research/edit.html.twig", [
-            "research" => $research,
-            "form" => $form->createView(),
+        return $this->render('research/edit.html.twig', [
+            'research' => $research,
+            'form' => $form->createView(),
         ]);
     }
 
     #[
         Route(
-            path: "/delete/{id}",
-            name: "research_delete",
-            methods: ["POST", "DELETE"]
+            path: '/delete/{id}',
+            name: 'research_delete',
+            methods: ['POST', 'DELETE']
         )
     ]
     public function delete(
@@ -247,8 +259,8 @@ class ResearchController extends AbstractController
     ): Response {
         if (
             $this->isCsrfTokenValid(
-                "delete" . $research->getId(),
-                $request->request->get("_token")
+                'delete' . $research->getId(),
+                $request->request->get('_token')
             )
         ) {
             $entityManager->remove($research);
@@ -259,15 +271,15 @@ class ResearchController extends AbstractController
             return $this->redirect($referer->get());
         }
 
-        return $this->redirectToRoute("research_index");
+        return $this->redirectToRoute('research_index');
     }
 
-    #[Route(path: "/search", name: "research_search", methods: ["POST"])]
+    #[Route(path: '/search', name: 'research_search', methods: ['POST'])]
     public function search(Request $request): Response
     {
-        $searchCriteria = $request->request->get("searchCriteria");
+        $searchCriteria = $request->request->get('searchCriteria');
         $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
 
-        return $this->redirectToRoute("research_index");
+        return $this->redirectToRoute('research_index');
     }
 }

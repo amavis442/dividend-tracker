@@ -127,6 +127,14 @@ services:
         tags:
             - { name: doctrine.event_listener, event: prePersist }
 
+    #Pagerfanta\Twig\Extension\PagerfantaExtension:
+    #    tags: ['twig.extension']
+
+    #Pagerfanta\Twig\Extension\PagerfantaRuntime:
+    #    tags:
+    #        - { name: 'twig.runtime' }
+
+
     #App\Serializer\AdminGroupsContextBuilder:
     #    decorates: 'api_platform.serializer.context_builder'
     #    arguments: ['@App\Serializer\AdminGroupsContextBuilder.inner']

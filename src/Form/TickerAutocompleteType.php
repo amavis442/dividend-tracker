@@ -24,9 +24,8 @@ class TickerAutocompleteType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            "searchCriteria" => "",
             "extra_options" => [],
-            "method" => "GET",
+            "method" => "POST",
         ]);
     }
 }

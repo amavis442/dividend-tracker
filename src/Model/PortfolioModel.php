@@ -12,21 +12,16 @@ use App\Service\DividendService;
 use DateTime;
 use RuntimeException;
 use Symfony\Component\Stopwatch\Stopwatch;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Pagerfanta\Pagerfanta;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
 
 class PortfolioModel
 {
-    public const CACHE_KEY = "portfolio_model_cache_key";
-    public const CACHE_NAMESPACE = "portfolio.cache";
+    public const CACHE_KEY = 'portfolio_model_cache_key';
+    public const CACHE_NAMESPACE = 'portfolio.cache';
     private bool $initialized = false;
     private array $portfolioItems = [];
-    private array $tickerIds = [];
-    private int $maxPages = 1;
-
-    /**
-     * When was the quote cache last updated
-     */
-    private int $timestamp = 0;
+    private ?Pagerfanta $pagerfanta = null;
 
     public function __construct(private Stopwatch $stopwatch)
     {
@@ -39,7 +34,7 @@ class PortfolioModel
         PaymentRepository $paymentRepository,
         array $tickerIds
     ): void {
-        $this->stopwatch->start("portfoliomodel-getDividends");
+        $this->stopwatch->start('portfoliomodel-getDividends');
         $dividends = $paymentRepository->getSumDividends($tickerIds);
         foreach ($this->portfolioItems as &$portfolioItem) {
             $tickerId = $portfolioItem->getTickerId();
@@ -47,7 +42,7 @@ class PortfolioModel
                 $portfolioItem->setDividend($dividends[$tickerId]);
             }
         }
-        $this->stopwatch->stop("portfoliomodel-getDividends");
+        $this->stopwatch->stop('portfoliomodel-getDividends');
     }
 
     /**
@@ -61,7 +56,7 @@ class PortfolioModel
         float $totalInvested,
         DividendService $dividendService
     ): array {
-        $this->stopwatch->start("portfoliomodel-createPortfolioItem");
+        $this->stopwatch->start('portfoliomodel-createPortfolioItem');
 
         $currentDate = new DateTime();
 
@@ -167,53 +162,35 @@ class PortfolioModel
                 $tickerIds[] = $id;
             }
         }
-        $this->stopwatch->stop("portfoliomodel-createPortfolioItem");
+        $this->stopwatch->stop('portfoliomodel-createPortfolioItem');
 
         return $tickerIds;
     }
 
-    /**
-     * Get 1 page of many with position data
-     *
-     * @param PositionRepository $positionRepository
-     * @param DividendService $dividendService
-     * @param PaymentRepository $paymentRepository
-     * @param float $totalInvested
-     * @param integer $page
-     * @param string $orderBy
-     * @param string $sort
-     * @param Ticker|null $ticker
-     * @param Pie|null $pie
-     * @return static
-     */
-    public function getPage(
+    public function getPager(
         PositionRepository $positionRepository,
-        DividendService $dividendService,
         PaymentRepository $paymentRepository,
+        DividendService $dividendService,
         float $totalInvested = 0.0,
         int $page = 1,
-        string $orderBy = "symbol",
-        string $sort = "asc",
+        string $orderBy = 'symbol',
+        string $sort = 'asc',
         ?Ticker $ticker = null,
         ?Pie $pie = null
     ): static {
-        $order = "t.symbol";
-        if ($orderBy == "industry") {
-            $order = "i.label";
+        $order = 't.symbol';
+        if ($orderBy == 'industry') {
+            $order = 'i.label';
         }
-        if (in_array($orderBy, ["symbol", "fullname"])) {
-            $order = "t." . $orderBy;
+        if (in_array($orderBy, ['symbol', 'fullname'])) {
+            $order = 't.' . $orderBy;
         }
-        if (!in_array($sort, ["asc", "desc", "ASC", "DESC"])) {
-            $sort = "asc";
+        if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
+            $sort = 'asc';
         }
 
-        $this->stopwatch->start("portfoliomodel-getpage");
-        $limit = 20;
         if ($pie && $pie->getId()) {
-            $pager = $positionRepository->getAll(
-                $page,
-                $limit,
+            $query = $positionRepository->getAllQuery(
                 $order,
                 $sort,
                 $ticker,
@@ -221,9 +198,7 @@ class PortfolioModel
                 $pie
             );
         } else {
-            $pager = $positionRepository->getAll(
-                $page,
-                $limit,
+            $query = $positionRepository->getAllQuery(
                 $order,
                 $sort,
                 $ticker,
@@ -231,18 +206,18 @@ class PortfolioModel
             );
         }
 
-        $this->maxPages = (int) ceil($pager->count() / $limit);
-
-        $this->stopwatch->stop("portfoliomodel-getpage");
+        $adapter = new QueryAdapter($query);
+        $this->pagerfanta = new Pagerfanta($adapter);
+        $this->pagerfanta->setMaxPerPage(10);
+        $this->pagerfanta->setCurrentPage($page);
 
         $tickerIds = $this->createPortfolioItem(
-            $pager,
+            $this->pagerfanta,
             $totalInvested,
             $dividendService
         );
         $this->getDividends($paymentRepository, $tickerIds);
 
-        $this->tickerIds = $tickerIds;
         $this->initialized = true;
 
         return $this;
@@ -256,55 +231,16 @@ class PortfolioModel
     public function getPortfolioItems(): array
     {
         if (!$this->initialized) {
-            throw new RuntimeException("First call PortfolioModel::getPage()");
+            throw new RuntimeException('First call PortfolioModel::getPage()');
         }
         return $this->portfolioItems;
     }
 
-    /**
-     * Get unique ticker ids
-     *
-     * @return  array
-     */
-    public function getTickerIds(): array
+    public function getPagerfanta(): Pagerfanta
     {
-        if (!$this->initialized) {
-            throw new RuntimeException("First call PortfolioModel::getPage()");
+        if (!$this->initialized || !$this->pagerfanta instanceof Pagerfanta) {
+            throw new RuntimeException('First call PortfolioModel::getPager()');
         }
-        return $this->tickerIds;
-    }
-
-    /**
-     * Get num Pages
-     *
-     * @return  integer
-     */
-    public function getMaxPages(): int
-    {
-        if (!$this->initialized) {
-            throw new RuntimeException("First call PortfolioModel::getPage()");
-        }
-        return $this->maxPages;
-    }
-
-    /**
-     * Get when was the quote cache last updated
-     *
-     * @return  int
-     */
-    public function getCacheTimestamp(): int
-    {
-        if (!$this->initialized) {
-            throw new RuntimeException("First call PortfolioModel::getPage()");
-        }
-        return $this->timestamp;
-    }
-
-    public static function clearCache(): void
-    {
-        // Clear the portfolioModel cache, when we have new data.
-        $cache = new FilesystemAdapter(self::CACHE_NAMESPACE);
-
-        $cache->clear();
+        return $this->pagerfanta;
     }
 }

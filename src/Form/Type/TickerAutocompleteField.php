@@ -14,11 +14,8 @@ use Symfony\Component\OptionsResolver\Options;
 #[AsEntityAutocompleteField]
 class TickerAutocompleteField extends AbstractType
 {
-
     public function configureOptions(OptionsResolver $resolver): void
     {
-        //\Symfony\Component\OptionsResolver\Options $options
-
         $resolver->setDefaults([
             'class' => Ticker::class,
             'placeholder' => 'Choose a Ticker',
@@ -34,20 +31,25 @@ class TickerAutocompleteField extends AbstractType
                 return function (EntityRepository $er) use ($options) {
                     $qb = $er->createQueryBuilder('t');
 
-                    $includeAllTickers = $options['extra_options']['include_all_tickers'] ?? [];
-                    $qb
-                        ->select('t')
+                    $includeAllTickers =
+                        $options['extra_options']['include_all_tickers'] ?? [];
+                    $qb->select('t')
                         ->where('lower(t.isin) NOT LIKE :ignore')
                         ->orderBy('t.fullname')
                         ->setParameter('ignore', 'nvt%');
 
                     if ([] !== $includeAllTickers && !$includeAllTickers) {
-                        $qb->join('t.positions', 'p', 'WITH', 'p.closed = false');
+                        $qb->join(
+                            't.positions',
+                            'p',
+                            'WITH',
+                            'p.closed = false'
+                        );
                     }
 
                     return $qb;
                 };
-            }
+            },
         ]);
     }
 

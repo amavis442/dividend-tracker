@@ -59,8 +59,35 @@ class PositionRepository extends ServiceEntityRepository
         return $paginator;
     }
 
-    public function findOneByTicker(Ticker $ticker, int $status = self::OPEN): ?Position
-    {
+    public function getAllQuery(
+        string $orderBy = 't.symbol',
+        string $sort = 'ASC',
+        ?Ticker $ticker = null,
+        int $status = self::OPEN,
+        ?Pie $pie = null
+    ): QueryBuilder {
+        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $ticker);
+        if ($status === self::OPEN) {
+            $queryBuilder->andWhere('p.closed = false');
+        }
+        if ($status === self::CLOSED) {
+            $queryBuilder->andWhere('p.closed = true');
+        }
+        if ($pie && $pie->getId()) {
+            $queryBuilder
+                ->leftJoin('p.pies', 'pies')
+                ->andWhere('pies IN (:pies)')
+                ->setParameter('pies', $pie->getId())
+                ->addSelect('pies');
+        }
+
+        return $queryBuilder;
+    }
+
+    public function findOneByTicker(
+        Ticker $ticker,
+        int $status = self::OPEN
+    ): ?Position {
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('p')
             ->where('p.ticker = :ticker');
@@ -88,12 +115,16 @@ class PositionRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
-    public function findOneByTickerAndTransactionDate(Ticker $ticker, ?DateTime $transactionDate = null): ?Position
-    {
+    public function findOneByTickerAndTransactionDate(
+        Ticker $ticker,
+        ?DateTime $transactionDate = null
+    ): ?Position {
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('p')
             ->where('p.ticker = :ticker')
-            ->andWhere(':transactionDate >= p.createdAt AND :transactionDate <= p.closedAt');
+            ->andWhere(
+                ':transactionDate >= p.createdAt AND :transactionDate <= p.closedAt'
+            );
 
         return $queryBuilder
             ->setParameter('ticker', $ticker)
@@ -102,10 +133,15 @@ class PositionRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function findOneByTickerAndDate(Ticker $ticker, ?DateTime $transactionDate = null): ?Position
-    {
+    public function findOneByTickerAndDate(
+        Ticker $ticker,
+        ?DateTime $transactionDate = null
+    ): ?Position {
         if ($transactionDate) {
-            $position = $this->findOneByTickerAndTransactionDate($ticker, $transactionDate);
+            $position = $this->findOneByTickerAndTransactionDate(
+                $ticker,
+                $transactionDate
+            );
             if ($position) {
                 return $position;
             }
@@ -123,8 +159,10 @@ class PositionRepository extends ServiceEntityRepository
         return $position;
     }
 
-    public function getForTicker(Ticker $ticker, int $status = self::OPEN): ?Position
-    {
+    public function getForTicker(
+        Ticker $ticker,
+        int $status = self::OPEN
+    ): ?Position {
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('p, tr, pa')
             ->innerJoin('p.ticker', 't')
@@ -138,7 +176,8 @@ class PositionRepository extends ServiceEntityRepository
         if ($status === self::CLOSED) {
             $queryBuilder->andWhere('p.closed = true');
         }
-        return $queryBuilder->orderBy('tr.transactionDate', 'DESC')
+        return $queryBuilder
+            ->orderBy('tr.transactionDate', 'DESC')
             ->setParameter('ticker', $ticker)
             ->getQuery()
             ->getOneOrNullResult();
@@ -154,7 +193,8 @@ class PositionRepository extends ServiceEntityRepository
             ->leftJoin('p.payments', 'pa')
             ->where('p = :position');
 
-        return $queryBuilder->orderBy('tr.transactionDate', 'DESC')
+        return $queryBuilder
+            ->orderBy('tr.transactionDate', 'DESC')
             ->setParameter('position', $position)
             ->getQuery()
             ->getOneOrNullResult();
@@ -174,9 +214,7 @@ class PositionRepository extends ServiceEntityRepository
             ->orderBy('p.closedAt', $sort);
 
         if ($ticker && $ticker->getId()) {
-            $queryBuilder->andWhere(
-                't = :ticker'
-            );
+            $queryBuilder->andWhere('t = :ticker');
             $queryBuilder->setParameter('ticker', $ticker->getId());
         }
         $queryBuilder->andWhere('p.closed = true');
@@ -186,8 +224,29 @@ class PositionRepository extends ServiceEntityRepository
         return $paginator;
     }
 
-    public function getAllOpenForProjection(int $pieId = null, int $year = null): array
-    {
+    public function getAllClosedQuery(
+        string $sort = 'DESC',
+        ?Ticker $ticker = null
+    ): \Doctrine\ORM\QueryBuilder {
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->select('p, t, i')
+            ->innerJoin('p.ticker', 't')
+            ->innerJoin('t.branch', 'i')
+            ->where('p.closedAt IS NOT NULL')
+            ->orderBy('p.closedAt', $sort);
+
+        if ($ticker && $ticker->getId()) {
+            $queryBuilder->andWhere('t = :ticker');
+            $queryBuilder->setParameter('ticker', $ticker->getId());
+        }
+        $queryBuilder->andWhere('p.closed = true');
+        return $queryBuilder;
+    }
+
+    public function getAllOpenForProjection(
+        int $pieId = null,
+        int $year = null
+    ): array {
         $qb = $this->createQueryBuilder('p')
             ->select('p, t, pa, pac, c, dm, tr')
             ->innerJoin('p.ticker', 't')
@@ -199,22 +258,25 @@ class PositionRepository extends ServiceEntityRepository
             ->where('p.closed = false');
 
         if ($pieId) {
-            $qb->join("p.pies", 'pie')
+            $qb->join('p.pies', 'pie')
                 ->andWhere('pie IN (:pieIds)')
                 ->setParameter('pieIds', [$pieId]);
         }
 
         if ($year) {
-            $qb->andWhere('YEAR(c.paymentDate) = :year')
-                ->setParameter('year', $year);
+            $qb->andWhere('YEAR(c.paymentDate) = :year')->setParameter(
+                'year',
+                $year
+            );
         }
 
-        return $qb->getQuery()
-            ->getResult();
+        return $qb->getQuery()->getResult();
     }
 
-    public function getAllOpenPaymentsForProjection(int $pieId = null, int $year = null): array
-    {
+    public function getAllOpenPaymentsForProjection(
+        int $pieId = null,
+        int $year = null
+    ): array {
         $qb = $this->createQueryBuilder('p')
             ->select('p, t, pa, pac')
             ->innerJoin('p.ticker', 't')
@@ -223,18 +285,19 @@ class PositionRepository extends ServiceEntityRepository
             ->where('p.closed = false');
 
         if ($pieId) {
-            $qb->join("p.pies", 'pie')
+            $qb->join('p.pies', 'pie')
                 ->andWhere('pie IN (:pieIds)')
                 ->setParameter('pieIds', [$pieId]);
         }
 
         if ($year) {
-            $qb->andWhere('YEAR(pac.paymentDate) = :year')
-                ->setParameter('year', $year);
+            $qb->andWhere('YEAR(pac.paymentDate) = :year')->setParameter(
+                'year',
+                $year
+            );
         }
 
-        return $qb->getQuery()
-            ->getResult();
+        return $qb->getQuery()->getResult();
     }
 
     public function getAllOpen(?Pie $pie = null, int $year = null): array
@@ -252,18 +315,19 @@ class PositionRepository extends ServiceEntityRepository
             ->where('p.closed = false');
 
         if ($pie && $pie->getId()) {
-            $qb->join("p.pies", 'pie')
+            $qb->join('p.pies', 'pie')
                 ->andWhere('pie IN (:pieIds)')
                 ->setParameter('pieIds', [$pie->getId()]);
         }
 
         if ($year) {
-            $qb->andWhere('YEAR(c.paymentDate) = :year')
-                ->setParameter('year', $year);
+            $qb->andWhere('YEAR(c.paymentDate) = :year')->setParameter(
+                'year',
+                $year
+            );
         }
 
-        return $qb->getQuery()
-            ->getResult();
+        return $qb->getQuery()->getResult();
     }
 
     private function getQueryBuilder(
@@ -393,13 +457,12 @@ class PositionRepository extends ServiceEntityRepository
             ->where('p.closed = false');
 
         if ($pie && $pie->getId()) {
-            $qb->join("p.pies", 'pie')
+            $qb->join('p.pies', 'pie')
                 ->andWhere('pie IN (:pieIds)')
                 ->setParameter('pieIds', [$pie->getId()]);
         }
 
-        $allocated = $qb->getQuery()
-            ->getSingleScalarResult();
+        $allocated = $qb->getQuery()->getSingleScalarResult();
         if ($allocated) {
             return $allocated;
         }
@@ -423,17 +486,14 @@ class PositionRepository extends ServiceEntityRepository
     public function getAllocationsAndUnits(array $tickerIds): array
     {
         $result = $this->createQueryBuilder('p')
-            ->select([
-                'p.price',
-                'p.amount',
-                'IDENTITY(p.ticker) as tickerId',
-            ])
+            ->select(['p.price', 'p.amount', 'IDENTITY(p.ticker) as tickerId'])
 
             ->where('p.closed = false')
-            ->join("p.ticker", 't')
+            ->join('p.ticker', 't')
             ->andWhere('t IN (:tickerIds)')
             ->setParameter('tickerIds', $tickerIds)
-            ->getQuery()->getArrayResult();
+            ->getQuery()
+            ->getArrayResult();
 
         $output = [];
         foreach ($result as $item) {
@@ -473,10 +533,7 @@ class PositionRepository extends ServiceEntityRepository
     public function getAllocationDataPerPosition(): array
     {
         return $this->createQueryBuilder('p')
-            ->select([
-                't.symbol',
-                'p.allocation',
-            ])
+            ->select(['t.symbol', 'p.allocation'])
             ->innerJoin('p.ticker', 't')
             ->where('p.closed = false')
             ->getQuery()

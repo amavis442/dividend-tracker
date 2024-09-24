@@ -52,7 +52,7 @@
 					</tr>
 				</thead>
 				<tbody class="table-group-divider">
-					{% for calendar in calendars %}
+					{% for calendar in pager %}
 						<tr>
 							<td>
 								{% if calendar.ticker.positions[0] %}
@@ -93,5 +93,5 @@
 		</div>
 	</div>
 
-	{% include 'paginator.html.twig' %}
+	{{ pagerfanta(pager) }}
 {% endblock %}

@@ -21,7 +21,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{% for position in positions %}
+			{% for position in pager %}
 				<tr>
 					<td>
 						{{ position.ticker.symbol }}
@@ -37,5 +37,5 @@
 		</tbody>
 	</table>
 
-	{% include 'paginator.html.twig' %}
+	{{ pagerfanta(pager) }}
 {% endblock %}

@@ -93,6 +93,43 @@ class CalendarRepository extends ServiceEntityRepository
         return $paginator;
     }
 
+    public function getAllQuery(
+        string $orderBy = 'exDividendDate',
+        string $sort = 'DESC',
+        ?Ticker $ticker = null
+    ): \Doctrine\ORM\QueryBuilder {
+        $order = 'c.' . $orderBy;
+        if ($orderBy === 'symbol') {
+            $order = 't.symbol';
+        }
+        $queryBuilder2 = $this->getEntityManager()->createQueryBuilder()
+            ->select("tp.id")
+            ->from("\App\Entity\Ticker", "tp")
+            ->innerJoin("\App\Entity\Position", "p")
+            ->where("p.ticker = tp and p.closed = false");
+
+        // Create our query
+        $queryBuilder = $this->createQueryBuilder('c')
+            ->select('c')
+            ->innerJoin('c.ticker', 't')
+            ->orderBy($order, $sort);
+
+        $queryBuilder
+            ->where(
+                $queryBuilder->expr()->in('t.id', $queryBuilder2->getDQL())
+            );
+
+        if ($ticker && $ticker->getId()) {
+            $queryBuilder
+                ->where(
+                    't = :ticker'
+                )
+                ->setParameter('ticker', $ticker->getId());
+        }
+
+        return $queryBuilder;
+    }
+
     public function getLastDividend(Ticker $ticker)
     {
         $queryBuilder = $this->createQueryBuilder('c')

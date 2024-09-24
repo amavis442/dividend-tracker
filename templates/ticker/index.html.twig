@@ -34,7 +34,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{% for ticker in tickers %}
+			{% for ticker in pager %}
 				<tr>
 					<td>{{ ticker.id }}</td>
 					<td>{{ ticker.symbol }}</td>
@@ -78,7 +78,7 @@
 			{% endfor %}
 		</tbody>
 	</table>
-	{% include 'paginator.html.twig' %}
+	{{ pagerfanta(pager) }}
 	<a class="btn btn-primary" href="{{ path('ticker_new') }}">
 		<i class="fas fa-plus"></i>
 	</a>

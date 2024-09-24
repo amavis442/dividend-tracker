@@ -38,7 +38,7 @@
 
 
 	<br/>
-	{% for journal in journals %}
+	{% for journal in pager %}
 		<div class="card" style="width: 60rem;">
 			<div class="card-header">
 				<h3>
@@ -71,6 +71,6 @@
 			{{ 'no records found'|trans }}
 		{% endfor %}
 
-		{% include 'paginator.html.twig' %}
+   {{ pagerfanta(pager) }}
 
 	{% endblock %}

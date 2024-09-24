@@ -34,6 +34,15 @@ class BranchRepository extends ServiceEntityRepository
         return $paginator;
     }
 
+    public function getAllQuery(): \Doctrine\ORM\QueryBuilder
+    {
+        // Create our query
+        $queryBuilder = $this->createQueryBuilder('i')
+            ->orderBy('i.label', 'DESC');
+
+        return $queryBuilder;
+    }
+
     public function getSumAssetAllocation(): int
     {
         return $this->createQueryBuilder('i')
