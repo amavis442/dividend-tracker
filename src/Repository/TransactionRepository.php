@@ -27,7 +27,7 @@ class TransactionRepository extends ServiceEntityRepository
     private function getQueryBuilder(
         string $orderBy = 'transactionDate',
         string $sort = 'ASC',
-        string $search = ''
+        ?Ticker $ticker = null
     ): QueryBuilder {
         $order = 'tr.' . $orderBy;
         if ($orderBy === 'symbol') {
@@ -42,12 +42,10 @@ class TransactionRepository extends ServiceEntityRepository
             ->innerJoin('t.branch', 'i')
             ->orderBy($order, $sort);
 
-        if (!empty($search)) {
-            $queryBuilder->andWhere($queryBuilder->expr()->orX(
-                $queryBuilder->expr()->like('t.symbol', ':search'),
-                $queryBuilder->expr()->like('i.label', ':search')
-            ));
-            $queryBuilder->setParameter('search', $search . '%');
+        if ($ticker) {
+            $queryBuilder
+                ->andWhere('t = :ticker')
+                ->setParameter('ticker', $ticker->getId());
         }
         return $queryBuilder;
     }
@@ -57,14 +55,24 @@ class TransactionRepository extends ServiceEntityRepository
         int $limit = 10,
         string $orderBy = 'transactionDate',
         string $sort = 'ASC',
-        string $search = ''
+        ?Ticker $ticker = null
     ): Paginator {
-        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $search);
+        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $ticker);
         $queryBuilder->leftJoin('t.calendars', 'c');
         $query = $queryBuilder->getQuery();
         $paginator = $this->paginate($query, $page, $limit);
 
         return $paginator;
+    }
+
+    public function getAllQuery(
+        string $orderBy = 'transactionDate',
+        string $sort = 'ASC',
+        ?Ticker $ticker = null
+    ): QueryBuilder {
+        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $ticker);
+        $queryBuilder->leftJoin('t.calendars', 'c');
+        return $queryBuilder;
     }
 
     public function getByTicker(Ticker $ticker)
@@ -82,7 +90,7 @@ class TransactionRepository extends ServiceEntityRepository
     public function getLastImportFile(): array
     {
         return $this->createQueryBuilder('t')
-            ->select("t.importfile")
+            ->select('t.importfile')
             ->where('t.importfile is not null')
             ->orderBy('t.id', 'desc')
             ->setMaxResults(1)

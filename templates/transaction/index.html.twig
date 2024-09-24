@@ -12,7 +12,13 @@
 	{% endfor %}
 	<br/>
 	<br/>
-	{% include '_search_form.html.twig' %}
+
+	<div class="row g-2">
+		<div class="col">
+			{% include '_search_form.html.twig' %}
+		</div>
+		<div class="col"></div>
+	</div>
 
 	<table class="table">
 		<thead>
@@ -22,7 +28,7 @@
 					<a href="{{ path('transaction_index', { page: thisPage ? thisPage : 1, orderBy: 'transactionDate', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">Transaction date</a>
 				</th>
 				<th>
-					<a href="{{ path('transaction_index', { page: thisPage ? thisPage : 1, orderBy: 'symbol', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">Ticker</a>
+					<a href="{{ path('transaction_index', { page: thisPage ? thisPage : 1, orderBy: 'symbol', sort: sort == 'desc' ? 'asc' : 'desc' }) }}">Ticker</a>
 				</th>
 				<th>Industry</th>
 				<th>Units</th>
@@ -32,15 +38,13 @@
 			</tr>
 		</thead>
 		<tbody>
-			{% for transaction in transactions %}
+			{% for transaction in pager %}
 				{% set currentDividendData = transaction.position.ticker.getRecentDividendDate %}
 				{% set dividendDaysLeft = currentDividendData ? currentDividendData.getDaysLeft : - 1 %}
 				{% set side = transaction.side == 1 ? 'Buy' : 'Sell' %}
 				<tr>
 					<td>
-						<span class="badge badge-{% if transaction.side == 1 %}
-								
-																              {% endif %}">
+						<span class="badge {% if transaction.side == 1 %}bg-success{% else %}bg-danger{% endif %}">
 							{{ side }}
 						</span>
 					</td>
@@ -73,5 +77,5 @@
 		</tbody>
 	</table>
 
-	{% include 'paginator.html.twig' %}
+	{{ pagerfanta(pager) }}
 {% endblock %}

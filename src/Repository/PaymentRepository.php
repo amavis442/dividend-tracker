@@ -82,6 +82,41 @@ class PaymentRepository extends ServiceEntityRepository
         return $paginator;
     }
 
+
+    public function getAllQuery(
+        string $orderBy = 'exDividendDate',
+        string $sort = 'DESC',
+        ?Ticker $ticker = null,
+        string $startDate = null,
+        string $endDate = null
+    ): \Doctrine\ORM\QueryBuilder {
+        $order = 'p.' . $orderBy;
+        if ($orderBy === 'symbol') {
+            $order = 't.symbol';
+        }
+        if ($orderBy === 'exDividendDate') {
+            $order = 'c.exDividendDate';
+        }
+
+        // Create our query
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->join('p.ticker', 't')
+            ->leftJoin('p.calendar', 'c')
+            ->orderBy($order, $sort);
+
+        if ($startDate !== null) {
+            $this->setDateRange($queryBuilder, $startDate . " 00:00:00", $endDate . " 23:59:59");
+        }
+
+        if ($ticker && $ticker->getId()) {
+            $queryBuilder->andWhere(
+                't = :ticker'
+            );
+            $queryBuilder->setParameter('ticker', $ticker->getId());
+        }
+        return $queryBuilder;
+    }
+
     public function getForTicker(Ticker $ticker): ?array
     {
         return $this->createQueryBuilder('p')

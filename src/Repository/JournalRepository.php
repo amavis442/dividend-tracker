@@ -37,4 +37,17 @@ class JournalRepository extends ServiceEntityRepository
 
         return $this->paginate($query, $page, $limit);
     }
+
+    public function findItemsQuery(?array $taxonomy = null): \Doctrine\ORM\QueryBuilder
+    {
+        $queryBuilder = $this->createQueryBuilder('j')
+            ->orderBy('j.id', 'DESC');
+        if (!is_null($taxonomy) && !empty($taxonomy)) {
+            $queryBuilder->join('j.taxonomy', 't')
+                ->where('t.id IN (:taxonomy)')
+                ->setParameter('taxonomy', array_flip($taxonomy));
+        }
+
+        return $queryBuilder;
+    }
 }

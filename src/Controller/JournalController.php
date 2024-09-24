@@ -11,40 +11,40 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
 
 #[Route(path: '/dashboard/journal')]
 class JournalController extends AbstractController
 {
     public const TAXONOMY_KEY = 'journal_taxonomy';
     #[Route(path: '/list/{page<\d+>?1}', name: 'journal_index', methods: ['GET'])]
-    public function index(Request $request, JournalRepository $journalRepository, TaxonomyRepository $taxonomyRepository, int $page = 1): Response
-    {
+    public function index(
+        Request $request,
+        JournalRepository $journalRepository,
+        TaxonomyRepository $taxonomyRepository,
+        int $page = 1
+    ): Response {
         $taxonomySelected = null;
-        if (!$request->hasSession()) {
-            dump('Nope');
-        }
         $taxonomySelected = $request->getSession()->get(self::TAXONOMY_KEY, null);
 
         if (!is_null($taxonomySelected)) {
             $taxonomySelected = array_flip($taxonomySelected);
         }
 
+        $queryBuilder = $journalRepository->findItemsQuery($taxonomySelected);
+        $adapter = new QueryAdapter($queryBuilder);
+        $pager = new Pagerfanta($adapter);
+        $pager->setMaxPerPage(5);
+        $pager->setCurrentPage($page);
 
-        $limit = 5;
-        $items = $journalRepository->findItems($page, $limit, $taxonomySelected);
         $taxonomy = $taxonomyRepository->findLinked();
 
-        $maxPages = ceil($items->count() / $limit);
-        $thisPage = $page;
-
-
         return $this->render('journal/index.html.twig', [
-            'journals' => $items->getIterator(),
+            'pager' => $pager,
             'taxonomy' => $taxonomy,
             'taxonomySelected' => $taxonomySelected ?? [],
-            'limit' => $limit,
-            'maxPages' => $maxPages,
-            'thisPage' => $thisPage,
+            'thisPage' => $page,
             'routeName' => 'journal_index',
         ]);
     }

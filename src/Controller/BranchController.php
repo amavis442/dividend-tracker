@@ -10,6 +10,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
 
 #[Route('/dashboard/branch')]
 class BranchController extends AbstractController
@@ -17,19 +19,17 @@ class BranchController extends AbstractController
     #[Route('/list/{page<\d+>?1}', name: 'branch_index', methods: ['GET'])]
     public function index(BranchRepository $branchRepository, int $page = 1): Response
     {
-        $items = $branchRepository->getAll($page);
+        $queryBuilder = $branchRepository->getAllQuery();
+        $adapter = new QueryAdapter($queryBuilder);
+        $pager = new Pagerfanta($adapter);
+        $pager->setMaxPerPage(10);
+        $pager->setCurrentPage($page);
+
         $sumAssetAllocation = $branchRepository->getSumAssetAllocation();
 
-        $limit = 10;
-        $maxPages = ceil($items->count() / $limit);
-        $thisPage = $page;
-
         return $this->render('branch/index.html.twig', [
-            'branches' => $items->getIterator(),
+            'pager' => $pager,
             'sumAssetAllocation' => $sumAssetAllocation,
-            'limit' => $limit,
-            'maxPages' => $maxPages,
-            'thisPage' => $thisPage,
             'routeName' => 'branch_index',
         ]);
     }

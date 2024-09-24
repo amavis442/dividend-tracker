@@ -16,65 +16,67 @@ class DateIntervalFormType extends AbstractType
         FormBuilderInterface $builder,
         array $options
     ): void {
-        $currentYear = (int) date("Y");
+        $currentYear = (int) date('Y');
         $years = [];
-        for ($i = $options["startYear"]; $i <= $currentYear; $i++) {
+        for ($i = $options['startYear']; $i <= $currentYear; $i++) {
             $years[$i] = $i;
         }
 
         $builder
-            ->add("year", ChoiceType::class, [
-                "label" => "Year",
-                "choices" => $years,
-                "choice_translation_domain" => false,
+            ->add('year', ChoiceType::class, [
+                'label' => 'Year',
+                'choices' => $years,
+                'choice_translation_domain' => false,
             ])
-            ->add("month", ChoiceType::class, [
-                "choices" => [
-                    "-" => 0,
-                    "Jan" => 1,
-                    "Feb" => 2,
-                    "Ma" => 3,
-                    "Apr" => 4,
-                    "May" => 5,
-                    "Jun" => 6,
-                    "Jul" => 7,
-                    "Aug" => 8,
-                    "Sept" => 9,
-                    "Oct" => 10,
-                    "Nov" => 11,
-                    "Dec" => 12,
+            ->add('month', ChoiceType::class, [
+                'choices' => [
+                    '-' => 0,
+                    'Jan' => 1,
+                    'Feb' => 2,
+                    'Ma' => 3,
+                    'Apr' => 4,
+                    'May' => 5,
+                    'Jun' => 6,
+                    'Jul' => 7,
+                    'Aug' => 8,
+                    'Sept' => 9,
+                    'Oct' => 10,
+                    'Nov' => 11,
+                    'Dec' => 12,
                 ],
-                "choice_translation_domain" => false,
+                'choice_translation_domain' => false,
             ])
-            ->add("quator", ChoiceType::class, [
-                "choices" => [
-                    "-" => 0,
-                    "Q1" => 1,
-                    "Q2" => 2,
-                    "Q3" => 3,
-                    "Q4" => 4,
+            ->add('quator', ChoiceType::class, [
+                'choices' => [
+                    '-' => 0,
+                    'Q1' => 1,
+                    'Q2' => 2,
+                    'Q3' => 3,
+                    'Q4' => 4,
                 ],
-                "choice_translation_domain" => false,
+                'choice_translation_domain' => false,
             ])
-            ->add("submit", SubmitType::class, [
-                "label" => '<i class="fas fa-solid fa-filter"></i>',
-                "label_html" => true,
+            ->add('ticker', TickerAutocompleteField::class, [
+                'extra_options' => [
+                    'include_all_tickers' =>
+                        $options['extra_options']['include_all_tickers'],
+
+                ]
             ])
-            ->add("ticker", TickerAutocompleteField::class, [
-            "extra_options" => [
-                "include_all_tickers" =>
-                    $options["extra_options"]["include_all_tickers"],
-            ],
-        ]);
+            ->add('submit', SubmitType::class, [
+                'label' => '<i class="fas fa-solid fa-filter"></i>',
+                'label_html' => true,
+                'translation_domain' => false,
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => DateIntervalSelect::class,
-            "startYear" => 2019,
-            "extra_options" => [],
-            'method' => 'GET',
+            'startYear' => 2019,
+            'extra_options' => [],
+            'method' => 'POST',
         ]);
     }
 }

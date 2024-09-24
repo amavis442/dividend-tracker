@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
@@ -51,6 +50,31 @@ class TickerRepository extends ServiceEntityRepository
         $paginator = $this->paginate($query, $page, $limit);
 
         return $paginator;
+    }
+
+    public function getAllQuery(
+        string $orderBy = "symbol",
+        string $sort = "ASC",
+        ?Ticker $ticker = null
+    ): \Doctrine\ORM\QueryBuilder {
+        $order = "t." . $orderBy;
+        // Create our query
+        $queryBuilder = $this->createQueryBuilder("t")
+            ->select("t")
+            ->join("t.branch", "i")
+            ->leftJoin("t.researches", "r")
+            ->leftJoin("t.dividendMonths", "d")
+            ->leftJoin("t.payments", "pa")
+            ->groupBy("t.id")
+            ->orderBy($order, $sort);
+
+        if ($ticker && $ticker->getId()) {
+            $queryBuilder->where("t = :ticker");
+            $queryBuilder->groupBy("t.id, t.symbol");
+            $queryBuilder->setParameter("ticker", $ticker->getId());
+        }
+
+        return $queryBuilder;
     }
 
     public function getCurrent(

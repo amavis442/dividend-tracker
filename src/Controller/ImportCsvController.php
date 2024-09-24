@@ -88,13 +88,6 @@ class ImportCsvController extends AbstractController
                 $entityManager->persist($importFiles);
                 $entityManager->flush();
 
-
-
-                // Clear the portfolioModel cache, when we have new data.
-                PortfolioModel::clearCache();
-                //$cache = new FilesystemAdapter();
-                //$cache->delete('portfolio_model_cache_key');
-
                 return $this->render('import_csv/report.html.twig', [
                     'controller_name' => 'ImportCsvController',
                     'data' => $result,

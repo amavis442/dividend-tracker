@@ -9,7 +9,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\ORM\QueryBuilder;
 
-
 /**
  * @method Research|null find($id, $lockMode = null, $lockVersion = null)
  * @method Research|null findOneBy(array $criteria, array $orderBy = null)
@@ -39,6 +38,15 @@ class ResearchRepository extends ServiceEntityRepository
         return $paginator;
     }
 
+    public function getAllQuery(
+        string $orderBy = 'id',
+        string $sort = 'ASC',
+        ?Ticker $ticker = null
+    ): QueryBuilder {
+        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $ticker);
+        return $queryBuilder;
+    }
+
     private function getQueryBuilder(
         string $orderBy = 'id',
         string $sort = 'ASC',
@@ -56,8 +64,7 @@ class ResearchRepository extends ServiceEntityRepository
             ->orderBy($order, $sort);
 
         if ($ticker && $ticker->getId()) {
-            $queryBuilder->andWhere('t = :ticker'
-            );
+            $queryBuilder->andWhere('t = :ticker');
             $queryBuilder->setParameter('ticker', $ticker->getId());
         }
         return $queryBuilder;

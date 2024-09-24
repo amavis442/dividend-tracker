@@ -14,7 +14,13 @@
 
 	<br/>
 	<br/>
-	{% include '_search_form.html.twig' %}
+	<div class="row">
+		<div class="col">
+			{% include '_search_form.html.twig' %}
+		</div>
+		<div class="col">
+		</div>
+	</div>
 
 	<table class="table">
 		<thead>
@@ -35,7 +41,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{% for position in positions %}
+			{% for position in pager %}
 				{% set currentDividendData = position.ticker.getRecentDividendDate %}
 				{% set dividendDaysLeft = currentDividendData ? currentDividendData.getDaysLeft : - 1 %}
 				<tr>
@@ -47,7 +53,7 @@
 
 					<td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ position.price|format_number({ fraction_digit: 2 }) }}</td>
 					<td>{{ (position.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ position.allocation|format_number({ fraction_digit: 2 }) }}</td>
-					<td>{{ position.posid }}</td>
+					<td>{{ position.id }}</td>
 					<td>{{ position.updatedAt ? position.updatedAt|date('d/m/Y') : '' }}</td>
 					<td>{{ position.closed == 2 ? 'closed' : 'open' }}</td>
 					<td>
@@ -78,5 +84,5 @@
 		</tbody>
 	</table>
 
-	{% include 'paginator.html.twig' %}
+	{{ pagerfanta(pager) }}
 {% endblock %}

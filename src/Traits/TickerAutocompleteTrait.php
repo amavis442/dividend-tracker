@@ -23,33 +23,37 @@ trait TickerAutocompleteTrait
      */
     protected function searchTicker(
         Request $request,
+        TickerRepository $tickerRepository,
         string $cacheKey,
         bool $include_all_tickers = false
     ): array {
-        $ticker = new Ticker();
+        $tickerAutoComplete = new TickerAutocomplete();
+        $ticker = null;
 
-        if ($request->hasSession()) {
-            $tickerCache = $request->getSession()->get($cacheKey, null);
-            if ($tickerCache instanceof Ticker) {
-                $ticker = $tickerCache;
+        $tickerAutoCompleteCache = $request->getSession()->get($cacheKey, null);
+
+
+        if ($tickerAutoCompleteCache instanceof TickerAutocomplete) {
+            // We need a mapped entity else symfony will complain
+            // This works, but i do not know if it is the best solution
+            if ($tickerAutoCompleteCache->getTicker() && $tickerAutoCompleteCache->getTicker()->getId()) {
+                $ticker = $tickerRepository->find($tickerAutoCompleteCache->getTicker()->getId());
+                $tickerAutoComplete->setTicker($ticker);
             }
         }
 
-        $tickerAutoComplete = new TickerAutocomplete();
         /**
          * @var Form $form
          */
         $form = $this->createForm(
             TickerAutocompleteType::class,
             $tickerAutoComplete,
-            ["extra_options" => ["include_all_tickers" => $include_all_tickers]]
+            ['extra_options' => ['include_all_tickers' => $include_all_tickers]]
         );
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $request->getSession()->set($cacheKey, null);
-
             $ticker = $tickerAutoComplete->getTicker();
-            $request->getSession()->set($cacheKey, $ticker);
+            $request->getSession()->set($cacheKey, $tickerAutoComplete);
         }
         return [$form, $ticker];
     }
@@ -81,51 +85,42 @@ trait TickerAutocompleteTrait
     protected function searchTickerAndPie(
         Request $request,
         TickerRepository $tickerRepository,
-        PieRepository $pieRepository,
         string $cacheKey,
         bool $include_all_tickers = false
     ) {
-        $pie = new Pie();
-        $ticker = new Ticker();
+        $pie = null;
+        $ticker = null;
 
         $searchFormData = new SearchForm();
+        $sessionFormData = $request->getSession()->get($cacheKey, null);
 
-        $request->getSession()->set($cacheKey, [0 => null, 1 => null]);
-
-        if ($request->hasSession()) {
-            [$tickerId, $pieId] = $request
-                ->getSession()
-                ->get($cacheKey, [0 => null, 1 => null]);
-
-            // If you just store searchFormData in cache, symfony will complain about
-            // App\Entity\Ticker not managed by doctrine
-            if ($tickerId != null) {
-                $ticker = $tickerRepository->find($tickerId);
-                $searchFormData->setTicker($ticker);
-            }
-            if ($pieId != null) {
-                $pie = $pieRepository->find($pieId);
+        if ($sessionFormData instanceof SearchForm) {
+            if ($sessionFormData->getPie() instanceof Pie) {
+                $pie = $sessionFormData->getPie();
                 $searchFormData->setPie($pie);
+            }
+
+            if (
+                $sessionFormData->getTicker() &&
+                $sessionFormData->getTicker()->getId()
+            ) {
+                $ticker_id = $sessionFormData->getTicker()->getId();
+                $ticker = $tickerRepository->find($ticker_id);
+                $searchFormData->setTicker($ticker);
             }
         }
 
         $searchForm = $this->createForm(
             SearchFormType::class,
             $searchFormData,
-            ["extra_options" => ["include_all_tickers" => $include_all_tickers]]
+            ['extra_options' => ['include_all_tickers' => $include_all_tickers]]
         );
         $searchForm->handleRequest($request);
 
         if ($searchForm->isSubmitted() && $searchForm->isValid()) {
-            $searchFormData = $searchForm->getData();
             $pie = $searchFormData->getPie();
             $ticker = $searchFormData->getTicker();
-            $request
-                ->getSession()
-                ->set($cacheKey, [
-                    $ticker ? $ticker->getId() : null,
-                    $pie ? $pie->getId() : null,
-                ]);
+            $request->getSession()->set($cacheKey, $searchFormData);
         }
 
         return [$searchForm, $ticker, $pie];
