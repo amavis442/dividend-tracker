@@ -142,9 +142,18 @@ class ImportCsvService extends ImportBase
         }
 
         $calendar = $this->calendarRepository->findByDate($transactionDate, $ticker, $divType);
-        $position = $ticker->getPositions()->last();
+
+        /**
+         * @var Position $position
+         */
+        $position = $ticker->getPositions()->first();
+
         if (!$position instanceof \App\Entity\Position) {
             throw new RuntimeException('There is no position for this dividend payment to link to. Are you sure you have the right account?');
+        }
+
+        if ($position->getClosed() !== false) {
+            throw new RuntimeException('Selected position for import is already closed?');
         }
 
         $currency = $this->currencyRepository->findOneBy(['symbol' => 'EUR']);
