@@ -46,7 +46,7 @@ class Pie
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'pies')]
     #[ORM\JoinColumn(nullable: true)]
-    private $user;
+    private ?User $user = null;
 
     #[ORM\OneToMany(targetEntity: 'App\Entity\Transaction', mappedBy: 'pie')]
     private $transactions;

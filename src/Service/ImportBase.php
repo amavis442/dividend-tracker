@@ -64,17 +64,20 @@ abstract class ImportBase
         Security $security,
         array $data
     ): Position {
-
         $user = $security->getUser();
         if (!$user instanceof User) {
-            throw new \RuntimeException("No user available");
+            throw new \RuntimeException('No user available');
         }
         $transactionDate = $data['transactionDate'];
-        $position = $positionRepository->findOneByTickerAndDate($ticker, $transactionDate);
+        $position = $positionRepository->findOneByTickerAndDate(
+            $ticker,
+            $transactionDate
+        );
 
         if (!$position) {
             $position = new Position();
-            $position->setTicker($ticker)
+            $position
+                ->setTicker($ticker)
                 ->setUser($user)
                 ->setCurrency($currency)
                 ->setAllocationCurrency($currency);
@@ -100,7 +103,8 @@ abstract class ImportBase
         $ticker = $tickerRepository->findOneBy(['isin' => $data['isin']]);
         if (!$ticker) {
             $ticker = new Ticker();
-            $ticker->setSymbol(rtrim($data['ticker'], "."))
+            $ticker
+                ->setSymbol(rtrim($data['ticker'], '.'))
                 ->setFullname($data['name'])
                 ->setIsin($data['isin'])
                 ->setBranch($branch)

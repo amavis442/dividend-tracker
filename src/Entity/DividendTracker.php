@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\DividendTrackerRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 
@@ -17,7 +16,7 @@ class DividendTracker
     private ?int $id = null;
 
     #[ORM\Column(type: 'date')]
-    private $sampleDate;
+    private \DateTime $sampleDate;
 
     #[ORM\Column(
         type: 'float',
@@ -32,14 +31,14 @@ class DividendTracker
         nullable: false,
         options: ["default" => 0]
     )]
-    private $dividend = 0.0;
+    private float $dividend = 0.0;
 
     #[ORM\Column()]
     private \DateTimeImmutable $createdAt;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'dividendTrackers')]
     #[ORM\JoinColumn(nullable: true)]
-    private $user;
+    private ?User $user = null;
 
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
@@ -52,12 +51,12 @@ class DividendTracker
         return $this->id;
     }
 
-    public function getSampleDate(): ?\DateTimeInterface
+    public function getSampleDate(): ?\DateTime
     {
         return $this->sampleDate;
     }
 
-    public function setSampleDate(\DateTimeInterface $sampleDate): self
+    public function setSampleDate(\DateTime $sampleDate): self
     {
         $this->sampleDate = $sampleDate;
 
@@ -88,7 +87,7 @@ class DividendTracker
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }

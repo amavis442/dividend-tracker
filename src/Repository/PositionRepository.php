@@ -84,6 +84,23 @@ class PositionRepository extends ServiceEntityRepository
         return $queryBuilder;
     }
 
+
+    public function getActivePositions(
+        int $status = self::OPEN,
+    ): QueryBuilder {
+
+        $queryBuilder = $this->createQueryBuilder('p');
+        if ($status === self::OPEN) {
+            $queryBuilder->andWhere('p.closed = false');
+        }
+        if ($status === self::CLOSED) {
+            $queryBuilder->andWhere('p.closed = true');
+        }
+
+        return $queryBuilder;
+    }
+
+
     public function findOneByTicker(
         Ticker $ticker,
         int $status = self::OPEN

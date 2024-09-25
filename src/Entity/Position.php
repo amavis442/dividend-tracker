@@ -14,15 +14,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource(
-    normalizationContext: ['groups' => ['position:read', 'position:read:item']],
-    denormalizationContext: ['groups' => ['position:write']],
-    security: 'is_granted("ROLE_USER")',
-    operations: [
-        new Get(),
-        new GetCollection(),
-    ]
-)]
+#[
+    ApiResource(
+        normalizationContext: [
+            'groups' => ['position:read', 'position:read:item'],
+        ],
+        denormalizationContext: ['groups' => ['position:write']],
+        security: 'is_granted("ROLE_USER")',
+        operations: [new Get(), new GetCollection()]
+    )
+]
 #[ORM\Entity(repositoryClass: 'App\Repository\PositionRepository')]
 #[ORM\HasLifecycleCallbacks]
 class Position
@@ -35,69 +36,69 @@ class Position
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
+    /**
+     * Average price
+     */
     #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
-    #[ORM\Column(
-        type: 'float',
-        nullable: false,
-        options: ["default" => 0]
-    )]
+    #[ORM\Column(type: 'float', nullable: false, options: ['default' => 0])]
     private float $price = 0.0;
 
     #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
-    #[ORM\Column(
-        type: 'float',
-        nullable: false,
-        options: ["default" => 0]
-    )]
+    #[ORM\Column(type: 'float', nullable: false, options: ['default' => 0])]
     private float $amount = 0.0;
 
     #[Groups(['position:read', 'position:write'])]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Ticker', inversedBy: 'positions')]
     #[ORM\JoinColumn(nullable: false)]
-    private $ticker;
+    private Ticker $ticker;
 
     #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
-    #[ORM\Column(type: 'boolean', nullable: false, options: ["default" => false])]
+    #[
+        ORM\Column(
+            type: 'boolean',
+            nullable: false,
+            options: ['default' => false]
+        )
+    ]
     private bool $closed = false;
 
     #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
-    #[ORM\Column(
-        type: 'float',
-        nullable: false,
-        options: ["default" => 0]
-    )]
+    #[ORM\Column(type: 'float', nullable: false, options: ['default' => 0])]
     private float $profit = 0.0;
 
     #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
-    #[ORM\Column(
-        type: 'float',
-        nullable: false,
-        options: ["default" => 0]
-    )]
+    #[ORM\Column(type: 'float', nullable: false, options: ['default' => 0])]
     private float $allocation = 0.0;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\User', inversedBy: 'positions')]
     #[ORM\JoinColumn(nullable: false)]
-    private $user;
+    private ?User $user = null;
 
     #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     #[ORM\JoinColumn(nullable: false)]
-    private $currency;
+    private Currency $currency;
 
     #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
-    private $allocationCurrency;
+    private ?Currency $allocationCurrency;
 
     #[Groups(['position:read', 'position:write'])]
-    #[ORM\OneToMany(targetEntity: 'App\Entity\Transaction', mappedBy: 'position', orphanRemoval: true, cascade: ['persist'])]
+    #[
+        ORM\OneToMany(
+            targetEntity: 'App\Entity\Transaction',
+            mappedBy: 'position',
+            orphanRemoval: true,
+            cascade: ['persist']
+        )
+    ]
     #[ORM\OrderBy(['transactionDate' => 'DESC'])]
-    private $transactions;
+    private Collection $transactions;
 
     #[Groups(['position:read', 'position:write'])]
-    #[ORM\OneToMany(targetEntity: 'App\Entity\Payment', mappedBy: 'position')]
+    #[ORM\OneToMany(targetEntity: \App\Entity\Payment::class, mappedBy: 'position')]
     #[ORM\OrderBy(['payDate' => 'DESC'])]
-    private $payments;
+    private Collection $payments;
 
     #[ORM\Column(name: 'created_at')]
     private \DateTimeImmutable $createdAt;
@@ -111,7 +112,7 @@ class Position
     #[ORM\InverseJoinColumn(name: 'pie_id', referencedColumnName: 'id')]
     #[ORM\ManyToMany(targetEntity: 'App\Entity\Pie', inversedBy: 'positions')]
     #[ORM\OrderBy(['label' => 'DESC'])]
-    private $pies;
+    private Collection $pies;
 
     #[Groups(['position:read', 'position:write'])]
     #[ORM\Column(type: 'datetime', name: 'closed_at', nullable: true)]
@@ -129,8 +130,23 @@ class Position
     private ?int $maxAllocation = 0;
 
     #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
-    #[ORM\Column(type: 'boolean', options: ["default" => false])]
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $ignore_for_dividend = false;
+
+    private float $percentageAllocation = 0.0;
+    private int $payoutFrequency = 3;
+    private bool $divDate = false;
+    private float $cashAmount = 0.0;
+    private ?Currency $cashCurrency = null;
+    private float $forwardNetDividend = 0.0;
+    private float $forwardNetDividendYield = 0.0;
+    private float $forwardNetDividendYieldPerShare = 0.0;
+    private float $netDividendPerShare = 0.0;
+    private ?DateTime $exDividendDate = null;
+    private ?DateTime $paymentDate = null;
+    private bool $isMaxAllocation = false;
+    private ?Collection $dividendCalendars = null;
+    private float $dividend = 0.0;
 
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
@@ -149,13 +165,18 @@ class Position
     public function validate(ExecutionContextInterface $context, $payload)
     {
         if (empty($this->getPrice()) && empty($this->getAllocation())) {
-            $context->buildViolation('Price and/or allocation should be filled!')
+            $context
+                ->buildViolation('Price and/or allocation should be filled!')
                 ->atPath('price')
                 ->addViolation();
         }
 
-        if ((empty($this->amount) || $this->amount == 0) && $this->closed === false) {
-            $context->buildViolation('Amount can not be empty or zero!')
+        if (
+            (empty($this->amount) || $this->amount == 0) &&
+            $this->closed === false
+        ) {
+            $context
+                ->buildViolation('Amount can not be empty or zero!')
                 ->atPath('amount')
                 ->addViolation();
         }
@@ -166,6 +187,8 @@ class Position
         $this->transactions = new ArrayCollection();
         $this->payments = new ArrayCollection();
         $this->pies = new ArrayCollection();
+        $this->dividendCalendars = new ArrayCollection();
+        $this->isMaxAllocation = false;
     }
 
     public function getId(): ?int
@@ -361,13 +384,17 @@ class Position
     /**
      * @return Collection|Pie[]
      */
-    public function getPies(): Collection
+    public function getPies(): ?Collection
     {
         return $this->pies;
     }
 
     public function addPie(Pie $pie): self
     {
+        if ($this->pies == null) {
+            $this->pies = new ArrayCollection();
+        }
+
         if (!$this->pies->contains($pie)) {
             $this->pies[] = $pie;
             $pie->addPosition($this);
@@ -399,7 +426,9 @@ class Position
         $timestamp = $datetime->format('Ymd');
         $amount = 0.0;
         foreach ($this->getTransactions() as $transaction) {
-            if ($transaction->getTransactionDate()->format('Ymd') < $timestamp) {
+            if (
+                $transaction->getTransactionDate()->format('Ymd') < $timestamp
+            ) {
                 if ($transaction->getSide() == Transaction::BUY) {
                     $amount += $transaction->getAmount();
                 }
@@ -419,7 +448,8 @@ class Position
 
     public function setClosedAt(?\DateTimeInterface $closedAt): self
     {
-        $this->closedAt = ($closedAt instanceof DateTime) ? $closedAt : new DateTime("now");
+        $this->closedAt =
+            $closedAt instanceof DateTime ? $closedAt : new DateTime('now');
 
         return $this;
     }
@@ -458,5 +488,329 @@ class Position
         $this->ignore_for_dividend = $ignore_for_dividend;
 
         return $this;
+    }
+
+    /**
+     * Percentage of total investment
+     */
+    public function setPercentageAllocation(float $totalInvested): self
+    {
+        $this->percentageAllocation =
+            ($this->allocation / $totalInvested) * 100;
+
+        return $this;
+    }
+
+    public function getPercentageAllocation(): float
+    {
+        return $this->percentageAllocation;
+    }
+
+    /**
+     * Frequency of dividends paid 3,6,12 etc
+     */
+    public function setDividendPayoutFrequency($payoutFrequency): self
+    {
+        $this->payoutFrequency = $payoutFrequency;
+
+        return $this;
+    }
+
+    public function getDividendPayoutFrequency(): int
+    {
+        return $this->payoutFrequency;
+    }
+
+    /**
+     * Get has a calendar entry
+     *
+     * @return  boolean
+     */
+    public function hasDivDate(): bool
+    {
+        return $this->divDate;
+    }
+
+    public function setDivDate(bool $divDate): self
+    {
+        $this->divDate = $divDate;
+
+        return $this;
+    }
+
+    /**
+     * @param  float  $cashAmount
+     *
+     * @return  self
+     */
+    public function setCashAmount(float $cashAmount): self
+    {
+        $this->cashAmount = $cashAmount;
+
+        return $this;
+    }
+
+    /**
+     * @return  float
+     */
+    public function getCashAmount(): float
+    {
+        return $this->cashAmount;
+    }
+
+    /**
+     *
+     * @return  Currency
+     */
+    public function getCashCurrency(): ?Currency
+    {
+        return $this->cashCurrency;
+    }
+
+    /**
+     * @param  Currency  $cashCurrency
+     *
+     * @return  self
+     */
+    public function setCashCurrency(Currency $cashCurrency): self
+    {
+        $this->cashCurrency = $cashCurrency;
+
+        return $this;
+    }
+
+    /**
+     * @param  float  $forwardNetDividend  Undocumented variable
+     *
+     * @return  self
+     */
+    public function setForwardNetDividend(float $forwardNetDividend): self
+    {
+        $this->forwardNetDividend = $forwardNetDividend;
+
+        return $this;
+    }
+
+    /**
+     * @return  float
+     */
+    public function getForwardNetDividend(): float
+    {
+        return $this->forwardNetDividend;
+    }
+
+    /**
+     * @param  float  $forwardNetDividendYield
+     *
+     * @return  self
+     */
+    public function setForwardNetDividendYield(
+        float $forwardNetDividendYield
+    ): self {
+        $this->forwardNetDividendYield = $forwardNetDividendYield;
+
+        return $this;
+    }
+
+    /**
+     * @return  float
+     */
+    public function getForwardNetDividendYield(): float
+    {
+        return $this->forwardNetDividendYield;
+    }
+
+    /**
+     * Get current dividend yield per share based on current marketprice
+     *
+     * @return  float
+     */
+    public function getForwardNetDividendYieldPerShare(): float
+    {
+        return $this->forwardNetDividendYieldPerShare ?? 0;
+    }
+
+    /**
+     * Set current dividend yield per share based on current marketprice
+     *
+     * @param  float  $forwardNetDividendYieldPerShare  Current dividend yield per share based on current marketprice
+     *
+     * @return  self
+     */
+    public function setForwardNetDividendYieldPerShare(
+        float $forwardNetDividendYieldPerShare
+    ): self {
+        $this->forwardNetDividendYieldPerShare = $forwardNetDividendYieldPerShare;
+
+        return $this;
+    }
+
+    /**
+     * Get net dividend per share
+     *
+     * @return  float
+     */
+    public function getNetDividendPerShare(): float
+    {
+        return $this->netDividendPerShare ?? 0.0;
+    }
+
+    /**
+     * Set net dividend per share
+     *
+     * @param  null|float  $netDividendPerShare  Net dividend per share
+     *
+     * @return  self
+     */
+    public function setNetDividendPerShare(?float $netDividendPerShare): self
+    {
+        $this->netDividendPerShare = $netDividendPerShare ?? 0.0;
+
+        return $this;
+    }
+
+    /**
+     * @return  DateTime
+     */
+    public function getExDividendDate(): ?DateTime
+    {
+        return $this->exDividendDate;
+    }
+
+    /**
+     * @param  DateTime  $exDividendDate
+     *
+     * @return  self
+     */
+    public function setExDividendDate(DateTime $exDividendDate): self
+    {
+        $this->exDividendDate = $exDividendDate;
+
+        return $this;
+    }
+
+    /**
+     * @return  DateTime
+     */
+    public function getPaymentDate(): ?DateTime
+    {
+        return $this->paymentDate;
+    }
+
+    /**
+     * @param  DateTime  $paymentDate  Undocumented variable
+     *
+     * @return  self
+     */
+    public function setPaymentDate(DateTime $paymentDate): self
+    {
+        $this->paymentDate = $paymentDate;
+
+        return $this;
+    }
+
+    /**
+     * Get collection of dividend calenders of future payments
+     *
+     * @return  array
+     */
+    public function getDividendCalendars(): array
+    {
+        if ($this->dividendCalendars == null) {
+            return [];
+        }
+
+        return array_reverse($this->dividendCalendars->toArray());
+    }
+
+    /**
+     * Add future calendar to collection
+     *
+     * @param  Calendar  $dividendCalendar
+     *
+     * @return  self
+     */
+    public function addDividendCalendar(Calendar $dividendCalendar): self
+    {
+        if ($this->dividendCalendars == null) {
+            $this->dividendCalendars = new ArrayCollection();
+        }
+
+        if (!$this->dividendCalendars->contains($dividendCalendar)) {
+            $this->dividendCalendars->add($dividendCalendar);
+        }
+
+        return $this;
+    }
+
+    public function computeCurrentDividendDates(DateTime $currentDate): self
+    {
+        foreach ($this->ticker->getCalendars() as $currentCalendar) {
+            if ($currentCalendar->getPaymentDate() >= $currentDate) {
+                $this->addDividendCalendar($currentCalendar);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get has maximum allocation been reached
+     *
+     * @return  bool
+     */
+    public function getIsMaxAllocation(): bool
+    {
+        return $this->isMaxAllocation;
+    }
+
+    /**
+     * Set has maximum allocation been reached
+     *
+     * @return  self
+     */
+    public function computeIsMaxAllocation(): self
+    {
+        if ($this->getMaxAllocation() !== null) {
+            if ($this->getAllocation() > $this->getMaxAllocation()) {
+                $this->isMaxAllocation = true;
+            }
+        }
+
+        return $this;
+    }
+
+        /**
+     * Get total received dividends
+     *
+     * @return  float
+     */
+    public function getDividend(): float
+    {
+        return $this->dividend;
+    }
+
+    /**
+     * Set total received dividends
+     *
+     * @param  float  $dividend  Total received dividends
+     *
+     * @return  self
+     */
+    public function setDividend(float $dividend): self
+    {
+        $this->dividend = $dividend;
+
+        return $this;
+    }
+
+    public function computeReceivedDividends(): float
+    {
+        $totalDividend = 0.0;
+        foreach ($this->getPayments() as $payment) {
+            $totalDividend += $payment->getDividend();
+        }
+        $this->setDividend($totalDividend);
+        return $totalDividend;
     }
 }

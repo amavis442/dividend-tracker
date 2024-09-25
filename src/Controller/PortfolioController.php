@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Contracts\Service\DividendServiceInterface;
 use App\Entity\Calendar;
 use App\Entity\Position;
 use App\Model\PortfolioModel;
@@ -54,7 +55,7 @@ class PortfolioController extends AbstractController
         PaymentRepository $paymentRepository,
         TickerRepository $tickerRepository,
         SummaryService $summaryService,
-        DividendService $dividendService,
+        DividendServiceInterface $dividendService,
         Referer $referer,
         PortfolioModel $model,
         int $page = 1,
@@ -81,9 +82,8 @@ class PortfolioController extends AbstractController
 
         $this->stopwatch->start('portfoliomodel-getpage');
 
-        $portfolioModel = $model->getPager(
+        $pager = $model->getPager(
             $positionRepository,
-            $paymentRepository,
             $dividendService,
             $summary->getAllocated(),
             $page,
@@ -100,10 +100,7 @@ class PortfolioController extends AbstractController
             ->set(get_class($this), $request->getRequestUri());
 
         return $this->render('portfolio/index.html.twig', [
-            'portfolioItems' =>
-                $portfolioModel != null
-                    ? $portfolioModel->getPortfolioItems()
-                    : null,
+            'pager' => $pager,
             'limit' => $limit,
             'thisPage' => $thisPage,
             'order' => $orderBy,
@@ -116,7 +113,7 @@ class PortfolioController extends AbstractController
             'totalDividend' => $summary->getTotalDividend(),
             'totalInvested' => $summary->getAllocated(),
             'autoCompleteForm' => $form,
-            'pager' => $portfolioModel->getPagerfanta(),
+
         ]);
     }
 

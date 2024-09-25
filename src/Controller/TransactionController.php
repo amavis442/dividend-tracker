@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[Route(path: '/dashboard/transaction')]
 class TransactionController extends AbstractController

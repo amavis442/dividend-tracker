@@ -66,56 +66,57 @@
 					</tr>
 				</thead>
 				<tbody class="table-group-divider">
-					{% for portfolioItem in portfolioItems %}
-						{% set dividendInfo = include('portfolio/_dividendinfo.html.twig', {'portfolioItem' : portfolioItem} ) %}
+					{% for position in pager %}
+						{% set dividendInfo = include('portfolio/_dividendinfo.html.twig', {'position' : position} ) %}
+						{% set ticker = position.ticker %}
 						<tr>
 							<td>
 
 								<div>
-									<span {% if portfolioItem.fullname|length > 20 %} data-bs-toggle="tooltip" data-placement="top" title="{{ portfolioItem.fullname }} ({{ portfolioItem.symbol }})" {% endif %}>
-										<a href="{{ path('portfolio_show', {'id': portfolioItem.positionId}) }}">{{ portfolioItem.fullname|slice(0, 20) }}
-											{% if portfolioItem.fullname|length > 20 %}...
+									<span {% if ticker.fullname|length > 20 %} data-bs-toggle="tooltip" data-placement="top" title="{{ ticker.fullname }} ({{ ticker.symbol }})" {% endif %}>
+										<a href="{{ path('portfolio_show', {'id': position.id}) }}">{{ ticker.fullname|slice(0, 20) }}
+											{% if ticker.fullname|length > 20 %}...
 											{% endif %}
 										</a>
 									</span>
 									<i class="fas fa-info-circle" data-bs-toggle="popover" data-bs-title="Dividend & pie info" data-bs-content='{{ dividendInfo }}' data-bs-html="true"></i>
 								</div>
 
-								<small>{{ portfolioItem.amount|format_number({fraction_digit: 7}) }}
+								<small>{{ position.amount|format_number({fraction_digit: 7}) }}
 									{{ 'shares'|trans }}</small>
 							</td>
 						<td>
 							&euro;
-							{{ portfolioItem.price|format_number({fraction_digit: 2}) }}
+							{{ position.price|format_number({fraction_digit: 2}) }}
 						</td>
 
 						<td>
-							<span class="badge text-bg-primary">&euro;{{ portfolioItem.allocation|format_number({fraction_digit: 2}) }}
-								<span class="badge text-bg-warning">{{ portfolioItem.percentageAllocation|format_number({fraction_digit: 2}) }}%</span>
+							<span class="badge text-bg-primary">&euro;{{ position.allocation|format_number({fraction_digit: 2}) }}
+								<span class="badge text-bg-warning">{{ position.percentageAllocation|format_number({fraction_digit: 2}) }}%</span>
 							</span>
 						</td>
 						<td>
 							<span class="badge text-bg-secondary">
-								&euro;{{ portfolioItem.dividend|format_number({fraction_digit: 2}) }}
-								<span class="badge text-bg-warning">{{ ((portfolioItem.dividend / portfolioItem.allocation) *100)|format_number({fraction_digit: 2}) }}%</span>
+								&euro;{{ position.dividend|format_number({fraction_digit: 2}) }}
+								<span class="badge text-bg-warning">{{ ((position.dividend / position.allocation) *100)|format_number({fraction_digit: 2}) }}%</span>
 							</span>
 						</td>
 						<td>
-							{% if portfolioItem.divDate %}
-								<span class="badge text-bg-primary">{{ portfolioItem.exDividendDate|format_date('long') }}</span>
+							{% if position.divDate %}
+								<span class="badge text-bg-primary">{{ position.exDividendDate|format_date('long') }}</span>
 								<br/>
-								<span class="badge text-bg-warning">{{ portfolioItem.paymentDate|format_date('long') }}</span>
+								<span class="badge text-bg-warning">{{ position.paymentDate|format_date('long') }}</span>
 							{% else %}
 								&mdash;
 							{% endif %}
 						</td>
 						<td>
-							{% if portfolioItem.divDate %}
-								<div class="badge text-bg-primary">{{ portfolioItem.cashCurrency.sign|raw }}
-									{{ portfolioItem.cashAmount|format_number({fraction_digit: 3}) }}</div><br/>
+							{% if position.divDate %}
+								<div class="badge text-bg-primary">{{ position.cashCurrency.sign|raw }}
+									{{ position.cashAmount|format_number({fraction_digit: 3}) }}</div><br/>
 								<div class="badge text-bg-secondary">&euro;
-									{{ portfolioItem.forwardNetDividend|format_number({fraction_digit: 2}) }}
-									<div class="badge text-bg-success">{{ portfolioItem.forwardNetDividendYield|format_number({fraction_digit: 2}) }}%</div>
+									{{ position.forwardNetDividend|format_number({fraction_digit: 2}) }}
+									<div class="badge text-bg-success">{{ position.forwardNetDividendYield|format_number({fraction_digit: 2}) }}%</div>
 								</div><br/>
 							{% else %}
 								&mdash;

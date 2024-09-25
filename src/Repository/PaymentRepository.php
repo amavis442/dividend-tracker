@@ -10,6 +10,8 @@ use App\Helper\DateHelper;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -29,18 +31,13 @@ class PaymentRepository extends ServiceEntityRepository
         parent::__construct($registry, Payment::class);
     }
 
-    /*
-    private function getInterval(QueryBuilder $queryBuilder, string $interval)
-    {
-        [$startDate, $endDate] = (new DateHelper())->getInterval($interval);
-        $this->setDateRange($queryBuilder, $startDate, $endDate);
-    }
-    */
-
     private function setDateRange(QueryBuilder $queryBuilder, string $startDate, string $endDate)
     {
-        $queryBuilder->andWhere('p.payDate >= :startDate and p.payDate <= :endDate');
-        $queryBuilder->setParameters(['startDate' => $startDate, 'endDate' => $endDate]);
+        $queryBuilder->andWhere('p.payDate >= :startDate and p.payDate <= :endDate')
+        ->setParameters(new ArrayCollection([
+            new Parameter('startDate', $startDate),
+            new Parameter('endDate', $endDate),
+        ]));
     }
 
     public function getAll(
