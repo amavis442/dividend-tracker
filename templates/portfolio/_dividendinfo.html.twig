@@ -3,7 +3,7 @@
   <div>
     <strong>{{ 'Frequency'|trans }}</strong>
   </div>
-  <div class="alert alert-primary" role="alert">{{ portfolioItem.dividendPayoutFrequency }}
+  <div class="alert alert-primary" role="alert">{{ position.dividendPayoutFrequency }}
     {{ 'x per year'|trans }}</div>
 {% endset %}
 {% set dividendDateInfo = '' %}
@@ -12,7 +12,7 @@
     <strong>{{ 'Dates'|trans }}</strong>
   </div>
   <ul class="list-group">
-    {% for calendar in portfolioItem.dividendCalendars %}
+    {% for calendar in position.dividendCalendars %}
       <li class="list-group-item">
         {{ calendar.exDividendDate|format_date('medium') }}
         /
@@ -32,7 +32,7 @@
     <strong>{{ 'Dividend treshold'|trans }}</strong>
   </div>
   <ul class="list-group">
-    <li class="list-group-item">{{ (portfolioItem.dividendTreshold * 100)|format_number({ fraction_digit: 2 }) }}%</li>
+    <li class="list-group-item">{{ (position.dividendTreshold * 100)|format_number({ fraction_digit: 2 }) }}%</li>
   </ul>
   <hr />
   <div>
@@ -40,7 +40,7 @@
   </div>
   <ul class="list-group">
     <li class="list-group-item">&euro;
-      {{ (portfolioItem.maxAllocation ? portfolioItem.maxAllocation : 0)|format_number({ fraction_digit: 2 }) }}</li>
+      {{ (position.maxAllocation ? position.maxAllocation : 0)|format_number({ fraction_digit: 2 }) }}</li>
   </ul>
 {% endset %}
 {% set dividendInfo = dividendInfo ~ dividendDateInfo %}
@@ -50,7 +50,7 @@
     <strong>{{ 'Pie'|trans }}</strong>
   </div>
   <ul class="list-group">
-    {% for pie in portfolioItem.pies %}
+    {% for pie in position.pies %}
       <li class="list-group-item">{{ pie.label }}</li>
     {% else %}
       <li class="list-group-item">{{ 'Not available'|trans }}</li>

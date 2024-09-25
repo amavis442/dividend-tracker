@@ -16,16 +16,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
-#[ApiResource(
-    normalizationContext: ['groups' => ['ticker:read', 'ticker:read:item']],
-    denormalizationContext: ['groups' => ['ticker:write']],
-    security: 'is_granted("ROLE_USER")',
-    operations: [
-        new Get(),
-        new GetCollection()
-    ]
-)]
+#[
+    ApiResource(
+        normalizationContext: ['groups' => ['ticker:read', 'ticker:read:item']],
+        denormalizationContext: ['groups' => ['ticker:write']],
+        security: 'is_granted("ROLE_USER")',
+        operations: [new Get(), new GetCollection()]
+    )
+]
 #[ORM\Entity(repositoryClass: 'App\Repository\TickerRepository')]
 #[UniqueEntity('isin')]
 #[HasLifecycleCallbacks]
@@ -70,12 +68,18 @@ class Ticker
     private $positions;
 
     //#[Groups(['ticker:read', 'ticker:write'])]
-    #[ORM\ManyToMany(targetEntity: 'App\Entity\DividendMonth', inversedBy: 'tickers', indexBy: 'dividendMonth')]
+    #[
+        ORM\ManyToMany(
+            targetEntity: 'App\Entity\DividendMonth',
+            inversedBy: 'tickers',
+            indexBy: 'dividendMonth'
+        )
+    ]
     private $dividendMonths;
 
+    //#[ApiProperty(identifier: true)]
     #[Groups(['ticker:read', 'ticker:write'])]
     #[Assert\Isin]
-    //#[ApiProperty(identifier: true)]
     #[ORM\Column(type: 'string', length: 255, nullable: false, unique: true)]
     private string $isin;
 
@@ -217,7 +221,8 @@ class Ticker
 
         if (
             !$isRegularDividend &&
-            $this->calendars[1]->getPaymentDate()->format('Ymd') === $this->calendars[0]->getPaymentDate()->format('Ymd') &&
+            $this->calendars[1]->getPaymentDate()->format('Ymd') ===
+                $this->calendars[0]->getPaymentDate()->format('Ymd') &&
             $this->calendars[1]->getDividendType() === Calendar::REGULAR
         ) {
             $index = 1;
@@ -225,7 +230,8 @@ class Ticker
         }
         if (
             !$isRegularDividend &&
-            $this->calendars[2]->getPaymentDate()->format('Ymd') === $this->calendars[0]->getPaymentDate()->format('Ymd') &&
+            $this->calendars[2]->getPaymentDate()->format('Ymd') ===
+                $this->calendars[0]->getPaymentDate()->format('Ymd') &&
             $this->calendars[2]->getDividendType() === Calendar::REGULAR
         ) {
             $index = 2;
@@ -237,9 +243,16 @@ class Ticker
 
     public function isDividendPayMonth(int $currentMonth): bool
     {
-        if ($this->getDividendMonths() instanceof Collection && !$this->getDividendMonths()->isEmpty()) {
-            return $this->getDividendMonths()->exists(function ($key, \App\Entity\DividendMonth $dividendMonth) use ($currentMonth): bool {
-                return (int)$dividendMonth->getDividendMonth() === $currentMonth;
+        if (
+            $this->getDividendMonths() instanceof Collection &&
+            !$this->getDividendMonths()->isEmpty()
+        ) {
+            return $this->getDividendMonths()->exists(function (
+                $key,
+                \App\Entity\DividendMonth $dividendMonth
+            ) use ($currentMonth): bool {
+                return (int) $dividendMonth->getDividendMonth() ===
+                    $currentMonth;
             });
         }
         return false;

@@ -141,16 +141,34 @@ class ImportCsvService extends ImportBase
             $divType = Calendar::SPECIAL;
         }
 
-        $calendar = $this->calendarRepository->findByDate($transactionDate, $ticker, $divType);
-        $position = $ticker->getPositions()->last();
+        $calendar = $this->calendarRepository->findByDate(
+            $transactionDate,
+            $ticker,
+            $divType
+        );
+
+        /**
+         * @var \App\Entity\Position $position
+         */
+        $position = $ticker->getPositions()->first();
+
         if (!$position instanceof \App\Entity\Position) {
-            throw new RuntimeException('There is no position for this dividend payment to link to. Are you sure you have the right account?');
+            throw new RuntimeException(
+                'There is no position for this dividend payment to link to. Are you sure you have the right account?'
+            );
+        }
+
+        if ($position->getClosed() !== false) {
+            throw new RuntimeException(
+                'Cannot import for this position. Selected position is already closed.'
+            );
         }
 
         $currency = $this->currencyRepository->findOneBy(['symbol' => 'EUR']);
         $payment = new Payment();
 
-        $payment->setTicker($ticker)
+        $payment
+            ->setTicker($ticker)
             ->setCurrency($currency)
             ->setAmount($amount)
             ->setDividend($dividend)
@@ -163,7 +181,13 @@ class ImportCsvService extends ImportBase
             ->setDividendPaid($dividendPaid)
             ->setDividendPaidCurrency($dividendPaidCurrency);
 
-        if ($this->paymentRepository->hasPayment($transactionDate, $ticker, $dividendType)) {
+        if (
+            $this->paymentRepository->hasPayment(
+                $transactionDate,
+                $ticker,
+                $dividendType
+            )
+        ) {
             return;
         }
 
@@ -188,10 +212,13 @@ class ImportCsvService extends ImportBase
         foreach ($csvRows as $csvRow) {
             $cellVal = $csvRow['action'];
 
-            if (false !== stripos($cellVal, 'deposit') || false !== stripos($cellVal, 'withdraw') || false !== stripos($cellVal, 'interest')) {
+            if (
+                false !== stripos($cellVal, 'deposit') ||
+                false !== stripos($cellVal, 'withdraw') ||
+                false !== stripos($cellVal, 'interest')
+            ) {
                 continue;
-            };
-
+            }
 
             $row = [];
             $row['stampduty'] = 0.0;
@@ -211,7 +238,10 @@ class ImportCsvService extends ImportBase
                     case 'time':
                         $row['time'] = $val;
                         $t = substr($val, 0, 19);
-                        $row['transactionDate'] = DateTime::createFromFormat("Y-m-d H:i:s", $t);
+                        $row['transactionDate'] = DateTime::createFromFormat(
+                            'Y-m-d H:i:s',
+                            $t
+                        );
                         if (!$row['transactionDate']) {
                             dd($csvRow, $row, $val);
                         }
@@ -222,8 +252,21 @@ class ImportCsvService extends ImportBase
                          */
                         $row['isin'] = $val;
                         $isin = $val;
-                        if (!preg_match('/^([A-Z]{2})(\d{1})(\w+)/i', $isin, $matches) && !preg_match('/^([A-Z]{4})(\d{1})(\w+)/i', $isin, $matches)) {
-                            throw new RuntimeException('ISIN Number not correct: ' . $isin);
+                        if (
+                            !preg_match(
+                                '/^([A-Z]{2})(\d{1})(\w+)/i',
+                                $isin,
+                                $matches
+                            ) &&
+                            !preg_match(
+                                '/^([A-Z]{4})(\d{1})(\w+)/i',
+                                $isin,
+                                $matches
+                            )
+                        ) {
+                            throw new RuntimeException(
+                                'ISIN Number not correct: ' . $isin
+                            );
                         }
                         break;
                     case 'ticker':
@@ -292,12 +335,15 @@ class ImportCsvService extends ImportBase
                 }
             }
 
-            if (false === stripos($cellVal, 'sell') && false === stripos($cellVal, 'buy')) {
+            if (
+                false === stripos($cellVal, 'sell') &&
+                false === stripos($cellVal, 'buy')
+            ) {
                 if (false !== stripos($cellVal, 'dividend')) {
                     $this->importDividend($row);
                 }
                 continue;
-            };
+            }
 
             if (count($row) > 0) {
                 $rows[$row['nr']] = $row;
@@ -338,7 +384,9 @@ class ImportCsvService extends ImportBase
             $entityManager->flush();
         }
 
-        $defaultBranch = $branchRepository->findOneBy(['label' => 'Unassigned']);
+        $defaultBranch = $branchRepository->findOneBy([
+            'label' => 'Unassigned',
+        ]);
         if (!$defaultBranch) {
             $defaultBranch = new Branch();
             $defaultBranch->setLabel('Unassigned');
@@ -347,18 +395,36 @@ class ImportCsvService extends ImportBase
             $entityManager->flush();
         }
 
-
         if (count($rows) > 0) {
             foreach ($rows as $row) {
-                $ticker = $this->preImportCheckTicker($entityManager, $defaultBranch, $tickerRepository, $defaultTax, $row);
-                $transaction = $transactionRepository->findOneBy(['jobid' => $row['opdrachtid']]);
+                $ticker = $this->preImportCheckTicker(
+                    $entityManager,
+                    $defaultBranch,
+                    $tickerRepository,
+                    $defaultTax,
+                    $row
+                );
+                $transaction = $transactionRepository->findOneBy([
+                    'jobid' => $row['opdrachtid'],
+                ]);
 
                 if (!$transaction) {
-                    $position = $this->preImportCheckPosition($entityManager, $ticker, $defaultCurrency, $positionRepository, $security, $row);
+                    $position = $this->preImportCheckPosition(
+                        $entityManager,
+                        $ticker,
+                        $defaultCurrency,
+                        $positionRepository,
+                        $security,
+                        $row
+                    );
                     $uuid = Uuid::v4();
 
-                    $originalPriceCurrency = $currencyRepository->findOneBy(['symbol' => $row['original_price_currency']]);
-                    $totalCurrency = $currencyRepository->findOneBy(['symbol' => $row['total_currency']]);
+                    $originalPriceCurrency = $currencyRepository->findOneBy([
+                        'symbol' => $row['original_price_currency'],
+                    ]);
+                    $totalCurrency = $currencyRepository->findOneBy([
+                        'symbol' => $row['total_currency'],
+                    ]);
 
                     $transaction = new Transaction();
                     $transaction
@@ -377,20 +443,22 @@ class ImportCsvService extends ImportBase
                         ->setStampduty($row['stampduty'] ?? 0)
                         ->setFxFee($row['fx_fee'] ?? 0)
                         ->setOriginalPrice($row['original_price'])
-                        ->setOriginalPriceCurrency($row['original_price_currency'])
+                        ->setOriginalPriceCurrency(
+                            $row['original_price_currency']
+                        )
                         ->setFinraFee($row['finra_fee'] ?? 0)
                         ->setTransactionFee($row['transaction_fee'] ?? 0)
                         ->setTotal($row['total'] ?? 0)
                         ->setTotalCurrency($totalCurrency)
                         ->setAvgprice(0.0)
                         ->setProfit(0.0)
-                        ->setUuid($uuid)
-                    ;
+                        ->setUuid($uuid);
 
                     $transaction->calcAllocation();
                     $transaction->calcPrice();
-                    $transaction->setCurrencyOriginalPrice($originalPriceCurrency);
-
+                    $transaction->setCurrencyOriginalPrice(
+                        $originalPriceCurrency
+                    );
 
                     $pies = $position->getPies();
                     if (count($pies) == 1) {
@@ -404,7 +472,8 @@ class ImportCsvService extends ImportBase
                     $weightedAverage->calc($position);
 
                     if (
-                        ((float) $position->getAmount() == 0 || (float) $position->getAmount() <= 0.00000001)
+                        (float) $position->getAmount() == 0 ||
+                        (float) $position->getAmount() <= 0.00000001
                     ) {
                         $position->setClosed(true);
                         $position->setClosedAt($row['transactionDate']);
@@ -415,7 +484,9 @@ class ImportCsvService extends ImportBase
                     $entityManager->flush();
                     $transactionsAdded++;
                 } else {
-                    $transactionAlreadyExists[] = 'Transaction already exists. ID: ' . $transaction->getId();
+                    $transactionAlreadyExists[] =
+                        'Transaction already exists. ID: ' .
+                        $transaction->getId();
                 }
                 unset($ticker, $position, $transaction);
 
@@ -428,7 +499,10 @@ class ImportCsvService extends ImportBase
             'transactionAlreadyExists' => $transactionAlreadyExists,
             'dividendsImported' => $this->importedDividendLines,
             'status' => 'ok',
-            'msg' => 'File [' . $uploadedFile->getClientOriginalName() . '] imported.',
+            'msg' =>
+                'File [' .
+                $uploadedFile->getClientOriginalName() .
+                '] imported.',
         ];
     }
 }

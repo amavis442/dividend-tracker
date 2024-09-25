@@ -54,7 +54,7 @@ class Journal
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\User', inversedBy: 'journals')]
     #[ORM\JoinColumn(nullable: false)]
-    private $user;
+    private ?User $user = null;
 
     #[Groups(['journal:read', 'journal:write'])]
     #[ORM\JoinTable(name: 'journal_taxonomy')]

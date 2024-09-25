@@ -11,20 +11,18 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
-#[ApiResource(
-    normalizationContext: ['groups' => ['payment:read']],
-    denormalizationContext: ['groups' => ['payment:write']],
-    security: 'is_granted("ROLE_USER")',
-    operations: [
-        new Get(),
-        new GetCollection()
-    ]
-)]
+#[
+    ApiResource(
+        normalizationContext: ['groups' => ['payment:read']],
+        denormalizationContext: ['groups' => ['payment:write']],
+        security: 'is_granted("ROLE_USER")',
+        operations: [new Get(), new GetCollection()]
+    )
+]
 #[ORM\Entity(repositoryClass: 'App\Repository\PaymentRepository')]
 #[ORM\HasLifecycleCallbacks]
 class Payment
 {
-
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column(type: 'integer')]
@@ -32,46 +30,48 @@ class Payment
 
     #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(type: 'datetime', name: 'pay_date')]
-    private $payDate;
+    private DateTime $payDate;
 
     #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
-    #[ORM\Column(
-        type: 'float',
-        nullable: false,
-        options: ["default" => 0]
-    )]
-    private $dividend = 0.0;
+    #[ORM\Column(type: 'float', nullable: false, options: ['default' => 0])]
+    private float $dividend = 0.0;
 
     private $taxes;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Ticker', inversedBy: 'payments')]
     #[ORM\JoinColumn(nullable: false)]
-    private $ticker;
+    private Ticker $ticker;
 
-    #[ORM\ManyToOne(targetEntity: 'App\Entity\Calendar', inversedBy: 'payments')]
+    #[
+        ORM\ManyToOne(
+            targetEntity: 'App\Entity\Calendar',
+            inversedBy: 'payments'
+        )
+    ]
     #[ORM\JoinColumn(nullable: true)]
-    private $calendar;
+    private ?Calendar $calendar;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\User', inversedBy: 'payments')]
     #[ORM\JoinColumn(nullable: false)]
-    private $user;
+    private ?User $user = null;
 
     #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Currency')]
     #[ORM\JoinColumn(nullable: false)]
-    private $currency;
+    private Currency $currency;
 
-    #[ORM\ManyToOne(targetEntity: 'App\Entity\Position', inversedBy: 'payments')]
+    #[
+        ORM\ManyToOne(
+            targetEntity: \App\Entity\Position::class,
+            inversedBy: 'payments'
+        )
+    ]
     #[ORM\JoinColumn(nullable: false)]
-    private $position;
+    private Position $position;
 
     #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
-    #[ORM\Column(
-        type: 'float',
-        nullable: false,
-        options: ["default" => 0]
-    )]
-    private $amount = 0.0;
+    #[ORM\Column(type: 'float', nullable: false, options: ['default' => 0])]
+    private float $amount = 0.0;
 
     #[ORM\Column(name: 'created_at')]
     private \DateTimeImmutable $createdAt;
@@ -80,32 +80,24 @@ class Payment
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
-    #[ORM\Column(
-        type: 'float',
-        nullable: false,
-        options: ["default" => 0]
-    )]
-    private $taxWithold = 0.0;
+    #[ORM\Column(type: 'float', nullable: false, options: ['default' => 0])]
+    private float $taxWithold = 0.0;
 
     #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $taxCurrency;
+    private ?string $taxCurrency;
 
     #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $dividendType;
+    private string $dividendType;
 
     #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
-    #[ORM\Column(
-        type: 'float',
-        nullable: false,
-        options: ["default" => 0]
-    )]
-    private $dividendPaid = 0.0;
+    #[ORM\Column(type: 'float', nullable: false, options: ['default' => 0])]
+    private float $dividendPaid = 0.0;
 
     #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $dividendPaidCurrency;
+    private ?string $dividendPaidCurrency = null;
 
     #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(type: 'uuid', nullable: true)]
@@ -140,8 +132,9 @@ class Payment
 
     public function setPayDate(\DateTimeInterface $payDate): self
     {
-        $this->payDate = $payDate;
-
+        if ($payDate instanceof \DateTime) {
+            $this->payDate = $payDate;
+        }
         return $this;
     }
 
@@ -159,7 +152,8 @@ class Payment
 
     public function getTaxes(): float
     {
-        $this->taxes = ($this->dividend / (100 - Constants::TAX)) * Constants::TAX;
+        $this->taxes =
+            ($this->dividend / (100 - Constants::TAX)) * Constants::TAX;
 
         return $this->taxes;
     }

@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Contracts\Service\DividendServiceInterface;
 use App\Entity\Calendar;
 use App\Entity\Constants;
 use App\Entity\Position;
@@ -12,7 +13,7 @@ use App\Service\ExchangeRate\EuExchangeRateService as ExchangeRateService;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DividendService
+class DividendService implements DividendServiceInterface
 {
     /**
      * Net dividend over the shares

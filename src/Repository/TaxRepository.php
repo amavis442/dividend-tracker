@@ -6,6 +6,8 @@ use App\Entity\Currency;
 use App\Entity\Tax;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,14 +23,21 @@ class TaxRepository extends ServiceEntityRepository
         parent::__construct($registry, Tax::class);
     }
 
-    public function findOneValid(Currency $currency, DateTimeInterface $dateTime): ?Tax
-    {
+    public function findOneValid(
+        Currency $currency,
+        DateTimeInterface $dateTime
+    ): ?Tax {
         return $this->createQueryBuilder('t')
             ->join('t.currency', 'c')
             ->where('c = :currency')
             ->andWhere('t.validFrom <= :validFrom')
             ->orderBy('t.id', 'desc')
-            ->setParameters(['currency' => $currency->getId(), 'validFrom' => $dateTime->format('Y-m-d')])
+            ->setParameters(
+                new ArrayCollection([
+                    new Parameter('currency', $currency->getId()),
+                    new Parameter('validFrom', $dateTime->format('Y-m-d')),
+                ])
+            )
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
