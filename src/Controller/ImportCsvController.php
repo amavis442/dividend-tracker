@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\FileUpload;
 use App\Entity\ImportFiles;
 use App\Form\FileUploadType;
-use App\Model\PortfolioModel;
 use App\Repository\BranchRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\ImportFilesRepository;
@@ -22,11 +21,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 class ImportCsvController extends AbstractController
 {
-    #[Route(path: '/dashboard/csv/import', name: 'csv_import')]
+    private const SESSION_IMPORT_RESULT_KEY = 'import_csv_result';
+
+    #[Route(path: '/dashboard/csv/import', name: 'app_csv_import')]
     public function index(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -41,31 +41,23 @@ class ImportCsvController extends AbstractController
         ImportFilesRepository $importFilesRepository,
         Security $security
     ): Response {
-
         $importfile = new fileUpload();
         $form = $this->createForm(FileUploadType::class, $importfile);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile $transactionFile */
             $transactionFile = $form->get('importfile')->getData();
 
             // this condition is needed because the 'transactionFile' field is not required
             // so the CSV file must be processed only when a file is uploaded
-            if ($transactionFile) {
-                $imp = $importFilesRepository->findOneBy(["name" => $transactionFile->getClientOriginalName()]);
+            if ($transactionFile instanceof UploadedFile) {
+                $imp = $importFilesRepository->findOneBy([
+                    'name' => $transactionFile->getClientOriginalName(),
+                ]);
 
                 if ($imp) {
-                    return $this->render('import_csv/report.html.twig', [
-                        'controller_name' => 'ImportCsvController',
-                        'data' => [
-                            'totalTransaction' => 0,
-                            'transactionsAdded' => 0,
-                            'transactionAlreadyExists' => 0,
-                            'dividendsImported' => 0,
-                            'status' => 'error',
-                            'msg' => 'File [' . $transactionFile->getClientOriginalName() . '] already imported: '
-                        ],
+                    return $this->redirectToRoute('app_csv_import_already_imported', [
+                        'filename' => $transactionFile->getClientOriginalName(),
                     ]);
                 }
 
@@ -83,23 +75,62 @@ class ImportCsvController extends AbstractController
                 );
 
                 $importFiles = new ImportFiles();
-                $importFiles
-                    ->setName($transactionFile->getClientOriginalName());
+                $importFiles->setName(
+                    $transactionFile->getClientOriginalName()
+                );
                 $entityManager->persist($importFiles);
                 $entityManager->flush();
 
-                return $this->render('import_csv/report.html.twig', [
-                    'controller_name' => 'ImportCsvController',
-                    'data' => $result,
-                ]);
+                $request
+                    ->getSession()
+                    ->set(self::SESSION_IMPORT_RESULT_KEY, $result);
+
+                return $this->redirectToRoute('app_csv_import_result');
             }
         }
-        $imp = $importFilesRepository->findOneBy([], ["id" => 'Desc']);
+        $imp = $importFilesRepository->findOneBy([], ['id' => 'Desc']);
 
         return $this->render('import_csv/index.html.twig', [
             'controller_name' => 'ImportCsvController',
             'form' => $form->createView(),
-            "importfile" => (is_object($imp) ? $imp->getName() : "")
+            'importfile' => is_object($imp) ? $imp->getName() : '',
+        ]);
+    }
+
+    #[
+        Route(
+            path: '/dashboard/csv/already-imported/{filename}',
+            name: 'app_csv_import_already_imported'
+        )
+    ]
+    public function alreadyImported(string $filename = ''): Response
+    {
+        return $this->render('import_csv/report.html.twig', [
+            'controller_name' => 'ImportCsvController',
+            'data' => [
+                'totalTransaction' => 0,
+                'transactionsAdded' => 0,
+                'transactionAlreadyExists' => 0,
+                'dividendsImported' => 0,
+                'status' => 'error',
+                'msg' => 'File [' . $filename . '] already imported: ',
+            ],
+        ]);
+    }
+
+    #[
+        Route(
+            path: '/dashboard/csv/result-import',
+            name: 'app_csv_import_result'
+        )
+    ]
+    public function report(Request $request): Response
+    {
+        $result = $request->getSession()->get(self::SESSION_IMPORT_RESULT_KEY);
+
+        return $this->render('import_csv/report.html.twig', [
+            'controller_name' => 'ImportCsvController',
+            'data' => $result,
         ]);
     }
 }
