@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Portfolio index{% endblock %}
+
+{% block body %}
+    <h1>Portfolio index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Goal</th>
+                <th>Invested</th>
+                <th>Created_at</th>
+                <th>Updated_at</th>
+                <th>Uuid</th>
+                <th>NumActivePosition</th>
+                <th>Profit</th>
+                <th>TotalDividend</th>
+                <th>Allocated</th>
+                <th>Goalpercentage</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for portfolio in portfolios %}
+            <tr>
+                <td>{{ portfolio.id }}</td>
+                <td>{{ portfolio.goal }}</td>
+                <td>{{ portfolio.invested }}</td>
+                <td>{{ portfolio.createdAt ? portfolio.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ portfolio.updatedAt ? portfolio.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ portfolio.uuid }}</td>
+                <td>{{ portfolio.numActivePosition }}</td>
+                <td>{{ portfolio.profit }}</td>
+                <td>{{ portfolio.totalDividend }}</td>
+                <td>{{ portfolio.allocated }}</td>
+                <td>{{ portfolio.goalpercentage }}</td>
+                <td>
+                    <a href="{{ path('app_admin_portfolio_controller_show', {'id': portfolio.id}) }}">show</a>
+                    <a href="{{ path('app_admin_portfolio_controller_edit', {'id': portfolio.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="12">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_admin_portfolio_controller_new') }}">Create new</a>
+{% endblock %}
