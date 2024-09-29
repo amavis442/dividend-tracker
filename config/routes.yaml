@@ -1,6 +1,6 @@
-index:
-    path: /
-    controller: App\Controller\StaticPageController::index
+#index:
+#    path: /
+#    controller: App\Controller\StaticPageController::index
 
 controllers:
     resource:
