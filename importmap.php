@@ -262,4 +262,14 @@ return [
     'color-name' => [
         'version' => '1.1.4',
     ],
+    'js-confetti' => [
+        'version' => '0.12.0',
+    ],
+    'ckeditor5/dist/ckeditor5.css' => [
+        'version' => '43.1.1',
+        'type' => 'css',
+    ],
+    '@stimulus-components/popover' => [
+        'version' => '7.0.0',
+    ],
 ];
