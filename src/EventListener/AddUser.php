@@ -15,7 +15,7 @@ class AddUser
     }
 
 
-    public function prePersist(PrePersistEventArgs $args)
+    public function prePersist(PrePersistEventArgs $args): void
     {
         $entity = $args->getObject();
         $user = $this->security->getUser();

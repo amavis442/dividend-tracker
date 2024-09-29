@@ -14,7 +14,8 @@
 	<div class="container mb-2 p-3">
 		<div class="h1">Portfolio</div>
 
-		{% include '_summary.html.twig' %}
+		{% include 'portfolio/_summary.html.twig' %}
+
 
 		<div class="border p-2 shadow p-3 mb-5 bg-body-tertiary rounded">
 			<div class="row">
@@ -41,7 +42,7 @@
 				<thead>
 					<tr>
 						<th scope="col">
-							<a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'fullname', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Fullname'|trans }}</a>
+							<a href="{{ path('portfolio_index', {'page': page ? page : 1, 'orderBy': 'fullname', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Fullname'|trans }}</a>
 						</th>
 						<th scope="col">{{ 'Avg. price'|trans }}</th>
 

@@ -1,7 +1,7 @@
 {% import _self as formMacros %}
 
 {% macro printAttachmentRow(attachmentForm) %}
-<button class="btn btn-danger removeAttachmentRow pull-right">
+<button id="remove_row___name__" class="btn btn-danger removeAttachmentRow pull-right">
     <i class="fa fa-minus"></i>
 </button>
 
@@ -20,7 +20,7 @@
 {% endmacro %}
 
 
-{{ form_start(form, { 'attr': {'autocomplete': 'off'} }) }}
+{{ form_start(form, { 'attr': {'autocomplete': 'off', 'data-controller' : 'file-upload ckeditor'} }) }}
     {{ form_row(form.ticker) }}
     {{ form_row(form.title) }}
     {{ form_row(form.info) }}

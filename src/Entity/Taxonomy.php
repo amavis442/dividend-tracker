@@ -39,6 +39,9 @@ class Taxonomy
     #[ORM\ManyToMany(targetEntity: Journal::class, mappedBy: 'taxonomy')]
     private $journals;
 
+    #[ORM\ManyToOne(inversedBy: 'taxonomies')]
+    private ?User $user = null;
+
     public function __construct()
     {
         $this->journals = new ArrayCollection();
@@ -96,6 +99,18 @@ class Taxonomy
         if ($this->journals->removeElement($journal)) {
             $journal->removeTaxonomy($this);
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

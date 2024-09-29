@@ -10,6 +10,7 @@ use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -133,6 +134,12 @@ class Position
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $ignore_for_dividend = false;
 
+    #[ORM\Column(type: 'uuid', nullable: true)]
+    private ?Uuid $uuid = null;
+
+    #[ORM\ManyToOne(inversedBy: 'positions')]
+    private ?Portfolio $portfolio = null;
+
     private float $percentageAllocation = 0.0;
     private int $payoutFrequency = 3;
     private bool $divDate = false;
@@ -148,6 +155,8 @@ class Position
     private ?Collection $dividendCalendars = null;
     private float $dividend = 0.0;
 
+
+
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
     {
@@ -158,6 +167,13 @@ class Position
     #[ORM\PreUpdate]
     public function setUpdatedAtValue(): void
     {
+        // Needed because of late implementation off uuid and
+        // do not want to generate it all at once.
+        if (!$this->getUuid()) {
+            $uuid = Uuid::v4();
+            $this->setUuid($uuid);
+        }
+
         $this->updatedAt = new \DateTimeImmutable();
     }
 
@@ -812,5 +828,29 @@ class Position
         }
         $this->setDividend($totalDividend);
         return $totalDividend;
+    }
+
+    public function getUuid(): ?Uuid
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(?Uuid $uuid): static
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    public function getPortfolio(): ?Portfolio
+    {
+        return $this->portfolio;
+    }
+
+    public function setPortfolio(?Portfolio $portfolio): static
+    {
+        $this->portfolio = $portfolio;
+
+        return $this;
     }
 }

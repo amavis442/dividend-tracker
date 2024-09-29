@@ -18,15 +18,23 @@ use Pagerfanta\Pagerfanta;
 class JournalController extends AbstractController
 {
     public const TAXONOMY_KEY = 'journal_taxonomy';
-    #[Route(path: '/list/{page<\d+>?1}', name: 'journal_index', methods: ['GET'])]
+
+    #[
+        Route(
+            path: '/list/{page<\d+>?1}',
+            name: 'journal_index',
+            methods: ['GET']
+        )
+    ]
     public function index(
         Request $request,
         JournalRepository $journalRepository,
         TaxonomyRepository $taxonomyRepository,
         int $page = 1
     ): Response {
-        $taxonomySelected = null;
-        $taxonomySelected = $request->getSession()->get(self::TAXONOMY_KEY, null);
+        $taxonomySelected = $request
+            ->getSession()
+            ->get(self::TAXONOMY_KEY, null);
 
         if (!is_null($taxonomySelected)) {
             $taxonomySelected = array_flip($taxonomySelected);
@@ -50,8 +58,10 @@ class JournalController extends AbstractController
     }
 
     #[Route(path: '/create', name: 'journal_new', methods: ['GET', 'POST'])]
-    public function create(Request $request, EntityManagerInterface $entityManager): Response
-    {
+    public function create(
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
         $journal = new Journal();
         $form = $this->createForm(JournalType::class, $journal);
         $form->handleRequest($request);
@@ -78,8 +88,11 @@ class JournalController extends AbstractController
     }
 
     #[Route(path: '/{id}/edit', name: 'journal_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, EntityManagerInterface $entityManager, Journal $journal): Response
-    {
+    public function edit(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        Journal $journal
+    ): Response {
         $form = $this->createForm(JournalType::class, $journal);
         $form->handleRequest($request);
 
@@ -95,10 +108,24 @@ class JournalController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/delete/{id}', name: 'journal_delete', methods: ['POST', 'DELETE'])]
-    public function delete(Request $request, EntityManagerInterface $entityManager, Journal $journal): Response
-    {
-        if ($this->isCsrfTokenValid('delete' . $journal->getId(), $request->request->get('_token'))) {
+    #[
+        Route(
+            path: '/delete/{id}',
+            name: 'journal_delete',
+            methods: ['POST', 'DELETE']
+        )
+    ]
+    public function delete(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        Journal $journal
+    ): Response {
+        if (
+            $this->isCsrfTokenValid(
+                'delete' . $journal->getId(),
+                $request->request->get('_token')
+            )
+        ) {
             $entityManager->remove($journal);
             $entityManager->flush();
         }

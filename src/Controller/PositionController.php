@@ -2,15 +2,15 @@
 
 namespace App\Controller;
 
+use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Form\PositionType;
-use App\Model\PortfolioModel;
+use App\Repository\PortfolioRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Service\PositionService;
 use App\Service\Referer;
-use App\Service\SummaryService;
 use App\Traits\TickerAutocompleteTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,7 +36,7 @@ class PositionController extends AbstractController
     ]
     public function index(
         Request $request,
-        SummaryService $summaryService,
+        PortfolioRepository $portfolioRepository,
         PositionRepository $positionRepository,
         TickerRepository $tickerRepository,
         Referer $referer,
@@ -46,19 +46,11 @@ class PositionController extends AbstractController
         string $sort = 'asc',
         int $status = PositionRepository::CLOSED
     ): Response {
-        $order = '';
-        if (!in_array($orderBy, ['profit'])) {
-            $order = 'p.' . $orderBy;
-        }
-        if (!in_array($orderBy, ['symbol'])) {
-            $order = 't.symbol';
-        }
-
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
         }
 
-        [$form, $ticker] = $this->searchTicker(
+        [$form, $_ticker] = $this->searchTicker(
             $request,
             $tickerRepository,
             self::SESSION_KEY,
@@ -67,7 +59,16 @@ class PositionController extends AbstractController
 
         $referer->set('position_index', ['status' => $status]);
 
-        $summary = $summaryService->getSummary();
+        /**
+         * @var \App\Entity\User $user
+         */
+        $user = $this->getUser();
+        $portfolio = $portfolioRepository->findOneBy([
+            'user' => $user->getId(),
+        ]);
+        if (!$portfolio) {
+            $portfolio = new Portfolio(); // do not want to throw an exception, but just use an empty entity
+        }
 
         $queryBuilder = $positionRepository->getAllQuery();
         $adapter = new QueryAdapter($queryBuilder);
@@ -85,12 +86,7 @@ class PositionController extends AbstractController
             'routeName' => 'position_index',
             'searchPath' => 'position_search',
             'tab' => $tab,
-            'numActivePosition' => $summary->getNumActivePosition(),
-            'numPosition' => $summary->getNumActivePosition(),
-            'numTickers' => $summary->getNumTickers(),
-            'profit' => $summary->getProfit(),
-            'totalDividend' => $summary->getTotalDividend(),
-            'totalInvested' => $summary->getAllocated(),
+            'portfolio' => $portfolio,
         ]);
     }
 
@@ -166,8 +162,10 @@ class PositionController extends AbstractController
             $request
                 ->getSession()
                 ->set(self::SESSION_KEY, $position->getTicker()->getSymbol());
-            if ($referer->get()) {
-                return $this->redirect($referer->get());
+
+            $refLink = $referer->get();
+            if ($refLink != null) {
+                return $this->redirect($refLink);
             }
             return $this->redirectToRoute('position_index');
         }
@@ -190,10 +188,14 @@ class PositionController extends AbstractController
         EntityManagerInterface $entityManager,
         Position $position
     ): Response {
+        if ($position->getId() == null) {
+            throw new \RuntimeException('No position to remove');
+        }
+        $position_id = (int) $position->getId();
         if (
             $this->isCsrfTokenValid(
-                'delete' . $position->getId(),
-                $request->request->get('_token')
+                'delete' . $position_id,
+                (string) $request->request->get('_token', '')
             )
         ) {
             $entityManager->remove($position);

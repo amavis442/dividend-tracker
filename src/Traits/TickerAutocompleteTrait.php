@@ -10,7 +10,6 @@ use App\Entity\SearchForm;
 use App\Form\SearchFormType;
 use App\Form\TickerAutocompleteType;
 use App\Form\PieSelectFormType;
-use App\Repository\PieRepository;
 use App\Repository\TickerRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Form;
@@ -32,12 +31,16 @@ trait TickerAutocompleteTrait
 
         $tickerAutoCompleteCache = $request->getSession()->get($cacheKey, null);
 
-
         if ($tickerAutoCompleteCache instanceof TickerAutocomplete) {
             // We need a mapped entity else symfony will complain
             // This works, but i do not know if it is the best solution
-            if ($tickerAutoCompleteCache->getTicker() && $tickerAutoCompleteCache->getTicker()->getId()) {
-                $ticker = $tickerRepository->find($tickerAutoCompleteCache->getTicker()->getId());
+            if (
+                $tickerAutoCompleteCache->getTicker() &&
+                $tickerAutoCompleteCache->getTicker()->getId()
+            ) {
+                $ticker = $tickerRepository->find(
+                    $tickerAutoCompleteCache->getTicker()->getId()
+                );
                 $tickerAutoComplete->setTicker($ticker);
             }
         }
@@ -58,7 +61,12 @@ trait TickerAutocompleteTrait
         return [$form, $ticker];
     }
 
-    protected function selectPie(Request $request, string $cacheKey)
+    /**
+     * @return (\App\Entity\Pie|\Symfony\Component\Form\FormInterface|mixed)[]
+     *
+     * @psalm-return list{\Symfony\Component\Form\FormInterface, \App\Entity\Pie|mixed}
+     */
+    protected function selectPie(Request $request, string $cacheKey): array
     {
         $pie = new Pie();
         $pieSelect = new PieSelect();
@@ -87,7 +95,7 @@ trait TickerAutocompleteTrait
         TickerRepository $tickerRepository,
         string $cacheKey,
         bool $include_all_tickers = false
-    ) {
+    ): array {
         $pie = null;
         $ticker = null;
 
