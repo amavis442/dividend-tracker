@@ -38,6 +38,7 @@ phpunit:
     - bash ci/php-install.sh
     - php composer.phar install -o
     - php composer.phar require --dev symfony/phpunit-bridge
+    - php bin/console tailwind:build
     - php bin/console asset-map:compile --no-debug
     - sh ci/php_test_run.sh
   cache:
