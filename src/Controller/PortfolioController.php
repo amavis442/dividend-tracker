@@ -4,11 +4,14 @@ namespace App\Controller;
 
 use App\Contracts\Service\DividendServiceInterface;
 use App\Entity\Calendar;
+use App\Entity\Pie;
 use App\Entity\Portfolio;
 use App\Entity\PortfolioGoal;
 use App\Entity\Position;
+use App\Entity\SearchForm;
 use App\Entity\User;
 use App\Form\PortfolioGoalType;
+use App\Form\SearchFormType;
 use App\Model\PortfolioModel;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
@@ -16,7 +19,6 @@ use App\Repository\TickerRepository;
 use App\Service\DividendGrowthService;
 use App\Service\DividendService;
 use App\Service\Referer;
-use App\Traits\TickerAutocompleteTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,6 +29,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use App\Helper\Colors;
 use App\Repository\PortfolioRepository;
 use RuntimeException;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
@@ -34,13 +37,7 @@ use Symfony\UX\Chartjs\Model\Chart;
 #[Route(path: '/dashboard/portfolio')]
 class PortfolioController extends AbstractController
 {
-    use TickerAutocompleteTrait;
-
     public const SESSION_KEY = 'portfoliocontroller_session';
-    public const PIE_KEY = 'portfolio_searchPie';
-    public const CACHE_SEARCH = 'cache_search';
-    public const CACHE_PIE = 'cache_pie';
-    public const CACHE_TICKER = 'cache_ticker';
 
     public function __construct(private Stopwatch $stopwatch)
     {
@@ -48,32 +45,61 @@ class PortfolioController extends AbstractController
 
     #[
         Route(
-            path: '/list/{page<\d+>?1}/{orderBy?fullname}/{sort?asc}',
+            path: '/list/{page}/{orderBy}/{sort}',
             name: 'portfolio_index',
             methods: ['GET', 'POST']
         )
     ]
     public function index(
         Request $request,
-        PositionRepository $positionRepository,
         TickerRepository $tickerRepository,
+        PositionRepository $positionRepository,
         PortfolioRepository $portfolioRepository,
+        PortfolioModel $model,
         DividendServiceInterface $dividendService,
         Referer $referer,
-        PortfolioModel $model,
-        EntityManagerInterface $entityManager,
-        int $page = 1,
-        string $orderBy = 'fullname',
-        string $sort = 'asc'
+        #[MapQueryParameter] int $page = 1,
+        #[MapQueryParameter] string $orderBy = 'fullname',
+        #[MapQueryParameter] string $sort = 'asc'
     ): Response {
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
         }
-        [$form, $ticker, $pie] = $this->searchTickerAndPie(
-            $request,
-            $tickerRepository,
-            self::SESSION_KEY
+
+        $pie = null;
+        $ticker = null;
+
+        $searchForm = new SearchForm();
+        $sessionForm = $request->getSession()->get(self::SESSION_KEY, null);
+
+        if ($sessionForm instanceof SearchForm) {
+            if ($sessionForm->getPie() instanceof Pie) {
+                $pie = $sessionForm->getPie();
+                $searchForm->setPie($pie);
+            }
+
+            if (
+                $sessionForm->getTicker() &&
+                $sessionForm->getTicker()->getId()
+            ) {
+                $ticker_id = $sessionForm->getTicker()->getId();
+                $ticker = $tickerRepository->find($ticker_id);
+                $searchForm->setTicker($ticker);
+            }
+        }
+
+        $form = $this->createForm(
+            SearchFormType::class,
+            $searchForm,
+            ['extra_options' => ['include_all_tickers' => false]]
         );
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $pie = $searchForm->getPie();
+            $ticker = $searchForm->getTicker();
+            $request->getSession()->set(self::SESSION_KEY, $searchForm);
+        }
 
         /**
          * @var \App\Entity\User $user
@@ -85,6 +111,7 @@ class PortfolioController extends AbstractController
         if (!$portfolio) {
             $portfolio = new Portfolio(); // do not want to trhow an exception but just use an empty entity
         }
+
         $referer->set('portfolio_index', [
             'page' => $page,
             'orderBy' => $orderBy,
@@ -104,19 +131,21 @@ class PortfolioController extends AbstractController
             $pie
         );
 
-        $this->stopwatch->stop('portfoliomodel-getpage');
-
-        $request
-            ->getSession()
-            ->set(get_class($this), $request->getRequestUri());
+        $referer->set('portfolio_index', [
+            'page' => $page,
+            'orderBy' => $orderBy,
+            'sort' => $sort,
+        ]);
 
         return $this->render('portfolio/index.html.twig', [
-            'pager' => $pager,
-            'page' => $page,
-            'order' => $orderBy,
-            'sort' => $sort,
-            'portfolio' => $portfolio,
             'autoCompleteForm' => $form,
+            'portfolio' => $portfolio,
+            'pager' => $pager,
+            'thisPage' => $page,
+            'orderBy' => $orderBy,
+            'sort' => $sort,
+            //'ticker' => $ticker != null ? $ticker->getId() : 0,
+            //'pie' => $pie != null ? $pie->getId() : 0,
         ]);
     }
 
@@ -348,7 +377,7 @@ class PortfolioController extends AbstractController
         if ($position->getId() == null) {
             throw new RuntimeException('No position to delete');
         }
-        $position_id = (int)$position->getId();
+        $position_id = (int) $position->getId();
         if (
             $this->isCsrfTokenValid(
                 'delete' . $position_id,
@@ -367,7 +396,7 @@ class PortfolioController extends AbstractController
         Route(
             path: '/updategoal',
             name: 'portfolio_update_goal',
-            methods: ['POST','GET']
+            methods: ['POST', 'GET']
         )
     ]
     public function updateGoal(
@@ -389,7 +418,7 @@ class PortfolioController extends AbstractController
         $portfolioGoal = new PortfolioGoal();
         $portfolioGoal->setGoal($portfolio->getGoal() ?? 0);
         $form = $this->createForm(PortfolioGoalType::class, $portfolioGoal, [
-            'action' => $this->generateUrl('portfolio_update_goal')
+            'action' => $this->generateUrl('portfolio_update_goal'),
         ]);
 
         $form->handleRequest($request);
@@ -406,7 +435,11 @@ class PortfolioController extends AbstractController
             $entityManager->persist($portfolio);
             $entityManager->flush();
 
-            return $this->redirectToRoute('portfolio_index', ['target' => '_top'], 303);
+            return $this->redirectToRoute(
+                'portfolio_index',
+                ['target' => '_top'],
+                303
+            );
         }
 
         return $this->render('portfolio/_update_goal_form.html.twig', [

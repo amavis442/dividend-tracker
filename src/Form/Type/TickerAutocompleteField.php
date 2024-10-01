@@ -38,7 +38,7 @@ class TickerAutocompleteField extends AbstractType
                         ->orderBy('t.fullname')
                         ->setParameter('ignore', 'nvt%');
 
-                    if ([] !== $includeAllTickers && !$includeAllTickers) {
+                    if ([] !== $includeAllTickers && $includeAllTickers === false) {
                         $qb->join(
                             't.positions',
                             'p',

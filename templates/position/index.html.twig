@@ -6,22 +6,44 @@
 
 {% block body %}
 	<h1>Positions</h1>
-	{% for notice in app.flashes('notice') %}
-		<br/>
-		<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
-	{% endfor %}
+
+	<section>
+		{% for notice in app.flashes('notice') %}
+			<br/>
+			<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
+		{% endfor %}
+	</section>
+
 	{% include 'portfolio/_summary.html.twig' %}
 
-	<br/>
-	<br/>
-	<div class="row">
-		<div class="col">
-			{% include '_search_form.html.twig' %}
-		</div>
-		<div class="col">
-		</div>
-	</div>
+	<section class="tw-flex tw-items-center tw-gap-2 tw-mb-6 tw-bg-gray-200 tw-shadow-md tw-rounded-lg tw-p-6">
+			{{ form_start(form, {
+				'action': path('position_index'),
+				'attr': {
+					'autocomplete' : 'off',
+					'class': 'tw-flex tw-w-full tw-justify-center',
+					'data-turbo-frame' : 'position_results'
+					}})
+				}}
+			{{ form_errors(form) }}
+			<div class="tw-w-1/2">
+				{{ form_widget(form.ticker) }}
+			</div>
+			<div>
+				<button class="focus:tw-outline-none tw-text-white tw-bg-green-700
+            hover:tw-bg-green-800 focus:tw-ring-4
+            focus:tw-ring-green-300 tw-font-medium tw-rounded-lg
+            tw-text-sm tw-px-2 tw-py-2 tw-ml-2 dark:tw-bg-green-600
+            dark:hover:tw-bg-green-700 dark:focus:tw-ring-green-800" data-toggle="tooltip" data-placement="top" title="{{ 'Search ticker'|trans }}">
+					<i class="fas fa-search"></i>
+				</button>
+			</div>
+			{{ form_end(form) }}
+	</section>
 
+
+	<section>
+	<turbo-frame id="position_results">
 	<table class="table">
 		<thead>
 			<tr>
@@ -59,18 +81,22 @@
 					<td>
 						<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 							<div class="btn-group mr-2" role="group" aria-label="First group">
-								<a href="{{ path('position_show', { id: position.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details position">
+								<a href="{{ path('position_show', { id: position.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details position"
+								data-turbo-frame="_top">
 									<i class="fas fa-book-open"></i>
 								</a>
-								<a class="btn btn-success" href="{{ path('payment_new', { position: position.id }) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment">
+								<a class="btn btn-success" href="{{ path('payment_new', { position: position.id }) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment"
+								data-turbo-frame="_top">
 									<i class="far fa-money-bill-alt"></i>
 								</a>
 
-								<a href="{{ path('position_edit', { id: position.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit position">
+								<a href="{{ path('position_edit', { id: position.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit position"
+								data-turbo-frame="_top">
 									<i class="far fa-edit"></i>
 								</a>
 								{% if not position.closed %}
-									<a class="btn btn-primary" href="{{ path('position_edit', { id: position.id, closed: true }) }}" data-toggle="tooltip" data-placement="top" title="Close position"><span class="fas fa-folder-minus"/></a>
+									<a class="btn btn-primary" href="{{ path('position_edit', { id: position.id, closed: true }) }}" data-toggle="tooltip" data-placement="top" title="Close position"
+									data-turbo-frame="_top"><span class="fas fa-folder-minus"/></a>
 								{% endif %}
 							</div>
 						</div>
@@ -85,4 +111,7 @@
 	</table>
 
 	{{ pagerfanta(pager) }}
+
+	</turbo-frame>
+	</section>
 {% endblock %}

@@ -5,13 +5,14 @@ namespace App\Controller;
 use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\Ticker;
+use App\Entity\TickerAutocomplete;
 use App\Form\PositionType;
+use App\Form\TickerAutocompleteType;
 use App\Repository\PortfolioRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Service\PositionService;
 use App\Service\Referer;
-use App\Traits\TickerAutocompleteTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,12 +20,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 #[Route(path: '/dashboard/position')]
 class PositionController extends AbstractController
 {
-    use TickerAutocompleteTrait;
-
     public const SESSION_KEY = 'positioncontroller_session';
 
     #[
@@ -40,22 +40,50 @@ class PositionController extends AbstractController
         PositionRepository $positionRepository,
         TickerRepository $tickerRepository,
         Referer $referer,
-        int $page = 1,
-        string $tab = 'All',
-        string $orderBy = 'symbol',
-        string $sort = 'asc',
-        int $status = PositionRepository::CLOSED
+        #[MapQueryParameter] int $page = 1,
+        #[MapQueryParameter] string $tab = 'All',
+        #[MapQueryParameter] string $orderBy = 'symbol',
+        #[MapQueryParameter] string $sort = 'asc',
+        #[MapQueryParameter] int $status = PositionRepository::CLOSED
     ): Response {
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
         }
 
-        [$form, $_ticker] = $this->searchTicker(
-            $request,
-            $tickerRepository,
-            self::SESSION_KEY,
-            true
+        $tickerAutoComplete = new TickerAutocomplete();
+        $ticker = null;
+
+        $tickerAutoCompleteCache = $request
+            ->getSession()
+            ->get(self::SESSION_KEY, null);
+
+        if ($tickerAutoCompleteCache instanceof TickerAutocomplete) {
+            // We need a mapped entity else symfony will complain
+            // This works, but i do not know if it is the best solution
+            if (
+                $tickerAutoCompleteCache->getTicker() &&
+                $tickerAutoCompleteCache->getTicker()->getId()
+            ) {
+                $ticker = $tickerRepository->find(
+                    $tickerAutoCompleteCache->getTicker()->getId()
+                );
+                $tickerAutoComplete->setTicker($ticker);
+            }
+        }
+
+        /**
+         * @var \Symfony\Component\Form\FormInterface $form
+         */
+        $form = $this->createForm(
+            TickerAutocompleteType::class,
+            $tickerAutoComplete,
+            ['extra_options' => ['include_all_tickers' => true]]
         );
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $ticker = $tickerAutoComplete->getTicker();
+            $request->getSession()->set(self::SESSION_KEY, $tickerAutoComplete);
+        }
 
         $referer->set('position_index', ['status' => $status]);
 
@@ -70,7 +98,11 @@ class PositionController extends AbstractController
             $portfolio = new Portfolio(); // do not want to throw an exception, but just use an empty entity
         }
 
-        $queryBuilder = $positionRepository->getAllQuery();
+        $queryBuilder = $positionRepository->getAllQuery(
+            $orderBy,
+            $sort,
+            $ticker
+        );
         $adapter = new QueryAdapter($queryBuilder);
         $pager = new Pagerfanta($adapter);
         $pager->setMaxPerPage(10);
@@ -78,15 +110,13 @@ class PositionController extends AbstractController
 
         return $this->render('position/index.html.twig', [
             'pager' => $pager,
-            'autoCompleteForm' => $form,
+            'portfolio' => $portfolio,
+            'form' => $form,
             'thisPage' => $page,
             'order' => $orderBy,
             'sort' => $sort,
             'status' => $status,
-            'routeName' => 'position_index',
-            'searchPath' => 'position_search',
             'tab' => $tab,
-            'portfolio' => $portfolio,
         ]);
     }
 

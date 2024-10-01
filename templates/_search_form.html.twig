@@ -1,4 +1,6 @@
-{{ form_start(autoCompleteForm, { 'action': path(routeName), 'attr': { 'class' : 'row g-2', 'autocomplete' : 'off' }}) }}
+{{ form_start(autoCompleteForm, { 'action': path(routeName, { page: thisPage, orderBy: order, sort: sort}),
+	'attr': { 'class' : 'row g-2', 'autocomplete' : 'off', 'data-turbo-frame' : turboframe }})
+}}
 	<div class="col">
 		{{ form_errors(autoCompleteForm) }}
 		{{ form_widget(autoCompleteForm.ticker) }}

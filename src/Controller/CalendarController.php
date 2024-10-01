@@ -5,14 +5,14 @@ namespace App\Controller;
 use App\Entity\Calendar;
 use App\Entity\DateSelect;
 use App\Entity\Ticker;
+use App\Entity\TickerAutocomplete;
 use App\Form\CalendarDividendType;
 use App\Form\CalendarType;
-use App\Model\PortfolioModel;
+use App\Form\TickerAutocompleteType;
 use App\Repository\CalendarRepository;
 use App\Repository\TickerRepository;
 use App\Service\DividendService;
 use App\Service\Referer;
-use App\Traits\TickerAutocompleteTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,13 +21,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 #[Route(path: '/dashboard/calendar')]
 class CalendarController extends AbstractController
 {
-    use TickerAutocompleteTrait;
-
-    public const SEARCH_KEY = 'calendar_searchCriteria';
+    public const SESSION_KEY = 'calendar_searchCriteria';
 
     #[
         Route(
@@ -41,9 +40,9 @@ class CalendarController extends AbstractController
         CalendarRepository $calendarRepository,
         TickerRepository $tickerRepository,
         Referer $referer,
-        int $page = 1,
-        string $orderBy = 'paymentDate',
-        string $sort = 'DESC'
+        #[MapQueryParameter] int $page = 1,
+        #[MapQueryParameter] string $orderBy = 'paymentDate',
+        #[MapQueryParameter] string $sort = 'DESC'
     ): Response {
         if (
             !in_array($orderBy, [
@@ -59,17 +58,45 @@ class CalendarController extends AbstractController
             $sort = 'DESC';
         }
 
-        [$form, $Ticker] = $this->searchTicker(
-            $request,
-            $tickerRepository,
-            self::SEARCH_KEY,
-            true
+        $tickerAutoComplete = new TickerAutocomplete();
+        $ticker = null;
+
+        $tickerAutoCompleteCache = $request
+            ->getSession()
+            ->get(self::SESSION_KEY, null);
+
+        if ($tickerAutoCompleteCache instanceof TickerAutocomplete) {
+            // We need a mapped entity else symfony will complain
+            // This works, but i do not know if it is the best solution
+            if (
+                $tickerAutoCompleteCache->getTicker() &&
+                $tickerAutoCompleteCache->getTicker()->getId()
+            ) {
+                $ticker = $tickerRepository->find(
+                    $tickerAutoCompleteCache->getTicker()->getId()
+                );
+                $tickerAutoComplete->setTicker($ticker);
+            }
+        }
+
+        /**
+         * @var \Symfony\Component\Form\FormInterface $form
+         */
+        $form = $this->createForm(
+            TickerAutocompleteType::class,
+            $tickerAutoComplete,
+            ['extra_options' => ['include_all_tickers' => true]]
         );
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $ticker = $tickerAutoComplete->getTicker();
+            $request->getSession()->set(self::SESSION_KEY, $tickerAutoComplete);
+        }
 
         $queryBuilder = $calendarRepository->getAllQuery(
             $orderBy,
             $sort,
-            $Ticker
+            $ticker
         );
         $adapter = new QueryAdapter($queryBuilder);
         $pager = new Pagerfanta($adapter);
@@ -83,12 +110,11 @@ class CalendarController extends AbstractController
         ]);
 
         return $this->render('calendar/index.html.twig', [
+            'form' => $form,
             'pager' => $pager,
             'thisPage' => $page,
             'order' => $orderBy,
             'sort' => $sort,
-            'routeName' => 'calendar_index',
-            'autoCompleteForm' => $form,
         ]);
     }
 
