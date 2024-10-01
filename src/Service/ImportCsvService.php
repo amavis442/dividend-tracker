@@ -85,6 +85,8 @@ class ImportCsvService extends ImportBase
 
     private int $importedDividendLines = 0;
 
+    private string $filename = '';
+
     public function __construct(
         TickerRepository $tickerRepository,
         CurrencyRepository $currencyRepository,
@@ -128,6 +130,12 @@ class ImportCsvService extends ImportBase
         $dividendPaid = $row['original_price'];
         $dividendPaidCurrency = $row['original_price_currency'];
 
+        $md5key = md5(
+            (string) $row['isin'] .
+                (string) $row['time'] .
+                (string) $row['total']
+        );
+
         $ticker = $this->tickerRepository->findOneBy(['isin' => $isin]);
         if (!$ticker) {
             return;
@@ -139,6 +147,10 @@ class ImportCsvService extends ImportBase
         }
         if (stripos($dividendType, 'Return') !== false) {
             $divType = Calendar::SPECIAL;
+        }
+
+        if ($this->paymentRepository->findOneBy(['mdHash' => $md5key])) {
+            return;
         }
 
         $calendar = $this->calendarRepository->findByDate(
@@ -166,9 +178,12 @@ class ImportCsvService extends ImportBase
 
         $currency = $this->currencyRepository->findOneBy(['symbol' => 'EUR']);
         $payment = new Payment();
+        $uuid = Uuid::v4();
 
         $payment
             ->setTicker($ticker)
+            ->setUuid($uuid)
+            ->setMdHash($md5key)
             ->setCurrency($currency)
             ->setAmount($amount)
             ->setDividend($dividend)
@@ -179,17 +194,8 @@ class ImportCsvService extends ImportBase
             ->setTaxCurrency($taxCurrency)
             ->setDividendType($dividendType)
             ->setDividendPaid($dividendPaid)
-            ->setDividendPaidCurrency($dividendPaidCurrency);
-
-        if (
-            $this->paymentRepository->hasPayment(
-                $transactionDate,
-                $ticker,
-                $dividendType
-            )
-        ) {
-            return;
-        }
+            ->setDividendPaidCurrency($dividendPaidCurrency)
+            ->setImportfile($this->filename);
 
         $this->entityManager->persist($payment);
         $this->entityManager->flush();
@@ -370,6 +376,7 @@ class ImportCsvService extends ImportBase
         $transactionAlreadyExists = [];
 
         $filename = $uploadedFile->getClientOriginalName();
+        $this->filename = $filename;
         $reader = new CsvReader($uploadedFile->getRealPath());
         $rows = $reader->getRows();
         $rows = $this->formatImportData($rows);

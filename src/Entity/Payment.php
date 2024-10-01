@@ -21,6 +21,7 @@ use Symfony\Component\Uid\Uuid;
 ]
 #[ORM\Entity(repositoryClass: 'App\Repository\PaymentRepository')]
 #[ORM\HasLifecycleCallbacks]
+#[ORM\Index(name: 'mdhash_idx', fields: ['mdHash'])]
 class Payment
 {
     #[ORM\Id]
@@ -106,6 +107,9 @@ class Payment
     #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $importfile = null;
+
+    #[ORM\Column(length: 32, nullable: true)]
+    private ?string $mdHash = null;
 
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
@@ -333,6 +337,18 @@ class Payment
     public function setImportfile(?string $importfile): static
     {
         $this->importfile = $importfile;
+
+        return $this;
+    }
+
+    public function getMdHash(): ?string
+    {
+        return $this->mdHash;
+    }
+
+    public function setMdHash(string $mdHash): static
+    {
+        $this->mdHash = $mdHash;
 
         return $this;
     }
