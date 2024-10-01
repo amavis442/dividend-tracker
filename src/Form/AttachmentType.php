@@ -11,18 +11,20 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AttachmentType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options): void
-    {
+    public function buildForm(
+        FormBuilderInterface $builder,
+        array $options
+    ): void {
         $builder
             ->add('label', TextType::class, [
                 'required' => false,
                 'attr' => [
-                    'placeholder' => 'Label'
+                    'placeholder' => 'Label',
                 ],
             ])
             ->add('attachmentFile', FileType::class, [
                 'required' => false,
-                'label' => false
+                'label' => true,
             ]);
     }
 
@@ -31,5 +33,10 @@ class AttachmentType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Attachment::class,
         ]);
+    }
+
+    public function getBlockPrefix(): string
+    {
+        return 'app_attachments';
     }
 }

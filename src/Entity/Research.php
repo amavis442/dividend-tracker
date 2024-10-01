@@ -31,19 +31,19 @@ class Research
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Ticker', inversedBy: 'researches')]
     #[ORM\JoinColumn(nullable: false)]
-    private $ticker;
+    private ?Ticker $ticker = null;
 
     #[Groups(['research:read', 'research:write'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $title;
+    private ?string $title = null;
 
     #[Groups(['research:read', 'research:write'])]
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $info = null;
 
     #[Groups(['research:read', 'research:write'])]
-    #[ORM\OneToMany(targetEntity: 'App\Entity\Attachment', mappedBy: 'research', cascade: ['persist'])]
-    private $attachments;
+    #[ORM\OneToMany(targetEntity: \App\Entity\Attachment::class, mappedBy: 'research', cascade: ['persist'])]
+    private Collection $attachments;
 
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
@@ -67,6 +67,7 @@ class Research
     public function __construct()
     {
         $this->attachments = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int

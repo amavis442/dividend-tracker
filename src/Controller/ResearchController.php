@@ -5,9 +5,10 @@ namespace App\Controller;
 use App\Entity\Research;
 use App\Entity\Ticker;
 use App\Entity\Attachment;
+use App\Entity\TickerAutocomplete;
 use App\Form\ResearchType;
+use App\Form\TickerAutocompleteType;
 use App\Repository\ResearchRepository;
-use App\Repository\AttachmentRepository;
 use App\Repository\TickerRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,17 +16,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\FileUploader;
 use App\Service\Referer;
-use App\Traits\TickerAutocompleteTrait;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 #[Route(path: '/dashboard/research')]
 class ResearchController extends AbstractController
 {
-    use TickerAutocompleteTrait;
-
     public const SEARCH_KEY = 'research_searchCriteria';
 
     #[
@@ -37,11 +36,11 @@ class ResearchController extends AbstractController
     ]
     public function index(
         Request $request,
-        ResearchRepository $researchRepository,
         TickerRepository $tickerRepository,
-        int $page = 1,
-        string $orderBy = 'id',
-        string $sort = 'asc'
+        ResearchRepository $researchRepository,
+        #[MapQueryParameter] int $page = 1,
+        #[MapQueryParameter] string $orderBy = 'id',
+        #[MapQueryParameter] string $sort = 'asc'
     ): Response {
         if (!in_array($orderBy, ['id', 'symbol'])) {
             $orderBy = 'id';
@@ -50,43 +49,58 @@ class ResearchController extends AbstractController
             $sort = 'asc';
         }
 
-        $searchCriteria = $request->getSession()->get(self::SEARCH_KEY, '');
-        [$form, $ticker] = $this->searchTicker(
-            $request,
-            $tickerRepository,
-            self::SEARCH_KEY,
-            true
-        );
+        $tickerAutoComplete = new TickerAutocomplete();
+        $ticker = null;
 
-        $items = $researchRepository->getAll(
-            $page,
-            10,
-            $orderBy,
-            $sort,
-            $ticker
+        $tickerAutoCompleteCache = $request
+            ->getSession()
+            ->get(self::SEARCH_KEY, null);
+
+        if ($tickerAutoCompleteCache instanceof TickerAutocomplete) {
+            // We need a mapped entity else symfony will complain
+            // This works, but i do not know if it is the best solution
+            if (
+                $tickerAutoCompleteCache->getTicker() &&
+                $tickerAutoCompleteCache->getTicker()->getId()
+            ) {
+                $ticker = $tickerRepository->find(
+                    $tickerAutoCompleteCache->getTicker()->getId()
+                );
+                $tickerAutoComplete->setTicker($ticker);
+            }
+        }
+
+        /**
+         * @var \Symfony\Component\Form\FormInterface $form
+         */
+        $form = $this->createForm(
+            TickerAutocompleteType::class,
+            $tickerAutoComplete,
+            ['extra_options' => ['include_all_tickers' => true]]
         );
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $ticker = $tickerAutoComplete->getTicker();
+            $request->getSession()->set(self::SEARCH_KEY, $tickerAutoComplete);
+        }
 
         $queryBuilder = $researchRepository->getAllQuery(
             $orderBy,
             $sort,
             $ticker
         );
+
         $adapter = new QueryAdapter($queryBuilder);
         $pager = new Pagerfanta($adapter);
         $pager->setMaxPerPage(10);
         $pager->setCurrentPage($page);
 
-        $thisPage = $page;
-
         return $this->render('research/index.html.twig', [
+            'form' => $form,
             'pager' => $pager,
-            'thisPage' => $thisPage,
+            'thisPage' => $page,
             'order' => $orderBy,
             'sort' => $sort,
-            'searchCriteria' => $searchCriteria ?? '',
-            'routeName' => 'research_index',
-            'searchPath' => 'research_search',
-            'autoCompleteForm' => $form,
         ]);
     }
 
@@ -112,24 +126,17 @@ class ResearchController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // $attachments = $form->get('attachments')->getData();
-            $attachments = $research->getAttachments();
-            if (count($attachments) > 0) {
-                foreach ($attachments as $attachment) {
-                    if ($attachment->getAttachmentFile()) {
-                        $attachmentFile = $attachment->getAttachmentFile();
-                        $attachment->setAttachmentSize(
-                            $attachmentFile->getSize()
-                        );
-                        $attachmentName = $fileUploader->upload(
-                            $attachmentFile
-                        );
-                        $attachment->setAttachmentName($attachmentName);
+            $attachments = $form->get('attachments')->getData();
 
-                        $research->addAttachment($attachment);
-                    }
-                }
+            foreach ($attachments as $file) {
+                $fileName = $fileUploader->upload($file);
+
+                $attachment = new Attachment();
+                $attachment->setAttachmentName($fileName);
+                $attachment->setAttachmentSize($fileUploader->getSize());
+                $research->addAttachment($attachment);
             }
+
             $entityManager->persist($research);
             $entityManager->flush();
 
@@ -143,11 +150,11 @@ class ResearchController extends AbstractController
 
         return $this->render('research/new.html.twig', [
             'research' => $research,
-            'form' => $form->createView(),
+            'form' => $form,
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'research_show', methods: ['GET'])]
+    #[Route(path: '/show/{id}', name: 'research_show', methods: ['GET'])]
     public function show(Research $research): Response
     {
         return $this->render('research/show.html.twig', [
@@ -157,7 +164,7 @@ class ResearchController extends AbstractController
 
     #[
         Route(
-            path: '/{id}/edit',
+            path: '/edit/{id}',
             name: 'research_edit',
             methods: ['GET', 'POST']
         )
@@ -167,68 +174,24 @@ class ResearchController extends AbstractController
         EntityManagerInterface $entityManager,
         Research $research,
         FileUploader $fileUploader,
-        AttachmentRepository $attachmentRepository,
         Referer $referer
     ): Response {
         $form = $this->createForm(ResearchType::class, $research);
         $form->handleRequest($request);
-        $documentDirectory = $this->getParameter('documents_directory');
-
-        $oldAttachments = $request->get('attachments');
-        $oldAttachmentLabels = $request->get('attachment_labels');
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $existingAttachments = $attachmentRepository->findBy([
-                'research' => $research->getId(),
-            ]);
+            $attachments = $form->get('attachments')->getData();
 
-            if ($existingAttachments) {
-                $filesystem = new Filesystem();
-                // Keep old attachments
-                /** @var Attachment $existingAttachment */
-                foreach ($existingAttachments as $existingAttachment) {
-                    if (
-                        $oldAttachments &&
-                        in_array($existingAttachment->getId(), $oldAttachments)
-                    ) {
-                        $label =
-                            $oldAttachmentLabels[$existingAttachment->getId()];
-                        $existingAttachment->setLabel($label);
-                        $research->addAttachment($existingAttachment);
-                    } else {
-                        $research->removeAttachment($existingAttachment);
-                        $entityManager->remove($existingAttachment);
-                        $fileOnDisk =
-                            $documentDirectory .
-                            '/' .
-                            $existingAttachment->getAttachmentName();
-                        if ($filesystem->exists($fileOnDisk)) {
-                            $filesystem->remove([$fileOnDisk]);
-                        }
-                    }
-                }
+            foreach ($attachments as $file) {
+                $fileName = $fileUploader->upload($file);
+
+                $attachment = new Attachment();
+                $attachment->setAttachmentName($fileName);
+                $attachment->setAttachmentSize($fileUploader->getSize());
+                $research->addAttachment($attachment);
             }
 
-            // add new attachments
-            $attachments = $research->getAttachments();
-            if (count($attachments) > 0) {
-                foreach ($attachments as $attachment) {
-                    if ($attachment->getAttachmentFile()) {
-                        $attachmentFile = $attachment->getAttachmentFile();
-                        $attachment->setAttachmentSize(
-                            $attachmentFile->getSize()
-                        );
-
-                        $attachmentName = $fileUploader->upload(
-                            $attachmentFile
-                        );
-
-                        $attachment->setAttachmentName($attachmentName);
-
-                        $research->addAttachment($attachment);
-                    }
-                }
-            }
+            $entityManager->persist($research);
             $entityManager->flush();
             if ($referer->get()) {
                 return $this->redirect($referer->get());
@@ -240,7 +203,7 @@ class ResearchController extends AbstractController
 
         return $this->render('research/edit.html.twig', [
             'research' => $research,
-            'form' => $form->createView(),
+            'form' => $form,
         ]);
     }
 
@@ -281,5 +244,38 @@ class ResearchController extends AbstractController
         $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
 
         return $this->redirectToRoute('research_index');
+    }
+
+    #[
+        Route(
+            path: '/attachment/delete/{id}',
+            name: 'research_delete_attachment'
+        )
+    ]
+    public function deleteAttachment(
+        Attachment $attachment,
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $data = json_decode($request->getContent(), true);
+
+        if (
+            $this->isCsrfTokenValid(
+                'delete' . $attachment->getId(),
+                $data['_token']
+            )
+        ) {
+            $name = $attachment->getAttachmentName();
+            // On supprime le fichier
+            unlink($this->getParameter('documents_directory') . '/' . $name);
+
+            $entityManager->remove($attachment);
+            $entityManager->flush();
+
+            // On répond en json
+            return new JsonResponse(['success' => 1]);
+        } else {
+            return new JsonResponse(['error' => 'Token Invalide'], 400);
+        }
     }
 }

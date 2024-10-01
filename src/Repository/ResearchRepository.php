@@ -44,6 +44,10 @@ class ResearchRepository extends ServiceEntityRepository
         ?Ticker $ticker = null
     ): QueryBuilder {
         $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $ticker);
+        $queryBuilder
+            ->andWhere('lower(t.isin) NOT LIKE :ignore')
+            ->setParameter('ignore', 'nvt%');
+
         return $queryBuilder;
     }
 

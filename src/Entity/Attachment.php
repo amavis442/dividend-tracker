@@ -35,24 +35,24 @@ class Attachment
 
     #[Groups(['attachment:read', 'attachment:write', 'research:read:item'])]
     #[ORM\Column(type: 'string')]
-    private string $attachmentName;
+    private string $attachmentName = '';
 
     #[Groups(['attachment:read', 'attachment:write', 'research:read:item'])]
     #[ORM\Column(type: 'bigint', nullable: true)]
     private ?int $attachmentSize = null;
+
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Research::class, inversedBy: 'attachments')]
+    private ?Research $research = null;
+
+    #[Groups(['attachment:read', 'attachment:write', 'research:read:item'])]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $label = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
-
-    #[ORM\ManyToOne(targetEntity: 'App\Entity\Research', inversedBy: 'attachments')]
-    private $research;
-
-    #[Groups(['attachment:read', 'attachment:write', 'research:read:item'])]
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $label = null;
 
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
@@ -65,6 +65,11 @@ class Attachment
     public function setUpdatedAtValue(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
