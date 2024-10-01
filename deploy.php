@@ -75,7 +75,12 @@ task('info', function () {
     writeln('type:' . get('labels')['type'] . ' env:' . get('labels')['env']);
 });
 
+task('tailwind:build', function () {
+    run('{{bin/console}} tailwind:build');
+});
+
 // Hooks
 after('deploy:cache:clear', 'database:migrate');
-after('database:migrate', 'assetmap:compile');
+after('database:migrate', 'tailwind:build');
+after('tailwind:build', 'assetmap:compile');
 after('deploy:failed', 'deploy:unlock');
