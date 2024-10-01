@@ -511,9 +511,10 @@ class Position
      */
     public function setPercentageAllocation(float $totalInvested): self
     {
-        $this->percentageAllocation =
-            ($this->allocation / $totalInvested) * 100;
-
+        if ($totalInvested > 0) {
+            $this->percentageAllocation =
+                ($this->allocation / $totalInvested) * 100;
+        }
         return $this;
     }
 
