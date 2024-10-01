@@ -5,23 +5,23 @@ namespace App\Service;
 use App\Entity\Summary;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
+use App\Contracts\Service\SummaryInterface;
 
-class SummaryService
+class SummaryService implements SummaryInterface
 {
     protected PositionRepository $positionRepository;
     protected PaymentRepository $paymentRepository;
 
-    public function __construct(PositionRepository $positionRepository, PaymentRepository $paymentRepository)
-    {
+    public function __construct(
+        PositionRepository $positionRepository,
+        PaymentRepository $paymentRepository
+    ) {
         $this->positionRepository = $positionRepository;
         $this->paymentRepository = $paymentRepository;
     }
 
     public function getSummary(): Summary
     {
-        /**
-         * @var Array $positions
-         */
         $positions = $this->positionRepository->getOpenPositions();
         $numActivePosition = count($positions);
         $numTickers = $numActivePosition;
@@ -43,8 +43,7 @@ class SummaryService
             ->setNumTickers($numTickers)
             ->setProfit($profit)
             ->setTotalDividend($totalDividend)
-            ->setAllocated($allocated)
-        ;
+            ->setAllocated($allocated);
 
         return $summary;
     }

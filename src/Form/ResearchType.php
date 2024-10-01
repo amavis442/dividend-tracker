@@ -8,6 +8,7 @@ use App\Repository\TickerRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,41 +24,44 @@ class ResearchType extends AbstractType
         $this->tickerRepository = $tickerRepository;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options): void
-    {
+    public function buildForm(
+        FormBuilderInterface $builder,
+        array $options
+    ): void {
         //$builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSubmit']);
 
         $research = $options['data'];
         $builder
-            ->add('ticker', HiddenType::class, ['data' => $research->getTicker()->getId()])
+            ->add('ticker', HiddenType::class, [
+                'data' => $research->getTicker()->getId(),
+            ])
             ->add('title')
             ->add('info', TextareaType::class, [
                 'required' => false,
                 'attr' => [
-                'class' => 'ckeditor5',
+                    'class' => 'ckeditor5',
                     'style' => 'display:none;height:100;',
-                    'data-note-height' => '200'
-                ]
+                    'data-note-height' => '200',
+                ],
             ])
-            ->add('attachments', CollectionType::class, [
-                'entry_type' => AttachmentType::class,
+            ->add('attachments', FileType::class, [
                 'required' => false,
                 'label' => false,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'prototype' => true,
-                'by_reference' => false,
+                'multiple' => true,
+                'mapped' => false,
                 //'attr' => ['style' => 'display:none'],
             ]);
 
-        $builder->get("ticker")->addModelTransformer(new CallbackTransformer(
-            function (int $tickerId) {
-                return $tickerId;
-            },
-            function (int $tickerId = null) {
-                return $this->tickerRepository->find($tickerId);
-            }
-        ));
+        $builder->get('ticker')->addModelTransformer(
+            new CallbackTransformer(
+                function (int $tickerId) {
+                    return $tickerId;
+                },
+                function (int $tickerId = null) {
+                    return $this->tickerRepository->find($tickerId);
+                }
+            )
+        );
     }
 
     public function configureOptions(OptionsResolver $resolver): void

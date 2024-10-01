@@ -158,14 +158,10 @@ class ImportCsvService extends ImportBase
             );
         }
 
-        if ($position->getClosed() !== false) {
+        if ($position->getClosed()) {
             throw new RuntimeException(
                 'Cannot import for this position. Selected position is already closed.'
             );
-        }
-
-        if ($position->getClosed() !== false) {
-            throw new RuntimeException('Selected position for import is already closed?');
         }
 
         $currency = $this->currencyRepository->findOneBy(['symbol' => 'EUR']);

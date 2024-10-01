@@ -18,10 +18,11 @@ class OnRequestListener
         $this->tokenStorage = $tokenStorage;
     }
 
-    public function onKernelRequest(RequestEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
-        if ($this->tokenStorage->getToken()) {
-            $user = $this->tokenStorage->getToken()->getUser();
+        $token = $this->tokenStorage->getToken();
+        if ($token != null) {
+            $user = $token->getUser();
             if ($user instanceof User) {
                 $filter = $this->manager->getFilters()->enable('user_filter');
                 $filter->setParameter('userID', $user->getId());

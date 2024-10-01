@@ -9,12 +9,10 @@ use App\Entity\Position;
 use App\Form\DateIntervalFormType;
 use App\Form\PaymentType;
 use App\Helper\DateHelper;
-use App\Model\PortfolioModel;
 use App\Repository\CalendarRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\TickerRepository;
 use App\Service\Referer;
-use App\Traits\TickerAutocompleteTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,10 +25,7 @@ use Pagerfanta\Pagerfanta;
 #[Route(path: '/dashboard/payment')]
 class PaymentController extends AbstractController
 {
-    public const SEARCH_KEY = 'payment_searchCriteria';
-    public const SEARCHFORM_KEY = 'payment_searchForm';
-    public const INTERVAL_KEY = 'payment_interval';
-    public const SESSION_FORM_DATA_KEY = 'session_form_data';
+    public const SESSION_KEY = 'paymentcontroller_session';
 
     #[
         Route(
@@ -58,7 +53,7 @@ class PaymentController extends AbstractController
 
         $sessionFormData = $request
             ->getSession()
-            ->get(self::SESSION_FORM_DATA_KEY, null);
+            ->get(self::SESSION_KEY, null);
         if ($sessionFormData instanceof DateIntervalSelect) {
             $year = $sessionFormData->getYear();
             $month = $sessionFormData->getMonth();
@@ -69,7 +64,7 @@ class PaymentController extends AbstractController
                 ->setMonth($month)
                 ->setQuator($qautor);
 
-            if ($sessionFormData->getTicker()) {
+            if ($sessionFormData->getTicker() != null) {
                 $ticker_id = $sessionFormData->getTicker()->getId();
                 $ticker = $tickerRepository->find($ticker_id);
                 $dateIntervalSelect->setTicker($ticker);
@@ -82,7 +77,7 @@ class PaymentController extends AbstractController
             [
                 'startYear' => 2019,
                 'extra_options' => [
-                    'include_all_tickers' => false
+                    'include_all_tickers' => false,
                 ],
             ]
         );
@@ -97,7 +92,7 @@ class PaymentController extends AbstractController
 
             $request
                 ->getSession()
-                ->set(self::SESSION_FORM_DATA_KEY, $dateIntervalSelect);
+                ->set(self::SESSION_KEY, $dateIntervalSelect);
         }
 
         [$startDate, $endDate] = [$year . '-01-01', $year . '-12-31'];
@@ -285,17 +280,5 @@ class PaymentController extends AbstractController
             return $this->redirect($referer->get());
         }
         return $this->redirectToRoute('payment_index');
-    }
-
-    #[Route(path: '/search', name: 'payment_search', methods: ['POST'])]
-    public function search(Request $request): Response
-    {
-        $searchCriteria = $request->request->get('searchCriteria');
-        $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
-
-        return $this->redirectToRoute('payment_index', [
-            'orderBy' => 'payDate',
-            'sort' => 'desc',
-        ]);
     }
 }

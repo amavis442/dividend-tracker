@@ -11,12 +11,22 @@
 		/
 		{{ endDate }}
 	</div>
-	{% for notice in app.flashes('notice') %}
-		<br/>
-		<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
-	{% endfor %}
 
-	{{ form_start(form, {'attr': {'class' : 'row g-3 mb-2 mt-2'}}) }}
+	<section>
+		{% for notice in app.flashes('notice') %}
+			<br/>
+			<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
+		{% endfor %}
+	</section>
+
+	<section>
+	{{ form_start(form, {
+			'attr': {
+				'class' : 'row g-3 mb-2 mt-2',
+				'data-turbo-frame': 'payment-results'
+				}
+			})
+		}}
 		<div class="col-auto">{{ form_widget(form.year, { 'attr': {'class' : 'myclass'}}) }}</div>
 		<div class="col-auto">{{ form_widget(form.month) }}</div>
 		<div class="col-auto">{{ form_widget(form.quator) }}</div>
@@ -24,7 +34,10 @@
 		<div class="col-auto">{{ form_widget(form.submit) }}</div>
 		<div class="col"></div>
 	{{ form_end(form) }}
+	</section>
 
+	<section>
+	<turbo-frame id="payment-results">
 	<table class="table table-striped border table-hover">
 		<thead>
 			<tr>
@@ -54,10 +67,10 @@
 					</td>
 					<td>{{ payment.dividendType }}</td>
 					<td>
-						<a href="{{ path('payment_show', { id: payment.id }) }}" class="btn btn-primary">
+						<a href="{{ path('payment_show', { id: payment.id }) }}" class="btn btn-primary" data-turbo-frame="_top">
 							<i class="fas fa-book-open"></i>
 						</a>
-						<a href="{{ path('payment_edit', { id: payment.id }) }}" class="btn btn-primary">
+						<a href="{{ path('payment_edit', { id: payment.id }) }}" class="btn btn-primary" data-turbo-frame="_top">
 							<i class="far fa-edit"></i>
 						</a>
 					</td>
@@ -82,5 +95,7 @@
 			</tr>
 		</tbody>
 	</table>
-	   {{ pagerfanta(pager) }}
+	{{ pagerfanta(pager) }}
+	</turbo-frame>
+	</section>
 {% endblock %}

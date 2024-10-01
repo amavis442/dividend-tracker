@@ -3,12 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Position;
+use App\Entity\TickerAutocomplete;
 use App\Form\PositionType;
+use App\Form\TickerAutocompleteType;
 use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Service\PositionService;
 use App\Service\Referer;
-use App\Traits\TickerAutocompleteTrait;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,9 +21,7 @@ use Pagerfanta\Pagerfanta;
 #[Route(path: '/dashboard/closed/position')]
 class ClosedPositionController extends AbstractController
 {
-    use TickerAutocompleteTrait;
-
-    public const SEARCH_KEY = 'closed_position_searchCriteria';
+    public const SESSION_KEY = 'closedportfolio_session';
 
     #[
         Route(
@@ -46,12 +45,40 @@ class ClosedPositionController extends AbstractController
         $referer->set('closed_position_index', [
             'status' => PositionRepository::CLOSED,
         ]);
-        [$form, $ticker] = $this->searchTicker(
-            $request,
-            $tickerRepository,
-            self::SEARCH_KEY,
-            true
+        $tickerAutoComplete = new TickerAutocomplete();
+        $ticker = null;
+
+        $tickerAutoCompleteCache = $request
+            ->getSession()
+            ->get(self::SESSION_KEY, null);
+
+        if ($tickerAutoCompleteCache instanceof TickerAutocomplete) {
+            // We need a mapped entity else symfony will complain
+            // This works, but i do not know if it is the best solution
+            if (
+                $tickerAutoCompleteCache->getTicker() &&
+                $tickerAutoCompleteCache->getTicker()->getId()
+            ) {
+                $ticker = $tickerRepository->find(
+                    $tickerAutoCompleteCache->getTicker()->getId()
+                );
+                $tickerAutoComplete->setTicker($ticker);
+            }
+        }
+
+        /**
+         * @var \Symfony\Component\Form\FormInterface $form
+         */
+        $form = $this->createForm(
+            TickerAutocompleteType::class,
+            $tickerAutoComplete,
+            ['extra_options' => ['include_all_tickers' => true]]
         );
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $ticker = $tickerAutoComplete->getTicker();
+            $request->getSession()->set(self::SESSION_KEY, $tickerAutoComplete);
+        }
 
         $queryBuilder = $positionRepository->getAllClosedQuery($sort, $ticker);
         $adapter = new QueryAdapter($queryBuilder);
@@ -105,7 +132,7 @@ class ClosedPositionController extends AbstractController
             $positionService->update($position);
             $request
                 ->getSession()
-                ->set(self::SEARCH_KEY, $position->getTicker()->getSymbol());
+                ->set(self::SESSION_KEY, $position->getTicker()->getSymbol());
             if ($referer->get()) {
                 return $this->redirect($referer->get());
             }
@@ -115,17 +142,6 @@ class ClosedPositionController extends AbstractController
         return $this->render('closed_position/edit.html.twig', [
             'position' => $position,
             'form' => $form->createView(),
-        ]);
-    }
-
-    #[Route(path: '/search', name: 'closed_position_search', methods: ['POST'])]
-    public function search(Request $request): Response
-    {
-        $searchCriteria = $request->request->get('searchCriteria');
-        $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
-
-        return $this->redirectToRoute('closed_position_index', [
-            'sort' => 'desc',
         ]);
     }
 }

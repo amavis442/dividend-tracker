@@ -6,60 +6,85 @@
 
 {% block body %}
 	<h1>Research index</h1>
-	{% for notice in app.flashes('notice') %}
-		<br/>
-		<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
-	{% endfor %}
 
-	<div class="row g2">
-		<div class="col">
-		{% include '_search_form.html.twig' %}
-		</div>
-		<div class="col"></div>
-	</div>
+	<section>
+		{% for notice in app.flashes('notice') %}
+			<br/>
+			<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
+		{% endfor %}
+	</section>
 
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Id</th>
-				<th>Ticker</th>
-				<th>Title</th>
-				<th>Info</th>
-				<th>Files</th>
-				<th>actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for research in pager %}
+	<section class="tw-flex tw-items-center tw-gap-2 tw-mb-6 tw-bg-gray-200 tw-shadow-md tw-rounded-lg tw-p-6">
+			{{ form_start(form, {
+				'action': path('research_index'),
+				'attr': {
+					'autocomplete' : 'off',
+					'class': 'tw-flex tw-w-full tw-justify-center',
+					'data-turbo-frame' : 'research-results'
+					}})
+				}}
+			{{ form_errors(form) }}
+			<div class="tw-w-1/2">
+				{{ form_widget(form.ticker) }}
+			</div>
+			<div>
+				<button class="focus:tw-outline-none tw-text-white tw-bg-green-700
+            hover:tw-bg-green-800 focus:tw-ring-4
+            focus:tw-ring-green-300 tw-font-medium tw-rounded-lg
+            tw-text-sm tw-px-2 tw-py-2 tw-ml-2 dark:tw-bg-green-600
+            dark:hover:tw-bg-green-700 dark:focus:tw-ring-green-800" data-toggle="tooltip" data-placement="top" title="{{ 'Search ticker'|trans }}">
+					<i class="fas fa-search"></i>
+				</button>
+			</div>
+			{{ form_end(form) }}
+	</section>
+
+	<section>
+	<turbo-frame id="research-results">
+		<table class="table">
+			<thead>
 				<tr>
-					<td>{{ research.id }}</td>
-					<td>{{ research.ticker.symbol }}</td>
-					<td>{{ research.title }}</td>
-					<td>{{ research.info|raw }}</td>
-					<td>
-						{% for doc in research.attachments %}
-							<a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}" target="_blank">
-								<i class="fa fa-download"></i>
-								{{ doc.label }}</a><br/>
-						{% else %}
-							no records found
-						{% endfor %}
-					</td>
-					<td>
-						<a href="{{ path('research_show', { id: research.id }) }}" class="btn btn-primary">
-							<i class="fas fa-book-open"></i>
-						</a>
-						<a href="{{ path('research_edit', { id: research.id }) }}" class="btn btn-primary">
-							<i class="far fa-edit"></i>
-						</a>
-					</td>
+					<th>Id</th>
+					<th>Ticker</th>
+					<th>Title</th>
+					<th>Info</th>
+					<th>Files</th>
+					<th>actions</th>
 				</tr>
-			{% else %}
-				<tr>
-					<td colspan="4">no records found</td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				{% for research in pager %}
+					<tr>
+						<td>{{ research.id }}</td>
+						<td>{{ research.ticker.symbol }}</td>
+						<td>{{ research.title }}</td>
+						<td>{{ research.info|raw }}</td>
+						<td>
+							{% for doc in research.attachments %}
+								<a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}" target="_blank">
+									<i class="fa fa-download"></i>
+									{{ doc.label }}</a><br/>
+							{% else %}
+								no records found
+							{% endfor %}
+						</td>
+						<td>
+							<a href="{{ path('research_show', { id: research.id }) }}" class="btn btn-primary" data-turbo-frame="_top">
+								<i class="fas fa-book-open"></i>
+							</a>
+							<a href="{{ path('research_edit', { id: research.id }) }}" class="btn btn-primary" data-turbo-frame="_top">
+								<i class="far fa-edit"></i>
+							</a>
+						</td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="4">no records found</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
 		{{ pagerfanta(pager) }}
+	</turbo-frame>
+	</section>
 {% endblock %}

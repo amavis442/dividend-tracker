@@ -3,8 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Ticker;
+use App\Entity\TickerAutocomplete;
+use App\Form\TickerAutocompleteType;
 use App\Form\TickerType;
-use App\Model\PortfolioModel;
 use App\Repository\TickerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,15 +13,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Referer;
-use App\Traits\TickerAutocompleteTrait;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 #[Route(path: '/dashboard/ticker')]
 class TickerController extends AbstractController
 {
-    use TickerAutocompleteTrait;
-
     public const SESSION_KEY = 'tickercontroller_session';
 
     #[
@@ -33,16 +32,44 @@ class TickerController extends AbstractController
     public function index(
         Request $request,
         TickerRepository $tickerRepository,
-        int $page = 1,
-        string $orderBy = 'symbol',
-        string $sort = 'asc'
+        #[MapQueryParameter] int $page = 1,
+        #[MapQueryParameter] string $orderBy = 'symbol',
+        #[MapQueryParameter] string $sort = 'asc'
     ): Response {
-        [$form, $ticker] = $this->searchTicker(
-            $request,
-            $tickerRepository,
-            self::SESSION_KEY,
-            true
+        $tickerAutoComplete = new TickerAutocomplete();
+        $ticker = null;
+
+        $tickerAutoCompleteCache = $request
+            ->getSession()
+            ->get(self::SESSION_KEY, null);
+
+        if ($tickerAutoCompleteCache instanceof TickerAutocomplete) {
+            // We need a mapped entity else symfony will complain
+            // This works, but i do not know if it is the best solution
+            if (
+                $tickerAutoCompleteCache->getTicker() &&
+                $tickerAutoCompleteCache->getTicker()->getId()
+            ) {
+                $ticker = $tickerRepository->find(
+                    $tickerAutoCompleteCache->getTicker()->getId()
+                );
+                $tickerAutoComplete->setTicker($ticker);
+            }
+        }
+
+        /**
+         * @var \Symfony\Component\Form\FormInterface $form
+         */
+        $form = $this->createForm(
+            TickerAutocompleteType::class,
+            $tickerAutoComplete,
+            ['extra_options' => ['include_all_tickers' => true]]
         );
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $ticker = $tickerAutoComplete->getTicker();
+            $request->getSession()->set(self::SESSION_KEY, $tickerAutoComplete);
+        }
 
         $queryBuilder = $tickerRepository->getAllQuery(
             $orderBy,
@@ -51,15 +78,16 @@ class TickerController extends AbstractController
         );
         $adapter = new QueryAdapter($queryBuilder);
 
-        $pagerfanta = new Pagerfanta($adapter);
-        $pagerfanta->setMaxPerPage(10);
-        $pagerfanta->setCurrentPage($page);
+        $pager = new Pagerfanta($adapter);
+        $pager->setMaxPerPage(10);
+        $pager->setCurrentPage($page);
 
         return $this->render('ticker/index.html.twig', [
-            'pager' => $pagerfanta,
-            'routeName' => 'ticker_index',
-            'searchPath' => 'ticker_search',
-            'autoCompleteForm' => $form,
+            'form' => $form,
+            'pager' => $pager,
+            'thisPage' => $page,
+            'order' => $orderBy,
+            'sort' => $sort,
         ]);
     }
 

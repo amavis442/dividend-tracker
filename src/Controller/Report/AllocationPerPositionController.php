@@ -2,10 +2,11 @@
 
 namespace App\Controller\Report;
 
+use App\Entity\Portfolio;
 use App\Helper\Colors;
 use App\Model\AllocationModel;
+use App\Repository\PortfolioRepository;
 use App\Repository\PositionRepository;
-use App\Service\SummaryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
@@ -21,11 +22,24 @@ class AllocationPerPositionController extends AbstractController
     #[Route(path: "/allocation/position", name: "report_allocation_position")]
     public function index(
         PositionRepository $positionRepository,
-        SummaryService $summaryService,
+        PortfolioRepository $portfolioRepository,
         AllocationModel $allocation,
         ChartBuilderInterface $chartBuilder
     ) {
-        $result = $allocation->position($positionRepository, $summaryService);
+        /**
+         * @var \App\Entity\User $user
+         */
+        $user = $this->getUser();
+        /**
+         * @var Portfolio|null $portfolio
+         */
+        $portfolio = $portfolioRepository->findOneBy(['user' => $user->getId()]);
+        if (!$portfolio) {
+            $portfolio = new Portfolio(); // do not want to trhow an exception but just use an empty entity
+        }
+
+
+        $result = $allocation->position($positionRepository, $portfolio->getInvested());
         $colors = Colors::COLORS;
 
         $chart = $chartBuilder->createChart(Chart::TYPE_PIE);
@@ -62,12 +76,7 @@ class AllocationPerPositionController extends AbstractController
         return $this->render(
             "report/allocation/position.html.twig",
             [
-                "numActivePosition" => $result["numActivePosition"],
-                "numPosition" => $result["numPosition"],
-                "numTickers" => $result["numTickers"],
-                "profit" => $result["profit"],
-                "totalDividend" => $result["totalDividend"],
-                "totalInvested" => $result["totalInvested"],
+                'portfolio' => $portfolio,
                 "controller_name" => "ReportController",
                 "chart" => $chart,
             ]

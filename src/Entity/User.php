@@ -83,6 +83,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    /**
+     * @var Collection<int, Taxonomy>
+     */
+    #[ORM\OneToMany(targetEntity: Taxonomy::class, mappedBy: 'user')]
+    private Collection $taxonomies;
+
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?Portfolio $portfolio = null;
+
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
     {
@@ -103,6 +112,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->journals = new ArrayCollection();
         $this->dividendTrackers = new ArrayCollection();
         $this->pies = new ArrayCollection();
+        $this->taxonomies = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -364,5 +374,52 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    /**
+     * @return Collection<int, Taxonomy>
+     */
+    public function getTaxonomies(): Collection
+    {
+        return $this->taxonomies;
+    }
+
+    public function addTaxonomy(Taxonomy $taxonomy): static
+    {
+        if (!$this->taxonomies->contains($taxonomy)) {
+            $this->taxonomies->add($taxonomy);
+            $taxonomy->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTaxonomy(Taxonomy $taxonomy): static
+    {
+        if ($this->taxonomies->removeElement($taxonomy)) {
+            // set the owning side to null (unless already changed)
+            if ($taxonomy->getUser() === $this) {
+                $taxonomy->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getPortfolio(): ?Portfolio
+    {
+        return $this->portfolio;
+    }
+
+    public function setPortfolio(Portfolio $portfolio): static
+    {
+        // set the owning side of the relation if necessary
+        if ($portfolio->getUser() !== $this) {
+            $portfolio->setUser($this);
+        }
+
+        $this->portfolio = $portfolio;
+
+        return $this;
     }
 }

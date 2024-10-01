@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {% block metas %}{% endblock %}
         <title>
             {% block title %}
                 Welcome!
@@ -16,11 +17,12 @@
         {% endblock %}
     </head>
     <body class="bg-light">
-        {% include 'navbar.html.twig' %}
-        <div class="container" id="app">
-         {% block body %}
-
-            {% endblock %}
-        </div>
+        <header>
+            {% include 'navbar.html.twig' %}
+        </header>
+        <main class="container" id="app">
+            {% block body %}{% endblock %}
+        </main>
+        <footer></footer>
     </body>
 </html>

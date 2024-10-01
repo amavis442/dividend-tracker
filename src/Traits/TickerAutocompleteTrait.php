@@ -10,34 +10,32 @@ use App\Entity\SearchForm;
 use App\Form\SearchFormType;
 use App\Form\TickerAutocompleteType;
 use App\Form\PieSelectFormType;
-use App\Repository\PieRepository;
 use App\Repository\TickerRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Response;
 
 trait TickerAutocompleteTrait
 {
-    /**
-     * $all means also the tickers who have no active positions.
-     * @return array{Form, Ticker}
-     */
-    protected function searchTicker(
-        Request $request,
-        TickerRepository $tickerRepository,
-        string $cacheKey,
-        bool $include_all_tickers = false
-    ): array {
+    protected function searchTicker(Request $request, string $cacheKey, TickerRepository $tickerRepository): array
+    {
         $tickerAutoComplete = new TickerAutocomplete();
         $ticker = null;
 
-        $tickerAutoCompleteCache = $request->getSession()->get($cacheKey, null);
-
+        $tickerAutoCompleteCache = $request
+            ->getSession()
+            ->get($cacheKey, null);
 
         if ($tickerAutoCompleteCache instanceof TickerAutocomplete) {
             // We need a mapped entity else symfony will complain
             // This works, but i do not know if it is the best solution
-            if ($tickerAutoCompleteCache->getTicker() && $tickerAutoCompleteCache->getTicker()->getId()) {
-                $ticker = $tickerRepository->find($tickerAutoCompleteCache->getTicker()->getId());
+            if (
+                $tickerAutoCompleteCache->getTicker() &&
+                $tickerAutoCompleteCache->getTicker()->getId()
+            ) {
+                $ticker = $tickerRepository->find(
+                    $tickerAutoCompleteCache->getTicker()->getId()
+                );
                 $tickerAutoComplete->setTicker($ticker);
             }
         }
@@ -48,17 +46,24 @@ trait TickerAutocompleteTrait
         $form = $this->createForm(
             TickerAutocompleteType::class,
             $tickerAutoComplete,
-            ['extra_options' => ['include_all_tickers' => $include_all_tickers]]
+            ['extra_options' => ['include_all_tickers' => true]]
         );
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $ticker = $tickerAutoComplete->getTicker();
             $request->getSession()->set($cacheKey, $tickerAutoComplete);
         }
+
         return [$form, $ticker];
     }
 
-    protected function selectPie(Request $request, string $cacheKey)
+
+    /**
+     * @return (\App\Entity\Pie|\Symfony\Component\Form\FormInterface|mixed)[]
+     *
+     * @psalm-return list{\Symfony\Component\Form\FormInterface, \App\Entity\Pie|mixed}
+     */
+    protected function selectPie(Request $request, string $cacheKey): array
     {
         $pie = new Pie();
         $pieSelect = new PieSelect();
@@ -87,7 +92,7 @@ trait TickerAutocompleteTrait
         TickerRepository $tickerRepository,
         string $cacheKey,
         bool $include_all_tickers = false
-    ) {
+    ): array {
         $pie = null;
         $ticker = null;
 

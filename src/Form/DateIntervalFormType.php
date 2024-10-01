@@ -61,7 +61,8 @@ class DateIntervalFormType extends AbstractType
                     'include_all_tickers' =>
                         $options['extra_options']['include_all_tickers'],
 
-                ]
+                ],
+                "required" => false,
             ])
             ->add('submit', SubmitType::class, [
                 'label' => '<i class="fas fa-solid fa-filter"></i>',

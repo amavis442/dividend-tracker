@@ -30,7 +30,7 @@ class JournalType extends AbstractType
                 'label' => 'Taxonomy',
                 'choice_label' => 'title',
                 'required' => false,
-                'placeholder' => 'Please choose a Pie',
+                'placeholder' => 'Please choose a Taxonomy',
                 //'empty_data' => null, Geeft een foutmelding als je deze erin laat staan en je wilt hem leeg hebben.
                 'multiple' => true,
                 'expanded' => true,

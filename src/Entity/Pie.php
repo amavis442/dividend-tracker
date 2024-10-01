@@ -51,6 +51,9 @@ class Pie
     #[ORM\OneToMany(targetEntity: 'App\Entity\Transaction', mappedBy: 'pie')]
     private $transactions;
 
+    #[ORM\Column(options: ["default" => 0.0])]
+    private float $goal = 0.0;
+
 
     public function __construct()
     {
@@ -116,6 +119,18 @@ class Pie
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getGoal(): float
+    {
+        return $this->goal;
+    }
+
+    public function setGoal(float $goal): static
+    {
+        $this->goal = $goal;
 
         return $this;
     }

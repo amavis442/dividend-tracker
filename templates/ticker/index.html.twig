@@ -6,19 +6,41 @@
 
 {% block body %}
 	<h1>Tickers</h1>
-	{% for notice in app.flashes('notice') %}
-		<br/>
-		<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
-	{% endfor %}
 
-	<div class="row">
-		<div class="col">
-			{% include '_search_form.html.twig' %}
-		</div>
-		<div class="col">
-		</div>
-	</div>
+	<section>
+		{% for notice in app.flashes('notice') %}
+			<br/>
+			<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
+		{% endfor %}
+	</section>
 
+	<section class="tw-flex tw-items-center tw-gap-2 tw-mb-6 tw-bg-gray-200 tw-shadow-md tw-rounded-lg tw-p-6">
+			{{ form_start(form, {
+				'action': path('ticker_index'),
+				'attr': {
+					'autocomplete' : 'off',
+					'class': 'tw-flex tw-w-full tw-justify-center',
+					'data-turbo-frame' : 'ticker-results'
+					}})
+				}}
+			{{ form_errors(form) }}
+			<div class="tw-w-1/2">
+				{{ form_widget(form.ticker) }}
+			</div>
+			<div>
+				<button class="focus:tw-outline-none tw-text-white tw-bg-green-700
+            hover:tw-bg-green-800 focus:tw-ring-4
+            focus:tw-ring-green-300 tw-font-medium tw-rounded-lg
+            tw-text-sm tw-px-2 tw-py-2 tw-ml-2 dark:tw-bg-green-600
+            dark:hover:tw-bg-green-700 dark:focus:tw-ring-green-800" data-toggle="tooltip" data-placement="top" title="{{ 'Search ticker'|trans }}">
+					<i class="fas fa-search"></i>
+				</button>
+			</div>
+			{{ form_end(form) }}
+	</section>
+
+	<section>
+	<turbo-frame id="ticker-results">
 	<table class="table">
 		<thead>
 			<tr>
@@ -79,6 +101,9 @@
 		</tbody>
 	</table>
 	{{ pagerfanta(pager) }}
+	</turbo-frame>
+	</section>
+
 	<a class="btn btn-primary" href="{{ path('ticker_new') }}">
 		<i class="fas fa-plus"></i>
 	</a>

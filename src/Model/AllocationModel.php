@@ -76,30 +76,20 @@ class AllocationModel
 
     public function position(
         PositionRepository $positionRepository,
-        SummaryService $summaryService
+        float $totalInvested,
     ): array {
-        $summary = $summaryService->getSummary();
-
-        $totalAllocated = $positionRepository->getSumAllocated();
-
         $allocationData = $positionRepository->getAllocationDataPerPosition();
         $labels = [];
         $data = [];
         foreach ($allocationData as $allocationItem) {
             $labels[] = $allocationItem['symbol'];
             $allocation = $allocationItem['allocation'] / 1000;
-            $data[] = round(($allocation / $totalAllocated) * 100, 2);
+            $data[] = round(($allocation / $totalInvested) * 100, 2);
         }
 
         return [
             'data' => $data,
             'labels' => $labels,
-            'numActivePosition' => $summary->getNumActivePosition(),
-            'numPosition' => $summary->getNumActivePosition(),
-            'numTickers' => $summary->getNumTickers(),
-            'profit' => $summary->getProfit(),
-            'totalDividend' => $summary->getTotalDividend(),
-            'totalInvested' => $summary->getAllocated(),
         ];
     }
 }

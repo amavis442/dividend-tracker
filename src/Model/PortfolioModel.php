@@ -16,8 +16,10 @@ use Pagerfanta\Doctrine\ORM\QueryAdapter;
 
 class PortfolioModel
 {
-    public function __construct(private Stopwatch $stopwatch)
-    {
+    public function __construct(
+        private Stopwatch $stopwatch,
+        private int $maxPerPage = 10
+    ) {
     }
 
     /**
@@ -125,7 +127,7 @@ class PortfolioModel
 
         $adapter = new QueryAdapter($queryBuilder);
         $pagerfanta = new Pagerfanta($adapter);
-        $pagerfanta->setMaxPerPage(10);
+        $pagerfanta->setMaxPerPage($this->maxPerPage);
         $pagerfanta->setCurrentPage($page);
 
         $this->createPortfolioItem(

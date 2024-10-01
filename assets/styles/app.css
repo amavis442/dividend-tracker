@@ -1,5 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-
+/*
+[data-turbo-preview] body {
+    opacity: .2;
+}
+*/
 .purple {
     background-color: #1B1022;
 }
@@ -15,3 +22,5 @@ body {
 .ck-editor__editable_inline {
     min-height: 400px;
 }
+
+

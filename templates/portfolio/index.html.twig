@@ -5,142 +5,145 @@
 
 {% block body %}
 
-
+	<section>
 	{% for notice in app.flashes('notice') %}
-    <br />
-    <div class="alert alert-primary" role="alert">{{ notice }}</div>
-  {% endfor %}
+    	<br />
+    	<div class="alert alert-primary" role="alert">{{ notice }}</div>
+  	{% endfor %}
+	<section>
 
-	<div class="container mb-2 p-3">
-		<div class="h1">Portfolio</div>
+	<div class="h1">Portfolio</div>
 
-		{% include '_summary.html.twig' %}
+	{% include 'portfolio/_summary.html.twig' %}
 
-		<div class="border p-2 shadow p-3 mb-5 bg-body-tertiary rounded">
-			<div class="row">
-				<div class="col mb-2">
 
-					{{ form_start(autoCompleteForm, {'action': path('portfolio_index'), 'attr':{'class': 'row g2'}}) }}
-						<div class="col">
-							{{ form_widget(autoCompleteForm.pie) }}
-						</div>
-						<div class="col">
-							{{ form_widget(autoCompleteForm.ticker) }}
-						</div>
-						<div class="col-auto">
-							<button class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Search Ticker">
-								<i class="fas fa-search"></i>
-							</button>
-						</div>
-					{{ form_end(autoCompleteForm) }}
-
+	<section>
+		<div class="col mb-2">
+			{{ form_start(autoCompleteForm, {
+				'action': path('portfolio_index'),
+				'attr': {
+					'class': 'row g2',
+					'data-turbo-frame': 'portfolio_results'
+					}
+				})
+			}}
+				<div class="col">
+					{{ form_widget(autoCompleteForm.pie) }}
 				</div>
-			</div>
+				<div class="col">
+					{{ form_widget(autoCompleteForm.ticker) }}
+				</div>
+				<div class="col-auto">
+					<button class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Search Ticker">
+						<i class="fas fa-search"></i>
+					</button>
+				</div>
+			{{ form_end(autoCompleteForm) }}
+		</div>
+	<section>
 
-			<table class="table table-sm table-striped table-hover border w-100">
-				<thead>
-					<tr>
-						<th scope="col">
-							<a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'fullname', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Fullname'|trans }}</a>
-						</th>
-						<th scope="col">{{ 'Avg. price'|trans }}</th>
+	<section>
+	<turbo-frame id="portfolio_results">
+    <table class="table table-sm table-striped table-hover border w-100">
+        <thead>
+            <tr>
+                <th scope="col">
+                    <a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'symbol', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Fullname'|trans }}</a>
+                </th>
+                <th scope="col">{{ 'Avg. price'|trans }}</th>
 
-						<th scope="col">{{ 'Allocation'|trans }}</th>
-						<th scope="col">
-							{{ 'Received dividend'|trans }}
-							<span title="{{'Dividend per position'|trans }}" data-bs-toggle="tooltip" data-placement="top">
-								<i class="fas fa-question-circle"></i>
-							</span>
+                <th scope="col">{{ 'Allocation'|trans }}</th>
+                <th scope="col">
+                    {{ 'Received dividend'|trans }}
+                    <span title="{{'Dividend per position'|trans }}" data-bs-toggle="tooltip" data-placement="top">
+                        <i class="fas fa-question-circle"></i>
+                    </span>
 
-						</th>
-						<th scope="col">{{ 'Ex-Div'|trans }}
-							/
-							<br/>
-							{{ 'Payout'|trans }}
-						</th>
-						<th scope="col">{{ 'Forward dividend'|trans }}
-							<span title="{{'Dividend yield based on cost basis'|trans }}" data-bs-toggle="tooltip" data-placement="top">
-								<i class="fas fa-question-circle"></i>
-							</span>
-						</th>
-					</tr>
-				</thead>
-				<tbody class="table-group-divider">
-					{% for position in pager %}
-						{% set dividendInfo = include('portfolio/_dividendinfo.html.twig', {'position' : position} ) %}
-						{% set ticker = position.ticker %}
-						<tr>
-							<td>
+                </th>
+                <th scope="col">{{ 'Ex-Div'|trans }}
+                    /
+                    <br/>
+                    {{ 'Payout'|trans }}
+                </th>
+                <th scope="col">{{ 'Forward dividend'|trans }}
+                    <span title="{{'Dividend yield based on cost basis'|trans }}" data-bs-toggle="tooltip" data-placement="top">
+                        <i class="fas fa-question-circle"></i>
+                    </span>
+                </th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            {% for position in pager %}
+                {% set dividendInfo = include('portfolio/_dividendinfo.html.twig', {'position' : position} ) %}
+                {% set ticker = position.ticker %}
+                <tr>
+                    <td>
 
-								<div>
-									<span {% if ticker.fullname|length > 20 %} data-bs-toggle="tooltip" data-placement="top" title="{{ ticker.fullname }} ({{ ticker.symbol }})" {% endif %}>
-										<a href="{{ path('portfolio_show', {'id': position.id}) }}">{{ ticker.fullname|slice(0, 20) }}
-											{% if ticker.fullname|length > 20 %}...
-											{% endif %}
-										</a>
-									</span>
-									<i class="fas fa-info-circle" data-bs-toggle="popover" data-bs-title="Dividend & pie info" data-bs-content='{{ dividendInfo }}' data-bs-html="true"></i>
-								</div>
+                        <div>
+                            <span {% if ticker.fullname|length > 20 %} data-bs-toggle="tooltip" data-placement="top" title="{{ ticker.fullname }} ({{ ticker.symbol }})" {% endif %}>
+                                <a href="{{ path('portfolio_show', {'id': position.id}) }}" data-turbo-frame="_top">
+                                    {{ ticker.fullname|slice(0, 20) }}
+                                    {% if ticker.fullname|length > 20 %}...
+                                    {% endif %}
+                                </a>
+                            </span>
+                            <i class="fas fa-info-circle" data-bs-toggle="popover" data-bs-title="Dividend & pie info" data-bs-content='{{ dividendInfo }}' data-bs-html="true"></i>
+                        </div>
 
-								<small>{{ position.amount|format_number({fraction_digit: 7}) }}
-									{{ 'shares'|trans }}</small>
-							</td>
-						<td>
-							&euro;
-							{{ position.price|format_number({fraction_digit: 2}) }}
-						</td>
+                        <small>{{ position.amount|format_number({fraction_digit: 7}) }}
+                            {{ 'shares'|trans }}</small>
+                    </td>
+                <td>
+                    &euro;
+                    {{ position.price|format_number({fraction_digit: 2}) }}
+                </td>
 
-						<td>
-							<span class="badge text-bg-primary">&euro;{{ position.allocation|format_number({fraction_digit: 2}) }}
-								<span class="badge text-bg-warning">{{ position.percentageAllocation|format_number({fraction_digit: 2}) }}%</span>
-							</span>
-						</td>
-						<td>
-							<span class="badge text-bg-secondary">
-								&euro;{{ position.dividend|format_number({fraction_digit: 2}) }}
-								<span class="badge text-bg-warning">{{ ((position.dividend / position.allocation) *100)|format_number({fraction_digit: 2}) }}%</span>
-							</span>
-						</td>
-						<td>
-							{% if position.divDate %}
-								<span class="badge text-bg-primary">{{ position.exDividendDate|format_date('long') }}</span>
-								<br/>
-								<span class="badge text-bg-warning">{{ position.paymentDate|format_date('long') }}</span>
-							{% else %}
-								&mdash;
-							{% endif %}
-						</td>
-						<td>
-							{% if position.divDate %}
-								<div class="badge text-bg-primary">{{ position.cashCurrency.sign|raw }}
-									{{ position.cashAmount|format_number({fraction_digit: 3}) }}</div><br/>
-								<div class="badge text-bg-secondary">&euro;
-									{{ position.forwardNetDividend|format_number({fraction_digit: 2}) }}
-									<div class="badge text-bg-success">{{ position.forwardNetDividendYield|format_number({fraction_digit: 2}) }}%</div>
-								</div><br/>
-							{% else %}
-								&mdash;
-							{% endif %}
-						</td>
-					</tr>
-					{% else %}
-					<tr>
-						<td colspan="9">no records found</td>
-					</tr>
-				{% endfor %}
-				</tbody>
-				<tfoot>
-					<tr>
-						<td colspan="8"></td>
-					</tr>
-				</tfoot>
-			</table>
+                <td>
+                    <span class="badge text-bg-primary">&euro;{{ position.allocation|format_number({fraction_digit: 2}) }}
+                        <span class="badge text-bg-warning">{{ position.percentageAllocation|format_number({fraction_digit: 2}) }}%</span>
+                    </span>
+                </td>
+                <td>
+                    <span class="badge text-bg-secondary">
+                        &euro;{{ position.dividend|format_number({fraction_digit: 2}) }}
+                        <span class="badge text-bg-warning">{{ ((position.dividend / position.allocation) *100)|format_number({fraction_digit: 2}) }}%</span>
+                    </span>
+                </td>
+                <td>
+                    {% if position.divDate %}
+                        <span class="badge text-bg-primary">{{ position.exDividendDate|format_date('long') }}</span>
+                        <br/>
+                        <span class="badge text-bg-warning">{{ position.paymentDate|format_date('long') }}</span>
+                    {% else %}
+                        &mdash;
+                    {% endif %}
+                </td>
+                <td>
+                    {% if position.divDate %}
+                        <div class="badge text-bg-primary">{{ position.cashCurrency.sign|raw }}
+                            {{ position.cashAmount|format_number({fraction_digit: 3}) }}</div><br/>
+                        <div class="badge text-bg-secondary">&euro;
+                            {{ position.forwardNetDividend|format_number({fraction_digit: 2}) }}
+                            <div class="badge text-bg-success">{{ position.forwardNetDividendYield|format_number({fraction_digit: 2}) }}%</div>
+                        </div><br/>
+                    {% else %}
+                        &mdash;
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="8"></td>
+            </tr>
+        </tfoot>
+    </table>
 	{{ pagerfanta(pager) }}
-
-	</div>
-</div>
-{% endblock %}
-
-{% block javascripts %}
-{{ parent() }}
+	</turbo-frame>
+	</section>
 {% endblock %}

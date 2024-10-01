@@ -82,7 +82,7 @@ class DateIntervalSelect
      *
      * @return  static
      */
-    public function setTicker(Ticker $ticker): static
+    public function setTicker(?Ticker $ticker): static
     {
         $this->ticker = $ticker;
 

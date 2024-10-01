@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Portfolio{% endblock %}
+
+{% block body %}
+    <h1>Portfolio</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ portfolio.id }}</td>
+            </tr>
+            <tr>
+                <th>Goal</th>
+                <td>{{ portfolio.goal }}</td>
+            </tr>
+            <tr>
+                <th>Invested</th>
+                <td>{{ portfolio.invested }}</td>
+            </tr>
+            <tr>
+                <th>Created_at</th>
+                <td>{{ portfolio.createdAt ? portfolio.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Updated_at</th>
+                <td>{{ portfolio.updatedAt ? portfolio.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Uuid</th>
+                <td>{{ portfolio.uuid }}</td>
+            </tr>
+            <tr>
+                <th>NumActivePosition</th>
+                <td>{{ portfolio.numActivePosition }}</td>
+            </tr>
+            <tr>
+                <th>Profit</th>
+                <td>{{ portfolio.profit }}</td>
+            </tr>
+            <tr>
+                <th>TotalDividend</th>
+                <td>{{ portfolio.totalDividend }}</td>
+            </tr>
+            <tr>
+                <th>Allocated</th>
+                <td>{{ portfolio.allocated }}</td>
+            </tr>
+            <tr>
+                <th>Goalpercentage</th>
+                <td>{{ portfolio.goalpercentage }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_admin_portfolio_controller_index') }}">back to list</a>
+
+    <a href="{{ path('app_admin_portfolio_controller_edit', {'id': portfolio.id}) }}">edit</a>
+
+    {{ include('portfolio/admin/_delete_form.html.twig') }}
+{% endblock %}

@@ -3,15 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\Position;
+use App\Entity\TickerAutocomplete;
 use App\Entity\Transaction;
+use App\Form\TickerAutocompleteType;
 use App\Form\TransactionType;
-use App\Model\PortfolioModel;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
 use App\Service\ExchangeRate\ExchangeRateInterface;
 use App\Service\Referer;
 use App\Service\WeightedAverage;
-use App\Traits\TickerAutocompleteTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,14 +21,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 #[Route(path: '/dashboard/transaction')]
 class TransactionController extends AbstractController
 {
-    use TickerAutocompleteTrait;
-
-    public const SEARCH_KEY = 'transaction_searchCriteria';
+    public const SESSION_KEY = 'transaction_searchCriteria';
 
     #[
         Route(
@@ -41,9 +39,9 @@ class TransactionController extends AbstractController
         Request $request,
         TransactionRepository $transactionRepository,
         TickerRepository $tickerRepository,
-        int $page = 1,
-        string $orderBy = 'transactionDate',
-        string $sort = 'desc'
+        #[MapQueryParameter] int $page = 1,
+        #[MapQueryParameter] string $orderBy = 'transactionDate',
+        #[MapQueryParameter] string $sort = 'desc'
     ): Response {
         if (!in_array($orderBy, ['transactionDate', 'symbol'])) {
             $orderBy = 'transactionDate';
@@ -52,12 +50,40 @@ class TransactionController extends AbstractController
             $sort = 'desc';
         }
 
-        [$form, $ticker] = $this->searchTicker(
-            $request,
-            $tickerRepository,
-            self::SEARCH_KEY,
-            true
+        $tickerAutoComplete = new TickerAutocomplete();
+        $ticker = null;
+
+        $tickerAutoCompleteCache = $request
+            ->getSession()
+            ->get(self::SESSION_KEY, null);
+
+        if ($tickerAutoCompleteCache instanceof TickerAutocomplete) {
+            // We need a mapped entity else symfony will complain
+            // This works, but i do not know if it is the best solution
+            if (
+                $tickerAutoCompleteCache->getTicker() &&
+                $tickerAutoCompleteCache->getTicker()->getId()
+            ) {
+                $ticker = $tickerRepository->find(
+                    $tickerAutoCompleteCache->getTicker()->getId()
+                );
+                $tickerAutoComplete->setTicker($ticker);
+            }
+        }
+
+        /**
+         * @var \Symfony\Component\Form\FormInterface $form
+         */
+        $form = $this->createForm(
+            TickerAutocompleteType::class,
+            $tickerAutoComplete,
+            ['extra_options' => ['include_all_tickers' => true]]
         );
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $ticker = $tickerAutoComplete->getTicker();
+            $request->getSession()->set(self::SESSION_KEY, $tickerAutoComplete);
+        }
 
         $queryBuilder = $transactionRepository->getAllQuery(
             $orderBy,
@@ -72,12 +98,10 @@ class TransactionController extends AbstractController
 
         return $this->render('transaction/index.html.twig', [
             'pager' => $pager,
+            'form' => $form,
             'thisPage' => $page,
             'order' => $orderBy,
             'sort' => $sort,
-            'routeName' => 'transaction_index',
-            'searchPath' => 'transaction_search',
-            'autoCompleteForm' => $form,
         ]);
     }
 
@@ -156,7 +180,7 @@ class TransactionController extends AbstractController
             $request
                 ->getSession()
                 ->set(
-                    self::SEARCH_KEY,
+                    self::SESSION_KEY,
                     $transaction->getPosition()->getTicker()->getSymbol()
                 );
             $request
@@ -221,7 +245,7 @@ class TransactionController extends AbstractController
             $request
                 ->getSession()
                 ->set(
-                    self::SEARCH_KEY,
+                    self::SESSION_KEY,
                     $transaction->getPosition()->getTicker()->getSymbol()
                 );
 
@@ -268,7 +292,7 @@ class TransactionController extends AbstractController
     public function search(Request $request): Response
     {
         $searchCriteria = $request->request->get('searchCriteria');
-        $request->getSession()->set(self::SEARCH_KEY, $searchCriteria);
+        $request->getSession()->set(self::SESSION_KEY, $searchCriteria);
 
         return $this->redirectToRoute('transaction_index', [
             'orderBy' => 'transactionDate',
