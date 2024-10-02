@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 
-#[Route(path: '/dashboard/payment')]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/payment')]
 class PaymentController extends AbstractController
 {
     public const SESSION_KEY = 'paymentcontroller_session';

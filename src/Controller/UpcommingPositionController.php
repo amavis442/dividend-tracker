@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\PaymentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
-#[Route(path: '/dashboard/upcomming')]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/upcomming')]
 class UpcommingPositionController extends AbstractController
 {
     #[Route(path: '/list', name: 'upcomming_position_index', methods: ['GET'])]

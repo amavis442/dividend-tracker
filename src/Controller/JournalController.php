@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 
-#[Route(path: '/dashboard/journal')]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/journal')]
 class JournalController extends AbstractController
 {
     public const TAXONOMY_KEY = 'journal_taxonomy';

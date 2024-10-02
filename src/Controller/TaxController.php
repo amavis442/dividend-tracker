@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
 
-#[Route(path: '/dashboard/tax')]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/tax')]
 class TaxController extends AbstractController
 {
     #[Route(path: '/', name: 'tax_index', methods: ['GET'])]

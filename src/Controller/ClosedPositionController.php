@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 
-#[Route(path: '/dashboard/closed/position')]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/closed/position')]
 class ClosedPositionController extends AbstractController
 {
     public const SESSION_KEY = 'closedportfolio_session';

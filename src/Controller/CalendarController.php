@@ -23,7 +23,7 @@ use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
-#[Route(path: '/dashboard/calendar')]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/calendar')]
 class CalendarController extends AbstractController
 {
     public const SESSION_KEY = 'calendar_searchCriteria';

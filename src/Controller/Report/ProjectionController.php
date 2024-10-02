@@ -12,7 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(path: '/dashboard/report')]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/report')]
 class ProjectionController extends AbstractController
 {
     public const TAX_DIVIDEND = 0.15; // %

@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 
-#[Route('/dashboard/branch')]
+#[Route('/{_locale<%app.supported_locales%>}/dashboard/branch')]
 class BranchController extends AbstractController
 {
     #[Route('/list/{page<\d+>?1}', name: 'branch_index', methods: ['GET'])]

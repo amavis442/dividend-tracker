@@ -22,11 +22,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\SecurityBundle\Security;
 
+#[Route(path: "/{_locale<%app.supported_locales%>}/dashboard/csv")]
 class ImportCsvController extends AbstractController
 {
     private const SESSION_IMPORT_RESULT_KEY = 'import_csv_result';
 
-    #[Route(path: '/dashboard/csv/import', name: 'app_csv_import')]
+    #[Route(path: '/import', name: 'app_csv_import')]
     public function index(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -99,7 +100,7 @@ class ImportCsvController extends AbstractController
 
     #[
         Route(
-            path: '/dashboard/csv/already-imported/{filename}',
+            path: '/already-imported/{filename}',
             name: 'app_csv_import_already_imported'
         )
     ]
@@ -120,7 +121,7 @@ class ImportCsvController extends AbstractController
 
     #[
         Route(
-            path: '/dashboard/csv/result-import',
+            path: '/result-import',
             name: 'app_csv_import_result'
         )
     ]

@@ -90,12 +90,12 @@
 								<br/><small>({{ calendar.ticker.symbol }})</small>
 							</td>
 							<td>{{ (calendar.dividendType ?? 'Regular')|trans }}</td>
-							<td>{{ calendar.paymentDate|format_date('medium') }}</td>
-							<td>{{ calendar.exDividendDate|format_date('medium') }}</td>
+							<td>{{ calendar.paymentDate|format_date('medium', locale=app.request.locale) }}</td>
+							<td>{{ calendar.exDividendDate|format_date('medium', locale=app.request.locale) }}</td>
 							<td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ calendar.cashAmount|format_number({ fraction_digit: 2 }) }}</td>
 							<td>{{ (calendar.source ?? 'manual')|trans }}</td>
 							<td>{{ calendar.description ?? '&mdash;' }}</td>
-							<td>{{ calendar.createdAt|format_date('short') }}</td>
+							<td>{{ calendar.createdAt|format_date('medium', locale=app.request.locale) }}</td>
 							<td>
 								<div class="btn-group" role="group">
 									<a href="{{ path('calendar_show', { id: calendar.id }) }}" class="btn btn-info" data-turbo-target="_top">

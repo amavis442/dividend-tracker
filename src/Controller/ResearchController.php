@@ -22,7 +22,7 @@ use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
-#[Route(path: '/dashboard/research')]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/research')]
 class ResearchController extends AbstractController
 {
     public const SEARCH_KEY = 'research_searchCriteria';

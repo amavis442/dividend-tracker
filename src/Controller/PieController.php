@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(path: '/dashboard/pie')]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/pie')]
 class PieController extends AbstractController
 {
     #[Route(path: '/', name: 'pie_index', methods: ['GET'])]

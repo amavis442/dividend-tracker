@@ -7,9 +7,9 @@
 {% block body %}
 	<div class="h1">
 		{{ 'Payments'|trans }}:
-		{{ startDate }}
+		{{ startDate|format_date(locale=app.request.locale) }}
 		/
-		{{ endDate }}
+		{{ endDate|format_date(locale=app.request.locale) }}
 	</div>
 
 	<section>
@@ -52,7 +52,7 @@
 		<tbody class="table-group-divider">
 			{% for payment in pager %}
 				<tr>
-					<td>{{ payment.payDate ? payment.payDate|format_date('medium') : '' }}</td>
+					<td>{{ payment.payDate ? payment.payDate|format_date('long', locale=app.request.locale) : '' }}</td>
 					<td>
 						{{ payment.position.ticker.fullname }}
 						({{ payment.position.ticker.symbol }})<br/>

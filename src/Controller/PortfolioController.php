@@ -34,7 +34,7 @@ use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
 /** @psalm-suppress PropertyNotSetInConstructor */
-#[Route(path: '/dashboard/portfolio')]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/portfolio')]
 class PortfolioController extends AbstractController
 {
     public const SESSION_KEY = 'portfoliocontroller_session';
@@ -65,7 +65,7 @@ class PortfolioController extends AbstractController
         if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
             $sort = 'asc';
         }
-
+//dd($request->getLocale(), $request->getDefaultLocale());
         $pie = null;
         $ticker = null;
 

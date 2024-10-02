@@ -13,7 +13,7 @@ use App\Entity\User;
 
 class AccountController extends AbstractController
 {
-    #[Route('/dashboard/account/update', name: 'app_account_update')]
+    #[Route('/{_locale<%app.supported_locales%>}/dashboard/account/update', name: 'app_account_update')]
     public function update(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,

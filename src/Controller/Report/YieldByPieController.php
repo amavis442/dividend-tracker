@@ -15,7 +15,7 @@ use App\Helper\Colors;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
-#[Route(path: "/dashboard/report")]
+#[Route(path: "/{_locale<%app.supported_locales%>}/dashboard/report")]
 class YieldByPieController extends AbstractController
 {
     public const TAX_DIVIDEND = 0.15; // %

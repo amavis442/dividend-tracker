@@ -10,6 +10,7 @@ parameters:
     app.dividend.tax: 0.15
     app.dividend.exchangerate: 1.19
     app.max_per_page: 10
+    app.supported_locales: 'en|nl'
 
 services:
     # default configuration for services in *this* file

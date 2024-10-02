@@ -11,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
-#[Route(path: "/dashboard/tracker")]
+#[Route(path: "/{_locale<%app.supported_locales%>}/dashboard/tracker")]
 class DividendTrackerController extends AbstractController
 {
     #[Route(path: "/dividend", name: "dividend_tracker")]

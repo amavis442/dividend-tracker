@@ -13,9 +13,17 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class RegistrationController extends AbstractController
 {
-    #[Route(path: '/dashboard/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface  $passwordHasher, EntityManagerInterface $entityManager): Response
-    {
+    #[
+        Route(
+            path: '/{_locale<%app.supported_locales%>}/dashboard/register',
+            name: 'app_register'
+        )
+    ]
+    public function register(
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $entityManager
+    ): Response {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);

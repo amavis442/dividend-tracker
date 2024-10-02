@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(path: '/dashboard/currency')]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/currency')]
 class CurrencyController extends AbstractController
 {
     #[Route(path: '/', name: 'currency_index', methods: ['GET'])]
@@ -27,8 +27,10 @@ class CurrencyController extends AbstractController
     }
 
     #[Route(path: '/create', name: 'currency_new', methods: ['GET', 'POST'])]
-    public function create(Request $request, EntityManagerInterface $entityManager): Response
-    {
+    public function create(
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
         $currency = new Currency();
         $form = $this->createForm(CurrencyType::class, $currency);
         $form->handleRequest($request);
@@ -54,9 +56,18 @@ class CurrencyController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}/edit', name: 'currency_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request,  EntityManagerInterface $entityManager, Currency $currency): Response
-    {
+    #[
+        Route(
+            path: '/{id}/edit',
+            name: 'currency_edit',
+            methods: ['GET', 'POST']
+        )
+    ]
+    public function edit(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        Currency $currency
+    ): Response {
         $form = $this->createForm(CurrencyType::class, $currency);
         $form->handleRequest($request);
 
@@ -72,7 +83,13 @@ class CurrencyController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/delete/{id}', name: 'currency_delete', methods: ['POST', 'DELETE'])]
+    #[
+        Route(
+            path: '/delete/{id}',
+            name: 'currency_delete',
+            methods: ['POST', 'DELETE']
+        )
+    ]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -82,20 +99,37 @@ class CurrencyController extends AbstractController
         PaymentRepository $paymentRepository,
         CalendarRepository $calendarRepository
     ): Response {
-        if ($this->isCsrfTokenValid('delete' . $currency->getId(), $request->request->get('_token'))) {
+        if (
+            $this->isCsrfTokenValid(
+                'delete' . $currency->getId(),
+                $request->request->get('_token')
+            )
+        ) {
             // Need to check tickers, positions, payments, calendars if there is a mandatory link so you can not remove
             // this item before decoupling them first. Boy oh boy lots of work.
-            if (($tickerRepository->findOneBy(['currency_id' =>  $currency->getId()]) &&
-                $positionRepository->findOneBy(['currency_id' => $currency->getId()]) &&
-                $paymentRepository->findOneBy(['currency_id' => $currency->getId()]) &&
-                $calendarRepository->findOneBy(['currency_id' => $currency->getId()])) == null) {
-
+            if (
+                ($tickerRepository->findOneBy([
+                    'currency_id' => $currency->getId(),
+                ]) &&
+                    $positionRepository->findOneBy([
+                        'currency_id' => $currency->getId(),
+                    ]) &&
+                    $paymentRepository->findOneBy([
+                        'currency_id' => $currency->getId(),
+                    ]) &&
+                    $calendarRepository->findOneBy([
+                        'currency_id' => $currency->getId(),
+                    ])) == null
+            ) {
                 $entityManager->remove($currency);
                 $entityManager->flush();
 
                 return $this->redirectToRoute('currency_index');
             }
-            $this->addFlash('notice', 'Can not remove currency. It has connections to either ticker, position, calendar and /or payment');
+            $this->addFlash(
+                'notice',
+                'Can not remove currency. It has connections to either ticker, position, calendar and /or payment'
+            );
         }
 
         return $this->redirectToRoute('currency_index');

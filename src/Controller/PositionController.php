@@ -22,7 +22,7 @@ use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
-#[Route(path: '/dashboard/position')]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/position')]
 class PositionController extends AbstractController
 {
     public const SESSION_KEY = 'positioncontroller_session';

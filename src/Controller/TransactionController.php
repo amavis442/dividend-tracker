@@ -23,7 +23,7 @@ use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
-#[Route(path: '/dashboard/transaction')]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/transaction')]
 class TransactionController extends AbstractController
 {
     public const SESSION_KEY = 'transaction_searchCriteria';

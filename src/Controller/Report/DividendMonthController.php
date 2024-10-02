@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(path: '/dashboard/report')]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/report')]
 class DividendMonthController extends AbstractController
 {
     #[Route(path: '/dividendmonth', name: 'dividend_month_index')]
