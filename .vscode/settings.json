@@ -2,11 +2,7 @@
     "gitlens.statusBar.enabled": false,
     "gitlens.hovers.enabled": false,
     "gitlens.blame.format": "${author|10} ${date}",
-    "gitlens.blame.highlight.locations": [
-        "gutter",
-        "line",
-        "overview"
-    ],
+    "gitlens.blame.highlight.locations": ["gutter", "line", "overview"],
     "gitlens.blame.avatars": false,
     "gitlens.blame.compact": false,
     "gitlens.defaultDateFormat": "DD/MM/YYYY",
@@ -52,4 +48,5 @@
     "eslint.format.enable": true,
     "eslint.codeActionsOnSave.mode": "all",
     "prettier.prettierPath": "/home/patrick/.nvm/versions/node/v20.17.0/lib/node_modules/prettier",
+    "psalm.phpExecutablePath": "/home/patrick/bin/psalm.phar"
 }
