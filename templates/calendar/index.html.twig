@@ -98,10 +98,10 @@
 							<td>{{ calendar.createdAt|format_date('medium', locale=app.request.locale) }}</td>
 							<td>
 								<div class="btn-group" role="group">
-									<a href="{{ path('calendar_show', { id: calendar.id }) }}" class="btn btn-info" data-turbo-target="_top">
+									<a href="{{ path('calendar_show', { id: calendar.id }) }}" class="btn btn-info" data-turbo-frame="_top">
 										<i class="fas fa-book-open"></i>
 									</a>
-									<a href="{{ path('calendar_edit', { id: calendar.id }) }}" class="btn btn-primary" data-turbo-target="_top">
+									<a href="{{ path('calendar_edit', { id: calendar.id }) }}" class="btn btn-primary" data-turbo-frame="_top">
 										<i class="far fa-edit"></i>
 									</a>
 								</div>
