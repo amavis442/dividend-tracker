@@ -2,7 +2,11 @@
     "gitlens.statusBar.enabled": false,
     "gitlens.hovers.enabled": false,
     "gitlens.blame.format": "${author|10} ${date}",
-    "gitlens.blame.highlight.locations": ["gutter", "line", "overview"],
+    "gitlens.blame.highlight.locations": [
+        "gutter",
+        "line",
+        "overview"
+    ],
     "gitlens.blame.avatars": false,
     "gitlens.blame.compact": false,
     "gitlens.defaultDateFormat": "DD/MM/YYYY",
@@ -16,7 +20,7 @@
     "window.zoomLevel": 0,
     "editor.minimap.enabled": false,
     "editor.insertSpaces": true,
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "editor.tabSize": 4,
     "editor.formatOnPaste": true,
     "editor.formatOnSaveMode": "modifications",
@@ -36,17 +40,13 @@
         "**/node_modules": true,
         "**/var": true
     },
-    "cSpell.words": [
-        "bbands",
-        "Bollinger",
-        "chrisleekr",
-        "MACD",
-        "mrkdwn",
-        "tradingview",
-        "tulind"
-    ],
-    "eslint.format.enable": true,
-    "eslint.codeActionsOnSave.mode": "all",
-    "prettier.prettierPath": "/home/patrick/.nvm/versions/node/v20.17.0/lib/node_modules/prettier",
-    "psalm.phpExecutablePath": "/home/patrick/bin/psalm.phar"
+    "[twig]": {
+        "editor.defaultFormatter": "jkillian.custom-local-formatters"
+    },
+    "pretty-php.formatting.alignment.alignData": true,
+    "pretty-php.formatting.alignment.alignChains": true,
+    "pretty-php.formatting.alignment.alignComments": true,
+    "pretty-php.formatting.alignment.alignLists": true,
+    "pretty-php.formatting.alignment.alignTernaryOperators": true,
+    "pretty-php.formatting.blankBeforeReturn": true
 }

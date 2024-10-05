@@ -1,8 +1,14 @@
-# Ignore artifacts:
-build
-coverage
+# COMPOSER
+/vendor
 
-# Ignore all TWIG files:
-**/*.twig
+# CRAFT STORAGE
+/storage/*
 
-**/*.yaml
+# Document root
+/web/*
+
+# BUILD FILES
+/bower_components/*
+/node_modules/*
+/build/*
+/yarn-error.log
