@@ -3,19 +3,13 @@
 namespace App\Service;
 
 use App\Entity\Position;
-use App\Entity\Transaction;
 use Doctrine\ORM\EntityManagerInterface;
-use DateTime;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class PositionService
 {
     public function __construct(
-        #[Autowire("@doctrine.orm.entity_manager")]
         private EntityManagerInterface $entityManager
-    ) {
-        $this->entityManager = $entityManager;
-    }
+    ) {}
 
     private function presetMetrics(Position $position): void
     {
@@ -31,32 +25,6 @@ class PositionService
         if ($position->getClosed()) {
             $position->setAllocation(0);
         }
-    }
-
-    public function create(Position $position): void
-    {
-        $currentDate = new DateTime();
-        $this->presetMetrics($position);
-
-        $transaction = new Transaction();
-        $transaction->setSide(Transaction::BUY)
-            ->setAmount((float) $position->getAmount())
-            ->setPrice($position->getPrice())
-            ->setCurrency($position->getCurrency())
-            ->setAllocation($position->getAllocation())
-            ->setAllocationCurrency($position->getAllocationCurrency())
-            ->setTransactionDate($currentDate);
-
-        if ($position->getAmount()) {
-            $transaction->setAmount((float) $position->getAmount());
-        }
-
-        $position->addTransaction($transaction);
-
-        $position->setClosed(false);
-        $this->entityManager->persist($transaction);
-        $this->entityManager->persist($position);
-        $this->entityManager->flush();
     }
 
     public function update(Position $position): void

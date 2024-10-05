@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Portfolio;
 use App\Entity\Position;
-use App\Entity\Ticker;
 use App\Entity\TickerAutocomplete;
 use App\Form\PositionType;
 use App\Form\TickerAutocompleteType;
@@ -120,47 +119,6 @@ class PositionController extends AbstractController
         ]);
     }
 
-    #[
-        Route(
-            path: '/create/{ticker?}',
-            name: 'position_new',
-            methods: ['GET', 'POST']
-        )
-    ]
-    public function create(
-        Request $request,
-        PositionService $positionService,
-        ?Ticker $ticker = null
-    ): Response {
-        $position = new Position();
-
-        if ($ticker != null) {
-            $position->setTicker($ticker);
-        }
-        $form = $this->createForm(PositionType::class, $position);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $positionService->create($position);
-            $request
-                ->getSession()
-                ->set(self::SESSION_KEY, $position->getTicker()->getSymbol());
-            $request
-                ->getSession()
-                ->set(
-                    PortfolioController::SESSION_KEY,
-                    $position->getTicker()->getSymbol()
-                );
-
-            return $this->redirectToRoute('portfolio_index');
-        }
-
-        return $this->render('position/new.html.twig', [
-            'position' => $position,
-            'form' => $form->createView(),
-        ]);
-    }
-
     #[Route(path: '/{id}', name: 'position_show', methods: ['GET'])]
     public function show(Position $position): Response
     {
@@ -181,14 +139,13 @@ class PositionController extends AbstractController
     public function edit(
         Request $request,
         Position $position,
-        PositionService $positionService,
-        Referer $referer
+        Referer $referer,
+        EntityManagerInterface $entityManager
     ): Response {
         $form = $this->createForm(PositionType::class, $position);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $positionService->update($position);
             $request
                 ->getSession()
                 ->set(self::SESSION_KEY, $position->getTicker()->getSymbol());
@@ -197,6 +154,9 @@ class PositionController extends AbstractController
             if ($refLink != null) {
                 return $this->redirect($refLink);
             }
+
+            $entityManager->persist($position);
+            $entityManager->flush();
             return $this->redirectToRoute('position_index');
         }
 

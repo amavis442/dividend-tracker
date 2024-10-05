@@ -74,13 +74,10 @@
 					<td>
 						<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
 							<div class="btn-group mr-2" role="group" aria-label="First group">
-								<a class="btn btn-secondary" href="{{ path('position_new', { ticker: ticker.id }) }}" data-toggle="tooltip" data-placement="top" title="add new position">
-									<i class="fas fa-plus"></i>
-								</a>
 								<a href="{{ path('ticker_show', { id: ticker.id }) }}" class="btn btn-primary">
 									<i class="fas fa-book-open"></i>
 								</a>
-								<a href="{{ path('ticker_edit', { id: ticker.id }) }}" class="btn btn-primary">
+								<a href="{{ path('ticker_edit', { id: ticker.id }) }}" class="btn btn-primary" data-turbo-frame="_top">
 									<i class="far fa-edit"></i>
 								</a>
 								<a class="btn btn-secondary" href="{{ path('calendar_new', { ticker: ticker.id }) }}" data-toggle="tooltip" data-placement="top" title="add dividend date">
