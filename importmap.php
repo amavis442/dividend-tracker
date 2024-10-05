@@ -269,9 +269,6 @@ return [
         'version' => '43.1.1',
         'type' => 'css',
     ],
-    '@stimulus-components/popover' => [
-        'version' => '7.0.0',
-    ],
     'just-extend' => [
         'version' => '6.2.0',
     ],
