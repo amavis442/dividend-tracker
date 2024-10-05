@@ -1,4 +1,12 @@
 #tooltip {
+    /* Float on top of the UI */
+    position: absolute;
+
+    /* Avoid layout interference */
+    width: max-content;
+    top: 0;
+    left: 0;
+
     background: #333;
     color: white;
     font-weight: bold;
@@ -8,38 +16,12 @@
     display: none;
 }
 
-#arrow,
-#arrow::before {
+#arrow {
     position: absolute;
+    background: #222;
     width: 8px;
     height: 8px;
-    background: inherit;
-}
-
-#arrow {
-    visibility: hidden;
-}
-
-#arrow::before {
-    visibility: visible;
-    content: "";
     transform: rotate(45deg);
-}
-
-#tooltip[data-popper-placement^="top"]>#arrow {
-    bottom: -4px;
-}
-
-#tooltip[data-popper-placement^="bottom"]>#arrow {
-    top: -4px;
-}
-
-#tooltip[data-popper-placement^="left"]>#arrow {
-    right: -4px;
-}
-
-#tooltip[data-popper-placement^="right"]>#arrow {
-    left: -4px;
 }
 
 #tooltip[data-show] {

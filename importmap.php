@@ -272,9 +272,6 @@ return [
     '@stimulus-components/popover' => [
         'version' => '7.0.0',
     ],
-    'dropzone' => [
-        'version' => '6.0.0-beta.2',
-    ],
     'just-extend' => [
         'version' => '6.2.0',
     ],
@@ -295,5 +292,27 @@ return [
     ],
     'picocolors' => [
         'version' => '1.0.1',
+    ],
+    'tom-select/dist/css/tom-select.default.css' => [
+        'version' => '2.3.1',
+        'type' => 'css',
+    ],
+    '@floating-ui/dom' => [
+        'version' => '1.6.11',
+    ],
+    '@floating-ui/core' => [
+        'version' => '1.6.8',
+    ],
+    '@floating-ui/utils' => [
+        'version' => '0.2.8',
+    ],
+    '@floating-ui/utils/dom' => [
+        'version' => '0.2.8',
+    ],
+    'stimulus-use' => [
+        'version' => '0.52.2',
+    ],
+    '@stimulus-components/dropdown' => [
+        'version' => '3.0.0',
     ],
 ];
