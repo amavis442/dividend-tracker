@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Importer;
 
 use App\Entity\Branch;
 use App\Entity\Currency;
@@ -8,33 +8,16 @@ use App\Entity\Position;
 use App\Entity\Tax;
 use App\Entity\Ticker;
 use App\Entity\User;
-use App\Repository\BranchRepository;
-use App\Repository\CurrencyRepository;
 use App\Repository\PositionRepository;
-use App\Repository\TaxRepository;
 use App\Repository\TickerRepository;
-use App\Repository\TransactionRepository;
-use App\Service\WeightedAverage;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\SecurityBundle\Security;
-use App\Service\CsvReader;
-use DOMNode;
 
-abstract class ImportBase
+abstract class AbstractImporter
 {
-    abstract protected function formatImportData(array|DOMNode $data): ?array;
+
     abstract public function importFile(
-        EntityManagerInterface $entityManager,
-        TickerRepository $tickerRepository,
-        PositionRepository $positionRepository,
-        WeightedAverage $weightedAverage,
-        CurrencyRepository $currencyRepository,
-        BranchRepository $branchRepository,
-        TransactionRepository $transactionRepository,
-        TaxRepository $taxRepository,
-        UploadedFile $uploadedFile,
-        Security $security
+        UploadedFile $uploadedFile
     ): array;
 
     protected function getImportFiles(): array
@@ -62,13 +45,12 @@ abstract class ImportBase
         Currency $currency,
         PositionRepository $positionRepository,
         Security $security,
-        array $data
+        \DateTime $transactionDate
     ): Position {
         $user = $security->getUser();
         if (!$user instanceof User) {
             throw new \RuntimeException('No user available');
         }
-        $transactionDate = $data['transactionDate'];
         $position = $positionRepository->findOneByTickerAndDate(
             $ticker,
             $transactionDate

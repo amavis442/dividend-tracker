@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Importer;
 
 use App\Entity\Branch;
 use App\Entity\Currency;
 use App\Entity\Tax;
 use App\Entity\Transaction;
 use App\Repository\BranchRepository;
+use App\Repository\CalendarRepository;
 use App\Repository\CurrencyRepository;
+use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TaxRepository;
 use App\Repository\TickerRepository;
@@ -15,7 +17,6 @@ use App\Repository\TransactionRepository;
 use App\Service\WeightedAverage;
 use DateTime;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
@@ -24,8 +25,22 @@ use ZBateson\MailMimeParser\MailMimeParser;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Uid\Uuid;
 
-class ImportMail extends ImportBase
+class ImportMail extends AbstractImporter
 {
+    public function __construct(
+        protected TickerRepository $tickerRepository,
+        protected CurrencyRepository $currencyRepository,
+        protected PositionRepository $positionRepository,
+        protected BranchRepository $branchRepository,
+        protected TransactionRepository $transactionRepository,
+        protected PaymentRepository $paymentRepository,
+        protected CalendarRepository $calendarRepository,
+        protected EntityManager $entityManager,
+        protected WeightedAverage $weightedAverage,
+        protected TaxRepository $taxRepository,
+        protected Security $security
+    ) {}
+
     protected function formatImportData(array|DOMNode $data): array
     {
         return $this->importData($data);
@@ -118,24 +133,15 @@ class ImportMail extends ImportBase
         return $rows;
     }
 
-    public function import(
-        TickerRepository $tickerRepository,
-        CurrencyRepository $currencyRepository,
-        PositionRepository $positionRepository,
-        WeightedAverage $weightedAverage,
-        BranchRepository $branchRepository,
-        TransactionRepository $transactionRepository,
-        TaxRepository $taxRepository,
-        EntityManager $entityManager,
-        Security $security
-    ): void {
+    public function import(): void
+    {
         ini_set('max_execution_time', 3000);
 
         $files = $this->getImportFiles();
         sort($files);
         $internalErrors = libxml_use_internal_errors(true);
-        $currency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
-        $branch = $branchRepository->findOneBy(['label' => 'Tech']);
+        $currency = $this->currencyRepository->findOneBy(['symbol' => 'EUR']);
+        $branch = $this->branchRepository->findOneBy(['label' => 'Tech']);
 
         // use an instance of MailMimeParser as a class dependency
         $mailParser = new MailMimeParser();
@@ -156,15 +162,15 @@ class ImportMail extends ImportBase
             $tables = $DOM->getElementsByTagName('table');
             $tableNodes = $tables[3];
             $rows = $this->formatImportData($tableNodes);
-            $defaultTax = $taxRepository->find(1);
+            $defaultTax = $this->taxRepository->find(1);
 
             if (count($rows) > 0) {
                 ksort($rows);
 
                 foreach ($rows as $row) {
-                    $ticker = $this->preImportCheckTicker($entityManager, $branch, $tickerRepository, $defaultTax, $row);
-                    $position = $this->preImportCheckPosition($entityManager, $ticker, $currency, $positionRepository, $security, $row);
-                    $transaction = $transactionRepository->findOneBy(['transactionDate' => $row['transactionDate'], 'position' => $position, 'meta' => $row['nr']]);
+                    $ticker = $this->preImportCheckTicker($this->entityManager, $branch, $this->tickerRepository, $defaultTax, $row);
+                    $position = $this->preImportCheckPosition($this->entityManager, $ticker, $currency, $this->positionRepository, $this->security, $row);
+                    $transaction = $this->transactionRepository->findOneBy(['transactionDate' => $row['transactionDate'], 'position' => $position, 'meta' => $row['nr']]);
 
                     if (!$transaction) {
                         $transaction = new Transaction();
@@ -185,7 +191,7 @@ class ImportMail extends ImportBase
                             ->setUuid($uuid);
 
                         $position->addTransaction($transaction);
-                        $weightedAverage->calc($position);
+                        $this->weightedAverage->calc($position);
 
                         if ((float) $position->getAmount() == 0) {
                             $position->setClosed(true);
@@ -196,8 +202,8 @@ class ImportMail extends ImportBase
                             $position->setAmount(0);
                         }
 
-                        $entityManager->persist($position);
-                        $entityManager->flush();
+                        $this->entityManager->persist($position);
+                        $this->entityManager->flush();
                         $transactionsAdded++;
                     } else {
                         dump('Transaction already exists. ID: ' . $transaction->getId());
@@ -214,18 +220,7 @@ class ImportMail extends ImportBase
     }
 
     public function importFile(
-        EntityManagerInterface $entityManager,
-        TickerRepository $tickerRepository,
-        PositionRepository $positionRepository,
-        WeightedAverage $weightedAverage,
-        CurrencyRepository $currencyRepository,
-        BranchRepository $branchRepository,
-        TransactionRepository $transactionRepository,
-        TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
-        Security $security,
-        \App\Service\CsvReader $reader = null
-
     ): array {
         return [];
     }

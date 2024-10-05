@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Importer;
 
 use App\Entity\Branch;
 use App\Entity\Calendar;
-use App\Entity\Currency;
 use App\Entity\Payment;
+use App\Entity\Position;
 use App\Entity\Transaction;
 use App\Entity\Tax;
 use App\Repository\BranchRepository;
@@ -19,7 +19,6 @@ use App\Repository\TransactionRepository;
 use App\Service\WeightedAverage;
 use App\Service\CsvReader;
 use DateTime;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -27,85 +26,24 @@ use Symfony\Bundle\SecurityBundle\Security;
 use DOMNode;
 use Symfony\Component\Uid\Uuid;
 
-class ImportCsvService extends ImportBase
+class ImportCsvService extends AbstractImporter
 {
-    /**
-     * @var TickerRepository
-     */
-    protected TickerRepository $tickerRepository;
-
-    /**
-     * Undocumented variable
-     *
-     * @var CurrencyRepository
-     */
-    protected CurrencyRepository $currencyRepository;
-    /**
-     * Undocumented variable
-     *
-     * @var PositionRepository
-     */
-    protected PositionRepository $positionRepository;
-    /**
-     * Undocumented variable
-     *
-     * @var WeightedAverage
-     */
-    protected WeightedAverage $weightedAverage;
-    /**
-     * Undocumented variable
-     *
-     * @var BranchRepository
-     */
-    protected BranchRepository $branchRepository;
-    /**
-     * Undocumented variable
-     *
-     * @var TransactionRepository
-     */
-    protected TransactionRepository $transactionRepository;
-    /**
-     * Undocumented variable
-     *
-     * @var PaymentRepository
-     */
-    protected PaymentRepository $paymentRepository;
-    /**
-     * Undocumented variable
-     *
-     * @var CalendarRepository
-     */
-    protected CalendarRepository $calendarRepository;
-    /**
-     * Undocumented variable
-     *
-     * @var EntityManagerInterface
-     */
-    protected EntityManagerInterface $entityManager;
-
     private int $importedDividendLines = 0;
-
     private string $filename = '';
 
     public function __construct(
-        TickerRepository $tickerRepository,
-        CurrencyRepository $currencyRepository,
-        PositionRepository $positionRepository,
-        BranchRepository $branchRepository,
-        TransactionRepository $transactionRepository,
-        PaymentRepository $paymentRepository,
-        CalendarRepository $calendarRepository,
-        EntityManager $entityManager
-    ) {
-        $this->tickerRepository = $tickerRepository;
-        $this->currencyRepository = $currencyRepository;
-        $this->positionRepository = $positionRepository;
-        $this->branchRepository = $branchRepository;
-        $this->transactionRepository = $transactionRepository;
-        $this->paymentRepository = $paymentRepository;
-        $this->calendarRepository = $calendarRepository;
-        $this->entityManager = $entityManager;
-    }
+        protected TickerRepository $tickerRepository,
+        protected CurrencyRepository $currencyRepository,
+        protected PositionRepository $positionRepository,
+        protected BranchRepository $branchRepository,
+        protected TransactionRepository $transactionRepository,
+        protected PaymentRepository $paymentRepository,
+        protected CalendarRepository $calendarRepository,
+        protected EntityManagerInterface $entityManager,
+        protected WeightedAverage $weightedAverage,
+        protected TaxRepository $taxRepository,
+        protected Security $security
+    ) {}
 
     protected function formatImportData(array|DOMNode $data): array
     {
@@ -160,11 +98,11 @@ class ImportCsvService extends ImportBase
         );
 
         /**
-         * @var \App\Entity\Position $position
+         * @var Position $position
          */
         $position = $ticker->getPositions()->first();
 
-        if (!$position instanceof \App\Entity\Position) {
+        if (!$position instanceof Position) {
             throw new RuntimeException(
                 'There is no position for this dividend payment to link to. Are you sure you have the right account?'
             );
@@ -360,16 +298,7 @@ class ImportCsvService extends ImportBase
     }
 
     public function importFile(
-        EntityManagerInterface $entityManager,
-        TickerRepository $tickerRepository,
-        PositionRepository $positionRepository,
-        WeightedAverage $weightedAverage,
-        CurrencyRepository $currencyRepository,
-        BranchRepository $branchRepository,
-        TransactionRepository $transactionRepository,
-        TaxRepository $taxRepository,
         UploadedFile $uploadedFile,
-        Security $security
     ): array {
         $transactionsAdded = 0;
         $totalTransaction = 0;
@@ -380,56 +309,55 @@ class ImportCsvService extends ImportBase
         $reader = new CsvReader($uploadedFile->getRealPath());
         $rows = $reader->getRows();
         $rows = $this->formatImportData($rows);
+        $defaultCurrency = $this->currencyRepository->findOneBy(['symbol' => 'EUR']);
 
-        $defaultCurrency = $currencyRepository->findOneBy(['symbol' => 'EUR']);
-
-        $defaultTax = $taxRepository->find(1);
+        $defaultTax = $this->taxRepository->find(1);
         if (!$defaultTax) {
             $defaultTax = new Tax();
             $defaultTax->setTaxRate(15);
-            $entityManager->persist($defaultTax);
-            $entityManager->flush();
+            $this->entityManager->persist($defaultTax);
+            $this->entityManager->flush();
         }
 
-        $defaultBranch = $branchRepository->findOneBy([
+        $defaultBranch = $this->branchRepository->findOneBy([
             'label' => 'Unassigned',
         ]);
         if (!$defaultBranch) {
             $defaultBranch = new Branch();
             $defaultBranch->setLabel('Unassigned');
             $defaultBranch->setDescription('Unassigned');
-            $entityManager->persist($defaultBranch);
-            $entityManager->flush();
+            $this->entityManager->persist($defaultBranch);
+            $this->entityManager->flush();
         }
 
         if (count($rows) > 0) {
             foreach ($rows as $row) {
                 $ticker = $this->preImportCheckTicker(
-                    $entityManager,
+                    $this->entityManager,
                     $defaultBranch,
-                    $tickerRepository,
+                    $this->tickerRepository,
                     $defaultTax,
                     $row
                 );
-                $transaction = $transactionRepository->findOneBy([
+                $transaction = $this->transactionRepository->findOneBy([
                     'jobid' => $row['opdrachtid'],
                 ]);
 
                 if (!$transaction) {
                     $position = $this->preImportCheckPosition(
-                        $entityManager,
+                        $this->entityManager,
                         $ticker,
                         $defaultCurrency,
-                        $positionRepository,
-                        $security,
-                        $row
+                        $this->positionRepository,
+                        $this->security,
+                        $row['transactionDate']
                     );
                     $uuid = Uuid::v4();
 
-                    $originalPriceCurrency = $currencyRepository->findOneBy([
+                    $originalPriceCurrency = $this->currencyRepository->findOneBy([
                         'symbol' => $row['original_price_currency'],
                     ]);
-                    $totalCurrency = $currencyRepository->findOneBy([
+                    $totalCurrency = $this->currencyRepository->findOneBy([
                         'symbol' => $row['total_currency'],
                     ]);
 
@@ -476,7 +404,7 @@ class ImportCsvService extends ImportBase
                         $transaction->setProfit($row['profit']);
                     }
                     $position->addTransaction($transaction);
-                    $weightedAverage->calc($position);
+                    $this->weightedAverage->calc($position);
 
                     if (
                         (float) $position->getAmount() == 0 ||
@@ -487,8 +415,8 @@ class ImportCsvService extends ImportBase
                         $position->setAmount(0);
                     }
 
-                    $entityManager->persist($position);
-                    $entityManager->flush();
+                    $this->entityManager->persist($position);
+                    $this->entityManager->flush();
                     $transactionsAdded++;
                 } else {
                     $transactionAlreadyExists[] =
@@ -507,7 +435,7 @@ class ImportCsvService extends ImportBase
             'dividendsImported' => $this->importedDividendLines,
             'status' => 'ok',
             'msg' =>
-                'File [' .
+            'File [' .
                 $uploadedFile->getClientOriginalName() .
                 '] imported.',
         ];
