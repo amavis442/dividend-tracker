@@ -99,7 +99,15 @@
 											{% else %}
 												{{ cal.ticker.fullname }}
 											{% endif %}
-											<i class="fas fa-info-circle" data-bs-toggle="popover" data-bs-html="true" data-bs-placement="right" data-bs-content="{{ tickerInfo }}"></i>
+											<span data-controller="popper">
+											<i class="fas fa-info-circle"
+												data-popper-target="element"
+												data-action="mouseenter->popper#show mouseleave->popper#hide"></i>
+												<div id="tooltip" role="tooltip" data-popper-target="tooltip">
+                       								{{ tickerInfo|raw }}
+                        							<div id="arrow" data-popper-target="tooltipArrow"></div>
+                    							</div>
+											</span>
 											<br/>
 											<small>{{ estimatedAmount|format_number({fraction_digit: 7}) }}
 												{{ 'shares'|trans }}</small>
