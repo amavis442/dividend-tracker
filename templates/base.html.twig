@@ -18,9 +18,11 @@
     </head>
     <body class="bg-light">
         <header>
-            {% include 'navbar.html.twig' %}
+            {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                {% include 'tw-navbar.html.twig' %}
+            {% endif %}
         </header>
-        <main class="container" id="app">
+        <main class="w-full mx-auto justify-center content-center p-4" id="app">
             {% block body %}{% endblock %}
         </main>
         <footer></footer>

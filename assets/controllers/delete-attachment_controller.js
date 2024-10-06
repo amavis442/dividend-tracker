@@ -23,7 +23,7 @@ export default class extends Controller {
             ).then(data => {
 
                 if (data.success) {
-                    this.attachmentTarget.parentNode.classList.add('tw-transform', 'tw-opacity-0', 'tw-transition', 'tw-duration-1000');
+                    this.attachmentTarget.parentNode.classList.add('transform', 'opacity-0', 'transition', 'duration-1000');
                     setTimeout(() => this.attachmentTarget.parentNode.remove(), 1000)
                 } else {
                     alert(data.error)

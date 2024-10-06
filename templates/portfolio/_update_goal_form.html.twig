@@ -1,13 +1,13 @@
 <turbo-frame id="goal-form">
 <!-- Card Goal -->
-<div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-6 tw-flex tw-flex-col tw-items-center">
-	<h2 class="tw-text-gray-500 tw-font-medium tw-text-sm">{{ 'Goal'|trans }}</h2>
+<div class="bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
+	<h2 class="text-gray-500 font-medium text-sm">{{ 'Goal'|trans }}</h2>
 
     {{ form_start(form) }}
         {{ form_errors(form) }}
-        <div class="tw-form-group">
+        <div class="form-group">
 
-            <div class="tw-mt-2 tw-text-sm tw-text-red-600 dark:tw-text-red-500">
+            <div class="mt-2 text-sm text-red-600 dark:text-red-500">
                 {{ form_errors(form.goal, {
                         attr: { 'data-turbo-frame': 'goal-form' }
                 }) }}
@@ -16,25 +16,25 @@
             <input name="{{ field_name(form.goal) }}"
                 value="{{ field_value(form.goal) }}"
                 placeholder="{{ field_label(form.goal) }}"
-                class="tw-border tw-border-gray-300 tw-p-1
-                    tw-text-gray-900 tw-text-xs tw-rounded-lg
-                    focus:tw-ring-blue-500 focus:tw-border-blue-500
-                    dark:tw-bg-gray-700 dark:tw-border-gray-600
-                        dark:w-placeholder-gray-400 dark:tw-text-white
-                    dark:focus:tw-ring-blue-500 dark:focus:tw-border-blue-500
+                class="border border-gray-300 p-1
+                    text-gray-900 text-xs rounded-lg
+                    focus:ring-blue-500 focus:border-blue-500
+                    dark:bg-gray-700 dark:border-gray-600
+                        dark:w-placeholder-gray-400 dark:text-white
+                    dark:focus:ring-blue-500 dark:focus:border-blue-500
             ">
-            <button type="submit" class="focus:tw-outline-none tw-text-white tw-bg-green-700
-            hover:tw-bg-green-800 focus:tw-ring-4
-            focus:tw-ring-green-300 tw-font-medium tw-rounded-lg
-            tw-text-sm tw-px-1 tw-py-1 tw-mb-2 dark:tw-bg-green-600
-            dark:hover:tw-bg-green-700 dark:focus:tw-ring-green-800">
+            <button type="submit" class="focus:outline-none text-white bg-green-700
+            hover:bg-green-800 focus:ring-4
+            focus:ring-green-300 font-medium rounded-lg
+            text-sm px-1 py-1 mb-2 dark:bg-green-600
+            dark:hover:bg-green-700 dark:focus:ring-green-800">
             save
             </button>
-            <button type="button" class="focus:tw-outline-none tw-text-white tw-bg-red-700
-                                                            hover:tw-bg-red-800 focus:tw-ring-4 focus:tw-ring-red-300
-                                                            tw-font-medium tw-rounded-lg tw-text-sm tw-px-1
-                                                            tw-py-1 tw-mb-2 dark:tw-bg-red-600
-                                                            dark:hover:tw-bg-red-700 dark:focus:tw-ring-red-900">
+            <button type="button" class="focus:outline-none text-white bg-red-700
+                                                            hover:bg-red-800 focus:ring-4 focus:ring-red-300
+                                                            font-medium rounded-lg text-sm px-1
+                                                            py-1 mb-2 dark:bg-red-600
+                                                            dark:hover:bg-red-700 dark:focus:ring-red-900">
                 cancel
             </button>
         </div>

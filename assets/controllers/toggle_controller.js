@@ -34,14 +34,8 @@ export default class extends Controller {
     }
 
     clickOutside(event) {
-        if (this.data.get("clickOutside") === "add") {
-            this.toggleableTargets.forEach((target) => {
-                target.classList.add(target.dataset.cssClass);
-            });
-        } else if (this.data.get("clickOutside") === "remove") {
-            this.toggleableTargets.forEach((target) => {
-                target.classList.remove(target.dataset.cssClass);
-            });
-        }
+        this.toggleableTargets.forEach((target) => {
+            target.classList.add(target.dataset.cssClass);
+        });
     }
 }

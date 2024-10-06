@@ -5,14 +5,14 @@
                                           cancelButtonText: 'Cancel'|trans,
                                           }) }}
 {{ stimulus_action('delete-confirm','onSubmit') }}
-class="tw-appearance-none"
+class="appearance-none"
 >
     <input type="hidden" name="_method" value="DELETE">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ position.id) }}">
 
     <div data-controller="popper">
         <button id="deleteBtn" data-popper-target="element" data-action="mouseenter->popper#show mouseleave->popper#hide"
-       class="tw-bg-red-400 tw-text-white tw-px-4 tw-py-2 tw-rounded-lg hover:tw-bg-red-600"
+       class="bg-red-400 text-white px-4 py-2 rounded-lg hover:bg-red-600"
         >
         <i class="fas fa-trash"></i>
         </button>
