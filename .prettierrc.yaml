@@ -13,4 +13,3 @@ twigMultiTags:
 plugins:
   - "@prettier/plugin-php"
   - "prettier-plugin-tailwindcss"
-  - "@zackad/prettier-plugin-twig"
