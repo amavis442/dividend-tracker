@@ -1,7 +1,33 @@
-// src/controllers/popper_controller.js
+// src/controllers/tooltip_controller.js
 import { Controller } from '@hotwired/stimulus';
 //import { createPopper } from "@popperjs/core";
 import { computePosition, autoUpdate, offset, flip, shift, arrow } from '@floating-ui/dom';
+
+/*
+ * Usage
+ * =====
+ * add data-controller="tooltip" to common ancestor
+ *
+ * Action (add this to your button):
+ * data-action="mouseenter->tooltip#show mouseleave->tooltip#hide" data-tooltip-target="element"
+ *
+ * Targets (add this to the item to be shown/hidden):
+ * data-tooltip-target="tooltip"
+ *
+ * Example:
+ * =====
+ *
+ *  <span data-controller="tooltip">
+ *     <i class="fas fa-info-circle"
+ *        data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"></i>
+ *       <div id="tooltip" role="tooltip" data-tooltip-target="tooltip">
+ *           content to show
+ *           <div id="arrow" data-tooltip-target="tooltipArrow"></div>
+ *       </div>
+ * </span>
+ */
+
+
 
 
 /* stimulusFetch: 'lazy' */
