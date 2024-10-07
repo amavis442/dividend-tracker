@@ -30,7 +30,11 @@
 						&euro;{{ portfolio.goal|format_number({fraction_digit: 2}) }}
 						<a
 							href="{{ path('portfolio_update_goal') }}"
-							class="btn btn-sm btn-secondary"
+							class="focus:outline-none text-white bg-green-700
+            hover:bg-green-800 focus:ring-4
+            focus:ring-green-300 font-medium rounded-lg
+            text-sm px-1 py-1 mb-2 dark:bg-green-600
+            dark:hover:bg-green-700 dark:focus:ring-green-800"
 							data-turbo-frame="_self"
 						>Edit</a>
 					</span>

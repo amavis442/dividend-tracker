@@ -3,57 +3,67 @@
   <div>
     <strong>{{ 'Frequency'|trans }}</strong>
   </div>
-  <div class="alert alert-primary" role="alert">{{ position.dividendPayoutFrequency }}
-    {{ 'x per year'|trans }}</div>
+  <twig:Alert:Primary>{{ position.dividendPayoutFrequency }}
+    {{ 'x per year'|trans }}</twig:Alert:Primary>
 {% endset %}
 {% set dividendDateInfo = '' %}
 {% set dividendDateInfo %}
+  <hr class="mt-2"/>
+
   <div>
     <strong>{{ 'Dates'|trans }}</strong>
   </div>
-  <ul class="list-group">
+  <ul class="w-56 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
     {% for calendar in position.dividendCalendars %}
-      <li class="list-group-item">
+      <li class="w-full px-4 py-2 {% if not loop.last %}border-b{% endif %} border-gray-200 {% if loop.index == 0 %}rounded-t-lg{% endif %} {% if loop.last %}rounded-b-lg{% endif %} dark:border-gray-600">
         {{ calendar.exDividendDate|format_date('medium') }}
         /
         <i class="fas fa-money-check-alt"></i>
         {{ calendar.paymentDate|format_date('medium') }}
-        <span class="badge rounded-pill bg-danger">
-          {{ calendar.currency.sign|raw }}
+
+        <twig:Badge:Danger class="rounded-md p-2 block">
+           {{ calendar.currency.sign|raw }}
           {{ calendar.cashAmount }}
-        </span>
+      </twig:Badge:Danger>
       </li>
     {% else %}
-      <li class="list-group-item">{{ 'Not available'|trans }}</li>
+      <li class="w-full px-4 py-2 rounded-b-lg">{{ 'Not available'|trans }}</li>
     {% endfor %}
   </ul>
-  <hr />
-  <div>
+
+  <hr class="mt-2"/>
+
+  <div class="mt-2 pb-2 ">
     <strong>{{ 'Dividend treshold'|trans }}</strong>
   </div>
-  <ul class="list-group">
-    <li class="list-group-item">{{ (position.dividendTreshold * 100)|format_number({ fraction_digit: 2 }) }}%</li>
+  <ul class="w-56 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+    <li class="w-full px-4 py-2 border-gray-200 rounded-t-lg rounded-b-lg dark:border-gray-600">{{ (position.dividendTreshold * 100)|format_number({ fraction_digit: 2 }) }}%</li>
   </ul>
-  <hr />
-  <div>
+
+  <hr class="mt-2"/>
+
+  <div class="mt-2">
     <strong>{{ 'Maximum allocation'|trans }}</strong>
   </div>
-  <ul class="list-group">
-    <li class="list-group-item">&euro;
-      {{ (position.maxAllocation ? position.maxAllocation : 0)|format_number({ fraction_digit: 2 }) }}</li>
+  <ul class="w-56 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+    <li class="w-full px-4 py-2 border-gray-200 rounded-t-lg rounded-b-lg dark:border-gray-600">&euro;
+      {{ (position.maxAllocation ? position.maxAllocation : 0)|format_number({ fraction_digit: 2 }) }}
+    </li>
   </ul>
+
 {% endset %}
 {% set dividendInfo = dividendInfo ~ dividendDateInfo %}
 {% set pieData %}
-  <hr />
+  <hr class="mt-2"/>
+
   <div>
     <strong>{{ 'Pie'|trans }}</strong>
   </div>
-  <ul class="list-group">
+  <ul class="w-56 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
     {% for pie in position.pies %}
-      <li class="list-group-item">{{ pie.label }}</li>
+      <li class="w-full px-4 py-2 {% if not loop.last %}border-b{% endif %} border-gray-200 {% if loop.index == 0 %}rounded-t-lg{% endif %} {% if loop.last %}rounded-b-lg{% endif %} dark:border-gray-600">{{ pie.label }}</li>
     {% else %}
-      <li class="list-group-item">{{ 'Not available'|trans }}</li>
+      <li class="w-full px-4 py-2 border-gray-200 rounded-t-lg rounded-b-lg dark:border-gray-600">{{ 'Not available'|trans }}</li>
     {% endfor %}
   </ul>
 {% endset %}

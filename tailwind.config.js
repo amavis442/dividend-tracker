@@ -11,4 +11,5 @@ module.exports = {
     '@tailwindcss/forms'
   ],
   important: true,
+  darkMode: 'selector',
 }

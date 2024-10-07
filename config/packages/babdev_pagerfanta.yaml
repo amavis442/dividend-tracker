@@ -1,3 +1,4 @@
 babdev_pagerfanta:
     default_view: twig
-    default_twig_template: '@BabDevPagerfanta/tailwind.html.twig'
+    default_twig_template: 'pagerfanta/default.html.twig'
+    #'@BabDevPagerfanta/tailwind.html.twig'

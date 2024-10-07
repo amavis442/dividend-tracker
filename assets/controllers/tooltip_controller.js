@@ -83,7 +83,6 @@ export default class extends Controller {
         const floatingEl = this.tooltipTarget;
 
         this.cleanup = autoUpdate(referenceEl, floatingEl, () => { this.updatePosition(referenceEl, floatingEl, arrowElement) });
-
     }
 
     hide(event) {

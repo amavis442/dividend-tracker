@@ -16,13 +16,13 @@
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
-    <body class="bg-light">
+    <body class="bg-slate-50">
         <header>
             {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
                 {% include 'tw-navbar.html.twig' %}
             {% endif %}
         </header>
-        <main class="w-full mx-auto justify-center content-center p-4" id="app">
+        <main class="w-full mx-auto justify-center content-center p-4 flex" id="app">
             {% block body %}{% endblock %}
         </main>
         <footer></footer>

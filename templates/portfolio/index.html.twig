@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block body %}
-
+<div class="w-5/8">
 	<section>
 	{% for notice in app.flashes('notice') %}
     	<br />
@@ -12,138 +12,178 @@
   	{% endfor %}
 	<section>
 
-	<div class="h1">Portfolio</div>
+    <section id="header" class="px-3 py-2">
+        <twig:Head:H1>
+            {{ 'Portfolio'|trans }}
+        </twig:Head:H1>
+    </section>
 
 	{% include 'portfolio/_summary.html.twig' %}
 
-
 	<section>
-		<div class="col mb-2">
+		<div class="mb-2 w-full">
 			{{ form_start(autoCompleteForm, {
 				'action': path('portfolio_index'),
 				'attr': {
-					'class': 'row g2',
 					'data-turbo-frame': 'portfolio_results'
 					}
 				})
 			}}
-				<div class="col">
-					{{ form_widget(autoCompleteForm.pie) }}
-				</div>
-				<div class="col">
-					{{ form_widget(autoCompleteForm.ticker) }}
-				</div>
-				<div class="col-auto">
-					<button class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Search Ticker">
-						<i class="fas fa-search"></i>
-					</button>
-				</div>
+				<div class="flex">
+					<div class="flex-auto w-64 p-2">
+                        {{ form_widget(autoCompleteForm.pie) }}
+				    </div>
+				    <div class="flex-auto w-64 p-2">
+					    {{ form_widget(autoCompleteForm.ticker) }}
+				    </div>
+				    <div class="flex-none w-64 p-2">
+                        <twig:Button:Secondary title="Search Ticker" type="submit">
+						    <i class="fas fa-search"></i>
+					    </button>
+				        </twig:Button:Secondary>
+                    </div>
+                </div>
 			{{ form_end(autoCompleteForm) }}
 		</div>
 	<section>
 
 	<section>
 	<turbo-frame id="portfolio_results">
-    <table class="table table-sm table-striped table-hover border w-100">
-        <thead>
+    <twig:Table:Table>
+        <twig:Table:THead>
             <tr>
-                <th scope="col">
-                    <a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'symbol', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">{{ 'Fullname'|trans }}</a>
-                </th>
-                <th scope="col">{{ 'Avg. price'|trans }}</th>
-
-                <th scope="col">{{ 'Allocation'|trans }}</th>
-                <th scope="col">
+                <twig:Table:THCol class="rounded-l-lg">
+                    <div class="flex items-center">
+                        {{ 'Fullname'|trans }}
+                        <a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'symbol', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">
+                            <svg class="w-3 h-3 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </twig:Table:THCol>
+                <twig:Table:THCol>
+                    {{ 'Avg. price'|trans }}
+                </twig:Table:THCol>
+                <twig:Table:THCol>
+                    {{ 'Allocation'|trans }}
+                </twig:Table:THCol>
+                <twig:Table:THCol>
                     {{ 'Received dividend'|trans }}
-                    <span title="{{'Dividend per position'|trans }}" data-bs-toggle="tooltip" data-placement="top">
-                        <i class="fas fa-question-circle"></i>
+                    <span {{ stimulus_controller('tooltip') }}>
+                        <i class="fas fa-question-circle" data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"></i>
+                        <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                            <span class="normal-case">{{'Dividend per position'|trans }}</span>
+                            <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                        </div>
                     </span>
-
-                </th>
-                <th scope="col">{{ 'Ex-Div'|trans }}
+                </twig:Table:THCol>
+                <twig:Table:THCol>{{ 'Ex-Div'|trans }}
                     /
                     <br/>
                     {{ 'Payout'|trans }}
-                </th>
-                <th scope="col">{{ 'Forward dividend'|trans }}
-                    <span title="{{'Dividend yield based on cost basis'|trans }}" data-bs-toggle="tooltip" data-placement="top">
-                        <i class="fas fa-question-circle"></i>
+                </twig:Table:THCol>
+                <twig:Table:THCol class="rounded-r-lg">{{ 'Forward dividend'|trans }}
+                    <span {{ stimulus_controller('tooltip') }} data-tooltip-placement-value="bottom">
+                        <i class="fas fa-question-circle" data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"></i>
+                        <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                            <span class="normal-case">{{'Dividend yield based on cost basis'|trans }}</span>
+                            <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                        </div>
                     </span>
-                </th>
+                </twig:Table:THCol>
             </tr>
-        </thead>
+        </twig:Table:THead>
         <tbody class="table-group-divider">
             {% for position in pager %}
                 {% set dividendInfo = include('portfolio/_dividendinfo.html.twig', {'position' : position} ) %}
                 {% set ticker = position.ticker %}
-                <tr>
-                    <td>
-
+                <twig:Table:TR>
+                    <twig:Table:TD>
                         <div>
-                            <span {% if ticker.fullname|length > 20 %} data-bs-toggle="tooltip" data-placement="top" title="{{ ticker.fullname }} ({{ ticker.symbol }})" {% endif %}>
-                                <a href="{{ path('portfolio_show', {'id': position.id}) }}" data-turbo-frame="_top">
+                            <span {{ stimulus_controller('tooltip') }} data-tooltip-placement-value="top">
+                                <a href="{{ path('portfolio_show', {'id': position.id}) }}" data-turbo-frame="_top" class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                                data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">
                                     {{ ticker.fullname|slice(0, 20) }}
                                     {% if ticker.fullname|length > 20 %}...
                                     {% endif %}
                                 </a>
+                                <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                    {{ ticker.fullname }} ({{ ticker.symbol }})
+                                    <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                </div>
                             </span>
-                            <i class="fas fa-info-circle" data-bs-toggle="popover" data-bs-title="Dividend & pie info" data-bs-content='{{ dividendInfo }}' data-bs-html="true"></i>
+                            <span {{ stimulus_controller('tooltip') }} data-tooltip-placement-value="right">
+                                <i class="fas fa-info-circle" data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"></i>
+                                <div class="card" role="tooltip" data-tooltip-target="tooltip">
+                                    <h5 class="bg-gray-300 p-2 rounded-t-lg mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                                            Dividend & pie info
+                                    </h5>
+                                    <div class='pl-5 pr-5 pb-5'>
+                                        <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{ dividendInfo|raw }}</p>
+                                    </div>
+                                    <div class="arrow-card" data-tooltip-target="tooltipArrow"></div>
+                                </div>
+                            </span>
                         </div>
-
                         <small>{{ position.amount|format_number({fraction_digit: 7}) }}
                             {{ 'shares'|trans }}</small>
-                    </td>
-                <td>
+                </twig:Table:TD>
+                <twig:Table:TD>
                     &euro;
                     {{ position.price|format_number({fraction_digit: 2}) }}
-                </td>
+                </twig:Table:TD>
 
-                <td>
-                    <span class="badge text-bg-primary">&euro;{{ position.allocation|format_number({fraction_digit: 2}) }}
-                        <span class="badge text-bg-warning">{{ position.percentageAllocation|format_number({fraction_digit: 2}) }}%</span>
-                    </span>
-                </td>
-                <td>
-                    <span class="badge text-bg-secondary">
+                <twig:Table:TD>
+                    <twig:Badge:Primary class="rounded-md p-2 block">
+                        &euro;{{ position.allocation|format_number({fraction_digit: 2}) }}
+                        <twig:Badge:Warning class="p-2 h-4 rounded-full inline-flex items-center justify-center">
+                            {{ position.percentageAllocation|format_number({fraction_digit: 2}) }}%
+                        </twig:Badge:Warning>
+                    </twig:Badge:Primary>
+                </twig:Table:TD>
+                <twig:Table:TD>
+                    <twig:Badge:Secondary class="rounded-md p-2 block">
                         &euro;{{ position.dividend|format_number({fraction_digit: 2}) }}
-                        <span class="badge text-bg-warning">{{ ((position.dividend / position.allocation) *100)|format_number({fraction_digit: 2}) }}%</span>
-                    </span>
-                </td>
-                <td>
+                        <twig:Badge:Warning class="p-2 h-4 rounded-full inline-flex items-center justify-center">{{ ((position.dividend / position.allocation) *100)|format_number({fraction_digit: 2}) }}%</twig:Badge:Warning>
+                    </twig:Badge:Secondary>
+                </twig:Table:TD>
+                <twig:Table:TD class="flex flex-col">
                     {% if position.divDate %}
-                        <span class="badge text-bg-primary">{{ position.exDividendDate|format_date('long') }}</span>
-                        <br/>
-                        <span class="badge text-bg-warning">{{ position.paymentDate|format_date('long') }}</span>
+                        <twig:Badge:Primary class="rounded-md p-1 block">{{ position.exDividendDate|format_date('long') }}</twig:Badge:Primary>
+                        <twig:Badge:Warning class="rounded-md py-1 ps-1 block mt-1">{{ position.paymentDate|format_date('long') }}</twig:Badge:Warning>
                     {% else %}
                         &mdash;
                     {% endif %}
-                </td>
-                <td>
+                </twig:Table:TD>
+                <twig:Table:TD>
                     {% if position.divDate %}
-                        <div class="badge text-bg-primary">{{ position.cashCurrency.sign|raw }}
-                            {{ position.cashAmount|format_number({fraction_digit: 3}) }}</div><br/>
-                        <div class="badge text-bg-secondary">&euro;
+                        <twig:Badge:Primary class="rounded-md p-1 block">{{ position.cashCurrency.sign|raw }}
+                            {{ position.cashAmount|format_number({fraction_digit: 3}) }}
+                        </twig:Badge:Primary>
+                        <twig:Badge:Secondary class="rounded-md p-1 block mt-1">&euro;
                             {{ position.forwardNetDividend|format_number({fraction_digit: 2}) }}
-                            <div class="badge text-bg-success">{{ position.forwardNetDividendYield|format_number({fraction_digit: 2}) }}%</div>
-                        </div><br/>
+                            <twig:Badge:Success class="p-2 h-4 rounded-full inline-flex items-center justify-center">{{ position.forwardNetDividendYield|format_number({fraction_digit: 2}) }}%</twig:Badge:Success>
+                        </twig:Badge:Secondary>
                     {% else %}
                         &mdash;
                     {% endif %}
-                </td>
-            </tr>
+                </twig:Table:TD>
+            </twig:Table:TR>
             {% else %}
-            <tr>
-                <td colspan="9">no records found</td>
-            </tr>
+            <twig:Table:TR>
+                <twig:Table:TD colspan="6">no records found</twig:Table:TD>
+            </twig:Table:TR>
         {% endfor %}
         </tbody>
         <tfoot>
-            <tr>
-                <td colspan="8"></td>
-            </tr>
+            <twig:Table:TR>
+                <twig:Table:TD colspan="6"></twig:Table:TD>
+            </twig:Table:TR>
         </tfoot>
-    </table>
+    </twig:Table:Table>
 	{{ pagerfanta(pager) }}
 	</turbo-frame>
 	</section>
+</div>
 {% endblock %}
