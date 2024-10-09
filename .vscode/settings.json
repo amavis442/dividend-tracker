@@ -30,6 +30,12 @@
     "files.trimTrailingWhitespace": true,
     "files.exclude": {},
     "files.insertFinalNewline": true,
+    "files.associations": {
+        "*.css": "tailwindcss"
+    },
+    "editor.quickSuggestions": {
+        "strings": true
+    },
     "typescript.preferences.importModuleSpecifier": "relative",
     "search.exclude": {
         ".git": true,
@@ -48,5 +54,8 @@
     "pretty-php.formatting.alignment.alignComments": true,
     "pretty-php.formatting.alignment.alignLists": true,
     "pretty-php.formatting.alignment.alignTernaryOperators": true,
-    "pretty-php.formatting.blankBeforeReturn": true
+    "pretty-php.formatting.blankBeforeReturn": true,
+    "css.customData": [
+        "./.vscode/css-data.json"
+    ]
 }

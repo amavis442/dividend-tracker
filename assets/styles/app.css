@@ -1,4 +1,6 @@
+@import "ckeditor5.css";
 @import "tooltip.css";
+@import "tom-select.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,18 +10,6 @@
     opacity: .2;
 }
 */
-.purple {
-    background-color: #1B1022;
-}
-
-.book {
-    background-color: #D0B294;
-}
-
-body {
-    background-color: lightgray;
-}
-
 .ck-editor__editable_inline {
     min-height: 400px;
 }

@@ -20,9 +20,9 @@ import { computePosition, autoUpdate, offset, flip, shift, arrow } from '@floati
  *  <span data-controller="tooltip">
  *     <i class="fas fa-info-circle"
  *        data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"></i>
- *       <div id="tooltip" role="tooltip" data-tooltip-target="tooltip">
+ *       <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
  *           content to show
- *           <div id="arrow" data-tooltip-target="tooltipArrow"></div>
+ *           <div class="arrow" data-tooltip-target="tooltipArrow"></div>
  *       </div>
  * </span>
  */
@@ -38,6 +38,9 @@ export default class extends Controller {
         offset: { type: Array, default: [0, 8] },
     };
 
+    connect() {
+        document.addEventListener('turbolinks:before-cache', this.handleCache);
+    }
 
     updatePosition(referenceEl, floatingEl, arrowElement) {
 
@@ -90,4 +93,7 @@ export default class extends Controller {
         this.cleanup();
     }
 
+    handleCache(event) {
+        this.hide(event);
+    }
 }
