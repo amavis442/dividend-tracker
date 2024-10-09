@@ -506,6 +506,7 @@ class PortfolioController extends AbstractController
     ): Response {
         $ticker = $position->getTicker();
         $calenders = $ticker->getCalendars();
+        $netYearlyDividend = 0;
 
         if (count($calenders) > 0) {
             $cal = $dividendService->getRegularCalendar($ticker);
