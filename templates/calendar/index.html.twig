@@ -5,120 +5,146 @@
 {% endblock %}
 
 {% block body %}
-	<div class="h1 mb-2">Calendar</div>
+<div class="w-full flex flex-col">
+	<div class="flex flex-col w-full md:container mx-auto px-4">
 
-	<section>
-	{% for notice in app.flashes('notice') %}
-		<br/>
-		<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
-	{% endfor %}
-	</section>
+		{% if app.flashes('notice') %}
+		<div class="w-1/2">
+			{% for notice in app.flashes('notice') %}
+				<twig:Alert class="mt-2">{{ notice|trans }}</twig:Alert>
+			{% endfor %}
+		</div>
+		{% endif %}
 
-	<section class="flex items-center gap-2 mb-6 bg-gray-200 shadow-md rounded-lg p-6">
-			{{ form_start(form, {
-				'action': path('calendar_index'),
-				'attr': {
-					'autocomplete' : 'off',
-					'class': 'flex w-full justify-center',
-					'data-turbo-frame' : 'calendar-results'
-					}})
-				}}
-			{{ form_errors(form) }}
-			<div class="w-1/2">
-				{{ form_widget(form.ticker) }}
+		<section id="header" class="flex mb-2 mt-2">
+			<twig:Head>
+			{{ 'Calendar'|trans }}:
+			</twig:Head>
+		</section>
+
+		<div class="flex items-center gap-2 mb-6 bg-gray-200 shadow-md rounded-lg p-6">
+				{{ form_start(form, {
+					'action': path('calendar_index'),
+					'attr': {
+						'autocomplete' : 'off',
+						'class': 'flex w-full justify-center',
+						'data-turbo-frame' : 'calendar-results'
+						}})
+					}}
+				{{ form_errors(form) }}
+				<div class="w-1/2">
+					{{ form_widget(form.ticker) }}
+				</div>
+				<div>
+					<button class="focus:outline-none text-white bg-green-700
+				hover:bg-green-800 focus:ring-4
+				focus:ring-green-300 font-medium rounded-lg
+				text-sm px-2 py-2 ml-2 dark:bg-green-600
+				dark:hover:bg-green-700 dark:focus:ring-green-800" data-toggle="tooltip" data-placement="top" title="{{ 'Search ticker'|trans }}">
+						<i class="fas fa-search"></i>
+					</button>
+				</div>
+				{{ form_end(form) }}
+		</div>
+
+		<div class="flex mb-3">
+			<div class="w-full text-right">
+				<twig:Button tag="a" class="btn btn-primary" href="{{ path('calendar_new') }}" data-turbo-target="_top">
+					<i class="fas fa-plus"></i>
+				</twig:Button>
 			</div>
-			<div>
-				<button class="focus:outline-none text-white bg-green-700
-            hover:bg-green-800 focus:ring-4
-            focus:ring-green-300 font-medium rounded-lg
-            text-sm px-2 py-2 ml-2 dark:bg-green-600
-            dark:hover:bg-green-700 dark:focus:ring-green-800" data-toggle="tooltip" data-placement="top" title="{{ 'Search ticker'|trans }}">
-					<i class="fas fa-search"></i>
-				</button>
-			</div>
-			{{ form_end(form) }}
-	</section>
+		</div>
 
-	<div class="row mb-3">
-		<div class="col text-right">
-			<a class="btn btn-primary" href="{{ path('calendar_new') }}" data-turbo-target="_top">
-				<i class="fas fa-plus"></i>
-			</a>
+		<div class="border border-gray-200 rounded-lg p-2">
+		<turbo-frame id="calendar-results">
+
+				<twig:Table:Table>
+					<thead>
+						<twig:Table:Tr>
+							<twig:Table:ThCol>
+								<a href="{{ path('calendar_index', { page: thisPage ? thisPage : 1, orderBy: 'ticker', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">{{ 'Fullname'|trans }}</a>
+							</twig:Table:ThCol>
+							<twig:Table:ThCol>{{ 'Type'|trans }}</twig:Table:ThCol>
+							<twig:Table:ThCol>
+								<a href="{{ path('calendar_index', { page: thisPage ? thisPage : 1, orderBy: 'paymentDate', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">{{ 'Payment date'|trans }}</a>
+							</twig:Table:ThCol>
+							<twig:Table:ThCol>
+								<a href="{{ path('calendar_index', { page: thisPage ? thisPage : 1, orderBy: 'exDividendDate', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">{{ 'Ex-dividend date'|trans }}</a>
+							</twig:Table:ThCol>
+							<twig:Table:ThCol>{{ 'Cash amount'|trans }}</twig:Table:ThCol>
+							<twig:Table:ThCol>{{ 'Source'|trans }}</twig:Table:ThCol>
+							<twig:Table:ThCol>{{ 'Descr.'|trans }}</twig:Table:ThCol>
+							<twig:Table:ThCol>
+								<a href="{{ path('calendar_index', { page: thisPage ? thisPage : 1, orderBy: 'createdAt', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">{{ 'Created'|trans }}</a>
+							</twig:Table:ThCol>
+							<twig:Table:ThCol>{{ 'actions'|trans }}</twig:Table:ThCol>
+						</twig:Table:Tr>
+					</thead>
+					<tbody>
+						{% for calendar in pager %}
+							<twig:Table:Tr>
+								<twig:Table:Td>
+									{% if calendar.ticker.positions[0] %}
+										<div class="inline-block" data-controller="tooltip">
+											<a href="{{ path('portfolio_show', { id: calendar.ticker.positions[0].id }) }}" data-turbo-frame="_top" data-tooltip-target="element"  data-action="mouseenter->tooltip#show mouseleave->tooltip#hide" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+											{{ calendar.ticker.fullname|slice(0, 20) }}
+											{% if (calendar.ticker.fullname|length) > 20 %}...
+											{% endif %}
+											</a>
+											<div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+											{{ calendar.ticker.fullname }} ({{ calendar.ticker.symbol }})
+											<div class="arrow" data-tooltip-target="tooltipArrow"></div>
+											</div>
+										</div>
+									{% else %}
+										{{ calendar.ticker.fullname }}
+									{% endif %}
+								</twig:Table:Td>
+								<twig:Table:Td>{{ (calendar.dividendType ?? 'Regular')|trans }}</twig:Table:Td>
+								<twig:Table:Td>{{ calendar.paymentDate|format_date('medium', locale=app.request.locale) }}</twig:Table:Td>
+								<twig:Table:Td>{{ calendar.exDividendDate|format_date('medium', locale=app.request.locale) }}</twig:Table:Td>
+								<twig:Table:Td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ calendar.cashAmount|format_number({ fraction_digit: 2 }) }}</twig:Table:Td>
+								<twig:Table:Td>{{ (calendar.source ?? 'manual')|trans }}</twig:Table:Td>
+								<twig:Table:Td>{{ calendar.description ?? '&mdash;' }}</twig:Table:Td>
+								<twig:Table:Td>{{ calendar.createdAt|format_date('medium', locale=app.request.locale) }}</twig:Table:Td>
+								<twig:Table:Td>
+									<div class="inline-flex rounded-md shadow-sm" role="group">
+										<div class="inline-block" data-controller="tooltip">
+											<a href="{{ path('calendar_show', { id: calendar.id }) }}" data-turbo-frame="_top" data-tooltip-target="element"  data-action="mouseenter->tooltip#show mouseleave->tooltip#hide" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+											<i class="fas fa-book-open"></i>
+											</a>
+											<div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+											{{ 'Show calendar'|trans }}
+											<div class="arrow" data-tooltip-target="tooltipArrow"></div>
+											</div>
+										</div>
+										<div class="inline-block" data-controller="tooltip">
+											<a href="{{ path('calendar_edit', { id: calendar.id }) }}" data-turbo-frame="_top" data-tooltip-target="element"  data-action="mouseenter->tooltip#show mouseleave->tooltip#hide" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+											<i class="far fa-edit"></i>
+											</a>
+											<div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+												{{ 'Edit calendar'|trans }}
+												<div class="arrow" data-tooltip-target="tooltipArrow"></div>
+											</div>
+										</div>
+									</div>
+								</twig:Table:Td>
+							</twig:Table:Tr>
+						{% else %}
+							<twig:Table:Tr>
+								<twig:Table:Td colspan="9">no records found</twig:Table:Td>
+							</twig:Table:Tr>
+						{% endfor %}
+					</tbody>
+				</twig:Table:Table>
+			</div>
+		</div>
+
+			div class="mb-2">
+			{{ pagerfanta(pager) }}
+			</div>
+		</turbo-frame>
 		</div>
 	</div>
-
-	<sector>
-	<turbo-frame id="calendar-results">
-	<div class="row">
-		<div class="col-sm">
-			<table class="table table-striped border table-hover">
-				<thead>
-					<tr>
-						<th scope="col">
-							<a href="{{ path('calendar_index', { page: thisPage ? thisPage : 1, orderBy: 'ticker', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">{{ 'Fullname'|trans }}</a>
-						</th>
-						<th scope="col">{{ 'Type'|trans }}</th>
-						<th scope="col">
-							<a href="{{ path('calendar_index', { page: thisPage ? thisPage : 1, orderBy: 'paymentDate', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">{{ 'Payment date'|trans }}</a>
-						</th>
-						<th scope="col">
-							<a href="{{ path('calendar_index', { page: thisPage ? thisPage : 1, orderBy: 'exDividendDate', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">{{ 'Ex-dividend date'|trans }}</a>
-						</th>
-						<th scope="col">{{ 'Cash amount'|trans }}</th>
-						<th scope="col">{{ 'Source'|trans }}</th>
-						<th scope="col">{{ 'Descr.'|trans }}</th>
-						<th scope="col">
-							<a href="{{ path('calendar_index', { page: thisPage ? thisPage : 1, orderBy: 'createdAt', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">{{ 'Created'|trans }}</a>
-						</th>
-						<th scope="col">{{ 'actions'|trans }}</th>
-					</tr>
-				</thead>
-				<tbody class="table-group-divider">
-					{% for calendar in pager %}
-						<tr>
-							<td>
-								{% if calendar.ticker.positions[0] %}
-									<a href="{{ path('portfolio_show', { id: calendar.ticker.positions[0].id }) }}" data-toggle="tooltip" data-placement="top" title="{{ calendar.ticker.fullname }}"
-									data-turbo-target="_top">
-									{{ calendar.ticker.fullname|slice(0, 20) }}
-										{% if (calendar.ticker.fullname|length) > 20 %}...
-										{% endif %}
-									</a>
-								{% else %}
-									{{ calendar.ticker.fullname }}
-								{% endif %}
-								<br/><small>({{ calendar.ticker.symbol }})</small>
-							</td>
-							<td>{{ (calendar.dividendType ?? 'Regular')|trans }}</td>
-							<td>{{ calendar.paymentDate|format_date('medium', locale=app.request.locale) }}</td>
-							<td>{{ calendar.exDividendDate|format_date('medium', locale=app.request.locale) }}</td>
-							<td>{{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ calendar.cashAmount|format_number({ fraction_digit: 2 }) }}</td>
-							<td>{{ (calendar.source ?? 'manual')|trans }}</td>
-							<td>{{ calendar.description ?? '&mdash;' }}</td>
-							<td>{{ calendar.createdAt|format_date('medium', locale=app.request.locale) }}</td>
-							<td>
-								<div class="btn-group" role="group">
-									<a href="{{ path('calendar_show', { id: calendar.id }) }}" class="btn btn-info" data-turbo-frame="_top">
-										<i class="fas fa-book-open"></i>
-									</a>
-									<a href="{{ path('calendar_edit', { id: calendar.id }) }}" class="btn btn-primary" data-turbo-frame="_top">
-										<i class="far fa-edit"></i>
-									</a>
-								</div>
-							</td>
-						</tr>
-					{% else %}
-						<tr>
-							<td colspan="9">no records found</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-		</div>
-	</div>
-
-	{{ pagerfanta(pager) }}
-	</turbo-frame>
-	</sector>
-
+</div>
 {% endblock %}

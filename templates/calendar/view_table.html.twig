@@ -4,66 +4,72 @@
 {% endblock %}
 
 {% block body %}
-	<div class="container mb-2 p-3">
-		<div class="border p-2">
-			<div>
-				<h3>Dividend payments per date for
-					{{ year }}
-				</h3>
-				<small class="text-muted">({{'Current date'|trans }}:
-					{{ date()|format_date('full') }})</small>
-			</div>
-		</div>
-	</div>
+<div class="flex flex-col">
+	<div class="flex flex-col w-full md:w-1/2 mx-auto px-4">
 
-	<div class="container mb-2 p-3">
-		<div class="border p-2">
+		<section id="header" class="flex flex-col mb-2 mt-2 border rounded-lg border-gray-200 p-4">
+			<twig:Head variant="h2">
+			Dividend payments per date for {{ year }}
+			</twig:Head>
+			<small class="text-sm mt-4">({{'Current date'|trans }}:
+				{{ date()|format_date('full') }})
+			</small>
+		</section>
 
-		<section>
-			{{ form_start(form) }}
-			<div class="row g-3">
-				<div class="col-auto">
-					{{ form_widget(form.startdate) }}
-				</div>
-				<div class="col-auto">
-					{{ form_widget(form.enddate) }}
-				</div>
-				<div class="col-auto">
-					{{ form_widget(form.pie) }}
-				</div>
 
-				<div class="col-auto">
-					<button type="submit" class="btn btn-secondary mb-2">
-						<i class="fas fa-solid fa-filter"></i>
-					</button>
+		<div class="w-full mb-6 bg-gray-200 shadow-md rounded-lg p-6">
+			{{ form_start(form, {
+					'action': path('calendar_per_date_table'),
+						'attr': {
+							'data-turbo-frame': 'calendar_per_date_table_frame'
+							}
+						})
+			}}
+				<div class="flex flex-row w-full">
+					<div class="flex-auto p-2">
+						{{ form_widget(form.startdate, { 'attr': {'class' : 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'}}) }}
+					</div>
+					<div class="flex-auto p-2">
+						{{ form_widget(form.enddate, { 'attr': {'class' : 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'}}) }}
+					</div>
+					<div class="flex-auto p-2">
+						{{ form_widget(form.pie, { 'attr': {'class' : 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'}}) }}
+					</div>
+
+					<div class="flex-none p-2">
+						<twig:Button type="submit" class="p-2.5">
+							<i class="fas fa-solid fa-filter"></i>
+						</twig:Button>
+					</div>
 				</div>
-			</div>
 			{{ form_end(form) }}
-		<section>
+		</div>
 
-		<section>
+		<div>
+		<turbo-frame id="calendar_per_date_table_frame">
+			<div class=" mx-auto">
 			{% if calendars %}
-				<table class="table table-striped">
+				<twig:Table:Table>
 					<thead>
-						<tr>
-							<th scope="col"></th>
-							<th scope="col">{{ 'Pay date'|trans }}</th>
-							<th scope="col">{{ 'Company'|trans }}</th>
-							<th scope="col">{{ 'Dividend'|trans }}</th>
-							<th scope="col">{{ 'Net dividend'|trans }}</th>
-						</tr>
+						<twig:Table:Tr>
+							<twig:Table:ThCol></twig:Table:ThCol>
+							<twig:Table:ThCol>{{ 'Pay date'|trans }}</twig:Table:ThCol>
+							<twig:Table:ThCol>{{ 'Company'|trans }}</twig:Table:ThCol>
+							<twig:Table:ThCol>{{ 'Dividend'|trans }}</twig:Table:ThCol>
+							<twig:Table:ThCol>{{ 'Net dividend'|trans }}</twig:Table:ThCol>
+						</twig:Table:Tr>
 					</thead>
 					<tbody>
 						{% for month,items in calendars %}
 							{% set sumDividend = 0.0 %}
 							{% set numPositions = 1 %}
-							<tr class="table-dark">
-								<th>#</th>
-								<th colspan="5">
+							<tr class="bg-slate-900 text-white">
+								<twig:Table:ThCol>#</twig:Table:ThCol>
+								<twig:Table:ThCol colspan="5">
 									{% set chosenDate = month|slice(0,4) ~ '-' ~ month|slice(4,2) ~ '-01' %}
 									{{ chosenDate|date('F')|trans }},
 									{{ month|slice(0,4) }}
-								</th>
+								</twig:Table:ThCol>
 							</tr>
 							{% for day, item in items %}
 								{% for key, calData in item %}
@@ -71,74 +77,79 @@
 									{% set netDividend = calData.positionDividend %}
 									{% set estimatedAmount = calData.positionAmount %}
 									{% set currentDate = cal.getPaymentDate %}
-									<tr>
-										<td>{{ numPositions}}</td>
-										<th>
+									<twig:Table:Tr>
+										<twig:Table:Td>{{ numPositions}}</twig:Table:Td>
+										<twig:Table:ThCol>
 											{{ currentDate|date('l')|trans }},
 											{{ currentDate|date('d') }}
 											{{ currentDate|date('F')|trans|lower }}
-											{{ currentDate|date('Y') }}</th>
-										<td>
+											{{ currentDate|date('Y') }}</twig:Table:ThCol>
+										<twig:Table:Td>
 											{% set tickerInfo  = '' %}
 											{% set tickerInfo %}
-											<h3>Ticker:
-												{{ calData.ticker }}</h3>
-											{{ 'Tax rate'|trans }}:
-											{{ calData.taxRate * 100 }}%
-											<br/>
-											{{ 'Exchangerate'|trans }}:
-											{{ calData.exchangeRate|format_number({fraction_digit: 4}) }}<br/>
-											{{ 'Tax'|trans }}: &euro;{{ (calData.tax * estimatedAmount)|format_number({fraction_digit: 2}) }}<br/>
-											Ex-div:
-											<span class='badge text-bg-info'>
-												{{ calData.calendar.exDividendDate|date('D, d-m-Y')|format_date('full',locale='nl') }}
-											</span>
+											<twig:ListGroup>
+												<twig:ListGroupItem><h3>Ticker:&nbsp;{{ calData.ticker }}</h3></twig:ListGroupItem>
+												<twig:ListGroupItem>{{ 'Tax rate'|trans }}:&nbsp;{{ calData.taxRate * 100 }}%</twig:ListGroupItem>
+												<twig:ListGroupItem>{{ 'Exchangerate'|trans }}:&nbsp;{{ calData.exchangeRate|format_number({fraction_digit: 4}) }}</twig:ListGroupItem>
+												<twig:ListGroupItem>{{ 'Tax'|trans }}: &euro;{{ (calData.tax * estimatedAmount)|format_number({fraction_digit: 2}) }}</twig:ListGroupItem>
+												<twig:ListGroupItem>
+													<div class="flex p-1">
+														<div>Ex-div:&nbsp;</div>
+														<twig:Badge variant="info">
+															{{ calData.calendar.exDividendDate|date('D, d-m-Y')|format_date('full',locale='nl') }}
+														</twig:Badge>
+													</div>
+												</twig:ListGroupItem>
+											</twig:ListGroup>
 											{% endset %}
 											{% if cal.ticker.positions[0] %}
 												<a href="{{ path('portfolio_show', {id: cal.ticker.positions[0].id}) }}">{{ cal.ticker.fullname }}</a>
 											{% else %}
 												{{ cal.ticker.fullname }}
 											{% endif %}
-											<span data-controller="popper">
-											<i class="fas fa-info-circle"
-												data-popper-target="element"
-												data-action="mouseenter->popper#show mouseleave->popper#hide"></i>
-												<div id="tooltip" role="tooltip" data-popper-target="tooltip">
-                       								{{ tickerInfo|raw }}
-                        							<div id="arrow" data-popper-target="tooltipArrow"></div>
-                    							</div>
-											</span>
+
+											<div class="inline-block" {{ stimulus_controller('tooltip') }}>
+												<i class="fas fa-info-circle" data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"></i>
+												<div class="tooltip p-2" role="tooltip" data-tooltip-target="tooltip">
+													{{ tickerInfo|raw }}
+													<div class="arrow" data-tooltip-target="tooltipArrow"></div>
+												</div>
+                                			</div>
+
 											<br/>
 											<small>{{ estimatedAmount|format_number({fraction_digit: 7}) }}
 												{{ 'shares'|trans }}</small>
-										</td>
-										<td>
+										</twig:Table:Td>
+										<twig:Table:Td>
 											{{ cal.currency.sign|raw}}{{ cal.cashAmount|format_number({fraction_digit: 2}) }}
-										</td>
-										<td>&euro;{{ netDividend|format_number({fraction_digit: 2}) }}</td>
-									</tr>
+										</twig:Table:Td>
+										<twig:Table:Td>&euro;{{ netDividend|format_number({fraction_digit: 2}) }}</twig:Table:Td>
+									</twig:Table:Tr>
 									{% set sumDividend = sumDividend + netDividend %}
 									{% set numPositions = numPositions  + 1 %}
 								{% endfor %}
 							{% endfor %}
-							<tr>
-								<td colspan="3"></td>
-								<th>{{ 'Total'|trans }}</th>
-								<th>&euro;{{ sumDividend|format_number({fraction_digit: 2}) }}</th>
-							</tr>
+							<twig:Table:Tr>
+								<twig:Table:Td colspan="3"></twig:Table:Td>
+								<twig:Table:ThCol>{{ 'Total'|trans }}</twig:Table:ThCol>
+								<twig:Table:ThCol>&euro;{{ sumDividend|format_number({fraction_digit: 2}) }}</twig:Table:ThCol>
+							</twig:Table:Tr>
 						{% endfor %}
 					</tbody>
-				</table>
+				</twig:Table:Table>
 			{% else %}
 				no items
 			{% endif %}
-		</section>
+			</div>
+		</turbo-frame>
+		</div>
 
-
-			<a href="{{ path('calendar_index') }}" class="btn btn-primary">
+		<div class="flex mt-2">
+			<twig:Button tag="a" href="{{ path('calendar_index') }}">
 				<i class="fas fa-angle-double-left"></i>
 				{{ 'back to list'|trans }}
-			</a>
+			</twig:Button>
 		</div>
 	</div>
+</div>
 {% endblock %}
