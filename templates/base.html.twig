@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         {% block metas %}{% endblock %}
         <title>
             {% block title %}
@@ -22,9 +22,17 @@
                 {% include 'tw-navbar.html.twig' %}
             {% endif %}
         </header>
-        <main class="w-full mx-auto justify-center content-center p-4 flex" id="app">
-            {% block body %}{% endblock %}
-        </main>
-        <footer></footer>
+
+        <div class="mx-auto min-h-screen flex flex-col">
+            <main class="flex-grow" id="app">
+                {% block body %}{% endblock %}
+            </main>
+        </div>
+
+        <footer class="w-full py-4 mt-6 bg-gray-800 text-center flex-none">
+            <div class="text-sm text-white">
+                With <svg class="inline-block w-4 h-4 text-red-600 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 3.22l-.61-.6a5.5 5.5 0 00-7.78 7.78l7.39 7.4 7.39-7.4a5.5 5.5 0 00-7.78-7.78l-.61.61z"/></svg> from Banpagi & Symfonycasts.
+            </div>
+        </footer>
     </body>
 </html>

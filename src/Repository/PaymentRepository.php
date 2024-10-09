@@ -125,6 +125,17 @@ class PaymentRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function getForPositionQueryBuilder(Position $position): QueryBuilder
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p, pos, c')
+            ->join('p.position', 'pos')
+            ->join('p.calendar',  'c')
+            ->where('pos = :position')
+            ->orderBy('p.payDate', 'DESC')
+            ->setParameter('position', $position);
+    }
+
     public function findForExport(): array
     {
         return $this->createQueryBuilder('p')

@@ -1,0 +1,66 @@
+<turbo-frame id="portfolio_tab_results">
+
+<div class="flex justify-end mb-4">
+		<twig:Button tag="a" href="{{ path('payment_new', { position: position.id }) }}">
+			<i class="fas fa-plus"></i>
+		</twig:Button>
+</div>
+
+<div class="h2 alert alert-secondary mt-2 mb-2 d-flex justify-content-end" role="alert">
+  {{ 'Total recieved dividends for this ticker'|trans }}:&nbsp;<strong>&euro;{{ dividend|format_number({ fraction_digit: 2 }) }}</strong>
+</div>
+
+<div class="flex mb-4">
+	<twig:Alert variant="secondary" class="text-right">
+		 {{ 'Total recieved dividends for this ticker'|trans }}:&nbsp;<strong>&euro;{{ dividend|format_number({ fraction_digit: 2 }) }}</strong>
+	</twig:Alert>
+</div>
+
+<div class="flex flex-col">
+
+   <twig:Table:Table>
+      <thead>
+        <twig:Table:Tr>
+          <twig:Table:ThCol></twig:Table:ThCol>
+          <twig:Table:ThCol>{{ 'Pay date'|trans }}</twig:Table:ThCol>
+          <twig:Table:ThCol>{{ 'Ex-dividend date'|trans }}</twig:Table:ThCol>
+          <twig:Table:ThCol>{{ 'Amount'|trans }}</twig:Table:ThCol>
+          <twig:Table:ThCol>{{ 'Total'|trans }}</twig:Table:ThCol>
+          <twig:Table:ThCol>{{ 'Type'|trans }}</twig:Table:ThCol>
+          <twig:Table:ThCol>{{ 'Actions'|trans }}</twig:Table:ThCol>
+        </twig:Table:Tr>
+      </thead>
+      <tbody>
+        {% for payment in pager %}
+          <twig:Table:Tr>
+            <twig:Table:Td></twig:Table:Td>
+            <twig:Table:Td>{{ payment.payDate|date('d-m-Y') }}</twig:Table:Td>
+            <twig:Table:Td>
+              {% if payment.calendar %}
+                {{ payment.calendar.exDividendDate ? payment.calendar.exDividendDate|date('d-m-Y') : '' }}
+              {% endif %}
+            </twig:Table:Td>
+            <twig:Table:Td>{{ payment.amount|format_number({ fraction_digit: 7 }) }}</twig:Table:Td>
+            <twig:Table:Td>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ payment.dividend|format_number({ fraction_digit: 2 }) }}</twig:Table:Td>
+            <twig:Table:Td>{{ payment.dividendType }}</twig:Table:Td>
+            <twig:Table:Td>
+							<div class="flex" data-controller="tooltip">
+								<twig:Button tag="a" href="{{ path('payment_edit', { id: payment.id }) }}" data-turbo-frame="_top" data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">
+										<i class="far fa-edit"></i>
+                     <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                       {{ 'Edit payment'|trans }}
+                      <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                    </div>
+								</twig:Button>
+							</div>
+            </twig:Table:Td>
+          </twig:Table:Tr>
+        {% endfor %}
+      </tbody>
+    </twig:Table:Table>
+	  <div class="mt-2">
+    	{{ pagerfanta(pager) }}
+    </div>
+</div>
+
+</turbo-frame>

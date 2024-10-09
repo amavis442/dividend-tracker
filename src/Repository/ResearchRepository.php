@@ -73,4 +73,16 @@ class ResearchRepository extends ServiceEntityRepository
         }
         return $queryBuilder;
     }
+
+    public function getForTickerQueryBuilder(
+        Ticker $ticker,
+        string $order = 'r.id',
+        string $sort = 'ASC',
+    ): QueryBuilder {
+        return $this->createQueryBuilder('r')
+            ->join('r.ticker', 't')
+            ->orderBy($order, $sort)
+            ->where('t = :ticker')
+            ->setParameter('ticker', $ticker->getId());
+    }
 }

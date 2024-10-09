@@ -10,15 +10,15 @@ class="appearance-none"
     <input type="hidden" name="_method" value="DELETE">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ position.id) }}">
 
-    <div data-controller="popper">
-        <button id="deleteBtn" data-popper-target="element" data-action="mouseenter->popper#show mouseleave->popper#hide"
+    <div data-controller="tooltip">
+        <button id="deleteBtn" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide" data-tooltip-target="element"
        class="bg-red-400 text-white px-4 py-2 rounded-lg hover:bg-red-600"
         >
         <i class="fas fa-trash"></i>
         </button>
-        <div id="tooltip" role="tooltip" data-popper-target="tooltip">
+        <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
             {{ 'Delete this item?'|trans }}
-            <div id="arrow" data-popper-target="tooltipArrow"></div>
+            <div class="arrow" data-tooltip-target="tooltipArrow"></div>
         </div>
     </div>
 

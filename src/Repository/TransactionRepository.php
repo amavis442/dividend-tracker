@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Position;
 use App\Entity\Transaction;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -85,6 +86,17 @@ class TransactionRepository extends ServiceEntityRepository
             ->setParameter('ticker', $ticker)
             ->getQuery()
             ->getResult();
+    }
+
+
+    public function getByPositionQueryBuilder(Position $position)
+    {
+        return $this->createQueryBuilder('t')
+            ->innerJoin('t.position', 'p')
+            ->orderBy('t.transactionDate, t.id', 'asc')
+            ->where('t.position = :position')
+            ->andWhere('p.closed = false')
+            ->setParameter('position', $position);
     }
 
     public function getLastImportFile(): array

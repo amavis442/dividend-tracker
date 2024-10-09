@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block body %}
-<div class="flex flex-col relative overflow-x-auto">
+<div class="flex flex-col items-center justify-between">
 
-  <section id="header" class="px-3 py-2">
-    <twig:Head:H1>
+  <section id="header" class="px-3 py-2 w-full">
+    <twig:Head>
         {{ 'Industry'|trans }}
-    </twig:Head:H1>
+    </twig:Head>
   </section>
 
   <section id="alerts">
@@ -42,18 +42,18 @@
                 <a href="{{ path('branch_show', { id: branch.id }) }}" data-tooltip-target="element"  data-action="mouseenter->tooltip#show mouseleave->tooltip#hide" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
                   <i class="fas fa-book-open"></i>
                 </a>
-                <div id="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
                   {{ 'show branch: %branch%'|trans({'%branch%': branch.label}) }}
-                  <div id="arrow" data-tooltip-target="tooltipArrow"></div>
+                  <div class="arrow" data-tooltip-target="tooltipArrow"></div>
                 </div>
               </span>
               <span data-controller="tooltip">
                 <a href="{{ path('branch_edit', { id: branch.id }) }}" data-tooltip-target="element"  data-action="mouseenter->tooltip#show mouseleave->tooltip#hide" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
                   <i class="far fa-edit"></i>
                 </a>
-                <div id="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
                   {{ 'Edit branch: %branch%'|trans({'%branch%': branch.label}) }}
-                  <div id="arrow" data-tooltip-target="tooltipArrow"></div>
+                  <div class="arrow" data-tooltip-target="tooltipArrow"></div>
                 </div>
               </span>
             </div>
@@ -77,7 +77,7 @@
   </div>
 </section>
 
-<section id="footer" class="pr-3 py-2 mt-2">
+<section id="footer" class="w-full pr-3 py-2 mt-2">
   <twig:Link:Default href="{{ path('branch_new') }}"><i class="fas fa-plus"></i></twig:Link:Default>
 </section>
 </div>

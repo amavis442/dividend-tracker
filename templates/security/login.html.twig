@@ -3,12 +3,12 @@
 {% block title %}Log in!{% endblock %}
 
 {% block body %}
-<div class="flex justify-center items-center h-screen w-1/2">
+<div class="flex container mx-auto justify-center items-center h-screen w-full">
 
     <!-- Login Form -->
-    <div class="mx-auto w-full lg:p-36 md:p-20 sm:p-15 p-8 border shadow-sm rounded-lg">
+    <div class="lg:p-36 md:p-20 sm:p-15 p-8 border shadow-sm rounded-lg m-4">
 
-        <h1 class="text-2xl font-semibold mb-4">{{ 'Please sign in'|trans }}</h1>
+        <twig:Head class="mb-4">{{ 'Please sign in'|trans }}</twig:Head>
 
         <form method="post">
             {% if error %}
@@ -22,15 +22,17 @@
             {% endif %}
 
             <!-- Username Input -->
-            <div class="mb-4">
-                <label for="inputEmail" class="block text-gray-600">Email</label>
-                <input type="email" alue="{{ last_username }}" name="_username" id="inputEmail" placeholder="Email" required aria-label="Username" aria-describedby="email" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500" autocomplete="off">
+            <div>
+                <label for="_username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+                <input type="email" value="{{ last_username }}" name="_username" id="_username" placeholder="Email" required
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" autocomplete="off">
             </div>
 
             <!-- Password Input -->
-            <div class="mb-4">
-                <label for="inputPassword" class="block text-gray-600">{{ 'Password'|trans }}</label>
-                <input type="password" id="inputPassword" name="_password" placeholder="{{ 'Password'|trans }}" required aria-label="Password" aria-describedby="password" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500" autocomplete="off">
+            <div>
+                <label for="_password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ 'Password'|trans }}</label>
+                <input type="password" id="_password" name="_password" placeholder="{{ 'Password'|trans }}"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" autocomplete="off">
             </div>
 
             <input type="hidden" name="_csrf_token"
@@ -44,7 +46,7 @@
             <!-- Remember Me Checkbox -->
             <div class="mb-4 flex items-center">
                 <input type="checkbox" id="_remember_me" name="_remember_me" class="text-blue-500">
-                <label for="remember" class="text-gray-600 ml-2">{{'Remember me'|trans}}</label>
+                <label for="_remember_me" class="text-gray-600 ml-2">{{'Remember me'|trans}}</label>
             </div>
 
             <!-- Login Button -->
