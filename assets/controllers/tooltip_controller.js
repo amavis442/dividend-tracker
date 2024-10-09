@@ -95,5 +95,6 @@ export default class extends Controller {
 
     handleCache(event) {
         this.hide(event);
+        this.tooltipTarget.addAttribute("hidden");
     }
 }
