@@ -1,6 +1,5 @@
 import { Controller } from '@hotwired/stimulus';
 import { ClassicEditor, Essentials, Bold, Italic, Font, Paragraph, Highlight } from 'ckeditor5';
-import '../styles/ckeditor5.css';
 
 export default class extends Controller {
     connect() {
