@@ -14,7 +14,6 @@
     "gitlens.blame.heatmap.enabled": false,
     "gitlens.codeLens.enabled": false,
     "files.autoSave": "afterDelay",
-    "workbench.iconTheme": "vscode-icons",
     "workbench.startupEditor": "welcomePage",
     "workbench.statusBar.visible": true,
     "window.zoomLevel": 0,
@@ -46,16 +45,15 @@
         "**/node_modules": true,
         "**/var": true
     },
-    "[twig]": {
-        "editor.defaultFormatter": "jkillian.custom-local-formatters"
-    },
-    "pretty-php.formatting.alignment.alignData": true,
-    "pretty-php.formatting.alignment.alignChains": true,
-    "pretty-php.formatting.alignment.alignComments": true,
-    "pretty-php.formatting.alignment.alignLists": true,
-    "pretty-php.formatting.alignment.alignTernaryOperators": true,
-    "pretty-php.formatting.blankBeforeReturn": true,
     "css.customData": [
         "./.vscode/css-data.json"
-    ]
+    ],
+    "customLocalFormatters.formatters": [
+    {
+      "command": "./djlint.sh",
+      "languages": [
+                "twig"
+            ]
+        }
+    ],
 }
