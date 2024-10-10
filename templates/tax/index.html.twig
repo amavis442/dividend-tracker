@@ -1,44 +1,72 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}
-  {{ 'Tax'|trans }}
-{% endblock %}
-
+{% block title %}{{ 'Tax'|trans }}{% endblock %}
 {% block body %}
-  <h1>{{ 'Tax'|trans }}</h1>
-  {% for notice in app.flashes('notice') %}
-    <br />
-    <div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
-  {% endfor %}
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Id</th>
-        <th>{{ 'TaxRate'|trans }}</th>
-        <th>{{ 'Valid from'|trans }}</th>
-        <th>{{ 'Actions'|trans }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for tax in taxes %}
-        <tr>
-          <td>{{ tax.id }}</td>
-          <td>{{ tax.taxRate * 100 }}%</td>
-          <td>{{ tax.validFrom|format_date('short') }}</td>
-          <td>
-            <div class="btn-group" role="group" aria-label="Basic example">
-              <a href="{{ path('tax_show', { id: tax.id }) }}" class="btn btn-primary">{{ 'show'|trans }}</a>
-              <a href="{{ path('tax_edit', { id: tax.id }) }}" class="btn btn-secondary">{{ 'edit'|trans }}</a>
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div>
+                {% for notice in app.flashes('notice') %}
+                    <twig:Alert:Danger>
+                        {{ notice|trans }}
+                    </twig:Alert:Danger>
+                {% endfor %}
             </div>
-          </td>
-        </tr>
-      {% else %}
-        <tr>
-          <td colspan="4">no records found</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-  <a class="btn btn-primary" href="{{ path('tax_new') }}" title="Create new"><i class="fas fa-plus"></i></a>
+            <div id="header" class="px-3 py-2 w-full">
+                <twig:Head>
+                    {{ 'Tax'|trans }}
+                </twig:Head>
+            </div>
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <twig:Table:Table>
+                    <twig:Table:THead>
+                        <tr>
+                            <twig:Table:ThCol class="rounded-l-lg">
+                                Id
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                {{ 'TaxRate'|trans }}
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                {{ 'Valid from'|trans }}
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                {{ 'Actions'|trans }}
+                            </twig:Table:ThCol>
+                        </tr>
+                    </twig:Table:THead>
+                </thead>
+                <tbody>
+                    {% for tax in taxes %}
+                        <twig:Table:Tr>
+                            <twig:Table:Td>
+                                {{ tax.id }}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {{ tax.taxRate * 100 }}%
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {{ tax.validFrom|format_date("short") }}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                <twig:ButtonGroup show_link="{{ path('tax_show', { id: tax.id }) }}"
+                                                  show_link_text="{{ 'show tax'|trans }}"
+                                                  edit_link="{{ path('tax_edit', { id: tax.id }) }}"
+                                                  edit_link_text="{{ 'edit tax'|trans }}" />
+                            </twig:Table:Td>
+                        </twig:Table:Tr>
+                    {% else %}
+                        <twig:Table:Tr>
+                            <twig:Table:Td colspan="4">
+                                no records found
+                            </twig:Table:Td>
+                        </twig:Table:Tr>
+                    {% endfor %}
+                </tbody>
+            </twig:Table:Table>
+            <section id="footer" class="w-full pr-3 py-2 mt-2">
+                <twig:Link:Default href="{{ path("tax_new") }}">
+                    <i class="fas fa-plus"></i>
+                </twig:Link:Default>
+            </section>
+        </div>
+    </div>
 {% endblock %}

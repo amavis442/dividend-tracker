@@ -1,90 +1,137 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}
-	Research index
-{% endblock %}
-
+{% block title %}Research index{% endblock %}
 {% block body %}
-	<h1>Research index</h1>
-
-	<section>
-		{% for notice in app.flashes('notice') %}
-			<br/>
-			<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
-		{% endfor %}
-	</section>
-
-	<section class="flex items-center gap-2 mb-6 bg-gray-200 shadow-md rounded-lg p-6">
-			{{ form_start(form, {
-				'action': path('research_index'),
-				'attr': {
-					'autocomplete' : 'off',
-					'class': 'flex w-full justify-center',
-					'data-turbo-frame' : 'research-results'
-					}})
-				}}
-			{{ form_errors(form) }}
-			<div class="w-1/2">
-				{{ form_widget(form.ticker) }}
-			</div>
-			<div>
-				<button class="focus:outline-none text-white bg-green-700
-            hover:bg-green-800 focus:ring-4
-            focus:ring-green-300 font-medium rounded-lg
-            text-sm px-2 py-2 ml-2 dark:bg-green-600
-            dark:hover:bg-green-700 dark:focus:ring-green-800" data-toggle="tooltip" data-placement="top" title="{{ 'Search ticker'|trans }}">
-					<i class="fas fa-search"></i>
-				</button>
-			</div>
-			{{ form_end(form) }}
-	</section>
-
-	<section>
-	<turbo-frame id="research-results">
-		<table class="table">
-			<thead>
-				<tr>
-					<th>Id</th>
-					<th>Ticker</th>
-					<th>Title</th>
-					<th>Info</th>
-					<th>Files</th>
-					<th>actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for research in pager %}
-					<tr>
-						<td>{{ research.id }}</td>
-						<td>{{ research.ticker.symbol }}</td>
-						<td>{{ research.title }}</td>
-						<td>{{ research.info|raw }}</td>
-						<td>
-							{% for doc in research.attachments %}
-								<a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}" target="_blank">
-									<i class="fa fa-download"></i>
-									{{ doc.label }}</a><br/>
-							{% else %}
-								no records found
-							{% endfor %}
-						</td>
-						<td>
-							<a href="{{ path('research_show', { id: research.id }) }}" class="btn btn-primary" data-turbo-frame="_top">
-								<i class="fas fa-book-open"></i>
-							</a>
-							<a href="{{ path('research_edit', { id: research.id }) }}" class="btn btn-primary" data-turbo-frame="_top">
-								<i class="far fa-edit"></i>
-							</a>
-						</td>
-					</tr>
-				{% else %}
-					<tr>
-						<td colspan="4">no records found</td>
-					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-		{{ pagerfanta(pager) }}
-	</turbo-frame>
-	</section>
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div>
+                {% for notice in app.flashes('notice') %}
+                    <twig:Alert:Danger>
+                        {{ notice|trans }}
+                    </twig:Alert:Danger>
+                {% endfor %}
+            </div>
+            <div id="header" class="px-3 py-2 w-full">
+                <twig:Head>
+                    {{ 'Research'|trans }}
+                </twig:Head>
+            </div>
+            <div class="flex items-center gap-2 mb-6 bg-gray-200 shadow-md rounded-lg p-6">
+                {{ form_start(form, {
+                                    'action': path('research_index') ,
+                    'attr': {
+                    'autocomplete' : 'off',
+                    'class': 'flex w-full justify-center',
+                    'data-turbo-frame' : 'research-results'
+                    }})
+                    }}
+                    {{ form_errors(form) }}
+                    <div class="w-1/2 me-2">
+                        <select placeholder="{{ 'Select a ticker'|trans }}" name="{{ field_name(form.ticker) }}" {{ stimulus_controller('symfony/ux-autocomplete/autocomplete',{
+                             url: path('ux_entity_autocomplete', { alias: 'ticker'})
+                            }) }}>
+                        </select>
+                    </div>
+                    <div>
+                        <twig:Button type="submit" title="{{ 'Search ticker'|trans }}">
+                            <i class="fas fa-search"></i>
+                        </twig:Button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <turbo-frame id="research-results">
+                <twig:Table:Table>
+                    <twig:Table:THead>
+                        <tr>
+                            <twig:Table:ThCol class="rounded-l-lg">
+                                Id
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Ticker
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Title
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Info
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Files
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol class="rounded-r-lg">
+                                actions
+                            </twig:Table:ThCol>
+                        </tr>
+                    </twig:Table:THead>
+                    <tbody>
+                        {% for research in pager %}
+                            <twig:Table:Tr>
+                                <twig:Table:Td>
+                                    {{ research.id }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ research.ticker.symbol }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ research.title }}
+                                </twig:Table:Td>
+                                <twig:Table:Td class="text-wrap">
+                                    {{ research.info|striptags|slice(0, 200) }}...
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {% for doc in research.attachments %}
+                                        <a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}"
+                                           target="_blank">
+                                            <i class="fa fa-download"></i>
+                                        {{ doc.label }}</a>
+                                        <br />
+                                    {% else %}
+                                        no records found
+                                    {% endfor %}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                                        <div class="inline-block" data-controller="tooltip">
+                                            <a href="{{ path('research_show', { id: research.id }) }}"
+                                               data-turbo-frame="_top"
+                                               data-tooltip-target="element"
+                                               data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                                <i class="fas fa-book-open"></i>
+                                            </a>
+                                            <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                {{ 'show research'|trans }}
+                                                <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                            </div>
+                                        </div>
+                                        <div class="inline-block" data-controller="tooltip">
+                                            <a href="{{ path('research_edit', { id: research.id }) }}"
+                                               data-turbo-frame="_top"
+                                               data-tooltip-target="element"
+                                               data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                                <i class="far fa-edit"></i>
+                                            </a>
+                                            <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                {{ 'Edit research'|trans }}
+                                                <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        {% else %}
+                            <twig:Table:Tr>
+                                <twig:Table:Td colspan="4">
+                                    no records found
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        {% endfor %}
+                    </tbody>
+                </twig:Table:Table>
+                <div class="mt-2">{{ pagerfanta(pager) }}</div>
+                </turbo-frame>
+            </div>
+        </div>
+    </div>
 {% endblock %}
