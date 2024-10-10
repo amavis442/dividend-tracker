@@ -15,6 +15,7 @@ final class Badge
         return match ($this->variant) {
             'default' => 'text-white bg-blue-500 hover:bg-blue-700',
             'success' => 'text-white bg-green-600 hover:bg-green-700',
+            'primary' => 'text-blue-900 bg-blue-300 hover:bg-blue-300',
             'secondary' => 'text-white bg-slate-500 hover:bg-slate-700',
             'danger' => 'text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 focus:outline-none',
             'info' =>  'text-white bg-orange-500 hover:bg-orange-700',
