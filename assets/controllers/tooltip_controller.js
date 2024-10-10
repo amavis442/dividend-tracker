@@ -39,7 +39,10 @@ export default class extends Controller {
     };
 
     connect() {
-        document.addEventListener('turbolinks:before-cache', this.handleCache);
+        //document.addEventListener('turbo:before-cache', this.handleCache);
+        //if (this.tooltipTarget.hasAttribute("data-show")) {
+        //    this.tooltipTarget.removeAttribute("data-show");
+        //}
     }
 
     updatePosition(referenceEl, floatingEl, arrowElement) {
@@ -90,11 +93,19 @@ export default class extends Controller {
 
     hide(event) {
         this.tooltipTarget.removeAttribute("data-show");
-        this.cleanup();
+//        this.cleanup();
+    }
+
+    disconnect(event) {
+        this.hide();
     }
 
     handleCache(event) {
-        this.hide(event);
-        this.tooltipTarget.addAttribute("hidden");
+        if (this.tooltipTargets != undefined) {
+            this.tooltipTargets.forEach((target) => {
+                target.removeAttribute("data-show");
+                target.classList.add("hidden");
+            });
+        }
     }
 }

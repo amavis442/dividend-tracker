@@ -23,7 +23,7 @@ export default class extends Controller {
         // be setup to either add a 'hidden' class or
         // remove a 'open' class etc.
         useClickOutside(this);
-        document.addEventListener('turbolinks:before-cache', this.handleCache);
+        document.addEventListener('turbo:before-cache', this.handleCache);
     }
 
     toggle(event) {
@@ -36,13 +36,25 @@ export default class extends Controller {
 
     clickOutside(event) {
         this.toggleableTargets.forEach((target) => {
-            target.classList.add(target.dataset.cssClass);
+            target.classList.add(target.dataset.cssClass)
         });
     }
 
-    handleCache(event) {
+    hide() {
         this.toggleableTargets.forEach((target) => {
-            target.classList.add(target.dataset.cssClass);
+            target.classList.add(target.dataset.cssClass)
         });
     }
-}
+
+    disconnect() {
+        this.hide();
+    }
+
+    handleCache(event) {
+        if (this.toggleableTargets !=undefined && this.toggleableTargets.length > 0) {
+            this.toggleableTargets.forEach((target) => {
+                target.classList.add(target.dataset.cssClass);
+            });
+        }
+    }
+ }
