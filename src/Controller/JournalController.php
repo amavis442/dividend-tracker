@@ -23,7 +23,7 @@ class JournalController extends AbstractController
         Route(
             path: '/list/{page<\d+>?1}',
             name: 'journal_index',
-            methods: ['GET']
+            methods: ['GET', 'POST']
         )
     ]
     public function index(
