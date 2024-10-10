@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="nl" target-language="nl" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="pXsIpIC" resname="Previous">
+        <source>Previous</source>
+        <target>Vorige</target>
+      </trans-unit>
+      <trans-unit id="H.V6Kdf" resname="Next">
+        <source>Next</source>
+        <target>Volgende</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
