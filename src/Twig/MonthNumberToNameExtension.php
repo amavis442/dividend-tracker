@@ -7,12 +7,18 @@ namespace App\Twig;
 use DateTime;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class TypeCastingExtension
  */
 class MonthNumberToNameExtension extends AbstractExtension
 {
+    public function __construct(private TranslatorInterface $translator)
+    {
+
+    }
+
     /**
      * Summary of getFilters
      * @return array
@@ -24,7 +30,7 @@ class MonthNumberToNameExtension extends AbstractExtension
                 $rawDate = date('Y') . '-' . $value . '-01';
                 $formatDate = new DateTime($rawDate);
 
-                return $formatDate->format('F');
+                return $this->translator->trans($formatDate->format('F'));
             }),
         ];
     }
