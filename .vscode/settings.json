@@ -56,4 +56,7 @@
             ]
         }
     ],
+    "[php]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
 }
