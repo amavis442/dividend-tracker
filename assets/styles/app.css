@@ -12,6 +12,10 @@
 */
 .ck-editor__editable_inline {
     min-height: 400px;
+    @apply mb-4;
 }
 
+.ck-rounded-corners {
+    @apply rounded-lg;
+}
 
