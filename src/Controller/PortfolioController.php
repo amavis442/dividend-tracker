@@ -50,7 +50,7 @@ class PortfolioController extends AbstractController
 
 	#[
 		Route(
-			path: '/list/{page}/{orderBy}/{sort}',
+			path: '/',
 			name: 'portfolio_index',
 			methods: ['GET', 'POST']
 		)
@@ -64,8 +64,8 @@ class PortfolioController extends AbstractController
 		DividendServiceInterface $dividendService,
 		Referer $referer,
 		#[MapQueryParameter] int $page = 1,
-		#[MapQueryParameter] string $orderBy = 'fullname',
-		#[MapQueryParameter] string $sort = 'asc'
+		#[MapQueryParameter] string $sort = 'fullname',
+		#[MapQueryParameter] string $orderBy = 'asc'
 	): Response {
 		$referer->clear();
 		$referer->set('portfolio_index', [
@@ -74,9 +74,7 @@ class PortfolioController extends AbstractController
 			'sort' => $sort,
 		]);
 
-		if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
-			$sort = 'asc';
-		}
+		$orderBy = in_array($orderBy, ['asc', 'desc', 'ASC', 'DESC']) ? $orderBy : 'asc';
 
 		$pie = null;
 		$ticker = null;
@@ -129,8 +127,8 @@ class PortfolioController extends AbstractController
 			$dividendService,
 			$portfolio->getInvested() ?? 0.0,
 			$page,
-			$orderBy,
 			$sort,
+			$orderBy,
 			$ticker,
 			$pie
 		);

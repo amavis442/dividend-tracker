@@ -24,7 +24,7 @@ class TickerController extends AbstractController
 
     #[
         Route(
-            path: '/list/{page<\d+>?1}',
+            path: '/',
             name: 'ticker_index',
             methods: ['GET', 'POST']
         )
@@ -34,8 +34,8 @@ class TickerController extends AbstractController
         TickerRepository $tickerRepository,
         Referer $referer,
         #[MapQueryParameter] int $page = 1,
-        #[MapQueryParameter] string $orderBy = 'symbol',
-        #[MapQueryParameter] string $sort = 'asc'
+        #[MapQueryParameter] string $sort = 'symbol',
+        #[MapQueryParameter] string $orderBy = 'asc'
     ): Response {
         $tickerAutoComplete = new TickerAutocomplete();
         $ticker = null;
@@ -80,8 +80,8 @@ class TickerController extends AbstractController
         }
 
         $queryBuilder = $tickerRepository->getAllQuery(
-            $orderBy,
             $sort,
+            $orderBy,
             $ticker
         );
         $adapter = new QueryAdapter($queryBuilder);

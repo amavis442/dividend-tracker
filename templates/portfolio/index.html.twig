@@ -48,7 +48,7 @@
                                 <twig:Table:ThCol>
                                     <div class="flex items-center">
                                         {{ 'Fullname'|trans }}
-                                        <a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'symbol', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">
+                                        <a href="{{ path('portfolio_index', { ...app.request.query.all() , sort: 'fullname', orderBy: sort == 'fullname' and orderBy == 'asc' ? 'desc' : 'asc',}) }}">
                                             <svg class="w-3 h-3 ms-1.5"
                                                  aria-hidden="true"
                                                  xmlns="http://www.w3.org/2000/svg"

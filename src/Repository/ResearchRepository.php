@@ -39,11 +39,11 @@ class ResearchRepository extends ServiceEntityRepository
     }
 
     public function getAllQuery(
-        string $orderBy = 'id',
-        string $sort = 'ASC',
+        string $sort = 'id',
+        string $orderBy = 'ASC',
         ?Ticker $ticker = null
     ): QueryBuilder {
-        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $ticker);
+        $queryBuilder = $this->getQueryBuilder($sort, $orderBy, $ticker);
         $queryBuilder
             ->andWhere('lower(t.isin) NOT LIKE :ignore')
             ->setParameter('ignore', 'nvt%');
@@ -52,20 +52,21 @@ class ResearchRepository extends ServiceEntityRepository
     }
 
     private function getQueryBuilder(
-        string $orderBy = 'id',
-        string $sort = 'ASC',
+        string $sort = 'id',
+        string $orderBy = 'ASC',
         ?Ticker $ticker = null
     ): QueryBuilder {
-        $order = 'r.' . $orderBy;
-        if ($orderBy === 'symbol') {
-            $order = 't.symbol';
-        }
+
+        $sort = match($sort) {
+            'symbol' => 't.symbol',
+            default => 'r.'.$sort,
+        };
 
         // Create our query
         $queryBuilder = $this->createQueryBuilder('r')
             ->select('r')
             ->innerJoin('r.ticker', 't')
-            ->orderBy($order, $sort);
+            ->orderBy($sort, $orderBy);
 
         if ($ticker && $ticker->getId()) {
             $queryBuilder->andWhere('t = :ticker');

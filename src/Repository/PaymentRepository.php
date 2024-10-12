@@ -81,25 +81,24 @@ class PaymentRepository extends ServiceEntityRepository
 
 
     public function getAllQuery(
-        string $orderBy = 'exDividendDate',
-        string $sort = 'DESC',
+        string $sort = 'exDividendDate',
+        string $orderBy = 'DESC',
         ?Ticker $ticker = null,
         string $startDate = null,
         string $endDate = null
     ): \Doctrine\ORM\QueryBuilder {
-        $order = 'p.' . $orderBy;
-        if ($orderBy === 'symbol') {
-            $order = 't.symbol';
-        }
-        if ($orderBy === 'exDividendDate') {
-            $order = 'c.exDividendDate';
-        }
+        $sort = match($sort) {
+            'symbol' => 't.symbol',
+            'exDividendDate' => 'c.exDividendDate',
+            default => 'p.' . $sort,
+        };
+
 
         // Create our query
         $queryBuilder = $this->createQueryBuilder('p')
             ->join('p.ticker', 't')
             ->leftJoin('p.calendar', 'c')
-            ->orderBy($order, $sort);
+            ->orderBy($sort, $orderBy);
 
         if ($startDate !== null) {
             $this->setDateRange($queryBuilder, $startDate . " 00:00:00", $endDate . " 23:59:59");

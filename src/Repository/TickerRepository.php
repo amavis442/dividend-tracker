@@ -53,11 +53,11 @@ class TickerRepository extends ServiceEntityRepository
     }
 
     public function getAllQuery(
-        string $orderBy = "symbol",
-        string $sort = "ASC",
+        string $sort = "symbol",
+        string $orderBy = "ASC",
         ?Ticker $ticker = null
     ): \Doctrine\ORM\QueryBuilder {
-        $order = "t." . $orderBy;
+        $sort = "t." . $sort;
         // Create our query
         $queryBuilder = $this->createQueryBuilder("t")
             ->select("t")
@@ -66,7 +66,7 @@ class TickerRepository extends ServiceEntityRepository
             ->leftJoin("t.dividendMonths", "d")
             ->leftJoin("t.payments", "pa")
             ->groupBy("t.id")
-            ->orderBy($order, $sort);
+            ->orderBy($sort, $orderBy);
 
         if ($ticker && $ticker->getId()) {
             $queryBuilder->where("t = :ticker");

@@ -29,7 +29,7 @@ class ResearchController extends AbstractController
 
     #[
         Route(
-            path: '/list/{page}/{orderBy}/{sort}',
+            path: '/',
             name: 'research_index',
             methods: ['GET', 'POST']
         )
@@ -40,8 +40,8 @@ class ResearchController extends AbstractController
         ResearchRepository $researchRepository,
         Referer $referer,
         #[MapQueryParameter] int $page = 1,
-        #[MapQueryParameter] string $orderBy = 'id',
-        #[MapQueryParameter] string $sort = 'asc'
+        #[MapQueryParameter] string $sort = 'id',
+        #[MapQueryParameter] string $orderBy = 'asc'
     ): Response {
         $referer->clear();
         $referer->set('calendar_index', [
@@ -49,12 +49,8 @@ class ResearchController extends AbstractController
             'orderBy' => $orderBy,
             'sort' => $sort,
         ]);
-        if (!in_array($orderBy, ['id', 'symbol'])) {
-            $orderBy = 'id';
-        }
-        if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
-            $sort = 'asc';
-        }
+        $sort = in_array($sort, ['id', 'symbol'])? $sort: 'id';
+        $orderBy = in_array($orderBy, ['asc', 'desc', 'ASC', 'DESC']) ? $orderBy : 'asc';
 
         $tickerAutoComplete = new TickerAutocomplete();
         $ticker = null;
@@ -92,8 +88,8 @@ class ResearchController extends AbstractController
         }
 
         $queryBuilder = $researchRepository->getAllQuery(
-            $orderBy,
             $sort,
+            $orderBy,
             $ticker
         );
 
@@ -106,7 +102,7 @@ class ResearchController extends AbstractController
             'form' => $form,
             'pager' => $pager,
             'thisPage' => $page,
-            'order' => $orderBy,
+            'orderBy' => $orderBy,
             'sort' => $sort,
         ]);
     }

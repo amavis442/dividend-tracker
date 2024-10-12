@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/payment')]
 class PaymentController extends AbstractController
@@ -29,7 +30,7 @@ class PaymentController extends AbstractController
 
 	#[
 		Route(
-			path: '/list/{page<\d+>?1}',
+			path: '/',
 			name: 'payment_index',
 			methods: ['GET', 'POST']
 		)
@@ -39,14 +40,14 @@ class PaymentController extends AbstractController
 		PaymentRepository $paymentRepository,
 		TickerRepository $tickerRepository,
 		Referer $referer,
-		int $page = 1
+		#[MapQueryParameter]int $page = 1
 	): Response {
 		$referer->set('payment_index', [
 			'page' => $page,
 		]);
 
-		$orderBy = 'payDate';
-		$sort = 'DESC';
+		$sort = 'payDate';
+		$orderBy = 'DESC';
 		$ticker = null;
 		$year = (int) date('Y');
 		$month = null;
@@ -119,12 +120,13 @@ class PaymentController extends AbstractController
 		$taxes = ($totalDividend / (100 - Constants::TAX)) * Constants::TAX;
 
 		$queryBuilder = $paymentRepository->getAllQuery(
-			$orderBy,
 			$sort,
+			$orderBy,
 			$ticker,
 			$startDate,
 			$endDate
 		);
+
 		$adapter = new QueryAdapter($queryBuilder);
 		$pager = new Pagerfanta($adapter);
 		$pager->setMaxPerPage(10);

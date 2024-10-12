@@ -99,7 +99,7 @@
                                         <span style="color:red">&euro;{{ payment.taxes|format_number({"fraction_digit": 2}) }}</span>
                                     </twig:Table:Td>
                                     <twig:Table:Td>
-                                        {{ payment.dividendType }}
+                                       {% if payment.dividendType is defined %}{{ payment.dividendType }} {% endif %}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
                                         <div class="inline-flex rounded-md shadow-sm" role="group">
@@ -157,7 +157,7 @@
                         </tbody>
                     </twig:Table:Table>
                 </div>
-                <div class="mb-2">{{ pagerfanta(pager) }}</div>
+                <div class="mb-2">{% if pager.haveToPaginate %}{{ pagerfanta(pager) }}{% endif %}</div>
                 </turbo-frame>
             </div>
         </div>

@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/journal')]
 class JournalController extends AbstractController
@@ -22,7 +23,7 @@ class JournalController extends AbstractController
 
     #[
         Route(
-            path: '/list/{page<\d+>?1}',
+            path: '/',
             name: 'journal_index',
             methods: ['GET', 'POST']
         )
@@ -32,7 +33,7 @@ class JournalController extends AbstractController
         JournalRepository $journalRepository,
         TaxonomyRepository $taxonomyRepository,
         Referer $referer,
-        int $page = 1
+        #[MapQueryParameter]int $page = 1
     ): Response {
         $referer->clear();
         $referer->set('journal_index', [
