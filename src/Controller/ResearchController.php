@@ -38,10 +38,17 @@ class ResearchController extends AbstractController
         Request $request,
         TickerRepository $tickerRepository,
         ResearchRepository $researchRepository,
+        Referer $referer,
         #[MapQueryParameter] int $page = 1,
         #[MapQueryParameter] string $orderBy = 'id',
         #[MapQueryParameter] string $sort = 'asc'
     ): Response {
+        $referer->clear();
+        $referer->set('calendar_index', [
+            'page' => $page,
+            'orderBy' => $orderBy,
+            'sort' => $sort,
+        ]);
         if (!in_array($orderBy, ['id', 'symbol'])) {
             $orderBy = 'id';
         }

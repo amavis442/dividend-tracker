@@ -6,6 +6,7 @@ use App\Entity\Journal;
 use App\Form\JournalType;
 use App\Repository\JournalRepository;
 use App\Repository\TaxonomyRepository;
+use App\Service\Referer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,8 +31,13 @@ class JournalController extends AbstractController
         Request $request,
         JournalRepository $journalRepository,
         TaxonomyRepository $taxonomyRepository,
+        Referer $referer,
         int $page = 1
     ): Response {
+        $referer->clear();
+        $referer->set('journal_index', [
+            'page' => $page,
+        ]);
         $taxonomySelected = $request
             ->getSession()
             ->get(self::TAXONOMY_KEY, null);
@@ -60,7 +66,8 @@ class JournalController extends AbstractController
     #[Route(path: '/create', name: 'journal_new', methods: ['GET', 'POST'])]
     public function create(
         Request $request,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        Referer $referer,
     ): Response {
         $journal = new Journal();
         $form = $this->createForm(JournalType::class, $journal);
@@ -70,6 +77,9 @@ class JournalController extends AbstractController
             $entityManager->persist($journal);
             $entityManager->flush();
 
+            if ($referer->get()) {
+                return $this->redirect($referer->get());
+            }
             return $this->redirectToRoute('journal_index');
         }
 
@@ -91,7 +101,8 @@ class JournalController extends AbstractController
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
-        Journal $journal
+        Journal $journal,
+        Referer $referer,
     ): Response {
         $form = $this->createForm(JournalType::class, $journal);
         $form->handleRequest($request);
@@ -99,6 +110,9 @@ class JournalController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
+            if ($referer->get()) {
+                return $this->redirect($referer->get());
+            }
             return $this->redirectToRoute('journal_index');
         }
 

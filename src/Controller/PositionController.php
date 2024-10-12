@@ -10,7 +10,6 @@ use App\Form\TickerAutocompleteType;
 use App\Repository\PortfolioRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
-use App\Service\PositionService;
 use App\Service\Referer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

@@ -32,12 +32,20 @@ class TickerController extends AbstractController
     public function index(
         Request $request,
         TickerRepository $tickerRepository,
+        Referer $referer,
         #[MapQueryParameter] int $page = 1,
         #[MapQueryParameter] string $orderBy = 'symbol',
         #[MapQueryParameter] string $sort = 'asc'
     ): Response {
         $tickerAutoComplete = new TickerAutocomplete();
         $ticker = null;
+        $referer->clear();
+
+        $referer->set('calendar_index', [
+            'page' => $page,
+            'orderBy' => $orderBy,
+            'sort' => $sort,
+        ]);
 
         $tickerAutoCompleteCache = $request
             ->getSession()

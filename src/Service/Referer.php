@@ -53,4 +53,9 @@ class Referer
     {
         return $this->session->get('referer');
     }
+
+    public function clear(): void
+    {
+        $this->session->remove(self::SESSION_REFERER_KEY);
+    }
 }

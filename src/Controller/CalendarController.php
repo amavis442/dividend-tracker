@@ -44,6 +44,14 @@ class CalendarController extends AbstractController
         #[MapQueryParameter] string $orderBy = 'paymentDate',
         #[MapQueryParameter] string $sort = 'DESC'
     ): Response {
+        $referer->clear();
+
+        $referer->set('calendar_index', [
+            'page' => $page,
+            'orderBy' => $orderBy,
+            'sort' => $sort,
+        ]);
+
         if (
             !in_array($orderBy, [
                 'paymentDate',
@@ -102,12 +110,6 @@ class CalendarController extends AbstractController
         $pager = new Pagerfanta($adapter);
         $pager->setMaxPerPage(10);
         $pager->setCurrentPage($page);
-
-        $referer->set('calendar_index', [
-            'page' => $page,
-            'orderBy' => $orderBy,
-            'sort' => $sort,
-        ]);
 
         return $this->render('calendar/index.html.twig', [
             'form' => $form,

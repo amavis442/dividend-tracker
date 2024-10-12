@@ -21,7 +21,7 @@ final class Head
             'h4' => 'text-2xl',
             'h5' => 'text-xl',
             'h6' => 'text-lg',
-            default => throw new \LogicException(sprintf('Unknown button type "%s"', $this->tag)),
+            default => throw new \LogicException(sprintf('Unknown header type "%s"', $this->tag)),
         };
     }
 
