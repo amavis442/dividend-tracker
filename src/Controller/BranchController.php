@@ -13,15 +13,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 #[Route('/{_locale<%app.supported_locales%>}/dashboard/branch')]
 class BranchController extends AbstractController
 {
-	#[Route('/list/{page<\d+>?1}', name: 'branch_index', methods: ['GET'])]
+	#[Route('/', name: 'branch_index', methods: ['GET'])]
 	public function index(
 		BranchRepository $branchRepository,
-		int $page = 1,
-		Referer $referer
+		Referer $referer,
+		#[MapQueryParameter]int $page = 1,
 	): Response {
 		$referer->clear();
 		$referer->set('branch_index', [
