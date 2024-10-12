@@ -1,117 +1,188 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}
-	Positions
-{% endblock %}
-
+{% block title %}Positions{% endblock %}
 {% block body %}
-	<h1>Positions</h1>
-
-	<section>
-		{% for notice in app.flashes('notice') %}
-			<br/>
-			<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
-		{% endfor %}
-	</section>
-
-	{% include 'portfolio/_summary.html.twig' %}
-
-	<section class="flex items-center gap-2 mb-6 bg-gray-200 shadow-md rounded-lg p-6">
-			{{ form_start(form, {
-				'action': path('position_index'),
-				'attr': {
-					'autocomplete' : 'off',
-					'class': 'flex w-full justify-center',
-					'data-turbo-frame' : 'position_results'
-					}})
-				}}
-			{{ form_errors(form) }}
-			<div class="w-1/2">
-				{{ form_widget(form.ticker) }}
-			</div>
-			<div>
-				<button class="focus:outline-none text-white bg-green-700
-            hover:bg-green-800 focus:ring-4
-            focus:ring-green-300 font-medium rounded-lg
-            text-sm px-2 py-2 ml-2 dark:bg-green-600
-            dark:hover:bg-green-700 dark:focus:ring-green-800" data-toggle="tooltip" data-placement="top" title="{{ 'Search ticker'|trans }}">
-					<i class="fas fa-search"></i>
-				</button>
-			</div>
-			{{ form_end(form) }}
-	</section>
-
-
-	<section>
-	<turbo-frame id="position_results">
-	<table class="table" class="max-w-min min-w-full">
-		<thead>
-			<tr>
-				<th>#</th>
-				<th>
-					<a href="{{ path('position_index', { page: thisPage ? thisPage : 1, tab: tab, orderBy: 'symbol', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">Ticker</a>
-				</th>
-				<th>Name</th>
-				<th>Industry</th>
-				<th>Amount</th>
-				<th>Average price</th>
-				<th>Allocation</th>
-				<th>Pos id</th>
-				<th>Closed at</th>
-				<th>Status</th>
-				<th style="width:20%">actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for position in pager %}
-				{% set currentDividendData = position.ticker.getRecentDividendDate %}
-				{% set dividendDaysLeft = currentDividendData ? currentDividendData.getDaysLeft : - 1 %}
-				<tr>
-					<td>{{ position.id }}</td>
-					<td>{{ position.ticker.symbol }}</td>
-					<td>{{ position.ticker.fullname }}</td>
-					<td>{{ position.ticker.branch.label }}</td>
-					<td>{{ position.amount|format_number({ fraction_digit: 2 }) }}</td>
-
-					<td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ position.price|format_number({ fraction_digit: 2 }) }}</td>
-					<td>{{ (position.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ position.allocation|format_number({ fraction_digit: 2 }) }}</td>
-					<td>{{ position.id }}</td>
-					<td>{{ position.updatedAt ? position.updatedAt|date('d/m/Y') : '' }}</td>
-					<td>{{ position.closed == 2 ? 'closed' : 'open' }}</td>
-					<td>
-						<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-							<div class="btn-group mr-2" role="group" aria-label="First group">
-								<a href="{{ path('position_show', { id: position.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details position"
-								data-turbo-frame="_top">
-									<i class="fas fa-book-open"></i>
-								</a>
-								<a class="btn btn-success" href="{{ path('payment_new', { position: position.id }) }}" data-toggle="tooltip" data-placement="top" title="add dividend payment"
-								data-turbo-frame="_top">
-									<i class="far fa-money-bill-alt"></i>
-								</a>
-
-								<a href="{{ path('position_edit', { id: position.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit position"
-								data-turbo-frame="_top">
-									<i class="far fa-edit"></i>
-								</a>
-								{% if not position.closed %}
-									<a class="btn btn-primary" href="{{ path('position_edit', { id: position.id, closed: true }) }}" data-toggle="tooltip" data-placement="top" title="Close position"
-									data-turbo-frame="_top"><span class="fas fa-folder-minus"/></a>
-								{% endif %}
-							</div>
-						</div>
-					</td>
-				</tr>
-			{% else %}
-				<tr>
-					<td colspan="11">no records found</td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-
-	{{ pagerfanta(pager) }}
-
-	</turbo-frame>
-	</section>
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div>
+                {% for notice in app.flashes('notice') %}
+                    <twig:Alert variant="danger">
+                        {{ notice|trans }}
+                    </twig:Alert>
+                {% endfor %}
+            </div>
+            <div id="header" class="px-3 py-2 w-full">
+                <twig:Head>
+                    {{ 'Positions'|trans }}
+                </twig:Head>
+            </div>
+            {% include 'portfolio/_summary.html.twig' %}
+            <section class="flex items-center gap-2 mb-6 bg-gray-200 shadow-md rounded-lg p-6">
+                {{ form_start(form, {
+                                    'action': path('position_index') ,
+                    'attr': {
+                    'autocomplete' : 'off',
+                    'class': 'flex w-full justify-center',
+                    'data-turbo-frame' : 'position_results'
+                    }})
+                    }}
+                    {{ form_errors(form) }}
+                    <div class="w-1/2 px-2">
+                        <select placeholder="{{ 'Select a ticker'|trans }}" name="{{ field_name(form.ticker) }}" {{ stimulus_controller('symfony/ux-autocomplete/autocomplete',{
+                             url: path('ux_entity_autocomplete', { alias: 'ticker'})
+                            }) }}>
+                        </select>
+                    </div>
+                    <div>
+                        <twig:Button title="{{ 'Search ticker'|trans }}">
+                            <i class="fas fa-search"></i>
+                        </twig:Button>
+                    </div>
+                {{ form_end(form) }}
+            </section>
+            <section>
+                <turbo-frame id="position_results">
+                <twig:Table:Table class="max-w-min min-w-full">
+                    <thead>
+                        <tr>
+                            <twig:Table:ThCol>
+                                #
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                <a href="{{ path('position_index', { page: thisPage ? thisPage : 1, tab: tab, orderBy: 'symbol', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">Ticker</a>
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Name
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Industry
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Amount
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Average price
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Allocation
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Pos id
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Closed at
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Status
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                actions
+                            </twig:Table:ThCol>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for position in pager %}
+                            {% set currentDividendData = position.ticker.getRecentDividendDate %}
+                            {% set dividendDaysLeft = currentDividendData ? currentDividendData.getDaysLeft : - 1 %}
+                            <twig:Table:Tr>
+                                <twig:Table:Td>
+                                    {{ position.id }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ position.ticker.symbol }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ position.ticker.fullname }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ position.ticker.branch.label }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ position.amount|format_number({"fraction_digit": 2}) }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ (position.currency ? position.currency.sign : '$')|raw }}{{ position.price|format_number({"fraction_digit": 2}) }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ (position.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ position.allocation|format_number({"fraction_digit": 2}) }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ position.id }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ position.updatedAt ? position.updatedAt|date("d/m/Y") : '' }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ position.closed == 2 ? 'closed' : 'open' }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                                        <div class="inline-block"  data-controller="tooltip">
+                                            <a href="{{ path('position_show', { id: position.id }) }}"
+                                               data-turbo-frame="_top"
+                                               data-tooltip-target="element"
+                                               data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                                <i class="fas fa-book-open"></i>
+                                            </a>
+                                            <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                {{ 'show portfolio'|trans }}
+                                                <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                            </div>
+                                        </div>
+                                        <div class="inline-block"  data-controller="tooltip">
+                                            <a href="{{ path('payment_new', { position: position.id }) }}"
+                                               data-turbo-frame="_top"
+                                               data-tooltip-target="element"
+                                               data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                                <i class="far fa-money-bill-alt"></i>
+                                            </a>
+                                            <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                {{ 'add dividend payment'|trans }}
+                                                <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                            </div>
+                                        </div>
+                                        <div class="inline-block"  data-controller="tooltip">
+                                            <a href="{{ path('position_edit', { id: position.id }) }}"
+                                               data-turbo-frame="_top"
+                                               data-tooltip-target="element"
+                                               data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                                <i class="far fa-edit"></i>
+                                            </a>
+                                            <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                {{ 'Edit position'|trans }}
+                                                <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                            </div>
+                                        </div>
+                                        <div class="inline-block"  data-controller="tooltip">
+                                            <a href="{{ path('position_edit', { id: position.id, closed: true }) }}" data-turbo-frame="_top" data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide" class="
+                                                {% if position.closed %}disabled>{% endif %}
+                                                px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white"
+                                                {% if position.closed %}disabled>{% endif %}
+                                                >
+                                                <i class="fas fa-folder-minus"></i>
+                                            </a>
+                                            <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                {{ 'Close position'|trans }}
+                                                <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        {% else %}
+                            <twig:Table:Tr>
+                                <twig:Table:Td colspan="11">
+                                    no records found
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        {% endfor %}
+                    </tbody>
+                </twig:Table:Table>
+                <div class="mt-2">{{ pagerfanta(pager) }}</div>
+                </turbo-frame>
+            </section>
+        </div>
+    </div>
 {% endblock %}

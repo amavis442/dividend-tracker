@@ -1,25 +1,13 @@
-<form method="post" action="{{ path('position_delete', {'id': position.id}) }}"
-{{ stimulus_controller('delete-confirm',{ title: 'Remove this item?'|trans,
+<form method="post" action="{{ path('position_delete', { id: position.id }) }}"
+  {{ stimulus_controller('delete-confirm',{ title: 'Remove this item?'|trans,
                                           icon: 'warning',
                                           confirmButtonText: 'Yes, remove it'|trans,
                                           cancelButtonText: 'Cancel'|trans,
                                           }) }}
-{{ stimulus_action('delete-confirm','onSubmit') }}
-class="appearance-none"
->
+              {{ stimulus_action('delete-confirm','onSubmit') }}>
     <input type="hidden" name="_method" value="DELETE">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ position.id) }}">
-
-    <div data-controller="tooltip">
-        <button id="deleteBtn" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide" data-tooltip-target="element"
-       class="bg-red-400 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-        >
+    <button type="submit" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
         <i class="fas fa-trash"></i>
-        </button>
-        <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
-            {{ 'Delete this item?'|trans }}
-            <div class="arrow" data-tooltip-target="tooltipArrow"></div>
-        </div>
-    </div>
-
+    </button>
 </form>

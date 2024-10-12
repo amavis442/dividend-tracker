@@ -45,7 +45,7 @@
                     <twig:Table:Table class="max-w-min min-w-full">
                         <twig:Table:THead>
                             <tr>
-                                <twig:Table:ThCol class="rounded-l-lg">
+                                <twig:Table:ThCol>
                                     <div class="flex items-center">
                                         {{ 'Fullname'|trans }}
                                         <a href="{{ path('portfolio_index', {'page': thisPage ? thisPage : 1, 'orderBy': 'symbol', 'sort': sort == 'asc' ? 'desc' : 'asc'}) }}">
@@ -83,7 +83,7 @@
                                     <br />
                                     {{ 'Payout'|trans }}
                                 </twig:Table:ThCol>
-                                <twig:Table:ThCol class="rounded-r-lg">
+                                <twig:Table:ThCol>
                                     {{ 'Forward dividend'|trans }}
                                     <div class="inlin-block" {{ stimulus_controller("tooltip") }} data-tooltip-placement-value="bottom">
                                         <i class="fas fa-question-circle"

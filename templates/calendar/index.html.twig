@@ -50,7 +50,7 @@
                     </twig:Button>
                 </div>
                 <turbo-frame id="calendar-results">
-                <twig:Table:Table>
+                <twig:Table:Table class="max-w-min min-w-full mb-4">
                     <twig:Table:THead>
                         <tr>
                             <twig:Table:ThCol>
@@ -210,13 +210,11 @@
                         {% endfor %}
                     </tbody>
                 </twig:Table:Table>
+                <div class="mb-2">{{ pagerfanta(pager) }}</div>
             </div>
         </div>
-        div class="mb-2">
-        {{ pagerfanta(pager) }}
+        </turbo-frame>
     </div>
-    </turbo-frame>
-</div>
 </div>
 </div>
 {% endblock %}

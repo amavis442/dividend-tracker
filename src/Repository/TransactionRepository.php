@@ -18,102 +18,111 @@ use App\Entity\Ticker;
  */
 class TransactionRepository extends ServiceEntityRepository
 {
-    use PagerTrait;
+	use PagerTrait;
 
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Transaction::class);
-    }
+	public function __construct(ManagerRegistry $registry)
+	{
+		parent::__construct($registry, Transaction::class);
+	}
 
-    private function getQueryBuilder(
-        string $orderBy = 'transactionDate',
-        string $sort = 'ASC',
-        ?Ticker $ticker = null
-    ): QueryBuilder {
-        $order = 'tr.' . $orderBy;
-        if ($orderBy === 'symbol') {
-            $order = 't.symbol';
-        }
+	private function getQueryBuilder(
+		string $orderBy = 'transactionDate',
+		string $sort = 'ASC',
+		?Ticker $ticker = null
+	): QueryBuilder {
+		$order = 'tr.' . $orderBy;
+		if ($orderBy === 'symbol') {
+			$order = 't.symbol';
+		}
 
-        // Create our query
-        $queryBuilder = $this->createQueryBuilder('tr')
-            ->select('tr')
-            ->innerJoin('tr.position', 'p')
-            ->innerJoin('p.ticker', 't')
-            ->innerJoin('t.branch', 'i')
-            ->orderBy($order, $sort);
+		// Create our query
+		$queryBuilder = $this->createQueryBuilder('tr')
+			->select('tr')
+			->innerJoin('tr.position', 'p')
+			->innerJoin('p.ticker', 't')
+			->innerJoin('t.branch', 'i')
+			->orderBy($order, $sort);
 
-        if ($ticker) {
-            $queryBuilder
-                ->andWhere('t = :ticker')
-                ->setParameter('ticker', $ticker->getId());
-        }
-        return $queryBuilder;
-    }
+		if ($ticker) {
+			$queryBuilder
+				->andWhere('t = :ticker')
+				->setParameter('ticker', $ticker->getId());
+		}
+		return $queryBuilder;
+	}
 
-    public function getAll(
-        int $page = 1,
-        int $limit = 10,
-        string $orderBy = 'transactionDate',
-        string $sort = 'ASC',
-        ?Ticker $ticker = null
-    ): Paginator {
-        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $ticker);
-        $queryBuilder->leftJoin('t.calendars', 'c');
-        $query = $queryBuilder->getQuery();
-        $paginator = $this->paginate($query, $page, $limit);
+	public function getAll(
+		int $page = 1,
+		int $limit = 10,
+		string $orderBy = 'transactionDate',
+		string $sort = 'ASC',
+		?Ticker $ticker = null
+	): Paginator {
+		$queryBuilder = $this->getQueryBuilder($orderBy, $sort, $ticker);
+		$queryBuilder->leftJoin('t.calendars', 'c');
+		$query = $queryBuilder->getQuery();
+		$paginator = $this->paginate($query, $page, $limit);
 
-        return $paginator;
-    }
+		return $paginator;
+	}
 
-    public function getAllQuery(
-        string $orderBy = 'transactionDate',
-        string $sort = 'ASC',
-        ?Ticker $ticker = null
-    ): QueryBuilder {
-        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $ticker);
-        $queryBuilder->leftJoin('t.calendars', 'c');
-        return $queryBuilder;
-    }
+	public function getAllQuery(
+		string $orderBy = 'transactionDate',
+		string $sort = 'ASC',
+		?Ticker $ticker = null
+	): QueryBuilder {
+		$queryBuilder = $this->getQueryBuilder($orderBy, $sort, $ticker);
+		$queryBuilder->leftJoin('t.calendars', 'c');
+		return $queryBuilder;
+	}
 
-    public function getByTicker(Ticker $ticker)
-    {
-        return $this->createQueryBuilder('t')
-            ->innerJoin('t.position', 'p')
-            ->where('t.ticker = :ticker')
-            ->orderBy('t.transactionDate, t.id', 'asc')
-            ->andWhere('p.closed = false')
-            ->setParameter('ticker', $ticker)
-            ->getQuery()
-            ->getResult();
-    }
+	public function getAllByPositionQuery(Position $position): QueryBuilder
+	{
+		return $this->createQueryBuilder('t')
+			->innerJoin('t.position', 'p')
+			->where('t.position = :position')
+			->orderBy('t.transactionDate, t.id', 'asc')
+			->andWhere('p.closed = false')
+			->setParameter('position', $position);
+	}
 
+	public function getByTicker(Ticker $ticker)
+	{
+		return $this->createQueryBuilder('t')
+			->innerJoin('t.position', 'p')
+			->where('t.ticker = :ticker')
+			->orderBy('t.transactionDate, t.id', 'asc')
+			->andWhere('p.closed = false')
+			->setParameter('ticker', $ticker)
+			->getQuery()
+			->getResult();
+	}
 
-    public function getByPositionQueryBuilder(Position $position)
-    {
-        return $this->createQueryBuilder('t')
-            ->innerJoin('t.position', 'p')
-            ->orderBy('t.transactionDate, t.id', 'asc')
-            ->where('t.position = :position')
-            ->andWhere('p.closed = false')
-            ->setParameter('position', $position);
-    }
+	public function getByPositionQueryBuilder(Position $position)
+	{
+		return $this->createQueryBuilder('t')
+			->innerJoin('t.position', 'p')
+			->orderBy('t.transactionDate, t.id', 'asc')
+			->where('t.position = :position')
+			->andWhere('p.closed = false')
+			->setParameter('position', $position);
+	}
 
-    public function getLastImportFile(): array
-    {
-        return $this->createQueryBuilder('t')
-            ->select('t.importfile')
-            ->where('t.importfile is not null')
-            ->orderBy('t.id', 'desc')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
+	public function getLastImportFile(): array
+	{
+		return $this->createQueryBuilder('t')
+			->select('t.importfile')
+			->where('t.importfile is not null')
+			->orderBy('t.id', 'desc')
+			->setMaxResults(1)
+			->getQuery()
+			->getOneOrNullResult();
+	}
 
-    // /**
-    //  * @return Transaction[] Returns an array of Transaction objects
-    //  */
-    /*
+	// /**
+	//  * @return Transaction[] Returns an array of Transaction objects
+	//  */
+	/*
     public function findByExampleField($value)
     {
         return $this->createQueryBuilder('o')
@@ -127,7 +136,7 @@ class TransactionRepository extends ServiceEntityRepository
     }
     */
 
-    /*
+	/*
     public function findOneBySomeField($value): ?Transaction
     {
         return $this->createQueryBuilder('o')

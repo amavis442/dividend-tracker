@@ -1,82 +1,67 @@
 {% extends 'base.html.twig' %}
-
-{% block title %} {{ 'Position'|trans }}
-{% endblock %}
-
+{% block title %}{{ 'Position'|trans }}{% endblock %}
 {% block body %}
-	<h1>Position</h1>
-
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-		<li class="nav-item" role="presentation">
-			<button type="button" class="nav-link active" id="position-tab" data-bs-toggle="tab" data-bs-target="#position" role="tab" aria-controls="position" aria-selected="true">
-				{{ 'Position'|trans }}
-			</button>
-		</li>
-		<li class="nav-item" role="presentation">
-			<button type="button" class="nav-link" id="transactions-tab" data-bs-toggle="tab" data-bs-target="#transactions" role="tab" aria-controls="transactions" aria-selected="false">
-				{{ 'Transactions'|trans }}
-			</button>
-		</li>
-	</ul>
-
-	<div class="tab-content shadow-sm p-3 mb-5 bg-body-tertiary rounded" id="myTabContent">
-		<div class="tab-pane fade show active" id="position" role="tabpanel" aria-labelledby="position-tab" tabindex="0">
-			<table class="table">
-				<tbody>
-					<tr>
-						<th>Ticker</th>
-						<td>{{ position.ticker.symbol }}</td>
-					</tr>
-					<tr>
-						<th>Name</th>
-						<td>{{ position.ticker.fullname }}</td>
-					</tr>
-					<tr>
-						<th>Industry</th>
-						<td>{{ position.ticker.branch.label }}</td>
-					</tr>
-					<tr>
-						<th>Units</th>
-						<td>{{ (position.amount)|format_number({fraction_digit: 2}) }}</td>
-					</tr>
-					<tr>
-						<th>Average price</th>
-						<td>{{ position.currency.sign|raw }}{{ (position.price)|format_number({fraction_digit: 2}) }}</td>
-					</tr>
-					<tr>
-						<th>Allocation</th>
-						<td>{{ position.allocationCurrency.sign|raw }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}</td>
-					</tr>
-					<tr>
-						<th>Status</th>
-						<td>{{ position.closed ? 'Closed' : 'Open' }}</td>
-					</tr>
-					<tr>
-						<th>Profit / Loss</th>
-						<td>
-							{% if position.profit %}&euro;{{ (position.profit)|format_number({fraction_digit: 2}) }}
-							{% endif %}
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-		<div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="transactions-tab" tabindex="0">
-			<br/>
-			{% set allocationSign = position.allocationCurrency ? position.allocationCurrency.sign : '$' %}
-
-			{% include 'portfolio/show/_orders.html.twig' %}
-		</div>
-	</div>
-
-	<a class="btn btn-primary" href="{{ path('position_edit', {'id': position.id}) }}">
-		<i class="far fa-edit"></i>
-	</a>
-	|
-
-	<a class="btn btn-primary" href="{{ path('position_index') }}">
-		<i class="fas fa-angle-double-left"></i>
-		back to list</a>
-	<hr/>
-
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <twig:Card title="{{ 'Position'|trans }}" class="w-1/2 mx-auto min-w-max h-min">
+                    <twig:Table:Table class="max-w-min min-w-full mb-4">
+                        <tbody>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>Ticker</twig:Table:ThRow>
+                                <twig:Table:Td>{{ position.ticker.symbol }}</twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>Name</twig:Table:ThRow>
+                                <twig:Table:Td>{{ position.ticker.fullname }}</twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>Industry</twig:Table:ThRow>
+                                <twig:Table:Td>{{ position.ticker.branch.label }}</twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>Units</twig:Table:ThRow>
+                                <twig:Table:Td>{{ (position.amount)|format_number({"fraction_digit": 2}) }}</twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>Average price</twig:Table:ThRow>
+                                <twig:Table:Td>{{ position.currency.sign|raw }}{{ (position.price)|format_number({"fraction_digit": 2}) }}</twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>Allocation</twig:Table:ThRow>
+                                <twig:Table:Td>{{ position.allocationCurrency.sign|raw }}{{ (position.allocation)|format_number({"fraction_digit": 2}) }}</twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>Status</twig:Table:ThRow>
+                                <twig:Table:Td>{{ position.closed ? 'Closed' : 'Open' }}</twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>Profit / Loss</twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {% if position.profit %}&euro;{{ (position.profit)|format_number({"fraction_digit": 2}) }}{% endif %}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        </tbody>
+                    </twig:Table:Table>
+                    <div class="mb-4">
+                        {% set allocationSign = position.allocationCurrency ? position.allocationCurrency.sign : '$' %}
+                        {% include 'portfolio/show/_orders.html.twig' %}
+                    </div>
+                    <div class="w-full pr-3 py-2 mt-2">
+                        <div class="inline-flex rounded-md shadow-sm" role="group">
+                            <a href="{{ path("position_index") }}"
+                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                <i class="fas fa-angle-double-left"></i>
+                                {{ 'back to list'|trans }}
+                            </a>
+                            <a href="{{ path('position_edit', {'id': position.id}) }}"
+                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                <i class="far fa-edit"></i>
+                            </a>
+                        </div>
+                    </div>
+                </twig:Card>
+            </div>
+        </div>
+    </div>
 {% endblock %}
