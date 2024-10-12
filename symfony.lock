@@ -631,6 +631,9 @@
     "symfony/ux-chartjs": {
         "version": "v2.19.3"
     },
+    "symfony/ux-dropzone": {
+        "version": "v2.20.0"
+    },
     "symfony/ux-turbo": {
         "version": "v2.20.0"
     },

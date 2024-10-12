@@ -68,6 +68,7 @@
         "symfony/uid": "6.4.*",
         "symfony/ux-autocomplete": "^2.19",
         "symfony/ux-chartjs": "^2.19",
+        "symfony/ux-dropzone": "^2.20",
         "symfony/ux-turbo": "^2.20",
         "symfony/ux-twig-component": "^2.20",
         "symfony/validator": "6.4.*",
