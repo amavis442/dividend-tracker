@@ -34,15 +34,14 @@
                         </select>
                     </div>
                     <div>
-                        <twig:Button type="submit"
-                            title="{{ 'Search ticker'|trans }}">
+                        <twig:Button type="submit" title="{{ 'Search ticker'|trans }}">
                             <i class="fas fa-search"></i>
                         </twig:Button>
                     </div>
                 {{ form_end(form) }}
             </div>
-            <div class="flex mb-3">
-                <div class="w-full text-right">
+            <div class="border border-gray-200 rounded-lg p-2">
+                <div class="w-full pr-3 py-2 mt-2 mb-2">
                     <twig:Button tag="a"
                                  class="btn btn-primary"
                                  href="{{ path("calendar_new") }}"
@@ -50,12 +49,10 @@
                         <i class="fas fa-plus"></i>
                     </twig:Button>
                 </div>
-            </div>
-            <div class="border border-gray-200 rounded-lg p-2">
                 <turbo-frame id="calendar-results">
                 <twig:Table:Table>
-                    <thead>
-                        <twig:Table:Tr>
+                    <twig:Table:THead>
+                        <tr>
                             <twig:Table:ThCol>
                                 <div class="flex items-center">
                                     {{ 'Fullname'|trans }}
@@ -127,8 +124,8 @@
                             <twig:Table:ThCol>
                                 {{ 'actions'|trans }}
                             </twig:Table:ThCol>
-                        </twig:Table:Tr>
-                    </thead>
+                        </tr>
+                    </twig:Table:THead>
                     <tbody>
                         {% for calendar in pager %}
                             <twig:Table:Tr>

@@ -1,42 +1,80 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}
-  Result of import csv file!
-{% endblock %}
-
+{% block title %}Result of import csv file!{% endblock %}
 {% block body %}
-  <h1>Import csv</h1>
-  {% if data.msg %}
-    {% if data.status == 'error' %}
-      <div class="alert alert-danger" role="alert">{{ data.msg }}</div>
-    {% else %}
-      <div class="alert alert-success" role="alert">{{ data.msg }}</div>
-    {% endif %}
-  {% endif %}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <div class="w-1/2 mx-auto border rounded-lg shadow-white bg-white px-3 py-2 ">
+                    <div id="header" class="px-3 py-2 w-full mb-4">
+                        <twig:Head>
+                            {{ 'Import csv'|trans }}
+                        </twig:Head>
+                    </div>
+                    <div class="mb-4">
+                        {% for notice in app.flashes('notice') %}
+                            <twig:Alert variant="danger">
+                                {{ notice|trans }}
+                            </twig:Alert variant="danger">
+                        {% endfor %}
+                        {% if data.msg %}
+                            {% if data.status == 'error' %}
+                                <twig:Alert variant="danger">
+                                    {{ data.msg }}
+                                </twig:Alert>
+                            {% else %}
+                                <twig:Alert variant="success">
+                                    {{ data.msg }}
+                                </twig:Alert>
+                            {% endif %}
+                        {% endif %}
+                    </div>
 
-  <table class="table">
-    <tr>
-      <td>Total transactions</td>
-      <td>{{ data.totalTransaction }}</td>
-    </tr>
-    <tr>
-      <td>Total added</td>
-      <td>{{ data.transactionsAdded }}</td>
-    </tr>
-    <tr>
-      <td>Dividend imported</td>
-      <td>{{ data.dividendsImported }}</td>
-    </tr>
-    <tr>
-      <td>Already existed</td>
-      <td>
-        {% for transactionAlreadyExists in data.transactionAlreadyExists %}
-          {{ transactionAlreadyExists }}<br />
-        {% else %}
-          None
-        {% endfor %}
-      </td>
-    </tr>
-  </table>
-  <a class="btn btn-secondary" href="{{ path('app_csv_import') }}">Back</a>
+                    <twig:Table:Table class="min-w-full max-w-min mb-4">
+                        <twig:Table:Tr>
+                            <twig:Table:Td>
+                                Total transactions
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {{ data.totalTransaction }}
+                            </twig:Table:Td>
+                        </twig:Table:Tr>
+                        <twig:Table:Tr>
+                            <twig:Table:Td>
+                                Total added
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {{ data.transactionsAdded }}
+                            </twig:Table:Td>
+                        </twig:Table:Tr>
+                        <twig:Table:Tr>
+                            <twig:Table:Td>
+                                Dividend imported
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {{ data.dividendsImported }}
+                            </twig:Table:Td>
+                        </twig:Table:Tr>
+                        <twig:Table:Tr>
+                            <twig:Table:Td>
+                                Already existed
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {% for transactionAlreadyExists in data.transactionAlreadyExists %}
+                                    {{ transactionAlreadyExists }}
+                                    <br />
+                                {% else %}
+                                    None
+                                {% endfor %}
+                            </twig:Table:Td>
+                        </twig:Table:Tr>
+                    </twig:Table:Table>
+                    <div class="mb-4">
+                        <twig:Button tag="a" href="{{ path("app_csv_import") }}">
+                            Back
+                        </twig:Button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

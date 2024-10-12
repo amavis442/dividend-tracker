@@ -1,5 +1,5 @@
-{{ form_start(form) }}
-    {{ form_widget(form,{ 'attr': {'autocomplete': 'off'} }) }}
+{{ form_start(form, { 'attr': {'autocomplete': 'off','data-turbo-frame' : '_top'} }) }}
+    {{ form_widget(form) }}
     <div class="mt-2">
         <twig:Button type="submit">
             <i class="far fa-save"></i>

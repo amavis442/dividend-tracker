@@ -5,9 +5,9 @@
         <div class="flex flex-col md:container mx-auto px-4">
             <div>
                 {% for notice in app.flashes('notice') %}
-                    <twig:Alert:Danger>
+                    <twig:Alert variant="danger">
                         {{ notice|trans }}
-                    </twig:Alert:Danger>
+                    </twig:Alert>
                 {% endfor %}
             </div>
             <div id="header" class="px-3 py-2 w-full">
@@ -31,16 +31,29 @@
                             }) }}>
                         </select>
                     </div>
-                    <div>
-                        <twig:Button type="submit" title="{{ 'Search ticker'|trans }}">
-                            <i class="fas fa-search"></i>
+                    <div data-controller="tooltip">
+                        <twig:Button type="submit" title="{{ 'Search ticker'|trans }}" data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">
+                            <i class="fas fa-search" ></i>
+                            <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                               {{ 'Search ticker'|trans }}
+                               <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                           </div>
                         </twig:Button>
                     </div>
                 {{ form_end(form) }}
             </div>
             <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <div class="w-full pr-3 py-2 mb-2" data-controller="tooltip">
+                    <twig:Button tag="a" href="{{ path("ticker_new") }}" data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">
+                        <i class="fas fa-plus"></i>
+                        <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                               {{ 'Create new ticker'|trans }}
+                               <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                           </div>
+                    </twig:Button>
+                </div>
                 <turbo-frame id="ticker-results">
-                <twig:Table:Table>
+                <twig:Table:Table class="max-w-min min-w-full">
                     <twig:Table:THead>
                         <tr>
                             <twig:Table:ThCol class="rounded-l-lg">
@@ -98,7 +111,7 @@
                                 </twig:Table:Td>
                                 <twig:Table:Td>
                                     {% for m in ticker.dividendMonths.toArray|sort((a, b) => a.dividendMonth <=> b.dividendMonth) %}
-                                        {{ m.dividendMonth }},
+                                        {{ m.dividendMonth|monthToName }},
                                     {% endfor %}
                                 </twig:Table:Td>
                                 <twig:Table:Td>
@@ -170,11 +183,6 @@
                 <div class="mt-2">{{ pagerfanta(pager) }}</div>
                 </turbo-frame>
             </div>
-            <section id="footer" class="w-full pr-3 py-2 mt-2">
-                <twig:Link:Default href="{{ path("ticker_new") }}">
-                    <i class="fas fa-plus"></i>
-                </twig:Link:Default>
-            </section>
         </div>
     </div>
 {% endblock %}

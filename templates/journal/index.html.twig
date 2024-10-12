@@ -1,121 +1,118 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}
-	{{ 'Journal'|trans }}
-{% endblock %}
-
+{% block title %}{{ 'Journal'|trans }}{% endblock %}
 {% block body %}
-<div class="w-full flex flex-col">
-	<div class="flex flex-col md:container mx-auto px-4">
-		<div>
-        	{% for notice in app.flashes('notice') %}
-          		<twig:Alert:Danger>{{ notice|trans }}</twig:Alert:Danger>
-        	{% endfor %}
-      	</div>
-
-      	<div id="header" class="px-3 py-2 w-full">
-        	<twig:Head>
-            	{{ 'Journal'|trans }}
-        	</twig:Head>
-      	</div>
-
-		<section id="footer" class="w-full pr-3 py-2 mt-2 mb-2">
-        	<twig:Link:Default href="{{ path('journal_new') }}"><i class="fas fa-plus"></i></twig:Link:Default>
-      	</section>
-
-
-		<div class="flex items-center gap-2 mb-6 bg-gray-200 shadow-md rounded-lg p-6">
-			<form action="{{ path('journal_taxonomy') }}" method="POST" class="form-inline" data-turbo-frame="journal-results">
-				<input type="hidden" name="_method" value="POST">
-
-				<div class="flex text-sm mb-2">
-					{% for t in taxonomy %}
-						<div class="px-0.5 me-2">
-							<input type="checkbox" value="{{ t.id }}" name='taxonomy[]' {% if taxonomySelected[t.id] is defined %} checked {% endif %} id="defaultCheck{{t.id}}">
-							<label for="defaultCheck{{t.id}}">
-								{{ t.title }}
-							</label>
-						</div>
-					{% endfor %}
-				</div>
-
-				<twig:Button variant="secondary">
-					<i class="fas fa-solid fa-filter"></i>
-				</twig:Button>
-			</form>
-		</div>
-
-		<div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
-		<turbo-frame id="journal-results">
-			{% for journal in pager %}
-				<div class="flex flex-col border border-gray-400 w-full rounded-tl-lg rounded-tr-lg">
-					<div class="mb-4 bg-gray-200 w-full rounded-tl-lg rounded-tr-lg p-4">
-						<twig:Head variant="h5">
-							<div class="flex">
-								<twig:Badge variant="primary">
-								{{ journal.createdAt ? journal.createdAt|date('l')|trans ~ ', ' ~ journal.createdAt|date('d') ~ ' ' ~ journal.createdAt|date('F')|trans ~ ' ' ~ journal.createdAt|date('Y') }}
-								</twig:Badge>
-								<div>
-								{{ journal.title }}
-								</div>
-							</div>
-						</twig:Head>
-					</div>
-
-					<div class="mb-4 flex flex-col p-4">
-						<div class="normal-case mb-4 border-b border-gray-400">
-							<div class="w-full mb-4">
-								{{ journal.content|raw }}
-							</div>
-						</div>
-
-						<div class="inline-flex" role="group">
-							<div class="inline-block" data-controller="tooltip">
-								<a href="{{ path('journal_show', {'id': journal.id}) }}" data-turbo-frame="_top" data-tooltip-target="element"  data-action="mouseenter->tooltip#show mouseleave->tooltip#hide" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
-									<i class="fas fa-book-open"></i>
-								</a>
-								<div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
-										{{ 'show journal'|trans }}
-									<div class="arrow" data-tooltip-target="tooltipArrow"></div>
-								</div>
-							</div>
-							<div class="inline-block" data-controller="tooltip">
-								<a href="{{ path('journal_edit', {'id': journal.id}) }}"  data-turbo-frame="_top" data-tooltip-target="element"  data-action="mouseenter->tooltip#show mouseleave->tooltip#hide" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
-									<i class="far fa-edit"></i>
-								</a>
-								<div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
-									{{ 'Edit journal'|trans }}
-									<div class="arrow" data-tooltip-target="tooltipArrow"></div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="bg-gray-200 text-sm text-slate-500 p-4">
-						{{ 'Created'|trans }}:
-						{{ journal.createdAt ? journal.createdAt|date('Y-m-d H:i:s', "Europe/Amsterdam") : '-' }},
-						{{ 'Modified'|trans }}:
-						{% if journal.updatedAt is not null %}
-							{{ journal.updatedAt ? journal.updatedAt|date('Y-m-d H:i:s', "Europe/Amsterdam") : '-' }}
-						{% endif %}
-						<div class="flex">
-							{% for taxonomy in journal.taxonomy %}
-								<twig:Badge variant="secondary">{{ taxonomy.title }}</twig:Badge>
-							{% endfor %}
-						</div>
-					</div>
-				</div>
-
-					<br/>
-				{% else %}
-					{{ 'no records found'|trans }}
-				{% endfor %}
-
-			<div class="mt-2">
-			{{ pagerfanta(pager) }}
-			</div>
-		</turbo-frame>
-		</div>
-	</div>
-</div>
-
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div>
+                {% for notice in app.flashes('notice') %}
+                    <twig:Alert variant="danger">
+                        {{ notice|trans }}
+                    </twig:Alert>
+                {% endfor %}
+            </div>
+            <div id="header" class="px-3 py-2 w-full">
+                <twig:Head>
+                    {{ 'Journal'|trans }}
+                </twig:Head>
+            </div>
+            <div class="flex items-center gap-2 mb-6 bg-gray-200 shadow-md rounded-lg p-6">
+                <form action="{{ path("journal_taxonomy") }}"
+                      method="POST"
+                      class="form-inline"
+                      data-turbo-frame="journal-results">
+                    <input type="hidden" name="_method" value="POST">
+                    <div class="flex text-sm mb-2">
+                        {% for t in taxonomy %}
+                            <div class="px-0.5 me-2">
+                                <input type="checkbox"
+                                       value="{{ t.id }}"
+                                       name='taxonomy[]'
+                                       {% if taxonomySelected[t.id] is defined %}checked{% endif %}
+                                       id="defaultCheck{{ t.id }}">
+                                <label for="defaultCheck{{ t.id }}">{{ t.title }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <twig:Button variant="secondary">
+                        <i class="fas fa-solid fa-filter"></i>
+                    </twig:Button>
+                </form>
+            </div>
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <div class="w-full pr-3 py-2 mb-2">
+                    <twig:Button href="{{ path("journal_new") }}">
+                        <i class="fas fa-plus"></i>
+                    </twig:Button>
+                </div>
+                <turbo-frame id="journal-results">
+                {% for journal in pager %}
+                    <div class="flex flex-col border border-gray-400 w-full rounded-tl-lg rounded-tr-lg">
+                        <div class="mb-4 bg-gray-200 w-full rounded-tl-lg rounded-tr-lg p-4">
+                            <twig:Head variant="h5">
+                                <div class="flex">
+                                    <twig:Badge variant="primary">
+                                        {{ journal.createdAt ? journal.createdAt|date("l") |trans ~ ', ' ~ journal.createdAt|date('d') ~ ' ' ~ journal.createdAt|date('F')|trans ~ ' ' ~ journal.createdAt|date('Y') }}
+                                    </twig:Badge>
+                                    <div>{{ journal.title }}</div>
+                                </div>
+                            </twig:Head>
+                        </div>
+                        <div class="mb-4 flex flex-col p-4">
+                            <div class="normal-case mb-4 border-b border-gray-400">
+                                <div class="w-full mb-4">{{ journal.content|raw }}</div>
+                            </div>
+                            <div class="inline-flex" role="group">
+                                <div class="inline-block" data-controller="tooltip">
+                                    <a href="{{ path('journal_show', {'id': journal.id}) }}"
+                                       data-turbo-frame="_top"
+                                       data-tooltip-target="element"
+                                       data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                       class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                        <i class="fas fa-book-open"></i>
+                                    </a>
+                                    <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                        {{ 'show journal'|trans }}
+                                        <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                    </div>
+                                </div>
+                                <div class="inline-block" data-controller="tooltip">
+                                    <a href="{{ path('journal_edit', {'id': journal.id}) }}"
+                                       data-turbo-frame="_top"
+                                       data-tooltip-target="element"
+                                       data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                       class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                        <i class="far fa-edit"></i>
+                                    </a>
+                                    <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                        {{ 'Edit journal'|trans }}
+                                        <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-200 text-sm text-slate-500 p-4">
+                            {{ 'Created'|trans }}:
+                            {{ journal.createdAt ? journal.createdAt|date('Y-m-d H:i:s', 'Europe/Amsterdam') : '-' }},
+                            {{ 'Modified'|trans }}:
+                            {% if journal.updatedAt is not null %}
+                                {{ journal.updatedAt ? journal.updatedAt|date('Y-m-d H:i:s', 'Europe/Amsterdam') : '-' }}
+                            {% endif %}
+                            <div class="flex">
+                                {% for taxonomy in journal.taxonomy %}
+                                    <twig:Badge variant="secondary">
+                                        {{ taxonomy.title }}
+                                    </twig:Badge>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                {% else %}
+                    {{ 'no records found'|trans }}
+                {% endfor %}
+                <div class="mt-2">{{ pagerfanta(pager) }}</div>
+                </turbo-frame>
+            </div>
+        </div>
+    </div>
 {% endblock %}

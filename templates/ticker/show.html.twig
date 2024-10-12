@@ -1,117 +1,140 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Ticker
-{% endblock %}
-
+{% block title %}Ticker{% endblock %}
 {% block body %}
-	<h1>Ticker</h1>
-
-	<table class="table">
-		<tbody>
-			<tr>
-				<th>Id</th>
-				<td>{{ ticker.id }}</td>
-			</tr>
-			<tr>
-				<th>{{'Ticker'|trans }}</th>
-				<td>{{ ticker.symbol }}</td>
-			</tr>
-			<tr>
-				<th>ISIN</th>
-				<td>{{ ticker.isin }}</td>
-			</tr>
-			<tr>
-				<th>{{'Fullname'|trans }}</th>
-				<td>{{ ticker.fullname }}</td>
-			</tr>
-			<tr>
-				<th>{{'Dividend currency'|trans }}</th>
-				<td>{{ ticker.currency ? ticker.currency.symbol : 'USD' }}</td>
-			</tr>
-			<tr>
-				<th>{{'Dividend months'|trans }}</th>
-				<td>
-					{% for m in ticker.dividendMonths %}
-						{{ m.dividendMonth }},
-					{% endfor %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{'Company details'|trans }}</th>
-				<td>
-					<div class="card" style="width: 100%;">
-						<div class="card-body">
-							<p class="card-text">{{ ticker.description|raw }}</p>
-							<hr/>
-							<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="card-link">
-								<i class="far fa-edit"></i>
-							</a>
-						</div>
-						<div class="card-footer text-muted">
-							{{ 'Created'|trans }}:
-							{{ ticker.createdAt ? ticker.createdAt|date('Y-m-d H:i:s') : '-' }},
-							{{ 'Modified'|trans }}:
-							{{ ticker.updatedAt ? ticker.updatedAt|date('Y-m-d H:i:s') : '-' }}
-						</div>
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<th>{{'Research info'|trans }}</th>
-				<td>
-					{% for research in ticker.researches %}
-
-						<p>
-							<div class="card" style="width: 100%;">
-								<div class="card-body">
-									<h5 class="card-title">
-										{{ research.title }}</h5>
-									<p class="card-text">{{ research.info|raw }}</p>
-									{% if research.attachments %}
-										<p>
-											{% for doc in research.attachments %}
-												<a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}" target='_blank'>
-													<i class="fa fa-download"></i>
-													{{ doc.label }}</a><br/>
-											{% endfor %}
-										</p>
-									{% endif %}
-									<hr/>
-									<a href="{{ path('research_edit', {'id': research.id}) }}" class="card-link">
-										<i class="far fa-edit"></i>
-									</a>
-								</div>
-								<div class="card-footer text-muted">
-									{{ 'Created'|trans }}:
-									{{ research.createdAt ? research.createdAt|date('Y-m-d H:i:s') : '-' }},
-									{{ 'Modified'|trans }}:
-									{{ research.updatedAt ? research.updatedAt|date('Y-m-d H:i:s') : '-' }}
-								</div>
-							</div>
-						</p>
-					{% else %}
-						no records found
-					{% endfor %}
-				</td>
-			</tr>
-		</tbody>
-	</table>
-
-	<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-		<div class="btn-group mr-2" role="group" aria-label="First group">
-			<a href="{{ path('ticker_index') }}" class="btn btn-secondary">
-				<i class="fas fa-angle-double-left"></i>
-				{{'back to list'|trans}}</a>
-		</div>
-		<div class="btn-group mr-2" role="group" aria-label="Second group">
-			<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit ticker">
-				<i class="far fa-edit"></i>
-			</a>
-			<a class="btn btn-primary" href="{{ path('research_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add research">
-				<i class="fab fa-searchengin"></i>
-			</a>
-		</div>
-	</div>
-	<hr/>
-	{{ include('ticker/_delete_form.html.twig') }}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <twig:Card title="{{ 'Ticker'|trans }}" class="w-1/2 mx-auto min-w-max h-min">
+                    <twig:Table:Table class="max-w-min min-w-full">
+                        <tbody>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Id
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ ticker.id }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    {{'Ticker'|trans }}
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ ticker.symbol }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    ISIN
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ ticker.isin }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    {{'Fullname'|trans }}
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ ticker.fullname }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    {{'Dividend currency'|trans }}
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ ticker.currency ? ticker.currency.symbol : 'USD' }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    {{'Dividend months'|trans }}
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {% for m in ticker.dividendMonths %}{{ m.dividendMonth }},{% endfor %}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    {{'Company details'|trans }}
+                                </twig:Table:ThRow>
+                                <twig:Table:Td class="max-w-min">
+                                    <twig:Card title="{{ ticker.symbol }}" title_header_variant="h2" class="w-full">
+                                        <div class="mb-4 border-b border-gray-400">
+                                            {{ ticker.description|replace({"<p": "<p class=\"text-pretty\""}) |raw }}
+                                        </div>
+                                        <div class="mb-2">
+                                            <twig:Button tag="a" href="{{ path('ticker_edit', {'id': ticker.id}) }}">
+                                                <i class="far fa-edit"></i>
+                                            </twig:Button>
+                                        </div>
+                                        <div class="bg-gray-200 rounded-b-lg p-2 mt-4 -mx-3 -my-2">
+                                            {{ 'Created'|trans }}:
+                                            {{ ticker.createdAt ? ticker.createdAt|date("Y-m-d H:i:s") : '-' }},
+                                            {{ 'Modified'|trans }}:
+                                            {{ ticker.updatedAt ? ticker.updatedAt|date("Y-m-d H:i:s") : '-' }}
+                                        </div>
+                                    </div>
+                                </twig:Card>
+                            </twig:Table:Td>
+                        </twig:Table:Tr>
+                        <twig:Table:Tr>
+                            <twig:Table:ThRow>
+                                {{'Research info'|trans }}
+                            </twig:Table:ThRow>
+                            <twig:Table:Td>
+                                {% for research in ticker.researches %}
+                                    <div class="mb-2">
+                                        <twig:Card title="{{ research.title }}" title_header_variant="h3" class="w-full">
+                                            <div class="mb-4 border-b border-gray-400">{{ research.info|raw }}</div>
+                                            {% if research.attachments %}
+                                                <div>
+                                                    {% for doc in research.attachments %}
+                                                        <a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}"
+                                                           target='_blank'>
+                                                            <i class="fa fa-download"></i>
+                                                        {{ doc.label }}</a>
+                                                        <br />
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            <div class="mb-2">
+                                                <twig:Button tag="a" href="{{ path('research_edit', {'id': research.id}) }}">
+                                                    <i class="far fa-edit"></i>
+                                                </twig:Button>
+                                            </div>
+                                            <div class="bg-gray-200 rounded-b-lg p-2 mt-4 -mx-3 -my-2 text-xs">
+                                                {{ 'Created'|trans }}:
+                                                {{ research.createdAt ? research.createdAt|date("Y-m-d H:i:s") : '-' }},
+                                                {{ 'Modified'|trans }}:
+                                                {{ research.updatedAt ? research.updatedAt|date("Y-m-d H:i:s") : '-' }}
+                                            </div>
+                                        </twig:Card>
+                                    </div>
+                                {% else %}
+                                    no records found
+                                {% endfor %}
+                            </twig:Table:Td>
+                        </twig:Table:Tr>
+                    </tbody>
+                </twig:Table:Table>
+                <div class="w-full pr-3 py-2 mt-2">
+                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                        <a href="{{ path("ticker_index") }}"
+                           class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                            <i class="fas fa-angle-double-left"></i>
+                            {{ 'back to list'|trans }}
+                        </a>
+                        <a href="{{ path('ticker_edit', {'id': ticker.id}) }}"
+                           class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                            <i class="far fa-edit"></i>
+                        </a>
+                        {{ include("ticker/_delete_form.html.twig") }}
+                    </div>
+                </div>
+            </twig:Card>
+        </div>
+    </div>
+</div>
 {% endblock %}

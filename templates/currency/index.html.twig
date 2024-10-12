@@ -5,9 +5,9 @@
         <div class="flex flex-col md:container mx-auto px-4">
             <div>
                 {% for notice in app.flashes('notice') %}
-                    <twig:Alert:Danger>
-                        {{ notice|trans }}
-                    </twig:Alert:Danger>
+                    <twig:Alert variant="danger">
+                        {{ notice|trans }}/var/www/dev/dividend/templates/tax
+                    </twig:Alert>
                 {% endfor %}
             </div>
             <div id="header" class="px-3 py-2 w-full">
@@ -16,6 +16,11 @@
                 </twig:Head>
             </div>
             <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <div class="w-full pr-3 py-2 mb-4">
+                    <twig:Button href="{{ path("currency_new") }}">
+                        <i class="fas fa-plus"></i>
+                    </twig:Button>
+                </div>
                 <twig:Table:Table>
                     <twig:Table:THead>
                         <tr>
@@ -67,11 +72,6 @@
                         {% endfor %}
                     </tbody>
                 </twig:Table:Table>
-                <section id="footer" class="w-full pr-3 py-2 mt-2">
-                    <twig:Link:Default href="{{ path("currency_new") }}">
-                        <i class="fas fa-plus"></i>
-                    </twig:Link:Default>
-                </section>
             </div>
         </div>
     </div>

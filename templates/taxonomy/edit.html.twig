@@ -1,13 +1,29 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}Edit Taxonomy{% endblock %}
-
 {% block body %}
-    <h1>Edit Taxonomy</h1>
-
-    {{ include('taxonomy/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('app_taxonomy_index') }}" class="btn btn-secondary"><i class="fas fa-angle-double-left"></i> {{'back to list' |trans }}</a>
-
-    {{ include('taxonomy/_delete_form.html.twig') }}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <div class="w-1/2 mx-auto border rounded-lg shadow-white bg-white px-3 py-2 ">
+                    <div class="px-3 py-2 w-full mb-4">
+                        <twig:Head>
+                            {{ 'Edit Taxonomy'|trans }}
+                        </twig:Head>
+                    </div>
+                    {{ include('taxonomy/_form.html.twig', {'button_label': 'Update'}) }}
+                    <br />
+                    <div class="w-full pr-3 py-2 mt-2">
+                        <div class="inline-flex rounded-md shadow-sm" role="group">
+                            <a href="{{ path("app_taxonomy_index") }}"
+                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                <i class="fas fa-angle-double-left"></i>
+                                {{ 'back to list'|trans }}
+                            </a>
+                            {{ include("taxonomy/_delete_form.html.twig") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

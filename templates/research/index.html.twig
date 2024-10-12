@@ -5,9 +5,9 @@
         <div class="flex flex-col md:container mx-auto px-4">
             <div>
                 {% for notice in app.flashes('notice') %}
-                    <twig:Alert:Danger>
+                    <twig:Alert variant="danger">
                         {{ notice|trans }}
-                    </twig:Alert:Danger>
+                    </twig:Alert>
                 {% endfor %}
             </div>
             <div id="header" class="px-3 py-2 w-full">
@@ -40,7 +40,7 @@
             </div>
             <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
                 <turbo-frame id="research-results">
-                <twig:Table:Table>
+                <twig:Table:Table class="max-w-min min-w-full">
                     <twig:Table:THead>
                         <tr>
                             <twig:Table:ThCol class="rounded-l-lg">

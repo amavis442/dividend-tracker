@@ -1,32 +1,25 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}
-	{{ 'Edit Ticker'|trans }}:
-	{{ ticker.symbol }}
+    {{ 'Edit Ticker'|trans }}:
+    {{ ticker.symbol }}
 {% endblock %}
-
 {% block body %}
-	<h1>{{ 'Edit Ticker'|trans }}:
-		{{ ticker.symbol }}</h1>
-
-	{{ include('ticker/_form.html.twig', { button_label: 'Update' }) }}
-	<br/>
-	<div data-controller="popper" class="sm:flex">
-		<a href="{{ path('ticker_index') }}"
-			data-popper-target="element"
-			data-action="mouseenter->popper#show mouseleave->popper#hide"
-			class="w-full justify-center rounded-md border
-                        border-transparent shadow-sm px-4 py-2 bg-blue-500 font-medium text-white
-                        hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                        sm:ml-3 sm:w-auto sm:text-sm">
-			<i class="fas fa-angle-double-left"></i>{{ 'back to list'|trans }}
-			<div id="tooltip" role="tooltip" data-popper-target="tooltip">
-    	    	{{ 'back to list'|trans }}
-        	    <div id="arrow" data-popper-target="tooltipArrow"></div>
-        	</div>
-		</a>
-	</div>
-
-	<hr/>
-	{{ include('ticker/_delete_form.html.twig') }}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <twig:Card title="{{ 'Edit Ticker'|trans }}: {{ ticker.symbol }}"
+                           class="w-1/2 mx-auto">
+                    <div class="mb-4">{{ include('ticker/_form.html.twig', { button_label: 'Update' }) }}</div>
+                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                        <a href="{{ path("ticker_index") }}"
+                           class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                            <i class="fas fa-angle-double-left"></i>
+                            {{ 'back to list'|trans }}
+                        </a>
+                        {{ include("ticker/_delete_form.html.twig") }}
+                    </div>
+                </twig:Card>
+            </div>
+        </div>
+    </div>
 {% endblock %}

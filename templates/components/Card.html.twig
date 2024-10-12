@@ -1,0 +1,12 @@
+<div {{ attributes.defaults({"class": "border rounded-lg shadow-white bg-white px-3 py-2"}) }}>
+    {% if title is defined %}
+        <div class="px-3 py-2 w-full mb-6">
+            <twig:Head variant="{{ title_header_variant|default('h1') }}">
+                {{ title }}
+            </twig:Head>
+        </div>
+    {% endif %}
+    <div>
+        {% block content %}{% endblock %}
+    </div>
+</div>
