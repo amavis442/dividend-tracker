@@ -24,7 +24,7 @@ class TickerAutocompleter implements EntityAutocompleterInterface
             ->createQueryBuilder('ticker')
             ->select('ticker')
             ->where('lower(ticker.isin) NOT LIKE :ignore')
-            ->andWhere('ticker.fullname LIKE :search OR ticker.symbol LIKE :search')
+            ->andWhere('lower(ticker.fullname) LIKE lower(:search) OR lower(ticker.symbol) LIKE lower(:search)')
             ->orderBy('ticker.fullname')
             ->setParameter('ignore', 'nvt%')
             ->setParameter('search', '%' . $query . '%')
