@@ -320,15 +320,16 @@ class PositionRepository extends ServiceEntityRepository
 		string $sortDirection = 'ASC'
 	): array {
 		$qb = $this->createQueryBuilder('p')
-			->select('p, t')
+			->select('p, t, c, pa, d')
 			->innerJoin('p.ticker', 't')
 			->leftJoin('t.calendars', 'c')
+			->leftJoin('t.dividendMonths' ,'d')
 			->leftJoin('t.tax', 'tax')
 			->leftJoin('t.branch', 'b')
 			->leftJoin('p.payments', 'pa')
 			->leftJoin('c.currency', 'cur')
-			->where('p.closed = false');
-
+			->where('p.closed = false')
+			->andWhere('p.ignore_for_dividend = false');
 
 		if ($pie && $pie->getId()) {
 			$qb->join('p.pies', 'pie')

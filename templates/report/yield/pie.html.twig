@@ -131,10 +131,15 @@
                             {% for item in datasource %}
                                 <twig:Table:Tr>
                                     <twig:Table:Td>
-                                        <div>
-                                            <span title="{{ item.label }}" data-toggle="tooltip" data-placement="top">
-                                                <a href="{{ path('portfolio_show', {'id': item.position.id}) }}">{{ item.ticker }}</a>
-                                            </span>
+                                        <div data-controller="tooltip">
+                                            <a href="{{ path('portfolio_show', {'id': item.position.id}) }}"
+                                               data-tooltip-target="element"
+                                               data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                               class="text-blue-700 hover:text-blue-500 font-sans font-bold underline">{{ item.ticker }}</a>
+                                            <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                {{ item.label }}
+                                                <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                            </div>
                                         </div>
                                         <small>({{ item.amount }})</small>
                                     </twig:Table:Td>
