@@ -1,15 +1,8 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}
-{{ 'Edit Position'|trans }}{% endblock %}
-
+{% block title %}{{ 'Edit Position'|trans }}{% endblock %}
 {% set is_edit = true %}
 {% block body %}
-
-
-
-
-        <div class="w-full flex flex-col">
+    <div class="w-full flex flex-col">
         <div class="flex flex-col md:container mx-auto px-4">
             <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
                 <div class="w-1/2 mx-auto border rounded-lg shadow-white bg-white px-3 py-2 ">
@@ -18,7 +11,7 @@
                             {{ 'Edit Position'|trans }}
                         </twig:Head>
                     </div>
-                     {{ include('position/_form.html.twig', {'button_label': 'Update'}) }}
+                    {{ include('position/_form.html.twig', {'button_label': 'Update'}) }}
                     <br />
                     <div class="w-full pr-3 py-2 mt-2">
                         <div class="inline-flex rounded-md shadow-sm" role="group">
