@@ -1,12 +1,14 @@
 <div {{ attributes.defaults({"class": "border rounded-lg shadow-white bg-white px-3 py-2"}) }}>
     {% if title is defined %}
-        <div class="px-3 py-2 w-full mb-6">
-            <twig:Head variant="{{ title_header_variant|default('h1') }}">
+        <div class="flex flex-col px-3 py-2 w-full mb-6 {% if title_center|default(false) %}items-center{% endif %}">
+            <twig:Head variant="{{ title_header_variant|default("h1") }}">
                 {{ title }}
             </twig:Head>
+            {% if subtitle is defined %}<div class="text-xs text-gray-400 ">{{ subtitle }}</div>{% endif %}
         </div>
     {% endif %}
     <div>
         {% block content %}{% endblock %}
     </div>
+    {% if footer is defined %}<div class="bg-gray-200 -my-2 -mx-3 p-2">{{ footer|raw }}</div>{% endif %}
 </div>
