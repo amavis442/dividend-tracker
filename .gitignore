@@ -11,6 +11,7 @@
 !*/.gitkeep
 /public/uploads/
 /.npm
+/.venv
 
 ###> symfony/webpack-encore-bundle ###
 /node_modules/
@@ -48,4 +49,4 @@ phpstan.neon
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
-.venv
+
