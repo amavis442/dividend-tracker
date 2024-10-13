@@ -41,7 +41,8 @@
                     </div>
                 </div>
                 <div>
-                    <turbo-frame id="portfolio_results">
+                    <turbo-frame id="portfolio_results" data-turbo-action="advance" class="border-black aria-busy:opacity-50 aria-busy:blur-sm transition-all">
+                    <div class="min-h-80">
                     <twig:Table:Table class="max-w-min min-w-full">
                         <twig:Table:THead>
                             <tr>
@@ -198,6 +199,7 @@
                             {% endfor %}
                         </tbody>
                     </twig:Table:Table>
+                    </div>
                     <div class="mt-2">{{ pagerfanta(pager) }}</div>
                     </turbo-frame>
                 </div>
