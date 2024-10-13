@@ -264,7 +264,7 @@ class CalendarRepository extends ServiceEntityRepository
             ->innerJoin('c.ticker', 't')
             ->innerJoin('t.positions', 'p', 'WITH', '(p.closed = false) OR (p.closedAt > :closedAt and p.closed = true AND p.ignore_for_dividend = false)')
             ->leftJoin('t.tax', 'tax')
-            ->leftJoin('p.transactions', 'tr')
+            ->leftJoin('p.transactions', 'tr', 'WITH', '(p.closed = false)' )
             ->leftJoin('p.pies', 'pies')
             ->leftJoin('c.currency', 'cur')
             ->where('c.paymentDate >= :start and c.paymentDate <= :end')
