@@ -158,17 +158,19 @@ class PositionController extends AbstractController
 		$form->handleRequest($request);
 
 		if ($form->isSubmitted() && $form->isValid()) {
+
 			$request
 				->getSession()
 				->set(self::SESSION_KEY, $position->getTicker()->getSymbol());
+
+			$entityManager->persist($position);
+			$entityManager->flush();
 
 			$refLink = $referer->get();
 			if ($refLink != null) {
 				return $this->redirect($refLink);
 			}
 
-			$entityManager->persist($position);
-			$entityManager->flush();
 			return $this->redirectToRoute('position_index');
 		}
 
