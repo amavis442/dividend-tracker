@@ -1,66 +1,92 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Payment
-{% endblock %}
-
+{% block title %}Payment{% endblock %}
 {% block body %}
-<div class="d-flex justify-content-center mt-4">
-	<div class="card mb-2">
-		<div class="card-header">
-			<h1>Payment</h1>
-		</div>
-		<div class="card-body">
-			<table class="table">
-				<tbody>
-					<tr>
-						<th scope="row">{{ 'Ticker'|trans }}</th>
-						<td>{{ payment.ticker.fullname }}
-							({{ payment.ticker.symbol }})</td>
-					</tr>
-					<tr>
-						<th scope="row">{{ 'Industry'|trans }}</th>
-						<td>{{ payment.ticker.branch.label }}</td>
-					</tr>
-					<tr>
-						<th scope="row">{{ 'Payment date'|trans }}</th>
-						<td>{{ payment.payDate ? payment.payDate|date('l')|trans ~ ', ' ~  payment.payDate|date('d') ~ ' ' ~ payment.payDate|date('F')|trans|lower ~  ' ' ~ payment.payDate|date('Y')  : '' }}
-						{{  payment.payDate|date('l d F Y')|trans   }}
-						</td>
-					</tr>
-					<tr>
-						<th scope="row">{{ 'Units'|trans }}</th>
-						<td>{{ (payment.amount)|format_number({fraction_digit: 2})  }}</td>
-					</tr>
-					<tr>
-						<th scope="row">Total dividend</th>
-						<td>{{ payment.currency ? payment.currency.sign|raw : '$' }}{{ payment.dividend|format_number({fraction_digit: 2}) }}</td>
-					</tr>
-					<tr>
-						<th scope="row">Type</th>
-						<td>{{ payment.dividendType }}</td>
-					</tr>
-				</tbody>
-			</table>
-
-			<div class="d-flex justify-content-end">
-				<div class="col"><a href="{{ path('payment_edit', {'id': payment.id}) }}" class="btn btn-primary">
-					<i class="far fa-edit"></i>
-				</a>
-				</div>
-				<div class="col">
-					{{ include('payment/_delete_form.html.twig') }}
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-
-	<a href="{{ path('payment_index') }}" class="btn btn-primary">
-		<i class="fas fa-angle-double-left"></i>
-		{{ 'back to list'|trans }}</a>
-	|
-
-
-	<hr/>
-
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <div class="w-1/2 mx-auto border rounded-lg shadow-white bg-white px-3 py-2 ">
+                    <div id="alerts">
+                        {% for notice in app.flashes('notice') %}
+                            <twig:Alert variant="danger">
+                                {{ notice|trans }}
+                            </twig:Alert>
+                        {% endfor %}
+                    </div>
+                    <div class="px-3 py-2 w-full mb-4">
+                        <twig:Head>
+                            {{ 'Payment details'|trans }}
+                        </twig:Head>
+                    </div>
+                    <twig:Table:Table>
+                        <tbody>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    {{ 'Ticker'|trans }}
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ payment.ticker.fullname }}
+                                    ({{ payment.ticker.symbol }})
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    {{ 'Industry'|trans }}
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ payment.ticker.branch.label }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    {{ 'Payment date'|trans }}
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ payment.payDate ? payment.payDate|date("l") |trans ~ ', ' ~  payment.payDate|date('d') ~ ' ' ~ payment.payDate|date('F')|trans|lower ~  ' ' ~ payment.payDate|date('Y')  : '' }}
+                                    {{ payment.payDate|date("l d F Y") |trans }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    {{ 'Units'|trans }}
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ (payment.amount)|format_number({"fraction_digit": 4}) }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Total dividend
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ payment.currency ? payment.currency.sign|raw : '$' }}{{ payment.dividend|format_number({"fraction_digit": 2}) }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Type
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ payment.dividendType }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        </tbody>
+                    </twig:Table:Table>
+                    <section class="w-full pr-3 py-2 mt-2">
+                        <div class="inline-flex rounded-md shadow-sm" role="group">
+                            <a href="{{ path("payment_index") }}"
+                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                <i class="fas fa-angle-double-left"></i>
+                                {{ 'back to list'|trans }}
+                            </a>
+                            <a href="{{ path('payment_edit', {'id': payment.id}) }}"
+                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                <i class="far fa-edit"></i>
+                            </a>
+                            {{ include("payment/_delete_form.html.twig") }}
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

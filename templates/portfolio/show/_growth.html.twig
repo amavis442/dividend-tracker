@@ -1,19 +1,17 @@
 
-<div class="d-flex justify-content-center">
-	<div class="d-flex flex-column">
-		<div class="row">
-			<div class="col" style="width:900px;height:600px">
-			{{ render_chart(chartYield, {
-						'data-controller': 'chartjs-add-percentage'
-					}) }}
-			</div>
-		</div>
-		<div class="row">
-			<div class="col" style="width:900px;height:600px">
-				{{ render_chart(chartPayout, {
-						'data-controller': 'chartjs-add-euro-sign'
-					}) }}
-			</div>
-		</div>
+<turbo-frame id="portfolio_tab_results">
+
+<div class="flex flex-col">
+	<div class="mx-auto" style="width:900px;height:600px">
+		{{ render_chart(chartYield, {
+					'data-controller': 'chartjs-add-percentage'
+				}) }}
+	</div>
+	<div class="mx-auto" style="width:900px;height:600px">
+		{{ render_chart(chartPayout, {
+				'data-controller': 'chartjs-add-euro-sign'
+			}) }}
 	</div>
 </div>
+
+</turbo-frame>

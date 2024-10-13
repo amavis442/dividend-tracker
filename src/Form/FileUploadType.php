@@ -8,13 +8,14 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\UX\Dropzone\Form\DropzoneType;
 
 class FileUploadType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('importfile', FileType::class, [
+            ->add('importfile', DropzoneType::class, [
                 'label' => 'Transactions (csv)',
                 'label_attr' => ['data-browse' => 'Bestand kiezen'],
                 // unmapped means that this field is not associated to any entity property

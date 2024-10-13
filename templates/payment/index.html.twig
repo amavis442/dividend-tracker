@@ -1,101 +1,165 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}
-	{{ 'Payments'|trans }}
-{% endblock %}
-
+{% block title %}{{ 'Payments'|trans }}{% endblock %}
 {% block body %}
-	<div class="h1">
-		{{ 'Payments'|trans }}:
-		{{ startDate|format_date(locale=app.request.locale) }}
-		/
-		{{ endDate|format_date(locale=app.request.locale) }}
-	</div>
-
-	<section>
-		{% for notice in app.flashes('notice') %}
-			<br/>
-			<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
-		{% endfor %}
-	</section>
-
-	<section>
-	{{ form_start(form, {
-			'attr': {
-				'class' : 'row g-3 mb-2 mt-2',
-				'data-turbo-frame': 'payment-results'
-				}
-			})
-		}}
-		<div class="col-auto">{{ form_widget(form.year, { 'attr': {'class' : 'myclass'}}) }}</div>
-		<div class="col-auto">{{ form_widget(form.month) }}</div>
-		<div class="col-auto">{{ form_widget(form.quator) }}</div>
-		<div class="col">{{ form_widget(form.ticker) }}</div>
-		<div class="col-auto">{{ form_widget(form.submit) }}</div>
-		<div class="col"></div>
-	{{ form_end(form) }}
-	</section>
-
-	<section>
-	<turbo-frame id="payment-results">
-	<table class="table table-striped border table-hover">
-		<thead>
-			<tr>
-				<th scope="col">{{ 'Pay date'|trans }}</th>
-				<th scope="col">{{ 'Company'|trans }}</th>
-				<th scope="col">{{ 'Dividend'|trans }}(&euro;)</th>
-				<th scope="col">{{ 'Tax'|trans }}</th>
-				<th scope="col">{{ 'Type'|trans }}</th>
-				<th scope="col">{{ 'Actions'|trans }}</th>
-			</tr>
-		</thead>
-		<tbody class="table-group-divider">
-			{% for payment in pager %}
-				<tr>
-					<td>{{ payment.payDate ? payment.payDate|format_date('long', locale=app.request.locale) : '' }}</td>
-					<td>
-						{{ payment.position.ticker.fullname }}
-						({{ payment.position.ticker.symbol }})<br/>
-						<small>{{ payment.amount|format_number({ fraction_digit: 7 }) }}
-							{{ 'shares'|trans }}</small>
-					</td>
-					<td>
-						<strong>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ payment.dividend|format_number({ fraction_digit: 2 }) }}</strong>
-					</td>
-					<td>
-						<span style="color:red">&euro;{{ payment.taxes|format_number({ fraction_digit: 2 }) }}</span>
-					</td>
-					<td>{{ payment.dividendType }}</td>
-					<td>
-						<a href="{{ path('payment_show', { id: payment.id }) }}" class="btn btn-primary" data-turbo-frame="_top">
-							<i class="fas fa-book-open"></i>
-						</a>
-						<a href="{{ path('payment_edit', { id: payment.id }) }}" class="btn btn-primary" data-turbo-frame="_top">
-							<i class="far fa-edit"></i>
-						</a>
-					</td>
-				</tr>
-			{% else %}
-				<tr>
-					<td colspan="6">{{ 'no records found'|trans }}</td>
-				</tr>
-			{% endfor %}
-			<tr>
-				<td colspan="1"></td>
-				<td>
-					<span style="font-weight:bold">{{ 'Total dividend'|trans }}</span>
-				</td>
-				<td>
-					<span style="font-weight:bold">&euro;{{ dividends|format_number({ fraction_digit: 2 }) }}</span>
-				</td>
-				<td>
-					<span style="color:red">&euro;{{ taxes|format_number({ fraction_digit: 2 }) }}</span>
-				</td>
-				<td colspan="3"></td>
-			</tr>
-		</tbody>
-	</table>
-	{{ pagerfanta(pager) }}
-	</turbo-frame>
-	</section>
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            {% if app.flashes('notice') %}
+                <div class="w-1/2">
+                    {% for notice in app.flashes('notice') %}
+                        <twig:Alert class="mt-2">
+                            {{ notice|trans }}
+                        </twig:Alert>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <section id="header" class="flex mb-4 mt-2">
+                <twig:Head variant="h2">
+                    {{ 'Payments'|trans }}:
+                    {{ startDate|format_date(locale=app.request.locale) }}
+                    /
+                    {{ endDate|format_date(locale=app.request.locale) }}
+                </twig:Head>
+            </section>
+            <div>
+                <div class="mb-2 w-full gap-2 bg-gray-200 shadow-md rounded-lg p-6">
+                    {{ form_start(form, {
+                                            'attr': {
+                                            'data-turbo-frame': 'payment-results'
+                                            }
+                                            })
+                        }}
+                        <div class="flex flex-row">
+                            <div class="flex-auto p-2">
+                                {{ form_widget(form.year, { 'attr': {'class' : 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' }}) }}
+                            </div>
+                            <div class="flex-auto p-2">
+                                {{ form_widget(form.month, { 'attr': {'class' : 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' }}) }}
+                            </div>
+                            <div class="flex-auto p-2">
+                                {{ form_widget(form.quator, { 'attr': {'class' : 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' }}) }}
+                            </div>
+                            <div class="flex-initial p-2 w-80">
+                                <select placeholder="{{ 'Select a ticker'|trans }}" name="{{ field_name(form.ticker) }}" {{ stimulus_controller('symfony/ux-autocomplete/autocomplete',{
+                                     url: path('ux_entity_autocomplete', { alias: 'ticker'})
+                                    }) }}>
+                                </select>
+                            </div>
+                            <div class="flex-none p-2">
+                                <twig:Button type="submit" variant="secondary">
+                                    <i class="fas fa-solid fa-filter"></i>
+                                </twig:Button>
+                            </div>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+            <div class="border border-gray-200 rounded-lg p-2">
+                <turbo-frame id="payment-results">
+                <div class="mb-2">
+                    <twig:Table:Table class="max-w-min min-w-full">
+                        <twig:Table:THead>
+                            <tr>
+                                <twig:Table:ThCol class="rounded-l-lg">
+                                    {{ 'Pay date'|trans }}
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    {{ 'Company'|trans }}
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    {{ 'Dividend'|trans }}(&euro;)
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    {{ 'Tax'|trans }}
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    {{ 'Type'|trans }}
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol class="rounded-r-lg">
+                                    {{ 'Actions'|trans }}
+                                </twig:Table:ThCol>
+                            </tr>
+                        </twig:Table:THead>
+                        <tbody>
+                            {% for payment in pager %}
+                                <twig:Table:Tr>
+                                    <twig:Table:Td>
+                                        {{ payment.payDate ? payment.payDate|format_date('long', locale=app.request.locale) : '' }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        {{ payment.position.ticker.fullname }}
+                                        ({{ payment.position.ticker.symbol }})
+                                        <br />
+                                        <small>{{ payment.amount|format_number({"fraction_digit": 7}) }}
+                                        {{ 'shares'|trans }}</small>
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        <strong>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ payment.dividend|format_number({"fraction_digit": 2}) }}</strong>
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        <span style="color:red">&euro;{{ payment.taxes|format_number({"fraction_digit": 2}) }}</span>
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                       {% if payment.dividendType is defined %}{{ payment.dividendType }} {% endif %}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        <div class="inline-flex rounded-md shadow-sm" role="group">
+                                            <div class="inline-block" data-controller="tooltip">
+                                                <a href="{{ path('payment_show', { id: payment.id }) }}"
+                                                   data-turbo-frame="_top"
+                                                   data-tooltip-target="element"
+                                                   data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                                   class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                                    <i class="fas fa-book-open"></i>
+                                                </a>
+                                                <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                    {{ 'Show payment'|trans }}
+                                                    <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                                </div>
+                                            </div>
+                                            <div class="inline-block" data-controller="tooltip">
+                                                <a href="{{ path('payment_edit', { id: payment.id }) }}"
+                                                   data-turbo-frame="_top"
+                                                   data-tooltip-target="element"
+                                                   data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                                   class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                                    <i class="far fa-edit"></i>
+                                                </a>
+                                                <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                    {{ 'Edit payment'|trans }}
+                                                    <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </twig:Table:Td>
+                                </twig:Table:Tr>
+                            {% else %}
+                                <twig:Table:Tr>
+                                    <twig:Table:Td colspan="6">
+                                        {{ 'no records found'|trans }}
+                                    </twig:Table:Td>
+                                </twig:Table:Tr>
+                            {% endfor %}
+                            <twig:Table:Tr>
+                                <twig:Table:Td colspan="1">
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    <span style="font-weight:bold">{{ 'Total dividend'|trans }}</span>
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    <span style="font-weight:bold">&euro;{{ dividends|format_number({"fraction_digit": 2}) }}</span>
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    <span style="color:red">&euro;{{ taxes|format_number({"fraction_digit": 2}) }}</span>
+                                </twig:Table:Td>
+                                <twig:Table:Td colspan="3">
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        </tbody>
+                    </twig:Table:Table>
+                </div>
+                <div class="mb-2">{% if pager.haveToPaginate %}{{ pagerfanta(pager) }}{% endif %}</div>
+                </turbo-frame>
+            </div>
+        </div>
+    </div>
 {% endblock %}

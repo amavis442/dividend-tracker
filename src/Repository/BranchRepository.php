@@ -26,7 +26,7 @@ class BranchRepository extends ServiceEntityRepository
     {
         // Create our query
         $query = $this->createQueryBuilder('i')
-            ->orderBy('i.label', 'DESC')
+            ->orderBy('i.label', 'ASC')
             ->getQuery();
 
         $paginator = $this->paginate($query, $page, $limit);
@@ -38,7 +38,7 @@ class BranchRepository extends ServiceEntityRepository
     {
         // Create our query
         $queryBuilder = $this->createQueryBuilder('i')
-            ->orderBy('i.label', 'DESC');
+            ->orderBy('i.label', 'ASC');
 
         return $queryBuilder;
     }

@@ -1,0 +1,41 @@
+{% use 'form_div_layout.html.twig' %}
+{%- block widget_attributes -%}
+    {%- set attr = attr|merge({ class: attr.class|default(widget_class|default('mb-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500')) ~
+        (disabled ? ' ' ~ widget_disabled_class|default('border-gray-300 text-gray-500')) ~
+        (errors|length ? ' ' ~ widget_errors_class|default('border-red-700')) }) -%}
+    {{- parent() -}}
+{%- endblock widget_attributes -%}
+
+{%- block form_help -%}
+    {%- set help_attr = help_attr|merge({ class: help_attr.class|default(help_class|default('mt-1 mb-1 text-gray-600 text-sm')) }) -%}
+    {{- parent() -}}
+{%- endblock form_help -%}
+
+{%- block choice_widget_expanded -%}
+    {%- set attr = attr|merge({ class: attr.class|default('mt-2') }) -%}
+    <div {{ block('widget_container_attributes') }}>
+        {%- for child in form %}
+            <div class="flex items-center mb-2">
+                <div class="flex items-center h-5">
+                    {{- form_widget(child, {attr: { class: 'bg-gray-50 border-gray-300 focus:ring-3 focus:ring-blue-300 h-4 w-4 rounded'}}) -}}
+                </div>
+                <div class="text-sm ml-3">
+                    {{- form_label(child, null, { translation_domain: choice_translation_domain, attr: {class: "font-medium text-gray-900"} }) -}}
+                </div>
+            </div>
+        {% endfor -%}
+    </div>
+{%- endblock choice_widget_expanded -%}
+
+{%- block form_label -%}
+    {%- set label_attr = label_attr|merge({ class: label_attr.class|default(label_class|default('block text-gray-800')) }) -%}
+    {{- parent() -}}
+{%- endblock form_label -%}
+
+{% block choice_label -%}
+    {# remove the checkbox-inline and radio-inline class, it's only useful for embed labels #}
+    {%- set label_attr = label_attr|merge({class: label_attr.class|default('')|replace({'block': '', 'radio-inline': '', 'checkbox-custom': '', 'radio-custom': '', 'switch-custom': ''})|trim}) -%}
+    {{- block('form_label') -}}
+{% endblock choice_label %}
+
+

@@ -63,11 +63,6 @@ class DateIntervalFormType extends AbstractType
 
                 ],
                 "required" => false,
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => '<i class="fas fa-solid fa-filter"></i>',
-                'label_html' => true,
-                'translation_domain' => false,
             ]);
     }
 

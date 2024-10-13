@@ -1,40 +1,70 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Industry
-{% endblock %}
-
+{% block title %}Industry{% endblock %}
 {% block body %}
-    <h1>Industry</h1>
-
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ branch.id }}</td>
-            </tr>
-            <tr>
-                <th>Label</th>
-                <td>{{ branch.label }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ branch.description }}</td>
-            </tr>
-            <tr>
-                <th>Target asset allocation</th>
-                <td>{{ (branch.assetAllocation)|format_number({fraction_digit: 2}) }}%</td>
-            </tr>
-        </tbody>
-    </table>
-
-
-    <a href="{{ path('branch_index') }}" class="btn btn-primary">
-        <i class="fas fa-angle-double-left"></i>
-        back to list</a>
-    |
-    <a href="{{ path('branch_edit', {'id': branch.id}) }}" class="btn btn-primary">
-        <i class="far fa-edit"></i>
-    </a>
-    <hr/>
-    {{ include('branch/_delete_form.html.twig') }}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <div class="w-1/2 mx-auto border rounded-lg shadow-white bg-white px-3 py-2 ">
+                    <div id="alerts">
+                        {% for notice in app.flashes('notice') %}
+                            <twig:Alert variant="danger">
+                                {{ notice|trans }}
+                            </twig:Alert>
+                        {% endfor %}
+                    </div>
+                    <div class="px-3 py-2 w-full mb-4">
+                        <twig:Head>
+                            {{ 'Industry'|trans }}
+                        </twig:Head>
+                    </div>
+                    <twig:Table:Table class="border border-gray-200 max-w-min min-w-full">
+                        <tbody>
+                            <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                <th scope="row"
+                                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    Id
+                                </th>
+                                <td class="px-6 py-4">{{ branch.id }}</td>
+                            </tr>
+                            <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                <th scope="row"
+                                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    Label
+                                </th>
+                                <td class="px-6 py-4">{{ branch.label }}</td>
+                            </tr>
+                            <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                <th scope="row"
+                                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    Description
+                                </th>
+                                <td class="px-6 py-4">{{ branch.description }}</td>
+                            </tr>
+                            <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                <th scope="row"
+                                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    Target asset allocation
+                                </th>
+                                <td class="px-6 py-4">{{ (branch.assetAllocation)|format_number({"fraction_digit": 2}) }}%</td>
+                            </tr>
+                        </tbody>
+                    </twig:Table:Table>
+                    <div class="w-full pr-3 py-2 mt-2">
+                        <div class="inline-flex rounded-md shadow-sm" role="group">
+                            <a href="{{ path("branch_index") }}"
+                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                <i class="fas fa-angle-double-left"></i>
+                                {{ 'back to list'|trans }}
+                            </a>
+                            <a href="{{ path('branch_edit', {'id': branch.id}) }}"
+                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                <i class="far fa-edit"></i>
+                            </a>
+                            {{ include("branch/_delete_form.html.twig") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

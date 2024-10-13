@@ -90,7 +90,7 @@ class Payment
 
     #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private string $dividendType;
+    private ?string $dividendType = Calendar::REGULAR;
 
     #[Groups(['payment:read', 'payment:write', 'position:read:item'])]
     #[ORM\Column(type: 'float', nullable: false, options: ['default' => 0])]

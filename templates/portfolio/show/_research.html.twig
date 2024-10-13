@@ -1,51 +1,82 @@
-<p>
-	<div class="card" style="width: 100%;">
-		<div class="card-body">
-			<h5 class="card-title">{{ 'Company details'|trans }}</h5>
-			<p class="card-text">{{ ticker.description|raw }}</p>
-			<hr/>
-			<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" class="card-link">
+<turbo-frame id="portfolio_tab_results">
+
+<div class="flex flex-col">
+
+	<div class="flex flex-col border border-gray-400 w-full rounded-lg p-4 mb-4">
+		<div class="mb-4">
+			<twig:Head variant="h5">{{ 'Company details'|trans }}</twig:Head>
+		</div>
+
+		<div class="normal-case">
+			{{ ticker.description|raw }}
+		</div>
+
+		<hr class="mt-2 mb-4">
+
+		<div class="mt-2">
+			<twig:Button tag="a" href="{{ path('ticker_edit', {'id': ticker.id}) }}" data-turbo-frame="_top">
 				<i class="far fa-edit"></i>
-			</a>
+			</twig:Button>
 		</div>
 	</div>
-</p>
 
-{% for research in ticker.researches %}
-	<p>
-		<div class="card" style="width: 100%;">
-			<div class="card-body">
-				<h5 class="card-title">{{ research.title }}</h5>
-				<p class="card-text">{{ research.info|raw }}</p>
-				{% if research.attachments %}
-					<p>
-						{% for doc in research.attachments %}
-							<a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}" target='_blank'>
-								<i class="fa fa-download"></i>
-								{{ doc.label }}</a><br/>
-						{% endfor %}
-					</p>
-				{% endif %}
-				<hr/>
-				<a href="{{ path('research_edit', {'id': research.id}) }}" class="card-link">
-					<i class="far fa-edit"></i>
-				</a>
-			</div>
-			<div class="card-footer text-muted">
-				{{ 'Created'|trans }}:
-				<strong>{{ research.createdAt ? research.createdAt|date('Y-m-d H:i:s', "Europe/Amsterdam")|format_datetime('full','medium', locale: 'nl') : '-' }}</strong>.
-				{{ 'Modified'|trans }}:
-				<strong>{{ research.updatedAt ? research.updatedAt|date('Y-m-d H:i:s', "Europe/Amsterdam")|format_datetime('full','medium', locale: 'nl') : '-' }}</strong>
-			</div>
-		</div>
-	</p>
-{% else %}
-	no records found
-{% endfor %}
-<hr/>
+	<div>
+	{% for research in pager %}
+		<p>
+			<div class="flex flex-col border border-gray-400 w-full rounded-lg">
+				<div class="mb-4 p-4">
+					<twig:Head variant="h5">{{ research.title }}</twig:Head>
+				</div>
 
-<div class="btn-group mr-2" role="group" aria-label="Second group">
-	<a class="btn btn-primary" href="{{ path('research_new', {'ticker': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="add research">
-		<i class="fab fa-searchengin"></i>
-	</a>
+				<div class="normal-case mb-4 flex flex-col p-4">
+					<div class="mb-4">
+						<p>{{ research.info|raw }}</p>
+						{% if research.attachments %}
+							<p>
+								{% for doc in research.attachments %}
+									<div class="mb-2">
+										<twig:Button tag="a" href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}" data-turbo-frame="_blank" target='_blank'>
+											<i class="fa fa-download"></i>
+											{{ doc.label }}
+										</twig:Button>
+									</div>
+								{% endfor %}
+							</p>
+						{% endif %}
+					</div>
+
+					<hr class="mt-2 mb-4">
+
+					<div class="mb-4">
+						<twig:Button tag="a" href="{{ path('research_edit', {'id': research.id}) }}" data-turbo-frame="_top" >
+							<i class="far fa-edit"></i>
+						</twig:Button>
+					</div>
+				</div>
+
+				<div class="flex w-full bg-gray-100 rounded-b-lg p-4">
+					{{ 'Created'|trans }}:&nbsp;
+					<strong>{{ research.createdAt ? research.createdAt|date('Y-m-d H:i:s', "Europe/Amsterdam")|format_datetime('full','medium', locale: 'nl') : '-' }}</strong>.
+					{{ 'Modified'|trans }}:&nbsp;
+					<strong>{{ research.updatedAt ? research.updatedAt|date('Y-m-d H:i:s', "Europe/Amsterdam")|format_datetime('full','medium', locale: 'nl') : '-' }}</strong>
+				</div>
+			</div>
+		</p>
+	{% else %}
+		no records found
+	{% endfor %}
+	</div>
+
+
+	<div class="flex mt-2" data-controller="tooltip">
+		<twig:Button tag="a" href="{{ path('research_new', {'ticker': ticker.id}) }}" data-turbo-frame="_top" data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">
+			<i class="fab fa-searchengin"></i>
+			<div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+				{{ 'Add research'|trans }}
+				<div class="arrow" data-tooltip-target="tooltipArrow"></div>
+			</div>
+		</twig:Button>
+	</div>
 </div>
+
+</turbo-frame>

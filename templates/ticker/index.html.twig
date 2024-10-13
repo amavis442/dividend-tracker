@@ -1,107 +1,188 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}
-	Tickers
-{% endblock %}
-
+{% block title %}Tickers{% endblock %}
 {% block body %}
-	<h1>Tickers</h1>
-
-	<section>
-		{% for notice in app.flashes('notice') %}
-			<br/>
-			<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
-		{% endfor %}
-	</section>
-
-	<section class="tw-flex tw-items-center tw-gap-2 tw-mb-6 tw-bg-gray-200 tw-shadow-md tw-rounded-lg tw-p-6">
-			{{ form_start(form, {
-				'action': path('ticker_index'),
-				'attr': {
-					'autocomplete' : 'off',
-					'class': 'tw-flex tw-w-full tw-justify-center',
-					'data-turbo-frame' : 'ticker-results'
-					}})
-				}}
-			{{ form_errors(form) }}
-			<div class="tw-w-1/2">
-				{{ form_widget(form.ticker) }}
-			</div>
-			<div>
-				<button class="focus:tw-outline-none tw-text-white tw-bg-green-700
-            hover:tw-bg-green-800 focus:tw-ring-4
-            focus:tw-ring-green-300 tw-font-medium tw-rounded-lg
-            tw-text-sm tw-px-2 tw-py-2 tw-ml-2 dark:tw-bg-green-600
-            dark:hover:tw-bg-green-700 dark:focus:tw-ring-green-800" data-toggle="tooltip" data-placement="top" title="{{ 'Search ticker'|trans }}">
-					<i class="fas fa-search"></i>
-				</button>
-			</div>
-			{{ form_end(form) }}
-	</section>
-
-	<section>
-	<turbo-frame id="ticker-results">
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Id</th>
-				<th>{{ 'Ticker'|trans }}</th>
-				<th>ISIN</th>
-				<th>{{ 'Fullname'|trans }}</th>
-				<th>{{ 'Industry'|trans }}</th>
-				<th>{{ 'Research'|trans }}</th>
-				<th>{{ 'Dividend currency'|trans }}</th>
-				<th>{{ 'Dividend months'|trans }}</th>
-				<th>{{ 'actions'|trans }}</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for ticker in pager %}
-				<tr>
-					<td>{{ ticker.id }}</td>
-					<td>{{ ticker.symbol }}</td>
-					<td>{{ ticker.isin }}</td>
-					<td>{{ ticker.fullname }}</td>
-					<td>{{ ticker.branch.label }}</td>
-					<td>{{ ticker.hasResearch ? 'Y' : 'N' }}</td>
-					<td>{{ ticker.currency ? ticker.currency.symbol : 'USD' }}</td>
-					<td>
-						{% for m in ticker.dividendMonths %}
-							{{ m.dividendMonth }},
-						{% endfor %}
-					</td>
-
-					<td>
-						<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-							<div class="btn-group mr-2" role="group" aria-label="First group">
-								<a href="{{ path('ticker_show', { id: ticker.id }) }}" class="btn btn-primary">
-									<i class="fas fa-book-open"></i>
-								</a>
-								<a href="{{ path('ticker_edit', { id: ticker.id }) }}" class="btn btn-primary" data-turbo-frame="_top">
-									<i class="far fa-edit"></i>
-								</a>
-								<a class="btn btn-secondary" href="{{ path('calendar_new', { ticker: ticker.id }) }}" data-toggle="tooltip" data-placement="top" title="add dividend date">
-									<i class="far fa-calendar-alt"></i>
-								</a>
-								<a class="btn btn-secondary" href="{{ path('research_new', { ticker: ticker.id }) }}" data-toggle="tooltip" data-placement="top" title="add/edit research">
-									<i class="fab fa-searchengin"></i>
-								</a>
-							</div>
-						</div>
-					</td>
-				</tr>
-			{% else %}
-				<tr>
-					<td colspan="7">no records found</td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-	{{ pagerfanta(pager) }}
-	</turbo-frame>
-	</section>
-
-	<a class="btn btn-primary" href="{{ path('ticker_new') }}">
-		<i class="fas fa-plus"></i>
-	</a>
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="mb-4 mt-4">
+                {% for notice in app.flashes('notice') %}
+                    <twig:Alert variant="danger">
+                        {{ notice|trans }}
+                    </twig:Alert>
+                {% endfor %}
+            </div>
+            <div id="header" class="px-3 py-2 w-full">
+                <twig:Head>
+                    {{ 'Tickers'|trans }}
+                </twig:Head>
+            </div>
+            <div class="flex items-center gap-2 mb-6 bg-gray-200 shadow-md rounded-lg p-6">
+                {{ form_start(form, {
+                                    'action': path('ticker_index') ,
+                    'attr': {
+                    'autocomplete' : 'off',
+                    'class': 'flex w-full justify-center',
+                    'data-turbo-frame' : 'ticker-results'
+                    }})
+                    }}
+                    {{ form_errors(form) }}
+                    <div class="w-1/2 me-2">
+                        <select placeholder="{{ 'Select a ticker'|trans }}" name="{{ field_name(form.ticker) }}" {{ stimulus_controller('symfony/ux-autocomplete/autocomplete',{
+                             url: path('ux_entity_autocomplete', { alias: 'ticker'})
+                            }) }}>
+                        </select>
+                    </div>
+                    <div data-controller="tooltip">
+                        <twig:Button type="submit" title="{{ 'Search ticker'|trans }}" data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">
+                            <i class="fas fa-search" ></i>
+                            <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                               {{ 'Search ticker'|trans }}
+                               <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                           </div>
+                        </twig:Button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <div class="w-full pr-3 py-2 mb-2" data-controller="tooltip">
+                    <twig:Button tag="a" href="{{ path("ticker_new") }}" data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">
+                        <i class="fas fa-plus"></i>
+                        <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                               {{ 'Create new ticker'|trans }}
+                               <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                           </div>
+                    </twig:Button>
+                </div>
+                <turbo-frame id="ticker-results">
+                <twig:Table:Table class="max-w-min min-w-full">
+                    <twig:Table:THead>
+                        <tr>
+                            <twig:Table:ThCol class="rounded-l-lg">
+                                Id
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                {{ 'Ticker'|trans }}
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                ISIN
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                {{ 'Fullname'|trans }}
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                {{ 'Industry'|trans }}
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                {{ 'Research'|trans }}
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                {{ 'Dividend currency'|trans }}
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                {{ 'Dividend months'|trans }}
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol class="rounded-r-lg">
+                                {{ 'actions'|trans }}
+                            </twig:Table:ThCol>
+                        </tr>
+                    </twig:Table:THead>
+                    <tbody>
+                        {% for ticker in pager %}
+                            <twig:Table:Tr>
+                                <twig:Table:Td>
+                                    {{ ticker.id }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ ticker.symbol }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ ticker.isin }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ ticker.fullname }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ ticker.branch.label }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ ticker.hasResearch ? 'Y' : 'N' }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ ticker.currency ? ticker.currency.symbol : 'USD' }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {% for m in ticker.dividendMonths.toArray|sort((a, b) => a.dividendMonth <=> b.dividendMonth) %}
+                                        {{ m.dividendMonth|monthToName }},
+                                    {% endfor %}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                                        <div class="inline-block" data-controller="tooltip">
+                                            <a href="{{ path('ticker_show', { id: ticker.id }) }}"
+                                               data-turbo-frame="_top"
+                                               data-tooltip-target="element"
+                                               data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                                <i class="fas fa-book-open"></i>
+                                            </a>
+                                            <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                {{ 'show ticker'|trans }}
+                                                <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                            </div>
+                                        </div>
+                                        <div class="inline-block" data-controller="tooltip">
+                                            <a href="{{ path('ticker_edit', { id: ticker.id }) }}"
+                                               data-turbo-frame="_top"
+                                               data-tooltip-target="element"
+                                               data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                                <i class="far fa-edit"></i>
+                                            </a>
+                                            <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                {{ 'Edit Ticker'|trans }}
+                                                <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                            </div>
+                                        </div>
+                                        <div class="inline-block" data-controller="tooltip">
+                                            <a href="{{ path('calendar_new', { ticker: ticker.id }) }}"
+                                               data-turbo-frame="_top"
+                                               data-tooltip-target="element"
+                                               data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                                <i class="far fa-calendar-alt"></i>
+                                            </a>
+                                            <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                {{ 'Add dividend date'|trans }}
+                                                <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                            </div>
+                                        </div>
+                                        <div class="inline-block" data-controller="tooltip">
+                                            <a href="{{ path('research_new', { ticker: ticker.id }) }}"
+                                               data-turbo-frame="_top"
+                                               data-tooltip-target="element"
+                                               data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                                <i class="fab fa-searchengin"></i>
+                                            </a>
+                                            <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                {{ 'Add/edit research'|trans }}
+                                                <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        {% else %}
+                            <twig:Table:Tr>
+                                <twig:Table:Td colspan="7">
+                                    no records found
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        {% endfor %}
+                    </tbody>
+                </twig:Table:Table>
+                <div class="mt-2">{{ pagerfanta(pager) }}</div>
+                </turbo-frame>
+            </div>
+        </div>
+    </div>
 {% endblock %}

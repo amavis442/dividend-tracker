@@ -1,46 +1,78 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}
-  {{ 'Currency'|trans }}
-{% endblock %}
-
+{% block title %}{{ 'Currency'|trans }}{% endblock %}
 {% block body %}
-  <h1>{{ 'Currency'|trans }}</h1>
-  {% for notice in app.flashes('notice') %}
-    <br />
-    <div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
-  {% endfor %}
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Id</th>
-        <th>{{ 'Symbol'|trans }}</th>
-        <th>{{ 'Description'|trans }}</th>
-        <th>{{ 'Sign'|trans }}</th>
-        <th>{{ 'Actions'|trans }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for currency in currencies %}
-        <tr>
-          <td>{{ currency.id }}</td>
-          <td>{{ currency.symbol }}</td>
-          <td>{{ currency.description }}</td>
-          <td>{{ currency.sign|raw }}</td>
-          <td>
-            <div class="btn-group" role="group" aria-label="Basic example">
-              <a href="{{ path('currency_show', { id: currency.id }) }}" class="btn btn-primary">{{ 'show'|trans }}</a>
-              <a href="{{ path('currency_edit', { id: currency.id }) }}" class="btn btn-secondary">{{ 'edit'|trans }}</a>
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div>
+                {% for notice in app.flashes('notice') %}
+                    <twig:Alert variant="danger">
+                        {{ notice|trans }}/var/www/dev/dividend/templates/tax
+                    </twig:Alert>
+                {% endfor %}
             </div>
-          </td>
-        </tr>
-      {% else %}
-        <tr>
-          <td colspan="5">no records found</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-  <a class="btn btn-primary" href="{{ path('currency_new') }}"><i class="fas fa-plus"></i></a>
+            <div id="header" class="px-3 py-2 w-full">
+                <twig:Head>
+                    {{ 'Currency'|trans }}
+                </twig:Head>
+            </div>
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <div class="w-full pr-3 py-2 mb-4">
+                    <twig:Button href="{{ path("currency_new") }}">
+                        <i class="fas fa-plus"></i>
+                    </twig:Button>
+                </div>
+                <twig:Table:Table>
+                    <twig:Table:THead>
+                        <tr>
+                            <twig:Table:ThCol class="rounded-l-lg">
+                                Id
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                {{ 'Symbol'|trans }}
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                {{ 'Description'|trans }}
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                {{ 'Sign'|trans }}
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol class="rounded-r-lg">
+                                {{ 'Actions'|trans }}
+                            </twig:Table:ThCol>
+                        </tr>
+                    </twig:Table:THead>
+                    <tbody>
+                        {% for currency in currencies %}
+                            <twig:Table:Tr>
+                                <twig:Table:Td>
+                                    {{ currency.id }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ currency.symbol }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ currency.description }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ currency.sign|raw }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    <twig:ButtonGroup show_link="{{ path('currency_show', { id: currency.id }) }}"
+                                                      show_link_text=" {{ 'show currency'|trans }}"
+                                                      edit_link="{{ path('currency_edit', { id: currency.id }) }}"
+                                                      edit_link_text="{{ 'Edit currency'|trans }}" />
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        {% else %}
+                            <twig:Table:Tr>
+                                <twig:Table:Td colspan="5">
+                                    no records found
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        {% endfor %}
+                    </tbody>
+                </twig:Table:Table>
+            </div>
+        </div>
+    </div>
 {% endblock %}

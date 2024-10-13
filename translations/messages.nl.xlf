@@ -1,0 +1,1374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="nl" target-language="nl" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="XF2xIMs" resname="Jan">
+        <source>Jan</source>
+        <target>Januari</target>
+      </trans-unit>
+      <trans-unit id="NwguaN_" resname="January">
+        <source>January</source>
+        <target>Januari</target>
+      </trans-unit>
+      <trans-unit id="yvcbP1g" resname="Feb">
+        <source>Feb</source>
+        <target>Februari</target>
+      </trans-unit>
+      <trans-unit id="yHfG.0B" resname="February">
+        <source>February</source>
+        <target>Februari</target>
+      </trans-unit>
+      <trans-unit id="G7ZX_27" resname="Ma">
+        <source>Ma</source>
+        <target>Maart</target>
+      </trans-unit>
+      <trans-unit id="tLfTgY2" resname="Mar">
+        <source>Mar</source>
+        <target>Maart</target>
+      </trans-unit>
+      <trans-unit id="nZWizw1" resname="March">
+        <source>March</source>
+        <target>Maart</target>
+      </trans-unit>
+      <trans-unit id="YXUxtP7" resname="Apr">
+        <source>Apr</source>
+        <target>April</target>
+      </trans-unit>
+      <trans-unit id="Sv5uoVD" resname="April">
+        <source>April</source>
+        <target>April</target>
+      </trans-unit>
+      <trans-unit id="jHj_W5k" resname="May">
+        <source>May</source>
+        <target>Mei</target>
+      </trans-unit>
+      <trans-unit id="sn.UbtG" resname="Jun">
+        <source>Jun</source>
+        <target>Juni</target>
+      </trans-unit>
+      <trans-unit id="1YCMDgp" resname="June">
+        <source>June</source>
+        <target>Juni</target>
+      </trans-unit>
+      <trans-unit id="xD9WuYB" resname="Jul">
+        <source>Jul</source>
+        <target>Juli</target>
+      </trans-unit>
+      <trans-unit id="6c96HKS" resname="July">
+        <source>July</source>
+        <target>Juli</target>
+      </trans-unit>
+      <trans-unit id="QeHYKqm" resname="Aug">
+        <source>Aug</source>
+        <target>Augustus</target>
+      </trans-unit>
+      <trans-unit id="pm2JcOV" resname="August">
+        <source>August</source>
+        <target>Augustus</target>
+      </trans-unit>
+      <trans-unit id="RR4rcZB" resname="Sep">
+        <source>Sep</source>
+        <target>September</target>
+      </trans-unit>
+      <trans-unit id="AQkfmVX" resname="Sept">
+        <source>Sept</source>
+        <target>September</target>
+      </trans-unit>
+      <trans-unit id="zVWeoKv" resname="September">
+        <source>September</source>
+        <target>September</target>
+      </trans-unit>
+      <trans-unit id="aHfoSUw" resname="Oct">
+        <source>Oct</source>
+        <target>Oktober</target>
+      </trans-unit>
+      <trans-unit id=".deReHt" resname="October">
+        <source>October</source>
+        <target>Oktober</target>
+      </trans-unit>
+      <trans-unit id="PmMNKWS" resname="Nov">
+        <source>Nov</source>
+        <target>November</target>
+      </trans-unit>
+      <trans-unit id="neb_HXJ" resname="November">
+        <source>November</source>
+        <target>November</target>
+      </trans-unit>
+      <trans-unit id="8qDPvPG" resname="Dec">
+        <source>Dec</source>
+        <target>December</target>
+      </trans-unit>
+      <trans-unit id="j7IEykY" resname="December">
+        <source>December</source>
+        <target>December</target>
+      </trans-unit>
+      <trans-unit id="9vRoj.I" resname="Send">
+        <source>Send</source>
+        <target>Verstuur</target>
+      </trans-unit>
+      <trans-unit id="agDfwdy" resname="Monday">
+        <source>Monday</source>
+        <target>Maandag</target>
+      </trans-unit>
+      <trans-unit id="fYrx3hJ" resname="Tuesday">
+        <source>Tuesday</source>
+        <target>Dinsdag</target>
+      </trans-unit>
+      <trans-unit id="wKbMgpz" resname="Wednesday">
+        <source>Wednesday</source>
+        <target>Woensdag</target>
+      </trans-unit>
+      <trans-unit id=".CZiBi." resname="Thursday">
+        <source>Thursday</source>
+        <target>Donderdag</target>
+      </trans-unit>
+      <trans-unit id="4h8.Nyp" resname="Friday">
+        <source>Friday</source>
+        <target>Vrijdag</target>
+      </trans-unit>
+      <trans-unit id="MO819mG" resname="Saterday">
+        <source>Saterday</source>
+        <target>Zaterdag</target>
+      </trans-unit>
+      <trans-unit id="2_Ncc2P" resname="Saturday">
+        <source>Saturday</source>
+        <target>Zaterdag</target>
+      </trans-unit>
+      <trans-unit id="hz.vdg5" resname="Sunday">
+        <source>Sunday</source>
+        <target>Zondag</target>
+      </trans-unit>
+      <trans-unit id="v9QCsvb" resname="Sign in">
+        <source>Sign in</source>
+        <target>Aanmelden</target>
+      </trans-unit>
+      <trans-unit id="dDUw20Q" resname="Please sign in">
+        <source>Please sign in</source>
+        <target>Meld u zich a.u.b. aan</target>
+      </trans-unit>
+      <trans-unit id="588_9PF" resname="Password">
+        <source>Password</source>
+        <target>Wachtwoord</target>
+      </trans-unit>
+      <trans-unit id="0FJ_Sz1" resname="Logout">
+        <source>Logout</source>
+        <target>Afmelden</target>
+      </trans-unit>
+      <trans-unit id="nWMiwfT" resname="Login">
+        <source>Login</source>
+        <target>Aanmelden</target>
+      </trans-unit>
+      <trans-unit id="W8x9O83" resname="Allocation">
+        <source>Allocation</source>
+        <target>Toewijzing</target>
+      </trans-unit>
+      <trans-unit id="bQMa8Q2" resname="Position">
+        <source>Position</source>
+        <target>Positie</target>
+      </trans-unit>
+      <trans-unit id="SeltfN9" resname="Amount">
+        <source>Amount</source>
+        <target>Aantal</target>
+      </trans-unit>
+      <trans-unit id="rZPV9Nb" resname="Total dividend received">
+        <source>Total dividend received</source>
+        <target>Totaal ontvangen dividend</target>
+      </trans-unit>
+      <trans-unit id="b988m8Y" resname="Instrument">
+        <source>Instrument</source>
+        <target>Instrument</target>
+      </trans-unit>
+      <trans-unit id="wYVNkRY" resname="Dividend payment months">
+        <source>Dividend payment months</source>
+        <target>Dividend uitkeer maanden</target>
+      </trans-unit>
+      <trans-unit id="tESEoPo" resname="Industry">
+        <source>Industry</source>
+        <target>Industrie</target>
+      </trans-unit>
+      <trans-unit id="5heXQz7" resname="Dividend frequency">
+        <source>Dividend frequency</source>
+        <target>Dividend frequentie</target>
+      </trans-unit>
+      <trans-unit id="4YF09Ux" resname="Yearly forward dividend payout">
+        <source>Yearly forward dividend payout</source>
+        <target>Jaarlijkse verwachte uitkering van dividend</target>
+      </trans-unit>
+      <trans-unit id="s46Dk3b" resname="Single time forward dividend payout">
+        <source>Single time forward dividend payout</source>
+        <target>Eenmalige dividenduitkering</target>
+      </trans-unit>
+      <trans-unit id="gMpvgv0" resname="Dividend yield">
+        <source>Dividend yield</source>
+        <target>Dividend opbrengst</target>
+      </trans-unit>
+      <trans-unit id="mm7u5e0" resname="Next dividend (Ex-div / payout)">
+        <source>Next dividend (Ex-div / payout)</source>
+        <target>Volgende dividend (ex-div / uitkering)</target>
+      </trans-unit>
+      <trans-unit id="UlMfGHR" resname="Weighted average price">
+        <source>Weighted average price</source>
+        <target>Gewogen gemiddelde prijs</target>
+      </trans-unit>
+      <trans-unit id="RBe39vK" resname="Pies">
+        <source>Pies</source>
+        <target>Schijven</target>
+      </trans-unit>
+      <trans-unit id="VJEvzmH" resname="Avg. price">
+        <source>Avg. price</source>
+        <target>Gem. Prijs</target>
+      </trans-unit>
+      <trans-unit id="bgsip8v" resname="Dividends">
+        <source>Dividends</source>
+        <target>Dividend</target>
+      </trans-unit>
+      <trans-unit id="lUZPpt8" resname="Div dates">
+        <source>Div dates</source>
+        <target>Div datum</target>
+      </trans-unit>
+      <trans-unit id="v3JHjBP" resname="Forward dividend">
+        <source>Forward dividend</source>
+        <target>Verwachte dividend</target>
+      </trans-unit>
+      <trans-unit id="VByWkwb" resname="Fullname">
+        <source>Fullname</source>
+        <target>Volledige naam</target>
+      </trans-unit>
+      <trans-unit id="m8gVS_t" resname="Holdings">
+        <source>Holdings</source>
+        <target>Posities</target>
+      </trans-unit>
+      <trans-unit id="DP32bA7" resname="Total invested">
+        <source>Total invested</source>
+        <target>Totaal geïnvesteerd</target>
+      </trans-unit>
+      <trans-unit id="5FVD_On" resname="Total dividend">
+        <source>Total dividend</source>
+        <target>Totaal ontvangen dividend</target>
+      </trans-unit>
+      <trans-unit id="G3n3.Nr" resname="Expected next payout">
+        <source>Expected next payout</source>
+        <target>Verwachte uitkering</target>
+      </trans-unit>
+      <trans-unit id="XJZZvRp" resname="Pie">
+        <source>Pie</source>
+        <target>Schijf</target>
+      </trans-unit>
+      <trans-unit id="Mya1si1" resname="Profit / Loss">
+        <source>Profit / Loss</source>
+        <target>Winst / Verlies</target>
+      </trans-unit>
+      <trans-unit id=".4BZ3Gd" resname="Actions">
+        <source>Actions</source>
+        <target>Acties</target>
+      </trans-unit>
+      <trans-unit id="ZOPLDkl" resname="Buy">
+        <source>Buy</source>
+        <target>Kopen</target>
+      </trans-unit>
+      <trans-unit id="LsHigVl" resname="Sell">
+        <source>Sell</source>
+        <target>Verkopen</target>
+      </trans-unit>
+      <trans-unit id="6G.7wP1" resname="Edit position">
+        <source>Edit position</source>
+        <target>Bewerk positie</target>
+      </trans-unit>
+      <trans-unit id="l51jAP2" resname="Research">
+        <source>Research</source>
+        <target>Onderzoek</target>
+      </trans-unit>
+      <trans-unit id="PlE2.Us" resname="Transactions">
+        <source>Transactions</source>
+        <target>Transacties</target>
+      </trans-unit>
+      <trans-unit id="FwMioy8" resname="Info">
+        <source>Info</source>
+        <target>Info</target>
+      </trans-unit>
+      <trans-unit id="CL4IWvM" resname="Payout">
+        <source>Payout</source>
+        <target>Uitkering</target>
+      </trans-unit>
+      <trans-unit id="SsIeiIL" resname="Dividend">
+        <source>Dividend</source>
+        <target>Dividend</target>
+      </trans-unit>
+      <trans-unit id="0LQ8sla" resname="Dividend growth">
+        <source>Dividend growth</source>
+        <target>Dividend groei</target>
+      </trans-unit>
+      <trans-unit id="p7XrK7k" resname="Fundamental">
+        <source>Fundamental</source>
+        <target>Fundamenteel</target>
+      </trans-unit>
+      <trans-unit id="jnapSsg" resname="Summary">
+        <source>Summary</source>
+        <target>Samenvatting</target>
+      </trans-unit>
+      <trans-unit id="nz33U6Q" resname="Create new">
+        <source>Create new</source>
+        <target>Maak nieuw</target>
+      </trans-unit>
+      <trans-unit id="HGMzUJ3" resname="show">
+        <source>show</source>
+        <target>toon</target>
+      </trans-unit>
+      <trans-unit id="JiEhxTc" resname="edit">
+        <source>edit</source>
+        <target>bewerk</target>
+      </trans-unit>
+      <trans-unit id="Q7fHXVb" resname="Journal">
+        <source>Journal</source>
+        <target>Logboek</target>
+      </trans-unit>
+      <trans-unit id="1wueJLy" resname="Created">
+        <source>Created</source>
+        <target>Aangemaakt</target>
+      </trans-unit>
+      <trans-unit id="6M5dyvQ" resname="Modified">
+        <source>Modified</source>
+        <target>Gewijzigd</target>
+      </trans-unit>
+      <trans-unit id="R70pB1_" resname="Content">
+        <source>Content</source>
+        <target>Inhoud</target>
+      </trans-unit>
+      <trans-unit id="fozSBW2" resname="Title">
+        <source>Title</source>
+        <target>Titel</target>
+      </trans-unit>
+      <trans-unit id="U0M9PNE" resname="back to list">
+        <source>back to list</source>
+        <target>terug naar lijst</target>
+      </trans-unit>
+      <trans-unit id="GP3VSbL" resname="New">
+        <source>New</source>
+        <target>Nieuw</target>
+      </trans-unit>
+      <trans-unit id="8XNatpE" resname="Create new Journal">
+        <source>Create new Journal</source>
+        <target>Maak nieuw logboek regel aan</target>
+      </trans-unit>
+      <trans-unit id="FQn1YfJ" resname="Save">
+        <source>Save</source>
+        <target>Opslaan</target>
+      </trans-unit>
+      <trans-unit id="lXbyFjK" resname="Edit Journal">
+        <source>Edit Journal</source>
+        <target>Bewerk logboek</target>
+      </trans-unit>
+      <trans-unit id="wcEAnT8" resname="Update">
+        <source>Update</source>
+        <target>Bijwerken</target>
+      </trans-unit>
+      <trans-unit id="REE8PZe" resname="Are you sure you want to delete this item?">
+        <source>Are you sure you want to delete this item?</source>
+        <target>Weet u zeker dat u dit item wilt verwijderen?</target>
+      </trans-unit>
+      <trans-unit id="DmY3P0X" resname="Label">
+        <source>Label</source>
+        <target>Label</target>
+      </trans-unit>
+      <trans-unit id="3kdDyHl" resname="Company">
+        <source>Company</source>
+        <target>Bedrijf</target>
+      </trans-unit>
+      <trans-unit id="nWZcdnT" resname="Projected dividend / Actual payout">
+        <source>Projected dividend / Actual payout</source>
+        <target>Verwachte dividend / Uitgekeerd</target>
+      </trans-unit>
+      <trans-unit id="FBj2vwf" resname="Exdiv / Pay date">
+        <source>Exdiv / Pay date</source>
+        <target>Ex-div / Uitkeringsdatum</target>
+      </trans-unit>
+      <trans-unit id="vQbE68L" resname="Pay date">
+        <source>Pay date</source>
+        <target>Uitkeringsdatum</target>
+      </trans-unit>
+      <trans-unit id="8UuiBTV" resname="Net dividend">
+        <source>Net dividend</source>
+        <target>Netto dividend</target>
+      </trans-unit>
+      <trans-unit id="HqRCoTS" resname="No">
+        <source>No</source>
+        <target>Nee</target>
+      </trans-unit>
+      <trans-unit id="YN.TA7s" resname="With pie">
+        <source>With pie</source>
+        <target>Met schijf</target>
+      </trans-unit>
+      <trans-unit id="cGdTuuz" resname="Without pie">
+        <source>Without pie</source>
+        <target>Zonder schijf</target>
+      </trans-unit>
+      <trans-unit id="FV_BbAQ" resname="Submit">
+        <source>Submit</source>
+        <target>Indienen</target>
+      </trans-unit>
+      <trans-unit id="ybPDgkf" resname="Total">
+        <source>Total</source>
+        <target>Totaal</target>
+      </trans-unit>
+      <trans-unit id="Ax_nbwu" resname="Please choose a Pie">
+        <source>Please choose a Pie</source>
+        <target>Kies een schijf</target>
+      </trans-unit>
+      <trans-unit id="iNR1jCE" resname="Current date">
+        <source>Current date</source>
+        <target>Huidige datum</target>
+      </trans-unit>
+      <trans-unit id="SmRgn32" resname="shares">
+        <source>shares</source>
+        <target>aandelen</target>
+      </trans-unit>
+      <trans-unit id="naH0Lcx" resname="Received dividend">
+        <source>Received dividend</source>
+        <target>Ontvangen dividend</target>
+      </trans-unit>
+      <trans-unit id="BkRtSZn" resname="Market Price">
+        <source>Market Price</source>
+        <target>Marktprijs</target>
+      </trans-unit>
+      <trans-unit id="tkPI8hm" resname="Ex-Div">
+        <source>Ex-Div</source>
+        <target>Ex-Div</target>
+      </trans-unit>
+      <trans-unit id="0HQT4pO" resname="Dividend payout month">
+        <source>Dividend payout month</source>
+        <target>Dividend uitkeer maand</target>
+      </trans-unit>
+      <trans-unit id="dFO1xu6" resname="Principle">
+        <source>Principle</source>
+        <target>Inleg</target>
+      </trans-unit>
+      <trans-unit id="VFO0DBU" resname="Expected dividend">
+        <source>Expected dividend</source>
+        <target>Verwachte dividend</target>
+      </trans-unit>
+      <trans-unit id="XXeQiiF" resname="x per year">
+        <source>x per year</source>
+        <target>x per jaar</target>
+      </trans-unit>
+      <trans-unit id="eJY5BfO" resname="Dates">
+        <source>Dates</source>
+        <target>Datum</target>
+      </trans-unit>
+      <trans-unit id="FrZmjZg" resname="Frequency">
+        <source>Frequency</source>
+        <target>Frequentie</target>
+      </trans-unit>
+      <trans-unit id="Z6km9wC" resname="Not available">
+        <source>Not available</source>
+        <target>Niet beschikbaar</target>
+      </trans-unit>
+      <trans-unit id="IQ_Wzyo" resname="Edit ticker / months">
+        <source>Edit ticker / months</source>
+        <target>Bewerk ticker / dividend maanden</target>
+      </trans-unit>
+      <trans-unit id="Nr3mbyi" resname="manual">
+        <source>manual</source>
+        <target>handmatig</target>
+      </trans-unit>
+      <trans-unit id="uq3fcPt" resname="Type">
+        <source>Type</source>
+        <target>Type</target>
+      </trans-unit>
+      <trans-unit id="ZdUWXyW" resname="Payment date">
+        <source>Payment date</source>
+        <target>Uitkeerdatum</target>
+      </trans-unit>
+      <trans-unit id="KOxbQSt" resname="Ex-dividend date">
+        <source>Ex-dividend date</source>
+        <target>Ex-dividend datum</target>
+      </trans-unit>
+      <trans-unit id="SOOO2x3" resname="Cash amount">
+        <source>Cash amount</source>
+        <target>Uitkeerbedrag</target>
+      </trans-unit>
+      <trans-unit id="DlcMpvq" resname="Source">
+        <source>Source</source>
+        <target>Bron</target>
+      </trans-unit>
+      <trans-unit id="rKp_H_4" resname="Descr.">
+        <source>Descr.</source>
+        <target>Omschr.</target>
+      </trans-unit>
+      <trans-unit id="Kw3N1AA" resname="actions">
+        <source>actions</source>
+        <target>acties</target>
+      </trans-unit>
+      <trans-unit id="tFV4SrU" resname="Regular">
+        <source>Regular</source>
+        <target>Normaal</target>
+      </trans-unit>
+      <trans-unit id="Um4Ah8w" resname="Description">
+        <source>Description</source>
+        <target>Omschrijving</target>
+      </trans-unit>
+      <trans-unit id="Yw7wC3x" resname="Side">
+        <source>Side</source>
+        <target>Kant</target>
+      </trans-unit>
+      <trans-unit id="nxVZ.IX" resname="Transaction date">
+        <source>Transaction date</source>
+        <target>Transactie datum</target>
+      </trans-unit>
+      <trans-unit id="k8kchR5" resname="Price">
+        <source>Price</source>
+        <target>Prijs</target>
+      </trans-unit>
+      <trans-unit id="oqZb7e2" resname="avgPrice">
+        <source>avgPrice</source>
+        <target>Gem. Prijs</target>
+      </trans-unit>
+      <trans-unit id="_1wgEXU" resname="Record date">
+        <source>Record date</source>
+        <target>Pijl datum</target>
+      </trans-unit>
+      <trans-unit id="lIS3KPu" resname="Calendar items">
+        <source>Calendar items</source>
+        <target>Kalender regels</target>
+      </trans-unit>
+      <trans-unit id="1pDR5Vx" resname="Research info">
+        <source>Research info</source>
+        <target>Onderzoek info</target>
+      </trans-unit>
+      <trans-unit id="OsGp7E_" resname="Currency">
+        <source>Currency</source>
+        <target>Valuta</target>
+      </trans-unit>
+      <trans-unit id="wcIksDz" resname="Admin">
+        <source>Admin</source>
+        <target>Beheer</target>
+      </trans-unit>
+      <trans-unit id="42ddWa9" resname="Research on Tickers">
+        <source>Research on Tickers</source>
+        <target>Onderzoek naar Bedrijf</target>
+      </trans-unit>
+      <trans-unit id="yU3GuqY" resname="Closed positions">
+        <source>Closed positions</source>
+        <target>Gesloten posities</target>
+      </trans-unit>
+      <trans-unit id="UVEDWMj" resname="Import csv">
+        <source>Import csv</source>
+        <target>Csv importeren</target>
+      </trans-unit>
+      <trans-unit id="fhsNVkH" resname="Account">
+        <source>Account</source>
+        <target>Account</target>
+      </trans-unit>
+      <trans-unit id="R_KIbuX" resname="Tax">
+        <source>Tax</source>
+        <target>Belasting</target>
+      </trans-unit>
+      <trans-unit id="GFPrLp5" resname="Portfolio">
+        <source>Portfolio</source>
+        <target>Portfolio</target>
+      </trans-unit>
+      <trans-unit id="Yy4cWDl" resname="Payments">
+        <source>Payments</source>
+        <target>Uitkeringen</target>
+      </trans-unit>
+      <trans-unit id="1dCjC1F" resname="Calendar">
+        <source>Calendar</source>
+        <target>Kalender</target>
+      </trans-unit>
+      <trans-unit id="8FqlUHy" resname="Calendar per date">
+        <source>Calendar per date</source>
+        <target>Kalender per datum</target>
+      </trans-unit>
+      <trans-unit id="BNxofwY" resname="Calendar per date printout">
+        <source>Calendar per date printout</source>
+        <target>Afdruk kalender per datum</target>
+      </trans-unit>
+      <trans-unit id="2syjy6P" resname="Reports">
+        <source>Reports</source>
+        <target>Rapporten</target>
+      </trans-unit>
+      <trans-unit id="yNXuUk4" resname="Dividend Tracker">
+        <source>Dividend Tracker</source>
+        <target>Dividend Tracker</target>
+      </trans-unit>
+      <trans-unit id="cBKlEgc" resname="Sector allocation">
+        <source>Sector allocation</source>
+        <target>Sector allocatie</target>
+      </trans-unit>
+      <trans-unit id="YcNVck3" resname="Position allocation">
+        <source>Position allocation</source>
+        <target>Positie allocatie</target>
+      </trans-unit>
+      <trans-unit id="g9bNQBZ" resname="Dividend month Tickers">
+        <source>Dividend month Tickers</source>
+        <target>Overzicht Dividend maandelijks</target>
+      </trans-unit>
+      <trans-unit id="w9KA9jA" resname="Dividend projection">
+        <source>Dividend projection</source>
+        <target>Dividend projectie</target>
+      </trans-unit>
+      <trans-unit id="ie0RR2D" resname="Dividend payout">
+        <source>Dividend payout</source>
+        <target>Uitkering</target>
+      </trans-unit>
+      <trans-unit id="JcgbOlY" resname="Dividend yield pie">
+        <source>Dividend yield pie</source>
+        <target>Dividend opbrengst per schijf</target>
+      </trans-unit>
+      <trans-unit id="UFFphXB" resname="Compound calc">
+        <source>Compound calc</source>
+        <target>Samengestelde rente rekenmachine</target>
+      </trans-unit>
+      <trans-unit id="NmSJVXn" resname="Export">
+        <source>Export</source>
+        <target>Exporteren</target>
+      </trans-unit>
+      <trans-unit id="ug5K_pN" resname="Symbol">
+        <source>Symbol</source>
+        <target>Symbool</target>
+      </trans-unit>
+      <trans-unit id="DJYY6YS" resname="Sign">
+        <source>Sign</source>
+        <target>Teken</target>
+      </trans-unit>
+      <trans-unit id="LyNVlGg" resname="New Currency">
+        <source>New Currency</source>
+        <target>Nieuwe valuta</target>
+      </trans-unit>
+      <trans-unit id="BTwpI39" resname="Create new Currency">
+        <source>Create new Currency</source>
+        <target>Maak een nieuwe valuta aan</target>
+      </trans-unit>
+      <trans-unit id="JiqHLfp" resname="Edit Currency">
+        <source>Edit Currency</source>
+        <target>Bewerk valuta</target>
+      </trans-unit>
+      <trans-unit id="Zdr149h" resname="CountryCode">
+        <source>CountryCode</source>
+        <target>Landcode</target>
+      </trans-unit>
+      <trans-unit id="_T9cd6p" resname="TaxRate">
+        <source>TaxRate</source>
+        <target>Belastingtarief</target>
+      </trans-unit>
+      <trans-unit id="mlbZG1V" resname="Valid from">
+        <source>Valid from</source>
+        <target>Geldig vanaf</target>
+      </trans-unit>
+      <trans-unit id="fs5MiGB" resname="Edit Tax">
+        <source>Edit Tax</source>
+        <target>Bewerk belastingtarief</target>
+      </trans-unit>
+      <trans-unit id="tb96U0F" resname="Country code">
+        <source>Country code</source>
+        <target>Landcode</target>
+      </trans-unit>
+      <trans-unit id="cDUkkYE" resname="Tax rate">
+        <source>Tax rate</source>
+        <target>Belastingtarief</target>
+      </trans-unit>
+      <trans-unit id="RXgQE.c" resname="New Tax">
+        <source>New Tax</source>
+        <target>Nieuw belastingtarief</target>
+      </trans-unit>
+      <trans-unit id="w7ja7cU" resname="Create new Tax">
+        <source>Create new Tax</source>
+        <target>Maak een nieuwe belastingtarief aan</target>
+      </trans-unit>
+      <trans-unit id="4tClSWj" resname="Delete">
+        <source>Delete</source>
+        <target>Verwijder</target>
+      </trans-unit>
+      <trans-unit id="AK9hrbl" resname="Taxtarifs">
+        <source>Taxtarifs</source>
+        <target>Belastingtarieven</target>
+      </trans-unit>
+      <trans-unit id="nJMv_9N" resname="Exchangerate">
+        <source>Exchangerate</source>
+        <target>Wisselkoers</target>
+      </trans-unit>
+      <trans-unit id="T3Sd58J" resname="Meta">
+        <source>Meta</source>
+        <target>Meta</target>
+      </trans-unit>
+      <trans-unit id="IaAnC39" resname="script">
+        <source>script</source>
+        <target>script</target>
+      </trans-unit>
+      <trans-unit id="9Qhx0Uw" resname="positions">
+        <source>positions</source>
+        <target>posities</target>
+      </trans-unit>
+      <trans-unit id="aqVvTJE" resname="Total costs">
+        <source>Total costs</source>
+        <target>Totale kosten</target>
+      </trans-unit>
+      <trans-unit id="tDuGMXq" resname="Dividend Yield">
+        <source>Dividend Yield</source>
+        <target>Dividend opbrengst</target>
+      </trans-unit>
+      <trans-unit id="naFExeD" resname="Last dividend">
+        <source>Last dividend</source>
+        <target>Laatste dividend</target>
+      </trans-unit>
+      <trans-unit id="D5b3btX" resname="Last payout date">
+        <source>Last payout date</source>
+        <target>Laatste uitkeerdatum</target>
+      </trans-unit>
+      <trans-unit id="4UoKzEo" resname="Yearly forward dividend">
+        <source>Yearly forward dividend</source>
+        <target>Jaarlijkse verwachte dividend</target>
+      </trans-unit>
+      <trans-unit id="hXOmbR0" resname="Net forward yearly dividend per share">
+        <source>Net forward yearly dividend per share</source>
+        <target>Netto verwachte jaarlijkse uitkering per aandeel</target>
+      </trans-unit>
+      <trans-unit id="pmYuwqi" resname="Payouts per year">
+        <source>Payouts per year</source>
+        <target>Uitkeringen per jaar</target>
+      </trans-unit>
+      <trans-unit id="mcLfGzb" resname="Net forward dividend per payout">
+        <source>Net forward dividend per payout</source>
+        <target>Netto verwachte dividend per uitkering</target>
+      </trans-unit>
+      <trans-unit id="N14udu0" resname="Net forward yearly dividend total">
+        <source>Net forward yearly dividend total</source>
+        <target>Netto verwachte jaarlijkse dividend totaal</target>
+      </trans-unit>
+      <trans-unit id="NH3g7vy" resname="Yield">
+        <source>Yield</source>
+        <target>Rendement</target>
+      </trans-unit>
+      <trans-unit id="HEs7neC" resname="Yield on cost dividend">
+        <source>Yield on cost dividend</source>
+        <target>Rendement op kostendividend</target>
+      </trans-unit>
+      <trans-unit id="M7Lf3I5" resname="Total dividend in a year / total allocated">
+        <source>Total dividend in a year / total allocated</source>
+        <target>Totaal dividend in een jaar / totaal toegewezen</target>
+      </trans-unit>
+      <trans-unit id="6wPCPfa" resname="Search ticker">
+        <source>Search ticker</source>
+        <target>Zoek ticker</target>
+      </trans-unit>
+      <trans-unit id="g2yMM71" resname="use decimal point if you have a fraction of a stock">
+        <source>use decimal point if you have a fraction of a stock</source>
+        <target>gebruik een decimale punt als u een fractie van een aandeel heeft</target>
+      </trans-unit>
+      <trans-unit id="OSDUiDj" resname="What was the stock price and not what you paid">
+        <source>What was the stock price and not what you paid</source>
+        <target>Wat was de aandelenkoers en niet wat u betaalde</target>
+      </trans-unit>
+      <trans-unit id="FLnKAFo" resname="What was what you paid in total for this transaction">
+        <source>What was what you paid in total for this transaction</source>
+        <target>Wat heb je in totaal betaald voor deze transactie</target>
+      </trans-unit>
+      <trans-unit id="xCsJhOw" resname="Exchange rate">
+        <source>Exchange rate</source>
+        <target>Omwisselkoers</target>
+      </trans-unit>
+      <trans-unit id="vH7Wsok" resname="Current exchange rate">
+        <source>Current exchange rate</source>
+        <target>Huidige omwisselkoers</target>
+      </trans-unit>
+      <trans-unit id="8.PTJbI" resname="Original price">
+        <source>Original price</source>
+        <target>Orginele prijs</target>
+      </trans-unit>
+      <trans-unit id="1t7wzwZ" resname="Stamduty">
+        <source>Stamduty</source>
+        <target>Zegelrecht</target>
+      </trans-unit>
+      <trans-unit id="wOOy0DQ" resname="fx fee">
+        <source>fx fee</source>
+        <target>Omwisselkoers vergoeding</target>
+      </trans-unit>
+      <trans-unit id="OWe0peI" resname="Please choose a ticker">
+        <source>Please choose a ticker</source>
+        <target>Kies a.u.b een ticker</target>
+      </trans-unit>
+      <trans-unit id="wZ.ZU2h" resname="Ticker">
+        <source>Ticker</source>
+        <target>Ticker</target>
+      </trans-unit>
+      <trans-unit id="kbEoGV8" resname="Profit">
+        <source>Profit</source>
+        <target>Opbrengst</target>
+      </trans-unit>
+      <trans-unit id="yqHvxnl" resname="Average price">
+        <source>Average price</source>
+        <target>Gemiddelde prijs</target>
+      </trans-unit>
+      <trans-unit id="13jCeFJ" resname="Adjusment if automatic calculation is wrong">
+        <source>Adjusment if automatic calculation is wrong</source>
+        <target>Aanpassing van automatische berekening is verkeerd</target>
+      </trans-unit>
+      <trans-unit id="WWEOdi7" resname="Please choose a tax">
+        <source>Please choose a tax</source>
+        <target>Kies een belastingtarief</target>
+      </trans-unit>
+      <trans-unit id="hFhGL.A" resname="Edit Position">
+        <source>Edit Position</source>
+        <target>Bewerk positie</target>
+      </trans-unit>
+      <trans-unit id="t_is3VI" resname="Orders">
+        <source>Orders</source>
+        <target>Orders</target>
+      </trans-unit>
+      <trans-unit id="zTeDQ2X" resname="Order date">
+        <source>Order date</source>
+        <target>Order datum</target>
+      </trans-unit>
+      <trans-unit id="bmNVJt3" resname="Edit order">
+        <source>Edit order</source>
+        <target>Bewerk order</target>
+      </trans-unit>
+      <trans-unit id="FolvtZY" resname="Order info">
+        <source>Order info</source>
+        <target>Order info</target>
+      </trans-unit>
+      <trans-unit id="UVf.y5p" resname="Dividend yield based on cost basis">
+        <source>Dividend yield based on cost basis</source>
+        <target>Dividendrendement op basis van kosten</target>
+      </trans-unit>
+      <trans-unit id="lONHvYG" resname="Current dividend yield">
+        <source>Current dividend yield</source>
+        <target>Huidig dividend rendement</target>
+      </trans-unit>
+      <trans-unit id="qxg32nR" resname="Dividend yield based on current market price">
+        <source>Dividend yield based on current market price</source>
+        <target>Dividendrendement op basis van de huidige marktprijs</target>
+      </trans-unit>
+      <trans-unit id=".buayYR" resname="Current yield">
+        <source>Current yield</source>
+        <target>Huidig rendement</target>
+      </trans-unit>
+      <trans-unit id="bcAx6KL" resname="Net Dividend">
+        <source>Net Dividend</source>
+        <target>Net Dividend</target>
+      </trans-unit>
+      <trans-unit id="tLtMwnT" resname="Dividend to receive on total shares">
+        <source>Dividend to receive on total shares</source>
+        <target>Te ontvangen dividend op het totale aantal aandelen</target>
+      </trans-unit>
+      <trans-unit id="fs9GKEW" resname="Diff">
+        <source>Diff</source>
+        <target>Verschil</target>
+      </trans-unit>
+      <trans-unit id="8G_BMMG" resname="Dividend Reinvestment Calculator">
+        <source>Dividend Reinvestment Calculator</source>
+        <target>Dividend herinvesteer Calculator</target>
+      </trans-unit>
+      <trans-unit id="j67Sdlx" resname="Initial Number of Shares">
+        <source>Initial Number of Shares</source>
+        <target>Initieel Aantal Aandelen</target>
+      </trans-unit>
+      <trans-unit id="kWZ.Jg9" resname="Number of shares to start with">
+        <source>Number of shares to start with</source>
+        <target>Aantal aandelen om mee te beginnen</target>
+      </trans-unit>
+      <trans-unit id="cuoCvwD" resname="Initial Price per Share">
+        <source>Initial Price per Share</source>
+        <target>Initiele prijs per aandeel</target>
+      </trans-unit>
+      <trans-unit id="nMTYPkx" resname="Price that you pay for the shares">
+        <source>Price that you pay for the shares</source>
+        <target>Prijs die u betaalt voor de aandelen</target>
+      </trans-unit>
+      <trans-unit id="PdBLgyY" resname="Stock Price Annual Growth Rate">
+        <source>Stock Price Annual Growth Rate</source>
+        <target>Aandeel Prijs Jaarlijkse groei</target>
+      </trans-unit>
+      <trans-unit id="K5Igf0y" resname="Historically the market has risen 7.38%">
+        <source>Historically the market has risen 7.38%</source>
+        <target>Historisch gezien is de markt gestegen 7.38%</target>
+      </trans-unit>
+      <trans-unit id="6pqiWCA" resname="Maximum that price can rise">
+        <source>Maximum that price can rise</source>
+        <target>Maximaal dat de prijs kan stijgen</target>
+      </trans-unit>
+      <trans-unit id="6gceX2z" resname="If there is a range, what is the max range">
+        <source>If there is a range, what is the max range</source>
+        <target>Als er een bereik is, wat is het maximale bereik</target>
+      </trans-unit>
+      <trans-unit id="RwCumce" resname="Dividend Annual Growth Rate">
+        <source>Dividend Annual Growth Rate</source>
+        <target>Dividend Jaarlijkse groei</target>
+      </trans-unit>
+      <trans-unit id="AJD7QC5" resname="First 5 years. Nice target would be 10% and higher">
+        <source>First 5 years. Nice target would be 10% and higher</source>
+        <target>Eerste 5 jaar. Mooi doel zou 10% en hoger zijn</target>
+      </trans-unit>
+      <trans-unit id="Fcv1JB." resname="Average dividend growth rate (%) &gt; 5 years">
+        <source>Average dividend growth rate (%) &gt; 5 years</source>
+        <target><![CDATA[Gemiddeld dividendgroei (%)> 5 jaar]]></target>
+      </trans-unit>
+      <trans-unit id="xfuWwZ." resname="This will be around 3%">
+        <source>This will be around 3%</source>
+        <target>Dit is ongeveer 3%</target>
+      </trans-unit>
+      <trans-unit id="kDG97ue" resname="Annual Dividend">
+        <source>Annual Dividend</source>
+        <target>Jaarlijks dividend</target>
+      </trans-unit>
+      <trans-unit id="UGir_LO" resname="Dividends Per Year">
+        <source>Dividends Per Year</source>
+        <target>Dividenden per jaar</target>
+      </trans-unit>
+      <trans-unit id="fqYHEDu" resname="Number of Years">
+        <source>Number of Years</source>
+        <target>Aantal jaren</target>
+      </trans-unit>
+      <trans-unit id="g.07uau" resname="Dividend tax">
+        <source>Dividend tax</source>
+        <target>Dividend belasting</target>
+      </trans-unit>
+      <trans-unit id="MMwAcOi" resname="Quator">
+        <source>Quator</source>
+        <target>Kwartaal</target>
+      </trans-unit>
+      <trans-unit id="zRvLuvJ" resname="Dividend growth rate">
+        <source>Dividend growth rate</source>
+        <target>Dividend groei</target>
+      </trans-unit>
+      <trans-unit id="HGXZwS6" resname="Share price">
+        <source>Share price</source>
+        <target>Prijs</target>
+      </trans-unit>
+      <trans-unit id="istUwyD" resname="Number of Shares">
+        <source>Number of Shares</source>
+        <target>Aantal aandelen</target>
+      </trans-unit>
+      <trans-unit id="cQ_tJOq" resname="New shares">
+        <source>New shares</source>
+        <target>Nieuwe aandelen</target>
+      </trans-unit>
+      <trans-unit id="x.2eTMq" resname="Dividend from new shares">
+        <source>Dividend from new shares</source>
+        <target>Dividend van nieuwe aandelen</target>
+      </trans-unit>
+      <trans-unit id="1aHkaNn" resname="Received dividends">
+        <source>Received dividends</source>
+        <target>Ontvangen dividend</target>
+      </trans-unit>
+      <trans-unit id="nDcrQpU" resname="Supplement">
+        <source>Supplement</source>
+        <target>Aanvullend</target>
+      </trans-unit>
+      <trans-unit id="xkD8p8c" resname="Export transactions">
+        <source>Export transactions</source>
+        <target>Exporteer orders</target>
+      </trans-unit>
+      <trans-unit id="7T7MLIT" resname="Net order value">
+        <source>Net order value</source>
+        <target>Netto order waarde</target>
+      </trans-unit>
+      <trans-unit id="k0YnaJf" resname="Dividend treshold">
+        <source>Dividend treshold</source>
+        <target>Dividend drempel</target>
+      </trans-unit>
+      <trans-unit id="rG4on7." resname="Export dividend">
+        <source>Export dividend</source>
+        <target>Exporteer dividend</target>
+      </trans-unit>
+      <trans-unit id="L7K3sm1" resname="dividendTreshold (%)">
+        <source>dividendTreshold (%)</source>
+        <target>dividend grens (%)</target>
+      </trans-unit>
+      <trans-unit id="Cm_LeUq" resname="Maximum allocation">
+        <source>Maximum allocation</source>
+        <target>Maximale toewijzing</target>
+      </trans-unit>
+      <trans-unit id="PWozDhY" resname="Dividend type">
+        <source>Dividend type</source>
+        <target>Dividend type</target>
+      </trans-unit>
+      <trans-unit id="mXxUTxv" resname="Special">
+        <source>Special</source>
+        <target>Speciaal</target>
+      </trans-unit>
+      <trans-unit id="hKHBVJH" resname="Ex dividend date">
+        <source>Ex dividend date</source>
+        <target>Ex-dividend</target>
+      </trans-unit>
+      <trans-unit id="D_Wy1TG" resname="Total recieved dividends for this ticker">
+        <source>Total recieved dividends for this ticker</source>
+        <target>Totaal ontvangen dividend</target>
+      </trans-unit>
+      <trans-unit id="Uhhoa0j" resname="Transactions (csv)">
+        <source>Transactions (csv)</source>
+        <target>Transacties (csv)</target>
+      </trans-unit>
+      <trans-unit id="GQ_2MOH" resname="Transaction fee">
+        <source>Transaction fee</source>
+        <target>Transactie kosten</target>
+      </trans-unit>
+      <trans-unit id="k15mTFL" resname="Commission/ extra fees etc">
+        <source>Commission/ extra fees etc</source>
+        <target>Commissie en extra kosten</target>
+      </trans-unit>
+      <trans-unit id="pXsIpIC" resname="Previous">
+        <source>Previous</source>
+        <target>Vorige</target>
+      </trans-unit>
+      <trans-unit id="H.V6Kdf" resname="Next">
+        <source>Next</source>
+        <target>Volgende</target>
+      </trans-unit>
+      <trans-unit id="zzjZXJx" resname="amount">
+        <source>amount</source>
+        <target>hoeveelheid</target>
+      </trans-unit>
+      <trans-unit id="h_txGiE" resname="Please choose a ex div date">
+        <source>Please choose a ex div date</source>
+        <target>Kies a.u.b een ex dividend datum</target>
+      </trans-unit>
+      <trans-unit id="n7Zmmnf" resname="Units">
+        <source>Units</source>
+        <target>Eenheden</target>
+      </trans-unit>
+      <trans-unit id="O0oDWuK" resname="Isin">
+        <source>Isin</source>
+        <target>Isin</target>
+      </trans-unit>
+      <trans-unit id="6YeEEIq" resname="Dividend months">
+        <source>Dividend months</source>
+        <target>Dividend maanden</target>
+      </trans-unit>
+      <trans-unit id="UmVugQT" resname="Branch">
+        <source>Branch</source>
+        <target>Branche</target>
+      </trans-unit>
+      <trans-unit id="Djoz6eL" resname="Please choose a branch">
+        <source>Please choose a branch</source>
+        <target>Kies een branche</target>
+      </trans-unit>
+      <trans-unit id="acVpEs4" resname="You are logged in as">
+        <source>You are logged in as</source>
+        <target>Je bent ingelogd als</target>
+      </trans-unit>
+      <trans-unit id="lpzL089" resname="Email">
+        <source>Email</source>
+        <target>E-mail</target>
+      </trans-unit>
+      <trans-unit id="RZQ0CeQ" resname="Plain password">
+        <source>Plain password</source>
+        <target>Wachtwoord</target>
+      </trans-unit>
+      <trans-unit id="pSrOQg8" resname="All">
+        <source>All</source>
+        <target>Alles</target>
+      </trans-unit>
+      <trans-unit id="8eiSPEF" resname="Taxonomy">
+        <source>Taxonomy</source>
+        <target>Taxonomy</target>
+      </trans-unit>
+      <trans-unit id="HQBDwEW" resname="Please choose a taxonomy">
+        <source>Please choose a taxonomy</source>
+        <target>Kies een taxonomy</target>
+      </trans-unit>
+      <trans-unit id="UiaVT_r" resname="Real Estate">
+        <source>Real Estate</source>
+        <target>Vastgoed</target>
+      </trans-unit>
+      <trans-unit id="Tk8VZft" resname="Financials">
+        <source>Financials</source>
+        <target>Financieel</target>
+      </trans-unit>
+      <trans-unit id="TWNfEo0" resname="Consumer Staples">
+        <source>Consumer Staples</source>
+        <target>Consumenten goederen</target>
+      </trans-unit>
+      <trans-unit id="tgyuUzm" resname="Industrial">
+        <source>Industrial</source>
+        <target>Industrieel</target>
+      </trans-unit>
+      <trans-unit id="wu_MX7Q" resname="Consumer Discretionary">
+        <source>Consumer Discretionary</source>
+        <target>Consument Discretionair</target>
+      </trans-unit>
+      <trans-unit id="thlEM56" resname="Communication services">
+        <source>Communication services</source>
+        <target>Communicatie diensten</target>
+      </trans-unit>
+      <trans-unit id="BLCoioc" resname="Health Care">
+        <source>Health Care</source>
+        <target>Gezondheid</target>
+      </trans-unit>
+      <trans-unit id="8vzT99z" resname="Energy">
+        <source>Energy</source>
+        <target>Energie</target>
+      </trans-unit>
+      <trans-unit id="Iio28.Y" resname="Information Technology">
+        <source>Information Technology</source>
+        <target>Informatie Technologie</target>
+      </trans-unit>
+      <trans-unit id="PFYn2Ye" resname="Bonds">
+        <source>Bonds</source>
+        <target>Obligaties</target>
+      </trans-unit>
+      <trans-unit id="_Aysb2q" resname="ETF">
+        <source>ETF</source>
+        <target>ETF</target>
+      </trans-unit>
+      <trans-unit id="0Np6uLy" resname="Tech">
+        <source>Tech</source>
+        <target>Technologie</target>
+      </trans-unit>
+      <trans-unit id="CgNcK4W" resname="Utilities">
+        <source>Utilities</source>
+        <target>Nutsbedrijven</target>
+      </trans-unit>
+      <trans-unit id="9sJg0p1" resname="Per month">
+        <source>Per month</source>
+        <target>Per maand</target>
+      </trans-unit>
+      <trans-unit id="9mrqqS8" resname="Exclude from dividend yeld calculation">
+        <source>Exclude from dividend yeld calculation</source>
+        <target>Gebruik NIET bij dividend rendement berekening</target>
+      </trans-unit>
+      <trans-unit id="pN7pye7" resname="Exclude from dividend yield calc">
+        <source>Exclude from dividend yield calc</source>
+        <target>Gebruik NIET bij dividend rendement berekening</target>
+      </trans-unit>
+      <trans-unit id="ap5zzw1" resname="Import file">
+        <source>Import file</source>
+        <target>Import file</target>
+      </trans-unit>
+      <trans-unit id="D5lam8." resname="no records found">
+        <source>no records found</source>
+        <target>geen gegevens gevonden</target>
+      </trans-unit>
+      <trans-unit id="oKVFasT" resname="Dividend per position">
+        <source>Dividend per position</source>
+        <target>Dividend ontvangen bij deze positie (niet totaal)</target>
+      </trans-unit>
+      <trans-unit id="qWDLoEW" resname="Currency dividend will be paid out">
+        <source>Currency dividend will be paid out</source>
+        <target>Valuta waarin dividend wordt uitgekeerd</target>
+      </trans-unit>
+      <trans-unit id="yomXBrm" resname="Dividend currency">
+        <source>Dividend currency</source>
+        <target>Valuta dividend</target>
+      </trans-unit>
+      <trans-unit id="CoJNXHQ" resname="Edit Ticker">
+        <source>Edit Ticker</source>
+        <target>Bewerk ticker</target>
+      </trans-unit>
+      <trans-unit id="CkHwo5A" resname="Company details">
+        <source>Company details</source>
+        <target>Bedrijfsgegevens</target>
+      </trans-unit>
+      <trans-unit id="JhQ9NP0" resname="Extra per month">
+        <source>Extra per month</source>
+        <target>Extra inleg per maand</target>
+      </trans-unit>
+      <trans-unit id="LrrBNhR" resname="Extra money per month">
+        <source>Extra money per month</source>
+        <target>Extra inleg per maand bovenop de ontvangen dividend</target>
+      </trans-unit>
+      <trans-unit id="P11lWXX" resname="Can not remove calendar because it has payments linked to it.">
+        <source>Can not remove calendar because it has payments linked to it.</source>
+        <target>Er is een uitkering gekoppeld aan dit dividend item en kan dus niet verwijderd worden.</target>
+      </trans-unit>
+      <trans-unit id="PEgjRvN" resname="back">
+        <source>back</source>
+        <target>terug</target>
+      </trans-unit>
+      <trans-unit id="91KTA9A" resname="Ticker is connected to open positions">
+        <source>Ticker is connected to open positions</source>
+        <target>Ticker heeft gekoppelde posities. Ontkoppel deze eerst.</target>
+      </trans-unit>
+      <trans-unit id="DPyEyDA" resname="tickerSymbol:: Exchange rate for [Symbol] is currently unavailable. Available are: jsonSymbol">
+        <source>tickerSymbol:: Exchange rate for [Symbol] is currently unavailable. Available are: jsonSymbol</source>
+        <target>tickerSymbol:: Wisselkoers voor [Symbol] is momenteel niet beschikbaar. Beschikbaar is: jsonSymbol</target>
+      </trans-unit>
+      <trans-unit id="6LpWZ9_" resname="Original Price">
+        <source>Original Price</source>
+        <target>Originele prijs</target>
+      </trans-unit>
+      <trans-unit id="7Xe_K4n" resname="Original price before fx">
+        <source>Original price before fx</source>
+        <target>Originele prijs voor koers aanpassing</target>
+      </trans-unit>
+      <trans-unit id="k3m19dZ" resname="Original price currency">
+        <source>Original price currency</source>
+        <target>Valuta originele prijs</target>
+      </trans-unit>
+      <trans-unit id=".Kcj0iM" resname="Forex fee">
+        <source>Forex fee</source>
+        <target>Forex tarief</target>
+      </trans-unit>
+      <trans-unit id="CBBR1vh" resname="forex">
+        <source>forex</source>
+        <target>wisselkoers</target>
+      </trans-unit>
+      <trans-unit id="wexk6m8" resname="Stampduty">
+        <source>Stampduty</source>
+        <target>Zegelrecht</target>
+      </trans-unit>
+      <trans-unit id="3Q6pPJA" resname="Finra fee">
+        <source>Finra fee</source>
+        <target>Finra tarief</target>
+      </trans-unit>
+      <trans-unit id="ePDdFIu" resname="Total transaction cost (all fees + price * amount)">
+        <source>Total transaction cost (all fees + price * amount)</source>
+        <target>Totale transactie kosten (alle onkosten + prijs * aantal aandelen)</target>
+      </trans-unit>
+      <trans-unit id="bYBIbMM" resname="Fees">
+        <source>Fees</source>
+        <target>Tarieven</target>
+      </trans-unit>
+      <trans-unit id="0C5gPdn" resname="Buy or Sell">
+        <source>Buy or Sell</source>
+        <target>Kopen of verkopen</target>
+      </trans-unit>
+      <trans-unit id="_TJnqhH" resname="Remember me">
+        <source>Remember me</source>
+        <target>Onthoud mij</target>
+      </trans-unit>
+      <trans-unit id="cEjzizP" resname="Payment">
+        <source>Payment</source>
+        <target>Uitkering</target>
+      </trans-unit>
+      <trans-unit id="S9k1S7Z" resname="warning">
+        <source>warning</source>
+        <target>waarschuwing</target>
+      </trans-unit>
+      <trans-unit id="GXZu1sy" resname="Cancel">
+        <source>Cancel</source>
+        <target>Annuleer</target>
+      </trans-unit>
+      <trans-unit id="uDke9PS" resname="Remove this item?">
+        <source>Remove this item?</source>
+        <target>Verwijder dit item?</target>
+      </trans-unit>
+      <trans-unit id="HKE0b8T" resname="Yes, remove it">
+        <source>Yes, remove it</source>
+        <target>Ja, verwijder</target>
+      </trans-unit>
+      <trans-unit id="SGOjaR4" resname="Choose a Ticker">
+        <source>Choose a Ticker</source>
+        <target>Selecteer een ticker</target>
+      </trans-unit>
+      <trans-unit id="3PQfCLY" resname="Goal Percentage reached">
+        <source>Goal Percentage reached</source>
+        <target>Doel percentage bereikt</target>
+      </trans-unit>
+      <trans-unit id="zb9pdei" resname="Goal">
+        <source>Goal</source>
+        <target>Doel</target>
+      </trans-unit>
+      <trans-unit id="Mzx8nVA" resname="Target reached">
+        <source>Target reached</source>
+        <target>Doel bereikt</target>
+      </trans-unit>
+      <trans-unit id="YAJ27UD" resname="Delete this item?">
+        <source>Delete this item?</source>
+        <target>Dit item verwijderen?</target>
+      </trans-unit>
+      <trans-unit id="lf9nNFK" resname="show branch: %branch%">
+        <source>show branch: %branch%</source>
+        <target>laat branch %branch% zien</target>
+      </trans-unit>
+      <trans-unit id="uPi8twr" resname="Edit branch: %branch%">
+        <source>Edit branch: %branch%</source>
+        <target>Bewerk branch: %branch%</target>
+      </trans-unit>
+      <trans-unit id="Hw99oI_" resname="Allocation information">
+        <source>Allocation information</source>
+        <target>Allocation informatie</target>
+      </trans-unit>
+      <trans-unit id="uUMSFFp" resname="Tickers">
+        <source>Tickers</source>
+        <target>__Tickers</target>
+      </trans-unit>
+      <trans-unit id="Y3EUbtN" resname="show ticker">
+        <source>show ticker</source>
+        <target>__show ticker</target>
+      </trans-unit>
+      <trans-unit id="L7mkYx9" resname="Add dividend date">
+        <source>Add dividend date</source>
+        <target>__Add dividend date</target>
+      </trans-unit>
+      <trans-unit id="74PwZ6X" resname="Add/edit research">
+        <source>Add/edit research</source>
+        <target>__Add/edit research</target>
+      </trans-unit>
+      <trans-unit id="EV9Fssn" resname="show currency">
+        <source>show currency</source>
+        <target>__show currency</target>
+      </trans-unit>
+      <trans-unit id="F8QMuCq" resname="Edit currency">
+        <source>Edit currency</source>
+        <target>__Edit currency</target>
+      </trans-unit>
+      <trans-unit id="cJdPnHh" resname="show pie">
+        <source>show pie</source>
+        <target>__show pie</target>
+      </trans-unit>
+      <trans-unit id="TW2tQ0K" resname="Edit pie">
+        <source>Edit pie</source>
+        <target>__Edit pie</target>
+      </trans-unit>
+      <trans-unit id="gqgpQ9G" resname="Add research">
+        <source>Add research</source>
+        <target>__Add research</target>
+      </trans-unit>
+      <trans-unit id="xx6IPTI" resname="Edit transaction">
+        <source>Edit transaction</source>
+        <target>__Edit transaction</target>
+      </trans-unit>
+      <trans-unit id="hsGkNCa" resname="Edit payment">
+        <source>Edit payment</source>
+        <target>__Edit payment</target>
+      </trans-unit>
+      <trans-unit id="PcpdPMu" resname="Edit calendar">
+        <source>Edit calendar</source>
+        <target>__Edit calendar</target>
+      </trans-unit>
+      <trans-unit id="fLajFN4" resname="Show payment">
+        <source>Show payment</source>
+        <target>__Show payment</target>
+      </trans-unit>
+      <trans-unit id="bKXQypw" resname="show tax">
+        <source>show tax</source>
+        <target>__show tax</target>
+      </trans-unit>
+      <trans-unit id="o2KRbWP" resname="edit tax">
+        <source>edit tax</source>
+        <target>__edit tax</target>
+      </trans-unit>
+      <trans-unit id="jA9u1Kz" resname="Show calendar">
+        <source>Show calendar</source>
+        <target>__Show calendar</target>
+      </trans-unit>
+      <trans-unit id="2yy5xmL" resname="show journal">
+        <source>show journal</source>
+        <target>__show journal</target>
+      </trans-unit>
+      <trans-unit id="Z5F1HCp" resname="Edit journal">
+        <source>Edit journal</source>
+        <target>__Edit journal</target>
+      </trans-unit>
+      <trans-unit id="NDC.C1Q" resname="show taxonomy">
+        <source>show taxonomy</source>
+        <target>__show taxonomy</target>
+      </trans-unit>
+      <trans-unit id="KH.e.r9" resname="Edit taxonomy">
+        <source>Edit taxonomy</source>
+        <target>__Edit taxonomy</target>
+      </trans-unit>
+      <trans-unit id="oxTxNsI" resname="show research">
+        <source>show research</source>
+        <target>__show research</target>
+      </trans-unit>
+      <trans-unit id="KLUb6oO" resname="Edit research">
+        <source>Edit research</source>
+        <target>__Edit research</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

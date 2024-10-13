@@ -3,6 +3,7 @@ module.exports = {
   content: [
     "./assets/**/*.js",
     "./templates/**/*.html.twig",
+    "./src/Twig/Components/**/*.php",
   ],
   theme: {
     extend: {},
@@ -10,6 +11,6 @@ module.exports = {
   plugins: [
     '@tailwindcss/forms'
   ],
-  prefix: 'tw-',
   important: true,
+  darkMode: 'selector',
 }

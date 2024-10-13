@@ -1,49 +1,64 @@
-<table class="table rounded border">
+<turbo-frame id="portfolio_tab_results">
+<twig:Table:Table>
   <thead>
-    <tr>
-      <th></th>
-      <th>{{ 'Amount'|trans }}</th>
-      <th>{{ 'Weighted average price'|trans }}</th>
-      <th>{{ 'Allocation'|trans }}</th>
-      <th>{{ 'Profit / Loss'|trans }}</th>
-      <th>{{ 'Pie'|trans }}</th>
-      <th>{{ 'Exclude from dividend yield calc'|trans }}</th>
-      <th>{{ 'Actions'|trans }}</th>
-    </tr>
+    <twig:Table:Tr>
+      <twig:Table:ThCol></twig:Table:ThCol>
+      <twig:Table:ThCol>{{ 'Amount'|trans }}</twig:Table:ThCol>
+      <twig:Table:ThCol>{{ 'Weighted average price'|trans }}</twig:Table:ThCol>
+      <twig:Table:ThCol>{{ 'Allocation'|trans }}</twig:Table:ThCol>
+      <twig:Table:ThCol>{{ 'Profit / Loss'|trans }}</twig:Table:ThCol>
+      <twig:Table:ThCol>{{ 'Pie'|trans }}</twig:Table:ThCol>
+      <twig:Table:ThCol>{{ 'Exclude from dividend yield calc'|trans }}</twig:Table:ThCol>
+      <twig:Table:ThCol>{{ 'Actions'|trans }}</twig:Table:ThCol>
+    </twig:Table:Tr>
   </thead>
   <tbody class="table-group-divider">
     {% if position %}
-      <tr class="table-success">
-        <td>
+      <twig:Table:Tr>
+        <twig:Table:Td>
           <strong>{{ 'Summary'|trans }}</strong>
-        </td>
-        <td>{{ position.amount|format_number({ fraction_digit: 7 }) }}</td>
-        <td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ position.price|format_number({ fraction_digit: 2 }) }}</td>
-        <td>{{ allocationSign|raw }}{{ position.allocation|format_number({ fraction_digit: 2 }) }}</td>
-        <td>{{ allocationSign|raw }}{{ position.profit|format_number({ fraction_digit: 2 }) }}</td>
-        <td>
+        </twig:Table:Td>
+        <twig:Table:Td>{{ position.amount|format_number({ fraction_digit: 7 }) }}</twig:Table:Td>
+        <twig:Table:Td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ position.price|format_number({ fraction_digit: 2 }) }}</twig:Table:Td>
+        <twig:Table:Td>{{ position.allocationCurrency.Sign|raw }}{{ position.allocation|format_number({ fraction_digit: 2 }) }}</twig:Table:Td>
+        <twig:Table:Td>
+          <div class="flex">
+					  <twig:Badge variant="{{ position.profit > 0 ? "success" : "danger" }}">
+						  {{ (position.allocationCurrency ? position.allocationCurrency.Sign : '$')|raw }} {{ position.profit|format_number({ fraction_digit: 2 }) }}
+						</twig:Badge>
+					</div>
+       </twig:Table:Td>
+       <twig:Table:Td>
           {% for pie in position.pies %}
             {{ pie.label }},
           {% endfor %}
-        </td>
-        <td>{{ position.ignoreForDividend ? '<i class="fa-regular fa-circle-check"></i>'|raw:'' }}</td>
-        <td>
-          <div class="btn-group" role="group" aria-label="Edit position">
-              <button type="button" onclick="location.href='{{ path('position_edit', { id: position.id }) }}';" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="{{ 'Edit position'|trans }}"><i class="far fa-edit"></i></a>
+        </twig:Table:Td>
+        <twig:Table:Td>{{ position.ignoreForDividend ? '<i class="fa-regular fa-circle-check"></i>'|raw: '-' }}</twig:Table:Td>
+        <twig:Table:Td>
+          <div class="inline-flex rounded-md shadow-sm" role="group">
+              <a href="{{ path('position_edit', { id: position.id }) }}" data-turbo-frame="_top" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                  <i class="far fa-edit"></i>
+              </a>
 
-              <form method="post" action="{{ path('portfolio_position_close', { position: position.id }) }}" onsubmit="return confirm('Are you sure you want to close this position?');">
+              <form method="post" action="{{ path('portfolio_position_close', { position: position.id }) }}"
+              {{ stimulus_controller('delete-confirm',{ title: 'Remove this item?'|trans,
+                                          icon: 'warning',
+                                          confirmButtonText: 'Yes, remove it'|trans,
+                                          cancelButtonText: 'Cancel'|trans,
+                                          }) }}
+              {{ stimulus_action('delete-confirm','onSubmit') }}>
                 <input type="hidden" name="_method" value="DELETE" />
                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ position.id) }}" />
-                <button type="button" class="btn btn-danger"><i class="fa-regular fa-trash-can"></i></button>
+                <button type="submit" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white"><i class="fa-regular fa-trash-can"></i></button>
               </form>
-
           </div>
-        </td>
-      </tr>
+        </twig:Table:Td>
+      </twig:Table:Tr>
     {% else %}
-      <tr class="table-success" colspan="6">
-        <td colspan="6">no records found</td>
-      </tr>
+      <twig:Table:Tr class="table-success" colspan="6">
+        <twig:Table:Td colspan="6">no records found</twig:Table:Td>
+      </twig:Table:Tr>
     {% endif %}
   </tbody>
-</table>
+</twig:Table:Table>
+</turbo-frame>

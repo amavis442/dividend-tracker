@@ -1,109 +1,124 @@
-<table class="table border">
+<turbo-frame id="portfolio_tab_results">
+<twig:Table:Table>
 	<tbody>
-		<tr>
-			<th scope="row">{{ 'Instrument'|trans }}
-				<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Edit ticker / months'|trans }}">
+		<twig:Table:Tr>
+			<twig:Table:ThRow>
+				{{ 'Instrument'|trans }}
+				<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Edit ticker / months'|trans }}" data-turbo-frame="_top">
 					<i class="far fa-edit"></i>
 				</a>
-			</th>
-			<td>
-				<strong>{{ ticker.fullname }}
+			</twig:Table:ThRow>
+			<twig:Table:Td>
+				<strong>
+					{{ ticker.fullname }}
 					({{ ticker.symbol }})
 				</strong>
-			</td>
-		</tr>
-		<tr>
-			<th scope="row">{{ 'Industry'|trans }}</th>
-			<td>{{ ticker.branch.label }}</td>
-		</tr>
-		<tr>
-			<th scope="row">ISIN</th>
-			<td>{{ ticker.isin }}</td>
-		</tr>
-		<tr>
-			<th scope="row">{{ 'Dividend payment months'|trans }}</th>
-			<td>
-				<ul class="list-group">
+			</twig:Table:Td>
+		</twig:Table:Tr>
+		<twig:Table:Tr>
+			<twig:Table:ThRow>
+				{{ 'Industry'|trans }}
+			</twig:Table:ThRow>
+			<twig:Table:Td>
+				{{ ticker.branch.label }}
+			</twig:Table:Td>
+		</twig:Table:Tr>
+		<twig:Table:Tr>
+			<twig:Table:ThRow>
+				ISIN
+			</twig:Table:ThRow>
+			<twig:Table:Td>{{ ticker.isin }}</twig:Table:Td>
+		</twig:Table:Tr>
+		<twig:Table:Tr>
+			<twig:Table:ThRow>
+				{{ 'Dividend payment months'|trans }}
+			</twig:Table:ThRow>
+			<twig:Table:Td>
+				<twig:ListGroup class="w-74">
 					{% for month in ticker.dividendMonths %}
-						<li class="list-group-item">{{ month.getDividendMonthName|trans }}</li>
+						<twig:ListGroupItem first="loop.first" last="loop.last">{{ month.getDividendMonthName|trans }}</twig:ListGroupItem>
 					{% endfor %}
-				</ul>
-
-			</td>
-		</tr>
-		<tr>
-			<th scope="row">{{ 'Total dividend received'|trans }}</th>
-			<td>
-				<span class="badge text-bg-primary">
-					<strong>&euro;{{ dividend|format_number({fraction_digit: 2}) }}</string>
-				</span>
-			</td>
-		</tr>
-		<tr>
-			<th scope="row">{{ 'Amount'|trans }}
-				#</th>
-			<td>{{ (position.amount)|format_number({fraction_digit: 7}) }}</td>
-		</tr>
-		<tr>
-			<th scope="row">{{ 'Dividend frequency'|trans }}</th>
-			<td>
+				</twig:ListGroup>
+			</twig:Table:Td>
+		</twig:Table:Tr>
+		<twig:Table:Tr>
+			<twig:Table:ThRow>{{ 'Total dividend received'|trans }}</twig:Table:ThRow>
+			<twig:Table:Td>
+				<twig:Badge class="inline-block">
+					<strong>&euro;{{ dividend|format_number({fraction_digit: 2}) }}</strong>
+				</twig:Badge>
+			</twig:Table:Td>
+		</twig:Table:Tr>
+		<twig:Table:Tr>
+			<twig:Table:ThRow>{{ 'Amount'|trans }}
+				#</twig:Table:ThRow>
+			<twig:Table:Td>{{ (position.amount)|format_number({fraction_digit: 7}) }}</twig:Table:Td>
+		</twig:Table:Tr>
+		<twig:Table:Tr>
+			<twig:Table:ThRow>{{ 'Dividend frequency'|trans }}</twig:Table:ThRow>
+			<twig:Table:Td>
 				{{ position.ticker.getPayoutFrequency }}
-			</td>
-		</tr>
-		<tr>
-			<th scope="row">{{ 'Yearly forward dividend payout'|trans }}</th>
-			<td>
+			</twig:Table:Td>
+		</twig:Table:Tr>
+		<twig:Table:Tr>
+			<twig:Table:ThRow>{{ 'Yearly forward dividend payout'|trans }}</twig:Table:ThRow>
+			<twig:Table:Td>
 				&euro;{{ yearlyForwardDividendPayout|format_number({fraction_digit: 2}) }}
-			</td>
-		</tr>
-		<tr>
-			<th scope="row">{{ 'Single time forward dividend payout'|trans }}</th>
-			<td>
+			</twig:Table:Td>
+		</twig:Table:Tr>
+		<twig:Table:Tr>
+			<twig:Table:ThRow>{{ 'Single time forward dividend payout'|trans }}</twig:Table:ThRow>
+			<twig:Table:Td>
 				&euro;{{ singleTimeForwarddividendPayout|format_number({fraction_digit: 2}) }}
-			</td>
-		</tr>
-		<tr>
-			<th scope="row">{{ 'Dividend yield'|trans }}</th>
-			<td>
+			</twig:Table:Td>
+		</twig:Table:Tr>
+		<twig:Table:Tr>
+			<twig:Table:ThRow>{{ 'Dividend yield'|trans }}</twig:Table:ThRow>
+			<twig:Table:Td>
 				{{ dividendYield|format_number({fraction_digit: 2}) }}%
-			</td>
-		</tr>
-		<tr>
-			<th scope="row">{{ 'Next dividend (Ex-div / payout)'|trans }}</th>
-			<td>
-				<span class="badge text-bg-primary">{% if nextDividendExDiv is defined and nextDividendExDiv is not null %}{{ nextDividendExDiv|date('Y-m-d') }}{% endif %}</span>
+			</twig:Table:Td>
+		</twig:Table:Tr>
+		<twig:Table:Tr>
+			<twig:Table:ThRow>{{ 'Next dividend (Ex-div / payout)'|trans }}</twig:Table:ThRow>
+			<twig:Table:Td>
+				<div>
+				<twig:Badge class="inline-block">{% if nextDividendExDiv is defined and nextDividendExDiv is not null %}{{ nextDividendExDiv|date('Y-m-d') }}{% endif %}</twig:Badge>
 				/
-				<span class="badge text-bg-warning">{% if nextDividendPayout is defined and nextDividendPayout is not null %}{{ nextDividendPayout|date('Y-m-d') }}{% endif %}</span>
-
-			</td>
-		</tr>
-		<tr>
-			<th scope="row">{{ 'Expected next payout'|trans }}</th>
-			<td>
+				<twig:Badge variant="info" class="inline-block">{% if nextDividendPayout is defined and nextDividendPayout is not null %}{{ nextDividendPayout|date('Y-m-d') }}{% endif %}</twig:Badge>
+				</div>
+			</twig:Table:Td>
+		</twig:Table:Tr>
+		<twig:Table:Tr>
+			<twig:Table:ThRow>{{ 'Expected next payout'|trans }}</twig:Table:ThRow>
+			<twig:Table:Td>
 				#{{ amountPerDate }}
 				x  &euro;{{ netCashAmount|format_number({fraction_digit: 2}) }}
 				= &euro;{{ expectedPayout|format_number({fraction_digit: 2}) }}
-			</td>
-		</tr>
-		<tr>
-			<th scope="row">{{ 'Weighted average price'|trans }}</th>
-			<td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price)|format_number({fraction_digit: 2}) }}</td>
-		</tr>
-		<tr>
-			<th scope="row">{{ 'Allocation'|trans }}</th>
-			<td>{{ allocationSign|raw }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}</td>
-		</tr>
-		<tr>
-			<th scope="row">{{ 'Allocation'|trans }}(%)</th>
-			<td>{{ percentageAllocated|format_number({fraction_digit: 2}) }}%</td>
-		</tr>
-		<tr>
-			<th scope="row">{{ 'Pies'|trans }}</th>
-			<td>
-				{% for pie in position.pies %}
-					<span class="badge badge-primary">{{ pie.label }}</span>
-				{% endfor %}
-			</td>
-		</tr>
+			</twig:Table:Td>
+		</twig:Table:Tr>
+		<twig:Table:Tr>
+			<twig:Table:ThRow>{{ 'Weighted average price'|trans }}</twig:Table:ThRow>
+			<twig:Table:Td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price)|format_number({fraction_digit: 2}) }}</twig:Table:Td>
+		</twig:Table:Tr>
+		<twig:Table:Tr>
+			<twig:Table:ThRow>{{ 'Allocation'|trans }}</twig:Table:ThRow>
+			<twig:Table:Td>{{ position.allocationCurrency.sign|raw }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}</twig:Table:Td>
+		</twig:Table:Tr>
+		<twig:Table:Tr>
+			<twig:Table:ThRow>{{ 'Allocation'|trans }}(%)</twig:Table:ThRow>
+			<twig:Table:Td>{{ percentageAllocated|format_number({fraction_digit: 2}) }}%</twig:Table:Td>
+		</twig:Table:Tr>
+		<twig:Table:Tr>
+			<twig:Table:ThRow>{{ 'Pies'|trans }}</twig:Table:ThRow>
+			<twig:Table:Td>
+				<twig:ListGroup class="w-74">
+					{% for pie in position.pies %}
+						<twig:ListGroupItem first="loop.first" last="loop.last"><twig:Badge>{{ pie.label }}</twig:Badge></twig:ListGroupItem>
+					{% endfor %}
+				</twig:ListGroup>
+			</twig:Table:Td>
+		</twig:Table:Tr>
 	</tbody>
-</table>
+</twig:Table:Table>
+</turbo-frame>
+

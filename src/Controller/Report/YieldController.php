@@ -7,6 +7,7 @@ use App\Service\DividendService;
 use App\Service\YieldsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/report')]
@@ -16,14 +17,15 @@ class YieldController extends AbstractController
     public const EXCHANGE_RATE = 1.19; // dollar to euro
     public const YIELD_PIE_KEY = 'yeildpie_searchPie';
 
-    #[Route(path: '/yield/{orderBy}', name: 'report_dividend_yield')]
+    #[Route(path: '/yield', name: 'report_dividend_yield')]
     public function index(
         PositionRepository $positionRepository,
         YieldsService $yields,
         DividendService $dividendService,
-        string $orderBy = 'symbol'
+        #[MapQueryParameter]string $sort = 'symbol',
+        #[MapQueryParameter]string $sortDirection = 'ASC'
     ): Response {
-        $result = $yields->yield($positionRepository, $dividendService, $orderBy);
+        $result = $yields->yield($positionRepository, $dividendService, $sort, $sortDirection);
 
         return $this->render('report/yield/index.html.twig', array_merge($result, ['controller_name' => 'ReportController']));
     }

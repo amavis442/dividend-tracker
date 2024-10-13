@@ -1,0 +1,60 @@
+.tooltip {
+    /* Float on top of the UI */
+    position: absolute;
+
+    /* Avoid layout interference */
+    width: max-content;
+    top: 0;
+    left: 0;
+
+    background: #333;
+    color: white;
+    font-weight: bold;
+    padding: 4px 8px;
+    font-size: 13px;
+    border-radius: 4px;
+    display: none;
+    @apply hidden;
+}
+
+.arrow {
+    position: absolute;
+    background: #222;
+    width: 8px;
+    height: 8px;
+    transform: rotate(45deg);
+    @apply border-t-white dark:border-t-gray-900 border-transparent;
+}
+
+.tooltip[data-show] {
+    display: block;
+}
+
+.card {
+    /* Float on top of the UI */
+    position: absolute;
+    z-index: 20;
+
+    /* Avoid layout interference */
+    width: max-content;
+    top: 0;
+    left: 0;
+    display: none;
+
+    @apply max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700;
+}
+
+.arrow-card {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    z-index: -1;
+    pointer-events: none;
+
+    transform: rotate(45deg);
+    @apply bg-white border-t-white dark:border-t-gray-900 border-transparent;
+}
+
+.card[data-show] {
+    display: block;
+}

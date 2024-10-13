@@ -1,72 +1,95 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}
-	Edit Calendar
-{% endblock %}
-
+{% block title %}Edit Calendar{% endblock %}
 {% block body %}
-	<h1>Edit Calendar</h1>
-
-	{{ include('calendar/_form.html.twig', { button_label: 'Update' }) }}
-	<br/>
-	{% if calendar.payments %}
-		<h3>{{ 'Payments'|trans }}</h3>
-
-		<table class="table table-striped">
-			<thead>
-				<tr>
-					<th>{{ 'Pay date'|trans }}</th>
-					<th>{{ 'Company'|trans }}</th>
-					<th>{{ 'Dividend'|trans }}(&euro;)</th>
-					<th>{{ 'Tax'|trans }}</th>
-					<th>{{ 'Type'|trans }}</th>
-					<th>{{ 'Actions'|trans }}</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for payment in calendar.payments %}
-					<tr>
-						<td>{{ payment.payDate ? payment.payDate|format_date('medium') : '' }}</td>
-						<td>
-							{{ payment.position.ticker.fullname }}
-							({{ payment.position.ticker.symbol }})<br/>
-							<small>{{ payment.amount|format_number({ fraction_digit: 7 }) }}
-								{{ 'shares'|trans }}</small>
-						</td>
-						<td>
-							<strong>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ payment.dividend|format_number({ fraction_digit: 2 }) }}</strong>
-						</td>
-						<td>
-							<span style="color:red">&euro;{{ payment.taxes|format_number({ fraction_digit: 2 }) }}</span>
-						</td>
-						<td>{{ payment.dividendType }}</td>
-						<td>
-							<a href="{{ path('payment_show', { id: payment.id }) }}" class="btn btn-primary">
-								<i class="fas fa-book-open"></i>
-							</a>
-							<a href="{{ path('payment_edit', { id: payment.id }) }}" class="btn btn-primary">
-								<i class="far fa-edit"></i>
-							</a>
-						</td>
-					</tr>
-				{% else %}
-					<tr>
-						<td colspan="6">{{ 'no records found'|trans }}</td>
-					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-	{% endif %}
-
-	{% if referer %}
-		<a href="{{ referer }}" class="btn btn-primary">
-			<i class="fas fa-angle-double-left"></i>
-			{{ 'back'|trans }}</a>
-	{% else %}
-		<a href="{{ path('calendar_index') }}" class="btn btn-primary">
-			<i class="fas fa-angle-double-left"></i>
-			{{ 'back to list'|trans }}</a>
-	{% endif %}
-	<hr/>
-	{{ include('calendar/_delete_form.html.twig') }}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <twig:Card title="{{ 'Edit Calendar'|trans }}" class="w-3/4 flex-1 mx-auto">
+                    <div class="mb-4">
+                        <h1>Edit Calendar</h1>
+                        {{ include('calendar/_form.html.twig', { button_label: 'Update' }) }}
+                    </div>
+                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                        <a href="{{ path("calendar_index") }}"
+                           title="{{ 'back to list'|trans }}"
+                           class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                            <i class="fas fa-angle-double-left"></i>
+                            {{ 'back to list'|trans }}
+                        </a>
+                        {{ include("calendar/_delete_form.html.twig") }}
+                    </div>
+                    <div>
+                        {% if calendar.payments.count %}
+                            <div class="mt-4 mb-4">
+                                <twig:Head variant="h3">
+                                    {{ 'Payments'|trans }}
+                                </twig:Head>
+                            </div>
+                            <twig:Table:Table>
+                                <twig:Table:THead>
+                                    <tr>
+                                        <twig:Table:ThCol>
+                                            {{ 'Pay date'|trans }}
+                                        </twig:Table:ThCol>
+                                        <twig:Table:ThCol>
+                                            {{ 'Company'|trans }}
+                                        </twig:Table:ThCol>
+                                        <twig:Table:ThCol>
+                                            {{ 'Dividend'|trans }}(&euro;)
+                                        </twig:Table:ThCol>
+                                        <twig:Table:ThCol>
+                                            {{ 'Tax'|trans }}
+                                        </twig:Table:ThCol>
+                                        <twig:Table:ThCol>
+                                            {{ 'Type'|trans }}
+                                        </twig:Table:ThCol>
+                                        <twig:Table:ThCol>
+                                            {{ 'Actions'|trans }}
+                                        </twig:Table:ThCol>
+                                    </tr>
+                                </twig:Table:THead>
+                                <tbody>
+                                    {% for payment in calendar.payments %}
+                                        <twig:Table:Tr>
+                                            <twig:Table:Td>
+                                                {{ payment.payDate ? payment.payDate|format_date("medium") : '' }}
+                                            </twig:Table:Td>
+                                            <twig:Table:Td>
+                                                {{ payment.position.ticker.fullname }}
+                                                ({{ payment.position.ticker.symbol }})
+                                                <br />
+                                                <small>{{ payment.amount|format_number({"fraction_digit": 7}) }}
+                                                {{ 'shares'|trans }}</small>
+                                            </twig:Table:Td>
+                                            <twig:Table:Td>
+                                                <strong>{{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ payment.dividend|format_number({"fraction_digit": 2}) }}</strong>
+                                            </twig:Table:Td>
+                                            <twig:Table:Td>
+                                                <span style="color:red">&euro;{{ payment.taxes|format_number({"fraction_digit": 2}) }}</span>
+                                            </twig:Table:Td>
+                                            <twig:Table:Td>
+                                                {{ payment.dividendType }}
+                                            </twig:Table:Td>
+                                            <twig:Table:Td>
+                                                <twig:ButtonGroup edit_link="{{ path('payment_edit', { id: payment.id }) }}"
+                                                                  edit_link_text="{{ "Edit payment"|trans }}"
+                                                                  show_link="{{ path('payment_show', { id: payment.id }) }}"
+                                                                  show_link_text="{{ "Show payment"|trans }}" />
+                                            </twig:Table:Td>
+                                        </twig:Table:Tr>
+                                    {% else %}
+                                        <twig:Table:Tr>
+                                            <twig:Table:Td colspan="6">
+                                                {{ 'no records found'|trans }}
+                                            </twig:Table:Td>
+                                        </twig:Table:Tr>
+                                    {% endfor %}
+                                </tbody>
+                            </twig:Table:Table>
+                        {% endif %}
+                    </div>
+                </twig:Card>
+            </div>
+        </div>
+    </div>
 {% endblock %}

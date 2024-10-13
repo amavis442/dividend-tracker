@@ -1,24 +1,26 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Edit Research
-{% endblock %}
-
+{% block title %}Edit Research{% endblock %}
 {% block body %}
-	<h1>Edit Research for
-		{{ research.ticker.symbol }}</h1>
-
-	<section data-turbo="false">
-	{{ include('research/_form.html.twig', {'button_label': 'Update'}) }}
-	<br/>
-	</section>
-
-	<a href="{{ path('research_index') }}" class="btn btn-primary">
-		<i class="fas fa-angle-double-left"></i>
-		back to list</a>
-	<a href="{{ path('ticker_show',{'id' : research.ticker.id}) }}" class="btn btn-primary">
-		<i class="fas fa-angle-double-left"></i>
-		back to ticker</a>
-	<hr/>
-	{{ include('research/_delete_form.html.twig') }}
-{% endblock %}
-
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <twig:Card title="{{ 'Edit Research for'|trans }}: {{ research.ticker.symbol }}"
+                           class="w-1/2 mx-auto">
+                    <div class="mb-4">{{ include('research/_form.html.twig', {'button_label': 'Update'}) }}</div>
+                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                        <a href="{{ path("research_index") }}"
+                           class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                            <i class="fas fa-angle-double-left"></i>
+                            {{ 'back to list'|trans }}
+                        </a>
+                        <a href="{{ path('ticker_show',{'id' : research.ticker.id}) }}"
+                           class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                            <i class="fas fa-angle-double-left"></i>
+                            {{ 'back to ticker'|trans }}
+                        </a>
+                        {{ include("research/_delete_form.html.twig") }}
+                    </twig:Card>
+                </div>
+            </div>
+        </div>
+    {% endblock %}

@@ -12,87 +12,103 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Form\PieSelectFormType;
 use App\Helper\Colors;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
-#[Route(path: "/{_locale<%app.supported_locales%>}/dashboard/report")]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/report')]
 class YieldByPieController extends AbstractController
 {
-    public const TAX_DIVIDEND = 0.15; // %
-    public const EXCHANGE_RATE = 1.19; // dollar to euro
-    public const YIELD_PIE_KEY = "yieldpie_searchPie";
+	public const TAX_DIVIDEND = 0.15; // %
+	public const EXCHANGE_RATE = 1.19; // dollar to euro
+	public const YIELD_PIE_KEY = 'yieldpie_searchPie';
 
-    #[Route(path: "/pieyield/{orderBy}", name: "report_dividend_yield_by_pie")]
-    public function index(
-        Request $request,
-        PositionRepository $positionRepository,
-        YieldsService $yields,
-        DividendService $dividendService,
-        ChartBuilderInterface $chartBuilder,
-        string $orderBy = "symbol"
-    ): Response {
-        $pie = null;
-        $pieSelect = new PieSelect();
-        $form = $this->createForm(PieSelectFormType::class, $pieSelect);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $pieSelect = $form->getData();
-            $request->getSession()->set(self::YIELD_PIE_KEY, $pieSelect);
-            if ($pieSelect && $pieSelect->getPie()) {
-                $pie = $pieSelect->getPie();
-            }
-        }
+	#[Route(path: '/pieyield', name: 'report_dividend_yield_by_pie')]
+	public function index(
+		Request $request,
+		PositionRepository $positionRepository,
+		YieldsService $yields,
+		DividendService $dividendService,
+		ChartBuilderInterface $chartBuilder,
+		#[MapQueryParameter] string $sort = 'symbol',
+		#[MapQueryParameter] string $sortDirection = 'asc'
+	): Response {
+		$pie = null;
+		$pieSelect = new PieSelect();
+		$form = $this->createForm(PieSelectFormType::class, $pieSelect);
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			$pieSelect = $form->getData();
+			$request->getSession()->set(self::YIELD_PIE_KEY, $pieSelect);
+			if ($pieSelect && $pieSelect->getPie()) {
+				$pie = $pieSelect->getPie();
+			}
+		}
 
-        $pieSelected = $request->getSession()->get(self::YIELD_PIE_KEY, null);
-        $result = $yields->yield(
-            $positionRepository,
-            $dividendService,
-            $orderBy,
-            $pie
-        );
+		$validSorts = ['symbol', 'dividend', 'yield'];
+		$sort = in_array($sort, $validSorts) ? $sort : 'symbol';
+		$sortDirection = in_array($sortDirection, [
+			'asc',
+			'ASC',
+			'desc',
+			'DESC',
+		])
+			? $sortDirection
+			: 'ASC';
 
-        $colors = Colors::COLORS;
+		$pieSelected = $request->getSession()->get(self::YIELD_PIE_KEY, null);
+		$result = $yields->yield(
+			$positionRepository,
+			$dividendService,
+			$sort,
+			$sortDirection,
+			$pie
+		);
 
-        $chart = $chartBuilder->createChart(Chart::TYPE_BAR);
+		$colors = Colors::COLORS;
 
-        $chart->setData([
-            "labels" => $result["labels"],
-            "datasets" => [
-                [
-                    "label" => "Dividend yield",
-                    "backgroundColor" => $colors,
-                    "borderColor" => $colors,
-                    "data" => $result["data"],
-                ],
-            ],
-        ]);
+		$chart = $chartBuilder->createChart(Chart::TYPE_BAR);
 
-        $chart->setOptions([
-            "maintainAspectRatio" => false,
-            "responsive" => true,
-            "plugins" => [
-                "title" => [
-                    "display" => true,
-                    "text" => "Yield",
-                    "font" => [
-                        "size" => 24,
-                    ],
-                ],
-                "legend" => [
-                    "position" => "top",
-                ],
-            ],
-        ]);
+		$chart->setData([
+			'labels' => $result['labels'],
+			'datasets' => [
+				[
+					'label' => 'Dividend yield',
+					'backgroundColor' => $colors,
+					'borderColor' => $colors,
+					'data' => $result['data'],
+				],
+			],
+		]);
 
-        return $this->render(
-            "report/yield/pie.html.twig",
-            array_merge($result, [
-                "controller_name" => "ReportController",
-                //'pies' => $pies,
-                "form" => $form,
-                "pieSelected" => $pieSelected,
-                "chart" => $chart,
-            ])
-        );
-    }
+		$chart->setOptions([
+			'maintainAspectRatio' => false,
+			'responsive' => true,
+			'plugins' => [
+				'title' => [
+					'display' => true,
+					'text' => 'Yield',
+					'font' => [
+						'size' => 24,
+					],
+				],
+				'legend' => [
+					'position' => 'top',
+				],
+			],
+		]);
+
+		return $this->render(
+			'report/yield/pie.html.twig',
+			array_merge($result, [
+				'controller_name' => 'ReportController',
+				//'pies' => $pies,
+				'form' => $form,
+				'sort' => $sort,
+				'sortDirection' => $sortDirection,
+				'pieSelected' => $pieSelected,
+				'chart' => $chart,
+			])
+		);
+	}
 }

@@ -1,8 +1,9 @@
-{{ form_start(form, { 'attr': {'autocomplete': 'off', 'data-controller' : 'file-upload ckeditor'} }) }}
+{{ form_start(form, { 'attr': {'autocomplete': 'off', 'data-controller' : 'file-upload ckeditor', 'data-turbo-frame': '_top'} }) }}
     {{ form_row(form.ticker) }}
     {{ form_row(form.title) }}
     {{ form_row(form.info) }}
-    {{ form_row(form.attachments) }}
+
+    {{ form_row(form.attachments, attr: { class: 'abc'}) }}
 
 
     <hr/>
@@ -17,7 +18,7 @@
                         {{ attachment.attachmentName }}
                     </a>
                 </div>
-                <button type="button" class="btn btn-danger" {{ stimulus_controller('delete-attachment')}}
+                <button class="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 focus:outline-none"  type="button" {{ stimulus_controller('delete-attachment')}}
                 data-delete-attachment-link-value="{{ path('research_delete_attachment', {id: attachment.id})}}"
                 data-delete-attachment-token-value="{{ csrf_token('delete' ~ attachment.id )}}"
                 data-action="click->delete-attachment#delete"
@@ -30,6 +31,6 @@
     {% endif %}
 
     <br/>
-    <button type="submit" class="btn btn-primary"><i class="far fa-save"></i></button>
+    <twig:Button type="submit"><i class="far fa-save"></i></twig:Button>
     {{ form_widget(form._token) }}
 </form>

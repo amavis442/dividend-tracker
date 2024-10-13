@@ -1,77 +1,8 @@
-<div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-w-full tw-mb-2">
-    {{ form_start(form) }}
-    {{ form_errors(form) }}
-    <!-- Header -->
-    <div class="tw-p-4 tw-border-b tw-bg-blue-500 tw-text-white tw-rounded-t-lg tw-flex tw-justify-between tw-items-center">
-        <p class="tw-font-sans tw-text-xl tw-font-semibold tw-leading-snug tw-tracking-normal tw-text-inherit tw-antialiased">{{ 'Position' | trans }}: {{ position.ticker.fullname }}</p>
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <div class="mt-2">
+        <twig:Button type="submit">
+            <i class="far fa-save"></i>
+        </twig:Button>
     </div>
-    <!-- End Header -->
-
-    <!-- Body -->
-
-    <div class="tw-p-4 tw-flex-col">
-        <div class='tw-p-2 tw-mb-2 tw-w-full'>
-            <label for='{{ form.pies.vars.id }}' class="tw-block tw-text-gray-700 tw-text-sm tw-font-semibold tw-mb-2"> {{ form.pies.vars.label|trans }}</label>
-            {% if form.pies.vars.errors.count %}
-            <div class="form-error">{{ form_errors(form.pies)}}<div>
-            {% endif %}
-            {{ form_widget(form.pies, {'attr': {'class': 'tw-w-full tw-border tw-rounded-lg tw-p-1 focus:tw-outline-none focus:tw-ring-indigo-500 focus:tw-border-indigo-500'}}) }}
-            {% if form.pies.vars.help %}
-            <small id="{{ form.pies.vars.id }}_help" class="tw-text-gray-600 tw-text-xs tw-mt-1">{{ form.pies.vars.help|trans }}</small>
-            {% endif %}
-        </div>
-
-        <div class='tw-p-2 tw-mb-2 tw-w-full tw-border-yellow-400'>
-            <label for='{{ form.maxAllocation.vars.id }}' class="tw-block tw-text-gray-700 tw-text-sm tw-font-semibold tw-mb-2"> {{ form.maxAllocation.vars.label|trans }}</label>
-            {% if form.maxAllocation.vars.errors.count %}
-            <div class="form-error">{{ form_errors(form.maxAllocation)}}<div>
-            {% endif %}
-            {{ form_widget(form.maxAllocation, {'attr': {'class': 'tw-shadow-sm tw-rounded-md tw-w-full tw-px-3 tw-py-2 tw-border tw-border-gray-300 focus:tw-outline-none focus:tw-ring-indigo-500 focus:tw-border-indigo-500'}}) }}
-
-            {% if form.maxAllocation.vars.help %}
-            <small id="{{ form.maxAllocation.vars.id }}_help" class="tw-text-gray-600 tw-text-xs tw-mt-1">{{ form.maxAllocation.vars.help|trans }}</small>
-            {% endif %}
-        </div>
-
-        <div class='tw-p-2 tw-mb-2 tw-w-full tw-border-yellow-400'>
-            <label for='{{ form.dividendTreshold.vars.id }}' class="tw-block tw-text-gray-700 tw-text-sm tw-font-semibold tw-mb-2"> {{ form.dividendTreshold.vars.label|trans }}</label>
-            {% if form.dividendTreshold.vars.errors.count %}
-            <div class="form-error">{{ form_errors(form.dividendTreshold)}}<div>
-            {% endif %}
-            {{ form_widget(form.dividendTreshold, {'attr': {'class': 'tw-shadow-sm tw-rounded-md tw-w-full tw-px-3 tw-py-2 tw-border tw-border-gray-300 focus:tw-outline-none focus:tw-ring-indigo-500 focus:tw-border-indigo-500'}}) }}
-
-            {% if form.dividendTreshold.vars.help %}
-            <small id="{{ form.dividendTreshold.vars.id }}_help" class="tw-text-gray-600 tw-text-xs tw-mt-1">{{ form.dividendTreshold.vars.help|trans }}</small>
-            {% endif %}
-        </div>
-
-        <div class='tw-p-2 tw-mb-2 tw-w-full'>
-            {% if form.ignore_for_dividend.vars.errors.count %}
-            <div class="form-error">{{ form_errors(form.ignore_for_dividend)}}<div>
-            {% endif %}
-            {{ form_widget(form.ignore_for_dividend, {'attr': {'class': 'tw-h-4 tw-w-4 tw-bg-indigo-500 focus:tw-ring-indigo-400 tw-border-gray-300 tw-rounded"'}}) }}
-            <label for='{{ form.ignore_for_dividend.vars.id }}' class="tw-ml-2 tw-text-gray-700 tw-text-sm tw-font-semibold tw-mb-2"> {{ form.ignore_for_dividend.vars.label|trans }}</label>
-            {% if form.ignore_for_dividend.vars.help %}
-            <small id="{{ form.ignore_for_dividend.vars.id }}_help" class="tw-text-gray-600 tw-text-xs tw-mt-1">{{ form.ignore_for_dividend.vars.help|trans }}</small>
-            {% endif %}
-        </div>
-    </div>
-    <!-- End Body -->
-
-    <!-- Footer -->
-    <div class="tw-p-4 tw-border-t tw-flex">
-        <div class="tw-w-1/2">
-            <button type='submit' class='tw-bg-blue-500 tw-text-white tw-px-4 tw-py-2 tw-rounded-md hover:tw-bg-blue-600 tw-transition tw-duration-300'>
-                <i class='far fa-save'></i>
-            </button>
-        </div>
-        <div class="tw-w-1/2 tw-flex tw-mb-2 tw-justify-end">
-            {% if is_edit|default(false) %}
-                {{ include('position/_delete_form.html.twig') }}
-            {% endif %}
-        </div>
-    </div>
-    <!-- End Footer -->
-    {{ form_end(form) }}
-</div>
-
+{{ form_end(form) }}

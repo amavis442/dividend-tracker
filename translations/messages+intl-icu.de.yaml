@@ -1,0 +1,177 @@
+'Expected dividend': '__Expected dividend'
+Principle: __Principle
+'tickerSymbol:: Exchange rate for [Symbol] is currently unavailable. Available are: jsonSymbol': '__tickerSymbol:: Exchange rate for [Symbol] is currently unavailable. Available are: jsonSymbol'
+'Search ticker': '__Search ticker'
+Ticker: __Ticker
+Fullname: __Fullname
+Industry: __Industry
+Research: __Research
+'Dividend currency': '__Dividend currency'
+'Dividend months': '__Dividend months'
+actions: __actions
+'Edit Ticker': '__Edit Ticker'
+'back to list': '__back to list'
+'Company details': '__Company details'
+Created: __Created
+Modified: __Modified
+'Research info': '__Research info'
+Currency: __Currency
+Symbol: __Symbol
+Description: __Description
+Sign: __Sign
+Actions: __Actions
+show: __show
+edit: __edit
+'Edit Currency': '__Edit Currency'
+'New Currency': '__New Currency'
+'Create new Currency': '__Create new Currency'
+Quator: __Quator
+'Dividend growth rate': '__Dividend growth rate'
+'Share price': '__Share price'
+'Number of Shares': '__Number of Shares'
+Dividend: __Dividend
+'Net dividend': '__Net dividend'
+'New shares': '__New shares'
+'Dividend from new shares': '__Dividend from new shares'
+'Received dividends': '__Received dividends'
+'Extra per month': '__Extra per month'
+'Dividend yield': '__Dividend yield'
+'show branch %branch%': '__show branch %branch%'
+'Edit branch': '__Edit branch'
+'Are you sure you want to delete this item?': '__Are you sure you want to delete this item?'
+'Remove this item?': '__Remove this item?'
+'Yes, remove it': '__Yes, remove it'
+Cancel: __Cancel
+'Delete this item?': '__Delete this item?'
+'Edit Position': '__Edit Position'
+Position: __Position
+Transactions: __Transactions
+Fees: __Fees
+positions: __positions
+Company: __Company
+Amount: __Amount
+'Projected dividend / Actual payout': '__Projected dividend / Actual payout'
+'Exdiv / Pay date': '__Exdiv / Pay date'
+'Allocation information': '__Allocation information'
+'Dividend Yield': '__Dividend Yield'
+'Yield on cost dividend': '__Yield on cost dividend'
+'Total dividend in a year / total allocated': '__Total dividend in a year / total allocated'
+avgPrice: __avgPrice
+'Last dividend': '__Last dividend'
+'Last payout date': '__Last payout date'
+'Net forward yearly dividend per share': '__Net forward yearly dividend per share'
+'Payouts per year': '__Payouts per year'
+'Net forward dividend per payout': '__Net forward dividend per payout'
+'Net forward yearly dividend total': '__Net forward yearly dividend total'
+Allocation: __Allocation
+Yield: __Yield
+Exchangerate: __Exchangerate
+Tax: __Tax
+'Per month': '__Per month'
+'Yearly forward dividend': '__Yearly forward dividend'
+Admin: __Admin
+'Research on Tickers': '__Research on Tickers'
+Pies: __Pies
+'Import csv': '__Import csv'
+Journal: __Journal
+Account: __Account
+Taxonomy: __Taxonomy
+Taxtarifs: __Taxtarifs
+Portfolio: __Portfolio
+Payments: __Payments
+Calendar: __Calendar
+'Calendar per date printout': '__Calendar per date printout'
+Reports: __Reports
+'Dividend Tracker': '__Dividend Tracker'
+'Sector allocation': '__Sector allocation'
+'Position allocation': '__Position allocation'
+'Dividend month Tickers': '__Dividend month Tickers'
+'Dividend payout': '__Dividend payout'
+'Compound calc': '__Compound calc'
+'Export transactions': '__Export transactions'
+'Export dividend': '__Export dividend'
+Logout: __Logout
+Login: __Login
+Holdings: __Holdings
+'Total invested': '__Total invested'
+'Total dividend': '__Total dividend'
+Goal: __Goal
+'Avg. price': '__Avg. price'
+'Received dividend': '__Received dividend'
+'Dividend per position': '__Dividend per position'
+Ex-Div: __Ex-Div
+Payout: __Payout
+'Forward dividend': '__Forward dividend'
+'Dividend yield based on cost basis': '__Dividend yield based on cost basis'
+shares: __shares
+'Total recieved dividends for this ticker': '__Total recieved dividends for this ticker'
+'Pay date': '__Pay date'
+'Ex-dividend date': '__Ex-dividend date'
+Total: __Total
+Type: __Type
+'Buy or Sell': '__Buy or Sell'
+Side: __Side
+'Order date': '__Order date'
+Price: __Price
+'Total costs': '__Total costs'
+'Net order value': '__Net order value'
+'Profit / Loss': '__Profit / Loss'
+Pie: __Pie
+'Original price': '__Original price'
+Stamduty: __Stamduty
+'fx fee': '__fx fee'
+'Exchange rate': '__Exchange rate'
+'Import file': '__Import file'
+'Edit order': '__Edit order'
+'Order info': '__Order info'
+Instrument: __Instrument
+'Edit ticker / months': '__Edit ticker / months'
+'Dividend payment months': '__Dividend payment months'
+'Total dividend received': '__Total dividend received'
+'Dividend frequency': '__Dividend frequency'
+'Yearly forward dividend payout': '__Yearly forward dividend payout'
+'Single time forward dividend payout': '__Single time forward dividend payout'
+'Next dividend (Ex-div / payout)': '__Next dividend (Ex-div / payout)'
+'Expected next payout': '__Expected next payout'
+'Weighted average price': '__Weighted average price'
+'Payment date': '__Payment date'
+'Record date': '__Record date'
+'Cash amount': '__Cash amount'
+Source: __Source
+Descr.: __Descr.
+'Calendar items': '__Calendar items'
+'Exclude from dividend yield calc': '__Exclude from dividend yield calc'
+Summary: __Summary
+'Edit position': '__Edit position'
+Info: __Info
+Orders: __Orders
+'Dividend growth': '__Dividend growth'
+Frequency: __Frequency
+'x per year': '__x per year'
+Dates: __Dates
+'Not available': '__Not available'
+'Dividend treshold': '__Dividend treshold'
+'Maximum allocation': '__Maximum allocation'
+'no records found': '__no records found'
+Units: __Units
+Payment: __Payment
+'Please sign in': '__Please sign in'
+'You are logged in as': '__You are logged in as'
+Password: __Password
+'Remember me': '__Remember me'
+'Sign in': '__Sign in'
+TaxRate: __TaxRate
+'Valid from': '__Valid from'
+Delete: __Delete
+'Edit Tax': '__Edit Tax'
+'New Tax': '__New Tax'
+'Create new Tax': '__Create new Tax'
+'Current date': '__Current date'
+'Tax rate': '__Tax rate'
+back: __back
+'Create new': '__Create new'
+'Edit Journal': '__Edit Journal'
+New: __New
+'Create new Journal': '__Create new Journal'
+Title: __Title
+Content: __Content

@@ -7,7 +7,7 @@
                 "autoimport": {
                     "tom-select/dist/css/tom-select.default.css": false,
                     "tom-select/dist/css/tom-select.bootstrap4.css": false,
-                    "tom-select/dist/css/tom-select.bootstrap5.css": true
+                    "tom-select/dist/css/tom-select.bootstrap5.css": false
                 }
             }
         },
@@ -15,6 +15,15 @@
             "chart": {
                 "enabled": true,
                 "fetch": "eager"
+            }
+        },
+        "@symfony/ux-dropzone": {
+            "dropzone": {
+                "enabled": true,
+                "fetch": "eager",
+                "autoimport": {
+                    "@symfony/ux-dropzone/dist/style.min.css": true
+                }
             }
         },
         "@symfony/ux-turbo": {

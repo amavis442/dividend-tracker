@@ -1,36 +1,28 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}
-{{ 'Edit Position'|trans }}{% endblock %}
-
+{% block title %}{{ 'Edit Position'|trans }}{% endblock %}
 {% set is_edit = true %}
 {% block body %}
-    <div class="tw-flex tw-flex-col tw-w-full tw-items-center tw-justify-center">
-
-        <div class="xl:tw-w-3/8 lg:tw-w-1/2 md:tw-w-2/3 tw-flex tw-flex-col">
-
-            <div class="tw-mb-2 tw-text-left">
-                <h1 class="tw-block tw-font-sans tw-text-5xl tw-font-semibold tw-leading-tight tw-tracking-normal tw-text-inherit tw-antialiased">
-                    {{ 'Edit Position'|trans }}
-                </h1>
-            </div>
-
-            {{ include('position/_form.html.twig', {'button_label': 'Update'}) }}
-
-            <div class="tw-w-full tw-bg-slate-400 tw-rounded-lg tw-px-4 tw-py-3 sm:tw-px-6 sm:tw-flex sm:tw-flex-row-reverse">
-                <div data-controller="popper" class="sm:tw-flex">
-                <a href="{{ path('portfolio_show',  {'id': position.id}) }}"
-                  data-popper-target="element" data-action="mouseenter->popper#show mouseleave->popper#hide"
-                  class="tw-w-full tw-justify-center tw-rounded-md tw-border
-                        tw-border-transparent tw-shadow-sm tw-px-4 tw-py-2 tw-bg-blue-500 tw-font-medium tw-text-white
-                        hover:tw-bg-blue-700 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-offset-2 focus:tw-ring-blue-500
-                        sm:tw-ml-3 sm:tw-w-auto sm:tw-text-sm" >
-                    <i class="fa-solid fa-angles-left"></i>
-                    <div id="tooltip" role="tooltip" data-popper-target="tooltip">
-                        {{ 'back to list'|trans }}
-                        <div id="arrow" data-popper-target="tooltipArrow"></div>
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <div class="w-1/2 mx-auto border rounded-lg shadow-white bg-white px-3 py-2 ">
+                    <div class="px-3 py-2 w-full mb-4">
+                        <twig:Head>
+                            {{ 'Edit Position'|trans }}
+                        </twig:Head>
                     </div>
-                </a>
+                    {{ include('position/_form.html.twig', {'button_label': 'Update'}) }}
+                    <br />
+                    <div class="w-full pr-3 py-2 mt-2">
+                        <div class="inline-flex rounded-md shadow-sm" role="group">
+                            <a href="{{ path("position_index") }}"
+                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                <i class="fas fa-angle-double-left"></i>
+                                {{ 'back to list'|trans }}
+                            </a>
+                            {{ include("position/_delete_form.html.twig") }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

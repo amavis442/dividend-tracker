@@ -1,49 +1,53 @@
 
-<section class="tw-flex tw-flex-col tw-items-center tw-gap-4 tw-mb-6 tw-bg-gray-200 tw-shadow-md tw-rounded-lg tw-p-6">
-		<div class="tw-flex tw-gap-4">
+<section class="flex flex-col items-center gap-4 mb-6 bg-gray-200 shadow-md rounded-lg p-6">
+		<div class="flex gap-4">
 			<!-- Card Active positions -->
-			<div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-6 tw-flex tw-flex-col tw-items-center">
-				<h2 class="tw-text-gray-500 tw-font-medium tw-text-sm">{{ 'Holdings'|trans }}</h2>
-				<p class="tw-text-2xl tw-font-bold">{{ portfolio.numActivePosition }}</p>
+			<div class="bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
+				<h2 class="text-gray-500 font-medium text-sm">{{ 'Holdings'|trans }}</h2>
+				<p class="text-2xl font-bold">{{ portfolio.numActivePosition }}</p>
 			</div>
 
 			<!-- Card Total invested -->
-			<div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-6 tw-flex tw-flex-col tw-items-center">
-				<h2 class="tw-text-gray-500 tw-font-medium tw-text-sm">{{ 'Total invested'|trans }}</h2>
-				<p class="tw-text-2xl tw-font-bold">&euro;{{ portfolio.invested|format_number({fraction_digit: 2}) }}</p>
+			<div class="bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
+				<h2 class="text-gray-500 font-medium text-sm">{{ 'Total invested'|trans }}</h2>
+				<p class="text-2xl font-bold">&euro;{{ portfolio.invested|format_number({fraction_digit: 2}) }}</p>
 			</div>
 
 			<!-- Card Total Received Dividends -->
-			<div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-6 tw-flex tw-flex-col tw-items-center">
-				<h2 class="tw-text-gray-500 tw-font-medium tw-text-sm">{{ 'Total dividend'|trans }}</h2>
-				<p class="tw-text-2xl tw-font-bold">&euro;{{ portfolio.totalDividend|format_number({fraction_digit: 2}) }}</p>
+			<div class="bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
+				<h2 class="text-gray-500 font-medium text-sm">{{ 'Total dividend'|trans }}</h2>
+				<p class="text-2xl font-bold">&euro;{{ portfolio.totalDividend|format_number({fraction_digit: 2}) }}</p>
 			</div>
 
 
-			<turbo-frame id="goal-form" class="tw-flex tw-gap-4">
+			<turbo-frame id="goal-form" class="flex gap-4">
 			<!-- Card Goal -->
-			<div class="tw-bg-white tw-shadow-md tw-rounded-lg tw-p-6 tw-flex tw-flex-col tw-items-center">
-				<h2 class="tw-text-gray-500 tw-font-medium tw-text-sm">{{ 'Goal'|trans }}</h2>
+			<div class="bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
+				<h2 class="text-gray-500 font-medium text-sm">{{ 'Goal'|trans }}</h2>
 
-				<p class="tw-text-2xl tw-font-bold tw-mb-2">
+				<p class="text-2xl font-bold mb-2">
 					<span>
 						&euro;{{ portfolio.goal|format_number({fraction_digit: 2}) }}
 						<a
 							href="{{ path('portfolio_update_goal') }}"
-							class="btn btn-sm btn-secondary"
+							class="focus:outline-none text-white bg-green-700
+            hover:bg-green-800 focus:ring-4
+            focus:ring-green-300 font-medium rounded-lg
+            text-sm px-1 py-1 mb-2 dark:bg-green-600
+            dark:hover:bg-green-700 dark:focus:ring-green-800"
 							data-turbo-frame="_self"
 						>Edit</a>
 					</span>
 				</p>
 
-				<div class="tw-overflow-hidden tw-bg-blue-50 tw-h-1.5 tw-rounded-full tw-w-full">
+				<div class="overflow-hidden bg-blue-50 h-1.5 rounded-full w-full">
 						<span
-							class="tw-h-full tw-bg-blue-500 tw-block tw-rounded-full"
+							class="h-full bg-blue-500 block rounded-full"
 							style="width: {{ portfolio.goalpercentage|format_number({fraction_digit: 0}) }}%"
 						></span>
 					</div>
 
-					<span class="tw-text-sm tw-text-slate-500 tw-m-2">{{ portfolio.goalpercentage|format_number({fraction_digit: 2}) }}%</span>
+					<span class="text-sm text-slate-500 m-2">{{ portfolio.goalpercentage|format_number({fraction_digit: 2}) }}%</span>
 
 			</div>
 

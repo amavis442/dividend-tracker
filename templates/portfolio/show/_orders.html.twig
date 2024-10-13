@@ -1,41 +1,43 @@
-<div class="row">
-	<div class="d-flex justify-content-end">
-		<div class="btn-group mr-2" role="group" aria-label="First group">
-			<a class="btn btn-success" href="{{ path('transaction_new', {'ticker': ticker.id, 'position': position.id, }) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Buy or Sell'|trans }}">
-				<i class="fas fa-plus"></i>
-			</a>
-	</div>
-	</div>
+<turbo-frame id="portfolio_tab_results">
+
+<div class="flex justify-end mb-4">
+		<twig:Button tag="a" href="{{ path('transaction_new', {'ticker': position.ticker.id, 'position': position.id, }) }}">
+			<i class="fas fa-plus"></i>
+		</twig:Button>
 </div>
 
-<div class="h2 alert alert-secondary mt-2 mb-2 d-flex justify-content-end" role="alert">
-	{{ allocationSign|raw }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}
+<div class="flex mb-4">
+	<twig:Alert variant="secondary" class="text-right">
+		<strong class="font-sans text-4xl">{{ position.allocationCurrency.Sign|raw }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}</strong>
+	</twig:Alert>
 </div>
 
-<div class="table-responsive-xl">
-	<table class="table table-striped table-hover border rounded">
+<div class="flex flex-col">
+
+	<twig:Table:Table>
 		<thead>
-			<tr>
-				<th scope="col">ID</th>
-				<th scope="col">{{ 'Side'|trans }}</th>
-				<th scope="col">{{ 'Order date'|trans }}</th>
-				<th scope="col">{{ 'Amount'|trans }}</th>
-				<th scope="col">{{ 'Price'|trans }}</th>
-				<th scope="col">{{ 'avgPrice'|trans }}</th>
-				<th scope="col">{{ 'Allocation'|trans }}</th>
-				<th scope="col">{{ 'Total costs'|trans }}</th>
-				<th scope="col">{{ 'Net order value'|trans }}</th>
-				<th scope="col">{{ 'Profit / Loss'|trans }}</th>
-				<th scope="col">{{ 'Dividend yield'|trans }}</th>
-				<th scope="col">{{ 'Actions'|trans }}</th>
-			</tr>
+			<twig:Table:Tr>
+				<twig:Table:ThCol>ID</twig:Table:ThCol>
+				<twig:Table:ThCol>{{ 'Side'|trans }}</twig:Table:ThCol>
+				<twig:Table:ThCol>{{ 'Order date'|trans }}</twig:Table:ThCol>
+				<twig:Table:ThCol>{{ 'Amount'|trans }}</twig:Table:ThCol>
+				<twig:Table:ThCol>{{ 'Price'|trans }}</twig:Table:ThCol>
+				<twig:Table:ThCol>{{ 'avgPrice'|trans }}</twig:Table:ThCol>
+				<twig:Table:ThCol>{{ 'Allocation'|trans }}</twig:Table:ThCol>
+				<twig:Table:ThCol>{{ 'Total costs'|trans }}</twig:Table:ThCol>
+				<twig:Table:ThCol>{{ 'Net order value'|trans }}</twig:Table:ThCol>
+				<twig:Table:ThCol>{{ 'Profit / Loss'|trans }}</twig:Table:ThCol>
+				<twig:Table:ThCol>{{ 'Dividend yield'|trans }}</twig:Table:ThCol>
+				<twig:Table:ThCol>{{ 'Actions'|trans }}</twig:Table:ThCol>
+			</twig:Table:Tr>
 		</thead>
-		<tbody class="table-group-divider">
-			{% if position and position.transactions %}
+
+		<tbody>
+			{% if pager.count %}
 				{% set totalAmount = position.amount %}
 				{% set currentAmount = totalAmount %}
 				{% set oldAmount = totalAmount %}
-				{% for transaction in position.transactions %}
+				{% for transaction in pager %}
 					{% set side = (transaction.side == 1 ? 'Buy' : 'Sell') %}
 					{% set currentAmount = oldAmount %}
 					{% if transaction.side == 1 %}
@@ -45,64 +47,90 @@
 						{% set oldAmount = oldAmount + transaction.amount %}
 						{% set dividendYield = 0 %}
 					{% endif %}
-					<tr>
-						<td>{{ transaction.jobid ?: '' }}</td>
-						<td>
-							<span class="badge text-bg-{% if transaction.side == 1 %}success{% else %}danger{% endif %}">
-								{{ side }}
-							</span>
-						</td>
-						<td>{{ transaction.transactionDate|date("d-m-Y") }}</td>
-						<td>{{ transaction.amount|format_number({fraction_digit: 7}) }}</td>
-						<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ transaction.price|format_number({fraction_digit: 2}) }}</td>
-						<td>{{ currentAmount }}<br/>
+					<twig:Table:Tr>
+						<twig:Table:Td>
+							{% set transactionInfo %}
+							<twig:ListGroup>
+								<twig:ListGroupItem first="1">{{ 'Pie'|trans }}:
+									{{ transaction.pie ? transaction.pie.label : '-' }}</twig:ListGroupItem>
+								<twig:ListGroupItem>{{ 'Original price'|trans }}: &euro;{{ transaction.originalPrice }}</twig:ListGroupItem>
+								<twig:ListGroupItem>{{ 'Stamduty'|trans }}: &euro;{{ transaction.stampduty }}</twig:ListGroupItem>
+								<twig:ListGroupItem>{{ 'fx fee'|trans }}: &euro;{{ transaction.fxFee }}</twig:ListGroupItem>
+								<twig:ListGroupItem>{{ 'Exchange rate'|trans }}:
+									{{ transaction.exchangeRate }}</twig:ListGroupItem>
+								<twig:ListGroupItem last="1">{{ 'Import file'|trans }}:
+									{{ transaction.importfile }}</twig:ListGroupItem>
+							</twig:ListGroup>
+							{% endset %}
+							<div class="flex">
+								<span class="me-2">{{ transaction.jobid ?: '' }}</span>
+								<div class="inline-block" {{ stimulus_controller('tooltip') }} data-tooltip-placement-value="left">
+									<i class="fas fa-info-circle" data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"></i>
+									<div class="card" role="tooltip" data-tooltip-target="tooltip">
+										<h5 class="bg-gray-300 p-2 rounded-t-lg mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+												{{ 'Order info'|trans }}
+										</h5>
+										<div class='pl-5 pr-5 pb-5'>
+											<div class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+												{{ transactionInfo }}
+											</div>
+										</div>
+										<div class="arrow-card" data-tooltip-target="tooltipArrow"></div>
+									</div>
+								</div>
+							</div>
+						</twig:Table:Td>
+						<twig:Table:Td>
+							<div class="flex">
+								<twig:Badge variant="{{ transaction.side == 1 ? "success" : "danger" }}">
+									{{ side|trans }}
+								</twig:Badge>
+							</div>
+						</twig:Table:Td>
+						<twig:Table:Td>{{ transaction.transactionDate|date("d-m-Y") }}</twig:Table:Td>
+						<twig:Table:Td>{{ transaction.amount|format_number({fraction_digit: 7}) }}</twig:Table:Td>
+						<twig:Table:Td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ transaction.price|format_number({fraction_digit: 2}) }}</twig:Table:Td>
+						<twig:Table:Td>{{ currentAmount }}<br/>
 							@
-							{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ transaction.avgprice|format_number({fraction_digit: 2}) }}</td>
-						<td>{{ (transaction.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ transaction.allocation|format_number({fraction_digit: 2}) }}</td>
-						<td>&euro;{{ (transaction.stampduty + transaction.fxFee + transaction.finraFee + transaction.transactionFee)|format_number({fraction_digit: 2}) }}</td>
-						<td>&euro;{{ transaction.netOrderValue|format_number({fraction_digit: 2}) }}</td>
-						<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}
-							<span class="badge text-bg-{% if transaction.profit > 0 %}success{% else %}danger{% endif %}">
-								{{ transaction.profit|format_number({fraction_digit: 2}) }}
-							</span>
-						</td>
-						<td>
+							{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ transaction.avgprice|format_number({fraction_digit: 2}) }}</twig:Table:Td>
+						<twig:Table:Td>{{ (transaction.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ transaction.allocation|format_number({fraction_digit: 2}) }}</twig:Table:Td>
+						<twig:Table:Td>&euro;{{ (transaction.stampduty + transaction.fxFee + transaction.finraFee + transaction.transactionFee)|format_number({fraction_digit: 2}) }}</twig:Table:Td>
+						<twig:Table:Td>&euro;{{ transaction.netOrderValue|format_number({fraction_digit: 2}) }}</twig:Table:Td>
+						<twig:Table:Td>
+							<div class="flex">
+								<twig:Badge variant="{{ transaction.profit > 0 ? "success" : "danger" }}">
+									{{ (transaction.currency ? transaction.currency.sign : '$')|raw }} {{ transaction.profit|format_number({fraction_digit: 2}) }}
+								</twig:Badge>
+							</div>
+						</twig:Table:Td>
+						<twig:Table:Td>
 							{% if transaction.side == 1 %}
 								{{ dividendYield|format_number({fraction_digit: 2}) }}%
 							{% endif %}
-						</td>
-						<td>
-							{% set transactionInfo %}
-							<ul class="list-group">
-								<li class="list-group-item">{{ 'Pie'|trans }}:
-									{{ transaction.pie ? transaction.pie.label : '-' }}</li>
-								<li class="list-group-item">{{ 'Original price'|trans }}: &euro;{{ transaction.originalPrice }}</li>
-								<li class="list-group-item">{{ 'Stamduty'|trans }}: &euro;{{ transaction.stampduty }}</li>
-								<li class="list-group-item">{{ 'fx fee'|trans }}: &euro;{{ transaction.fxFee }}</li>
-								<li class="list-group-item">{{ 'Exchange rate'|trans }}:
-									{{ transaction.exchangeRate }}</li>
-								<li class="list-group-item">{{ 'Import file'|trans }}:
-									{{ transaction.importfile }}</li>
-							</ul>
-							{% endset %}
-
-							<div class="btn-group" role="group" aria-label="Actions">
-								<a href="{{ path('transaction_edit', {'id': transaction.id}) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="{{ 'Edit order'|trans }}">
+						</twig:Table:Td>
+						<twig:Table:Td>
+							<div class="flex" data-controller="tooltip">
+								<twig:Button tag="a" href="{{ path('transaction_edit', {'id': transaction.id}) }}" data-turbo-frame="_top" data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">
 									<i class="far fa-edit"></i>
-								</a>
-								<button class="btn btn-info" data-bs-toggle="popover" data-placement="right" title="{{ 'Order info'|trans }}" data-bs-content='{{ transactionInfo }}' data-bs-html="true">
-									<i class="fas fa-info-circle"></i>
-								</button>
+									<div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+										{{ 'Edit transaction'|trans }}
+										<div class="arrow" data-tooltip-target="tooltipArrow"></div>
+									</div>
+								</twig:Button>
 							</div>
-						</td>
-					</tr>
+						</twig:Table:Td>
+					</twig:Table:Tr>
 				{% endfor %}
-
 			{% else %}
-				<tr>
-					<td colspan="7">no records found</td>
-				</tr>
+				<twig:Table:Tr>
+					<twig:Table:Td colspan="7">no records found</twig:Table:Td>
+				</twig:Table:Tr>
 			{% endif %}
 		</tbody>
-	</table>
+	</twig:Table:Table>
+	<div class="mt-2">
+    	{{ pagerfanta(pager) }}
+    </div>
 </div>
+
+</turbo-frame>

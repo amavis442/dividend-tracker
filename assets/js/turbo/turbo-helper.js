@@ -1,9 +1,9 @@
-import { Modal } from 'bootstrap';
+//import { Modal } from 'bootstrap';
 
 const TurboHelper = class {
     constructor() {
         document.addEventListener('turbo:before-cache', () => {
-            this.closeModal();
+            //this.closeModal();
             this.closeSweetalert();
         });
 
@@ -14,6 +14,7 @@ const TurboHelper = class {
         */
     }
 
+    /*
     closeModal() {
         if (document.body.classList.contains('modal-open')) {
             const modalEl = document.querySelector('.modal');
@@ -24,6 +25,8 @@ const TurboHelper = class {
             modal.dispose();
         }
     }
+    */
+
     closeSweetalert() {
         // internal way to see if sweetalert2 has been imported yet
         import('sweetalert2').then((Swal) => {

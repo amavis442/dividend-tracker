@@ -101,25 +101,24 @@ class PortfolioModel
         DividendServiceInterface $dividendService,
         float $totalInvested = 0.0,
         int $page = 1,
-        string $orderBy = 'symbol',
-        string $sort = 'asc',
+        string $sort = 'symbol',
+        string $orderBy = 'asc',
         ?Ticker $ticker = null,
         ?Pie $pie = null
     ): Pagerfanta {
-        $order = 't.symbol';
-        if ($orderBy == 'industry') {
-            $order = 'i.label';
-        }
-        if (in_array($orderBy, ['symbol', 'fullname'])) {
-            $order = 't.' . $orderBy;
-        }
-        if (!in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])) {
-            $sort = 'asc';
-        }
+
+        $sort = match($sort) {
+            'industry' => 'i.label',
+            'symbol' => 't.symbol',
+            'fullname' => 't.fullname',
+            default => 't.symbol'
+        };
+
+        $orderBy = in_array($orderBy, ['asc', 'desc', 'ASC', 'DESC']) ? $orderBy: 'asc';
 
         $queryBuilder = $positionRepository->getAllQuery(
-            $order,
             $sort,
+            $orderBy,
             $ticker,
             PositionRepository::OPEN,
             $pie

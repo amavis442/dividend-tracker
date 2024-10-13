@@ -1,23 +1,23 @@
-<div class="col-sm-3">
-	<div class="card">
-		<div class="card-header">
-			{{ m.dividendMonth|monthToName|trans }}
-			<small>({{ m.tickers|length }}
-				{{ 'positions'|trans }})</small>
-		</div>
-		<div class="card-body">
-			<ul class="list-group">
-				{% for t in m.tickers %}
-					<li class="list-group-item d-flex justify-content-between align-items-center">
-						<strong>{{ t.symbol }}:</strong>
-						<div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-							<a class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': t.id}) }}" data-toggle="tooltip" data-placement="top" title="add dividend date">
-								<i class="far fa-calendar-alt"></i>
-							</a>
-						</div>
-					</li>
-				{% endfor %}
-			</ul>
-		</div>
-	</div>
-</div>
+<twig:Card title="{{ m.dividendMonth|monthToName|trans }}"
+           title_header_variant="h2"
+           subtitle="({{ m.tickers|length }} {{ 'positions'|trans }})"
+           title_center="true">
+    <twig:ListGroup>
+        {% for t in m.tickers %}
+            <twig:ListGroupItem>
+                <div class="rounded flex flex-col items-center">
+                    <div class="p-2 mb-2">
+                        <strong>{{ t.symbol }}:</strong>
+                    </div>
+                    <div class="mb-4">
+                        <twig:Button tag="a"
+                                     variant="secondary"
+                                     href="{{ path('calendar_new', {'ticker': t.id}) }}">
+                            <i class="far fa-calendar-alt"></i>
+                        </twig:Button>
+                    </div>
+                </div>
+            </twig:ListGroupItem>
+        {% endfor %}
+    </twig:ListGroup>
+</twig:Card>
