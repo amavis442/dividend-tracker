@@ -1,0 +1,360 @@
+Jan: Januari
+January: Januari
+Feb: Februari
+February: Februari
+Ma: Maart
+Mar: Maart
+March: Maart
+Apr: April
+April: April
+May: Mei
+Jun: Juni
+June: Juni
+Jul: Juli
+July: Juli
+Aug: Augustus
+August: Augustus
+Sep: September
+Sept: September
+September: September
+Oct: Oktober
+October: Oktober
+Nov: November
+November: November
+Dec: December
+December: December
+Send: Verstuur
+Monday: Maandag
+Tuesday: Dinsdag
+Wednesday: Woensdag
+Thursday: Donderdag
+Friday: Vrijdag
+Saterday: Zaterdag
+Saturday: Zaterdag
+Sunday: Zondag
+'Sign in': Aanmelden
+'Please sign in': 'Meld u zich a.u.b. aan'
+Password: Wachtwoord
+Logout: Afmelden
+Login: Aanmelden
+Allocation: Toewijzing
+Position: Positie
+Amount: Aantal
+'Total dividend received': 'Totaal ontvangen dividend'
+Instrument: Instrument
+'Dividend payment months': 'Dividend uitkeer maanden'
+Industry: Industrie
+'Dividend frequency': 'Dividend frequentie'
+'Yearly forward dividend payout': 'Jaarlijkse verwachte uitkering van dividend'
+'Single time forward dividend payout': 'Eenmalige dividenduitkering'
+'Dividend yield': 'Dividend opbrengst'
+'Next dividend (Ex-div / payout)': 'Volgende dividend (ex-div / uitkering)'
+'Weighted average price': 'Gewogen gemiddelde prijs'
+Pies: Schijven
+'Avg. price': 'Gem. Prijs'
+Dividends: Dividend
+'Div dates': 'Div datum'
+'Forward dividend': 'Verwachte dividend'
+Fullname: 'Volledige naam'
+Holdings: Posities
+'Total invested': 'Totaal geïnvesteerd'
+'Total dividend': 'Totaal ontvangen dividend'
+'Expected next payout': 'Verwachte uitkering'
+Pie: Schijf
+'Profit / Loss': 'Winst / Verlies'
+Actions: Acties
+Buy: Kopen
+Sell: Verkopen
+'Edit position': 'Bewerk positie'
+Research: Onderzoek
+Transactions: Transacties
+Info: Info
+Payout: Uitkering
+Dividend: Dividend
+'Dividend growth': 'Dividend groei'
+Fundamental: Fundamenteel
+Summary: Samenvatting
+'Create new': 'Maak nieuw'
+show: toon
+edit: bewerk
+Journal: Logboek
+Created: Aangemaakt
+Modified: Gewijzigd
+Content: Inhoud
+Title: Titel
+'back to list': 'terug naar lijst'
+New: Nieuw
+'Create new Journal': 'Maak nieuw logboek regel aan'
+Save: Opslaan
+'Edit Journal': 'Bewerk logboek'
+Update: Bijwerken
+'Are you sure you want to delete this item?': 'Weet u zeker dat u dit item wilt verwijderen?'
+Label: Label
+Company: Bedrijf
+'Projected dividend / Actual payout': 'Verwachte dividend / Uitgekeerd'
+'Exdiv / Pay date': 'Ex-div / Uitkeringsdatum'
+'Pay date': Uitkeringsdatum
+'Net dividend': 'Netto dividend'
+'No': Nee
+'With pie': 'Met schijf'
+'Without pie': 'Zonder schijf'
+Submit: Indienen
+Total: Totaal
+'Please choose a Pie': 'Kies een schijf'
+'Current date': 'Huidige datum'
+shares: aandelen
+'Received dividend': 'Ontvangen dividend'
+'Market Price': Marktprijs
+Ex-Div: Ex-Div
+'Dividend payout month': 'Dividend uitkeer maand'
+Principle: Inleg
+'Expected dividend': 'Verwachte dividend'
+'x per year': 'x per jaar'
+Dates: Datum
+Frequency: Frequentie
+'Not available': 'Niet beschikbaar'
+'Edit ticker / months': 'Bewerk ticker / dividend maanden'
+manual: handmatig
+Type: Type
+'Payment date': Uitkeerdatum
+'Ex-dividend date': 'Ex-dividend datum'
+'Cash amount': Uitkeerbedrag
+Source: Bron
+Descr.: Omschr.
+actions: acties
+Regular: Normaal
+Description: Omschrijving
+Side: Kant
+'Transaction date': 'Transactie datum'
+Price: Prijs
+avgPrice: 'Gem. Prijs'
+'Record date': 'Pijl datum'
+'Calendar items': 'Kalender regels'
+'Research info': 'Onderzoek info'
+Currency: Valuta
+Admin: Beheer
+'Research on Tickers': 'Onderzoek naar Bedrijf'
+'Closed positions': 'Gesloten posities'
+'Import csv': 'Csv importeren'
+Account: Account
+Tax: Belasting
+Portfolio: Portfolio
+Payments: Uitkeringen
+Calendar: Kalender
+'Calendar per date': 'Kalender per datum'
+'Calendar per date printout': 'Afdruk kalender per datum'
+Reports: Rapporten
+'Dividend Tracker': 'Dividend Tracker'
+'Sector allocation': 'Sector allocatie'
+'Position allocation': 'Positie allocatie'
+'Dividend month Tickers': 'Overzicht Dividend maandelijks'
+'Dividend projection': 'Dividend projectie'
+'Dividend payout': Uitkering
+'Dividend yield pie': 'Dividend opbrengst per schijf'
+'Compound calc': 'Samengestelde rente rekenmachine'
+Export: Exporteren
+Symbol: Symbool
+Sign: Teken
+'New Currency': 'Nieuwe valuta'
+'Create new Currency': 'Maak een nieuwe valuta aan'
+'Edit Currency': 'Bewerk valuta'
+CountryCode: Landcode
+TaxRate: Belastingtarief
+'Valid from': 'Geldig vanaf'
+'Edit Tax': 'Bewerk belastingtarief'
+'Country code': Landcode
+'Tax rate': Belastingtarief
+'New Tax': 'Nieuw belastingtarief'
+'Create new Tax': 'Maak een nieuwe belastingtarief aan'
+Delete: Verwijder
+Taxtarifs: Belastingtarieven
+Exchangerate: Wisselkoers
+Meta: Meta
+script: script
+positions: posities
+'Total costs': 'Totale kosten'
+'Dividend Yield': 'Dividend opbrengst'
+'Last dividend': 'Laatste dividend'
+'Last payout date': 'Laatste uitkeerdatum'
+'Yearly forward dividend': 'Jaarlijkse verwachte dividend'
+'Net forward yearly dividend per share': 'Netto verwachte jaarlijkse uitkering per aandeel'
+'Payouts per year': 'Uitkeringen per jaar'
+'Net forward dividend per payout': 'Netto verwachte dividend per uitkering'
+'Net forward yearly dividend total': 'Netto verwachte jaarlijkse dividend totaal'
+Yield: Rendement
+'Yield on cost dividend': 'Rendement op kostendividend'
+'Total dividend in a year / total allocated': 'Totaal dividend in een jaar / totaal toegewezen'
+'Search ticker': 'Zoek ticker'
+'use decimal point if you have a fraction of a stock': 'gebruik een decimale punt als u een fractie van een aandeel heeft'
+'What was the stock price and not what you paid': 'Wat was de aandelenkoers en niet wat u betaalde'
+'What was what you paid in total for this transaction': 'Wat heb je in totaal betaald voor deze transactie'
+'Exchange rate': Omwisselkoers
+'Current exchange rate': 'Huidige omwisselkoers'
+'Original price': 'Orginele prijs'
+Stamduty: Zegelrecht
+'fx fee': 'Omwisselkoers vergoeding'
+'Please choose a ticker': 'Kies a.u.b een ticker'
+Ticker: Ticker
+Profit: Opbrengst
+'Average price': 'Gemiddelde prijs'
+'Adjusment if automatic calculation is wrong': 'Aanpassing van automatische berekening is verkeerd'
+'Please choose a tax': 'Kies een belastingtarief'
+'Edit Position': 'Bewerk positie'
+Orders: Orders
+'Order date': 'Order datum'
+'Edit order': 'Bewerk order'
+'Order info': 'Order info'
+'Dividend yield based on cost basis': 'Dividendrendement op basis van kosten'
+'Current dividend yield': 'Huidig dividend rendement'
+'Dividend yield based on current market price': 'Dividendrendement op basis van de huidige marktprijs'
+'Current yield': 'Huidig rendement'
+'Net Dividend': 'Net Dividend'
+'Dividend to receive on total shares': 'Te ontvangen dividend op het totale aantal aandelen'
+Diff: Verschil
+'Dividend Reinvestment Calculator': 'Dividend herinvesteer Calculator'
+'Initial Number of Shares': 'Initieel Aantal Aandelen'
+'Number of shares to start with': 'Aantal aandelen om mee te beginnen'
+'Initial Price per Share': 'Initiele prijs per aandeel'
+'Price that you pay for the shares': 'Prijs die u betaalt voor de aandelen'
+'Stock Price Annual Growth Rate': 'Aandeel Prijs Jaarlijkse groei'
+'Historically the market has risen 7.38%': 'Historisch gezien is de markt gestegen 7.38%'
+'Maximum that price can rise': 'Maximaal dat de prijs kan stijgen'
+'If there is a range, what is the max range': 'Als er een bereik is, wat is het maximale bereik'
+'Dividend Annual Growth Rate': 'Dividend Jaarlijkse groei'
+'First 5 years. Nice target would be 10% and higher': 'Eerste 5 jaar. Mooi doel zou 10% en hoger zijn'
+'Average dividend growth rate (%) > 5 years': 'Gemiddeld dividendgroei (%)> 5 jaar'
+'This will be around 3%': 'Dit is ongeveer 3%'
+'Annual Dividend': 'Jaarlijks dividend'
+'Dividends Per Year': 'Dividenden per jaar'
+'Number of Years': 'Aantal jaren'
+'Dividend tax': 'Dividend belasting'
+Quator: Kwartaal
+'Dividend growth rate': 'Dividend groei'
+'Share price': Prijs
+'Number of Shares': 'Aantal aandelen'
+'New shares': 'Nieuwe aandelen'
+'Dividend from new shares': 'Dividend van nieuwe aandelen'
+'Received dividends': 'Ontvangen dividend'
+Supplement: Aanvullend
+'Export transactions': 'Exporteer orders'
+'Net order value': 'Netto order waarde'
+'Dividend treshold': 'Dividend drempel'
+'Export dividend': 'Exporteer dividend'
+'dividendTreshold (%)': 'dividend grens (%)'
+'Maximum allocation': 'Maximale toewijzing'
+'Dividend type': 'Dividend type'
+Special: Speciaal
+'Ex dividend date': Ex-dividend
+'Total recieved dividends for this ticker': 'Totaal ontvangen dividend'
+'Transactions (csv)': 'Transacties (csv)'
+'Transaction fee': 'Transactie kosten'
+'Commission/ extra fees etc': 'Commissie en extra kosten'
+Previous: Vorige
+Next: Volgende
+amount: hoeveelheid
+'Please choose a ex div date': 'Kies a.u.b een ex dividend datum'
+Units: Eenheden
+Isin: Isin
+'Dividend months': 'Dividend maanden'
+Branch: Branche
+'Please choose a branch': 'Kies een branche'
+'You are logged in as': 'Je bent ingelogd als'
+Email: E-mail
+'Plain password': Wachtwoord
+All: Alles
+Taxonomy: Taxonomy
+'Please choose a taxonomy': 'Kies een taxonomy'
+'Real Estate': Vastgoed
+Financials: Financieel
+'Consumer Staples': 'Consumenten goederen'
+Industrial: Industrieel
+'Consumer Discretionary': 'Consument Discretionair'
+'Communication services': 'Communicatie diensten'
+'Health Care': Gezondheid
+Energy: Energie
+'Information Technology': 'Informatie Technologie'
+Bonds: Obligaties
+ETF: ETF
+Tech: Technologie
+Utilities: Nutsbedrijven
+'Per month': 'Per maand'
+'Exclude from dividend yeld calculation': 'Gebruik NIET bij dividend rendement berekening'
+'Exclude from dividend yield calc': 'Gebruik NIET bij dividend rendement berekening'
+'Import file': 'Import file'
+'no records found': 'geen gegevens gevonden'
+'Dividend per position': 'Dividend ontvangen bij deze positie (niet totaal)'
+'Currency dividend will be paid out': 'Valuta waarin dividend wordt uitgekeerd'
+'Dividend currency': 'Valuta dividend'
+'Edit Ticker': 'Bewerk ticker'
+'Company details': Bedrijfsgegevens
+'Extra per month': 'Extra inleg per maand'
+'Extra money per month': 'Extra inleg per maand bovenop de ontvangen dividend'
+'Can not remove calendar because it has payments linked to it.': 'Er is een uitkering gekoppeld aan dit dividend item en kan dus niet verwijderd worden.'
+back: terug
+'Ticker is connected to open positions': 'Ticker heeft gekoppelde posities. Ontkoppel deze eerst.'
+'tickerSymbol:: Exchange rate for [Symbol] is currently unavailable. Available are: jsonSymbol': 'tickerSymbol:: Wisselkoers voor [Symbol] is momenteel niet beschikbaar. Beschikbaar is: jsonSymbol'
+'Original Price': 'Originele prijs'
+'Original price before fx': 'Originele prijs voor koers aanpassing'
+'Original price currency': 'Valuta originele prijs'
+'Forex fee': 'Forex tarief'
+forex: wisselkoers
+Stampduty: Zegelrecht
+'Finra fee': 'Finra tarief'
+'Total transaction cost (all fees + price * amount)': 'Totale transactie kosten (alle onkosten + prijs * aantal aandelen)'
+Fees: Tarieven
+'Buy or Sell': 'Kopen of verkopen'
+'Remember me': 'Onthoud mij'
+Payment: Uitkering
+warning: waarschuwing
+Cancel: Annuleer
+'Remove this item?': 'Verwijder dit item?'
+'Yes, remove it': 'Ja, verwijder'
+'Choose a Ticker': 'Selecteer een ticker'
+'Goal Percentage reached': 'Doel percentage bereikt'
+Goal: Doel
+'Target reached': 'Doel bereikt'
+'Delete this item?': 'Dit item verwijderen?'
+'show branch: %branch%': 'laat branch %branch% zien'
+'Edit branch: %branch%': 'Bewerk branch: %branch%'
+'Allocation information': 'Allocation informatie'
+Tickers: Tickers
+'show ticker': 'toor ticker'
+'Add dividend date': 'Voeg dividend datum toe'
+'Add/edit research': 'Nieuw/Bewerk onderzoek'
+'show currency': 'too valuta'
+'Edit currency': 'Bewerk valuta'
+'show pie': 'toon schijf'
+'Edit pie': 'Bewerk schijf'
+'Add research': 'Voeg odnerzoek toe'
+'Edit transaction': 'Bewerk transactie'
+'Edit payment': 'Bewerk uitkering'
+'Edit calendar': 'bewerk kalender'
+'Show payment': 'toon uitkering'
+'show tax': 'toon belasting'
+'edit tax': 'bewerk belasting'
+'Show calendar': 'Toon kalender'
+'show journal': 'toon journal'
+'Edit journal': 'Bewerk journal'
+'show taxonomy': 'toon taxonomy'
+'Edit taxonomy': 'Bewerk taxonomy'
+'show research': 'laat onderzoek zien'
+'Edit research': 'Bewerk onderzoek'
+'Select a ticker': 'Selecteer een ticker'
+'Create new ticker': 'Maak een nieuwe ticker'
+'Create new Ticker': 'Maak een nieuwe ticker'
+'Edit Industry': 'Bewerk branch'
+'Create new industry': 'Maak een nieuwe branch'
+'Create new Pie': 'Maak een nieuwe schijf'
+Positions: Posities
+'show portfolio': 'Laat portfolio zien'
+'add dividend payment': 'Voeg dividend uitkering toe'
+'Close position': 'Sluit positie'
+'Edit Payment': 'Bewerk uitkering'
+'Payment details': 'Uitkering details'
+'Edit Calendar': 'Bewerk kalender'
+'Create new Calendar': 'Maak nieuwe kalender'
+'Edit Taxonomy': 'Bewerk Taxonomy'
+'Create new Taxonomy': 'Maak nieuwe Taxonomy'
+'back to ticker': 'terug naar ticker'
+'Edit Research for': 'Bewerk onderzoek voor'
+'Can not delete. Ticker is connected to open positions.': 'Kan deze ticker niet verwijderen. Er zijn nog open posities aan gekoppeld.'

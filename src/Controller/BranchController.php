@@ -22,12 +22,12 @@ class BranchController extends AbstractController
 	public function index(
 		BranchRepository $branchRepository,
 		Referer $referer,
-		#[MapQueryParameter]int $page = 1,
+		#[MapQueryParameter] int $page = 1
 	): Response {
 		$referer->clear();
 		$referer->set('branch_index', [
-            'page' => $page,
-        ]);
+			'page' => $page,
+		]);
 
 		$queryBuilder = $branchRepository->getAllQuery();
 		$adapter = new QueryAdapter($queryBuilder);
@@ -121,10 +121,17 @@ class BranchController extends AbstractController
 				$request->request->get('_token')
 			)
 		) {
-			$entityManager->remove($branch);
-			$entityManager->flush();
-		}
+			if ($branch->getTickers()->isEmpty()) {
+				$entityManager->remove($branch);
+				$entityManager->flush();
+				return $this->redirectToRoute('branch_index');
+			}
 
+			$this->addFlash(
+				'notice',
+				'Can not delete. Branch is connected to tickers.'
+			);
+		}
 		return $this->redirectToRoute('branch_index');
 	}
 }

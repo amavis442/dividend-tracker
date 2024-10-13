@@ -3,7 +3,7 @@
 {% block body %}
     <div class="w-full flex flex-col">
         <div class="flex flex-col md:container mx-auto px-4">
-            <div>
+            <div class="mb-4 mt-4">
                 {% for notice in app.flashes('notice') %}
                     <twig:Alert variant="danger">
                         {{ notice|trans }}
