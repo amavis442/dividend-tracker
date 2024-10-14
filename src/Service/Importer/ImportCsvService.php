@@ -47,7 +47,7 @@ class ImportCsvService extends AbstractImporter
 
     protected function formatImportData(array|DOMNode $data): array
     {
-        return $this->importData($data);
+        return $this->processData($data);
     }
 
     /**
@@ -141,7 +141,7 @@ class ImportCsvService extends AbstractImporter
         $this->importedDividendLines++;
     }
 
-    protected function importData(array $csvRows): ?array
+    protected function processData(array $csvRows): ?array
     {
         $rows = [];
         $rowNum = 0;

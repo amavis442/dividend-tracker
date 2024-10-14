@@ -130,7 +130,7 @@ class PositionRepository extends ServiceEntityRepository
 
 	public function findOneByTickerAndTransactionDate(
 		Ticker $ticker,
-		?DateTime $transactionDate = null
+		DateTime $transactionDate
 	): ?Position {
 		$queryBuilder = $this->createQueryBuilder('p')
 			->select('p')
@@ -148,16 +148,15 @@ class PositionRepository extends ServiceEntityRepository
 
 	public function findOneByTickerAndDate(
 		Ticker $ticker,
-		?DateTime $transactionDate = null
+		DateTime $transactionDate
 	): ?Position {
-		if ($transactionDate) {
-			$position = $this->findOneByTickerAndTransactionDate(
-				$ticker,
-				$transactionDate
-			);
-			if ($position) {
-				return $position;
-			}
+
+		$position = $this->findOneByTickerAndTransactionDate(
+			$ticker,
+			$transactionDate
+		);
+		if ($position) {
+			return $position;
 		}
 		$queryBuilder = $this->createQueryBuilder('p')
 			->select('p')
