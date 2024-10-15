@@ -108,12 +108,6 @@ class ImportCsvService extends AbstractImporter
             );
         }
 
-        if ($position->getClosed()) {
-            throw new RuntimeException(
-                'Cannot import for this position. Selected position is already closed.'
-            );
-        }
-
         $currency = $this->currencyRepository->findOneBy(['symbol' => 'EUR']);
         $payment = new Payment();
         $uuid = Uuid::v4();
