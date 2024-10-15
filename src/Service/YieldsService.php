@@ -22,7 +22,8 @@ class YieldsService
 		string $sortDirection = 'ASC',
 		?Pie $pie = null
 	): array {
-		$yieldData = $this->pool->get('positions_for_yield'.($pie ? '_'.$pie->getId(): ''), function (
+		$poolKey = 'positions_for_yield'.($pie ? '_'.$pie->getId(): '');
+		$yieldData = $this->pool->get($poolKey, function (
 			ItemInterface $item
 		) use ($positionRepository, $dividendService, $pie): PositionYield {
 			$positionYield = new PositionYield();
@@ -42,8 +43,7 @@ class YieldsService
 				$avgPrice = $position->getPrice();
 				$amount = $position->getAmount();
 				$allocation = $position->getAllocation();
-				$scheduleCalendar = $ticker->getDividendMonths();
-				$numPayoutsPerYear = count($scheduleCalendar);
+				$numPayoutsPerYear = $ticker->getDividendMonths()->count();
 				$lastCash = 0;
 				$lastDividendDate = null;
 				$payCalendars = $ticker->getCalendars();
@@ -160,6 +160,8 @@ class YieldsService
 
 			return $positionYield;
 		});
+
+		//$this->pool->delete($poolKey);
 
 		ksort($yieldData->labels);
 		ksort($yieldData->data);

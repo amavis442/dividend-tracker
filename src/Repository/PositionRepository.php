@@ -319,8 +319,8 @@ class PositionRepository extends ServiceEntityRepository
 		string $sortDirection = 'ASC'
 	): array {
 		$qb = $this->createQueryBuilder('p')
-			->select('p, t, c, pa, d')
-			->innerJoin('p.ticker', 't')
+			->select('p, t,c, d')
+			->innerJoin('p.ticker','t')
 			->leftJoin('t.calendars', 'c')
 			->leftJoin('t.dividendMonths' ,'d')
 			->leftJoin('t.tax', 'tax')

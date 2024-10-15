@@ -19,7 +19,11 @@ framework:
 
         # Namespaced pools use the above "app" backend by default
         pools:
+            my_custom_pool:
+                adapter: cache.adapter.redis
+                provider: 'redis://localhost:6379'
             exchangerate.cache:
-                adapter: cache.app
+                adapter: cache.adapter.redis
+                provider: 'redis://localhost:6379'
             stock.cache:
                 adapter: cache.app

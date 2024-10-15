@@ -27,6 +27,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 ]
 #[ORM\Entity(repositoryClass: 'App\Repository\PositionRepository')]
 #[ORM\HasLifecycleCallbacks]
+#[ORM\Index(name: 'position_closed_idx', fields: ['closed'])]
 class Position
 {
     public const OPEN = 1;
