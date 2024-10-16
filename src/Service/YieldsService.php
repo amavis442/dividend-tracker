@@ -16,12 +16,10 @@ use Symfony\Contracts\Cache\ItemInterface;
 class YieldsService
 {
 	public function __construct(
-		private CacheInterface $pool,
+		//private CacheInterface $pool,
 		private Stopwatch $stopwatch,
 		private PositionRepository $positionRepository,
 		private DividendService $dividendService,
-		private CalendarRepository $calendarRepository,
-		private DividendMonthRepository $dividendMonthRepository
 	) {
 	}
 	public function yield(
@@ -58,6 +56,7 @@ class YieldsService
 			$totalDividend = 0.0;
 			$totalNetYearlyDividend = 0.0;
 			$dividendYieldOnCost = 0.0;
+			$totalAvgYield = 0.0;
 
 			/**
 			 * @var \App\Entity\Position $position
