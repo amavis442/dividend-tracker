@@ -40,6 +40,16 @@ host('acc')
         'stage' => 'acc',
     ]);
 
+host('acerdeploy')
+    ->set('hostname', 'acerdeploy')
+    ->setRemoteUser('deployer')
+    ->setDeployPath('/var/www/prod/{{application}}')
+    ->setLabels([
+        'type' => 'local',
+        'env' => 'prod',
+        'stage' => 'prod',
+    ]);
+
 host('test')
     ->set('hostname', '127.0.0.1')
     ->setRemoteUser('deployer')
