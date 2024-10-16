@@ -3,6 +3,7 @@
 namespace Deployer;
 
 require 'recipe/symfony.php';
+require 'contrib/cachetool.php';
 
 // Config
 
@@ -15,6 +16,11 @@ set('allow_anonymous_stats', false);
 set('bin/npm', function () {
     return run('which npm');
 });
+//set('cachetool', '/var/run/php8.3-fpm-dividend.sock');
+set('bin/cachetool', function () {
+    return which('cachetool.phar');
+});
+
 
 // Shared files/dirs between deploys
 add('shared_files', ['.env.local', 'public/uploads']);
@@ -28,7 +34,8 @@ host('prod')
         'type' => 'local',
         'env' => 'prod',
         'stage' => 'prod',
-    ]);
+    ])
+    ->set('cachetool', '/run/php/php8.3-fpm-dividend.sock');
 
 host('acc')
     ->set('hostname', '127.0.0.1')
@@ -38,7 +45,8 @@ host('acc')
         'type' => 'local',
         'env' => 'prod',
         'stage' => 'acc',
-    ]);
+    ])
+    ->set('cachetool', '/run/php/php8.3-fpm-prod-sites.sock');
 
 host('acerdeploy')
     ->set('hostname', 'acerdeploy')
@@ -104,3 +112,4 @@ after('deploy:cache:clear', 'database:migrate');
 after('database:migrate', 'tailwind:build');
 after('tailwind:build', 'assetmap:compile');
 after('deploy:failed', 'deploy:unlock');
+after('deploy:symlink', 'cachetool:clear:opcache');
