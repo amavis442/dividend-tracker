@@ -58,8 +58,6 @@ class YieldByPieController extends AbstractController
 
 		$pieSelected = $request->getSession()->get(self::YIELD_PIE_KEY, null);
 		$result = $yields->yield(
-			$positionRepository,
-			$dividendService,
 			$sort,
 			$sortDirection,
 			$pie

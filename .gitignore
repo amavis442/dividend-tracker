@@ -50,3 +50,5 @@ phpstan.neon
 /assets/vendor/
 ###< symfony/asset-mapper ###
 
+/.php-version
+php.ini

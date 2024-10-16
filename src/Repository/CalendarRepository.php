@@ -23,300 +23,346 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class CalendarRepository extends ServiceEntityRepository
 {
-    use PagerTrait;
+	use PagerTrait;
 
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Calendar::class);
-    }
+	public function __construct(ManagerRegistry $registry)
+	{
+		parent::__construct($registry, Calendar::class);
+	}
 
-    public function save(Calendar $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
+	public function save(Calendar $entity, bool $flush = false): void
+	{
+		$this->getEntityManager()->persist($entity);
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
+		if ($flush) {
+			$this->getEntityManager()->flush();
+		}
+	}
 
-    public function remove(Calendar $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
+	public function remove(Calendar $entity, bool $flush = false): void
+	{
+		$this->getEntityManager()->remove($entity);
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
+		if ($flush) {
+			$this->getEntityManager()->flush();
+		}
+	}
 
-    /**
-     * TODO: Refactor query
-     */
-    public function getAll(
-        int $page = 1,
-        int $limit = 10,
-        string $orderBy = 'exDividendDate',
-        string $sort = 'DESC',
-        ?Ticker $ticker = null
-    ): Paginator {
-        $order = 'c.' . $orderBy;
-        if ($orderBy === 'symbol') {
-            $order = 't.symbol';
-        }
-        $queryBuilder2 = $this->getEntityManager()->createQueryBuilder()
-            ->select("tp.id")
-            ->from("\App\Entity\Ticker", "tp")
-            ->innerJoin("\App\Entity\Position", "p")
-            ->where("p.ticker = tp and p.closed = false");
+	/**
+	 * TODO: Refactor query
+	 */
+	public function getAll(
+		int $page = 1,
+		int $limit = 10,
+		string $orderBy = 'exDividendDate',
+		string $sort = 'DESC',
+		?Ticker $ticker = null
+	): Paginator {
+		$order = 'c.' . $orderBy;
+		if ($orderBy === 'symbol') {
+			$order = 't.symbol';
+		}
+		$queryBuilder2 = $this->getEntityManager()
+			->createQueryBuilder()
+			->select('tp.id')
+			->from('\App\Entity\Ticker', 'tp')
+			->innerJoin('\App\Entity\Position', 'p')
+			->where('p.ticker = tp and p.closed = false');
 
-        // Create our query
-        $queryBuilder = $this->createQueryBuilder('c')
-            ->select('c')
-            ->innerJoin('c.ticker', 't')
-            ->orderBy($order, $sort);
+		// Create our query
+		$queryBuilder = $this->createQueryBuilder('c')
+			->select('c')
+			->innerJoin('c.ticker', 't')
+			->orderBy($order, $sort);
 
-        $queryBuilder
-            ->where(
-                $queryBuilder->expr()->in('t.id', $queryBuilder2->getDQL())
-            );
+		$queryBuilder->where(
+			$queryBuilder->expr()->in('t.id', $queryBuilder2->getDQL())
+		);
 
-        if ($ticker && $ticker->getId()) {
-            $queryBuilder
-                ->where(
-                    't = :ticker'
-                )
-                ->setParameter('ticker', $ticker->getId());
-        }
+		if ($ticker && $ticker->getId()) {
+			$queryBuilder
+				->where('t = :ticker')
+				->setParameter('ticker', $ticker->getId());
+		}
 
-        $query = $queryBuilder->getQuery();
-        $paginator = $this->paginate($query, $page, $limit);
+		$query = $queryBuilder->getQuery();
+		$paginator = $this->paginate($query, $page, $limit);
 
-        return $paginator;
-    }
+		return $paginator;
+	}
 
-    public function getAllQuery(
-        string $orderBy = 'exDividendDate',
-        string $sort = 'DESC',
-        ?Ticker $ticker = null
-    ): \Doctrine\ORM\QueryBuilder {
-        $order = 'c.' . $orderBy;
-        if ($orderBy === 'symbol') {
-            $order = 't.symbol';
-        }
-        $queryBuilder2 = $this->getEntityManager()->createQueryBuilder()
-            ->select("tp.id")
-            ->from("\App\Entity\Ticker", "tp")
-            ->innerJoin("\App\Entity\Position", "p")
-            ->where("p.ticker = tp and p.closed = false");
+	public function getAllQuery(
+		string $orderBy = 'exDividendDate',
+		string $sort = 'DESC',
+		?Ticker $ticker = null
+	): \Doctrine\ORM\QueryBuilder {
+		$order = 'c.' . $orderBy;
+		if ($orderBy === 'symbol') {
+			$order = 't.symbol';
+		}
+		$queryBuilder2 = $this->getEntityManager()
+			->createQueryBuilder()
+			->select('tp.id')
+			->from('\App\Entity\Ticker', 'tp')
+			->innerJoin('\App\Entity\Position', 'p')
+			->where('p.ticker = tp and p.closed = false');
 
-        // Create our query
-        $queryBuilder = $this->createQueryBuilder('c')
-            ->select('c')
-            ->innerJoin('c.ticker', 't')
-            ->orderBy($order, $sort);
+		// Create our query
+		$queryBuilder = $this->createQueryBuilder('c')
+			->select('c')
+			->innerJoin('c.ticker', 't')
+			->orderBy($order, $sort);
 
-        $queryBuilder
-            ->where(
-                $queryBuilder->expr()->in('t.id', $queryBuilder2->getDQL())
-            );
+		$queryBuilder->where(
+			$queryBuilder->expr()->in('t.id', $queryBuilder2->getDQL())
+		);
 
-        if ($ticker && $ticker->getId()) {
-            $queryBuilder
-                ->where(
-                    't = :ticker'
-                )
-                ->setParameter('ticker', $ticker->getId());
-        }
+		if ($ticker && $ticker->getId()) {
+			$queryBuilder
+				->where('t = :ticker')
+				->setParameter('ticker', $ticker->getId());
+		}
 
-        return $queryBuilder;
-    }
+		return $queryBuilder;
+	}
 
-    public function getLastDividend(Ticker $ticker)
-    {
-        $queryBuilder = $this->createQueryBuilder('c')
-            ->select('c')
-            ->innerJoin('c.ticker', 't')
-            ->where('t = :ticker')
-            ->setParameter('ticker', $ticker)
-            ->orderBy('c.exDividendDate', 'DESC')
-            ->setMaxResults(1)
-            ->getQuery();
+	public function getLastDividend(Ticker $ticker)
+	{
+		$queryBuilder = $this->createQueryBuilder('c')
+			->select('c')
+			->innerJoin('c.ticker', 't')
+			->where('t = :ticker')
+			->setParameter('ticker', $ticker)
+			->orderBy('c.exDividendDate', 'DESC')
+			->setMaxResults(1)
+			->getQuery();
 
-        return $queryBuilder->getOneOrNullResult();
-    }
+		return $queryBuilder->getOneOrNullResult();
+	}
 
-    public function findByDate(DateTimeInterface $dateTime, Ticker $ticker, string $dividendType = Calendar::REGULAR): ?Calendar
-    {
-        $queryBuilder = $this->createQueryBuilder('c')
-            ->select('c')
-            ->innerJoin('c.ticker', 't')
-            ->where('t = :ticker')
-            ->andWhere('c.paymentDate <= :paydate')
-            ->andWhere('c.dividendType = :dividendType')
-            ->setParameter('ticker', $ticker)
-            ->setParameter('paydate', $dateTime->format('Y-m-d'))
-            ->setParameter('dividendType', $dividendType)
-            ->orderBy('c.id', 'DESC')
-            ->setMaxResults(1)
-            ->getQuery();
+	public function getLastestDividends(array $ticker_ids): mixed
+	{
+		$em = $this->getEntityManager();
+		$expr = $this->getEntityManager()->getExpressionBuilder();
 
-        return $queryBuilder->getOneOrNullResult();
-    }
+		$queryBuilder = $this->createQueryBuilder('c', 'c.ticker')
+			->select('c')
+			->where(
+				$expr->in(
+					'c.id',
+					$em
+						->createQueryBuilder()
+						->select('MAX(c2.id)')
+						->from('App\Entity\Calendar', 'c2')
+						->where('c2.ticker IN (:tickerIds)')
+						->groupBy('c2.ticker')
+						->getDQL()
+				)
+			)
+			->setParameter(':tickerIds', $ticker_ids)
+			->getQuery();
 
-    private function getPositionSize(Collection $transactions, Calendar $item)
-    {
-        $units = 0;
+		return $queryBuilder->getResult();
+	}
 
-        foreach ($transactions as $transaction) {
-            if ($transaction->getTransactionDate() >= $item->getExdividendDate()) {
-                continue;
-            }
-            $amount = $transaction->getAmount();
-            if ($transaction->getSide() === Transaction::BUY) {
-                $units += $amount;
-            }
-            if ($transaction->getSide() === Transaction::SELL) {
-                $units -= $amount;
-            }
-        }
+	public function findByDate(
+		DateTimeInterface $dateTime,
+		Ticker $ticker,
+		string $dividendType = Calendar::REGULAR
+	): ?Calendar {
+		$queryBuilder = $this->createQueryBuilder('c')
+			->select('c')
+			->innerJoin('c.ticker', 't')
+			->where('t = :ticker')
+			->andWhere('c.paymentDate <= :paydate')
+			->andWhere('c.dividendType = :dividendType')
+			->setParameter('ticker', $ticker)
+			->setParameter('paydate', $dateTime->format('Y-m-d'))
+			->setParameter('dividendType', $dividendType)
+			->orderBy('c.id', 'DESC')
+			->setMaxResults(1)
+			->getQuery();
 
-        return $units;
-    }
+		return $queryBuilder->getOneOrNullResult();
+	}
 
-    public function getDividendEstimate(Position $position, ?int $year = null): array
-    {
-        if (!$year) {
-            $year = date('Y');
-        }
+	private function getPositionSize(Collection $transactions, Calendar $item)
+	{
+		$units = 0;
 
-        $qb = $this->createQueryBuilder('c')
-            ->select(['c', 't', 'pa'])
-            ->innerJoin('c.ticker', 't')
-            ->leftJoin('c.payments', 'pa', 'WITH', 'pa.calendar = c')
-            ->andWhere('YEAR(c.paymentDate) = :year')
-            ->andWhere('c.ticker = :ticker')
-            ->setParameter('year', $year)
-            ->setParameter('ticker', $position->getTicker())
-            ->getQuery();
-        $result = $qb->getResult();
-        $output = [];
+		foreach ($transactions as $transaction) {
+			if (
+				$transaction->getTransactionDate() >= $item->getExdividendDate()
+			) {
+				continue;
+			}
+			$amount = $transaction->getAmount();
+			if ($transaction->getSide() === Transaction::BUY) {
+				$units += $amount;
+			}
+			if ($transaction->getSide() === Transaction::SELL) {
+				$units -= $amount;
+			}
+		}
 
-        $transactions = $position->getTransactions();
-        $ticker = $position->getTicker();
+		return $units;
+	}
 
-        foreach ($result as $calendar) {
-            if ($calendar === null) {
-                continue;
-            }
-            $paydate = $calendar->getPaymentDate()->format('Ym');
-            if (!isset($output[$paydate])) {
-                $output[$paydate] = [];
-            }
+	public function getDividendEstimate(
+		Position $position,
+		?int $year = null
+	): array {
+		if (!$year) {
+			$year = date('Y');
+		}
 
-            if (!isset($output[$paydate][$ticker->getSymbol()])) {
-                $output[$paydate]['tickers'][$ticker->getSymbol()] = [];
-            }
-            if (!isset($output[$paydate]['grossTotalPayment'])) {
-                $output[$paydate]['grossTotalPayment'] = 0.0;
-            }
+		$qb = $this->createQueryBuilder('c')
+			->select(['c', 't', 'pa'])
+			->innerJoin('c.ticker', 't')
+			->leftJoin('c.payments', 'pa', 'WITH', 'pa.calendar = c')
+			->andWhere('YEAR(c.paymentDate) = :year')
+			->andWhere('c.ticker = :ticker')
+			->setParameter('year', $year)
+			->setParameter('ticker', $position->getTicker())
+			->getQuery();
+		$result = $qb->getResult();
+		$output = [];
 
-            $amount = $this->getPositionSize($transactions, $calendar);
+		$transactions = $position->getTransactions();
+		$ticker = $position->getTicker();
 
-            $netPayment = 0.0;
-            foreach ($calendar->getPayments() as $payment) {
-                $netPayment += $payment->getDividend();
-            }
+		foreach ($result as $calendar) {
+			if ($calendar === null) {
+				continue;
+			}
+			$paydate = $calendar->getPaymentDate()->format('Ym');
+			if (!isset($output[$paydate])) {
+				$output[$paydate] = [];
+			}
 
-            $dividend = $calendar->getCashAmount();
-            $output[$paydate]['tickers'][$ticker->getSymbol()] = [
-                'amount' => $amount,
-                'dividend' => $dividend,
-                'payoutdate' => $calendar->getPaymentDate()->format('d-m-Y'),
-                'exdividend' => $calendar->getExdividendDate()->format('d-m-Y'),
-                'ticker' => $ticker,
-                'netPayment' => $netPayment,
-                'calendar' => $calendar,
-                'position' => $position,
-            ];
-        }
-        return $output;
-    }
+			if (!isset($output[$paydate][$ticker->getSymbol()])) {
+				$output[$paydate]['tickers'][$ticker->getSymbol()] = [];
+			}
+			if (!isset($output[$paydate]['grossTotalPayment'])) {
+				$output[$paydate]['grossTotalPayment'] = 0.0;
+			}
 
-    /**
-     * Get the calendars between startDate and endDate
-     *
-     * @param DividendService $dividendService
-     * @param integer $year
-     * @param string|null $startDate
-     * @param string|null $endDate
-     * @return array|null
-     */
-    public function groupByMonth(DividendService $dividendService, int $year, ?string $startDate = null, ?string $endDate = null, ?Pie $pie = null): ?array
-    {
-        if (!$startDate) {
-            $startDate = $year . '-01-01';
-        }
-        if (!$endDate) {
-            $endDate = $year . '-12-31';
-        }
+			$amount = $this->getPositionSize($transactions, $calendar);
 
-        $qb = $this->createQueryBuilder('c')
-            ->select('c, t, p, tr, pies, cur, tax')
-            ->innerJoin('c.ticker', 't')
-            ->innerJoin('t.positions', 'p', 'WITH', '(p.closed = false) OR (p.closedAt > :closedAt and p.closed = true AND p.ignore_for_dividend = false)')
-            ->leftJoin('t.tax', 'tax')
-            ->leftJoin('p.transactions', 'tr', 'WITH', '(p.closed = false)' )
-            ->leftJoin('p.pies', 'pies')
-            ->leftJoin('c.currency', 'cur')
-            ->where('c.paymentDate >= :start and c.paymentDate <= :end')
+			$netPayment = 0.0;
+			foreach ($calendar->getPayments() as $payment) {
+				$netPayment += $payment->getDividend();
+			}
 
-            ->setParameter('start', $startDate)
-            ->setParameter('end', $endDate)
-            ->setParameter('closedAt', (new DateTime('-2 month'))->format('Y-m-d'));
+			$dividend = $calendar->getCashAmount();
+			$output[$paydate]['tickers'][$ticker->getSymbol()] = [
+				'amount' => $amount,
+				'dividend' => $dividend,
+				'payoutdate' => $calendar->getPaymentDate()->format('d-m-Y'),
+				'exdividend' => $calendar->getExdividendDate()->format('d-m-Y'),
+				'ticker' => $ticker,
+				'netPayment' => $netPayment,
+				'calendar' => $calendar,
+				'position' => $position,
+			];
+		}
+		return $output;
+	}
 
-        if ($pie && $pie->getId() != null) {
-            $qb->andWhere('tr.pie IN (:pie) OR pies IN (:pie)')
-                ->setParameter('pie', [$pie->getId()]);
-        }
-        $result = $qb->getQuery()
-            ->getResult();
+	/**
+	 * Get the calendars between startDate and endDate
+	 *
+	 * @param DividendService $dividendService
+	 * @param integer $year
+	 * @param string|null $startDate
+	 * @param string|null $endDate
+	 * @return array|null
+	 */
+	public function groupByMonth(
+		DividendService $dividendService,
+		int $year,
+		?string $startDate = null,
+		?string $endDate = null,
+		?Pie $pie = null
+	): ?array {
+		if (!$startDate) {
+			$startDate = $year . '-01-01';
+		}
+		if (!$endDate) {
+			$endDate = $year . '-12-31';
+		}
 
-        if (!$result) {
-            return null;
-        }
+		$qb = $this->createQueryBuilder('c')
+			->select('c, t, p, tr, pies, cur, tax')
+			->innerJoin('c.ticker', 't')
+			->innerJoin(
+				't.positions',
+				'p',
+				'WITH',
+				'(p.closed = false) OR (p.closedAt > :closedAt and p.closed = true AND p.ignore_for_dividend = false)'
+			)
+			->leftJoin('t.tax', 'tax')
+			->leftJoin('p.transactions', 'tr', 'WITH', '(p.closed = false)')
+			->leftJoin('p.pies', 'pies')
+			->leftJoin('c.currency', 'cur')
+			->where('c.paymentDate >= :start and c.paymentDate <= :end')
 
-        $data = [];
-        $dividendService->setCummulateDividendAmount(false);
+			->setParameter('start', $startDate)
+			->setParameter('end', $endDate)
+			->setParameter(
+				'closedAt',
+				(new DateTime('-2 month'))->format('Y-m-d')
+			);
 
-        foreach ($result as $item) {
-            $positionAmount = $dividendService->getPositionAmount($item);
-            if ($positionAmount < 0.001) { // filter out ones that have no amount of stocks for dividend payout
-                continue;
-            }
-            $positionDividend = $dividendService->getTotalNetDividend($item);
-            if ($positionDividend < 0.01) { // filter out ones that have no payout of dividend or to small to matter
-                continue;
-            }
+		if ($pie && $pie->getId() != null) {
+			$qb->andWhere('tr.pie IN (:pie) OR pies IN (:pie)')->setParameter(
+				'pie',
+				[$pie->getId()]
+			);
+		}
+		$result = $qb->getQuery()->getResult();
 
-            $ticker = $item->getTicker()->getSymbol();
+		if (!$result) {
+			return null;
+		}
 
-            $taxRate = $dividendService->getTaxRate($item);
-            $exchangeRate = $dividendService->getExchangeRate($item);
-            $tax = $item->getCashAmount() * $exchangeRate * $taxRate;
+		$data = [];
+		$dividendService->setCummulateDividendAmount(false);
 
-            $data[$item->getPaymentDate()->format('Ym')][$item->getPaymentDate()->format('j')][] = [
-                'calendar' => $item,
-                'ticker' => $ticker,
-                'positionAmount' => $positionAmount,
-                'positionDividend' => $positionDividend,
-                'taxRate' => $taxRate,
-                'exchangeRate' => $exchangeRate,
-                'tax' => $tax,
-            ];
-        }
-        ksort($data);
-        foreach ($data as &$month) {
-            ksort($month);
-        }
-        return $data;
-    }
+		foreach ($result as $item) {
+			$positionAmount = $dividendService->getPositionAmount($item);
+			if ($positionAmount < 0.001) {
+				// filter out ones that have no amount of stocks for dividend payout
+				continue;
+			}
+			$positionDividend = $dividendService->getTotalNetDividend($item);
+			if ($positionDividend < 0.01) {
+				// filter out ones that have no payout of dividend or to small to matter
+				continue;
+			}
+
+			$ticker = $item->getTicker()->getSymbol();
+
+			$taxRate = $dividendService->getTaxRate($item);
+			$exchangeRate = $dividendService->getExchangeRate($item);
+			$tax = $item->getCashAmount() * $exchangeRate * $taxRate;
+
+			$data[$item->getPaymentDate()->format('Ym')][
+				$item->getPaymentDate()->format('j')
+			][] = [
+				'calendar' => $item,
+				'ticker' => $ticker,
+				'positionAmount' => $positionAmount,
+				'positionDividend' => $positionDividend,
+				'taxRate' => $taxRate,
+				'exchangeRate' => $exchangeRate,
+				'tax' => $tax,
+			];
+		}
+		ksort($data);
+		foreach ($data as &$month) {
+			ksort($month);
+		}
+		return $data;
+	}
 }

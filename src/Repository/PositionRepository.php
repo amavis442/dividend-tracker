@@ -319,14 +319,15 @@ class PositionRepository extends ServiceEntityRepository
 		string $sortDirection = 'ASC'
 	): array {
 		$qb = $this->createQueryBuilder('p')
-			->select('p, t,c, d')
-			->innerJoin('p.ticker','t')
+			->select('p')
+			/* ->innerJoin('p.ticker','t')
 			->leftJoin('t.calendars', 'c')
 			->leftJoin('t.dividendMonths' ,'d')
 			->leftJoin('t.tax', 'tax')
 			->leftJoin('t.branch', 'b')
 			->leftJoin('p.payments', 'pa')
 			->leftJoin('c.currency', 'cur')
+			*/
 			->where('p.closed = false')
 			->andWhere('p.ignore_for_dividend = false');
 
@@ -352,7 +353,7 @@ class PositionRepository extends ServiceEntityRepository
         };
         */
 
-		return $qb->getQuery()->getResult();
+		return $qb->getQuery()->useQueryCache(true)->getResult();
 	}
 
 	private function getQueryBuilder(

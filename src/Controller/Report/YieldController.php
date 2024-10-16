@@ -25,7 +25,7 @@ class YieldController extends AbstractController
         #[MapQueryParameter]string $sort = 'symbol',
         #[MapQueryParameter]string $sortDirection = 'ASC'
     ): Response {
-        $result = $yields->yield($positionRepository, $dividendService, $sort, $sortDirection);
+        $result = $yields->yield($sort, $sortDirection);
 
         return $this->render('report/yield/index.html.twig', array_merge($result, ['controller_name' => 'ReportController']));
     }
