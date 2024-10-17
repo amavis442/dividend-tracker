@@ -35,8 +35,8 @@ class CalendarController extends AbstractController
 		TickerRepository $tickerRepository,
 		Referer $referer,
 		#[MapQueryParameter] int $page = 1,
-		#[MapQueryParameter] string $orderBy = 'paymentDate',
-		#[MapQueryParameter] string $sort = 'DESC'
+		#[MapQueryParameter] string $sort = 'createdAt',
+		#[MapQueryParameter] string $orderBy = 'DESC'
 	): Response {
 		$referer->clear();
 		$referer->set('calendar_index', [
@@ -45,17 +45,17 @@ class CalendarController extends AbstractController
 			'sort' => $sort,
 		]);
 
-		$orderBy = in_array($orderBy, [
+		$sort = in_array($sort, [
 			'paymentDate',
 			'symbol',
 			'exDividendDate',
 			'createdAt',
         ])
-			? $orderBy
+			? $sort
 			: 'paymentDate';
 
-		$sort = in_array($sort, ['asc', 'desc', 'ASC', 'DESC'])
-			? $sort
+		$orderBy = in_array($orderBy, ['asc', 'desc', 'ASC', 'DESC'])
+			? $orderBy
 			: 'DESC';
 
 		$tickerAutoComplete = new TickerAutocomplete();
@@ -94,8 +94,8 @@ class CalendarController extends AbstractController
 		}
 
 		$queryBuilder = $calendarRepository->getAllQuery(
-			$orderBy,
 			$sort,
+			$orderBy,
 			$ticker
 		);
 		$adapter = new QueryAdapter($queryBuilder);

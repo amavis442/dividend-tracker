@@ -54,14 +54,15 @@ class CalendarRepository extends ServiceEntityRepository
 	public function getAll(
 		int $page = 1,
 		int $limit = 10,
-		string $orderBy = 'exDividendDate',
-		string $sort = 'DESC',
+		string $sort = 'exDividendDate',
+		string $orderBy = 'DESC',
 		?Ticker $ticker = null
 	): Paginator {
-		$order = 'c.' . $orderBy;
-		if ($orderBy === 'symbol') {
-			$order = 't.symbol';
-		}
+		$sort = match($sort) {
+			'symbol' => 't.symbol',
+			default => 'c.' . $sort
+		};
+
 		$queryBuilder2 = $this->getEntityManager()
 			->createQueryBuilder()
 			->select('tp.id')
@@ -73,7 +74,7 @@ class CalendarRepository extends ServiceEntityRepository
 		$queryBuilder = $this->createQueryBuilder('c')
 			->select('c')
 			->innerJoin('c.ticker', 't')
-			->orderBy($order, $sort);
+			->orderBy($sort, $orderBy);
 
 		$queryBuilder->where(
 			$queryBuilder->expr()->in('t.id', $queryBuilder2->getDQL())
@@ -92,14 +93,16 @@ class CalendarRepository extends ServiceEntityRepository
 	}
 
 	public function getAllQuery(
-		string $orderBy = 'exDividendDate',
-		string $sort = 'DESC',
+		string $sort = 'exDividendDate',
+		string $orderBy = 'DESC',
 		?Ticker $ticker = null
 	): \Doctrine\ORM\QueryBuilder {
-		$order = 'c.' . $orderBy;
-		if ($orderBy === 'symbol') {
-			$order = 't.symbol';
-		}
+
+		$sort = match($sort) {
+			'symbol' => $sort = 't.symbol',
+			default => 'c.' . $sort
+		};
+
 		$queryBuilder2 = $this->getEntityManager()
 			->createQueryBuilder()
 			->select('tp.id')
@@ -111,7 +114,7 @@ class CalendarRepository extends ServiceEntityRepository
 		$queryBuilder = $this->createQueryBuilder('c')
 			->select('c')
 			->innerJoin('c.ticker', 't')
-			->orderBy($order, $sort);
+			->orderBy($sort, $orderBy);
 
 		$queryBuilder->where(
 			$queryBuilder->expr()->in('t.id', $queryBuilder2->getDQL())
