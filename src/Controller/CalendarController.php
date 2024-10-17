@@ -107,7 +107,7 @@ class CalendarController extends AbstractController
 			'form' => $form,
 			'pager' => $pager,
 			'thisPage' => $page,
-			'order' => $orderBy,
+			'orderBy' => $orderBy,
 			'sort' => $sort,
 		]);
 	}
