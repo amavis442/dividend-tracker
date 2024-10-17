@@ -105,6 +105,7 @@ class TransactionRepository extends ServiceEntityRepository
 			->orderBy('t.transactionDate, t.id', 'asc')
 			->where('t.position = :position')
 			->andWhere('p.closed = false')
+			->orderBy('t.id', 'DESC')
 			->setParameter('position', $position);
 	}
 
