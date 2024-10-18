@@ -133,6 +133,7 @@
                                     <twig:Table:Td>
                                         <div data-controller="tooltip">
                                             <a href="{{ path('portfolio_show', {'id': item.position.id}) }}"
+                                               data-turbo-frame="_top"
                                                data-tooltip-target="element"
                                                data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
                                                class="text-blue-700 hover:text-blue-500 font-sans font-bold underline">{{ item.ticker }}</a>
