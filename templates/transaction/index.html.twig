@@ -1,106 +1,159 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}
-	Transactions
-{% endblock %}
-
+{% block title %}Transactions{% endblock %}
 {% block body %}
-	<h1>Transactions</h1>
-
-	<section>
-		{% for notice in app.flashes('notice') %}
-			<br/>
-			<div class="alert alert-primary" role="alert">{{ notice|trans }}</div>
-		{% endfor %}
-	</section>
-
-	<section class="flex items-center gap-2 mb-6 bg-gray-200 shadow-md rounded-lg p-6">
-			{{ form_start(form, {
-				'action': path('transaction_index'),
-				'attr': {
-					'autocomplete' : 'off',
-					'class': 'flex w-full justify-center',
-					'data-turbo-frame' : 'transaction-results'
-					}})
-				}}
-			{{ form_errors(form) }}
-			<div class="w-1/2">
-				{{ form_widget(form.ticker) }}
-			</div>
-			<div>
-				<button class="focus:outline-none text-white bg-green-700
-            hover:bg-green-800 focus:ring-4
-            focus:ring-green-300 font-medium rounded-lg
-            text-sm px-2 py-2 ml-2 dark:bg-green-600
-            dark:hover:bg-green-700 dark:focus:ring-green-800" data-toggle="tooltip" data-placement="top" title="{{ 'Search ticker'|trans }}">
-					<i class="fas fa-search"></i>
-				</button>
-			</div>
-			{{ form_end(form) }}
-	</section>
-
-	<section>
-	<turbo-frame id="transaction-results">
-	<table class="table" class="max-w-min min-w-full">
-		<thead>
-			<tr>
-				<th>Side</th>
-				<th>
-					<a href="{{ path('transaction_index', { page: thisPage ? thisPage : 1, orderBy: 'transactionDate', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">Transaction date</a>
-				</th>
-				<th>
-					<a href="{{ path('transaction_index', { page: thisPage ? thisPage : 1, orderBy: 'symbol', sort: sort == 'desc' ? 'asc' : 'desc' }) }}">Ticker</a>
-				</th>
-				<th>Industry</th>
-				<th>Units</th>
-				<th>Price</th>
-				<th>Allocation</th>
-				<th style="width:20%">actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for transaction in pager %}
-				{% set currentDividendData = transaction.position.ticker.getRecentDividendDate %}
-				{% set dividendDaysLeft = currentDividendData ? currentDividendData.getDaysLeft : - 1 %}
-				{% set side = transaction.side == 1 ? 'Buy' : 'Sell' %}
-				<tr>
-					<td>
-						<span class="badge {% if transaction.side == 1 %}bg-success{% else %}bg-danger{% endif %}">
-							{{ side }}
-						</span>
-					</td>
-					<td>{{ transaction.transactionDate|date('d-m-Y') }}</td>
-					<td>{{ transaction.position.ticker.symbol }}</td>
-					<td>{{ transaction.position.ticker.branch.label }}</td>
-					<td>{{ transaction.amount|format_number({ fraction_digit: 7 }) }}</td>
-
-					<td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ transaction.price|format_number({ fraction_digit: 2 }) }}</td>
-					<td>{{ (transaction.allocationCurrency ? transaction.allocationCurrency.sign : '$')|raw }}{{ transaction.allocation|format_number({ fraction_digit: 2 }) }}</td>
-
-					<td>
-						<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-							<div class="btn-group mr-2" role="group" aria-label="First group">
-								<a href="{{ path('transaction_show', { id: transaction.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Show details transaction"
-								data-turbo-frame="_top">
-									<i class="fas fa-book-open"></i>
-								</a>
-								<a href="{{ path('transaction_edit', { id: transaction.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit transaction"
-								data-turbo-frame="_top">
-									<i class="far fa-edit"></i>
-								</a>
-							</div>
-						</div>
-					</td>
-				</tr>
-			{% else %}
-				<tr>
-					<td colspan="11">no records found</td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-
-	{{ pagerfanta(pager) }}
-	</turbo-frame>
-	</section>
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            {% if app.flashes('notice') %}
+                <div class="w-1/2">
+                    {% for notice in app.flashes('notice') %}
+                        <twig:Alert class="mt-2">
+                            {{ notice|trans }}
+                        </twig:Alert>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <section id="header" class="flex mb-4 mt-2">
+                <twig:Head variant="h2">
+                    {{ 'Transactions'|trans }}:
+                </twig:Head>
+            </section>
+            <div>
+                <div class="mb-2 w-full gap-2 bg-gray-200 shadow-md rounded-lg p-6">
+                    {{ form_start(form, {
+                                            'action': path('transaction_index') ,
+                        'attr': {
+                        'autocomplete' : 'off',
+                        'class': 'flex w-full justify-center',
+                        'data-turbo-frame' : 'transaction-results'
+                        }})
+                        }}
+                        {{ form_errors(form) }}
+                        <div class="w-1/2 me-2">
+                            <select placeholder="{{ 'Select a ticker'|trans }}" name="{{ field_name(form.ticker) }}" {{ stimulus_controller('symfony/ux-autocomplete/autocomplete',{
+                                 url: path('ux_entity_autocomplete', { alias: 'ticker'})
+                                }) }}>
+                            </select>
+                        </div>
+                        <div data-controller="tooltip">
+                            <twig:Button type="submit"
+                                         title="{{ 'Search ticker'|trans }}"
+                                         data-tooltip-target="element"
+                                         data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">
+                                <i class="fas fa-search"></i>
+                                <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                    {{ 'Search ticker'|trans }}
+                                    <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                </div>
+                            </twig:Button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+            <div class="border border-gray-200 rounded-lg p-2">
+                <turbo-frame id="transaction-results">
+                <div class="mb-2">
+                    <twig:Table:Table class="max-w-min min-w-full">
+                        <twig:Table:THead>
+                            <tr>
+                                <twig:Table:ThCol>
+                                    Side
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    <a href="{{ path('transaction_index', { page: thisPage ? thisPage : 1, orderBy: 'transactionDate', sort: sort == 'asc' ? 'desc' : 'asc' }) }}">Transaction date</a>
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    <a href="{{ path('transaction_index', { page: thisPage ? thisPage : 1, orderBy: 'symbol', sort: sort == 'desc' ? 'asc' : 'desc' }) }}">Ticker</a>
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    Industry
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    Units
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    Price
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    Allocation
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol style="width:20%">
+                                    actions
+                                </twig:Table:ThCol>
+                            </tr>
+                        </twig:Table:THead>
+                        <tbody>
+                            {% for transaction in pager %}
+                                {% set currentDividendData = transaction.position.ticker.getRecentDividendDate %}
+                                {% set dividendDaysLeft = currentDividendData ? currentDividendData.getDaysLeft : - 1 %}
+                                {% set side = transaction.side == 1 ? 'Buy' : 'Sell' %}
+                                <twig:Table:Tr>
+                                    <twig:Table:Td>
+                                        <span class="badge {% if transaction.side == 1 %}bg-success{% else %}bg-danger{% endif %}">{{ side }}</span>
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        {{ transaction.transactionDate|date("d-m-Y") }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        {{ transaction.position.ticker.symbol }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        {{ transaction.position.ticker.branch.label }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        {{ transaction.amount|format_number({"fraction_digit": 7}) }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        {{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ transaction.price|format_number({"fraction_digit": 2}) }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        {{ (transaction.allocationCurrency ? transaction.allocationCurrency.sign : '$')|raw }}{{ transaction.allocation|format_number({"fraction_digit": 2}) }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        <div class="inline-flex rounded-md shadow-sm" role="group">
+                                            <div class="inline-block" data-controller="tooltip">
+                                                <a href="{{ path('transaction_show', { id: transaction.id }) }}"
+                                                   data-turbo-frame="_top"
+                                                   data-tooltip-target="element"
+                                                   data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                                   class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                                    <i class="fas fa-book-open"></i>
+                                                </a>
+                                                <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                    {{ 'Show transaction'|trans }}
+                                                    <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                                </div>
+                                            </div>
+                                            <div class="inline-block" data-controller="tooltip">
+                                                <a href="{{ path('transaction_edit', { id: transaction.id }) }}"
+                                                   data-turbo-frame="_top"
+                                                   data-tooltip-target="element"
+                                                   data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                                   class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                                    <i class="far fa-edit"></i>
+                                                </a>
+                                                <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                    {{ 'Edit transaction'|trans }}
+                                                    <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </twig:Table:Td>
+                                </twig:Table:Tr>
+                            {% else %}
+                                <twig:Table:Tr>
+                                    <twig:Table:Td colspan="11">
+                                        no records found
+                                    </twig:Table:Td>
+                                </twig:Table:Tr>
+                            {% endfor %}
+                        </tbody>
+                    </twig:Table:Table>
+                </div>
+                <div class="mb-2">
+                    {% if pager.haveToPaginate %}{{ pagerfanta(pager) }}{% endif %}
+                </div>
+                </turbo-frame>
+            </div>
+        </div>
+    </div>
 {% endblock %}
