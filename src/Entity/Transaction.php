@@ -193,7 +193,7 @@ class Transaction
     private float $total = 0.0;
 
     #[ORM\ManyToOne(targetEntity: Pie::class, inversedBy: 'transactions')]
-    private $pie;
+    private ?Pie $pie = null;
 
     #[Groups(['transaction:read', 'transaction:write'])]
     #[ORM\ManyToOne]

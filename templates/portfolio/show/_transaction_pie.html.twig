@@ -1,0 +1,7 @@
+<turbo-frame id="update-pie-{{ transaction.id }}">
+<a href="{{ path('portfolio_update_pie',{id: transaction.id}) }}"
+   class="flex w-full">
+    {{ transaction.pie ?  transaction.pie.label : (transaction.position.pies[0] != null ? transaction.position.pies[0].label : '') }}
+    <i class="fa-solid fa-pencil"></i>
+</a>
+</turbo-frame>

@@ -9,9 +9,11 @@ use App\Entity\Portfolio;
 use App\Entity\PortfolioGoal;
 use App\Entity\Position;
 use App\Entity\SearchForm;
+use App\Entity\Transaction;
 use App\Entity\User;
 use App\Form\PortfolioGoalType;
 use App\Form\SearchFormType;
+use App\Form\TransactionPieType;
 use App\Model\PortfolioModel;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
@@ -27,6 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Stopwatch\Stopwatch;
 use App\Helper\Colors;
+use App\Repository\PieRepository;
 use App\Repository\PortfolioRepository;
 use App\Repository\ResearchRepository;
 use App\Repository\TransactionRepository;
@@ -48,13 +51,7 @@ class PortfolioController extends AbstractController
 	{
 	}
 
-	#[
-		Route(
-			path: '/',
-			name: 'portfolio_index',
-			methods: ['GET', 'POST']
-		)
-	]
+	#[Route(path: '/', name: 'portfolio_index', methods: ['GET', 'POST'])]
 	public function index(
 		Request $request,
 		TickerRepository $tickerRepository,
@@ -74,7 +71,9 @@ class PortfolioController extends AbstractController
 			'sort' => $sort,
 		]);
 
-		$orderBy = in_array($orderBy, ['asc', 'desc', 'ASC', 'DESC']) ? $orderBy : 'asc';
+		$orderBy = in_array($orderBy, ['asc', 'desc', 'ASC', 'DESC'])
+			? $orderBy
+			: 'asc';
 
 		$pie = null;
 		$ticker = null;
@@ -514,7 +513,6 @@ class PortfolioController extends AbstractController
 		)
 	]
 	public function showOrders(
-		Request $request,
 		Position $position,
 		TransactionRepository $transactionRepository,
 		DividendService $dividendService,
@@ -598,13 +596,9 @@ class PortfolioController extends AbstractController
 		)
 	]
 	public function showDividend(
-		Request $request,
 		Position $position,
 		PositionRepository $positionRepository,
 		PaymentRepository $paymentRepository,
-		PortfolioRepository $portfolioRepository,
-		DividendGrowthService $dividendGrowth,
-		DividendService $dividendService,
 		int $page = 1
 	): Response {
 		$ticker = $position->getTicker();
@@ -663,14 +657,8 @@ class PortfolioController extends AbstractController
 		)
 	]
 	public function showDividendProgression(
-		Request $request,
 		Position $position,
-		PositionRepository $positionRepository,
-		PaymentRepository $paymentRepository,
-		PortfolioRepository $portfolioRepository,
 		DividendGrowthService $dividendGrowth,
-		DividendService $dividendService,
-		Referer $referer,
 		ChartBuilderInterface $chartBuilder
 	): Response {
 		$ticker = $position->getTicker();
@@ -754,7 +742,6 @@ class PortfolioController extends AbstractController
 		)
 	]
 	public function showResearch(
-		Request $request,
 		Position $position,
 		ResearchRepository $researchRepository,
 		int $page = 1
@@ -858,6 +845,39 @@ class PortfolioController extends AbstractController
 			'portfolio' => $portfolio,
 			'form' => $form,
 			'formTarget' => $request->headers->get('Turbo-Frame', '_top'),
+		]);
+	}
+
+	#[
+		Route(
+			path: '/updatepie/{id}',
+			name: 'portfolio_update_pie',
+			methods: ['POST', 'GET']
+		)
+	]
+	public function updatePie(
+		Request $request,
+		Transaction $transaction,
+		EntityManagerInterface $entityManager
+	): Response {
+		$form = $this->createForm(TransactionPieType::class, $transaction, [
+			'action' => $this->generateUrl('portfolio_update_goal'),
+		]);
+
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			$entityManager->persist($transaction);
+			$entityManager->flush();
+
+			return $this->render('portfolio/show/_transaction_pie.html.twig', [
+				'transaction' => $transaction,
+			]);
+		}
+
+		return $this->render('portfolio/show/_form_update_pie.html.twig', [
+			'transaction' => $transaction,
+			'form' => $form,
+			'formTarget' => 'update-pie-' . $transaction->getId(),
 		]);
 	}
 }

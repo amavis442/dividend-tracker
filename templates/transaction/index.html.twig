@@ -76,6 +76,9 @@
                                 <twig:Table:ThCol>
                                     Allocation
                                 </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    Pie
+                                </twig:Table:ThCol>
                                 <twig:Table:ThCol style="width:20%">
                                     actions
                                 </twig:Table:ThCol>
@@ -107,6 +110,9 @@
                                     </twig:Table:Td>
                                     <twig:Table:Td>
                                         {{ (transaction.allocationCurrency ? transaction.allocationCurrency.sign : '$')|raw }}{{ transaction.allocation|format_number({"fraction_digit": 2}) }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        {{ transaction.pie ? transaction.pie.label : '-' }}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
                                         <div class="inline-flex rounded-md shadow-sm" role="group">

@@ -28,6 +28,7 @@
 				<twig:Table:ThCol>{{ 'Net order value'|trans }}</twig:Table:ThCol>
 				<twig:Table:ThCol>{{ 'Profit / Loss'|trans }}</twig:Table:ThCol>
 				<twig:Table:ThCol>{{ 'Dividend yield'|trans }}</twig:Table:ThCol>
+				<twig:Table:ThCol>{{ 'Pie'|trans }}</twig:Table:ThCol>
 				<twig:Table:ThCol>{{ 'Actions'|trans }}</twig:Table:ThCol>
 			</twig:Table:Tr>
 		</thead>
@@ -107,6 +108,14 @@
 							{% if transaction.side == 1 %}
 								{{ dividendYield|format_number({fraction_digit: 2}) }}%
 							{% endif %}
+						</twig:Table:Td>
+						<twig:Table:Td>
+							<turbo-frame id="update-pie-{{ transaction.id }}">
+								<a href="{{ path('portfolio_update_pie',{id: transaction.id})}}" class="flex w-full">
+									{{ transaction.pie ?  transaction.pie.label : (transaction.position.pies[0] != null ? transaction.position.pies[0].label : '') }}
+									<i class="fa-solid fa-pencil"></i>
+								</a>
+							</turbo-frame>
 						</twig:Table:Td>
 						<twig:Table:Td>
 							<div class="flex" data-controller="tooltip">
