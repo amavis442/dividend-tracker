@@ -858,8 +858,11 @@ class PortfolioController extends AbstractController
 	public function updatePie(
 		Request $request,
 		Transaction $transaction,
-		EntityManagerInterface $entityManager
-	): Response {
+		EntityManagerInterface $entityManager,
+		TransactionRepository $transactionRepository
+		): Response {
+		$transaction = $transactionRepository->find($transaction->getId());
+
 		$form = $this->createForm(TransactionPieType::class, $transaction, [
 			'action' => $this->generateUrl('portfolio_update_goal'),
 		]);
