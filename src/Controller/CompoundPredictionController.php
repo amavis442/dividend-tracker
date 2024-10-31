@@ -25,7 +25,7 @@ class CompoundPredictionController extends AbstractController
         $endCapital = 0.0;
 
         $data = [];
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted()) {
             $data = $compoundCalculator->run($compound);
         }
 
