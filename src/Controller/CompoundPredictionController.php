@@ -13,28 +13,36 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/compound')]
 class CompoundPredictionController extends AbstractController
 {
-    #[Route(path: '/prediction', name: 'compound_prediction')]
-    public function prediction(Request $request, CompoundCalculator $compoundCalculator): Response
-    {
-        $compound = new Compound();
-        $payoutFrequency = 4;
-        $compound->setFrequency($payoutFrequency);
-        $form = $this->createForm(CompoundType::class, $compound);
-        $form->handleRequest($request);
-        $startCapital = 0.0;
-        $endCapital = 0.0;
+	#[Route(path: '/prediction', name: 'compound_prediction')]
+	public function prediction(
+		Request $request,
+		CompoundCalculator $compoundCalculator
+	): Response {
+		$payoutFrequency = 4;
+		$startCapital = 0.0;
+		$compound = new Compound();
+		$compound->setFrequency($payoutFrequency);
 
-        $data = [];
-        if ($form->isSubmitted()) {
-            $data = $compoundCalculator->run($compound);
-        }
+		$form = $this->createForm(CompoundType::class, $compound);
+		$form->handleRequest($request);
+
+
+		if ($form->isSubmitted() && $form->isValid()) {
+			$data = $compoundCalculator->run($compound);
+
+			return $this->render(
+				'compound_prediction/_table-results.html.twig',
+				[
+					'data' => $data,
+					'startCapital' => $startCapital,
+					'payoutFrequency' => $payoutFrequency,
+				]
+			);
+		}
 
         return $this->render('compound_prediction/index.html.twig', [
-            'controller_name' => 'CompoundPredictionController',
-            'form' => $form->createView(),
-            'data' => $data,
-            'startCapital' => $startCapital,
-            'payoutFrequency' => $payoutFrequency,
-        ]);
-    }
+			'controller_name' => 'CompoundPredictionController',
+			'form' => $form,
+		]);
+	}
 }

@@ -12,13 +12,13 @@ class CompoundCalculator
     public function run(Compound $compound): array
     {
         $data = [];
-        $dividend = $compound->getDividend() / 1000;
+        $dividend = $compound->getDividend();
         $startAmount = $compound->getAmount();
-        $startPrice = $compound->getPrice() / 1000;
-        $priceAppreciation = $compound->getPriceAppreciation() / 1000;
-        $dividendGrowthRate = $compound->getGrowth() / 1000;
-        $dividendGrowthRateAfter5Years = $compound->getGrowthAfter5Years() / 1000;
-        $maxPrice = $compound->getMaxPrice() / 1000;
+        $startPrice = $compound->getPrice();
+        $priceAppreciation = $compound->getPriceAppreciation();
+        $dividendGrowthRate = $compound->getGrowth();
+        $dividendGrowthRateAfter5Years = $compound->getGrowthAfter5Years();
+        $maxPrice = $compound->getMaxPrice();
         $payoutFrequency = $compound->getFrequency();
         $startDividend = $dividend / $payoutFrequency;
         $years = $compound->getYears();
@@ -26,7 +26,7 @@ class CompoundCalculator
         $endCapital = 0.0;
         $extraMoney = $compound->getExtraPerMonth();
 
-        $oldShares = $startAmount / 10000000;
+        $oldShares = $startAmount;
         $dividendShares = 0;
         $oldPrice = $startPrice;
         $oldDividend = (float) $startDividend;

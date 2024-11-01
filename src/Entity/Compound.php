@@ -9,75 +9,75 @@ class Compound
     /**
      * Number of shares
      *
-     * @var int|null
+     * @var float
      */
     #[Assert\GreaterThan(0)]
-    private $amount;
+    private float $amount;
     /**
      * Starting price and will be higher each year depending price Appreciation
      *
-     * @var int|null
+     * @var float
      */
     #[Assert\GreaterThan(0)]
-    private $price;
+    private float $price;
     /**
      * Start dividend yield
      *
-     * @var int|null
+     * @var float
      */
     #[Assert\GreaterThan(0)]
-    private $dividend;
+    private float $dividend;
     /**
      * Rise of market gain in percentage per year around 7.43%
      *
-     * @var int|null
+     * @var float|null
      */
-    private $priceAppreciation;
+    private ?float $priceAppreciation = 0.0;
 
     /**
      * Maximum price
      *
-     * @var int
+     * @var float
      */
-    private $maxPrice;
+    private float $maxPrice = 0.0;
 
     /**
      * Dividend growth for the first 5 years
      *
-     * @var int|null
+     * @var float|null
      */
-    private $growth;
+    private ?float $growth = 0.0;
     /**
      * Growth after 5 years and into infinity will normally be around 3%
      *
-     * @var int|null
+     * @var float|null
      */
-    private $growthAfter5Years;
+    private ?float $growthAfter5Years = 0.0;
     /**
      * How many times does a company pay dividends per year. Default will be 4
      *
      * @var int|null
      */
-    private $frequency;
+    private ?int $frequency;
 
     /**
      * Extra per month
      *
      * @var float
      */
-    private $extraPerMonth = 0.0;
+    private float $extraPerMonth = 0.0;
 
     /**
      *
      * @var int
      */
-    private $years;
+    private int $years = 5;
 
     /**
      *
      * @var float
      */
-    private $taxRate = 15;
+    private float $taxRate = 15;
 
     /**
      *
@@ -86,50 +86,50 @@ class Compound
     #[Assert\GreaterThan(0.7)]
     private $exchangeRate = 1.2;
 
-    public function setAmount(int $amount): self
+    public function setAmount(float $amount): self
     {
         $this->amount = $amount;
 
         return $this;
     }
 
-    public function getAmount(): ?int
+    public function getAmount(): float
     {
         return $this->amount;
     }
 
-    public function setPrice(int $price): self
+    public function setPrice(float $price): self
     {
         $this->price = $price;
 
         return $this;
     }
 
-    public function getPrice(): ?int
+    public function getPrice(): float
     {
         return $this->price;
     }
 
-    public function setDividend(int $dividend): self
+    public function setDividend(float $dividend): self
     {
         $this->dividend = $dividend;
 
         return $this;
     }
 
-    public function getDividend(): ?int
+    public function getDividend(): float
     {
         return $this->dividend;
     }
 
-    public function setGrowth(int $growth): self
+    public function setGrowth(?float $growth): self
     {
         $this->growth = $growth;
 
         return $this;
     }
 
-    public function getGrowth(): ?int
+    public function getGrowth(): ?float
     {
         return $this->growth;
     }
@@ -150,9 +150,9 @@ class Compound
     /**
      * Get rise of market gain in percentage per year around 7.43%
      *
-     * @return  int|null
+     * @return  float|null
      */
-    public function getPriceAppreciation(): ?int
+    public function getPriceAppreciation(): ?float
     {
         return $this->priceAppreciation;
     }
@@ -160,11 +160,11 @@ class Compound
     /**
      * Set rise of market gain in percentage per year around 7.43%
      *
-     * @param  int  $priceAppreciation  Rise of market gain in percentage per year around 7.43%
+     * @param  float  $priceAppreciation  Rise of market gain in percentage per year around 7.43%
      *
      * @return  self
      */
-    public function setPriceAppreciation(int $priceAppreciation): self
+    public function setPriceAppreciation(float $priceAppreciation): self
     {
         $this->priceAppreciation = $priceAppreciation;
 
@@ -174,9 +174,9 @@ class Compound
     /**
      * Get growth after 5 years and into infinity will normally be around 3%
      *
-     * @return  int|null
+     * @return  float|null
      */
-    public function getGrowthAfter5Years(): ?int
+    public function getGrowthAfter5Years(): ?float
     {
         return $this->growthAfter5Years;
     }
@@ -184,11 +184,11 @@ class Compound
     /**
      * Set growth after 5 years and into infinity will normally be around 3%
      *
-     * @param  int $growthAfter5Years  Growth after 5 years and into infinity will normally be around 3%
+     * @param  float $growthAfter5Years  Growth after 5 years and into infinity will normally be around 3%
      *
      * @return  self
      */
-    public function setGrowthAfter5Years(int $growthAfter5Years): self
+    public function setGrowthAfter5Years(?float $growthAfter5Years): self
     {
         $this->growthAfter5Years = $growthAfter5Years;
 
@@ -198,9 +198,9 @@ class Compound
     /**
      * Get maximum price
      *
-     * @return  int|null
+     * @return  float|null
      */
-    public function getMaxPrice(): ?int
+    public function getMaxPrice(): ?float
     {
         return $this->maxPrice;
     }
@@ -208,11 +208,11 @@ class Compound
     /**
      * Set maximum price
      *
-     * @param  int  $maxPrice  Maximum price
+     * @param  float  $maxPrice  Maximum price
      *
      * @return  self
      */
-    public function setMaxPrice(int $maxPrice): self
+    public function setMaxPrice(?float $maxPrice): self
     {
         $this->maxPrice = $maxPrice;
 
@@ -272,7 +272,7 @@ class Compound
      *
      * @return  float
      */
-    public function getTaxRate()
+    public function getTaxRate(): float
     {
         return $this->taxRate;
     }
@@ -296,7 +296,7 @@ class Compound
      *
      * @return  float
      */
-    public function getExchangeRate()
+    public function getExchangeRate(): float
     {
         return $this->exchangeRate;
     }

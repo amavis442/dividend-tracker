@@ -29,7 +29,7 @@ class CompoundType extends AbstractType
                 'required' => true,
                 'input' => 'number',
                 'scale' => 3,
-                'empty_data' => 1000
+                'empty_data' => 1
             ])
             ->add('maxPrice', NumberType::class, [
                 'label' => 'Maximum that price can rise',
@@ -40,7 +40,7 @@ class CompoundType extends AbstractType
             ])
             ->add('priceAppreciation', NumberType::class, [
                 'label' => 'Stock Price Annual Growth Rate',
-                'data' => '7830',
+                'data' => '7.830',
                 'help' => 'Historically the market has risen 7.38%',
                 'required' => false,
                 'input' => 'number',
@@ -51,7 +51,8 @@ class CompoundType extends AbstractType
                 'required' => true,
                 'input' => 'number',
                 'scale' => 3,
-                'empty_data' => 1
+                'empty_data' => 1,
+                'help' => 'Dividend per share',
             ])
             ->add('extraPerMonth', NumberType::class, [
                 'label' => 'Extra per month',
@@ -67,7 +68,6 @@ class CompoundType extends AbstractType
                 'required' => false,
                 'input' => 'number',
                 'scale' => 3,
-                'empty_data' => 0
             ])
             ->add('growthAfter5Years', NumberType::class, [
                 'label' => 'Average dividend growth rate (%) > 5 years',
@@ -75,7 +75,7 @@ class CompoundType extends AbstractType
                 'required' => false,
                 'input' => 'number',
                 'scale' => 3,
-                'data' => '3000',
+                'data' => '3',
             ])
             ->add('years', NumberType::class, [
                 'label' => 'Number of Years',
@@ -111,6 +111,7 @@ class CompoundType extends AbstractType
                 'empty_data' => $compound->getExchangeRate()
             ]);
 
+        /*
         $callbackValutaTransformer = CallbackTransformerValutaFactory::create();
         $callbackUnitsTransformer = CallbackTransformerUnitsFactory::create();
 
@@ -120,7 +121,7 @@ class CompoundType extends AbstractType
         $builder->get('dividend')->addModelTransformer($callbackValutaTransformer);
         $builder->get('growth')->addModelTransformer($callbackValutaTransformer);
         $builder->get('growthAfter5Years')->addModelTransformer($callbackValutaTransformer);
-        $builder->get('priceAppreciation')->addModelTransformer($callbackValutaTransformer);
+        $builder->get('priceAppreciation')->addModelTransformer($callbackValutaTransformer); */
     }
 
 

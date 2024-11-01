@@ -10,52 +10,8 @@
                         {{ include("compound_prediction/_form.html.twig") }}
                     </twig:Card>
                 </div>
-                <twig:Table:Table>
-                    <twig:Table:THead>
-                        <twig:Table:Tr>
-                            <twig:Table:ThCol>{{ 'Quator'|trans }}</twig:Table:ThCol>
-                            <twig:Table:ThCol>{{ 'Dividend growth rate'|trans }}</twig:Table:ThCol>
-                            <twig:Table:ThCol>{{ 'Share price'|trans }}</twig:Table:ThCol>
-                            <twig:Table:ThCol>{{ 'Number of Shares'|trans }}</twig:Table:ThCol>
-                            <twig:Table:ThCol>{{ 'Dividend'|trans }}</twig:Table:ThCol>
-                            <twig:Table:ThCol>{{ 'Net dividend'|trans }}</twig:Table:ThCol>
-                            <twig:Table:ThCol>{{ 'New shares'|trans }}</twig:Table:ThCol>
-                            <twig:Table:ThCol>{{ 'Dividend from new shares'|trans }}</twig:Table:ThCol>
-                            <twig:Table:ThCol>{{ 'Received dividends'|trans }}</twig:Table:ThCol>
-                            <twig:Table:ThCol>{{ 'Extra per month'|trans }}</twig:Table:ThCol>
-                            <twig:Table:ThCol>{{ 'Dividend yield'|trans }}</twig:Table:ThCol>
-                        </twig:Table:Tr>
-                    </twig:Table:THead>
-                    <tbody>
-                        {% set rowcount = 1 %}
-                        {% set oddrow = false %}
-                        {% for item in data %}
-                            {% if oddrow and rowcount < payoutFrequency + 1 %}
-                                {% set oddrow = false %}
-                            {% endif %}
-                            {% if rowcount > payoutFrequency %}
-                                {% set oddrow = true %}
-                            {% endif %}
-                            {% if rowcount > 2 * payoutFrequency - 1 %}
-                                {% set rowcount = 0 %}
-                            {% endif %}
-                            <twig:Table:Tr>
-                                <twig:Table:Td>{{ item.quator }}</twig:Table:Td>
-                                <twig:Table:Td>{{ item.dividendGrowth|format_number({"fraction_digit": 3}) }}%</twig:Table:Td>
-                                <twig:Table:Td>{{ item.shareprice|format_number({"fraction_digit": 3}) }}</twig:Table:Td>
-                                <twig:Table:Td>{{ item.amount }}</twig:Table:Td>
-                                <twig:Table:Td>{{ item.dividend }}</twig:Table:Td>
-                                <twig:Table:Td>{{ item.net_dividend|format_number({"fraction_digit": 3}) }}</twig:Table:Td>
-                                <twig:Table:Td>{{ item.new_amount }}</twig:Table:Td>
-                                <twig:Table:Td>{{ item.extra_dividend|format_number({"fraction_digit": 3}) }}</twig:Table:Td>
-                                <twig:Table:Td>{{ item.received_dividend|format_number({"fraction_digit": 3}) }}</twig:Table:Td>
-                                <twig:Table:Td>{{ item.extra_per_month|format_number({"fraction_digit": 3}) }}</twig:Table:Td>
-                                <twig:Table:Td>{{ item.dividendyield|format_number({"fraction_digit": 2}) }}%</twig:Table:Td>
-                            </twig:Table:Tr>
-                            {% set rowcount = rowcount + 1 %}
-                        {% endfor %}
-                    </tbody>
-                </twig:Table:Table>
+                <turbo-frame id="compound-results">
+                </turbo-frame>
             </div>
         </div>
     </div>

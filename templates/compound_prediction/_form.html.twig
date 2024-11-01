@@ -1,11 +1,148 @@
 <div class="d-flex justify-content-center">
     <div class="flex items-center gap-2 mb-6 bg-gray-200 shadow-md rounded-lg p-6">
-        {{ form_start(form, {'attr':{'class':'border p-2 rounded','data-turbo-frame' : '_top' }}) }}
-            {{ form_widget(form) }}
-            <div class="mt-2">
-                <twig:Button type="submit">
-                    <i class="far fa-save"></i>
-                </twig:Button>
+        {{ form_start(form, {'action': path('compound_prediction'), 'method':'POST' ,'attr':{'class':'border p-2 rounded', 'data-turbo-frame': 'compound-results' }}) }}
+
+            <div class="flex flex-col">
+                <div>
+                    {{ form_errors(form) }}
+                </div>
+                <div class="flex mb-4 gap-2">
+                    <div class="w-1/2">
+                        {% if form_errors(form.amount) %}
+                            <div class="p-2 text-red-700">
+                                {{ form_errors(form.amount) }}
+                            </div>
+                        {% endif %}
+                        {{ form_label(form.amount) }}
+                        {{ form_widget(form.amount, {'attr': {'class': 'form-input w-full rounded border border-gray-400 px-2 py-1 shadow-sm' }}) }}
+                        {{ form_help(form.amount) }}
+                    </div>
+                    <div class="w-1/2">
+                        {% if form_errors(form.price) %}
+                            <div class="p-2 text-red-700">
+                                {{ form_errors(form.price) }}
+                           </div>
+                        {% endif %}
+                        {{ form_label(form.price) }}
+                        {{ form_widget(form.price, {'attr': {'class': 'form-input w-full rounded border border-gray-400 px-2 py-1 shadow-sm' }}) }}
+                        {{ form_help(form.price) }}
+                    </div>
+                </div>
+                <div class="flex mb-4 gap-2">
+                    <div class="w-1/2">
+                        {% if form_errors(form.extraPerMonth) %}
+                            <div class="p-2 text-red-700">
+                                {{ form_errors(form.extraPerMonth) }}
+                           </div>
+                        {% endif %}
+                        {{ form_label(form.extraPerMonth) }}
+                        {{ form_widget(form.extraPerMonth, {'attr': {'class': 'form-input w-full rounded border border-gray-400 px-2 py-1 shadow-sm' }}) }}
+                        {{ form_help(form.extraPerMonth) }}
+                    </div>
+                    <div class="w-1/2">
+                        {% if form_errors(form.priceAppreciation) %}
+                            <div class="p-2 text-red-700">
+                                {{ form_errors(form.priceAppreciation) }}
+                           </div>
+                        {% endif %}
+                        {{ form_label(form.priceAppreciation) }}
+                        {{ form_widget(form.priceAppreciation, {'attr': {'class': 'form-input w-full rounded border border-gray-400 px-2 py-1 shadow-sm' }}) }}
+                        {{ form_help(form.priceAppreciation) }}
+                    </div>
+                </div>
+                <div class="flex mb-4 gap-2">
+                    <div class="w-1/2">
+                        {% if form_errors(form.maxPrice) %}
+                            <div class="p-2 text-red-700">
+                                {{ form_errors(form.maxPrice) }}
+                           </div>
+                        {% endif %}
+                        {{ form_label(form.maxPrice) }}
+                        {{ form_widget(form.maxPrice, {'attr': {'class': 'form-input w-full rounded border border-gray-400 px-2 py-1 shadow-sm' }}) }}
+                        {{ form_help(form.maxPrice) }}
+                    </div>
+                    <div class="w-1/2">
+                        {% if form_errors(form.dividend) %}
+                            <div class="p-2 text-red-700">
+                                {{ form_errors(form.dividend) }}
+                           </div>
+                        {% endif %}
+                        {{ form_label(form.dividend) }}
+                        {{ form_widget(form.dividend, {'attr': {'class': 'form-input w-full rounded border border-gray-400 px-2 py-1 shadow-sm' }}) }}
+                        {{ form_help(form.dividend) }}
+                    </div>
+                </div>
+                <div class="flex mb-4 gap-2">
+                    <div class="w-1/2">
+                        {% if form_errors(form.frequency) %}
+                            <div class="p-2 text-red-700">
+                                {{ form_errors(form.frequency) }}
+                           </div>
+                        {% endif %}
+                        {{ form_label(form.frequency) }}
+                        {{ form_widget(form.frequency, {'attr': {'class': 'form-select w-full rounded border border-gray-400 px-2 py-1 shadow-sm' }}) }}
+                        {{ form_help(form.frequency) }}
+                    </div>
+                    <div class="w-1/2">
+                        {% if form_errors(form.growth) %}
+                            <div class="p-2 text-red-700">
+                                {{ form_errors(form.growth) }}
+                           </div>
+                        {% endif %}
+                        {{ form_label(form.growth) }}
+                        {{ form_widget(form.growth, {'attr': {'class': 'form-input w-full rounded border border-gray-400 px-2 py-1 shadow-sm' }}) }}
+                        {{ form_help(form.growth) }}
+                    </div>
+                </div>
+                <div class="flex mb-4 gap-2">
+                    <div class="w-1/2">
+                        {% if form_errors(form.growthAfter5Years) %}
+                            <div class="p-2 text-red-700">
+                                {{ form_errors(form.growthAfter5Years) }}
+                           </div>
+                        {% endif %}
+                        {{ form_label(form.growthAfter5Years) }}
+                        {{ form_widget(form.growthAfter5Years, {'attr': {'class': 'form-input w-full rounded border border-gray-400 px-2 py-1 shadow-sm' }}) }}
+                        {{ form_help(form.growthAfter5Years) }}
+                    </div>
+                    <div class="w-1/2">
+                        {% if form_errors(form.years) %}
+                            <div class="p-2 text-red-700">
+                                {{ form_errors(form.years) }}
+                           </div>
+                        {% endif %}
+                        {{ form_label(form.years) }}
+                        {{ form_widget(form.years, {'attr': {'class': 'form-input w-full rounded border border-gray-400 px-2 py-1 shadow-sm' }}) }}
+                        {{ form_help(form.years) }}
+                    </div>
+                </div>
+                <div class="flex mb-4 gap-2">
+                    <div class="w-1/2">
+                        {% if form_errors(form.taxRate) %}
+                            <div class="p-2 text-red-700">
+                                {{ form_errors(form.taxRate) }}
+                           </div>
+                        {% endif %}
+                        {{ form_label(form.taxRate) }}
+                        {{ form_widget(form.taxRate, {'attr': {'class': 'form-input w-full rounded border border-gray-400 px-2 py-1 shadow-sm' }}) }}
+                        {{ form_help(form.taxRate) }}
+                    </div>
+                    <div class="w-1/2">
+                        {% if form_errors(form.exchangeRate) %}
+                            <div class="p-2 text-red-700">
+                                {{ form_errors(form.exchangeRate) }}
+                           </div>
+                        {% endif %}
+                        {{ form_label(form.exchangeRate) }}
+                        {{ form_widget(form.exchangeRate, {'attr': {'class': 'form-input w-full rounded border border-gray-400 px-2 py-1 shadow-sm' }}) }}
+                        {{ form_help(form.exchangeRate) }}
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <twig:Button type="submit">
+                        <i class="far fa-save"></i>
+                    </twig:Button>
+                </div>
             </div>
         {{ form_end(form) }}
     </div>
