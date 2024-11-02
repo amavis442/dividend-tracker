@@ -166,7 +166,7 @@ class PositionController extends AbstractController
 
 			$pies = $position->getPies();
 
-			$transactionRepository->updatePieNull($pies[0]);
+			$transactionRepository->updatePieNull($position, $pies[0]);
 
 			$entityManager->persist($position);
 			$entityManager->flush();

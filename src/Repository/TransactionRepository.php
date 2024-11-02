@@ -147,13 +147,15 @@ class TransactionRepository extends ServiceEntityRepository
 			->getOneOrNullResult();
 	}
 
-	public function updatePieNull(Pie $pie): void {
+	public function updatePieNull(Position $position, Pie $pie): void {
 		$this
 		->createQueryBuilder('t')
 		->update(Transaction::class, 't')
 		->set('t.pie',':pie')
 		->where('t.pie is null')
+		->andWhere('t.position = :position')
 		->setParameter('pie', $pie)
+		->setParameter('position', $position)
 		->getQuery()
 		->execute();
 	}
