@@ -261,12 +261,19 @@ class PortfolioController extends AbstractController
 
 		$yearlyForwardDividendPayout =
 			$position->getTicker()->getPayoutFrequency() *
-			$dividendService->getForwardNetDividend($position);
+			$dividendService->getForwardNetDividend(
+				$position->getTicker(),
+				$position->getAmount()
+			);
 		$singleTimeForwarddividendPayout = $dividendService->getForwardNetDividend(
-			$position
+			$position->getTicker(),
+			$position->getAmount()
 		);
 		$dividendYield = $dividendService->getForwardNetDividendYield(
-			$position
+			$position,
+			$position->getTicker(),
+			$position->getAmount(),
+			$position->getAllocation()
 		);
 
 		$referer->set('portfolio_show', ['id' => $position->getId()]);
@@ -463,12 +470,19 @@ class PortfolioController extends AbstractController
 
 		$yearlyForwardDividendPayout =
 			$position->getTicker()->getPayoutFrequency() *
-			$dividendService->getForwardNetDividend($position);
+			$dividendService->getForwardNetDividend(
+				$position->getTicker(),
+				$position->getAmount()
+			);
 		$singleTimeForwarddividendPayout = $dividendService->getForwardNetDividend(
-			$position
+			$position->getTicker(),
+			$position->getAmount()
 		);
 		$dividendYield = $dividendService->getForwardNetDividendYield(
-			$position
+			$position,
+			$position->getTicker(),
+			$position->getAmount(),
+			$position->getAllocation()
 		);
 
 		return $this->render('portfolio/show/_info.html.twig', [
@@ -860,7 +874,7 @@ class PortfolioController extends AbstractController
 		Transaction $transaction,
 		EntityManagerInterface $entityManager,
 		TransactionRepository $transactionRepository
-		): Response {
+	): Response {
 		$transaction = $transactionRepository->find($transaction->getId());
 
 		$form = $this->createForm(TransactionPieType::class, $transaction, [
