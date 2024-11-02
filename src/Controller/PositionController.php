@@ -152,6 +152,7 @@ class PositionController extends AbstractController
 		Request $request,
 		Position $position,
 		Referer $referer,
+		TransactionRepository $transactionRepository,
 		EntityManagerInterface $entityManager
 	): Response {
 		$form = $this->createForm(PositionType::class, $position);
@@ -162,6 +163,10 @@ class PositionController extends AbstractController
 			$request
 				->getSession()
 				->set(self::SESSION_KEY, $position->getTicker()->getSymbol());
+
+			$pies = $position->getPies();
+
+			$transactionRepository->updatePieNull($pies[0]);
 
 			$entityManager->persist($position);
 			$entityManager->flush();
