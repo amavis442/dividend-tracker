@@ -26,9 +26,7 @@ class YieldByPieController extends AbstractController
 	#[Route(path: '/pieyield', name: 'report_dividend_yield_by_pie')]
 	public function index(
 		Request $request,
-		PositionRepository $positionRepository,
 		YieldsService $yields,
-		DividendService $dividendService,
 		ChartBuilderInterface $chartBuilder,
 		#[MapQueryParameter] string $sort = 'symbol',
 		#[MapQueryParameter] string $sortDirection = 'asc'

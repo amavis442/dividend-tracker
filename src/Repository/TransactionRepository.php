@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Transaction;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -51,6 +52,8 @@ class TransactionRepository extends ServiceEntityRepository
 		return $queryBuilder;
 	}
 
+
+
 	public function getAll(
 		int $page = 1,
 		int $limit = 10,
@@ -94,6 +97,30 @@ class TransactionRepository extends ServiceEntityRepository
 			->orderBy('t.transactionDate, t.id', 'asc')
 			->andWhere('p.closed = false')
 			->setParameter('ticker', $ticker)
+			->getQuery()
+			->getResult();
+	}
+
+	public function getSummaryByPie(Pie $pie)
+	{
+		return $this->createQueryBuilder('t')
+			->select(
+				'p.id position_id, SUM(CASE WHEN t.side = 1 THEN t.amount ELSE -t.amount END) AS amount,
+				SUM(
+					CASE WHEN t.side = 1 THEN t.allocation ELSE 0 END
+
+				)/SUM(CASE WHEN t.side = 1 THEN t.amount ELSE 0 END) avgPrice,
+
+				(SUM(
+					CASE WHEN t.side = 1 THEN t.allocation ELSE 0 END
+
+				)/SUM(CASE WHEN t.side = 1 THEN t.amount ELSE 0 END)) * SUM(CASE WHEN t.side = 1 THEN t.amount ELSE -t.amount END) AS allocation'
+			)
+			->innerJoin('t.position', 'p', null, null, 'p.id')
+			->where('p.closed = false')
+			->andWhere('t.pie = :pie')
+			->setParameter('pie', $pie)
+			->groupBy('p.id')
 			->getQuery()
 			->getResult();
 	}

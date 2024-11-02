@@ -9,6 +9,7 @@ use App\Entity\PositionYield;
 use App\Repository\CalendarRepository;
 use App\Repository\DividendMonthRepository;
 use App\Repository\PositionRepository;
+use App\Repository\TransactionRepository;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -19,7 +20,8 @@ class YieldsService
 		//private CacheInterface $pool,
 		private Stopwatch $stopwatch,
 		private PositionRepository $positionRepository,
-		private DividendService $dividendService,
+		private TransactionRepository $transactionRepository,
+		private DividendService $dividendService
 	) {
 	}
 	public function yield(
@@ -37,164 +39,176 @@ class YieldsService
 			ItemInterface $item
 		) use ($positionRepository, $dividendService, $pie): PositionYield {
 		*/
-			$positionYield = new PositionYield();
+		$positionYield = new PositionYield();
 
-			//$item->expiresAfter(3600);
+		//$item->expiresAfter(3600);
 
-			$this->stopwatch->start('getting-positions-from-database', 'parsing');
+		$this->stopwatch->start('getting-positions-from-database', 'parsing');
+		if ($pie) {
+			$report = $this->transactionRepository->getSummaryByPie($pie);
+			$positions = $positionRepository->getAllByIds(array_keys($report));
+		} else {
 			$positions = $positionRepository->getAllOpen($pie, null);
-			$this->stopwatch->stop('getting-positions-from-database');
+		}
 
-			$this->stopwatch->start('getting-sumallocated-from-database', 'parsing');
-			$allocated = $positionRepository->getSumAllocated(
-				$pie
-			);
-			$this->stopwatch->stop('getting-sumallocated-from-database');
+		$this->stopwatch->stop('getting-positions-from-database');
 
-			$this->stopwatch->start('processing-file', 'parsing');
+		$this->stopwatch->start(
+			'getting-sumallocated-from-database',
+			'parsing'
+		);
+		$allocated = $positionRepository->getSumAllocated($pie);
+		$this->stopwatch->stop('getting-sumallocated-from-database');
 
-			$totalDividend = 0.0;
-			$totalNetYearlyDividend = 0.0;
-			$dividendYieldOnCost = 0.0;
-			$totalAvgYield = 0.0;
+		$this->stopwatch->start('processing-file', 'parsing');
 
-			/**
-			 * @var \App\Entity\Position $position
-			 */
-			foreach ($positions as $position) {
-				$avgPrice = $position->getPrice();
-				$amount = $position->getAmount();
-				$allocation = $position->getAllocation();
-				$ticker = $position->getTicker();
+		$totalDividend = 0.0;
+		$totalNetYearlyDividend = 0.0;
+		$dividendYieldOnCost = 0.0;
+		$totalAvgYield = 0.0;
 
-				$lastCash = 0;
-				$lastDividendDate = null;
+		/**
+		 * @var \App\Entity\Position $position
+		 */
+		foreach ($positions as $position) {
+			$avgPrice =
+				$pie && $report[$position->getId()]
+					? $report[$position->getId()]['avgPrice']
+					: $position->getPrice();
+			$amount =
+				$pie && $report[$position->getId()]
+					? $report[$position->getId()]['amount']
+					: $position->getAmount();
+			$allocation =
+				$pie && $report[$position->getId()]
+					? $report[$position->getId()]['allocation']
+					: $position->getAllocation();
+			$ticker = $position->getTicker();
 
-				$numPayoutsPerYear = $ticker->getDividendMonths()->count();
-				$firstCalendarEntry = $ticker->getCalendars()->first();
+			$lastCash = 0;
+			$lastDividendDate = null;
 
-				$netTotalForwardYearlyPayout = 0;
-				$netForwardYearlyPayout = 0;
-				$dividendYield = 0;
-				$netTotalPayoutPerPaydate = 0;
-				$lastCash = 0;
-				$lastCashCurrency = '$';
-				$taxRate = $ticker->getTax()
-					? $ticker->getTax()->getTaxRate() * 100
-					: Constants::TAX;
-				$exchangeRate = $firstCalendarEntry
-					? $dividendService->getExchangeRate($firstCalendarEntry)
-					: 0;
+			$numPayoutsPerYear = $ticker->getDividendMonths()->count();
+			$firstCalendarEntry = $ticker->getCalendars()->first();
 
-				if ($firstCalendarEntry) {
-					$lastCash = $dividendService->getCashAmount($ticker); // $firstCalendarEntry->getCashAmount();
-					$lastCashCurrency = $firstCalendarEntry
-						->getCurrency()
-						->getSign();
-					$lastDividendDate = $firstCalendarEntry->getPaymentDate();
+			$netTotalForwardYearlyPayout = 0;
+			$netForwardYearlyPayout = 0;
+			$dividendYield = 0;
+			$netTotalPayoutPerPaydate = 0;
+			$lastCash = 0;
+			$lastCashCurrency = '$';
+			$taxRate = $ticker->getTax()
+				? $ticker->getTax()->getTaxRate() * 100
+				: Constants::TAX;
+			$exchangeRate = $firstCalendarEntry
+				? $dividendService->getExchangeRate($firstCalendarEntry)
+				: 0;
 
-					$netTotalForwardYearlyPayout =
-						$numPayoutsPerYear *
-						$dividendService->getForwardNetDividend($position);
-					$netForwardYearlyPayout =
-						$numPayoutsPerYear *
-						$dividendService->getNetDividend(
-							$position,
-							$firstCalendarEntry
-						);
-					$dividendYield = $dividendService->getForwardNetDividendYield(
-						$position
+			if ($firstCalendarEntry) {
+				$lastCash = $dividendService->getCashAmount($ticker); // $firstCalendarEntry->getCashAmount();
+				$lastCashCurrency = $firstCalendarEntry
+					->getCurrency()
+					->getSign();
+				$lastDividendDate = $firstCalendarEntry->getPaymentDate();
+
+				$netTotalForwardYearlyPayout =
+					$numPayoutsPerYear *
+					$dividendService->getForwardNetDividend($position);
+				$netForwardYearlyPayout =
+					$numPayoutsPerYear *
+					$dividendService->getNetDividend(
+						$position,
+						$firstCalendarEntry
 					);
-					$netTotalPayoutPerPaydate = 0;
-					if ($numPayoutsPerYear > 0) {
-						$netTotalPayoutPerPaydate =
-							$netTotalForwardYearlyPayout / $numPayoutsPerYear;
-					}
-				}
-				$dividendPerYear = $numPayoutsPerYear * $lastCash;
-
-				$tickerLabel = $ticker->getSymbol();
-				$positionYield->labels[$tickerLabel] = sprintf(
-					'%s (%s)',
-					substr(
-						addslashes(
-							str_replace(
-								["'", '"'],
-								['', ''],
-								$ticker->getFullname()
-							)
-						),
-						0,
-						8
-					),
-					$ticker->getSymbol()
+				$dividendYield = $dividendService->getForwardNetDividendYield(
+					$position
 				);
-				$positionYield->data[$tickerLabel] = $dividendYield;
-
-				$orderKey['yield'] =
-					str_pad(
-						(string) ($dividendYield * 100),
-						10,
-						'0',
-						STR_PAD_LEFT
-					) . $ticker->getSymbol();
-				$orderKey['dividend'] =
-					str_pad(
-						(string) ($dividendPerYear * 100),
-						10,
-						'0',
-						STR_PAD_LEFT
-					) . $ticker->getSymbol();
-				$orderKey['symbol'] = $ticker->getSymbol();
-
-				$positionYield->dataSource['symbol'][
-					$orderKey['symbol']
-				] = $positionYield->dataSource['dividend'][
-					$orderKey['dividend']
-				] = $positionYield->dataSource['yield'][$orderKey['yield']] = [
-					'ticker' => $ticker->getSymbol(),
-					'tickerId' => $ticker->getId(),
-					'position' => $position,
-					'label' => $ticker->getFullname(),
-					'yield' => $dividendYield,
-					'payout' => $dividendPerYear,
-					'allocation' => $allocation,
-					'netTotalPayoutPerPaydate' => $netTotalPayoutPerPaydate,
-					'netForwardYearlyPayout' => $netForwardYearlyPayout,
-					'netTotalForwardYearlyPayout' => $netTotalForwardYearlyPayout,
-					'avgPrice' => $avgPrice,
-					'lastDividend' => $lastCash,
-					'lastDividendCurrency' => $lastCashCurrency,
-					'lastDividendDate' => $lastDividendDate,
-					'numPayoutsPerYear' => $numPayoutsPerYear,
-					'amount' => $amount,
-					'taxRate' => $taxRate,
-					'exchangeRate' => $exchangeRate,
-				];
-				$totalNetYearlyDividend += $netTotalForwardYearlyPayout;
-				$positionYield->sumAvgPrice += $avgPrice;
-				$positionYield->sumDividends += $dividendPerYear;
-				$totalDividend += $dividendPerYear * $amount;
-
-				$this->stopwatch->lap('processing-file');
+				$netTotalPayoutPerPaydate = 0;
+				if ($numPayoutsPerYear > 0) {
+					$netTotalPayoutPerPaydate =
+						$netTotalForwardYearlyPayout / $numPayoutsPerYear;
+				}
 			}
-			$this->stopwatch->stop('processing-file');
+			$dividendPerYear = $numPayoutsPerYear * $lastCash;
 
-			if ($positionYield->sumAvgPrice) {
-				$totalAvgYield =
-					($positionYield->sumDividends /
-						$positionYield->sumAvgPrice) *
-					100;
-			}
-			if ($allocated) {
-				$dividendYieldOnCost =
-					($totalNetYearlyDividend /
-						$allocated) *
-					100;
-			}
-			$yieldData = $positionYield;
+			$tickerLabel = $ticker->getSymbol();
+			$positionYield->labels[$tickerLabel] = sprintf(
+				'%s (%s)',
+				substr(
+					addslashes(
+						str_replace(
+							["'", '"'],
+							['', ''],
+							$ticker->getFullname()
+						)
+					),
+					0,
+					8
+				),
+				$ticker->getSymbol()
+			);
+			$positionYield->data[$tickerLabel] = $dividendYield;
 
-			//return $positionYield;
+			$orderKey['yield'] =
+				str_pad(
+					(string) ($dividendYield * 100),
+					10,
+					'0',
+					STR_PAD_LEFT
+				) . $ticker->getSymbol();
+			$orderKey['dividend'] =
+				str_pad(
+					(string) ($dividendPerYear * 100),
+					10,
+					'0',
+					STR_PAD_LEFT
+				) . $ticker->getSymbol();
+			$orderKey['symbol'] = $ticker->getSymbol();
+
+			$positionYield->dataSource['symbol'][
+				$orderKey['symbol']
+			] = $positionYield->dataSource['dividend'][
+				$orderKey['dividend']
+			] = $positionYield->dataSource['yield'][$orderKey['yield']] = [
+				'ticker' => $ticker->getSymbol(),
+				'tickerId' => $ticker->getId(),
+				'position' => $position,
+				'label' => $ticker->getFullname(),
+				'yield' => $dividendYield,
+				'payout' => $dividendPerYear,
+				'allocation' => $allocation,
+				'netTotalPayoutPerPaydate' => $netTotalPayoutPerPaydate,
+				'netForwardYearlyPayout' => $netForwardYearlyPayout,
+				'netTotalForwardYearlyPayout' => $netTotalForwardYearlyPayout,
+				'avgPrice' => $avgPrice,
+				'lastDividend' => $lastCash,
+				'lastDividendCurrency' => $lastCashCurrency,
+				'lastDividendDate' => $lastDividendDate,
+				'numPayoutsPerYear' => $numPayoutsPerYear,
+				'amount' => $amount,
+				'taxRate' => $taxRate,
+				'exchangeRate' => $exchangeRate,
+			];
+			$totalNetYearlyDividend += $netTotalForwardYearlyPayout;
+			$positionYield->sumAvgPrice += $avgPrice;
+			$positionYield->sumDividends += $dividendPerYear;
+			$totalDividend += $dividendPerYear * $amount;
+
+			$this->stopwatch->lap('processing-file');
+		}
+		$this->stopwatch->stop('processing-file');
+
+		if ($positionYield->sumAvgPrice) {
+			$totalAvgYield =
+				($positionYield->sumDividends / $positionYield->sumAvgPrice) *
+				100;
+		}
+		if ($allocated) {
+			$dividendYieldOnCost = ($totalNetYearlyDividend / $allocated) * 100;
+		}
+		$yieldData = $positionYield;
+
+		//return $positionYield;
 		//});
 
 		ksort($yieldData->labels);
@@ -205,7 +219,6 @@ class YieldsService
 			'asc' => ksort($yieldData->dataSource[$sort]),
 			default => ksort($yieldData->dataSource[$sort]),
 		};
-
 
 		//$this->pool->delete($poolKey);
 

@@ -318,7 +318,7 @@ class CalendarRepository extends ServiceEntityRepository
 			);
 
 		if ($pie && $pie->getId() != null) {
-			$qb->andWhere('tr.pie IN (:pie) OR pies IN (:pie)')->setParameter(
+			$qb->andWhere('tr.pie IN (:pie)')->setParameter(
 				'pie',
 				[$pie->getId()]
 			);

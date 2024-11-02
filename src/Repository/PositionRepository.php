@@ -150,7 +150,6 @@ class PositionRepository extends ServiceEntityRepository
 		Ticker $ticker,
 		DateTime $transactionDate
 	): ?Position {
-
 		$position = $this->findOneByTickerAndTransactionDate(
 			$ticker,
 			$transactionDate
@@ -312,6 +311,15 @@ class PositionRepository extends ServiceEntityRepository
 		return $qb->getQuery()->getResult();
 	}
 
+	public function getAllByIds(array $ids): array
+	{
+		return $this->getQueryBuilder('p')
+			->where('p.id IN (:ids)')
+			->setParameter('ids', $ids)
+			->getQuery()
+			->getResult();
+	}
+
 	public function getAllOpen(
 		?Pie $pie = null,
 		int $year = null,
@@ -344,7 +352,7 @@ class PositionRepository extends ServiceEntityRepository
 			);
 		}
 
-        /* Does nothing for now
+		/* Does nothing for now
         match($sort) {
             'symbol' => $qb->orderBy('t.symbol', $sortDirection),
             'dividend' => '',
@@ -361,7 +369,9 @@ class PositionRepository extends ServiceEntityRepository
 		string $orderBy = 'ASC',
 		?Ticker $ticker = null
 	): QueryBuilder {
-		$sort = in_array($sort, ['t.symbol', 't.fullname', 'i.label']) ? $sort : 't.symbol';
+		$sort = in_array($sort, ['t.symbol', 't.fullname', 'i.label'])
+			? $sort
+			: 't.symbol';
 
 		// Create our query
 		$queryBuilder = $this->createQueryBuilder('p')
