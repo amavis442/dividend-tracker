@@ -53,12 +53,15 @@ class YieldsService
 
 		$this->stopwatch->stop('getting-positions-from-database');
 
+		/*
 		$this->stopwatch->start(
 			'getting-sumallocated-from-database',
 			'parsing'
 		);
 		$allocated = $positionRepository->getSumAllocated($pie);
 		$this->stopwatch->stop('getting-sumallocated-from-database');
+		*/
+		$allocated = 0.0;
 
 		$this->stopwatch->start('processing-file', 'parsing');
 
@@ -84,6 +87,8 @@ class YieldsService
 					? $report[$position->getId()]['allocation']
 					: $position->getAllocation();
 			$ticker = $position->getTicker();
+
+			$allocated += $allocation;
 
 			$lastCash = 0;
 			$lastDividendDate = null;
@@ -113,7 +118,10 @@ class YieldsService
 
 				$netTotalForwardYearlyPayout =
 					$numPayoutsPerYear *
-					$dividendService->getForwardNetDividend($position->getTicker(), $amount);
+					$dividendService->getForwardNetDividend(
+						$position->getTicker(),
+						$amount
+					);
 				$netForwardYearlyPayout =
 					$numPayoutsPerYear *
 					$dividendService->getNetDividend(
