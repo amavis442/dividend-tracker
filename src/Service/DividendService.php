@@ -297,11 +297,10 @@ class DividendService implements DividendServiceInterface
      * @param Position $position
      * @return float|null
      */
-    public function getForwardNetDividend(Position $position): ?float
+    public function getForwardNetDividend(Ticker $ticker, float $amount): ?float
     {
         $cashAmount = 0.0;
         $forwardNetDividend = 0.0;
-        $ticker = $position->getTicker();
         $calendars = $ticker->getCalendars();
         if (count($calendars) > 0) {
             /**
@@ -313,7 +312,7 @@ class DividendService implements DividendServiceInterface
                 if ($this->cummulateDividendAmount) {
                     $cashAmount = $this->getCashAmount($ticker);
                 }
-                $amount = $position->getAmount();
+
                 $dividendTax = $ticker->getTax() ? $ticker->getTax()->getTaxRate() : Constants::TAX / 100;
                 $exchangeRate = $this->getExchangeRate($calendar);
                 $this->netDividendPerShare = $cashAmount * $exchangeRate * (1 - $dividendTax);
@@ -321,8 +320,6 @@ class DividendService implements DividendServiceInterface
             }
         }
         $this->forwardNetDividend = $forwardNetDividend;
-
-        $this->position = $position;
 
         return $forwardNetDividend;
     }
@@ -333,17 +330,14 @@ class DividendService implements DividendServiceInterface
      * @param Position $position
      * @return float|null
      */
-    public function getForwardNetDividendYield(Position $position): ?float
+    public function getForwardNetDividendYield(Position $position, Ticker $ticker, float $amount, float $allocation): ?float
     {
         if ($position->getClosed() == true) {
             return null;
         }
 
         $netDividendYield = 0.0;
-        $forwardNetDividend = $this->forwardNetDividend;
-        if ($this->position !== $position) {
-            $forwardNetDividend = $this->getForwardNetDividend($position);
-        }
+        $forwardNetDividend = $this->getForwardNetDividend($position->getTicker(), $amount);
 
         if ($forwardNetDividend) {
             $dividendFrequency = 4;
@@ -351,7 +345,7 @@ class DividendService implements DividendServiceInterface
                 $dividendFrequency = $position->getTicker()->getPayoutFrequency();
             }
             $totalNetDividend = $forwardNetDividend * $dividendFrequency;
-            $allocation = $position->getAllocation();
+            
             $netDividendYield = round(($totalNetDividend / $allocation) * 100, 2);
         }
 
@@ -368,7 +362,7 @@ class DividendService implements DividendServiceInterface
     public function getNetDividendPerShare(?Position $position): ?float
     {
         if (!$this->netDividendPerShare && $position) {
-            $this->getForwardNetDividend($position);
+            $this->getForwardNetDividend($position->getTicker(), $position->getAmount());
         }
 
         return $this->netDividendPerShare;

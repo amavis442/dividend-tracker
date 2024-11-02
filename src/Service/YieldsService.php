@@ -113,7 +113,7 @@ class YieldsService
 
 				$netTotalForwardYearlyPayout =
 					$numPayoutsPerYear *
-					$dividendService->getForwardNetDividend($position);
+					$dividendService->getForwardNetDividend($position->getTicker(), $amount);
 				$netForwardYearlyPayout =
 					$numPayoutsPerYear *
 					$dividendService->getNetDividend(
@@ -121,7 +121,10 @@ class YieldsService
 						$firstCalendarEntry
 					);
 				$dividendYield = $dividendService->getForwardNetDividendYield(
-					$position
+					$position,
+					$position->getTicker(),
+					$amount,
+					$allocation
 				);
 				$netTotalPayoutPerPaydate = 0;
 				if ($numPayoutsPerYear > 0) {
