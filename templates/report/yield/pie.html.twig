@@ -16,25 +16,25 @@
                         {{ 'Yield'|trans }}
                     </twig:Head>
                 </div>
-                <twig:Card title="{{ 'Yield on cost dividend'|trans }} ({{ dividendYieldOnCost|format_number({"fraction_digit": 2}) }}%)"
+                <twig:Card title="{{ 'Yield on cost dividend'|trans }} ({{ dividendYieldOnCost|default(0)|format_number({"fraction_digit": 2}) }}%)"
                            title_header_variant="h5"
                            class="mb-4">
                     <div class="mb-4">
                         <div class="flex mt-2">
                             {{ 'Total dividend in a year / total allocated'|trans }}:&nbsp;
                             <twig:Badge variant="primary">
-                                &euro;{{ totalNetYearlyDividend|format_number({"fraction_digit": 2}) }}
+                                &euro;{{ totalNetYearlyDividend|default(0)|format_number({"fraction_digit": 2}) }}
                             </twig:Badge>
                             /&nbsp;
                             <twig:Badge variant="info">
-                                &euro;{{ allocated|format_number({"fraction_digit": 2}) }}
+                                &euro;{{ allocated|default(0)|format_number({"fraction_digit": 2}) }}
                             </twig:Badge>
                         </div>
                     </div>
                     <div class="bg-gray-200 rounded-b-lg p-2 mt-4 -mx-3 -my-2">
                         <small>
                             {{ 'Per month'|trans }}
-                            <strong>&euro;{{ (totalNetYearlyDividend / 12)|format_number({"fraction_digit": 2}) }}</strong>
+                            <strong>&euro;{{ (totalNetYearlyDividend|default(0) / 12)|format_number({"fraction_digit": 2}) }}</strong>
                         </small>
                     </div>
                 </twig:Card>
@@ -128,7 +128,7 @@
                             </tr>
                         </twig:Table:THead>
                         <tbody>
-                            {% for item in datasource %}
+                            {% for item in datasource|default([]) %}
                                 <twig:Table:Tr>
                                     <twig:Table:Td>
                                         <div data-controller="tooltip">
@@ -232,13 +232,13 @@
                                 <twig:Table:Td colspan='6'>
                                 </twig:Table:Td>
                                 <twig:Table:Td>
-                                    &euro;{{ totalNetYearlyDividend|format_number({"fraction_digit": 2}) }}
+                                    &euro;{{ totalNetYearlyDividend|default(0)|format_number({"fraction_digit": 2}) }}
                                 </twig:Table:Td>
                                 <twig:Table:Td>
-                                    {{ dividendYieldOnCost|format_number({"fraction_digit": 2}) }}%
+                                    {{ dividendYieldOnCost|default(0)|format_number({"fraction_digit": 2}) }}%
                                 </twig:Table:Td>
                                 <twig:Table:Td>
-                                    &euro;{{ allocated|format_number({"fraction_digit": 2}) }}
+                                    &euro;{{ allocated|default(0)|format_number({"fraction_digit": 2}) }}
                                 </twig:Table:Td>
                             </tr>
                         </tbody>

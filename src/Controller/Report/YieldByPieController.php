@@ -55,45 +55,41 @@ class YieldByPieController extends AbstractController
 			: 'ASC';
 
 		$pieSelected = $request->getSession()->get(self::YIELD_PIE_KEY, null);
-		$result = $yields->yield(
-			$sort,
-			$sortDirection,
-			$pie
-		);
+		$result = $yields->yield($sort, $sortDirection, $pie);
 
 		$colors = Colors::COLORS;
 
 		$chart = $chartBuilder->createChart(Chart::TYPE_BAR);
-
-		$chart->setData([
-			'labels' => $result['labels'],
-			'datasets' => [
-				[
-					'label' => 'Dividend yield',
-					'backgroundColor' => $colors,
-					'borderColor' => $colors,
-					'data' => $result['data'],
-				],
-			],
-		]);
-
-		$chart->setOptions([
-			'maintainAspectRatio' => false,
-			'responsive' => true,
-			'plugins' => [
-				'title' => [
-					'display' => true,
-					'text' => 'Yield',
-					'font' => [
-						'size' => 24,
+		if (count($result) > 0) {
+			$chart->setData([
+				'labels' => $result['labels'],
+				'datasets' => [
+					[
+						'label' => 'Dividend yield',
+						'backgroundColor' => $colors,
+						'borderColor' => $colors,
+						'data' => $result['data'],
 					],
 				],
-				'legend' => [
-					'position' => 'top',
-				],
-			],
-		]);
+			]);
 
+			$chart->setOptions([
+				'maintainAspectRatio' => false,
+				'responsive' => true,
+				'plugins' => [
+					'title' => [
+						'display' => true,
+						'text' => 'Yield',
+						'font' => [
+							'size' => 24,
+						],
+					],
+					'legend' => [
+						'position' => 'top',
+					],
+				],
+			]);
+		}
 		return $this->render(
 			'report/yield/pie.html.twig',
 			array_merge($result, [

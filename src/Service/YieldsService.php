@@ -53,6 +53,10 @@ class YieldsService
 
 		$this->stopwatch->stop('getting-positions-from-database');
 
+		if ($pie && count($report) < 1) {
+			return [];
+		}
+
 		/*
 		$this->stopwatch->start(
 			'getting-sumallocated-from-database',
