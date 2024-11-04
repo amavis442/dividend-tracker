@@ -54,7 +54,7 @@ class DividendTrackerCommand extends Command
 
             $positions = $this->positionRepository->getAllOpen();
             foreach ($positions as $position) {
-                $currentDividend = $this->dividendService->getForwardNetDividend($position);
+                $currentDividend = $this->dividendService->getForwardNetDividend($position->getTicker(), $position->getAmount());
                 $totalDividend += $currentDividend * $position->getTicker()->getPayoutFrequency();
                 $principle += $position->getAllocation();
             }
