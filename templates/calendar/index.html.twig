@@ -159,7 +159,7 @@
                                     {{ calendar.exDividendDate|format_date('medium', locale=app.request.locale) }}
                                 </twig:Table:Td>
                                 <twig:Table:Td>
-                                    {{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ calendar.cashAmount|format_number({"fraction_digit": 2}) }}
+                                    {{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ calendar.cashAmount|format_number({"fraction_digit": 3}) }}
                                 </twig:Table:Td>
                                 <twig:Table:Td>
                                     {{ (calendar.source ?? 'manual')|trans }}
