@@ -54,6 +54,7 @@ services:
             $client: "@http_client"
             $exchangerateCache: "@exchangerate.cache"
 
+    # Yahoo api does not work anymore
     App\Service\StockPriceService:
         arguments:
             $client: "@http_client"
@@ -82,7 +83,8 @@ services:
         arguments:
             $client: "@http_client"
         calls:
-            - addService: ['App\Service\DividendDate\SeekingAlphaService']
+            # They changed the api and is no longer available
+            # - addService: ['App\Service\DividendDate\SeekingAlphaService']
             - addService:
                   [
                       'App\Service\DividendDate\ISharesService',
@@ -96,7 +98,7 @@ services:
             - addService:
                   ['App\Service\DividendDate\PimcoService', ["STHS", "SSHY"]]
             - addService: ['\App\Service\DividendDate\NullService', ["DSM"]]
-            - setDefault: ['App\Service\DividendDate\SeekingAlphaService']
+            #- setDefault: ['App\Service\DividendDate\SeekingAlphaService']
 
     App\Service\Importer\ImportCsvService:
         arguments:
