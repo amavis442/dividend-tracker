@@ -46,11 +46,15 @@ class DividendDateService
      * @param string $serviceClass
      * @return self
      */
-    public function addService(string $serviceClass, ?array $symbols = []): self
+    public function addService(string $serviceClass, ?array $symbols = [], ?string $api_key = ''): self
     {
         $service = new $serviceClass($this->client);
+        if ($api_key) {
+            $service->setApiKey($api_key);
+        }
+
         if (!$service instanceof DividendDatePluginInterface) {
-            throw new \RuntimeException("Class [" . $serviceClass . "] should implement StockPriceInterface");
+            throw new \RuntimeException("Class [" . $serviceClass . "] should implement DividendDatePluginInterface");
         }
 
         $this->services[$serviceClass] = $service;

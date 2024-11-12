@@ -25,6 +25,9 @@ class SeekingAlphaService implements DividendDatePluginInterface
         $this->client = $client;
     }
 
+    public function setApiKey(?string $api_key): void{
+    }
+
     private function getToken()
     {
         $response = $this->client->request('GET', self::TOKEN_URL);

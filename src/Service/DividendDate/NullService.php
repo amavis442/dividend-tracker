@@ -23,6 +23,10 @@ class NullService implements DividendDatePluginInterface
         $this->client = $client;
     }
 
+    public function setApiKey(?string $api_key): void
+    {
+
+    }
     public function getData(string $symbol): ?array
     {
         return null;

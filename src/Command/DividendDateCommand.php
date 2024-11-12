@@ -162,7 +162,7 @@ class DividendDateCommand extends Command
                     $addedDates++;
                 }
             }
-            sleep(2);
+            sleep(10);
         }
         $io->success('Done.... added: ' . $addedDates);
         $io->info(implode(', ', $addedForTicker));

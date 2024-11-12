@@ -11,6 +11,7 @@ parameters:
     app.dividend.exchangerate: 1.19
     app.max_per_page: 10
     app.supported_locales: 'en|nl'
+    dividend.financial_modeling_prep_api_key: '%env(FINANCIALMODELINGPREP_API_KEY)%'
 
 services:
     # default configuration for services in *this* file
@@ -83,8 +84,13 @@ services:
         arguments:
             $client: "@http_client"
         calls:
-            # They changed the api and is no longer available
+            # SeekingAlpha: They changed the api and is no longer available
             # - addService: ['App\Service\DividendDate\SeekingAlphaService']
+            - addService: [
+                    'App\Service\DividendDate\FinancialModelingPrepService',
+                    [],
+                    '%dividend.financial_modeling_prep_api_key%'
+                    ]
             - addService:
                   [
                       'App\Service\DividendDate\ISharesService',
@@ -99,6 +105,7 @@ services:
                   ['App\Service\DividendDate\PimcoService', ["STHS", "SSHY"]]
             - addService: ['\App\Service\DividendDate\NullService', ["DSM"]]
             #- setDefault: ['App\Service\DividendDate\SeekingAlphaService']
+            - setDefault: ['App\Service\DividendDate\FinancialModelingPrepService']
 
     App\Service\Importer\ImportCsvService:
         arguments:
