@@ -1,7 +1,7 @@
 <turbo-frame id="portfolio_tab_results">
 
 <div class="flex justify-end mb-4">
-		<twig:Button tag="a" href="{{ path('payment_new', { position: position.id }) }}">
+		<twig:Button tag="a" href="{{ path('payment_new', { position: position.id }) }}" data-turbo-frame="_top">
 			<i class="fas fa-plus"></i>
 		</twig:Button>
 </div>
