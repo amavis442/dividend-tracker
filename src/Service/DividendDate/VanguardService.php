@@ -34,7 +34,7 @@ class VanguardService implements DividendDatePluginInterface
 
     }
 
-    public function getData(string $symbol): ?array
+    public function getData(string $symbol, string $isin): ?array
     {
         $url = '';
         $currency = 'USD';

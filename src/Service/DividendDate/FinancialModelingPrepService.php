@@ -11,6 +11,9 @@ class FinancialModelingPrepService implements DividendDatePluginInterface
 {
 	public const URL = 'https://financialmodelingprep.com/api/v3/historical-price-full/stock_dividend/[SYMBOL]?apikey=[API_KEY]'; // source https://github.com/AlmaWeb3/dividend-web
 
+	private array $ignore = ['QQQY'];
+
+
 	/**
 	 * Http client
 	 *
@@ -29,8 +32,17 @@ class FinancialModelingPrepService implements DividendDatePluginInterface
 		$this->apiKey = $apiKey;
 	}
 
-	public function getData(string $symbol): ?array
+	public function getData(string $symbol, string $isin): ?array
 	{
+		if (in_array(strtolower($symbol), $this->ignore)) {
+			return [];
+		}
+
+		// API key is only usefull for US stocks so we ignore the rest
+		if (!stripos($isin, 'us')) {
+			return [];
+		}
+
 		$url = '';
 		$url = str_replace('[SYMBOL]', $symbol, self::URL);
 		$url = str_replace('[API_KEY]', (string) $this->apiKey, $url);

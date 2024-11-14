@@ -137,11 +137,11 @@ class DividendDateService
      * @param string $symbol
      * @return array|null
      */
-    public function getData(string $symbol): ?array
+    public function getData(string $symbol, string $isin): ?array
     {
         $service = $this->getService($symbol);
         if (isset($service)) {
-            return $service->getData($symbol);
+            return $service->getData($symbol, $isin);
         }
         return [];
     }
