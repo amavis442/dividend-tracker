@@ -666,18 +666,18 @@ class PortfolioController extends AbstractController
 		]);
 	}
 
-		#[
+	#[
 		Route(
-			path: '/create_inline/{ticker?}',
-			name: 'calendar_inline_new',
+			path: '/create_dividend/{ticker?}',
+			name: 'portfolio_calendar_new',
 			methods: ['GET', 'POST']
 		)
 	]
-	public function createInline(
+	public function createDividend(
 		Request $request,
 		EntityManagerInterface $entityManager,
 		?Ticker $ticker,
-		?Position $position,
+		?Position $position
 	) {
 		$calendar = new Calendar();
 		if ($ticker != null) {
@@ -689,18 +689,55 @@ class PortfolioController extends AbstractController
 			$calendar->setSource(Calendar::SOURCE_MANUEL);
 			$entityManager->persist($calendar);
 			$entityManager->flush();
-			return $this->redirectToRoute('portfolio_show_dividends',['id'=> $position->getId(),'page'=> 1]);
+
+			return $this->redirectToRoute('portfolio_show_dividends', [
+				'id' => $position->getId(),
+				'page' => 1,
+			]);
 		}
 
-		return $this->render(
-			'portfolio/show/_form_new_inline_dividend.html.twig',
-			[
-				'calendar' => $calendar,
-				'position' => $position,
-				'ticker' => $ticker,
-				'form' => $form->createView(),
-			]
-		);
+		return $this->render('portfolio/show/_form_dividend_create.html.twig', [
+			'calendar' => $calendar,
+			'position' => $position,
+			'ticker' => $ticker,
+			'form' => $form->createView(),
+		]);
+	}
+
+	#[
+		Route(
+			path: '/delete_dividend/{calendar}/{position}',
+			name: 'portfolio_calendar_delete',
+			methods: ['POST']
+		)
+	]
+	public function delete(
+		Request $request,
+		EntityManagerInterface $entityManager,
+		Calendar $calendar,
+		Position $position
+	): Response {
+		if (
+			$this->isCsrfTokenValid(
+				'delete' . $calendar->getId(),
+				$request->request->get('_token')
+			)
+		) {
+			if ($calendar->getPayments()->isEmpty()) {
+				$entityManager->remove($calendar);
+				$entityManager->flush();
+			} else {
+				$this->addFlash(
+					'notice',
+					'Can not remove calendar because it has payments linked to it.'
+				);
+			}
+		}
+
+		return $this->redirectToRoute('portfolio_show_dividends', [
+			'id' => $position->getId(),
+			'page' => 1,
+		]);
 	}
 
 	#[

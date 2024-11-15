@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 import Swal from 'sweetalert2';
+import * as Turbo from '@hotwired/turbo';
 
 /* stimulusFetch: 'lazy' */
 export default class extends Controller {
@@ -10,10 +11,17 @@ export default class extends Controller {
         confirmButtonText: String,
         cancelButtonText: String,
     }
+    connect() {
+        this.submit = false
+    }
 
     onSubmit(event) {
+        if (this.submit) {
+            return true
+        }
         event.preventDefault();
 
+        //console.debug(event.target.dataset)
         Swal.fire({
             title: this.titleValue || null,
             text: this.textValue || null,
@@ -25,7 +33,8 @@ export default class extends Controller {
             confirmButtonText: this.confirmButtonTextValue || 'Yes',
         }).then((result) => {
             if (result.isConfirmed) {
-                this.element.submit();
+                this.submit = true
+                this.element.requestSubmit()
             }
         })
     }

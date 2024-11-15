@@ -1,104 +1,138 @@
 <turbo-frame id="portfolio_tab_results">
-
 <div class="flex justify-end mb-4">
-		<twig:Button tag="a" href="{{ path('calendar_inline_new', { ticker: ticker.id, position: position.id }) }}" data-turbo-frame="add-dividend">
-			<i class="fas fa-plus"></i>
-		</twig:Button>
+    <twig:Button tag="a"
+                 href="{{ path('portfolio_calendar_new', { ticker: ticker.id, position: position.id }) }}"
+                 data-turbo-frame="add-dividend">
+        <i class="fas fa-plus"></i>
+    </twig:Button>
 </div>
-
-
 <div class="flex flex-col">
     <twig:Table:Table>
-      <thead>
-        <twig:Table:Tr>
-          <twig:Table:ThCol>{{ 'Payment date'|trans }}</twig:Table:ThCol>
-          <twig:Table:ThCol>{{ 'Ex-dividend date'|trans }}</twig:Table:ThCol>
-          <twig:Table:ThCol>{{ 'Record date'|trans }}</twig:Table:ThCol>
-          <twig:Table:ThCol>{{ 'Cash amount'|trans }}</twig:Table:ThCol>
-          <twig:Table:ThCol>{{ 'Type'|trans }}</twig:Table:ThCol>
-          <twig:Table:ThCol>{{ 'Source'|trans }}</twig:Table:ThCol>
-          <twig:Table:ThCol>{{ 'Descr.'|trans }}</twig:Table:ThCol>
-          <twig:Table:ThCol>{{ 'Created'|trans }}</twig:Table:ThCol>
-          <twig:Table:ThCol>{{ 'Actions'|trans }}</twig:Table:ThCol>
-        </twig:Table:Tr>
-      </thead>
-      <tbody>
-        {% set oldCash = 0 %}
-        {% for index, calendar in pager %}
-          {% set dividendDaysLeft = calendar.getDaysLeft ?? - 1 %}
-          {% set tableColorClass = '' %}
-          {% if dividendDaysLeft > - 1 %}
-            {% set badgeColor = 'info' %}
-            {% if dividendDaysLeft > - 1 and dividendDaysLeft < 2 %}
-              {% set badgeColor = 'danger' %}
-            {% endif %}
-            {% if dividendDaysLeft > 1 and dividendDaysLeft < 3 %}
-              {% set badgeColor = 'warning' %}
-            {% endif %}
-            {% set tableColorClass = ' class="table-' ~ badgeColor ~ '"' %}
-          {% endif %}
-
-          <twig:Table:Tr>
-            <turbo-frame id="add-dividend"></turbo-frame>
-
-            <twig:Table:Td>{{ (calendar.paymentDate ? '<strong>' ~ (calendar.paymentDate|date('d-m-Y')) ~ '</strong><br/>(<small>' ~ (calendar.paymentDate|date('l')|trans) ~ '</small>)' : '')|raw }}</twig:Table:Td>
-            <twig:Table:Td>{{ (calendar.exDividendDate ? '<strong>' ~ (calendar.exDividendDate|date('d-m-Y')) ~ '</strong><br/>(<small>' ~ (calendar.exDividendDate|date('l')|trans) ~ '</small>)' : '')|raw }}</twig:Table:Td>
-            <twig:Table:Td>{{ calendar.recordDate ? calendar.recordDate|date('d-m-Y') : '' }}</twig:Table:Td>
-            <twig:Table:Td>
-              {{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ calendar.cashAmount|format_number({ fraction_digit: 3 }) }}
-              {% if dividendRaises[index] > 0 %}
-                <span class="badge badge-success">
-                  <i class="fas fa-arrow-circle-up"></i>
-                  {{ dividendRaises[index]|format_number({ fraction_digit: 2 }) }}%
-                </span>
-              {% endif %}
-              {% if dividendRaises[index] < 0 %}
-                <span class="badge badge-danger">
-                  <i class="fas fa-arrow-circle-down"></i>
-                  {{ dividendRaises[index]|format_number({ fraction_digit: 2 }) }}%
-                </span>
-              {% endif %}
-            </twig:Table:Td>
-            <twig:Table:Td>{{ (calendar.dividendType ?? 'Regular')|trans }}</twig:Table:Td>
-            <twig:Table:Td>{{ (calendar.source ?? 'manual')|trans }}</twig:Table:Td>
-            <twig:Table:Td>{{ calendar.description }}</twig:Table:Td>
-            <twig:Table:Td>
-              {{ calendar.createdAt|format_date('short') }}{% if not calendar.payments.isEmpty %}
-                <i class="fa-solid fa-triangle-exclamation" title="Has payments attached"></i>
-              {% endif %}
-            </twig:Table:Td>
-            <twig:Table:Td>
-              <div class="flex" data-controller="tooltip">
-								<twig:Button tag="a" href="{{ path('calendar_edit', { id: calendar.id }) }}" data-turbo-frame="_top" data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">
-										<i class="far fa-edit"></i>
-                     <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
-                       {{ 'Edit calendar'|trans }}
-                      <div class="arrow" data-tooltip-target="tooltipArrow"></div>
-                    </div>
-								</twig:Button>
-							</div>
-            </twig:Table:Td>
-          </twig:Table:Tr>
-        {% else %}
-          <twig:Table:Tr>
-            <twig:Table:Td colspan="8">no records found</twig:Table:Td>
-          </twig:Table:Tr>
-        {% endfor %}
-          <tfoot>
+        <thead>
             <twig:Table:Tr>
-              <twig:Table:Td colspan="8">
-                <small>{{ 'Calendar items'|trans }} #{{ calendarsCount }}</small>
-              </twig:Table:Td>
+                <twig:Table:ThCol>
+                    {{ 'Payment date'|trans }}
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    {{ 'Ex-dividend date'|trans }}
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    {{ 'Record date'|trans }}
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    {{ 'Cash amount'|trans }}
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    {{ 'Type'|trans }}
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    {{ 'Source'|trans }}
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    {{ 'Descr.'|trans }}
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    {{ 'Created'|trans }}
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    {{ 'Actions'|trans }}
+                </twig:Table:ThCol>
             </twig:Table:Tr>
-          </tfoot>
-      </tbody>
+        </thead>
+        <tbody>
+            {% set oldCash = 0 %}
+            {% for index, calendar in pager %}
+                {% set dividendDaysLeft = calendar.getDaysLeft ?? - 1 %}
+                {% set tableColorClass = "" %}
+                {% if dividendDaysLeft > - 1 %}
+                    {% set badgeColor = "info" %}
+                    {% if dividendDaysLeft > - 1 and dividendDaysLeft < 2 %}
+                        {% set badgeColor = "danger" %}
+                    {% endif %}
+                    {% if dividendDaysLeft > 1 and dividendDaysLeft < 3 %}
+                        {% set badgeColor = "warning" %}
+                    {% endif %}
+                    {% set tableColorClass = ' class="table-' ~ badgeColor ~ '"' %}
+                {% endif %}
+                <twig:Table:Tr>
+                    <turbo-frame id="add-dividend"></turbo-frame>
+                    <twig:Table:Td>
+                        {{ (calendar.paymentDate ? '<strong>' ~ (calendar.paymentDate|date("d-m-Y") ) ~ '</strong><br />(<small>' ~ (calendar.paymentDate|date('l')|trans) ~ '</small>)' : '')|raw }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ (calendar.exDividendDate ? '<strong>' ~ (calendar.exDividendDate|date("d-m-Y") ) ~ '</strong><br />(<small>' ~ (calendar.exDividendDate|date('l')|trans) ~ '</small>)' : '')|raw }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ calendar.recordDate ? calendar.recordDate|date("d-m-Y") : '' }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ calendar.cashAmount|format_number({"fraction_digit": 3}) }}
+                        {% if dividendRaises[index] > 0 %}
+                            <span class="badge badge-success">
+                                <i class="fas fa-arrow-circle-up"></i>
+                                {{ dividendRaises[index]|format_number({"fraction_digit": 2}) }}%
+                            </span>
+                        {% endif %}
+                        {% if dividendRaises[index] < 0 %}
+                            <span class="badge badge-danger">
+                                <i class="fas fa-arrow-circle-down"></i>
+                                {{ dividendRaises[index]|format_number({"fraction_digit": 2}) }}%
+                            </span>
+                        {% endif %}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ (calendar.dividendType ?? 'Regular')|trans }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ (calendar.source ?? 'manual')|trans }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ calendar.description }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ calendar.createdAt|format_date("short") }}
+                        {% if not calendar.payments.isEmpty %}
+                            <i class="fa-solid fa-triangle-exclamation"
+                               title="Has payments attached"></i>
+                        {% endif %}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        <div class="flex" data-controller="tooltip">
+                            <div class="inline-flex rounded-md shadow-sm items-center justify-between mx-auto"
+                                 role="group">
+                                <a href="{{ path('calendar_edit', { id: calendar.id }) }}"
+                                   class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white"
+                                   data-turbo-frame="_top"
+                                   data-tooltip-target="element"
+                                   data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">
+                                    <i class="far fa-edit"></i>
+                                    <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                        {{ 'Edit calendar'|trans }}
+                                        <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                    </div>
+                                </a>
+                                {{ include("portfolio/show/_form_dividend_delete.html.twig") }}
+                            </div>
+                        </div>
+                    </twig:Table:Td>
+                </twig:Table:Tr>
+            {% else %}
+                <twig:Table:Tr>
+                    <twig:Table:Td colspan="9">
+                        no records found
+                    </twig:Table:Td>
+                </twig:Table:Tr>
+            {% endfor %}
+            <tfoot>
+                <twig:Table:Tr>
+                    <twig:Table:Td colspan="8">
+                        <small>{{ 'Calendar items'|trans }} #{{ calendarsCount }}</small>
+                    </twig:Table:Td>
+                </twig:Table:Tr>
+            </tfoot>
+        </tbody>
     </twig:Table:Table>
-    <div class="mt-2">
-    	{{ pagerfanta(pager) }}
-    </div>
+    <div class="mt-2">{{ pagerfanta(pager) }}</div>
 </div>
-
-
-    <small>{{ 'Calendar items'|trans }} #{{ calendarsCount }}</small>
-
+<small>{{ 'Calendar items'|trans }} #{{ calendarsCount }}</small>
 </turbo-frame>
