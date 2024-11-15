@@ -1,7 +1,7 @@
 <turbo-frame id="portfolio_tab_results">
 
 <div class="flex justify-end mb-4">
-		<twig:Button tag="a" href="{{ path('calendar_new', { ticker: ticker.id }) }}" data-turbo-frame="_top">
+		<twig:Button tag="a" href="{{ path('calendar_inline_new', { ticker: ticker.id, position: position.id }) }}" data-turbo-frame="add-dividend">
 			<i class="fas fa-plus"></i>
 		</twig:Button>
 </div>
@@ -39,6 +39,8 @@
           {% endif %}
 
           <twig:Table:Tr>
+            <turbo-frame id="add-dividend"></turbo-frame>
+
             <twig:Table:Td>{{ (calendar.paymentDate ? '<strong>' ~ (calendar.paymentDate|date('d-m-Y')) ~ '</strong><br/>(<small>' ~ (calendar.paymentDate|date('l')|trans) ~ '</small>)' : '')|raw }}</twig:Table:Td>
             <twig:Table:Td>{{ (calendar.exDividendDate ? '<strong>' ~ (calendar.exDividendDate|date('d-m-Y')) ~ '</strong><br/>(<small>' ~ (calendar.exDividendDate|date('l')|trans) ~ '</small>)' : '')|raw }}</twig:Table:Td>
             <twig:Table:Td>{{ calendar.recordDate ? calendar.recordDate|date('d-m-Y') : '' }}</twig:Table:Td>

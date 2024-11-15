@@ -9,8 +9,10 @@ use App\Entity\Portfolio;
 use App\Entity\PortfolioGoal;
 use App\Entity\Position;
 use App\Entity\SearchForm;
+use App\Entity\Ticker;
 use App\Entity\Transaction;
 use App\Entity\User;
+use App\Form\CalendarType;
 use App\Form\PortfolioGoalType;
 use App\Form\SearchFormType;
 use App\Form\TransactionPieType;
@@ -618,7 +620,7 @@ class PortfolioController extends AbstractController
 		$ticker = $position->getTicker();
 		$calenders = $ticker->getCalendars();
 
-		$position = $positionRepository->getForPosition($position);
+		//$position = $positionRepository->getForPosition($position);
 		$dividendRaises = [];
 
 		$reverseCalendars = array_reverse($calenders->toArray(), true);
@@ -656,11 +658,49 @@ class PortfolioController extends AbstractController
 
 		return $this->render('portfolio/show/_dividend.html.twig', [
 			'ticker' => $ticker,
+			'position' => $position,
 			'dividend' => $dividend,
 			'pager' => $pager,
 			'calendarsCount' => $calendarsCount,
 			'dividendRaises' => $dividendRaises,
 		]);
+	}
+
+		#[
+		Route(
+			path: '/create_inline/{ticker?}',
+			name: 'calendar_inline_new',
+			methods: ['GET', 'POST']
+		)
+	]
+	public function createInline(
+		Request $request,
+		EntityManagerInterface $entityManager,
+		?Ticker $ticker,
+		?Position $position,
+	) {
+		$calendar = new Calendar();
+		if ($ticker != null) {
+			$calendar->setTicker($ticker);
+		}
+		$form = $this->createForm(CalendarType::class, $calendar);
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			$calendar->setSource(Calendar::SOURCE_MANUEL);
+			$entityManager->persist($calendar);
+			$entityManager->flush();
+			return $this->redirectToRoute('portfolio_show_dividends',['id'=> $position->getId(),'page'=> 1]);
+		}
+
+		return $this->render(
+			'portfolio/show/_form_new_inline_dividend.html.twig',
+			[
+				'calendar' => $calendar,
+				'position' => $position,
+				'ticker' => $ticker,
+				'form' => $form->createView(),
+			]
+		);
 	}
 
 	#[
