@@ -96,9 +96,13 @@ export default class extends Controller {
 //        this.cleanup();
     }
 
-    disconnect(event) {
-        this.hide();
+
+    disconnect() {
+        if (this.hasTooltipTarget) {
+            this.hide();
+        }
     }
+
 
     handleCache(event) {
         if (this.tooltipTargets != undefined) {
