@@ -840,7 +840,7 @@ class PortfolioController extends AbstractController
 		$ticker = $position->getTicker();
 
 		$adapter = new QueryAdapter(
-			$researchRepository->getForTickerQueryBuilder($ticker)
+			$researchRepository->getForTickerQueryBuilder($ticker, 'r.id','DESC')
 		);
 		$pager = new Pagerfanta($adapter);
 		$pager->setMaxPerPage(10);
