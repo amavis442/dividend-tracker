@@ -40,6 +40,7 @@
             </twig:Table:Tr>
         </thead>
         <tbody>
+            <turbo-frame id="add-dividend"></turbo-frame>
             {% set oldCash = 0 %}
             {% for index, calendar in pager %}
                 {% set dividendDaysLeft = calendar.getDaysLeft ?? - 1 %}
@@ -55,7 +56,6 @@
                     {% set tableColorClass = ' class="table-' ~ badgeColor ~ '"' %}
                 {% endif %}
                 <twig:Table:Tr>
-                    <turbo-frame id="add-dividend"></turbo-frame>
                     <twig:Table:Td>
                         {{ (calendar.paymentDate ? '<strong>' ~ (calendar.paymentDate|date("d-m-Y") ) ~ '</strong><br />(<small>' ~ (calendar.paymentDate|date('l')|trans) ~ '</small>)' : '')|raw }}
                     </twig:Table:Td>
@@ -125,7 +125,7 @@
             {% endfor %}
             <tfoot>
                 <twig:Table:Tr>
-                    <twig:Table:Td colspan="8">
+                    <twig:Table:Td colspan="9">
                         <small>{{ 'Calendar items'|trans }} #{{ calendarsCount }}</small>
                     </twig:Table:Td>
                 </twig:Table:Tr>
