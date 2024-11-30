@@ -16,7 +16,7 @@ set('allow_anonymous_stats', false);
 set('bin/npm', function () {
     return run('which npm');
 });
-//set('cachetool', '/var/run/php8.3-fpm-dividend.sock');
+set('cachetool', '/run/php/php8.3-fpm-dividend.sock');
 set('bin/cachetool', function () {
     return which('cachetool.phar');
 });
@@ -50,6 +50,16 @@ host('acc')
 
 host('acerdeploy')
     ->set('hostname', 'acerdeploy')
+    ->setRemoteUser('deployer')
+    ->setDeployPath('/var/www/prod/{{application}}')
+    ->setLabels([
+        'type' => 'local',
+        'env' => 'prod',
+        'stage' => 'prod',
+    ]);
+
+host('proxmox')
+    ->set('hostname', 'proxmox')
     ->setRemoteUser('deployer')
     ->setDeployPath('/var/www/prod/{{application}}')
     ->setLabels([
