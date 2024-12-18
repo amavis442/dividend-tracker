@@ -153,7 +153,7 @@ class ImportCsvService extends AbstractImporter
             if (
                 false !== stripos($cellVal, 'deposit') ||
                 false !== stripos($cellVal, 'withdraw') ||
-                false !== stripos($cellVal, 'interest')
+                (false !== stripos($cellVal, 'interest') && !(false == stripos($cellVal, 'dividend')))
             ) {
                 continue;
             }
