@@ -112,7 +112,7 @@
 						<twig:Table:Td>
 							<turbo-frame id="update-pie-{{ transaction.id }}">
 									<a href="{{ path('portfolio_update_pie',{id: transaction.id})}}" class="flex w-full group">
-										{{ transaction.pie ?  transaction.pie.label : (transaction.position.pies[0] != null ? transaction.position.pies[0].label : '') }}
+										{{ transaction.pie ?  transaction.pie.label : (transaction.position.pies|length > 0  and transaction.position.pies[0] != null ? transaction.position.pies[0].label : '') }}
 											<div class="invisible group-hover:visible px-2 py-2">
 												<i class="fa-solid fa-pencil"></i>
 											</div>
