@@ -5,7 +5,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     .container.dumper.inline_factories: true
-    documents_directory: "%kernel.project_dir%/public/uploads/documents"
+    documents_directory: '%kernel.project_dir%/public/uploads/documents'
     app.path.research_attachments: /uploads/documents
     app.dividend.tax: 0.15
     app.dividend.exchangerate: 1.19
@@ -22,23 +22,23 @@ services:
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
-        resource: "../src/"
+        resource: '../src/'
         exclude:
-            - "../src/DependencyInjection/"
-            - "../src/Entity/"
-            - "../src/Kernel.php"
-            - "../src/Tests/"
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            - '../src/Tests/'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
     App\Controller\:
-        resource: "../src/Controller"
-        tags: ["controller.service_arguments"]
+        resource: '../src/Controller'
+        tags: ['controller.service_arguments']
 
     # Listeners
     on_request_listener:
         class: App\EventListener\OnRequestListener
-        arguments: ["@doctrine.orm.entity_manager", "@security.token_storage"]
+        arguments: ['@doctrine.orm.entity_manager', '@security.token_storage']
         tags:
             - {
                   name: kernel.event_listener,
@@ -52,14 +52,14 @@ services:
 
     App\Service\ExchangeRate\ExchangeRateService:
         arguments:
-            $client: "@http_client"
-            $exchangerateCache: "@exchangerate.cache"
+            $client: '@http_client'
+            $exchangerateCache: '@exchangerate.cache'
 
     # Yahoo api does not work anymore
     App\Service\StockPriceService:
         arguments:
-            $client: "@http_client"
-            $stockCache: "@stock.cache"
+            $client: '@http_client'
+            $stockCache: '@stock.cache'
             $exchangeRateService: '@App\Service\ExchangeRate\ExchangeRateService'
         calls:
             - addService: ['App\Service\StockPrices\YahooFinanceService']
@@ -67,53 +67,59 @@ services:
                   [
                       'App\Service\StockPrices\LondonService',
                       [
-                          "SEMB",
-                          "PNN",
-                          "RB",
-                          "BATS",
-                          "SSHY",
-                          "STHS",
-                          "VWRL",
-                          "VGOV",
-                          "VUSC",
+                          'SEMB',
+                          'PNN',
+                          'RB',
+                          'BATS',
+                          'SSHY',
+                          'STHS',
+                          'VWRL',
+                          'VGOV',
+                          'VUSC',
                       ],
                   ]
             - setDefault: ['App\Service\StockPrices\YahooFinanceService']
 
     App\Service\DividendDateService:
         arguments:
-            $client: "@http_client"
+            $client: '@http_client'
         calls:
             # SeekingAlpha: They changed the api and is no longer available
             # - addService: ['App\Service\DividendDate\SeekingAlphaService']
-            - addService: [
-                    'App\Service\DividendDate\FinancialModelingPrepService',
-                    [],
-                    '%dividend.financial_modeling_prep_api_key%'
-                    ]
+            - addService:
+                  [
+                      'App\Service\DividendDate\FinancialModelingPrepService',
+                      [],
+                      '%dividend.financial_modeling_prep_api_key%',
+                  ]
+            - addService:
+                  ['App\Service\DividendDate\NasdaqService', [], '', true]
             - addService:
                   [
                       'App\Service\DividendDate\ISharesService',
-                      ["SEMB", "INRG", "IPRP", "ISF", "IUS3", "IWDP"],
+                      ['SEMB', 'INRG', 'IPRP', 'ISF', 'IUS3', 'IWDP'],
                   ]
             - addService:
                   [
                       'App\Service\DividendDate\VanguardService',
-                      ["VMID", "VJPN", "VEUR", "VAPX", "VUSA", "VGOV"],
+                      ['VMID', 'VJPN', 'VEUR', 'VAPX', 'VUSA', 'VGOV'],
                   ]
             - addService:
-                  ['App\Service\DividendDate\PimcoService', ["STHS", "SSHY"]]
-            - addService: ['\App\Service\DividendDate\NullService', ["DSM"]]
+                  ['App\Service\DividendDate\PimcoService', ['STHS', 'SSHY']]
+            - addService: ['\App\Service\DividendDate\NullService', ['DSM']]
+
             #- setDefault: ['App\Service\DividendDate\SeekingAlphaService']
-            - setDefault: ['App\Service\DividendDate\FinancialModelingPrepService']
+            - setDefault:
+                  ['App\Service\DividendDate\FinancialModelingPrepService']
+            #- setDefault: ['App\Service\DividendDate\NasdaqService']
 
     App\Service\Importer\ImportCsvService:
         arguments:
-            $entityManager: "@doctrine.orm.entity_manager"
+            $entityManager: '@doctrine.orm.entity_manager'
 
     App\Service\WeightedAverage:
         arguments:
-            $entityManager: "@doctrine.orm.entity_manager"
+            $entityManager: '@doctrine.orm.entity_manager'
 
     Doctrine\Migrations\Version\DbalMigrationFactory: ~
     App\Migrations\Factory\MigrationFactoryDecorator:
@@ -121,7 +127,7 @@ services:
         arguments:
             [
                 '@App\Migrations\Factory\MigrationFactoryDecorator.inner',
-                "@service_container",
+                '@service_container',
             ]
 
     App\Model\PortfolioModel:
@@ -148,7 +154,6 @@ services:
     #Pagerfanta\Twig\Extension\PagerfantaRuntime:
     #    tags:
     #        - { name: 'twig.runtime' }
-
 
     #App\Serializer\AdminGroupsContextBuilder:
     #    decorates: 'api_platform.serializer.context_builder'

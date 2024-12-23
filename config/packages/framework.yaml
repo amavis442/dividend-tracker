@@ -1,6 +1,6 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
-    secret: "%env(APP_SECRET)%"
+    secret: '%env(APP_SECRET)%'
     annotations: false
     csrf_protection: true
     http_method_override: false
@@ -10,12 +10,12 @@ framework:
     # Remove or comment this section to explicitly disable session support.
     session:
         enabled: true
-        handler_id: "session.handler.native_file"
+        handler_id: 'session.handler.native_file'
         cookie_secure: auto
         cookie_samesite: lax
         storage_factory_id: session.storage.factory.native
 
-    enabled_locales: ["en", "nl"]
+    enabled_locales: ['en', 'nl']
 
     #esi: true
     #fragments: true
@@ -23,30 +23,49 @@ framework:
         log: true
 
     http_client:
+        default_options:
+            headers:
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
         scoped_clients:
             seekingalpha.client:
-                scope: "https://seekingalpha.com"
+                scope: 'https://seekingalpha.com'
                 headers:
-                    Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8"
-                    User-Agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
-                    Accept-Encoding: "gzip, deflate, br"
+                    Accept: 'text/html,application/xhtml+xml,application/xml,application/json;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8'
+                    User-Agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+                    Accept-Encoding: 'gzip, deflate, br'
+            nasdaq.client:
+                scope: 'https://api.nasdaq.com'
+                headers:
+                    Accept: 'text/html,application/xhtml+xml,application/xml,application/json,text/plain;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8'
+                    Accept-Encoding: 'gzip, deflate, br'
+                    Accept-Language: 'en-US,en;q=0.5'
+                    Cache-Control: 'max-age=0'
+                    User-Agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+            financialmodelingprep.client:
+                scope: 'https://financialmodelingprep.com'
+                headers:
+                    Accept: 'text/html,application/xhtml+xml,application/xml,application/json;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8'
+                    Accept-Encoding: 'gzip, deflate, br'
+                    Accept-Language: 'en-US,en;q=0.5'
+                    Cache-Control: 'max-age=0'
+                    User-Agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
             jsdelivr.client:
-                scope: "https://cdn.jsdelivr.net"
+                scope: 'https://cdn.jsdelivr.net'
                 headers:
-                    Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8"
-                    Accept-Encoding: "gzip, deflate, br"
-                    Accept-Language: "en-US,en;q=0.5"
-                    Cache-Control: "max-age=0"
-                    User-Agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-                    Authorization: "token %env(GITHUB_API_TOKEN)%"
+                    Accept: 'text/html,application/xhtml+xml,application/xml,application/json;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8'
+                    Accept-Encoding: 'gzip, deflate, br'
+                    Accept-Language: 'en-US,en;q=0.5'
+                    Cache-Control: 'max-age=0'
+                    User-Agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+                    Authorization: 'token %env(GITHUB_API_TOKEN)%'
             eu.client:
-                scope: "https://www.ecb.europa.eu"
+                scope: 'https://www.ecb.europa.eu'
                 headers:
-                    Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8"
-                    Accept-Encoding: "gzip, deflate, br"
-                    Accept-Language: "en-US,en;q=0.5"
-                    Cache-Control: "max-age=0"
-                    User-Agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+                    Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8'
+                    Accept-Encoding: 'gzip, deflate, br'
+                    Accept-Language: 'en-US,en;q=0.5'
+                    Cache-Control: 'max-age=0'
+                    User-Agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
 
 when@test:
     framework:

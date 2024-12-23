@@ -25,6 +25,7 @@ class DividendDateService
      * @var array
      */
     private array $services;
+    private array $fallbackServices;
 
     /**
      * Which service is linked to ticker
@@ -46,7 +47,7 @@ class DividendDateService
      * @param string $serviceClass
      * @return self
      */
-    public function addService(string $serviceClass, ?array $symbols = [], ?string $api_key = ''): self
+    public function addService(string $serviceClass, ?array $symbols = [], ?string $api_key = '', bool $isFallBack = false): self
     {
         $service = new $serviceClass($this->client);
         if ($api_key) {
@@ -62,6 +63,10 @@ class DividendDateService
             foreach ($symbols as $symbol) {
                 $this->linkServiceToTicker($serviceClass, $symbol);
             }
+        }
+
+        if ($isFallBack) {
+            $this->fallbackServices[] = $service;
         }
 
         return $this;
@@ -141,8 +146,15 @@ class DividendDateService
     {
         $service = $this->getService($symbol);
         if (isset($service)) {
+            $result =  $service->getData($symbol, $isin);
+            if ($result && count($result) > 0 ) {
+                return $result;
+            }
+        }
+        foreach ($this->fallbackServices as $service) { // These should have cached data, so they play nice with free api's
             return $service->getData($symbol, $isin);
         }
+
         return [];
     }
 }
