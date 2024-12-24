@@ -294,7 +294,8 @@ class DividendService implements DividendServiceInterface
     /**
      * Get the expected regular dividend for the next dividend payout date
      *
-     * @param Position $position
+     * @param Ticker $ticker
+     * @param float $amount
      * @return float|null
      */
     public function getForwardNetDividend(Ticker $ticker, float $amount): ?float
@@ -345,7 +346,7 @@ class DividendService implements DividendServiceInterface
                 $dividendFrequency = $position->getTicker()->getPayoutFrequency();
             }
             $totalNetDividend = $forwardNetDividend * $dividendFrequency;
-            
+
             $netDividendYield = round(($totalNetDividend / $allocation) * 100, 2);
         }
 
