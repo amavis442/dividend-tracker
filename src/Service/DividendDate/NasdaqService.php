@@ -12,6 +12,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class NasdaqService implements DividendDatePluginInterface
 {
 	public const URL = 'https://api.nasdaq.com/api/calendar/dividends';
+	public const API_URL = 'https://api.nasdaq.com/api/quote/[SYMBOL]/dividends?assetclass=stocks';
 
 	private array $ignore = [];
 
@@ -55,16 +56,13 @@ class NasdaqService implements DividendDatePluginInterface
 			$content = $response->getContent(true);
 			$data = json_decode($content, true);
 
-			$currentYear = (int) date('Y');
 			$records = [];
 			foreach ($data['data']['calendar']['rows'] as $divDate) {
 				$symbolData = strtolower($divDate['symbol']);
-				$payDate = new \DateTime($divDate['payment_Date']);
 				if (
 					$divDate['dividend_Ex_Date'] == '' ||
 					$divDate['payment_Date'] == '' ||
-					$divDate['dividend_Rate'] == '' ||
-					$currentYear < (int) $payDate->format('Y')
+					$divDate['dividend_Rate'] == ''
 				) {
 					continue;
 				}
@@ -90,9 +88,68 @@ class NasdaqService implements DividendDatePluginInterface
 		});
 
 		if (!isset($data[$symbol])) {
-			return [];
+			// Try the api
+			return $this->apiCall($symbol);
 		}
 
 		return $data[$symbol];
+	}
+
+	protected function apiCall($symbol): array
+	{
+		$apiUrl = str_replace('[SYMBOL]', strtoupper($symbol), self::API_URL);
+
+		$response = $this->client->request('GET', $apiUrl);
+
+		if ($response->getStatusCode() !== 200) {
+			return [];
+		}
+
+		$content = $response->getContent(true);
+		$jsonData = json_decode($content, true);
+
+		$records = [];
+		if ($jsonData['data'] == null) {
+			//dump($jsonData['status']);
+		}
+		if ($jsonData['data'] != null && count($jsonData['data']['dividends']['rows']) > 0) {
+			$divDate = $jsonData['data']['dividends']['rows'][0];
+
+			/*
+			"exOrEffDate": "01/02/2025",
+			"type": "Cash",
+			"amount": "$0.15",
+			"declarationDate": "12/11/2024",
+			"recordDate": "01/02/2025",
+			"paymentDate": "01/07/2025",
+			"currency": "USD"
+			*/
+
+			if (
+				$divDate['exOrEffDate'] == '' ||
+				$divDate['paymentDate'] == '' ||
+				$divDate['amount'] == ''
+			) {
+				return [];
+			}
+
+			$exDivDate = new \DateTime($divDate['exOrEffDate']);
+			$paymentDate = new \DateTime($divDate['paymentDate']);
+
+			$declarationDate = new \DateTime($divDate['declarationDate']);
+			$recordDate = new \DateTime($divDate['recordDate']);
+			$dividend = str_replace('$','',$divDate['amount']);
+
+			$record = [];
+			$record['DeclaredDate'] = $declarationDate->format('Y-m-d');
+			$record['RecordDate'] = $recordDate->format('Y-m-d');
+			$record['ExDate'] = $exDivDate->format('Y-m-d');
+			$record['PayDate'] = $paymentDate->format('Y-m-d');
+			$record['DividendAmount'] = $dividend;
+			$record['Type'] = Calendar::REGULAR;
+			$record['Currency'] = 'USD';
+			$records[] = $record;
+		}
+		return $records;
 	}
 }
