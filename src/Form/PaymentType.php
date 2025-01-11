@@ -28,7 +28,7 @@ class PaymentType extends AbstractType
             ->add('Calendar', EntityType::class, [
                 'class' => Calendar::class,
                 'choice_label' => function ($calendar) {
-                    return $calendar->getTicker()->getSymbol() . '::' . $calendar->getPaymentDate()->format('Y-m-d') . ' ' . ($calendar->getDividendType() ?? 'Regular') . ' ' . $calendar->GetCreatedAt()->format('Y-m-d');
+                    return $calendar->getTicker()->getSymbol() . ',(p):: ' . $calendar->getPaymentDate()->format('Y-m-d') . ' (ex):: ' . $calendar->getExDividendDate()->format('Y-m-d') . ' ' . ($calendar->getDividendType() ?? 'Regular');
                 },
                 'query_builder' => function (EntityRepository $er) use ($tickerId) {
                     $query = $er->createQueryBuilder('c')

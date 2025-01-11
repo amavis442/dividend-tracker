@@ -1,0 +1,129 @@
+<turbo-frame id="edit-payment">
+{{ form_start(form, {
+    action: path('portfolio_edit_payment', {payment: edit_payment.id}) ,
+    method: 'POST',
+    attr:{
+    'data-turbo-frame': 'portfolio_tab_results'
+    }
+    }) }}
+    <twig:Table:Table>
+        <thead>
+            <twig:Table:Tr>
+                <twig:Table:ThCol>
+                    {{ 'Pay date'|trans }}
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    {{ 'Ex-dividend date'|trans }}
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    {{ 'Amount'|trans }}
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    {{ 'Total'|trans }}
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    {{ 'Type'|trans }}
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    {{ 'Actions'|trans }}
+                </twig:Table:ThCol>
+            </twig:Table:Tr>
+        </thead>
+        <tbody>
+            {% for payment in pager %}
+                {% if payment.id != edit_payment.id %}
+                    <twig:Table:Tr>
+                        <twig:Table:Td>
+                            {{ payment.payDate|date("d-m-Y") }}
+                        </twig:Table:Td>
+                        <twig:Table:Td>
+                            {% if payment.calendar is not empty %}
+                                {{ payment.calendar.exDividendDate ? payment.calendar.exDividendDate|date("d-m-Y") : '' }}
+                                <i class="fa-solid fa-triangle-exclamation"
+                                   title="Has calendar attached"></i>
+                            {% endif %}
+                        </twig:Table:Td>
+                        <twig:Table:Td>
+                            {{ payment.amount|format_number({"fraction_digit": 7}) }}
+                        </twig:Table:Td>
+                        <twig:Table:Td>
+                            {{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ payment.dividend|format_number({"fraction_digit": 2}) }}
+                        </twig:Table:Td>
+                        <twig:Table:Td>
+                            {{ payment.dividendType }}
+                        </twig:Table:Td>
+                        <twig:Table:Td>
+                            <div class="flex" data-controller="tooltip">
+                                <twig:Button tag="a"
+                                             href="{{ path('portfolio_edit_payment', { payment: payment.id }) }}"
+                                             data-turbo-frame="edit-payment-{{ payment.id }}"
+                                             data-tooltip-target="element"
+                                             data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">
+                                    <i class="far fa-edit"></i>
+                                    <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                        {{ 'Edit payment'|trans }}
+                                        <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                    </div>
+                                </twig:Button>
+                            </div>
+                        </twig:Table:Td>
+                    </twig:Table:Tr>
+                {% else %}
+                    <twig:Table:Tr>
+                        <twig:Table:Td>
+                            {{ form_widget(form.pay_date) }}
+                        </twig:Table:Td>
+                        <twig:Table:Td>
+                            {{ form_widget(form.Calendar) }}
+                        </twig:Table:Td>
+                        <twig:Table:Td>
+                            {{ form_widget(form.amount) }}
+                        </twig:Table:Td>
+                        <twig:Table:Td>
+                            <div class="flex">
+                                <div class="w-4/12 mr-2">{{ form_widget(form.currency) }}</div>
+                                <div class="w-8/12">{{ form_widget(form.dividend) }}</div>
+                            </div>
+                        </twig:Table:Td>
+                        <twig:Table:Td>
+                             {{ edit_payment.dividendType }}
+                        </twig:Table:Td>
+                        <twig:Table:Td>
+                            <div class="flex" data-controller="tooltip">
+                                <div class="inline-flex rounded-md shadow-sm items-center justify-between mx-auto"
+                                     role="group">
+                                    <div data-controller="tooltip">
+                                        <button type="submit"
+                                                data-tooltip-target="element"
+                                                data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                                class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                            <i class="far fa-save"></i>
+                                        </button>
+                                        <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                            {{ 'Save'|trans }}
+                                            <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                        </div>
+                                    </div>
+                                    <div data-controller="tooltip">
+                                        <a href="{{ path('portfolio_show_payments', {'id': payment.position.id}) }}"
+                                           data-turbo-frame="portfolio_tab_results"
+                                           data-tooltip-target="element"
+                                           data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                           class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </a>
+                                        <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                            {{ 'Cancel'|trans }}
+                                            <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </twig:Table:Td>
+                    </twig:Table:Tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </twig:Table:Table>
+{{ form_end(form) }}
+</turbo-frame>

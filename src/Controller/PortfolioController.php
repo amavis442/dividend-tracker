@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Contracts\Service\DividendServiceInterface;
 use App\Entity\Calendar;
+use App\Entity\Payment;
 use App\Entity\Pie;
 use App\Entity\Portfolio;
 use App\Entity\PortfolioGoal;
@@ -13,6 +14,7 @@ use App\Entity\Ticker;
 use App\Entity\Transaction;
 use App\Entity\User;
 use App\Form\CalendarType;
+use App\Form\PaymentType;
 use App\Form\PortfolioGoalType;
 use App\Form\SearchFormType;
 use App\Form\TransactionPieType;
@@ -516,7 +518,7 @@ class PortfolioController extends AbstractController
 	): Response {
 		$position = $positionRepository->getForPosition($position);
 
-		return $this->render('portfolio/show/_position.html.twig', [
+		return $this->render('portfolio/show/position/_position.html.twig', [
 			'position' => $position,
 		]);
 	}
@@ -560,10 +562,137 @@ class PortfolioController extends AbstractController
 		$pager->setMaxPerPage(10);
 		$pager->setCurrentPage($page);
 
-		return $this->render('portfolio/show/_orders.html.twig', [
-			'position' => $position,
-			'pager' => $pager,
-			'netYearlyDividend' => $netYearlyDividend,
+		return $this->render(
+			'portfolio/show/transaction/_transactions.html.twig',
+			[
+				'position' => $position,
+				'pager' => $pager,
+				'netYearlyDividend' => $netYearlyDividend,
+			]
+		);
+	}
+
+	#[
+		Route(
+			path: '/create_payment/{position?}',
+			name: 'portfolio_create_payment',
+			methods: ['GET']
+		)
+	]
+	public function createPayment(
+		Request $request,
+		EntityManagerInterface $entityManager,
+		Position $position
+	) {
+		$payment = new Payment();
+		$payment->setPosition($position);
+		$payment->setTicker($position->getTicker());
+
+		$form = $this->createForm(PaymentType::class, $payment);
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			$entityManager->persist($payment);
+			$entityManager->flush();
+
+			return $this->redirectToRoute('portfolio_show_payments', [
+				'id' => $position->getId(),
+				'page' => 1,
+			]);
+		}
+
+		return $this->render(
+			'portfolio/show/payment/_form_payment_create.html.twig',
+			[
+				'payment' => $payment,
+				'position' => $position,
+				'ticker' => $position->getTicker(),
+				'form' => $form->createView(),
+			]
+		);
+	}
+
+		#[
+		Route(
+			path: '/edit_payment/{payment}/{page}',
+			name: 'portfolio_edit_payment',
+			methods: ['GET', 'POST']
+		)
+	]
+	public function editPayment(
+		Request $request,
+		EntityManagerInterface $entityManager,
+		PaymentRepository $paymentRepository,
+		Payment $payment,
+		int $page = 1
+	) {
+		$form = $this->createForm(PaymentType::class, $payment);
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			$entityManager->persist($payment);
+			$entityManager->flush();
+
+			return $this->redirectToRoute('portfolio_show_payments', [
+				'id' => $payment->getPosition()->getId(),
+				'page' => 1,
+			]);
+		}
+
+		$ticker = $payment->getTicker();
+		$position = $payment->getPosition();
+
+		$dividends = $paymentRepository->getSumDividends([$ticker->getId()]);
+		$dividend = 0;
+		if (!empty($dividends) && $ticker->getId() != null) {
+			$dividend = $dividends[$ticker->getId()];
+		}
+
+		$queryBuilder = $paymentRepository->getForPositionQueryBuilder(
+			$position
+		);
+		$adapter = new QueryAdapter($queryBuilder);
+		$pager = new Pagerfanta($adapter);
+		$pager->setMaxPerPage(10);
+		$pager->setCurrentPage($page);
+
+		return $this->render(
+			'portfolio/show/payment/_form_payment_edit.html.twig',
+			[
+				'edit_payment' => $payment,
+				'pager' => $pager,
+				'position' => $position,
+				'dividend' => $dividend,
+				'form' => $form->createView(),
+			]
+		);
+	}
+
+	#[
+		Route(
+			path: '/delete_payment/{payment}',
+			name: 'portfolio_payment_delete',
+			methods: ['POST']
+		)
+	]
+	public function deletePayment(
+		Request $request,
+		EntityManagerInterface $entityManager,
+		Payment $payment,
+		Position $position
+	): Response {
+		if (
+			$this->isCsrfTokenValid(
+				'delete' . $payment->getId(),
+				$request->request->get('_token')
+			)
+		) {
+			$entityManager->remove($payment);
+			$entityManager->flush();
+
+			$this->addFlash('notice', 'Payment removed.');
+		}
+		return $this->redirectToRoute('portfolio_show_dividends', [
+			'id' => $position->getId(),
+			'page' => 1,
 		]);
 	}
 
@@ -596,7 +725,7 @@ class PortfolioController extends AbstractController
 		$pager->setMaxPerPage(10);
 		$pager->setCurrentPage($page);
 
-		return $this->render('portfolio/show/_payments.html.twig', [
+		return $this->render('portfolio/show/payment/_payments.html.twig', [
 			'pager' => $pager,
 			'position' => $position,
 			'payments' => $payments,
@@ -656,7 +785,7 @@ class PortfolioController extends AbstractController
 		$pager->setMaxPerPage(10);
 		$pager->setCurrentPage($page);
 
-		return $this->render('portfolio/show/_dividend.html.twig', [
+		return $this->render('portfolio/show/dividend/_dividend.html.twig', [
 			'ticker' => $ticker,
 			'position' => $position,
 			'dividend' => $dividend,
@@ -696,12 +825,15 @@ class PortfolioController extends AbstractController
 			]);
 		}
 
-		return $this->render('portfolio/show/_form_dividend_create.html.twig', [
-			'calendar' => $calendar,
-			'position' => $position,
-			'ticker' => $ticker,
-			'form' => $form->createView(),
-		]);
+		return $this->render(
+			'portfolio/show/dividend/_form_dividend_create.html.twig',
+			[
+				'calendar' => $calendar,
+				'position' => $position,
+				'ticker' => $ticker,
+				'form' => $form->createView(),
+			]
+		);
 	}
 
 	#[
@@ -840,7 +972,11 @@ class PortfolioController extends AbstractController
 		$ticker = $position->getTicker();
 
 		$adapter = new QueryAdapter(
-			$researchRepository->getForTickerQueryBuilder($ticker, 'r.id','DESC')
+			$researchRepository->getForTickerQueryBuilder(
+				$ticker,
+				'r.id',
+				'DESC'
+			)
 		);
 		$pager = new Pagerfanta($adapter);
 		$pager->setMaxPerPage(10);

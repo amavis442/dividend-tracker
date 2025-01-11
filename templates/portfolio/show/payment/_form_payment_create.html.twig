@@ -1,0 +1,92 @@
+<twig:Table:Tr>
+<turbo-frame id="add-payment">
+{{ form_start(form, {
+  action: path('portfolio_create_payment', {position: position.id}),
+  method: 'POST',
+  attr:{
+    'data-turbo-frame': 'portfolio_tab_results'
+  }
+}) }}
+    <div class="mb-2 border-2 border-gray-700">
+        <twig:Table:Table>
+            <thead>
+                <twig:Table:Tr>
+                    <twig:Table:ThCol>
+                        {{ 'Payment date'|trans }}
+                    </twig:Table:ThCol>
+                    <twig:Table:ThCol>
+                        {{ 'Ex-dividend date'|trans }}
+                    </twig:Table:ThCol>
+                    <twig:Table:ThCol>
+                        {{ 'Amount'|trans }}
+                    </twig:Table:ThCol>
+                    <twig:Table:ThCol>
+                        {{ 'Total'|trans }}
+                    </twig:Table:ThCol>
+                    <twig:Table:ThCol>
+                        {{ 'Type'|trans }}
+                    </twig:Table:ThCol>
+                    <twig:Table:ThCol>
+                        {{ 'Actions'|trans }}
+                    </twig:Table:ThCol>
+                </twig:Table:Tr>
+            </thead>
+            <tbody>
+
+                <twig:Table:Tr>
+                    <twig:Table:Td>
+                        {{ form_widget(form.pay_date) }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ form_widget(form.Calendar) }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ form_widget(form.amount) }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        <div class="flex">
+                            <div class="w-4/12 mr-2">{{ form_widget(form.currency) }}</div>
+                            <div class="w-8/12">{{ form_widget(form.dividend) }}</div>
+                        </div>
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        -
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        <div class="flex" data-controller="tooltip">
+                            <div class="inline-flex rounded-md shadow-sm items-center justify-between mx-auto" role="group">
+                                <div  data-controller="tooltip">
+                                    <button type="submit"
+                                       data-tooltip-target="element"
+                                       data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                       class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                        <i class="far fa-save"></i>
+                                    </button>
+                                    <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                        {{ 'Add payment'|trans }}
+                                        <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                    </div>
+                                </div>
+                                <div data-controller="tooltip">
+                                    <a href="{{ path('portfolio_show_payments', {'id': position.id}) }}"
+                                       data-turbo-frame="portfolio_tab_results"
+                                       data-tooltip-target="element"
+                                       data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                       class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </a>
+                                    <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                        {{ 'Cancel'|trans }}
+                                        <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </twig:Table:Td>
+                </twig:Table:Tr>
+            </tbody>
+        </twig:Table:Table>
+    </div>
+{{ form_end(form) }}
+</twig:Table:Tr>
+</turbo-frame>
