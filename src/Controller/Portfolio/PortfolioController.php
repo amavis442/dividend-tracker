@@ -720,39 +720,5 @@ class PortfolioController extends AbstractController
 		]);
 	}
 
-	#[
-		Route(
-			path: '/updatepie/{id}',
-			name: 'portfolio_update_pie',
-			methods: ['POST', 'GET']
-		)
-	]
-	public function updatePie(
-		Request $request,
-		Transaction $transaction,
-		EntityManagerInterface $entityManager,
-		TransactionRepository $transactionRepository
-	): Response {
-		$transaction = $transactionRepository->find($transaction->getId());
 
-		$form = $this->createForm(TransactionPieType::class, $transaction, [
-			'action' => $this->generateUrl('portfolio_update_goal'),
-		]);
-
-		$form->handleRequest($request);
-		if ($form->isSubmitted() && $form->isValid()) {
-			$entityManager->persist($transaction);
-			$entityManager->flush();
-
-			return $this->render('portfolio/show/_transaction_pie.html.twig', [
-				'transaction' => $transaction,
-			]);
-		}
-
-		return $this->render('portfolio/show/_form_update_pie.html.twig', [
-			'transaction' => $transaction,
-			'form' => $form,
-			'formTarget' => 'update-pie-' . $transaction->getId(),
-		]);
-	}
 }
