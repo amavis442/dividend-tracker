@@ -86,7 +86,7 @@
     "require-dev": {
         "behat/behat": "^3.14",
         "dama/doctrine-test-bundle": "^8.2",
-        "deployer/deployer": "^7.0",
+        "deployer/deployer": "^7.5",
         "doctrine/coding-standard": "^9.0",
         "doctrine/doctrine-fixtures-bundle": "^3.6",
         "fakerphp/faker": "^1.23",

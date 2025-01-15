@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Portfolio\PortfolioController;
 use App\Entity\Position;
 use App\Entity\TickerAutocomplete;
 use App\Entity\Transaction;

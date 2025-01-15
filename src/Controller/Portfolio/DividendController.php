@@ -22,10 +22,6 @@ class DividendController extends AbstractController
 {
 	public const SESSION_KEY = 'portfoliocontroller_session';
 
-	public function __construct(private Stopwatch $stopwatch)
-	{
-	}
-
 	#[
 		Route(
 			path: '/show/dividends/{id}/{page}',
