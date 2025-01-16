@@ -16,18 +16,18 @@
                         {{ 'Yield'|trans }}
                     </twig:Head>
                 </div>
-                <twig:Card title="{{ 'Yield on cost dividend'|trans }} ({{ dividendYieldOnCost|default(0)|format_number({"fraction_digit": 2}) }}%)"
+                <twig:Card title="{{ 'Yield on cost dividend'|trans }} ({{ dividendYieldOnCost|default(0) |format_number({"fraction_digit": 2}) }}%)"
                            title_header_variant="h5"
                            class="mb-4">
                     <div class="mb-4">
                         <div class="flex mt-2">
                             {{ 'Total dividend in a year / total allocated'|trans }}:&nbsp;
                             <twig:Badge variant="primary">
-                                &euro;{{ totalNetYearlyDividend|default(0)|format_number({"fraction_digit": 2}) }}
+                                &euro;{{ totalNetYearlyDividend|default(0) |format_number({"fraction_digit": 2}) }}
                             </twig:Badge>
                             /&nbsp;
                             <twig:Badge variant="info">
-                                &euro;{{ allocated|default(0)|format_number({"fraction_digit": 2}) }}
+                                &euro;{{ allocated|default(0) |format_number({"fraction_digit": 2}) }}
                             </twig:Badge>
                         </div>
                     </div>
@@ -229,16 +229,19 @@
                                 </twig:Table:Tr>
                             {% endfor %}
                             <tr class="bg-gray-700 text-white">
-                                <twig:Table:Td colspan='6'>
+                                <twig:Table:Td colspan='5'>
                                 </twig:Table:Td>
                                 <twig:Table:Td>
-                                    &euro;{{ totalNetYearlyDividend|default(0)|format_number({"fraction_digit": 2}) }}
+                                    &euro;{{ totalNetMonthlyDividend|default(0) |format_number({"fraction_digit": 2}) }}
                                 </twig:Table:Td>
                                 <twig:Table:Td>
-                                    {{ dividendYieldOnCost|default(0)|format_number({"fraction_digit": 2}) }}%
+                                    &euro;{{ totalNetYearlyDividend|default(0) |format_number({"fraction_digit": 2}) }}
                                 </twig:Table:Td>
                                 <twig:Table:Td>
-                                    &euro;{{ allocated|default(0)|format_number({"fraction_digit": 2}) }}
+                                    {{ dividendYieldOnCost|default(0) |format_number({"fraction_digit": 2}) }}%
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    &euro;{{ allocated|default(0) |format_number({"fraction_digit": 2}) }}
                                 </twig:Table:Td>
                             </tr>
                         </tbody>

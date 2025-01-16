@@ -71,6 +71,7 @@ class YieldsService
 
 		$totalDividend = 0.0;
 		$totalNetYearlyDividend = 0.0;
+		$totalNetMonthlyDividend = 0.0;
 		$dividendYieldOnCost = 0.0;
 		$totalAvgYield = 0.0;
 
@@ -142,6 +143,7 @@ class YieldsService
 				if ($numPayoutsPerYear > 0) {
 					$netTotalPayoutPerPaydate =
 						$netTotalForwardYearlyPayout / $numPayoutsPerYear;
+					$totalNetMonthlyDividend += $netTotalPayoutPerPaydate;
 				}
 			}
 			$dividendPerYear = $numPayoutsPerYear * $lastCash;
@@ -246,6 +248,7 @@ class YieldsService
 			'allocated' => $allocated,
 			'totalDividend' => $totalDividend,
 			'totalNetYearlyDividend' => $totalNetYearlyDividend,
+			'totalNetMonthlyDividend' => $totalNetMonthlyDividend,
 		];
 	}
 }
