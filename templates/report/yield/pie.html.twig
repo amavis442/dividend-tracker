@@ -229,7 +229,16 @@
                                 </twig:Table:Tr>
                             {% endfor %}
                             <tr class="bg-gray-700 text-white">
-                                <twig:Table:Td colspan='5'>
+                                <twig:Table:Td></twig:Table:Td>
+                                <twig:Table:Td>
+                                &euro;{{ allocated|default(0) |format_number({"fraction_digit": 2}) }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    &euro;{{ totalNetYearlyDividendPerStock|default(0) |format_number({"fraction_digit": 2}) }}
                                 </twig:Table:Td>
                                 <twig:Table:Td>
                                     &euro;{{ totalNetMonthlyDividend|default(0) |format_number({"fraction_digit": 2}) }}
@@ -241,7 +250,6 @@
                                     {{ dividendYieldOnCost|default(0) |format_number({"fraction_digit": 2}) }}%
                                 </twig:Table:Td>
                                 <twig:Table:Td>
-                                    &euro;{{ allocated|default(0) |format_number({"fraction_digit": 2}) }}
                                 </twig:Table:Td>
                             </tr>
                         </tbody>

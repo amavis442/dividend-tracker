@@ -71,6 +71,7 @@ class YieldsService
 
 		$totalDividend = 0.0;
 		$totalNetYearlyDividend = 0.0;
+		$totalNetYearlyDividendPerStock = 0.0;
 		$totalNetMonthlyDividend = 0.0;
 		$dividendYieldOnCost = 0.0;
 		$totalAvgYield = 0.0;
@@ -210,7 +211,7 @@ class YieldsService
 			$positionYield->sumAvgPrice += $avgPrice;
 			$positionYield->sumDividends += $dividendPerYear;
 			$totalDividend += $dividendPerYear * $amount;
-
+			$totalNetYearlyDividendPerStock += $netForwardYearlyPayout;
 			$this->stopwatch->lap('processing-file');
 		}
 		$this->stopwatch->stop('processing-file');
@@ -249,6 +250,7 @@ class YieldsService
 			'totalDividend' => $totalDividend,
 			'totalNetYearlyDividend' => $totalNetYearlyDividend,
 			'totalNetMonthlyDividend' => $totalNetMonthlyDividend,
+			'totalNetYearlyDividendPerStock' => $totalNetYearlyDividendPerStock,
 		];
 	}
 }
