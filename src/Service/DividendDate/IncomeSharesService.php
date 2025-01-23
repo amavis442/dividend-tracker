@@ -5,8 +5,6 @@ namespace App\Service\DividendDate;
 use App\Contracts\Service\DividendDatePluginInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
-
 class IncomeSharesService implements DividendDatePluginInterface
 {
 	public const API_URL = 'https://stage.incomeshares.com/api/products/{ISIN}';
