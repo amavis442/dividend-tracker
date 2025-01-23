@@ -33,16 +33,12 @@ class IncomeSharesService implements DividendDatePluginInterface
 		$currency = 'USD';
 
 		$response = $this->client->request('GET', $url, [
-			'auth_bearer' => $this->apiKey, // '6|eB2Kw0VPdjDc6zebi2wTqGStBKmeDyTdMkMwudWZc1849cdf',
+			'auth_bearer' => $this->apiKey,
 		]);
 
 		$content = $response->getContent(true);
 		$content = str_replace("\xEF\xBB\xBF", '', $content);
 
-		/*
-        $bom = pack('H*','EFBBBF');
-        $content = preg_replace("/^$bom/", '', $content);
-         */
 		$data = json_decode($content, true);
 
 		$rows = $data['data']['distributions'][0]['distributionCalendarModels'];
@@ -53,7 +49,6 @@ class IncomeSharesService implements DividendDatePluginInterface
                 continue;
 
 			$item = [];
-			//$item['DeclaredDate'] = $row[0][0]['raw'];
 			$item['RecordDate'] = $row['recordDate'];
 			$item['ExDate'] = $row['exDate'];
 			$item['PayDate'] = $row['paymentDate'];
