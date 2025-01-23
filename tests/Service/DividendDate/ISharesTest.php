@@ -22,7 +22,7 @@ class ISharesTest extends KernelTestCase
         $container = static::getContainer();
 
         $iSharesService = $container->get(ISharesService::class);
-        $content = $iSharesService->getData('SEMB');
+        $content = $iSharesService->getData('SEMB','');
 
         $this->assertNotEmpty($content, "Not received any data");
         $this->assertArrayHasKey('ExDate', $content[0]);
