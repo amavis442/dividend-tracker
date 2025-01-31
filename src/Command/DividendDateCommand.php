@@ -90,9 +90,6 @@ class DividendDateCommand extends Command
          * @var \App\Entity\Ticker $ticker
          */
         foreach ($tickers as $ticker) {
-            if (strtolower($ticker->getIsin()) == "xs2875105608") { // Todo: Make this in a ignore list
-                continue; // They fucked up QQQY is actually QQQO which does not give that much of a dividend :(
-            }
             $data = $this->dividendDateService->getData($ticker->getSymbol(), $ticker->getIsin());
 
             if (!$data) {
