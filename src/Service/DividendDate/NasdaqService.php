@@ -41,58 +41,8 @@ class NasdaqService implements DividendDatePluginInterface
 		if (in_array($symbol, $this->ignore)) {
 			return [];
 		}
-
-		$pool = new FilesystemAdapter();
-		$data = $pool->get('nasdaq', function (ItemInterface $item): array {
-			$item->expiresAfter(3600);
-
-			// ... do some HTTP request or heavy computations
-			$response = $this->client->request('GET', self::URL);
-
-			if ($response->getStatusCode() !== 200) {
-				return [];
-			}
-
-			$content = $response->getContent(true);
-			$data = json_decode($content, true);
-
-			$records = [];
-			foreach ($data['data']['calendar']['rows'] as $divDate) {
-				$symbolData = strtolower($divDate['symbol']);
-				if (
-					$divDate['dividend_Ex_Date'] == '' ||
-					$divDate['payment_Date'] == '' ||
-					$divDate['dividend_Rate'] == ''
-				) {
-					continue;
-				}
-
-				$exDivDate = new \DateTime($divDate['dividend_Ex_Date']);
-				$paymentDate = new \DateTime($divDate['payment_Date']);
-
-				$declarationDate = new \DateTime($divDate['announcement_Date']);
-				$recordDate = new \DateTime($divDate['record_Date']);
-				$dividend = $divDate['dividend_Rate'];
-
-				$record = [];
-				$record['DeclaredDate'] = $declarationDate->format('Y-m-d');
-				$record['RecordDate'] = $recordDate->format('Y-m-d');
-				$record['ExDate'] = $exDivDate->format('Y-m-d');
-				$record['PayDate'] = $paymentDate->format('Y-m-d');
-				$record['DividendAmount'] = $dividend;
-				$record['Type'] = Calendar::REGULAR;
-				$record['Currency'] = 'USD';
-				$records[$symbolData][] = $record;
-			}
-			return $records;
-		});
-
-		if (!isset($data[$symbol])) {
-			// Try the api
-			return $this->apiCall($symbol);
-		}
-
-		return $data[$symbol];
+		// Try the api
+		return $this->apiCall($symbol);
 	}
 
 	protected function apiCall($symbol): array
@@ -112,10 +62,12 @@ class NasdaqService implements DividendDatePluginInterface
 		if ($jsonData['data'] == null) {
 			//dump($jsonData['status']);
 		}
-		if ($jsonData['data'] != null && count($jsonData['data']['dividends']['rows']) > 0) {
-			$divDate = $jsonData['data']['dividends']['rows'][0];
-
-			/*
+		if (
+			$jsonData['data'] != null &&
+			count($jsonData['data']['dividends']['rows']) > 0
+		) {
+			foreach ($jsonData['data']['dividends']['rows'] as $divDate) {
+				/*
 			"exOrEffDate": "01/02/2025",
 			"type": "Cash",
 			"amount": "$0.15",
@@ -124,31 +76,39 @@ class NasdaqService implements DividendDatePluginInterface
 			"paymentDate": "01/07/2025",
 			"currency": "USD"
 			*/
+				if (
+					$divDate['exOrEffDate'] == '' ||
+					$divDate['exOrEffDate'] == 'N/A' ||
+					$divDate['paymentDate'] == '' ||
+					$divDate['paymentDate'] == 'N/A' ||
+					$divDate['amount'] == ''
 
-			if (
-				$divDate['exOrEffDate'] == '' ||
-				$divDate['paymentDate'] == '' ||
-				$divDate['amount'] == ''
-			) {
-				return [];
+				) {
+					return [];
+				}
+
+				try {
+				$exDivDate = new \DateTime($divDate['exOrEffDate']);
+				} catch (\Exception $e) {
+					dump($divDate);
+					throw $e;
+				}
+				$paymentDate = new \DateTime($divDate['paymentDate']);
+
+				$declarationDate = new \DateTime($divDate['declarationDate']);
+				$recordDate = new \DateTime($divDate['recordDate']);
+				$dividend = str_replace('$', '', $divDate['amount']);
+
+				$record = [];
+				$record['DeclaredDate'] = $declarationDate->format('Y-m-d');
+				$record['RecordDate'] = $recordDate->format('Y-m-d');
+				$record['ExDate'] = $exDivDate->format('Y-m-d');
+				$record['PayDate'] = $paymentDate->format('Y-m-d');
+				$record['DividendAmount'] = $dividend;
+				$record['Type'] = Calendar::REGULAR;
+				$record['Currency'] = 'USD';
+				$records[] = $record;
 			}
-
-			$exDivDate = new \DateTime($divDate['exOrEffDate']);
-			$paymentDate = new \DateTime($divDate['paymentDate']);
-
-			$declarationDate = new \DateTime($divDate['declarationDate']);
-			$recordDate = new \DateTime($divDate['recordDate']);
-			$dividend = str_replace('$','',$divDate['amount']);
-
-			$record = [];
-			$record['DeclaredDate'] = $declarationDate->format('Y-m-d');
-			$record['RecordDate'] = $recordDate->format('Y-m-d');
-			$record['ExDate'] = $exDivDate->format('Y-m-d');
-			$record['PayDate'] = $paymentDate->format('Y-m-d');
-			$record['DividendAmount'] = $dividend;
-			$record['Type'] = Calendar::REGULAR;
-			$record['Currency'] = 'USD';
-			$records[] = $record;
 		}
 		return $records;
 	}
