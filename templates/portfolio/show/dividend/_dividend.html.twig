@@ -101,17 +101,22 @@
                             <div class="inline-flex rounded-md shadow-sm items-center justify-between mx-auto"
                                  role="group">
                                 <a href="{{ path('calendar_edit', { id: calendar.id }) }}"
-                                   class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white"
+                                   class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg
+                                   hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700
+                                   dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700
+                                   dark:focus:ring-blue-500 dark:focus:text-white"
                                    data-turbo-frame="_top"
                                    data-tooltip-target="element"
-                                   data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">
+                                   data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                   >
                                     <i class="far fa-edit"></i>
                                     <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
                                         {{ 'Edit calendar'|trans }}
                                         <div class="arrow" data-tooltip-target="tooltipArrow"></div>
                                     </div>
                                 </a>
-                                {{ include("portfolio/show/dividend/_form_dividend_delete.html.twig") }}
+                                {% set isDisabled = calendar.payments.isEmpty ? false : true %}
+                                {% include 'portfolio/show/dividend/_form_dividend_delete.html.twig' with {'isDisabled' : isDisabled} %}
                             </div>
                         </div>
                     </twig:Table:Td>
