@@ -86,7 +86,7 @@
                                         {{ payment.payDate ? payment.payDate|format_date('long', locale=app.request.locale) : '' }}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
-                                        {{ payment.position.ticker.fullname }}
+                                        <a href="{{ path('portfolio_show', {'id': payment.position.id}) }} " data-turbo-frame="_top" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">{{ payment.position.ticker.fullname }}</a>
                                         ({{ payment.position.ticker.symbol }})
                                         <br />
                                         <small>{{ payment.amount|format_number({"fraction_digit": 7}) }}
