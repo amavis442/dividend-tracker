@@ -1,0 +1,150 @@
+{% extends 'base.html.twig' %}
+{% block title %}MonthlySummary{% endblock %}
+{% block body %}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <twig:Card title="{{ 'Ticker'|trans }}" class="w-1/2 mx-auto min-w-max h-min">
+                    <twig:Table:Table class="max-w-min min-w-full">
+                        <tbody>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Id
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.id }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Ac Date
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.acDate ? monthly_summary.acDate|date("Y-m-d") : '' }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Deposit/Withdrawal
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.depositWithdrawal }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Closed Position Result
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.closedPositionResult }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Dividends
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.dividends }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Interest on uninvestedCash
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.interestOnUninvestedCash }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Commissions and fees
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.commissionsAndFees }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Equity charges and fees
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.equityChargesAndFees }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Account adjustments
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.accountAdjustments }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Account value
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.accountValue }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Cash
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.cash }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Bonus non-withdrawable
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.bonusNonWithdrawable }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Created
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.createdAt ? monthly_summary.createdAt|date("Y-m-d H:i:s") : '' }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Updated
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.updatedAt ? monthly_summary.updatedAt|date("Y-m-d H:i:s") : '' }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
+                                    Uuid
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.uuid }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        </tbody>
+                    </twig:Table:Table>
+                    <div class="w-full pr-3 py-2 mt-2">
+                        <div class="inline-flex rounded-md shadow-sm" role="group">
+                            <a href="{{ path("app_monthly_summary_index") }}"
+                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                <i class="fas fa-angle-double-left"></i>
+                                {{ 'back to list'|trans }}
+                            </a>
+                            <a href="{{ path('app_monthly_summary_edit', {'id': monthly_summary.id}) }}"
+                               class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                <i class="far fa-edit"></i>
+                            </a>
+                            {{ include("monthly_summary/_delete_form.html.twig") }}
+                        </div>
+                    </div>
+                </twig:Card>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'Monthly Summary'|trans }}{% endblock %}
+{% block body %}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div>
+                {% for notice in app.flashes('notice') %}
+                    <twig:Alert variant="danger">
+                        {{ notice|trans }}
+                    </twig:Alert>
+                {% endfor %}
+            </div>
+            <div id="header" class="px-3 py-2 w-full">
+                <twig:Head>
+                    {{ 'Monthly Summary'|trans }}
+                </twig:Head>
+            </div>
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <div class="w-full pr-3 py-2 mb-4">
+                    <twig:Button tag="a" href="{{ path("app_monthly_summary_new") }}">
+                        <i class="fas fa-plus"></i>
+                    </twig:Button>
+                </div>
+                <twig:Table:Table>
+                    <twig:Table:THead>
+                        <tr>
+                            <twig:Table:ThCol class="rounded-l-lg">
+                                Id
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Ac Date
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Deposit/Withdrawal
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Closed Position Result
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Dividends
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Account Value
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                Cash
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
+                                actions
+                            </twig:Table:ThCol>
+                        </tr>
+                    </twig:Table:THead>
+                    <tbody>
+                        {% for monthly_summary in monthly_summaries %}
+                            <twig:Table:Tr>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.id }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.acDate ? monthly_summary.acDate|date("Y-m-d") : '' }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.depositWithdrawal }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.closedPositionResult }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.dividends }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.accountValue }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ monthly_summary.cash }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    <twig:ButtonGroup show_link="{{ path('app_monthly_summary_show', { id: monthly_summary.id }) }}"
+                                                      show_link_text=" {{ 'show'|trans }}"
+                                                      edit_link="{{ path('app_monthly_summary_edit', { id: monthly_summary.id }) }}"
+                                                      edit_link_text="{{ 'Edit'|trans }}" />
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        {% else %}
+                            <twig:Table:Tr>
+                                <twig:Table:Td colspan="16">
+                                    no records found
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        {% endfor %}
+                    </tbody>
+                </twig:Table:Table>
+            {% endblock %}
