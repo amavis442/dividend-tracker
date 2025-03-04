@@ -156,8 +156,7 @@
         ],
         "csfix": "phpcbf --ignore=migrations/**,src/Kernel.php,bin/**",
         "cscheck": "phpcs --ignore=migrations/**,src/Kernel.php,bin/**",
-        "phpstan": "phpstan analyse src/ -c phpstan.neon --level=5 --no-progress -vvv --memory-limit=1024M",
-        "phpunit": "phpunit --testdox"
+        "phpstan": "phpstan analyse src/ -c phpstan.neon --level=5 --no-progress -vvv --memory-limit=1024M"
     },
     "conflict": {
         "symfony/symfony": "*"
