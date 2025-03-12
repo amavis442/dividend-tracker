@@ -38,11 +38,28 @@
                             </twig:Table:Tr>
                             <twig:Table:Tr>
                                 <twig:Table:ThRow>
+                                    {{ 'Calendar'|trans }}
+                                </twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    {% if payment.calendar is defined and payment.calendar is not null %}
+                                        #{{ payment.calendar.id }}
+                                        <br />
+                                        Ex: {{ payment.calendar.exDividendDate|date("l") |trans ~ ', ' ~  payment.calendar.exDividendDate|date('d') ~ ' ' ~ payment.calendar.exDividendDate|date('F')|trans|lower ~  ' ' ~ payment.calendar.exDividendDate|date('Y') }}
+                                        <br />
+                                        {{ 'Payment date'|trans }}: {{ payment.calendar.paymentDate|date("l") |trans ~ ', ' ~  payment.calendar.paymentDate|date('d') ~ ' ' ~ payment.calendar.paymentDate|date('F')|trans|lower ~  ' ' ~ payment.calendar.paymentDate|date('Y') }}
+                                        <br />
+                                        {{ 'Amount'|trans }}: ${{ payment.calendar.cashAmount }}
+                                    {% else %}
+                                        &mdash;
+                                    {% endif %}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>
                                     {{ 'Payment date'|trans }}
                                 </twig:Table:ThRow>
                                 <twig:Table:Td>
                                     {{ payment.payDate ? payment.payDate|date("l") |trans ~ ', ' ~  payment.payDate|date('d') ~ ' ' ~ payment.payDate|date('F')|trans|lower ~  ' ' ~ payment.payDate|date('Y')  : '' }}
-                                    {{ payment.payDate|date("l d F Y") |trans }}
                                 </twig:Table:Td>
                             </twig:Table:Tr>
                             <twig:Table:Tr>

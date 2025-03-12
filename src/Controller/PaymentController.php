@@ -158,7 +158,7 @@ class PaymentController extends AbstractController
 		Request $request,
 		EntityManagerInterface $entityManager,
 		position $position,
-		string $timestamp = null,
+		string $timestamp,
 		CalendarRepository $calendarRepository,
 		Referer $referer
 	): Response {
