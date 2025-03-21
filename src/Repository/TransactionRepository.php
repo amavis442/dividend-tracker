@@ -52,8 +52,6 @@ class TransactionRepository extends ServiceEntityRepository
 		return $queryBuilder;
 	}
 
-
-
 	public function getAll(
 		int $page = 1,
 		int $limit = 10,
@@ -99,6 +97,26 @@ class TransactionRepository extends ServiceEntityRepository
 			->setParameter('ticker', $ticker)
 			->getQuery()
 			->getResult();
+	}
+
+	public function getHighLow(Position $position): array
+	{
+		$result = $this->createQueryBuilder('t')
+			->select('MAX(t.price) as high, MIN(t.price) as low')
+			->innerJoin('t.position', 'p')
+			->where('p = :position')
+			->andWhere('p.closed = false')
+			->setParameter('position', $position)
+			->getQuery()
+			->getResult();
+
+		if (count($result) > 0) {
+			return [
+				'low' => $result['0']['low'],
+				'high' => $result['0']['high'],
+			];
+		}
+		return ['low' => 0, 'high' => 0];
 	}
 
 	public function getSummaryByPie(Pie $pie)
@@ -147,19 +165,18 @@ class TransactionRepository extends ServiceEntityRepository
 			->getOneOrNullResult();
 	}
 
-	public function updatePieNull(Position $position, Pie $pie): void {
-		$this
-		->createQueryBuilder('t')
-		->update(Transaction::class, 't')
-		->set('t.pie',':pie')
-		->where('t.pie is null')
-		->andWhere('t.position = :position')
-		->setParameter('pie', $pie)
-		->setParameter('position', $position)
-		->getQuery()
-		->execute();
+	public function updatePieNull(Position $position, Pie $pie): void
+	{
+		$this->createQueryBuilder('t')
+			->update(Transaction::class, 't')
+			->set('t.pie', ':pie')
+			->where('t.pie is null')
+			->andWhere('t.position = :position')
+			->setParameter('pie', $pie)
+			->setParameter('position', $position)
+			->getQuery()
+			->execute();
 	}
-
 
 	// /**
 	//  * @return Transaction[] Returns an array of Transaction objects

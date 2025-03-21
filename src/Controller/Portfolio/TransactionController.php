@@ -35,6 +35,8 @@ class TransactionController extends AbstractController
 		$calenders = $ticker->getCalendars();
 		$netYearlyDividend = 0;
 
+		$highAndLowPriceTransaction = $transactionRepository->getHighLow($position);
+
 		if (count($calenders) > 0) {
 			$cal = $dividendService->getRegularCalendar($ticker);
 			[$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax(
@@ -63,6 +65,7 @@ class TransactionController extends AbstractController
 				'position' => $position,
 				'pager' => $pager,
 				'netYearlyDividend' => $netYearlyDividend,
+				'highAndLowPriceTransaction' => $highAndLowPriceTransaction,
 			]
 		);
 	}
