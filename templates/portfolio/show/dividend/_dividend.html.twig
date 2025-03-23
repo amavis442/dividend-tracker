@@ -93,7 +93,7 @@
                         {{ calendar.createdAt|format_date("short") }}
                         {% if not calendar.payments.isEmpty %}
                             <i class="fa-solid fa-triangle-exclamation"
-                               title="Has payments attached"></i>
+                               title="{{ 'Has payments attached'|trans}} "></i>
                         {% endif %}
                     </twig:Table:Td>
                     <twig:Table:Td>

@@ -7,8 +7,8 @@
 </div>
 
 <div class="flex mb-4">
-	<twig:Alert variant="secondary" class="text-right">
-		<strong class="font-sans text-4xl">{{ position.allocationCurrency.Sign|raw }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}</strong>
+	<twig:Alert variant="black" class="text-right">
+		{{ 'Total investment'|trans }}: <strong class="font-sans">{{ position.allocationCurrency.Sign|raw }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}</strong>
 	</twig:Alert>
 </div>
 
