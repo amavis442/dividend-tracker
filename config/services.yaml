@@ -107,8 +107,9 @@ services:
             - addService:
                   ['App\Service\DividendDate\PimcoService', ['STHS', 'SSHY']]
             - addService: ['\App\Service\DividendDate\NullService', ['DSM']]
-            - addService: ['\App\Service\DividendDate\IncomeSharesService', ['COIY', 'QQQY','SPYY','TSLI'], '%env(INCOMESHARE_API_TOKEN)%']
-
+            # Does not work anymore, so we use null service
+            #- addService: ['\App\Service\DividendDate\IncomeSharesService', ['COIY', 'QQQY','SPYY','TSLI'], '%env(INCOMESHARE_API_TOKEN)%']
+            - addService: ['\App\Service\DividendDate\NullService', ['COIY', 'QQQY','SPYY','TSLI']]
             #- setDefault: ['App\Service\DividendDate\SeekingAlphaService']
             - setDefault:
                   ['App\Service\DividendDate\FinancialModelingPrepService']
