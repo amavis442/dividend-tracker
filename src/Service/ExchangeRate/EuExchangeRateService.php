@@ -29,7 +29,10 @@ class EuExchangeRateService implements ExchangeRateInterface
 				ExchangeRateInterface::CACHE_KEY
 			);
 			$rates = $item->get();
-			return $rates;
+			if (!isset($rates['GB']) && isset($rates['GBP'])) {
+				$rates['GB'] = $rates['GBP'];
+			}
+ 			return $rates;
 		}
 
 		$apiCallUrl = self::ECB_EXCHANGERATE;
@@ -56,6 +59,7 @@ class EuExchangeRateService implements ExchangeRateInterface
 		//dd($rates, $internalErrors);
 
 		$rates['GBX'] = $rates['GBP'] * 100;
+		$rates['GB'] = $rates['GBP'];
 
 		$item = $this->exchangerateCache->getItem(
 				ExchangeRateInterface::CACHE_KEY
