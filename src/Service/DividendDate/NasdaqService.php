@@ -62,8 +62,11 @@ class NasdaqService implements DividendDatePluginInterface
 		if ($jsonData['data'] == null) {
 			//dump($jsonData['status']);
 		}
-		if (
+
+ 		if (
 			$jsonData['data'] != null &&
+			isset($jsonData['data']['dividends']) &&
+			isset($jsonData['data']['dividends']['rows']) &&
 			count($jsonData['data']['dividends']['rows']) > 0
 		) {
 			foreach ($jsonData['data']['dividends']['rows'] as $divDate) {
@@ -82,19 +85,20 @@ class NasdaqService implements DividendDatePluginInterface
 					$divDate['paymentDate'] == '' ||
 					$divDate['paymentDate'] == 'N/A' ||
 					$divDate['amount'] == ''
-
 				) {
 					return [];
 				}
 
 				try {
-				$exDivDate = new \DateTime($divDate['exOrEffDate']);
+					$exDivDate = new \DateTime($divDate['exOrEffDate']);
 				} catch (\Exception $e) {
 					dump($divDate);
 					throw $e;
 				}
 				$paymentDate = new \DateTime($divDate['paymentDate']);
-
+				if ($divDate['declarationDate'] == 'N/A') {
+					$divDate['declarationDate'] = $divDate['recordDate'];
+				}
 				$declarationDate = new \DateTime($divDate['declarationDate']);
 				$recordDate = new \DateTime($divDate['recordDate']);
 				$dividend = str_replace('$', '', $divDate['amount']);
