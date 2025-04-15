@@ -315,12 +315,19 @@ class Transaction
 
     public function getAllocated(): float
     {
-        return $this->getAmount() * $this->getPrice();
+        return $this->getAllocation();
+        //return $this->getAmount() * $this->getPrice();
     }
 
+    /**
+     * Allocation is not precise enough. All will be converted to EURO if it is not already in euro.
+     * Note: if chosen currency is USD then the conversion should be EURO to Dollar.
+     */
     public function getAllocation(): ?float
     {
-        return $this->allocation;
+        return ($this->originalPrice * $this->amount) / $this->exchangeRate;
+
+        //return $this->allocation;
     }
 
     public function setAllocation(?float $allocation): self

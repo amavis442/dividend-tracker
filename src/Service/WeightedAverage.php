@@ -56,7 +56,7 @@ class WeightedAverage
             $allocation = $transaction->getAllocation(); // This one should be total - all the costs
 
             if ($transaction->getSide() === Transaction::BUY) {
-                $costBase += $allocation; // - $transaction->getFxFee() - $transaction->getTransactionFee() - $transaction->getFinraFee();
+                $costBase += $allocation;
                 $numShares += $amount;
             }
 
