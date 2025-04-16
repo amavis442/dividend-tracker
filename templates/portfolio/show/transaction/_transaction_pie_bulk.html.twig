@@ -1,0 +1,10 @@
+<turbo-frame id="update-pie-bulk">
+<a href="{{ path('portfolio_update_pie_bulk',{id: position.id}) }}"
+   class="flex w-full group">
+    {{ 'Pie'|trans }}
+    <div class="invisible group-hover:visible px-2 py-2">
+        <i class="fa-solid fa-pencil"></i>
+    </div>
+</a>
+{% if position.pies is not null and position.pies|length > 0 %}<small>({{ position.pies.0.label }})</small>{% endif %}
+</turbo-frame>

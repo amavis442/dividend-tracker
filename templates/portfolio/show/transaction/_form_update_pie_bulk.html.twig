@@ -1,0 +1,10 @@
+<turbo-frame id="update-pie-bulk">
+{{ form_start(form, {action: path('portfolio_update_pie_bulk', {'id': position.id}), attr: { "data-controller": "inline-edit", "data-turbo-frame": formTarget  }}) }}
+    <select name="{{ field_name(form.pies) }}" data-inline-edit-target="input"
+            class="border border-gray-400 rounded-lg"
+            data-action="blur->inline-edit#submitForm keydown.enter->inline-edit#submitForm:prevent keydown.esc->inline-edit#abort">
+        <option value="">{{ field_label(form.pies) }}</option>
+        {% for label, value in field_choices(form.pies) %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+    </select>
+{{ form_end(form) }}
+</turbo-frame>

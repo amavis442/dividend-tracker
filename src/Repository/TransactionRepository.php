@@ -178,6 +178,18 @@ class TransactionRepository extends ServiceEntityRepository
 			->execute();
 	}
 
+	public function updatePie(Position $position, Pie $pie): void
+	{
+		$this->createQueryBuilder('t')
+			->update(Transaction::class, 't')
+			->set('t.pie', ':pie')
+			->andWhere('t.position = :position')
+			->setParameter('pie', $pie)
+			->setParameter('position', $position)
+			->getQuery()
+			->execute();
+	}
+
 	// /**
 	//  * @return Transaction[] Returns an array of Transaction objects
 	//  */
