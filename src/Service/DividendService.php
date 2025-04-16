@@ -9,9 +9,9 @@ use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Transaction;
 use App\Repository\TaxRepository;
-use App\Service\ExchangeRate\EuExchangeRateService as ExchangeRateService;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use App\Service\ExchangeRate\ExchangeRateInterface;
 
 class DividendService implements DividendServiceInterface
 {
@@ -32,7 +32,7 @@ class DividendService implements DividendServiceInterface
      *
      * @var ExchangeRateService
      */
-    protected ExchangeRateService $exchangeRateService;
+    protected ExchangeRateInterface $exchangeRateService;
     /**
      * Dividend tax withhold
      *
@@ -58,7 +58,7 @@ class DividendService implements DividendServiceInterface
 
     protected float $netDividendYield = 0;
 
-    public function __construct(ExchangeRateService $exchangeRateService, TaxRepository $taxRepository, TranslatorInterface $translator)
+    public function __construct(ExchangeRateInterface $exchangeRateService, TaxRepository $taxRepository, TranslatorInterface $translator)
     {
         $this->exchangeRateService = $exchangeRateService;
         $this->taxRepository = $taxRepository;

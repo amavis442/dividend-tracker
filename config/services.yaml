@@ -55,12 +55,17 @@ services:
             $client: '@http_client'
             $exchangerateCache: '@exchangerate.cache'
 
+    App\Service\DividendService:
+        arguments:
+            $exchangeRateService: '@App\Service\ExchangeRate\WisselkoersNlExchangeRateService'
+            #$exchangerateCache: '@exchangerate.cache'
+
     # Yahoo api does not work anymore
     App\Service\StockPriceService:
         arguments:
             $client: '@http_client'
             $stockCache: '@stock.cache'
-            $exchangeRateService: '@App\Service\ExchangeRate\ExchangeRateService'
+            $exchangeRateService: '@App\Service\ExchangeRate\WisselkoersNlExchangeRateService'
         calls:
             - addService: ['App\Service\StockPrices\YahooFinanceService']
             - addService:

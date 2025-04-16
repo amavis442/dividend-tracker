@@ -17,7 +17,6 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface
 
 	public function getRates(): array
 	{
-
 		if (
 			$this->exchangerateCache->hasItem(ExchangeRateInterface::CACHE_KEY)
 		) {
@@ -28,6 +27,7 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface
 
  			return $rates;
 		}
+
 
 		$apiCallUrl = self::URL_EXCHANGERATE;
 		$client = $this->client;
@@ -59,7 +59,8 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface
 		$item = $this->exchangerateCache->getItem(
 				ExchangeRateInterface::CACHE_KEY
 			);
-		$item->expiresAfter(60 * 15);
+		$Minutes15 = 60*15;
+		$item->expiresAfter($Minutes15);
 		$item->set($rates);
 
 		$this->exchangerateCache->save($item);
