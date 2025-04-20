@@ -69,6 +69,9 @@ class DateIntervalFormType extends AbstractType
                 'multiple' => false,
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('pie')
+                        ->join("pie.positions", "pos")
+                        ->where("pos.closed = false")
+                        ->andWhere("pos.ignore_for_dividend = false")
                         ->orderBy('pie.label', 'ASC');
                 },
             ])
