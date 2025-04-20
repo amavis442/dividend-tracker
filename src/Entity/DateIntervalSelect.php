@@ -8,6 +8,7 @@ class DateIntervalSelect
     private ?int $month = null;
     private ?int $quator = null;
     private ?Ticker $ticker = null;
+    private ?Pie $pie = null;
 
     /**
      * Get the value of year
@@ -88,4 +89,25 @@ class DateIntervalSelect
 
         return $this;
     }
+
+    /**
+     * Get the value of pie
+     */
+    public function getPie(): ?Pie
+    {
+        return $this->pie;
+    }
+
+    /**
+     * Set the value of pie
+     *
+     * @return  static
+     */
+    public function setPie(?Pie $pie): static
+    {
+        $this->pie = $pie;
+
+        return $this;
+    }
+
 }

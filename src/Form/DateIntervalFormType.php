@@ -3,7 +3,10 @@
 namespace App\Form;
 
 use App\Entity\DateIntervalSelect;
+use App\Entity\Pie;
 use App\Form\Type\TickerAutocompleteField;
+use Doctrine\ORM\EntityRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -55,6 +58,19 @@ class DateIntervalFormType extends AbstractType
                     'Q4' => 4,
                 ],
                 'choice_translation_domain' => false,
+            ])
+            ->add('pie', EntityType::class, [
+                'class' => Pie::class,
+                'label' => 'Pie',
+                'choice_label' => 'label',
+                'required' => false,
+                'placeholder' => 'Please choose a Pie',
+                'empty_data' => null,
+                'multiple' => false,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('pie')
+                        ->orderBy('pie.label', 'ASC');
+                },
             ])
             ->add('ticker', TickerAutocompleteField::class, [
                 'extra_options' => [

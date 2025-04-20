@@ -38,6 +38,10 @@
                             <div class="flex-auto p-2">
                                 {{ form_widget(form.quator, { 'attr': {'class' : 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' }}) }}
                             </div>
+                            <div class="flex-auto p-2">
+                                {{ form_widget(form.pie, { 'attr': {'class' : 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' }}) }}
+                            </div>
+
                             <div class="flex-initial p-2 w-80">
                                 <select placeholder="{{ 'Select a ticker'|trans }}" name="{{ field_name(form.ticker) }}" {{ stimulus_controller('symfony/ux-autocomplete/autocomplete',{
                                      url: path('ux_entity_autocomplete', { alias: 'ticker'})
@@ -86,8 +90,8 @@
                                         {{ payment.payDate ? payment.payDate|format_date('long', locale=app.request.locale) : '' }}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
-                                        <a href="{{ path('portfolio_show', {'id': payment.position.id}) }} " data-turbo-frame="_top" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">{{ payment.position.ticker.fullname }}</a>
-                                        ({{ payment.position.ticker.symbol }})
+                                        <a href="{{ path('portfolio_show', {'id': payment.position.id}) }} " data-turbo-frame="_top" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">{{ payment.ticker.fullname }}</a>
+                                        ({{ payment.ticker.symbol }})
                                         <br />
                                         <small>{{ payment.amount|format_number({"fraction_digit": 7}) }}
                                         {{ 'shares'|trans }}</small>

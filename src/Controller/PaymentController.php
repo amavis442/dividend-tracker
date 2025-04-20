@@ -11,6 +11,7 @@ use App\Form\PaymentType;
 use App\Helper\DateHelper;
 use App\Repository\CalendarRepository;
 use App\Repository\PaymentRepository;
+use App\Repository\PieRepository;
 use App\Repository\TickerRepository;
 use App\Service\Referer;
 use DateTime;
@@ -39,6 +40,7 @@ class PaymentController extends AbstractController
 		Request $request,
 		PaymentRepository $paymentRepository,
 		TickerRepository $tickerRepository,
+		PieRepository $pieRepository,
 		Referer $referer,
 		#[MapQueryParameter]int $page = 1
 	): Response {
@@ -49,6 +51,7 @@ class PaymentController extends AbstractController
 		$sort = 'payDate';
 		$orderBy = 'DESC';
 		$ticker = null;
+		$pie = null;
 		$year = (int) date('Y');
 		$month = null;
 		$qautor = null;
@@ -72,6 +75,12 @@ class PaymentController extends AbstractController
 				$ticker = $tickerRepository->find($ticker_id);
 				$dateIntervalSelect->setTicker($ticker);
 			}
+
+			if ($sessionFormData->getPie() != null) {
+				$pie_id = $sessionFormData->getPie()->getId();
+				$pie = $pieRepository->find($pie_id);
+				$dateIntervalSelect->setPie($pie);
+			}
 		}
 
 		$form = $this->createForm(
@@ -92,6 +101,7 @@ class PaymentController extends AbstractController
 			$month = $dateIntervalSelect->getMonth();
 			$qautor = $dateIntervalSelect->getQuator();
 			$ticker = $dateIntervalSelect->getTicker();
+			$pie = $dateIntervalSelect->getPie();
 
 			$request->getSession()->set(self::SESSION_KEY, $dateIntervalSelect);
 		}
@@ -113,7 +123,8 @@ class PaymentController extends AbstractController
 		$totalDividend = $paymentRepository->getTotalDividend(
 			$startDate . ' 00:00:00',
 			$endDate . ' 23:59:59',
-			$ticker
+			$ticker,
+			$pie,
 		);
 
 		// TODO: Make this dynamic because not all stocks have 15% dividend tax
@@ -123,6 +134,7 @@ class PaymentController extends AbstractController
 			$sort,
 			$orderBy,
 			$ticker,
+			$pie,
 			$startDate,
 			$endDate
 		);
