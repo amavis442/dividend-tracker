@@ -154,7 +154,9 @@
                                             &euro;{{ position.dividend|format_number({"fraction_digit": 2}) }}
                                             <div class="inline-block w-full text-right pl-1">
                                                 <twig:Badge variant="info" type="pill" class="justify-right">
+                                                    {% if position.allocation > 0 %}
                                                     {{ ((position.dividend / position.allocation) *100)|format_number({"fraction_digit": 2}) }}%
+                                                    {% endif %}
                                                 </twig:Badge>
                                             </div>
                                         </twig:Badge>

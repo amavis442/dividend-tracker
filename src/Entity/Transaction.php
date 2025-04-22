@@ -325,9 +325,9 @@ class Transaction
      */
     public function getAllocation(): ?float
     {
-        return ($this->originalPrice * $this->amount) / $this->exchangeRate;
+        //return ($this->originalPrice * $this->amount) / $this->exchangeRate;
 
-        //return $this->allocation;
+        return $this->allocation;
     }
 
     public function setAllocation(?float $allocation): self

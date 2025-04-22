@@ -206,8 +206,8 @@ class PaymentRepository extends ServiceEntityRepository
 	}
 
 	public function getTotalDividend(
-		string $startDate,
-		string $endDate,
+		string $startDate = '',
+		string $endDate = '',
 		?Ticker $ticker = null,
 		?Pie $pie = null
 	): ?float {
@@ -215,7 +215,7 @@ class PaymentRepository extends ServiceEntityRepository
 			'SUM(p.dividend) total'
 		);
 
-		if ($startDate !== null) {
+		if ($startDate !== '' && isset($startDate) && $endDate !== '' && isset($endDate)) {
 			$this->setDateRange($queryBuilder, $startDate, $endDate);
 		}
 
