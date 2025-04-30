@@ -177,10 +177,10 @@
                                         {% if position.divDate %}
                                             <twig:Badge class="block">
                                                 {{ position.cashCurrency.sign|raw }}
-                                                {{ position.cashAmount|format_number({"fraction_digit": 3}) }}
+                                                {{ position.cashAmount|format_number({"fraction_digit": 4}) }}
                                             </twig:Badge>
                                             <twig:Badge variant="secondary" class="flex mt-1">
-                                                <span class="whitespace-nowrap">&euro; {{ position.forwardNetDividend|format_number({"fraction_digit": 2}) }}</span>
+                                                <span class="whitespace-nowrap">&euro; {{ position.forwardNetDividend|format_number({"fraction_digit": 4}) }}</span>
                                                 <div class="block-inline w-full text-right">
                                                     <twig:Badge variant="success" type="pill">
                                                         {{ position.forwardNetDividendYield|format_number({"fraction_digit": 2}) }}%

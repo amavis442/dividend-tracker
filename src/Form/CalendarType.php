@@ -53,7 +53,7 @@ class CalendarType extends AbstractType
                 'label' => 'Dividend',
                 'required' => false,
                 'input' => 'number',
-                'scale' => 3,
+                'scale' => 4,
             ])
             ->add('dividend_type', ChoiceType::class, [
                 'choices' => [

@@ -121,9 +121,9 @@
 												{{ 'shares'|trans }}</small>
 										</twig:Table:Td>
 										<twig:Table:Td>
-											{{ cal.currency.sign|raw}}{{ cal.cashAmount|format_number({fraction_digit: 2}) }}
+											{{ cal.currency.sign|raw}}{{ cal.cashAmount|format_number({fraction_digit: 4}) }}
 										</twig:Table:Td>
-										<twig:Table:Td>&euro;{{ netDividend|format_number({fraction_digit: 2}) }}</twig:Table:Td>
+										<twig:Table:Td>&euro;{{ netDividend|format_number({fraction_digit: 4}) }}</twig:Table:Td>
 									</twig:Table:Tr>
 									{% set sumDividend = sumDividend + netDividend %}
 									{% set numPositions = numPositions  + 1 %}
