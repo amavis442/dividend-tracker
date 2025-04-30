@@ -66,7 +66,7 @@
                         {{ calendar.recordDate ? calendar.recordDate|date("d-m-Y") : '' }}
                     </twig:Table:Td>
                     <twig:Table:Td>
-                        {{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ calendar.cashAmount|format_number({"fraction_digit": 3}) }}
+                        {{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ calendar.cashAmount|format_number({"fraction_digit": 4}) }}
                         {% if dividendRaises[index] > 0 %}
                             <span class="badge badge-success">
                                 <i class="fas fa-arrow-circle-up"></i>
