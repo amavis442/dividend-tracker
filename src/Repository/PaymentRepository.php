@@ -215,7 +215,7 @@ class PaymentRepository extends ServiceEntityRepository
 			'SUM(p.dividend) total'
 		);
 
-		if ($startDate !== '' && isset($startDate) && $endDate !== '' && isset($endDate)) {
+		if ($startDate !== '' && $endDate !== '') {
 			$this->setDateRange($queryBuilder, $startDate, $endDate);
 		}
 

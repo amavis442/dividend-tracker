@@ -30,7 +30,7 @@ class DividendService implements DividendServiceInterface
     /**
      * Current exchangerate
      *
-     * @var ExchangeRateService
+     * @var ExchangeRateInterface
      */
     protected ExchangeRateInterface $exchangeRateService;
     /**
