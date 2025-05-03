@@ -82,6 +82,7 @@ final class IncomesSharesController extends AbstractController
 			// ... do your form processing, like saving the Task and Tag entities
 			$shares = $incomesShares->getShares();
             $saveData = false;
+            // @phpstan-ignore-next-line
             if ($form->get('save')->isClicked()) {
                 $saveData = true;
             }
