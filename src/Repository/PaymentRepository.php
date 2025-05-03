@@ -242,6 +242,20 @@ class PaymentRepository extends ServiceEntityRepository
 		return $result[0]['total'];
 	}
 
+	public function getSumDividendsByPosition(Position $position): ?float
+	{
+		$queryBuilder = $this->createQueryBuilder('p')
+			->select('SUM(p.dividend) total')
+			->join('p.position', 'pos')
+			->where('pos.closed = false')
+			->andWhere('p.position = :position')
+			->groupBy('p.position')
+			->setParameter('position', $position->getId());
+
+		$result = $queryBuilder->getQuery()->getOneOrNullResult();
+		return $result ? $result['total'] : 0.0;
+	}
+
 	public function getSumDividends(array $tickerIds)
 	{
 		$queryBuilder = $this->createQueryBuilder('p')

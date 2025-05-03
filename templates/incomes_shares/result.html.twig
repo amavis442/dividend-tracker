@@ -1,0 +1,19 @@
+<turbo-frame id="incomesshares-results">
+    {% if data|length > 0 %}
+        {% for isin, item in data %}
+            {{ isin }}
+            {{ item.fullname}}
+            {{ item.allocation}}
+            {{ item.distributions }}
+            {{ item.pl }}
+            {% if item.totalReturn < item.allocation %}
+                <span class="bg-red-950">
+                {{ item.totalReturn }} deze
+                </span>
+            {% else %}
+                {{ item.totalReturn }}
+            {% endif %}
+            <br/>
+        {% endfor %}
+    {% endif %}
+</turbo-frame>
