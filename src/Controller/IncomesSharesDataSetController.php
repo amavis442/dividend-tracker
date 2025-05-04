@@ -31,7 +31,6 @@ final class IncomesSharesDataSetController extends AbstractController
 		IncomesSharesDataSetRepository $incomesSharesDataSetRepository,
 		#[MapQueryParameter] int $page = 1
 	): Response {
-
 		$queryBuilder = $incomesSharesDataSetRepository->all();
 
 		$adapter = new QueryAdapter($queryBuilder);
@@ -191,12 +190,12 @@ final class IncomesSharesDataSetController extends AbstractController
 
 			if ($saveData) {
 				$em->flush();
-			}
 
-			$this->addFlash(
-			   'success',
-			   'Saved dataset: '. $uuid->__toString()
-			);
+				$this->addFlash(
+					'success',
+					'Saved dataset: ' . $uuid->__toString()
+				);
+			}
 		}
 
 		return $this->render('incomes_shares_data_set/create.html.twig', [
@@ -252,39 +251,40 @@ final class IncomesSharesDataSetController extends AbstractController
 			methods: ['GET']
 		)
 	]
-	public function show(IncomesSharesDataSet $incomesSharesDataSet,
-	IncomesSharesDataRepository $incomesSharesDataRepository,
-	): Response
-	{
+	public function show(
+		IncomesSharesDataSet $incomesSharesDataSet,
+		IncomesSharesDataRepository $incomesSharesDataRepository
+	): Response {
 		$uuid = $incomesSharesDataSet->getUuid();
-		$dataIshares = $incomesSharesDataRepository->findBy(['dataset' => $uuid]);
+		$dataIshares = $incomesSharesDataRepository->findBy([
+			'dataset' => $uuid,
+		]);
 		foreach ($dataIshares as $ishare) {
-				$ticker = $ishare->getTicker();
-				$isin = $ticker->getIsin();
-				$position = $ishare->getPosition();
-				$allocation = $ishare->getAllocation();
-				$distributions = $ishare->getDistributions();
-				$profitLoss = $ishare->getProfitLoss();
-				$price = $ishare->getPrice();
-				$amount = $position->getAmount();
+			$ticker = $ishare->getTicker();
+			$isin = $ticker->getIsin();
+			$position = $ishare->getPosition();
+			$allocation = $ishare->getAllocation();
+			$distributions = $ishare->getDistributions();
+			$profitLoss = $ishare->getProfitLoss();
+			$price = $ishare->getPrice();
+			$amount = $position->getAmount();
 
-				$totalReturn =
-					$allocation + $distributions + $profitLoss;
-				$totalGain = $totalReturn - $allocation;
-				$totalReturnPercentage = ($totalGain / $allocation) * 100;
-				$calcGain = $price * $amount - $allocation;
-				$data[$isin] = [
-					'fullname' => $ticker->getFullname(),
-					'allocation' => $allocation,
-					'amount' => $amount,
-					'price' => $price,
-					'calcGain' => $calcGain,
-					'distributions' => $distributions,
-					'pl' => $ishare->getProfitLoss(),
-					'totalGain' => $totalGain,
-					'totalReturn' => $totalReturn,
-					'totalReturnPercentage' => $totalReturnPercentage,
-				];
+			$totalReturn = $allocation + $distributions + $profitLoss;
+			$totalGain = $totalReturn - $allocation;
+			$totalReturnPercentage = ($totalGain / $allocation) * 100;
+			$calcGain = $price * $amount - $allocation;
+			$data[$isin] = [
+				'fullname' => $ticker->getFullname(),
+				'allocation' => $allocation,
+				'amount' => $amount,
+				'price' => $price,
+				'calcGain' => $calcGain,
+				'distributions' => $distributions,
+				'pl' => $ishare->getProfitLoss(),
+				'totalGain' => $totalGain,
+				'totalReturn' => $totalReturn,
+				'totalReturnPercentage' => $totalReturnPercentage,
+			];
 		}
 
 		return $this->render('incomes_shares_data_set/show.html.twig', [
@@ -352,7 +352,9 @@ final class IncomesSharesDataSetController extends AbstractController
 			)
 		) {
 			$uuid = $incomesSharesDataSet->getUuid();
-			$ishares = $incomesSharesDataRepository->findBy(['dataset' => $uuid]);
+			$ishares = $incomesSharesDataRepository->findBy([
+				'dataset' => $uuid,
+			]);
 
 			foreach ($ishares as $share) {
 				$entityManager->remove($share);
