@@ -46,6 +46,9 @@
                 {{ 'Distributions'|trans }}
             </twig:Table:ThCol>
             <twig:Table:ThCol>
+                {{ 'Price'|trans }} (&euro;)
+            </twig:Table:ThCol>
+            <twig:Table:ThCol>
                 {{ 'Profit/Loss'|trans }}
             </twig:Table:ThCol>
             <twig:Table:ThCol>
@@ -70,6 +73,9 @@
                     </twig:Table:Td>
                     <twig:Table:Td>
                         {{ item.distributions }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ item.price }}
                     </twig:Table:Td>
                     <twig:Table:Td>
                         {% if item.pl < 0 %}
