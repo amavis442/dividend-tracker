@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New IncomesSharesDataSet{% endblock %}
+
+{% block body %}
+    <h1>Create new IncomesSharesDataSet</h1>
+
+    {{ include('incomes_shares_data_set/_form.html.twig') }}
+
+    <a href="{{ path('app_incomes_shares_data_set_index') }}">back to list</a>
+{% endblock %}

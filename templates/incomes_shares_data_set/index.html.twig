@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+{% block title %}IncomesSharesDataSet index{% endblock %}
+{% block body %}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div>
+                {% for notice in app.flashes('notice') %}
+                    <twig:Alert variant="danger">
+                        {{ notice|trans }}
+                    </twig:Alert>
+                {% endfor %}
+            </div>
+            <div id="header" class="px-3 py-2 w-full">
+                <twig:Head>
+                    IncomesSharesDataSet
+                </twig:Head>
+            </div>
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <div class="w-full pr-3 py-2 mb-2">
+                    <twig:Button tag="a" href="{{ path("app_incomes_shares_data_set_create") }}">
+                        <i class="fas fa-plus"></i>
+                    </twig:Button>
+                </div>
+                <div class="border border-gray-200 rounded-lg p-2">
+                    <turbo-frame id="results">
+                    <div class="mb-2">
+                        <twig:Table:Table class="max-w-min min-w-full">
+                            <twig:Table:THead>
+                                <thead>
+                                    <tr>
+                                        <twig:Table:ThCol class="rounded-l-lg">
+                                            TotalProfitLoss
+                                        </twig:Table:ThCol>
+                                        <twig:Table:ThCol>
+                                            TotalDistribution
+                                        </twig:Table:ThCol>
+                                        <twig:Table:ThCol>
+                                            TotalAllocation
+                                        </twig:Table:ThCol>
+                                        <twig:Table:ThCol>
+                                            Yield
+                                        </twig:Table:ThCol>
+                                        <twig:Table:ThCol>
+                                            CreatedAt
+                                        </twig:Table:ThCol>
+                                        <twig:Table:ThCol class="rounded-r-lg">
+                                            actions
+                                        </twig:Table:ThCol>
+                                    </tr>
+                                </twig:Table:THead>
+                                <tbody>
+                                    {% for incomes_shares_data_set in pager %}
+                                        <twig:Table:Tr>
+                                            <twig:Table:Td>
+                                                {{ incomes_shares_data_set.totalProfitLoss }}
+                                            </twig:Table:Td>
+                                            <twig:Table:Td>
+                                                {{ incomes_shares_data_set.totalDistribution }}
+                                            </twig:Table:Td>
+                                            <twig:Table:Td>
+                                                {{ incomes_shares_data_set.totalAllocation }}
+                                            </twig:Table:Td>
+                                            <twig:Table:Td>
+                                                {{ incomes_shares_data_set.yield }}
+                                            </twig:Table:Td>
+                                            <twig:Table:Td>
+                                                {{ incomes_shares_data_set.createdAt ? incomes_shares_data_set.createdAt|date("Y-m-d H:i:s") : '' }}
+                                            </twig:Table:Td>
+                                            <twig:Table:Td>
+                                                <div class="inline-flex rounded-md shadow-sm" role="group">
+                                                    <div class="inline-block" data-controller="tooltip">
+                                                        <a href="{{ path('app_incomes_shares_data_set_show', { 'id': incomes_shares_data_set.id }) }}"
+                                                           data-turbo-frame="_top"
+                                                           data-tooltip-target="element"
+                                                           data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                                           class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                                            <i class="fas fa-book-open"></i>
+                                                        </a>
+                                                        <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                            {{ 'Show'|trans }}
+                                                            <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                                        </div>
+                                                    </div>
+                                               </div>
+                                            </twig:Table:Td>
+                                        </twig:Table:Tr>
+                                    {% else %}
+                                        <twig:Table:Tr>
+                                            <twig:Table:Td colspan="9">
+                                                no records found
+                                            </twig:Table:Td>
+                                        </twig:Table:Tr>
+                                    {% endfor %}
+                                </tbody>
+                            </twig:Table:Table>
+                        </div>
+                    </div>
+                    <div class="mb-2">{% if pager.haveToPaginate %}{{ pagerfanta(pager) }}{% endif %}</div>
+                    </turbo-frame>
+                </div>
+            </div>
+        </div>
+    {% endblock %}

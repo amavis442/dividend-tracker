@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit IncomesSharesDataSet{% endblock %}
+
+{% block body %}
+    <h1>Edit IncomesSharesDataSet</h1>
+
+    {{ include('incomes_shares_data_set/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_incomes_shares_data_set_index') }}">back to list</a>
+
+    {{ include('incomes_shares_data_set/_delete_form.html.twig') }}
+{% endblock %}

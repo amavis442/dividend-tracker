@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+{% block title %}IncomesShares!{% endblock %}
+{% block body %}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+
+            <div class="mb-2 w-full gap-2 bg-gray-200 shadow-md rounded-lg p-6 flex justify-center">
+                <div class="flex">
+                    {{ form_start(form, { 'attr': {'autocomplete': 'off','data-turbo-frame': 'incomesshares-results','class': 'border border-b border-black rounded-lg p-2'} }) }}
+                        <div id="header" class="px-3 py-2 w-full">
+                            <twig:Head>
+                                Shares
+                            </twig:Head>
+                        </div>
+                        <table>
+                            {% for share in form.shares %}
+                                <tr>
+                                    <td>{{ form_row(share.isin) }}</td>
+                                    <td>{{ form_row(share.fullname) }}</td>
+                                    <td>{{ form_row(share.price) }}</td>
+                                    <td>{{ form_row(share.profitLoss) }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                        <div>
+                            {{ form_widget(form.submit, {'label':'execute', 'attr': {'class': 'px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-blue-500 hover:bg-blue-700 p-2' }}) }}
+                            {{ form_widget(form.save, {'attr': {'class': 'px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-red-500 hover:bg-red-700 p-2' }}) }}
+                            <a class="px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-green-500 hover:bg-green-700 p-2"
+                               href="{{ path("app_incomes_shares_data_set_index") }}">
+                                <i class="fas fa-angle-double-left"></i> {{ 'back to list'|trans }}
+                            </a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+            <turbo-frame id="incomesshares-results">
+            {% if data|length > 0 %}
+                {% include 'incomes_shares_data_set/_dataset.html.twig' %}
+            {% endif %}
+            </turbo-frame>
+        </div>
+    </div>
+</div>
+{% endblock %}

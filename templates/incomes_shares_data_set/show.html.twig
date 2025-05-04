@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+{% block title %}IncomesSharesDataSet{% endblock %}
+{% block body %}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div>
+                {% for notice in app.flashes('notice') %}
+                    <twig:Alert variant="danger">
+                        {{ notice|trans }}
+                    </twig:Alert>
+                {% endfor %}
+            </div>
+            <div id="header" class="px-3 py-2 w-full">
+                <twig:Head variant="h2">
+                    IncomesSharesDataSet <span class="font-sans text-sm">({{ incomes_shares_data_set.createdAt ? (incomes_shares_data_set.createdAt|date('l')|trans ~ ', ' ~ incomes_shares_data_set.createdAt|format_datetime('long', 'short', locale: 'nl')) : '' }})</span>
+                </twig:Head>
+            </div>
+            <div class="mb-2 w-full gap-2 bg-gray-200 shadow-md rounded-lg p-6 flex justify-center">
+                <div class="">
+                    <div class="w-full">{% include 'incomes_shares_data_set/_dataset.html.twig' %}</div>
+                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                    <a class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white"
+                       href="{{ path("app_incomes_shares_data_set_index") }}">
+                        <i class="fas fa-angle-double-left"></i> {{ 'back to list'|trans }}
+                    </a>
+                    {{ include("incomes_shares_data_set/_delete_form.html.twig") }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -3,9 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\IncomesSharesDataRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: IncomesSharesDataRepository::class)]
 class IncomesSharesData
@@ -43,6 +43,9 @@ class IncomesSharesData
 
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column(type: 'uuid', nullable: true)]
+    private ?Uuid $dataset = null;
 
     public function getId(): ?int
     {
@@ -157,6 +160,16 @@ class IncomesSharesData
         return $this;
     }
 
+    public function getDataset(): ?Uuid
+    {
+        return $this->dataset;
+    }
 
+    public function setDataset(?Uuid $dataset): static
+    {
+        $this->dataset = $dataset;
+
+        return $this;
+    }
 
 }

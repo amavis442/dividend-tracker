@@ -1,0 +1,371 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\IncomesShare;
+use App\Entity\IncomesShares;
+use App\Entity\IncomesSharesData;
+use App\Entity\IncomesSharesDataSet;
+use App\Form\IncomesSharesType;
+use App\Repository\IncomesSharesDataRepository;
+use App\Repository\PaymentRepository;
+use App\Repository\PositionRepository;
+use App\Repository\TickerRepository;
+use App\Form\IncomesSharesDataSetType;
+use App\Repository\IncomesSharesDataSetRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Uid\Uuid;
+
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/incomesshares')]
+final class IncomesSharesDataSetController extends AbstractController
+{
+	#[Route(name: 'app_incomes_shares_data_set_index', methods: ['GET'])]
+	public function index(
+		IncomesSharesDataSetRepository $incomesSharesDataSetRepository,
+		#[MapQueryParameter] int $page = 1
+	): Response {
+
+		$queryBuilder = $incomesSharesDataSetRepository->all();
+
+		$adapter = new QueryAdapter($queryBuilder);
+		$pager = new Pagerfanta($adapter);
+		$pager->setMaxPerPage(10);
+		$pager->setCurrentPage($page);
+
+		return $this->render('incomes_shares_data_set/index.html.twig', [
+			'pager' => $pager,
+		]);
+	}
+
+	#[Route('/create', name: 'app_incomes_shares_data_set_create')]
+	public function create(
+		Request $request,
+		TickerRepository $tickerRepository,
+		PositionRepository $positionRepository,
+		PaymentRepository $paymentRepository,
+		EntityManagerInterface $em
+	): Response {
+		$incomesShares = new IncomesShares();
+		$ticker = [];
+
+		$share = new IncomesShare();
+		$ticker['XS2901886445'] = $tickerRepository->findOneBy([
+			'isin' => 'XS2901886445',
+		]);
+		$share->setIsin($ticker['XS2901886445']->getIsin());
+		$share->setFullname($ticker['XS2901886445']->getFullname());
+		$incomesShares->getShares()->add($share);
+
+		$share2 = new IncomesShare();
+		$ticker['XS2875105608'] = $tickerRepository->findOneBy([
+			'isin' => 'XS2875105608',
+		]);
+		$share2->setIsin($ticker['XS2875105608']->getIsin());
+		$share2->setFullname($ticker['XS2875105608']->getFullname());
+		$incomesShares->getShares()->add($share2);
+
+		$share3 = new IncomesShare();
+		$ticker['XS2852999692'] = $tickerRepository->findOneBy([
+			'isin' => 'XS2852999692',
+		]);
+		$share3->setIsin($ticker['XS2852999692']->getIsin());
+		$share3->setFullname($ticker['XS2852999692']->getFullname());
+		$incomesShares->getShares()->add($share3);
+
+		$share4 = new IncomesShare();
+		$ticker['XS2875106242'] = $tickerRepository->findOneBy([
+			'isin' => 'XS2875106242',
+		]);
+		$share4->setIsin($ticker['XS2875106242']->getIsin());
+		$share4->setFullname($ticker['XS2875106242']->getFullname());
+		$incomesShares->getShares()->add($share4);
+
+		$share5 = new IncomesShare();
+		$ticker['XS2852999429'] = $tickerRepository->findOneBy([
+			'isin' => 'XS2852999429',
+		]);
+		$share5->setIsin($ticker['XS2852999429']->getIsin());
+		$share5->setFullname($ticker['XS2852999429']->getFullname());
+		$incomesShares->getShares()->add($share5);
+
+		$form = $this->createForm(IncomesSharesType::class, $incomesShares);
+
+		$form->handleRequest($request);
+
+		$data = [];
+		$totalDistributions = 0.0;
+		$totalAllocation = 0.0;
+		$totalProfitLoss = 0.0;
+		$yield = 0.0;
+		$uuid = Uuid::v7();
+		if ($form->isSubmitted() && $form->isValid()) {
+			// ... do your form processing, like saving the Task and Tag entities
+			$shares = $incomesShares->getShares();
+			$saveData = false;
+			// @phpstan-ignore-next-line
+			// @var \Symfony\Component\Form\SubmitButton
+			$formSaveElement = $form->get('save');
+			/** @disregard P1013 Undefined method */
+			if ($formSaveElement->isClicked()) {
+				$saveData = true;
+			}
+
+			foreach ($shares as $ishare) {
+				$tick = $ticker[$ishare->getIsin()];
+
+				$position = $positionRepository->findOneBy([
+					'ticker' => $tick->getId(),
+					'closed' => false,
+				]);
+				$allocation = $position->getAllocation();
+				$distributions = $paymentRepository->getSumDividendsByPosition(
+					$position
+				);
+
+				$totalReturn =
+					$allocation + $distributions + $ishare->getProfitLoss();
+				$totalGain = $totalReturn - $allocation;
+				$totalReturnPercentage = ($totalGain / $allocation) * 100;
+
+				$price = $ishare->getPrice();
+				$amount = $position->getAmount();
+
+				$calcGain = $price * $amount - $allocation;
+
+				$totalDistributions += $distributions;
+				$totalAllocation += $allocation;
+
+				$totalProfitLoss += $ishare->getProfitLoss();
+
+				$data[$ishare->getIsin()] = [
+					'fullname' => $tick->getFullname(),
+					'allocation' => $allocation,
+					'amount' => $amount,
+					'price' => $price,
+					'calcGain' => $calcGain,
+					'distributions' => $distributions,
+					'pl' => $ishare->getProfitLoss(),
+					'totalGain' => $totalGain,
+					'totalReturn' => $totalReturn,
+					'totalReturnPercentage' => $totalReturnPercentage,
+				];
+
+				if ($saveData) {
+					$incomesSharesData = new IncomesSharesData();
+					$incomesSharesData->setTicker($tick);
+					$incomesSharesData->setPosition($position);
+					$incomesSharesData->setPrice($price);
+					$incomesSharesData->setProfitLoss($ishare->getProfitLoss());
+					$incomesSharesData->setDistributions($distributions);
+					$incomesSharesData->setAllocation($allocation);
+					$incomesSharesData->setAmount($amount);
+					$incomesSharesData->setDataset($uuid);
+					$incomesSharesData->setCreatedAt(new \DateTimeImmutable());
+					$incomesSharesData->setUpdatedAt(new \DateTimeImmutable());
+
+					$em->persist($incomesSharesData);
+				}
+			}
+
+			$yield = 0.0;
+			if ($totalAllocation > 0) {
+				$yield = ($totalDistributions / $totalAllocation) * 100;
+			}
+
+			$dataset = new IncomesSharesDataSet();
+			$dataset->setUuid($uuid);
+			$dataset->setTotalAllocation($totalAllocation);
+			$dataset->setTotalDistribution($totalDistributions);
+			$dataset->setTotalProfitLoss($totalProfitLoss);
+			$dataset->setYield($yield);
+			$dataset->setCreatedAt(new \DateTimeImmutable());
+
+			$em->persist($dataset);
+
+			if ($saveData) {
+				$em->flush();
+			}
+
+			$this->addFlash(
+			   'success',
+			   'Saved dataset: '. $uuid->__toString()
+			);
+		}
+
+		return $this->render('incomes_shares_data_set/create.html.twig', [
+			'controller_name' => 'IncomesSharesController',
+			'form' => $form,
+			'data' => $data,
+			'totalProfitLoss' => $totalProfitLoss,
+			'totalDistribution' => $totalDistributions,
+			'totalAllocation' => $totalAllocation,
+			'yield' => $yield,
+		]);
+	}
+
+	#[
+		Route(
+			'/new',
+			name: 'app_incomes_shares_data_set_new',
+			methods: ['GET', 'POST']
+		)
+	]
+	public function new(
+		Request $request,
+		EntityManagerInterface $entityManager
+	): Response {
+		$incomesSharesDataSet = new IncomesSharesDataSet();
+		$form = $this->createForm(
+			IncomesSharesDataSetType::class,
+			$incomesSharesDataSet
+		);
+		$form->handleRequest($request);
+
+		if ($form->isSubmitted() && $form->isValid()) {
+			$entityManager->persist($incomesSharesDataSet);
+			$entityManager->flush();
+
+			return $this->redirectToRoute(
+				'app_incomes_shares_data_set_index',
+				[],
+				Response::HTTP_SEE_OTHER
+			);
+		}
+
+		return $this->render('incomes_shares_data_set/new.html.twig', [
+			'incomes_shares_data_set' => $incomesSharesDataSet,
+			'form' => $form,
+		]);
+	}
+
+	#[
+		Route(
+			'/{id}',
+			name: 'app_incomes_shares_data_set_show',
+			methods: ['GET']
+		)
+	]
+	public function show(IncomesSharesDataSet $incomesSharesDataSet,
+	IncomesSharesDataRepository $incomesSharesDataRepository,
+	): Response
+	{
+		$uuid = $incomesSharesDataSet->getUuid();
+		$dataIshares = $incomesSharesDataRepository->findBy(['dataset' => $uuid]);
+		foreach ($dataIshares as $ishare) {
+				$ticker = $ishare->getTicker();
+				$isin = $ticker->getIsin();
+				$position = $ishare->getPosition();
+				$allocation = $ishare->getAllocation();
+				$distributions = $ishare->getDistributions();
+				$profitLoss = $ishare->getProfitLoss();
+				$price = $ishare->getPrice();
+				$amount = $position->getAmount();
+
+				$totalReturn =
+					$allocation + $distributions + $profitLoss;
+				$totalGain = $totalReturn - $allocation;
+				$totalReturnPercentage = ($totalGain / $allocation) * 100;
+				$calcGain = $price * $amount - $allocation;
+				$data[$isin] = [
+					'fullname' => $ticker->getFullname(),
+					'allocation' => $allocation,
+					'amount' => $amount,
+					'price' => $price,
+					'calcGain' => $calcGain,
+					'distributions' => $distributions,
+					'pl' => $ishare->getProfitLoss(),
+					'totalGain' => $totalGain,
+					'totalReturn' => $totalReturn,
+					'totalReturnPercentage' => $totalReturnPercentage,
+				];
+		}
+
+		return $this->render('incomes_shares_data_set/show.html.twig', [
+			'controller_name' => 'IncomesSharesController',
+			'incomes_shares_data_set' => $incomesSharesDataSet,
+			'data' => $data,
+			'totalProfitLoss' => $incomesSharesDataSet->getTotalProfitLoss(),
+			'totalDistribution' => $incomesSharesDataSet->getTotalDistribution(),
+			'totalAllocation' => $incomesSharesDataSet->getTotalAllocation(),
+			'yield' => $incomesSharesDataSet->getYield(),
+		]);
+	}
+
+	#[
+		Route(
+			'/{id}/edit',
+			name: 'app_incomes_shares_data_set_edit',
+			methods: ['GET', 'POST']
+		)
+	]
+	public function edit(
+		Request $request,
+		IncomesSharesDataSet $incomesSharesDataSet,
+		EntityManagerInterface $entityManager
+	): Response {
+		$form = $this->createForm(
+			IncomesSharesDataSetType::class,
+			$incomesSharesDataSet
+		);
+		$form->handleRequest($request);
+
+		if ($form->isSubmitted() && $form->isValid()) {
+			$entityManager->flush();
+
+			return $this->redirectToRoute(
+				'app_incomes_shares_data_set_index',
+				[],
+				Response::HTTP_SEE_OTHER
+			);
+		}
+
+		return $this->render('incomes_shares_data_set/edit.html.twig', [
+			'incomes_shares_data_set' => $incomesSharesDataSet,
+			'form' => $form,
+		]);
+	}
+
+	#[
+		Route(
+			'/{id}',
+			name: 'app_incomes_shares_data_set_delete',
+			methods: ['POST']
+		)
+	]
+	public function delete(
+		Request $request,
+		IncomesSharesDataSet $incomesSharesDataSet,
+		IncomesSharesDataRepository $incomesSharesDataRepository,
+		EntityManagerInterface $entityManager
+	): Response {
+		if (
+			$this->isCsrfTokenValid(
+				'delete' . $incomesSharesDataSet->getId(),
+				$request->getPayload()->getString('_token')
+			)
+		) {
+			$uuid = $incomesSharesDataSet->getUuid();
+			$ishares = $incomesSharesDataRepository->findBy(['dataset' => $uuid]);
+
+			foreach ($ishares as $share) {
+				$entityManager->remove($share);
+			}
+
+			$entityManager->remove($incomesSharesDataSet);
+			$entityManager->flush();
+		}
+
+		return $this->redirectToRoute(
+			'app_incomes_shares_data_set_index',
+			[],
+			Response::HTTP_SEE_OTHER
+		);
+	}
+}
