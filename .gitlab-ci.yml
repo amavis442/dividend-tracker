@@ -30,7 +30,7 @@ static_analysis:
   script:
     - bash ci/php-install.sh
     - php composer.phar require --dev phpstan/phpstan
-    - php vendor/bin/phpstan.phar analyse src --level=1
+    - php vendor/bin/phpstan.phar analyse src/ -c phpstan.neon --level=5 --no-progress -vvv --memory-limit=1024M
 
 phpunit:
   stage: test
