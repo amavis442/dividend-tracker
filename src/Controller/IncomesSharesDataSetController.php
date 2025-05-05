@@ -54,45 +54,32 @@ final class IncomesSharesDataSetController extends AbstractController
 		$incomesShares = new IncomesShares();
 		$ticker = [];
 
-		$share = new IncomesShare();
-		$ticker['XS2901886445'] = $tickerRepository->findOneBy([
-			'isin' => 'XS2901886445',
-		]);
-		$share->setIsin($ticker['XS2901886445']->getIsin());
-		$share->setFullname($ticker['XS2901886445']->getFullname());
-		$incomesShares->getShares()->add($share);
+		try {
+			$parameter = $this->getParameter('app.incomesshares');
+		} catch (\Symfony\Component\DependencyInjection\Exception\EnvNotFoundException $e) {
+			$this->addFlash(
+				'notice',
+				'Missing INCOMESSHARES parameter in .env(.local)'
+			);
+			$parameter = '';
+		}
 
-		$share2 = new IncomesShare();
-		$ticker['XS2875105608'] = $tickerRepository->findOneBy([
-			'isin' => 'XS2875105608',
-		]);
-		$share2->setIsin($ticker['XS2875105608']->getIsin());
-		$share2->setFullname($ticker['XS2875105608']->getFullname());
-		$incomesShares->getShares()->add($share2);
+		$shareConfig = explode(',', $parameter);
 
-		$share3 = new IncomesShare();
-		$ticker['XS2852999692'] = $tickerRepository->findOneBy([
-			'isin' => 'XS2852999692',
-		]);
-		$share3->setIsin($ticker['XS2852999692']->getIsin());
-		$share3->setFullname($ticker['XS2852999692']->getFullname());
-		$incomesShares->getShares()->add($share3);
+		//$shareConfig = ['XS2901886445', 'XS2875105608','XS2852999692','XS2875106242','XS2852999429'];
 
-		$share4 = new IncomesShare();
-		$ticker['XS2875106242'] = $tickerRepository->findOneBy([
-			'isin' => 'XS2875106242',
+		$tickers = $tickerRepository->findBy([
+			'isin' => $shareConfig,
 		]);
-		$share4->setIsin($ticker['XS2875106242']->getIsin());
-		$share4->setFullname($ticker['XS2875106242']->getFullname());
-		$incomesShares->getShares()->add($share4);
 
-		$share5 = new IncomesShare();
-		$ticker['XS2852999429'] = $tickerRepository->findOneBy([
-			'isin' => 'XS2852999429',
-		]);
-		$share5->setIsin($ticker['XS2852999429']->getIsin());
-		$share5->setFullname($ticker['XS2852999429']->getFullname());
-		$incomesShares->getShares()->add($share5);
+		foreach ($tickers as $ticker) {
+			$isin = $ticker->getIsin();
+			$share = new IncomesShare();
+			$share->setTicker($ticker);
+			$share->setIsin($isin);
+			$share->setFullname($ticker->getFullname());
+			$incomesShares->getShares()->add($share);
+		}
 
 		$form = $this->createForm(IncomesSharesType::class, $incomesShares);
 
@@ -108,16 +95,15 @@ final class IncomesSharesDataSetController extends AbstractController
 			// ... do your form processing, like saving the Task and Tag entities
 			$shares = $incomesShares->getShares();
 			$saveData = false;
-			// @phpstan-ignore-next-line
-			// @var \Symfony\Component\Form\SubmitButton
 			$formSaveElement = $form->get('save');
 			/** @disregard P1013 Undefined method */
+			/** @phpstan-ignore method.notFound  */
 			if ($formSaveElement->isClicked()) {
 				$saveData = true;
 			}
 
 			foreach ($shares as $ishare) {
-				$tick = $ticker[$ishare->getIsin()];
+				$tick = $ishare->getTicker();
 
 				$position = $positionRepository->findOneBy([
 					'ticker' => $tick->getId(),
@@ -259,6 +245,8 @@ final class IncomesSharesDataSetController extends AbstractController
 		$dataIshares = $incomesSharesDataRepository->findBy([
 			'dataset' => $uuid,
 		]);
+		$data = [];
+
 		foreach ($dataIshares as $ishare) {
 			$ticker = $ishare->getTicker();
 			$isin = $ticker->getIsin();

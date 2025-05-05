@@ -3,7 +3,18 @@
 {% block body %}
     <div class="w-full flex flex-col">
         <div class="flex flex-col md:container mx-auto px-4">
-
+            <div class="w-full">
+                {% for notice in app.flashes('notice') %}
+                    <twig:Alert class="mt-2">
+                        {{ notice|trans }}
+                    </twig:Alert>
+                {% endfor %}
+            </div>
+            <section id="header" class="flex mb-4 mt-2">
+                <twig:Head variant="h2">
+                    IncomesShares
+                </twig:Head>
+            </section>
             <div class="mb-2 w-full gap-2 bg-gray-200 shadow-md rounded-lg p-6 flex justify-center">
                 <div class="flex">
                     {{ form_start(form, { 'attr': {'autocomplete': 'off','data-turbo-frame': 'incomesshares-results','class': 'border border-b border-black rounded-lg p-2'} }) }}

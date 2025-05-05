@@ -14,6 +14,8 @@ class IncomesShare
 
     private ?float $totalReturn = 0.0;
 
+    private ?Ticker $ticker = null;
+
     public function getIsin(): ?string
     {
         return $this->isin;
@@ -70,6 +72,18 @@ class IncomesShare
     public function setTotalReturn(?float $totalReturn): static
     {
         $this->totalReturn = $totalReturn;
+
+        return $this;
+    }
+
+    public function getTicker(): ?Ticker
+    {
+        return $this->ticker;
+    }
+
+    public function setTicker(?Ticker $ticker): static
+    {
+        $this->ticker = $ticker;
 
         return $this;
     }
