@@ -66,11 +66,12 @@ final class IncomesSharesDataSetController extends AbstractController
 
 		$shareConfig = explode(',', $parameter);
 
-		//$shareConfig = ['XS2901886445', 'XS2875105608','XS2852999692','XS2875106242','XS2852999429'];
-
-		$tickers = $tickerRepository->findBy([
-			'isin' => $shareConfig,
-		]);
+		$tickers = $tickerRepository->findBy(
+			[
+				'isin' => $shareConfig,
+			],
+			['fullname' => 'ASC']
+		);
 
 		foreach ($tickers as $ticker) {
 			$isin = $ticker->getIsin();
@@ -92,7 +93,6 @@ final class IncomesSharesDataSetController extends AbstractController
 		$yield = 0.0;
 		$uuid = Uuid::v7();
 		if ($form->isSubmitted() && $form->isValid()) {
-			// ... do your form processing, like saving the Task and Tag entities
 			$shares = $incomesShares->getShares();
 			$saveData = false;
 			$formSaveElement = $form->get('save');

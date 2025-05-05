@@ -19,7 +19,7 @@ class IncomesSharesDataSetRepository extends ServiceEntityRepository
 
     public function all(): QueryBuilder
     {
-        return $this->createQueryBuilder('i');
+        return $this->createQueryBuilder('i')->orderBy('i.createdAt','DESC');
     //            ->andWhere('i.exampleField = :val')
     //            ->setParameter('val', $value)
     //            ->getQuery()
