@@ -2,11 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\IncomesShare;
-use App\Entity\IncomesShares;
 use App\Entity\IncomesSharesData;
 use App\Entity\IncomesSharesDataSet;
-use App\Form\IncomesSharesType;
 use App\Repository\IncomesSharesDataRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
@@ -177,6 +174,12 @@ final class IncomesSharesDataSetController extends AbstractController
 				$this->addFlash(
 					'success',
 					'Saved dataset: ' . $uuid->__toString()
+				);
+
+				return $this->redirectToRoute(
+					'app_incomes_shares_data_set_index',
+					[],
+					Response::HTTP_SEE_OTHER
 				);
 			}
 		}
