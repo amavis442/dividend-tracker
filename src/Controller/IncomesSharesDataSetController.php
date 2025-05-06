@@ -9,6 +9,7 @@ use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Form\IncomesSharesDataSetType;
+use App\Helper\Colors;
 use App\Repository\IncomesSharesDataSetRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
@@ -19,6 +20,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
+use Symfony\UX\Chartjs\Model\Chart;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/incomesshares')]
 final class IncomesSharesDataSetController extends AbstractController
@@ -230,9 +234,94 @@ final class IncomesSharesDataSetController extends AbstractController
 		]);
 	}
 
+	#[Route('/graph', name: 'app_incomes_shares_data_set_graph')]
+	public function graph(
+		IncomesSharesDataSetRepository $incomesSharesDataSetRepository,
+		TranslatorInterface $translator,
+		ChartBuilderInterface $chartBuilder
+	) {
+		$data = $incomesSharesDataSetRepository->findAll();
+		$labels = [];
+		$allocationData = [];
+		$totalReturnData = [];
+		$distributionData = [];
+
+		$colors = Colors::COLORS;
+
+		foreach ($data as $item) {
+			$allocationData[] = round($item->getTotalAllocation(), 2);
+			$totalReturnData[] = round($item->getTotalAllocation() + $item->getTotalDistribution() + $item->getTotalProfitLoss(), 2);
+			$distributionData[] = round($item->getTotalDistribution(), 2);
+
+			$labels[] = $item->getCreatedAt()->format('d-m-Y');
+		}
+		$chartData = [
+			[
+				'label' => $translator->trans('Total return'),
+				'data' => $totalReturnData,
+			],
+			[
+				'label' => $translator->trans('Principle'),
+				'data' => $allocationData,
+			],
+			[
+				'label' => $translator->trans('Distributions'),
+				'data' => $distributionData,
+			],
+		];
+
+		$chart = $chartBuilder->createChart(Chart::TYPE_LINE);
+
+		$chart->setData([
+			'labels' => $labels,
+			'datasets' => [
+				[
+					'label' => $chartData[0]['label'],
+					'backgroundColor' => $colors[0],
+					'borderColor' => $colors,
+					'data' => $chartData[0]['data'],
+				],
+				[
+					'label' => $chartData[1]['label'],
+					'backgroundColor' => $colors[1],
+					'borderColor' => $colors,
+					'data' => $chartData[1]['data'],
+				],
+				[
+					'label' => $chartData[2]['label'],
+					'backgroundColor' => $colors[2],
+					'borderColor' => $colors,
+					'data' => $chartData[2]['data'],
+				],
+			],
+		]);
+
+		$chart->setOptions([
+			'maintainAspectRatio' => false,
+			'responsive' => true,
+			'plugins' => [
+				'title' => [
+					'display' => true,
+					'text' => $translator->trans('Expected dividend'),
+					'font' => [
+						'size' => 24,
+					],
+				],
+				'legend' => [
+					'position' => 'top',
+				],
+			],
+		]);
+
+		return $this->render('incomes_shares_data_set/graph.html.twig', [
+			'controller_name' => 'IncomesSharesController',
+			'chart' => $chart,
+		]);
+	}
+
 	#[
 		Route(
-			'/{id}',
+			'/show/{id}',
 			name: 'app_incomes_shares_data_set_show',
 			methods: ['GET']
 		)
@@ -410,7 +499,6 @@ final class IncomesSharesDataSetController extends AbstractController
 	public function delete(
 		Request $request,
 		IncomesSharesDataSet $incomesSharesDataSet,
-		IncomesSharesDataRepository $incomesSharesDataRepository,
 		EntityManagerInterface $entityManager
 	): Response {
 		if (
@@ -429,4 +517,6 @@ final class IncomesSharesDataSetController extends AbstractController
 			Response::HTTP_SEE_OTHER
 		);
 	}
+
+
 }

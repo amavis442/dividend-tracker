@@ -16,9 +16,13 @@
                 </twig:Head>
             </div>
             <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
-                <div class="w-full pr-3 py-2 mb-2">
+                <div class="w-full pr-3 py-2 mb-2 space-x-1">
                     <twig:Button tag="a" href="{{ path("app_incomes_shares_data_set_create") }}">
                         <i class="fas fa-plus"></i>
+                    </twig:Button>
+
+                    <twig:Button tag="a" href="{{ path("app_incomes_shares_data_set_graph") }}">
+                        <i class="fa fa-line-chart"></i>
                     </twig:Button>
                 </div>
                 <div class="border border-gray-200 rounded-lg p-2">
