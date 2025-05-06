@@ -17,11 +17,11 @@ class IncomesSharesData
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Ticker $Ticker = null;
+    private ?Ticker $ticker = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Position $Position = null;
+    private ?Position $position = null;
 
     #[ORM\Column]
     private ?float $price = null;
@@ -47,6 +47,10 @@ class IncomesSharesData
     #[ORM\Column(type: 'uuid', nullable: true)]
     private ?Uuid $dataset = null;
 
+    #[ORM\ManyToOne(inversedBy: 'shares')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?IncomesSharesDataSet $incomesSharesDataSet = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -54,24 +58,24 @@ class IncomesSharesData
 
         public function getTicker(): ?Ticker
     {
-        return $this->Ticker;
+        return $this->ticker;
     }
 
-    public function setTicker(?Ticker $Ticker): static
+    public function setTicker(?Ticker $ticker): static
     {
-        $this->Ticker = $Ticker;
+        $this->ticker = $ticker;
 
         return $this;
     }
 
     public function getPosition(): ?Position
     {
-        return $this->Position;
+        return $this->position;
     }
 
-    public function setPosition(?Position $Position): static
+    public function setPosition(?Position $position): static
     {
-        $this->Position = $Position;
+        $this->position = $position;
 
         return $this;
     }
@@ -168,6 +172,18 @@ class IncomesSharesData
     public function setDataset(?Uuid $dataset): static
     {
         $this->dataset = $dataset;
+
+        return $this;
+    }
+
+    public function getIncomesSharesDataSet(): ?IncomesSharesDataSet
+    {
+        return $this->incomesSharesDataSet;
+    }
+
+    public function setIncomesSharesDataSet(?IncomesSharesDataSet $incomesSharesDataSet): static
+    {
+        $this->incomesSharesDataSet = $incomesSharesDataSet;
 
         return $this;
     }

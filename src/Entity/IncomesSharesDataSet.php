@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\IncomesSharesDataSetRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
@@ -15,16 +17,16 @@ class IncomesSharesDataSet
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?float $totalProfitLoss = null;
+    private ?float $totalProfitLoss = 0.0;
 
     #[ORM\Column]
-    private ?float $totalDistribution = null;
+    private ?float $totalDistribution = 0.0;
 
     #[ORM\Column]
-    private ?float $totalAllocation = null;
+    private ?float $totalAllocation = 0.0;
 
     #[ORM\Column]
-    private ?float $yield = null;
+    private ?float $yield = 0.0;
 
     #[ORM\Column(type: 'uuid')]
     private ?Uuid $uuid = null;
@@ -34,6 +36,17 @@ class IncomesSharesDataSet
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    /**
+     * @var Collection<int, IncomesSharesData>
+     */
+    #[ORM\OneToMany(targetEntity: IncomesSharesData::class, mappedBy: 'incomesSharesDataSet', orphanRemoval: true)]
+    private Collection $shares;
+
+    public function __construct()
+    {
+        $this->shares = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -120,6 +133,36 @@ class IncomesSharesDataSet
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, IncomesSharesData>
+     */
+    public function getShares(): Collection
+    {
+        return $this->shares;
+    }
+
+    public function addShare(IncomesSharesData $share): static
+    {
+        if (!$this->shares->contains($share)) {
+            $this->shares->add($share);
+            $share->setIncomesSharesDataSet($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShare(IncomesSharesData $share): static
+    {
+        if ($this->shares->removeElement($share)) {
+            // set the owning side to null (unless already changed)
+            if ($share->getIncomesSharesDataSet() === $this) {
+                $share->setIncomesSharesDataSet(null);
+            }
+        }
 
         return $this;
     }

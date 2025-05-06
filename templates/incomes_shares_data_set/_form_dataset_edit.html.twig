@@ -26,7 +26,8 @@
                         <table>
                             {% for share in form.shares %}
                                 <tr>
-                                    <td>{{ form_row(share.ticker) }}</td>
+                                    <td>{{ form_row(share.isin) }}</td>
+                                    <td>{{ form_row(share.fullname) }}</td>
                                     <td>{{ form_row(share.price) }}</td>
                                     <td>{{ form_row(share.profitLoss) }}</td>
                                 </tr>
@@ -34,7 +35,7 @@
                         </table>
                         <div>
                             {{ form_widget(form.submit, {'label':'execute', 'attr': {'class': 'px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-blue-500 hover:bg-blue-700 p-2' }}) }}
-                            {{ form_widget(form.save, {'attr': { 'data-turbo-frame': '_top','class': 'px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-red-500 hover:bg-red-700 p-2' }}) }}
+                            {{ form_widget(form.save, {'attr': {'class': 'px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-red-500 hover:bg-red-700 p-2' }}) }}
                             <a class="px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-green-500 hover:bg-green-700 p-2"
                                href="{{ path("app_incomes_shares_data_set_index") }}">
                                 <i class="fas fa-angle-double-left"></i> {{ 'back to list'|trans }}

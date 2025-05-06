@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\IncomesSharesData;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @extends ServiceEntityRepository<IncomesSharesData>
@@ -15,6 +16,18 @@ class IncomesSharesDataRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, IncomesSharesData::class);
     }
+
+    public function findByDataset(Uuid $uuid): array
+        {
+            return $this->createQueryBuilder('i')
+                ->join('i.ticker','t')
+                ->andWhere('i.dataset = :dataset')
+                ->setParameter('dataset', $uuid)
+                ->orderBy('t.fullname', 'ASC')
+                ->getQuery()
+                ->getResult()
+            ;
+        }
 
     //    /**
     //     * @return IncomesSharesData[] Returns an array of IncomesSharesData objects

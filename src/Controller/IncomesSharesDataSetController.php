@@ -51,7 +51,7 @@ final class IncomesSharesDataSetController extends AbstractController
 		PaymentRepository $paymentRepository,
 		EntityManagerInterface $em
 	): Response {
-		$incomesShares = new IncomesShares();
+		$incomesSharesDataSet = new IncomesSharesDataSet();
 		$ticker = [];
 
 		try {
@@ -74,15 +74,17 @@ final class IncomesSharesDataSetController extends AbstractController
 		);
 
 		foreach ($tickers as $ticker) {
-			$isin = $ticker->getIsin();
-			$share = new IncomesShare();
+			$share = new IncomesSharesData();
 			$share->setTicker($ticker);
-			$share->setIsin($isin);
-			$share->setFullname($ticker->getFullname());
-			$incomesShares->getShares()->add($share);
+			$share->setPrice(0);
+			$share->setProfitLoss(0);
+			$incomesSharesDataSet->getShares()->add($share);
 		}
 
-		$form = $this->createForm(IncomesSharesType::class, $incomesShares);
+		$form = $this->createForm(
+			IncomesSharesDataSetType::class,
+			$incomesSharesDataSet
+		);
 
 		$form->handleRequest($request);
 
@@ -93,7 +95,8 @@ final class IncomesSharesDataSetController extends AbstractController
 		$yield = 0.0;
 		$uuid = Uuid::v7();
 		if ($form->isSubmitted() && $form->isValid()) {
-			$shares = $incomesShares->getShares();
+			$sharesData = $incomesSharesDataSet->getShares();
+			$incomesSharesDataSet->setUuid($uuid);
 			$saveData = false;
 			$formSaveElement = $form->get('save');
 			/** @disregard P1013 Undefined method */
@@ -102,11 +105,11 @@ final class IncomesSharesDataSetController extends AbstractController
 				$saveData = true;
 			}
 
-			foreach ($shares as $ishare) {
-				$tick = $ishare->getTicker();
+			foreach ($sharesData as $ishare) {
+				$ticker = $ishare->getTicker();
 
 				$position = $positionRepository->findOneBy([
-					'ticker' => $tick->getId(),
+					'ticker' => $ticker->getId(),
 					'closed' => false,
 				]);
 				$allocation = $position->getAllocation();
@@ -129,8 +132,8 @@ final class IncomesSharesDataSetController extends AbstractController
 
 				$totalProfitLoss += $ishare->getProfitLoss();
 
-				$data[$ishare->getIsin()] = [
-					'fullname' => $tick->getFullname(),
+				$data[$ticker->getIsin()] = [
+					'fullname' => $ticker->getFullname(),
 					'allocation' => $allocation,
 					'amount' => $amount,
 					'price' => $price,
@@ -143,19 +146,15 @@ final class IncomesSharesDataSetController extends AbstractController
 				];
 
 				if ($saveData) {
-					$incomesSharesData = new IncomesSharesData();
-					$incomesSharesData->setTicker($tick);
-					$incomesSharesData->setPosition($position);
-					$incomesSharesData->setPrice($price);
-					$incomesSharesData->setProfitLoss($ishare->getProfitLoss());
-					$incomesSharesData->setDistributions($distributions);
-					$incomesSharesData->setAllocation($allocation);
-					$incomesSharesData->setAmount($amount);
-					$incomesSharesData->setDataset($uuid);
-					$incomesSharesData->setCreatedAt(new \DateTimeImmutable());
-					$incomesSharesData->setUpdatedAt(new \DateTimeImmutable());
-
-					$em->persist($incomesSharesData);
+					$ishare->setPosition($position);
+					$ishare->setDistributions($distributions);
+					$ishare->setAllocation($allocation);
+					$ishare->setAmount($amount);
+					$ishare->setDataset($uuid);
+					$ishare->setCreatedAt(new \DateTimeImmutable());
+					$ishare->setUpdatedAt(new \DateTimeImmutable());
+					$ishare->setIncomesSharesDataSet($incomesSharesDataSet);
+					$em->persist($ishare);
 				}
 			}
 
@@ -164,17 +163,15 @@ final class IncomesSharesDataSetController extends AbstractController
 				$yield = ($totalDistributions / $totalAllocation) * 100;
 			}
 
-			$dataset = new IncomesSharesDataSet();
-			$dataset->setUuid($uuid);
-			$dataset->setTotalAllocation($totalAllocation);
-			$dataset->setTotalDistribution($totalDistributions);
-			$dataset->setTotalProfitLoss($totalProfitLoss);
-			$dataset->setYield($yield);
-			$dataset->setCreatedAt(new \DateTimeImmutable());
-
-			$em->persist($dataset);
+			$incomesSharesDataSet->setTotalAllocation($totalAllocation);
+			$incomesSharesDataSet->setTotalDistribution($totalDistributions);
+			$incomesSharesDataSet->setTotalProfitLoss($totalProfitLoss);
+			$incomesSharesDataSet->setYield($yield);
+			$incomesSharesDataSet->setCreatedAt(new \DateTimeImmutable());
 
 			if ($saveData) {
+				$em->persist($incomesSharesDataSet);
+
 				$em->flush();
 
 				$this->addFlash(
@@ -242,9 +239,11 @@ final class IncomesSharesDataSetController extends AbstractController
 		IncomesSharesDataRepository $incomesSharesDataRepository
 	): Response {
 		$uuid = $incomesSharesDataSet->getUuid();
-		$dataIshares = $incomesSharesDataRepository->findBy([
+		/*$dataIshares = $incomesSharesDataRepository->findBy([
 			'dataset' => $uuid,
-		]);
+		]); */
+		$dataIshares = $incomesSharesDataRepository->findByDataset($uuid);
+
 		$data = [];
 
 		foreach ($dataIshares as $ishare) {
@@ -299,24 +298,102 @@ final class IncomesSharesDataSetController extends AbstractController
 		EntityManagerInterface $entityManager
 	): Response {
 		$form = $this->createForm(
-			IncomesSharesDataSetType::class,
+			incomesSharesDataSetType::class,
 			$incomesSharesDataSet
 		);
+
 		$form->handleRequest($request);
 
+		$data = [];
+		$totalDistributions = 0.0;
+		$totalAllocation = 0.0;
+		$totalProfitLoss = 0.0;
+		$yield = 0.0;
 		if ($form->isSubmitted() && $form->isValid()) {
-			$entityManager->flush();
+			$sharesData = $incomesSharesDataSet->getShares();
+			$saveData = false;
+			$formSaveElement = $form->get('save');
+			/** @disregard P1013 Undefined method */
+			/** @phpstan-ignore method.notFound  */
+			if ($formSaveElement->isClicked()) {
+				$saveData = true;
+			}
 
-			return $this->redirectToRoute(
-				'app_incomes_shares_data_set_index',
-				[],
-				Response::HTTP_SEE_OTHER
-			);
+			foreach ($sharesData as $ishare) {
+				$allocation = $ishare->getAllocation();
+				$distributions = $ishare->getDistributions();
+				$profitLoss = $ishare->getProfitLoss();
+				$ticker = $ishare->getTicker();
+
+				$totalReturn = $allocation + $distributions + $profitLoss;
+				$totalGain = $totalReturn - $allocation;
+				$totalReturnPercentage = ($totalGain / $allocation) * 100;
+
+				$price = $ishare->getPrice();
+				$amount = $ishare->getAmount();
+
+				$calcGain = $price * $amount - $allocation;
+
+				$totalDistributions += $distributions;
+				$totalAllocation += $allocation;
+
+				$totalProfitLoss += $ishare->getProfitLoss();
+
+				$data[$ticker->getIsin()] = [
+					'fullname' => $ticker->getFullname(),
+					'allocation' => $allocation,
+					'amount' => $amount,
+					'price' => $price,
+					'calcGain' => $calcGain,
+					'distributions' => $distributions,
+					'pl' => $ishare->getProfitLoss(),
+					'totalGain' => $totalGain,
+					'totalReturn' => $totalReturn,
+					'totalReturnPercentage' => $totalReturnPercentage,
+				];
+
+				if ($saveData) {
+					$entityManager->persist($ishare);
+				}
+			}
+
+			$yield = 0.0;
+			if ($totalAllocation > 0) {
+				$yield = ($totalDistributions / $totalAllocation) * 100;
+			}
+
+			$incomesSharesDataSet->setTotalAllocation($totalAllocation);
+			$incomesSharesDataSet->setTotalDistribution($totalDistributions);
+			$incomesSharesDataSet->setTotalProfitLoss($totalProfitLoss);
+			$incomesSharesDataSet->setYield($yield);
+			$incomesSharesDataSet->setCreatedAt(new \DateTimeImmutable());
+
+			if ($saveData) {
+				$entityManager->persist($incomesSharesDataSet);
+
+				$entityManager->flush();
+				$uuid = $incomesSharesDataSet->getUuid();
+
+				$this->addFlash(
+					'success',
+					'Saved dataset: ' . $uuid->__toString()
+				);
+
+				return $this->redirectToRoute(
+					'app_incomes_shares_data_set_index',
+					[],
+					Response::HTTP_SEE_OTHER
+				);
+			}
 		}
 
-		return $this->render('incomes_shares_data_set/edit.html.twig', [
-			'incomes_shares_data_set' => $incomesSharesDataSet,
+		return $this->render('incomes_shares_data_set/create.html.twig', [
 			'form' => $form,
+			'data' => $data,
+			'totalProfitLoss' => $totalProfitLoss,
+			'totalDistribution' => $totalDistributions,
+			'totalAllocation' => $totalAllocation,
+			'yield' => $yield,
 		]);
 	}
 
@@ -339,15 +416,6 @@ final class IncomesSharesDataSetController extends AbstractController
 				$request->getPayload()->getString('_token')
 			)
 		) {
-			$uuid = $incomesSharesDataSet->getUuid();
-			$ishares = $incomesSharesDataRepository->findBy([
-				'dataset' => $uuid,
-			]);
-
-			foreach ($ishares as $share) {
-				$entityManager->remove($share);
-			}
-
 			$entityManager->remove($incomesSharesDataSet);
 			$entityManager->flush();
 		}
