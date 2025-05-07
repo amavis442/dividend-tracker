@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+{% block title %}IncomesShares file upload{% endblock %}
+{% block body %}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            {{ form_start(form) }}
+                <ul>
+                {% set labels = {0 : 'Dollar upload', 1 : 'Euro upload'} %}
+                    {% for key, file in form.files %}<li>{{ form_row(file.uploadfile, {'label' :labels[key]}) }}</li>{% endfor %}
+                </ul>
+                 {{ form_row(form.submit, {'label':'execute', 'attr': {'class': 'px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-blue-500 hover:bg-blue-700 p-2' }}) }}
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

@@ -4,6 +4,9 @@ namespace App\Controller;
 
 use App\Entity\IncomesSharesData;
 use App\Entity\IncomesSharesDataSet;
+use App\Entity\IncomesSharesFile;
+use App\Entity\IncomesSharesFiles;
+use App\Form\IncomesShareFilesType;
 use App\Repository\IncomesSharesDataRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
@@ -250,7 +253,12 @@ final class IncomesSharesDataSetController extends AbstractController
 
 		foreach ($data as $item) {
 			$allocationData[] = round($item->getTotalAllocation(), 2);
-			$totalReturnData[] = round($item->getTotalAllocation() + $item->getTotalDistribution() + $item->getTotalProfitLoss(), 2);
+			$totalReturnData[] = round(
+				$item->getTotalAllocation() +
+					$item->getTotalDistribution() +
+					$item->getTotalProfitLoss(),
+				2
+			);
 			$distributionData[] = round($item->getTotalDistribution(), 2);
 
 			$labels[] = $item->getCreatedAt()->format('d-m-Y');
@@ -374,6 +382,155 @@ final class IncomesSharesDataSetController extends AbstractController
 			'totalDistribution' => $incomesSharesDataSet->getTotalDistribution(),
 			'totalAllocation' => $incomesSharesDataSet->getTotalAllocation(),
 			'yield' => $incomesSharesDataSet->getYield(),
+		]);
+	}
+
+	#[
+		Route(
+			'/upload',
+			name: 'app_incomes_shares_data_set_upload_files',
+			methods: ['POST', 'GET']
+		)
+	]
+	public function uploadFiles(
+		Request $request,
+		TickerRepository $tickerRepository,
+		PaymentRepository $paymentRepository,
+		EntityManagerInterface $entityManager
+	): Response {
+		$files = new IncomesSharesFiles();
+		$fileEuro = new IncomesSharesFile();
+		$files->getFiles()->add($fileEuro);
+		$fileDollar = new IncomesSharesFile();
+		$files->getFiles()->add($fileDollar);
+
+		$form = $this->createForm(IncomesShareFilesType::class, $files);
+		$form->handleRequest($request);
+
+		if ($form->isSubmitted() && $form->isValid()) {
+			$data = [];
+			foreach ($form->get('files') as $fileData) {
+				$csvFile = $fileData->get('uploadfile')->getData();
+				$content = $csvFile->getContent();
+				$lines = explode("\n", $content);
+				$lineNumber = 0;
+				foreach ($lines as $line) {
+					if ($lineNumber == 0) {
+						$lineNumber++;
+						continue; //labels we do not not need
+					}
+
+					$items = explode(',', $line);
+					$symbol = trim($items[0], '"');
+					if ($symbol == 'Total') {
+						$lineNumber++;
+						continue;
+					}
+					if ($symbol == 'DSPY') {
+						$symbol = 'SPYY';
+					}
+
+					if (!isset($data[$symbol])) {
+						$data[$symbol]['invested_value'] = 0.0;
+						$data[$symbol]['value'] = 0.0;
+						$data[$symbol]['result'] = 0.0;
+						$data[$symbol]['owned_quantity'] = 0.0;
+						$data[$symbol]['price'] = 0.0;
+					}
+
+					$data[$symbol]['invested_value'] += $items[2];
+					$data[$symbol]['value'] += $items[3];
+					$data[$symbol]['result'] += $items[4];
+					$data[$symbol]['owned_quantity'] += (float) trim(
+						$items[5],
+						'"'
+					);
+
+					$lineNumber++;
+				}
+			}
+
+			$symbols = [];
+			foreach ($data as $symbol => $item) {
+				$price = $item['value'] / $item['owned_quantity'];
+				$data[$symbol]['price'] = round($price, 4);
+				$symbols[] = $symbol;
+			}
+
+			$tickers = $tickerRepository->findBy(
+				[
+					'symbol' => $symbols,
+				],
+				['fullname' => 'ASC']
+			);
+
+			$totalDistributions = 0.0;
+			$totalAllocation = 0.0;
+			$totalProfitLoss = 0.0;
+			$yield = 0.0;
+			$uuid = Uuid::v7();
+			$incomesSharesDataSet = new IncomesSharesDataSet();
+			foreach ($tickers as $ticker) {
+				$item = $data[$ticker->getSymbol()];
+				$share = new IncomesSharesData();
+				$share->setTicker($ticker);
+				$share->setPrice($item['price']);
+				$share->setProfitLoss($item['result']);
+				$incomesSharesDataSet->getShares()->add($share);
+
+				$position = $ticker->getPositions()[0];
+				$allocation = $position->getAllocation();
+				$distributions = $paymentRepository->getSumDividendsByPosition(
+					$position
+				);
+
+				$price = $share->getPrice();
+				$amount = $position->getAmount();
+
+				$totalDistributions += $distributions;
+				$totalAllocation += $allocation;
+
+				$totalProfitLoss += $share->getProfitLoss();
+
+				$share->setPosition($position);
+				$share->setDistributions($distributions);
+				$share->setAllocation($allocation);
+				$share->setAmount($amount);
+				$share->setDataset($uuid);
+				$share->setCreatedAt(new \DateTimeImmutable());
+				$share->setUpdatedAt(new \DateTimeImmutable());
+				$share->setIncomesSharesDataSet($incomesSharesDataSet);
+				$entityManager->persist($share);
+			}
+
+			$yield = 0.0;
+			if ($totalAllocation > 0) {
+				$yield = ($totalDistributions / $totalAllocation) * 100;
+			}
+			$incomesSharesDataSet->setUuid($uuid);
+			$incomesSharesDataSet->setTotalAllocation($totalAllocation);
+			$incomesSharesDataSet->setTotalDistribution($totalDistributions);
+			$incomesSharesDataSet->setTotalProfitLoss($totalProfitLoss);
+			$incomesSharesDataSet->setYield($yield);
+			$incomesSharesDataSet->setCreatedAt(new \DateTimeImmutable());
+
+			$entityManager->persist($incomesSharesDataSet);
+
+			$entityManager->flush();
+
+			$this->addFlash('success', 'Saved dataset: ' . $uuid->__toString());
+
+			return $this->redirectToRoute(
+				'app_incomes_shares_data_set_index',
+				[],
+				Response::HTTP_SEE_OTHER
+			);
+
+		}
+
+		return $this->render('incomes_shares_data_set/uploadfile.html.twig', [
+			'controller_name' => 'IncomesSharesController',
+			'form' => $form,
 		]);
 	}
 
@@ -517,6 +674,4 @@ final class IncomesSharesDataSetController extends AbstractController
 			Response::HTTP_SEE_OTHER
 		);
 	}
-
-
 }
