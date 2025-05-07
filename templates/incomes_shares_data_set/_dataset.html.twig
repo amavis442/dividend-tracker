@@ -46,13 +46,19 @@
                 {{ 'Allocation'|trans }} (&euro;)
             </twig:Table:ThCol>
             <twig:Table:ThCol>
-                {{ 'Distributions'|trans }}
+                {{ 'Shares'|trans }}
+            </twig:Table:ThCol>
+            <twig:Table:ThCol>
+                {{ 'Expected Distributions'|trans }}
+            </twig:Table:ThCol>
+            <twig:Table:ThCol>
+                {{ 'Recieved Distributions'|trans }}
             </twig:Table:ThCol>
             <twig:Table:ThCol>
                 {{ 'Price'|trans }} (&euro;)
             </twig:Table:ThCol>
             <twig:Table:ThCol>
-                {{ 'Profit/Loss'|trans }}
+                {{ 'Result'|trans }}
             </twig:Table:ThCol>
             <twig:Table:ThCol>
                 {{ 'Total gain'|trans }}
@@ -72,29 +78,44 @@
                         <small>({{ item.amount }})</small>
                     </twig:Table:Td>
                     <twig:Table:Td>
-                        {{ item.allocation }}
+                        {{ item.allocation|format_number({"fraction_digit": 2}) }}
                     </twig:Table:Td>
                     <twig:Table:Td>
-                        {{ item.distributions }}
+                        {{ item.amount|format_number({"fraction_digit": 5}) }}
                     </twig:Table:Td>
                     <twig:Table:Td>
-                        {{ item.price }}
+                        {{ item.expectedDistribution|format_number({"fraction_digit": 2}) }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ item.distributions|format_number({"fraction_digit": 2}) }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ item.price|format_number({"fraction_digit": 3}) }}
                     </twig:Table:Td>
                     <twig:Table:Td>
                         {% if item.pl < 0 %}
-                            <div class="bg-red-500 text-white p-2 rounded-lg">
-                                {{ item.pl }}
+                            <div class="bg-red-500 text-white p-2 rounded-lg flex">
+                                <span class="pr-2">{{ item.pl }}</span>
                                 <small>({{ item.calcGain|format_number({"fraction_digit": 2}) }})</small>
                             </div>
                         {% else %}
-                            <div class="bg-green-500  p-2 rounded-lg">
-                                {{ item.pl }}
+                            <div class="bg-green-500  p-2 rounded-lg flex">
+                                <span class="pr-2">{{ item.pl }}</span>
                                 <small>({{ item.calcGain|format_number({"fraction_digit": 2}) }})</small>
                             </div>
                         {% endif %}
                     </twig:Table:Td>
                     <twig:Table:Td>
-                        {{ item.totalReturn - item.allocation }}
+                        {% set result = item.totalReturn - item.allocation %}
+                        {% if result < 0 %}
+                            <div class="bg-red-500 text-white p-2 rounded-lg">
+                                {{ result }}
+                            </div>
+                        {% else %}
+                            <div class="bg-green-500  p-2 rounded-lg">
+                                {{ result }}
+                            </div>
+                        {% endif %}
                     </twig:Table:Td>
                     <twig:Table:Td>
                         {% if item.totalReturn < item.allocation %}
@@ -116,50 +137,68 @@
             {% endfor %}
         </tbody>
     </twig:Table:Table>
-    <div class="mt-5 bg-slate-200 rounded-lg p-4">
-        <ul class="max-w-md divide-y divide-gray-200 dark:divide-gray-700">
-            <li class="pb-3 sm:pb-4 border-solid border-b border-black">
+    <div class="mt-5 bg-white rounded-lg p-4">
+        <ul class="max-w-md divide-y divide-gray-500 dark:divide-gray-700">
+            <li class="pb-3 sm:pb-4">
                 <div class="flex items-center space-x-4 rtl:space-x-reverse">
                     <div class="flex-1 min-w-0">{{ 'Distributions'|trans }}:</div>
                     <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                        {{ totalDistribution }}
+                        {{ totalDistribution }}&euro;
                     </div>
                 </div>
             </li>
-            <li class="pb-3 sm:pb-4 border-solid border-b border-black">
-                <div class="flex items-center space-x-4 rtl:space-x-reverse">
-                    <div class="flex-1 min-w-0">{{ 'Profit/Loss'|trans }}:</div>
-                    <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">{{ totalProfitLoss }}</div>
-                </div>
-            </li>
-            <li class="pb-3 sm:pb-4 border-solid border-b border-black">
-                <div class="flex items-center space-x-4 rtl:space-x-reverse">
-                    <div class="flex-1 min-w-0">{{ 'Allocation'|trans }}:</div>
-                    <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">{{ totalAllocation }}</div>
-                </div>
-            </li>
-            <li class="pb-3 sm:pb-4 border-solid border-b border-black">
-                <div class="flex items-center space-x-4 rtl:space-x-reverse">
-                    <div class="flex-1 min-w-0">{{ 'Gain'|trans }}:</div>
-                    <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                        {{ totalAllocation + totalProfitLoss + totalDistribution }}
-                    </div>
-                </div>
-            </li>
-            <li class="pb-3 sm:pb-4 border-solid border-b border-black">
-                <div class="flex items-center space-x-4 rtl:space-x-reverse">
-                    <div class="flex-1 min-w-0">{{ 'Current value'|trans }}:</div>
-                    <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                        {% set currentValue = totalProfitLoss + totalAllocation %}
-                        {% if currentValue < totalAllocation %}
-                            <div class="bg-red-500 text-white p-2 rounded-lg">{{ currentValue }} ({{ currentValue - totalAllocation }})</div>
+            <li class="pb-3 sm:pb-4">
+                <div class="flex items-center space-x-4 rtl:space-x-reversk">
+                    <div class="flex-1 min-w-0">{{ 'Result'|trans }}:</div>
+                    <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white pt-2">
+                        {% if totalProfitLoss < 0 %}
+                            <div class="bg-red-500 text-white p-2 rounded-lg">{{ totalProfitLoss }}&euro;</div>
                         {% else %}
-                            <div class="bg-green-500 p-2 rounded-lg">{{ currentValue }} ({{ currentValue - totalAllocation }})</div>
+                            <div class="bg-green-500 p-2 rounded-lg">{{ totalProfitLoss }}&euro;</div>
                         {% endif %}
                     </div>
                 </div>
             </li>
-            <li class="pb-3 sm:pb-4 border-solid border-b border-black">
+            <li class="pb-3 sm:pb-4">
+                <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                    <div class="flex-1 min-w-0">{{ 'Allocation'|trans }}:</div>
+                    <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                        {{ totalAllocation }}&euro;
+                    </div>
+                </div>
+            </li>
+            <li class="pb-3 sm:pb-4">
+                <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                    <div class="flex-1 min-w-0">{{ 'Gain'|trans }}:</div>
+                    <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                        {{ totalAllocation + totalProfitLoss + totalDistribution }}&euro;
+                    </div>
+                </div>
+            </li>
+            <li class="pb-3 sm:pb-4">
+                <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                    <div class="flex-1 min-w-0">{{ 'Current value'|trans }}:</div>
+                    <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white pt-2">
+                        {% set currentValue = totalProfitLoss + totalAllocation %}
+                        {% if currentValue < totalAllocation %}
+                            <div class="bg-red-500 text-white p-2 rounded-lg">
+                                {{ currentValue }}&euro; ({{ currentValue - totalAllocation }}&euro;)
+                            </div>
+                        {% else %}
+                            <div class="bg-green-500 p-2 rounded-lg">{{ currentValue }}&euro; ({{ currentValue - totalAllocation }}&euro;)</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </li>
+            <li class="pb-3 sm:pb-4">
+                <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                    <div class="flex-1 min-w-0">{{ 'Expected Distributions'|trans }}:</div>
+                    <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                        {{ totalExpectedDistribution|format_number({"fraction_digit": 4}) }}&euro;
+                    </div>
+                </div>
+            </li>
+            <li class="pb-3 sm:pb-4">
                 <div class="flex items-center space-x-4 rtl:space-x-reverse">
                     <div class="flex-1 min-w-0">{{ 'Return'|trans }}:</div>
                     <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">

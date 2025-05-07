@@ -14,6 +14,7 @@ use App\Repository\TickerRepository;
 use App\Form\IncomesSharesDataSetType;
 use App\Helper\Colors;
 use App\Repository\IncomesSharesDataSetRepository;
+use App\Service\ExchangeRate\ExchangeRateInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
@@ -336,17 +337,25 @@ final class IncomesSharesDataSetController extends AbstractController
 	]
 	public function show(
 		IncomesSharesDataSet $incomesSharesDataSet,
-		IncomesSharesDataRepository $incomesSharesDataRepository
+		IncomesSharesDataRepository $incomesSharesDataRepository,
+		ExchangeRateInterface $exchangeRateService,
 	): Response {
 		$uuid = $incomesSharesDataSet->getUuid();
 		/*$dataIshares = $incomesSharesDataRepository->findBy([
 			'dataset' => $uuid,
 		]); */
 		$dataIshares = $incomesSharesDataRepository->findByDataset($uuid);
+		$rates = $exchangeRateService->getRates();
+		$usdRate = $rates['USD'] ?: 1;
+		$usdToEuro = 1 / $usdRate;
 
 		$data = [];
+		$totalExpectedDistribution = 0.0;
 
 		foreach ($dataIshares as $ishare) {
+			/**
+			 * @var \App\Entity\Ticker
+			 */
 			$ticker = $ishare->getTicker();
 			$isin = $ticker->getIsin();
 			$position = $ishare->getPosition();
@@ -355,6 +364,12 @@ final class IncomesSharesDataSetController extends AbstractController
 			$profitLoss = $ishare->getProfitLoss();
 			$price = $ishare->getPrice();
 			$amount = $position->getAmount();
+			/**
+			 * @var \App\Entity\Calendar
+			 */
+			$calendar = $ticker->getCalendars()->first();
+			$distributionCash = $calendar->getCashAmount();
+			$expectedDistribution = $distributionCash * $amount * $usdToEuro;
 
 			$totalReturn = $allocation + $distributions + $profitLoss;
 			$totalGain = $totalReturn - $allocation;
@@ -364,6 +379,7 @@ final class IncomesSharesDataSetController extends AbstractController
 				'fullname' => $ticker->getFullname(),
 				'allocation' => $allocation,
 				'amount' => $amount,
+				'expectedDistribution' => $expectedDistribution,
 				'price' => $price,
 				'calcGain' => $calcGain,
 				'distributions' => $distributions,
@@ -372,6 +388,8 @@ final class IncomesSharesDataSetController extends AbstractController
 				'totalReturn' => $totalReturn,
 				'totalReturnPercentage' => $totalReturnPercentage,
 			];
+
+			$totalExpectedDistribution += $expectedDistribution;
 		}
 
 		return $this->render('incomes_shares_data_set/show.html.twig', [
@@ -381,6 +399,7 @@ final class IncomesSharesDataSetController extends AbstractController
 			'totalProfitLoss' => $incomesSharesDataSet->getTotalProfitLoss(),
 			'totalDistribution' => $incomesSharesDataSet->getTotalDistribution(),
 			'totalAllocation' => $incomesSharesDataSet->getTotalAllocation(),
+			'totalExpectedDistribution' =>$totalExpectedDistribution,
 			'yield' => $incomesSharesDataSet->getYield(),
 		]);
 	}
