@@ -9,17 +9,17 @@ class IncomesSharesFile
     /**
      * Holder for raw file data. Not to be persisted.
      *
-     * @var UploadedFile
+     * @var string
      */
-    private UploadedFile $uploadfile;
+    private string $uploadfile;
 
-    public function setFilename(UploadedFile $uploadfile): self
+    public function setFilename(string $uploadfile): self
     {
         $this->uploadfile = $uploadfile;
         return $this;
     }
 
-    public function getFilename(): ?UploadedFile
+    public function getFilename(): ?string
     {
         return $this->uploadfile;
     }
