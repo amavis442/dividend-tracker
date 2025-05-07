@@ -3,7 +3,6 @@
 namespace App\Entity;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class IncomesSharesFiles
 {
@@ -15,14 +14,14 @@ class IncomesSharesFiles
     }
 
      /**
-     * @return Collection<int, File>
+     * @return Collection<int, IncomesSharesFile>
      */
     public function getFiles(): Collection
     {
         return $this->files;
     }
 
-    public function addFile(UploadedFile $file): static
+    public function addFile(IncomesSharesFile $file): static
     {
         if (!$this->files->contains($file)) {
             $this->files->add($file);
@@ -31,7 +30,7 @@ class IncomesSharesFiles
         return $this;
     }
 
-    public function removeFile(UploadedFile $file): static
+    public function removeFile(IncomesSharesFile $file): static
     {
         if ($this->files->removeElement($file)) {
         }
