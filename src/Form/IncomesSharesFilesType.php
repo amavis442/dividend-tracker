@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class IncomesShareFilesType extends AbstractType
+class IncomesSharesFilesType extends AbstractType
 {
 	public function buildForm(
 		FormBuilderInterface $builder,
@@ -17,7 +17,7 @@ class IncomesShareFilesType extends AbstractType
 	): void {
 		$builder
 			->add('files', CollectionType::class, [
-                    'entry_type' => IncomesShareFileType::class,
+                    'entry_type' => IncomesSharesFileType::class,
                     'allow_add' => true,
                     'by_reference' => false,
                 ])

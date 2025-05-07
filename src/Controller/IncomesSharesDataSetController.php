@@ -6,7 +6,7 @@ use App\Entity\IncomesSharesData;
 use App\Entity\IncomesSharesDataSet;
 use App\Entity\IncomesSharesFile;
 use App\Entity\IncomesSharesFiles;
-use App\Form\IncomesShareFilesType;
+use App\Form\IncomesSharesFilesType;
 use App\Repository\IncomesSharesDataRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
@@ -404,7 +404,7 @@ final class IncomesSharesDataSetController extends AbstractController
 		$fileDollar = new IncomesSharesFile();
 		$files->getFiles()->add($fileDollar);
 
-		$form = $this->createForm(IncomesShareFilesType::class, $files);
+		$form = $this->createForm(IncomesSharesFilesType::class, $files);
 		$form->handleRequest($request);
 
 		if ($form->isSubmitted() && $form->isValid()) {
