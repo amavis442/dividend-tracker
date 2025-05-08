@@ -1,0 +1,86 @@
+{% extends 'layouts/index.html.twig' %}
+{% set create_path = "app_api_key_new" %}
+{% block title %}ApiKey{% endblock %}
+{% block content %}
+    <twig:Table:Table class="max-w-min min-w-full">
+        <twig:Table:THead>
+            <tr>
+                <twig:Table:ThCol class="rounded-l-lg">
+                    Id
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    Api Key
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    Api Key Name
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    Created
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    Updated
+                </twig:Table:ThCol>
+                <twig:Table:ThCol class="rounded-r-lg">
+                    actions
+                </twig:Table:ThCol>
+            </tr>
+        </twig:Table:THead>
+        <tbody>
+            {% for api_key in pager %}
+                <twig:Table:Tr>
+                    <twig:Table:ThRow>
+                        {{ api_key.id }}
+                    </twig:Table:ThRow>
+                    <twig:Table:Td>
+                        {{ api_key.apiKey }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ api_key.apiKeyName.keyName }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ api_key.createdAt ? api_key.createdAt|date("Y-m-d H:i:s") : '' }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ api_key.updatedAt ? api_key.updatedAt|date("Y-m-d H:i:s") : '' }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        <div class="inline-flex rounded-md shadow-sm" role="group">
+                            <div class="inline-block"  data-controller="tooltip">
+                                <a href="{{ path('app_api_key_show', { id: api_key.id }) }}"
+                                   data-turbo-frame="_top"
+                                   data-tooltip-target="element"
+                                   data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                   class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                    <i class="fas fa-book-open"></i>
+                                </a>
+                                <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                    {{ 'Show %name%'|trans({'%name%': api_key.apiKey}) }}
+                                    <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                </div>
+                            </div>
+                            <div class="inline-block"  data-controller="tooltip">
+                                <a href="{{ path('app_api_key_edit', { id: api_key.id }) }}"
+                                   data-turbo-frame="_top"
+                                   data-tooltip-target="element"
+                                   data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                   class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                    <i class="far fa-edit"></i>
+                                </a>
+                                <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                    {{ 'Edit %name%'|trans({'%name%': api_key.apiKey}) }}
+                                    <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </twig:Table:Td>
+                </twig:Table:Tr>
+            {% else %}
+                <twig:Table:Tr>
+                    <twig:Table:Td colspan="5">
+                        no records found
+                    </twig:Table:Td>
+                </twig:Table:Tr>
+            {% endfor %}
+        </tbody>
+    </twig:Table:Table>
+{% endblock %}

@@ -358,3 +358,5 @@ Positions: Posities
 'back to ticker': 'terug naar ticker'
 'Edit Research for': 'Bewerk onderzoek voor'
 'Can not delete. Ticker is connected to open positions.': 'Kan deze ticker niet verwijderen. Er zijn nog open posities aan gekoppeld.'
+'Show %name%': 'Toon %name%'
+'Edit %name%': 'Bewerk %name%'

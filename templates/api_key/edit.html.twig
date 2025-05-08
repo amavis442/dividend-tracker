@@ -1,0 +1,10 @@
+{% extends 'layouts/edit.html.twig' %}
+{% block title %}Api Key{% endblock %}
+{% set title='ApiKey' %}
+{% set entity=api_key %}
+{% set back_path='app_api_key_index' %}
+{% set delete_path='app_api_key_delete' %}
+{% set can_remove=1 %}
+{% block content %}
+    {{ include('api_key/_form.html.twig', {'button_label': 'Update'}) }}
+{% endblock %}

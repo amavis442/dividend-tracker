@@ -1,0 +1,35 @@
+{% extends 'layouts/show.html.twig' %}
+{% block title %}ApiKeyName{% endblock %}
+{% set title='Api Key' %}
+{% set entity=api_key %}
+{% set delete_template='api_key/_delete_form.html.twig' %}
+{% set back_path='app_api_key_index' %}
+{% set edit_path='app_api_key_edit' %}
+{% set delete_path='app_api_key_delete' %}
+{% set can_remove=1 %}
+{% block content %}
+    <twig:Table:Table class="border border-gray-200 max-w-min min-w-full">
+        <tbody>
+            <twig:Table:Tr>
+                <twig:Table:ThRow>Id</twig:Table:ThRow>
+                <twig:Table:Td>{{ api_key.id }}</twig:Table:Td>
+            </twig:Table:Tr>
+            <twig:Table:Tr>
+                <twig:Table:ThRow>Api Key</twig:Table:ThRow>
+                <twig:Table:Td>{{ api_key.apiKey }}</twig:Table:Td>
+            </twig:Table:Tr>
+            <twig:Table:Tr>
+                <twig:Table:ThRow>Api Key Name</twig:Table:ThRow>
+                <twig:Table:Td>{{ api_key.apiKeyName.keyName }}</twig:Table:Td>
+            </twig:Table:Tr>
+            <twig:Table:Tr>
+                <twig:Table:ThRow>Created</twig:Table:ThRow>
+                <twig:Table:Td>{{ api_key.createdAt ? api_key.createdAt|date('Y-m-d H:i:s') : '' }}</twig:Table:Td>
+            </twig:Table:Tr>
+            <twig:Table:Tr>
+                <twig:Table:ThRow>Updated</twig:Table:ThRow>
+                <twig:Table:Td>{{ api_key.updatedAt ? api_key.updatedAt|date('Y-m-d H:i:s') : '' }}</twig:Table:Td>
+            </twig:Table:Tr>
+        </tbody>
+    </twig:Table:Table>
+{% endblock %}

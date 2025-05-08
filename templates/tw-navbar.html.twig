@@ -6,9 +6,7 @@
             <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                 <div class="flex text-white flex-shrink-0 items-center">
                     {% if brand_image| default(false ) %}
-                        <img class="h-8 w-auto"
-                             src="{{ asset("images/brand.png") }}"
-                             alt="Your Company">
+                        <img class="h-8 w-auto" src="{{ asset("images/brand.png") }}" alt="Your Company">
                     {% else %}
                         <a class="px-2 tx-py-2 mr-4 font-sans text-xl" href="#">Dividend tracker</a>
                     {% endif %}
@@ -86,6 +84,12 @@
                                    role="menuitem"
                                    tabindex="-1"
                                    id="admin-menu-item-8"><i class="fas fa-percent pr-2"></i> {{ 'Taxtarifs'|trans }}</a>
+                                <div class="border border-solid h-0 bg-[##e5e7eb] "></div>
+                                <a href="{{ url('app_api_key_name_index', parameters = [], schemeRelative = false) }}"
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
+                                   role="menuitem"
+                                   tabindex="-1"
+                                   id="admin-menu-item-9"><i class="fa-solid fa-key pr-2"></i> {{ 'Api keys'|trans }}</a>
                             </div>
                         </div>
                         <!-- Portfolio -->
@@ -245,9 +249,7 @@
                                     data-action="toggle#toggle">
                                 <span class="absolute -inset-1.5"></span>
                                 <span class="sr-only">Open user menu</span>
-                                <img class="h-8 w-8 rounded-full"
-                                     src="{{ asset("images/profile-placeholder.png") }}"
-                                     alt="Profile picture">
+                                <img class="h-8 w-8 rounded-full" src="{{ asset("images/profile-placeholder.png") }}" alt="Profile picture">
                             </button>
                         </div>
                         <div class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
@@ -266,6 +268,12 @@
                                role="menuitem"
                                tabindex="-1"
                                id="user-menu-item-1"><i class="far fa-user-circle pr-2"></i> {{ 'Account'|trans }}</a>
+                            <a href="{{ url('app_api_key_index', parameters = [], schemeRelative = false) }}"
+                               class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
+                               role="menuitem"
+                               tabindex="-1"
+                               id="user-menu-item-1a"><i class="fa-solid fa-key pr-2"></i> {{ 'Api keys'|trans }}
+                            </a>
                             <a href="{{ path("app_logout") }}"
                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
                                role="menuitem"

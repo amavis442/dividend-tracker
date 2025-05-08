@@ -1,0 +1,16 @@
+{% extends 'layouts/edit.html.twig' %}
+{% block title %}ApiKeyName{% endblock %}
+{% set title='ApiKeyName' %}
+{% set entity=api_key_name %}
+{% set delete_template='api_key_name/_delete_form.html.twig' %}
+{% set back_path='app_api_key_name_index' %}
+{% set delete_path='app_api_key_name_delete' %}
+{% if api_key_name.apiKeys.count() > 0 %}
+    {% set can_remove=-1 %}
+{% else %}
+    {% set can_remove=1 %}
+{% endif %}
+
+{% block content %}
+    {{ include('api_key_name/_form.html.twig', {'button_label': 'Update'}) }}
+{% endblock %}
