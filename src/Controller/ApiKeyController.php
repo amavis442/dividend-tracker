@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/{_locale<%app.supported_locales%>}/dashboard/account/apikeys')]
+#[Route('/{_locale<%app.supported_locales%>}/dashboard/user/apikeys')]
 final class ApiKeyController extends AbstractController
 {
 	#[Route(name: 'app_api_key_index', methods: ['GET'])]
