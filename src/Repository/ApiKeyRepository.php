@@ -7,7 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ApiKeys>
+ * @extends ServiceEntityRepository<ApiKey>
  */
 class ApiKeyRepository extends ServiceEntityRepository
 {
@@ -21,8 +21,19 @@ class ApiKeyRepository extends ServiceEntityRepository
 		return $this->createQueryBuilder('a')->orderBy('a.id', 'ASC');
 	}
 
+	public function findByApiKeyName(string $value): ?ApiKey
+	{
+	        return $this->createQueryBuilder('a')
+			->join('a.apiKeyName', 'ak')
+	            ->where('ak.keyName = :val')
+	            ->setParameter('val', $value)
+	            ->getQuery()
+	            ->getOneOrNullResult()
+	        ;
+	    }
+
 	//    /**
-	//     * @return ApiKeys[] Returns an array of ApiKeys objects
+	//     * @return ApiKey[] Returns an array of ApiKey objects
 	//     */
 	//    public function findByExampleField($value): array
 	//    {
