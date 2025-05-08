@@ -85,7 +85,6 @@ class Transaction
     #[ORM\Column(
         type: 'float',
         nullable: false,
-        precision: 6,
         options: ["default" => 0]
     )]
     private float $profit = 0.0;
