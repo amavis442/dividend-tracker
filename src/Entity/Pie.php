@@ -54,11 +54,20 @@ class Pie
     #[ORM\Column(options: ["default" => 0.0])]
     private float $goal = 0.0;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $trading212PieId = null;
+
+    /**
+     * @var Collection<int, Trading212PieMetaData>
+     */
+    #[ORM\OneToMany(targetEntity: Trading212PieMetaData::class, mappedBy: 'pie')]
+    private Collection $trading212PieMetaData;
 
     public function __construct()
     {
         $this->positions = new ArrayCollection();
         $this->transactions = new ArrayCollection();
+        $this->trading212PieMetaData = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -131,6 +140,40 @@ class Pie
     public function setGoal(float $goal): static
     {
         $this->goal = $goal;
+
+        return $this;
+    }
+
+    public function getTrading212PieId(): ?int
+    {
+        return $this->trading212PieId;
+    }
+
+    public function setTrading212PieId(?int $trading212PieId): static
+    {
+        $this->trading212PieId = $trading212PieId;
+
+        return $this;
+    }
+
+    public function addTrading212PieMetaData(Trading212PieMetaData $trading212PieMetaData): static
+    {
+        if (!$this->trading212PieMetaData->contains($trading212PieMetaData)) {
+            $this->trading212PieMetaData->add($trading212PieMetaData);
+            $trading212PieMetaData->setPie($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTrading212PieMetaData(Trading212PieMetaData $trading212PieMetaData): static
+    {
+        if ($this->trading212PieMetaData->removeElement($trading212PieMetaData)) {
+            // set the owning side to null (unless already changed)
+            if ($trading212PieMetaData->getPie() === $this) {
+                $trading212PieMetaData->setPie(null);
+            }
+        }
 
         return $this;
     }

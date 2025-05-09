@@ -14,7 +14,10 @@ class PieType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('label');
+            ->add('label')
+            ->add('trading212PieId', null,[
+                'required' => false
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

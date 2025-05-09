@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Entity\Trading212PieMetaData;
 use App\Repository\ApiKeyRepository;
+use App\Repository\PieRepository;
 use App\Repository\Trading212PieMetaDataRepository;
 use App\Service\Trading212\PieService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,6 +28,7 @@ class Trading212GetPiesCommand extends Command
 		protected HttpClientInterface $client,
 		protected ApiKeyRepository $apiKeyRepository,
 		protected Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
+		protected PieRepository $pieRepository,
 		protected EntityManagerInterface $entityManager,
 	) {
 		parent::__construct();
@@ -53,6 +55,13 @@ class Trading212GetPiesCommand extends Command
 		foreach ($data as $metaData) {
 			$trading212PieMetaData = new Trading212PieMetaData();
 			$trading212PieMetaData->setTrading212PieId($metaData['id']);
+
+			$pie = $this->pieRepository->findOneBy(['trading212PieId' => $metaData['id']]);
+			if ($pie) {
+				$trading212PieMetaData->setPieName($pie->getLabel());
+				$trading212PieMetaData->setPie($pie);
+			}
+
 			$trading212PieMetaData->setPriceAvgInvestedValue($metaData['result']['priceAvgInvestedValue']);
 			$trading212PieMetaData->setPriceAvgValue($metaData['result']['priceAvgValue']);
 			$trading212PieMetaData->setRaw($metaData);

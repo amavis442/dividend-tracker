@@ -43,6 +43,9 @@ class Trading212PieMetaData
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $pieName = null;
 
+    #[ORM\ManyToOne(inversedBy: 'trading212PieMetaData')]
+    private ?Pie $pie = null;
+
     public function __construct()
     {
         $this->trading212PieInstruments = new ArrayCollection();
@@ -179,4 +182,17 @@ class Trading212PieMetaData
 
         return $this;
     }
+
+    public function getPie(): ?Pie
+    {
+        return $this->pie;
+    }
+
+    public function setPie(?Pie $pie): static
+    {
+        $this->pie = $pie;
+
+        return $this;
+    }
+
 }
