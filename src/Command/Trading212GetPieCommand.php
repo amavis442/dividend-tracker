@@ -74,6 +74,7 @@ class Trading212GetPieCommand extends Command
 		if ($trading212PieMetaData) {
 			$trading212PieMetaData->setPieName($trading212_pie_name);
             $this->entityManager->persist($trading212PieMetaData);
+			$this->entityManager->flush();
 
 			foreach ($data['instruments'] as $instrument) {
 				$trading212PieInstrument = new Trading212PieInstrument();
