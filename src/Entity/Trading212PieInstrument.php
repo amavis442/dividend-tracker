@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\Trading212PieInstrumentRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: Trading212PieInstrumentRepository::class)]
@@ -43,6 +45,9 @@ class Trading212PieInstrument
 
     #[ORM\ManyToOne(inversedBy: 'trading212PieInstruments')]
     private ?Trading212PieMetaData $trading212PieMetaData = null;
+
+    #[ORM\ManyToOne(inversedBy: 'trading212PieInstruments')]
+    private ?Ticker $ticker = null;
 
     #[ORM\PrePersist]
 	public function setCreatedAtValue(): void
@@ -178,6 +183,18 @@ class Trading212PieInstrument
     public function setTrading212PieMetaData(?Trading212PieMetaData $trading212PieMetaData): static
     {
         $this->trading212PieMetaData = $trading212PieMetaData;
+
+        return $this;
+    }
+
+    public function getTicker(): ?Ticker
+    {
+        return $this->ticker;
+    }
+
+    public function setTicker(?Ticker $ticker): static
+    {
+        $this->ticker = $ticker;
 
         return $this;
     }

@@ -105,6 +105,18 @@ class Ticker
     #[ORM\Column(type: 'uuid', nullable: true)]
     private ?Uuid $uuid = null;
 
+    /**
+     * @var Collection<int, TickerAlternativeSymbol>
+     */
+    #[ORM\OneToMany(targetEntity: TickerAlternativeSymbol::class, mappedBy: 'ticker', orphanRemoval: true)]
+    private Collection $tickerAlternativeSymbols;
+
+    /**
+     * @var Collection<int, Trading212PieInstrument>
+     */
+    #[ORM\OneToMany(targetEntity: Trading212PieInstrument::class, mappedBy: 'ticker')]
+    private Collection $trading212PieInstruments;
+
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
     {
@@ -125,6 +137,8 @@ class Ticker
         $this->dividendMonths = new ArrayCollection();
         $this->payments = new ArrayCollection();
         $this->positions = new ArrayCollection();
+        $this->tickerAlternativeSymbols = new ArrayCollection();
+        $this->trading212PieInstruments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -419,4 +433,65 @@ class Ticker
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, TickerAlternativeSymbol>
+     */
+    public function getTickerAlternativeSymbols(): Collection
+    {
+        return $this->tickerAlternativeSymbols;
+    }
+
+    public function addTickerAlternativeSymbol(TickerAlternativeSymbol $tickerAlternativeSymbol): static
+    {
+        if (!$this->tickerAlternativeSymbols->contains($tickerAlternativeSymbol)) {
+            $this->tickerAlternativeSymbols->add($tickerAlternativeSymbol);
+            $tickerAlternativeSymbol->setTicker($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTickerAlternativeSymbol(TickerAlternativeSymbol $tickerAlternativeSymbol): static
+    {
+        if ($this->tickerAlternativeSymbols->removeElement($tickerAlternativeSymbol)) {
+            // set the owning side to null (unless already changed)
+            if ($tickerAlternativeSymbol->getTicker() === $this) {
+                $tickerAlternativeSymbol->setTicker(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Trading212PieInstrument>
+     */
+    public function getTrading212PieInstruments(): Collection
+    {
+        return $this->trading212PieInstruments;
+    }
+
+    public function addTrading212PieInstrument(Trading212PieInstrument $trading212PieInstrument): static
+    {
+        if (!$this->trading212PieInstruments->contains($trading212PieInstrument)) {
+            $this->trading212PieInstruments->add($trading212PieInstrument);
+            $trading212PieInstrument->setTicker($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTrading212PieInstrument(Trading212PieInstrument $trading212PieInstrument): static
+    {
+        if ($this->trading212PieInstruments->removeElement($trading212PieInstrument)) {
+            // set the owning side to null (unless already changed)
+            if ($trading212PieInstrument->getTicker() === $this) {
+                $trading212PieInstrument->setTicker(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

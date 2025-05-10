@@ -1,0 +1,21 @@
+{% extends 'layouts/show.html.twig' %}
+{% block title %}Ticker Alternative Symbol{% endblock %}
+
+{% block content %}
+    <twig:Table:Table class="border border-gray-200 max-w-min min-w-full">
+        <tbody>
+            <twig:Table:Tr>
+                <twig:Table:ThRow>Id</twig:Table:ThRow>
+                <twig:Table:Td>{{ ticker_alternative_symbol.id }}</twig:Table:Td>
+            </twig:Table:Tr>
+            <twig:Table:Tr>
+                <twig:Table:ThRow>Symbol</twig:Table:ThRow>
+                <twig:Table:Td>{{ ticker_alternative_symbol.symbol }}</twig:Table:Td>
+            </twig:Table:Tr>
+            <twig:Table:Tr>
+                <twig:Table:ThRow>Ticker</twig:Table:ThRow>
+                <twig:Table:Td>{{ ticker_alternative_symbol.ticker.fullname }} ({{ ticker_alternative_symbol.ticker.symbol }})</twig:Table:Td>
+            </twig:Table:Tr>
+        </tbody>
+    </twig:Table:Table>
+{% endblock %}

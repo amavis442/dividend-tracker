@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Command;
+namespace App\Command\Trading212;
 
 use App\Entity\Trading212PieMetaData;
 use App\Repository\ApiKeyRepository;
@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 		description: 'Get trading212 meta data for pies'
 	)
 ]
-class Trading212GetPiesCommand extends Command
+class GetPiesCommand extends Command
 {
 	public function __construct(
 		protected HttpClientInterface $client,

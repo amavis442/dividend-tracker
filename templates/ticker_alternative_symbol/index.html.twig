@@ -1,0 +1,46 @@
+{% extends 'layouts/index.html.twig' %}
+{% block title %}TickerAlternativeSymbol index{% endblock %}
+{% block content %}
+    <twig:Table:Table class="max-w-min min-w-full">
+        <twig:Table:THead>
+            <tr>
+                <twig:Table:ThCol class="rounded-l-lg">
+                    Id
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    Symbol
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    Ticker
+                </twig:Table:ThCol>
+                <twig:Table:ThCol class="rounded-r-lg">
+                    actions
+                </twig:Table:ThCol>
+            </tr>
+        </twig:Table:THead>
+        <tbody>
+            {% for ticker_alternative_symbol in pager %}
+                <twig:Table:Tr>
+                    <twig:Table:ThRow>
+                        {{ ticker_alternative_symbol.id }}
+                    </twig:Table:ThRow>
+                    <twig:Table:Td>
+                        {{ ticker_alternative_symbol.symbol }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ ticker_alternative_symbol.ticker.fullname }} ({{ ticker_alternative_symbol.ticker.symbol }})
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {% include 'layouts/actions.html.twig' with {'entity_id': ticker_alternative_symbol.id, 'name': ticker_alternative_symbol.symbol, 'actions_show_path': 'app_ticker_alternative_symbol_show', 'actions_edit_path': 'app_ticker_alternative_symbol_edit'} %}
+                    </twig:Table:Td>
+                </twig:Table:Tr>
+            {% else %}
+                <twig:Table:Tr>
+                    <twig:Table:Td colspan="3">
+                        no records found
+                    </twig:Table:Td>
+                </twig:Table:Tr>
+            {% endfor %}
+        </tbody>
+    </twig:Table:Table>
+{% endblock %}

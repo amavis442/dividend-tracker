@@ -2,28 +2,28 @@
 
 namespace App\Repository;
 
-use App\Entity\Trading212PieMetaData;
+use App\Entity\TickerAlternativeSymbol;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Trading212PieMetaData>
+ * @extends ServiceEntityRepository<TickerAlternativeSymbol>
  */
-class Trading212PieMetaDataRepository extends ServiceEntityRepository
+class TickerAlternativeSymbolRepository extends ServiceEntityRepository
 {
 	public function __construct(ManagerRegistry $registry)
 	{
-		parent::__construct($registry, Trading212PieMetaData::class);
+		parent::__construct($registry, TickerAlternativeSymbol::class);
 	}
 
-	public function all(): QueryBuilder
+	public function getQueryBuilderFindByAll(): QueryBuilder
 	{
-		return $this->createQueryBuilder('t')->orderBy('t.createdAt', 'DESC');
+		return $this->createQueryBuilder('t')->orderBy('t.id', 'ASC');
 	}
 
 	//    /**
-	//     * @return Trading212PieMetaData[] Returns an array of Trading212PieMetaData objects
+	//     * @return TickerAlternativeSymbol[] Returns an array of TickerAlternativeSymbol objects
 	//     */
 	//    public function findByExampleField($value): array
 	//    {
@@ -37,7 +37,7 @@ class Trading212PieMetaDataRepository extends ServiceEntityRepository
 	//        ;
 	//    }
 
-	//    public function findOneBySomeField($value): ?Trading212PieMetaData
+	//    public function findOneBySomeField($value): ?TickerAlternativeSymbol
 	//    {
 	//        return $this->createQueryBuilder('t')
 	//            ->andWhere('t.exampleField = :val')

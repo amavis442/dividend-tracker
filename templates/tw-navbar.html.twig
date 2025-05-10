@@ -30,7 +30,7 @@
                                 </button>
                             </div>
                             <!-- Dropdown menu -->
-                            <div class="hidden absolute left-1 z-20 mt-2 w-52 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                            <div class="hidden absolute left-1 z-20 mt-2 w-72 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                                  role="menu"
                                  data-toggle-target="toggleable"
                                  data-css-class="hidden">
@@ -39,16 +39,22 @@
                                    role="menuitem"
                                    tabindex="-1"
                                    id="admin-menu-item-0"><i class="fas fa-industry pr-2"></i> {{ 'Industry'|trans }}</a>
-                                <a href="{{ url('ticker_index', parameters = [], schemeRelative = false) }}"
-                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
-                                   role="menuitem"
-                                   tabindex="-1"
-                                   id="admin-menu-item-1"><i class="fas fa-ticket-alt pr-2"></i> Tickers</a>
                                 <a href="{{ url('research_index', parameters = [], schemeRelative = false) }}"
                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
                                    role="menuitem"
                                    tabindex="-1"
                                    id="admin-menu-item-2"><i class="fas fa-search-plus pr-2"></i> {{ 'Research on Tickers'|trans }}</a>
+                                <div class="border border-solid h-0 bg-[##e5e7eb] "></div>
+                                <a href="{{ url('ticker_index', parameters = [], schemeRelative = false) }}"
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
+                                   role="menuitem"
+                                   tabindex="-1"
+                                   id="admin-menu-item-1"><i class="fas fa-ticket-alt pr-2"></i> Tickers</a>
+                                <a href="{{ url('app_ticker_alternative_symbol_index', parameters = [], schemeRelative = false) }}"
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
+                                   role="menuitem"
+                                   tabindex="-1"
+                                   id="admin-menu-item-1"><i class="fas fa-ticket-alt pr-2"></i> Ticker Alternative symbols</a>
                                 <div class="border border-solid h-0 bg-[##e5e7eb] "></div>
                                 <a href="{{ url('pie_index', parameters = [], schemeRelative = false) }}"
                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
@@ -204,11 +210,17 @@
                                    role="menuitem"
                                    tabindex="-1"
                                    id="report-menu-item-6"><i class="fas fa-calculator pr-2"></i> {{ 'Compound calc'|trans }}</a>
+                                <div class="border border-solid h-0 bg-[##e5e7eb] "></div>
                                 <a href="{{ url('app_incomes_shares_data_set_index', parameters = [], schemeRelative = false) }}"
                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
                                    role="menuitem"
                                    tabindex="-1"
-                                   id="report-menu-item-6a"><i class="fas fa-calculator pr-2"></i> {{ 'IncomesShares'|trans }}</a>
+                                   id="report-menu-item-6a"><i class="fa-solid fa-chart-line"></i> {{ 'IncomesShares'|trans }}</a>
+                                <a href="{{ url('app_report_trading212_index', parameters = [], schemeRelative = false) }}"
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
+                                   role="menuitem"
+                                   tabindex="-1"
+                                   id="report-menu-item-6a"><i class="fa-solid fa-chart-line"></i> {{ 'Trading212'|trans }}</a>
                                 <div class="border border-solid h-0 bg-[##e5e7eb] "></div>
                                 <a href="{{ url('report_export_transactions', parameters = [], schemeRelative = false) }}"
                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"

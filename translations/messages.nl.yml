@@ -360,3 +360,11 @@ Positions: Posities
 'Can not delete. Ticker is connected to open positions.': 'Kan deze ticker niet verwijderen. Er zijn nog open posities aan gekoppeld.'
 'Show %name%': 'Toon %name%'
 'Edit %name%': 'Bewerk %name%'
+'Invested': 'Geïnvesteerd'
+'Api keys': 'Api sleutels'
+'Owned Quantity': 'Aantal in bezit'
+'Avg value': 'Gemiddelde waarde'
+'Created At': 'Aangemaakt op'
+'Updated At': 'Bijgewerkt op'
+'Avg value - Invested' : 'Gemiddelde waarde - geïnvesteerd'
+

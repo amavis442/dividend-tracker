@@ -1,0 +1,66 @@
+{% extends 'layouts/index_no_add.html.twig' %}
+{% block title %}Trading212{% endblock %}
+{% block content %}
+    <twig:Table:Table class="max-w-min min-w-full">
+        <twig:Table:THead>
+            <tr>
+                <twig:Table:ThCol class="rounded-l-lg">
+                    Id - Trading212 Pie Id
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    Pie
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    Avg invested
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    Avg value
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    Created At
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    Updated At
+                </twig:Table:ThCol>
+                <twig:Table:ThCol class="rounded-r-lg">
+                    actions
+                </twig:Table:ThCol>
+            </tr>
+        </twig:Table:THead>
+        <tbody>
+            {% for item in pager %}
+                <twig:Table:Tr>
+                    <twig:Table:ThRow>
+                        {{ item.id }} - {{ item.trading212PieId }}
+                    </twig:Table:ThRow>
+                    <twig:Table:Td>
+                        {{ item.pieName }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ item.priceAvgInvestedValue }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ item.priceAvgValue }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ item.createdAt ? item.createdAt|date("Y-m-d H:i:s") : '' }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ item.updatedAt ? item.updatedAt|date("Y-m-d H:i:s") : '' }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        <twig:Button tag="a" href="{{ path("app_report_trading212_graph", {'pie': item.pie.id}) }}">
+                        <i class="fa fa-line-chart"></i>
+                        </twig:Button>
+                    </twig:Table:Td>
+                </twig:Table:Tr>
+            {% else %}
+                <tr>
+                    <twig:Table:Td colspan="7">
+                        no records found
+                    </twig:Table:Td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </twig:Table:Table>
+{% endblock %}

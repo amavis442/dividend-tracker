@@ -1,0 +1,110 @@
+{% extends 'base.html.twig' %}
+{% block title %}Trading212 Tracker!{% endblock %}
+{% block body %}
+    <div class="flex flex-col items-center mb-6 mt-6 bg-white shadow-md rounded-lg p-6">
+        <div style="width:900px;
+                    height:600px"
+             class="border border-gray-500 p-2 mb-4 rounded-lg">
+            {{ render_chart(chart, {
+                        'data-controller': 'chartjs-add-euro-sign'
+                        }) }}
+        </div>
+        <div style="w-full">
+            <div class="mb-2">
+                <twig:Head variant="h4">
+                    Instruments
+                </twig:Head>
+            </div>
+            <twig:Table:Table class="max-w-min min-w-full">
+                <twig:Table:THead>
+                    <tr>
+                        <twig:Table:ThCol class="rounded-l-lg">
+                            Id
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Ticker'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Ticker'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Owned Quantity'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Invested'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Avg value'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Avg value - Invested'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Created At'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Updated At'|trans}}
+                        </twig:Table:ThCol>
+                    </tr>
+                </twig:Table:THead>
+                <tbody>
+                    {% for instrument in instruments %}
+                        <twig:Table:Tr>
+                            <twig:Table:ThRow>
+                                {{ instrument.id }}
+                            </twig:Table:ThRow>
+                            <twig:Table:Td>
+                                {{ instrument.tickerName }}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {% if instrument.ticker %}
+                                    {{ instrument.ticker.fullname }}
+                                {% else %}
+                                    &mdash;
+                                {% endif %}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {{ instrument.ownedQuantity }}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {{ instrument.priceAvgInvestedValue }}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {% if instrument.priceAvgValue < instrument.priceAvgInvestedValue %}
+                                    <span class="bg-red-500 text-white p-2 rounded-lg flex">{{ instrument.priceAvgValue }}</span>
+                                {% else %}
+                                    <span class="bg-green-500  p-2 rounded-lg flex">{{ instrument.priceAvgValue }}</span>
+                                {% endif %}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {% if instrument.priceAvgValue < instrument.priceAvgInvestedValue %}
+                                    <span class="bg-red-500 text-white p-2 rounded-lg flex">{{ instrument.priceAvgValue - instrument.priceAvgInvestedValue }}</span>
+                                {% else %}
+                                    <span class="bg-green-500  p-2 rounded-lg flex">{{ instrument.priceAvgValue - instrument.priceAvgInvestedValue }}</span>
+                                {% endif %}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {{ instrument.createdAt ? instrument.createdAt|date("Y-m-d H:i:s") : '' }}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {{ instrument.updatedAt ? instrument.updatedAt|date("Y-m-d H:i:s") : '' }}
+                            </twig:Table:Td>
+                        </twig:Table:Tr>
+                    {% else %}
+                        <tr>
+                            <twig:Table:Td colspan="8">
+                                no records found
+                            </twig:Table:Td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </twig:Table:Table>
+        </div>
+        <div class="mt-4">
+            <a class="px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-green-500 hover:bg-green-700 p-2"
+               href="{{ path("app_report_trading212_index") }}">
+                <i class="fas fa-angle-double-left"></i> {{ 'back to list'|trans }}
+            </a>
+        </div>
+    </div>
+{% endblock %}

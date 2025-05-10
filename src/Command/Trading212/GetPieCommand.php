@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Command;
+namespace App\Command\Trading212;
 
 use App\Entity\PieSelect;
 use App\Entity\Trading212PieInstrument;
 use App\Repository\ApiKeyRepository;
+use App\Repository\TickerAlternativeSymbolRepository;
 use App\Repository\Trading212PieMetaDataRepository;
 use App\Service\Trading212\PieService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,12 +24,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 		description: 'Get all shares in trading212 pie with pie id'
 	)
 ]
-class Trading212GetPieCommand extends Command
+class GetPieCommand extends Command
 {
 	public function __construct(
 		protected HttpClientInterface $client,
 		protected ApiKeyRepository $apiKeyRepository,
 		protected Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
+		protected TickerAlternativeSymbolRepository $tickerAlternativeSymbolRepository,
 		protected EntityManagerInterface $entityManager
 	) {
 		parent::__construct();
@@ -93,7 +95,13 @@ class Trading212GetPieCommand extends Command
 				$trading212PieInstrument->setRaw($instrument);
 
                 $trading212PieInstrument->setTrading212PieMetaData($trading212PieMetaData);
-
+				/**
+				 * @var \App\Entity\TickerAlternativeSymbol
+				 */
+				$tickerAlternativeSymbol = $this->tickerAlternativeSymbolRepository->findOneBy(['symbol'=>$instrument['ticker']]);
+				if ($tickerAlternativeSymbol) {
+					$trading212PieInstrument->setTicker($tickerAlternativeSymbol->getTicker());
+				}
 				$this->entityManager->persist($trading212PieInstrument);
 			}
 
