@@ -19,7 +19,7 @@ class TickerAlternativeSymbolRepository extends ServiceEntityRepository
 
 	public function getQueryBuilderFindByAll(): QueryBuilder
 	{
-		return $this->createQueryBuilder('t')->orderBy('t.id', 'ASC');
+		return $this->createQueryBuilder('t')->orderBy('t.symbol', 'ASC');
 	}
 
 	//    /**
