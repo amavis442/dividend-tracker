@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Trading212;
 
 use App\Entity\IncomesSharesData;
 use App\Entity\IncomesSharesDataSet;
@@ -28,7 +28,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
-#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/incomesshares')]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/trading212/incomesshares')]
 final class IncomesSharesDataSetController extends AbstractController
 {
 	#[Route(name: 'app_incomes_shares_data_set_index', methods: ['GET'])]
