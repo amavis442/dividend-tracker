@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+{% block title %}CompoundPrediction{% endblock %}
+{% block body %}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <div class="w-1/2 border mx-auto rounded-lg shadow-white bg-white px-3 py-2 ">
+                    <twig:Card title="{{ 'Compound calculator'|trans }}"
+                               class="w-1/2 min-w-max h-min">
+                        {{ include("compound_prediction/calc_compound/_form.html.twig") }}
+                    </twig:Card>
+                </div>
+                <turbo-frame id="compound-results">
+                </turbo-frame>
+            </div>
+        </div>
+    </div>
+{% endblock %}

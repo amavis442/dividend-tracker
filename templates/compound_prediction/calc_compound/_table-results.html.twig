@@ -1,0 +1,61 @@
+<turbo-frame id="compound-results">
+<div style="height:500px" class="w-full">
+    {{ render_chart(chart, {
+        'data-controller': 'chartjs-add-euro-sign'
+        }) }}
+</div>
+<twig:Table:Table>
+    <twig:Table:THead>
+        <twig:Table:Tr>
+            <twig:Table:ThCol>
+                {{ 'Periode'|trans }}
+            </twig:Table:ThCol>
+            <twig:Table:ThCol>
+                {{ 'Capital before'|trans }}
+            </twig:Table:ThCol>
+            <twig:Table:ThCol>
+                {{ 'Dividend'|trans }}
+            </twig:Table:ThCol>
+            <twig:Table:ThCol>
+                {{ 'Capital after'|trans }}
+            </twig:Table:ThCol>
+            <twig:Table:ThCol>
+                {{ 'Acumulated Dividend'|trans }}
+            </twig:Table:ThCol>
+        </twig:Table:Tr>
+    </twig:Table:THead>
+    <tbody>
+        {% set rowcount = 1 %}
+        {% set oddrow = false %}
+        {% for item in data %}
+            {% if oddrow and rowcount < frequency + 1 %}
+                {% set oddrow = false %}
+            {% endif %}
+            {% if rowcount > frequency %}
+                {% set oddrow = true %}
+            {% endif %}
+            {% if rowcount > 2 * frequency - 1 %}
+                {% set rowcount = 0 %}
+            {% endif %}
+            <twig:Table:Tr>
+                <twig:Table:Td>
+                    {{ item.quator }}
+                </twig:Table:Td>
+                <twig:Table:Td>
+                    {{ item.capital_before|format_number({"fraction_digit": 2}) }}
+                </twig:Table:Td>
+                <twig:Table:Td>
+                    {{ item.dividend|format_number({"fraction_digit": 2}) }}
+                </twig:Table:Td>
+                <twig:Table:Td>
+                    {{ item.capital_after|format_number({"fraction_digit": 2}) }}
+                </twig:Table:Td>
+                <twig:Table:Td>
+                    {{ item.acumulated_dividend|format_number({"fraction_digit": 2}) }}
+                </twig:Table:Td>
+            </twig:Table:Tr>
+            {% set rowcount = rowcount + 1 %}
+        {% endfor %}
+    </tbody>
+</twig:Table:Table>
+</turbo-frame>
