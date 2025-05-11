@@ -67,7 +67,7 @@ final class Trading212Controller extends AbstractController
 		$colors = Colors::COLORS;
 
         /**
-         * @var \app\Entity\Trading212PieMetaData
+         * @var \App\Entity\Trading212PieMetaData $item
          */
 		foreach ($data as $item) {
 			$allocationData[] = round($item->getPriceAvgInvestedValue(), 2);
