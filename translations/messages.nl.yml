@@ -366,5 +366,7 @@ Positions: Posities
 'Avg value': 'Gemiddelde waarde'
 'Created At': 'Aangemaakt op'
 'Updated At': 'Bijgewerkt op'
-'Avg value - Invested' : 'Gemiddelde waarde - geïnvesteerd'
-
+'Average value - Invested' : 'Gemiddelde waarde - geïnvesteerd'
+'Average invested': 'Gemiddeld geïnvesteerd'
+'Average value - average invested' : 'Gemiddelde waarde - gemiddeld geïnvesteerd'
+'Gained': 'Gewonnen'

@@ -8,25 +8,31 @@
                     Id - Trading212 Pie Id
                 </twig:Table:ThCol>
                 <twig:Table:ThCol>
-                    Pie
+                    {{ 'Pie'|trans }}
                 </twig:Table:ThCol>
                 <twig:Table:ThCol>
-                    Avg invested
+                    {{ 'Average invested'|trans }}
                 </twig:Table:ThCol>
                 <twig:Table:ThCol>
-                    Avg value
+                    {{ 'Average value'|trans }}
                 </twig:Table:ThCol>
                 <twig:Table:ThCol>
-                    Gained
+                    {{ 'Average value - average invested'|trans }}
                 </twig:Table:ThCol>
                 <twig:Table:ThCol>
-                    Created At
+                    {{ 'Gained'|trans }}
                 </twig:Table:ThCol>
                 <twig:Table:ThCol>
-                    Updated At
+                    {{ 'Total return'|trans }}
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    {{ 'Created At'|trans }}
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    {{ 'Updated At'|trans }}
                 </twig:Table:ThCol>
                 <twig:Table:ThCol class="rounded-r-lg">
-                    actions
+                    {{ 'actions'|trans }}
                 </twig:Table:ThCol>
             </tr>
         </twig:Table:THead>
@@ -46,8 +52,23 @@
                         {{ item.priceAvgValue }}
                     </twig:Table:Td>
                     <twig:Table:Td>
-                        {{ item.gained|default('0.0') }}
+                        {% if item.diffValue < 0 %}
+                            <span class="bg-red-500 text-white p-2 rounded-lg flex">{{ item.diffValue|number_format(2) }}</span>
+                        {% else %}
+                            <span class="bg-green-500  p-2 rounded-lg flex">{{ item.diffValue|number_format(2) }}</span>
+                        {% endif %}
                     </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ item.gained|default("0.0") }} ( {{ item.gainedPercentage|number_format(2) }} %)
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {% if item.totalReturn < 0 %}
+                            <span class="bg-red-500 text-white p-2 rounded-lg flex">{{ item.totalReturn|number_format(2) }}</span>
+                        {% else %}
+                            <span class="bg-green-500  p-2 rounded-lg flex">{{ item.totalReturn|number_format(2) }}</span>
+                        {% endif %}
+                    </twig:Table:Td>
+
                     <twig:Table:Td>
                         {{ item.createdAt ? item.createdAt|date("Y-m-d H:i:s") : '' }}
                     </twig:Table:Td>
@@ -55,8 +76,9 @@
                         {{ item.updatedAt ? item.updatedAt|date("Y-m-d H:i:s") : '' }}
                     </twig:Table:Td>
                     <twig:Table:Td>
-                        <twig:Button tag="a" href="{{ path("app_report_trading212_graph", {'pie': item.pie.id}) }}">
-                        <i class="fa fa-line-chart"></i>
+                        <twig:Button tag="a"
+                                     href="{{ path("app_report_trading212_graph", {'pie': item.pie.id}) }}">
+                            <i class="fa fa-line-chart"></i>
                         </twig:Button>
                     </twig:Table:Td>
                 </twig:Table:Tr>
