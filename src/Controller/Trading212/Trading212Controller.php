@@ -72,6 +72,7 @@ final class Trading212Controller extends AbstractController
 		foreach ($data as $item) {
 			$allocationData[] = round($item->getPriceAvgInvestedValue(), 2);
 			$valueData[] = round($item->getPriceAvgValue(), 2);
+			$gained[] =  round($item->getGained(), 2);
 			$labels[] = $item->getCreatedAt()->format('d-m-Y');
 		}
 		$chartData = [
