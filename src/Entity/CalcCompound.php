@@ -26,7 +26,6 @@ class CalcCompound
 	 *
 	 * @var float
 	 */
-	#[Assert\GreaterThan(0)]
 	private float $investPerMonth = 100.0;
 
 	/**
@@ -122,9 +121,9 @@ class CalcCompound
 	 *
 	 * @return  self
 	 */
-	public function setInvestPerMonth(float $investPerMonth): self
+	public function setInvestPerMonth(?float $investPerMonth): self
 	{
-		$this->investPerMonth = $investPerMonth;
+		$this->investPerMonth = $investPerMonth ?? 0;
 
 		return $this;
 	}

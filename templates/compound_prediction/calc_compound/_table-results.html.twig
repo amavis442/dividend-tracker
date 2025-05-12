@@ -8,7 +8,7 @@
     <twig:Table:THead>
         <twig:Table:Tr>
             <twig:Table:ThCol>
-                {{ 'Periode'|trans }}
+                {{ 'Period'|trans }}
             </twig:Table:ThCol>
             <twig:Table:ThCol>
                 {{ 'Capital before'|trans }}
@@ -17,10 +17,16 @@
                 {{ 'Dividend'|trans }}
             </twig:Table:ThCol>
             <twig:Table:ThCol>
+                {{ 'Deposits/Withdrawals'|trans }}
+            </twig:Table:ThCol>
+            <twig:Table:ThCol>
+                {{ 'Reinvested'|trans }}
+            </twig:Table:ThCol>
+            <twig:Table:ThCol>
                 {{ 'Capital after'|trans }}
             </twig:Table:ThCol>
             <twig:Table:ThCol>
-                {{ 'Acumulated Dividend'|trans }}
+                {{ 'Accumulated dividend'|trans }}
             </twig:Table:ThCol>
         </twig:Table:Tr>
     </twig:Table:THead>
@@ -46,6 +52,12 @@
                 </twig:Table:Td>
                 <twig:Table:Td>
                     {{ item.dividend|format_number({"fraction_digit": 2}) }}
+                </twig:Table:Td>
+                <twig:Table:Td>
+                    {{ deposits_withdrawals|format_number({"fraction_digit": 2}) }}
+                </twig:Table:Td>
+                <twig:Table:Td>
+                    {{ (deposits_withdrawals + item.dividend)|format_number({"fraction_digit": 2}) }}
                 </twig:Table:Td>
                 <twig:Table:Td>
                     {{ item.capital_after|format_number({"fraction_digit": 2}) }}

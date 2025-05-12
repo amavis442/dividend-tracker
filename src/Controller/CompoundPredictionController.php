@@ -75,6 +75,7 @@ class CompoundPredictionController extends AbstractController
 				'compound_prediction/calc_compound/_table-results.html.twig',
 				[
 					'data' => $data['data'],
+					'deposits_withdrawals' => $compound->getInvestPerMonth(),
 					'yearlySummary' => $data['yearlySummary'],
 					//'startCapital' => $startCapital,
 					'frequency' => $compound->getFrequency(),
@@ -115,7 +116,7 @@ class CompoundPredictionController extends AbstractController
 				'data' => $capital,
 			],
 			[
-				'label' => $translator->trans('Acumulated dividend'),
+				'label' => $translator->trans('Accumulated dividend'),
 				'data' => $acumulatedDividend,
 			],
 			[

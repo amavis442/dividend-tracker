@@ -147,7 +147,7 @@ class CompoundCalculator
 		$year = 0;
 		$reportRange = $years * $frequency;
 		for ($i = 0; $i < $reportRange; $i++) {
-			$capital += $investPerMonth;
+			//$capital += $investPerMonth;
 			$data[$i]['capital_before'] = $capital;
             $data[$i]['quator'] = '';
 
@@ -157,6 +157,7 @@ class CompoundCalculator
                 $dividend = 0;
             }
 			$capital += $dividend;
+			$capital += $investPerMonth;
 			$data[$i]['dividend'] = $dividend;
 			$data[$i]['capital_after'] = $capital;
 
