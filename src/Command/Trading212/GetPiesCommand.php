@@ -29,7 +29,7 @@ class GetPiesCommand extends Command
 		protected ApiKeyRepository $apiKeyRepository,
 		protected Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
 		protected PieRepository $pieRepository,
-		protected EntityManagerInterface $entityManager,
+		protected EntityManagerInterface $entityManager
 	) {
 		parent::__construct();
 	}
@@ -42,12 +42,12 @@ class GetPiesCommand extends Command
 		InputInterface $input,
 		OutputInterface $output
 	): int {
-        /**
-         * $var \App\Entity\ApiKey
-         */
-        $apiKey = $this->apiKeyRepository->findByApiKeyName('Trading212');
+		/**
+		 * $var \App\Entity\ApiKey
+		 */
+		$apiKey = $this->apiKeyRepository->findByApiKeyName('Trading212');
 		$pieService = new PieService($this->client);
-        $pieService->setApiKey($apiKey->getApiKey());
+		$pieService->setApiKey($apiKey->getApiKey());
 
 		$io = new SymfonyStyle($input, $output);
 		$data = $pieService->getPies();
@@ -56,23 +56,38 @@ class GetPiesCommand extends Command
 			$trading212PieMetaData = new Trading212PieMetaData();
 			$trading212PieMetaData->setTrading212PieId($metaData['id']);
 
-			$pie = $this->pieRepository->findOneBy(['trading212PieId' => $metaData['id']]);
+			$pie = $this->pieRepository->findOneBy([
+				'trading212PieId' => $metaData['id'],
+			]);
 			if ($pie) {
 				$trading212PieMetaData->setPieName($pie->getLabel());
 				$trading212PieMetaData->setPie($pie);
 			}
 
-			$trading212PieMetaData->setPriceAvgInvestedValue($metaData['result']['priceAvgInvestedValue']);
-			$trading212PieMetaData->setPriceAvgValue($metaData['result']['priceAvgValue']);
+			$trading212PieMetaData->setPriceAvgInvestedValue(
+				$metaData['result']['priceAvgInvestedValue']
+			);
+			$trading212PieMetaData->setPriceAvgValue(
+				$metaData['result']['priceAvgValue']
+			);
+
+			$trading212PieMetaData->setGained(
+				$metaData['dividendDetails']['gained']
+			);
+			$trading212PieMetaData->setReinvested(
+				$metaData['dividendDetails']['reinvested']
+			);
+			$trading212PieMetaData->setInCash(
+				$metaData['dividendDetails']['inCash']
+			);
+
 			$trading212PieMetaData->setRaw($metaData);
 
 			$this->entityManager->persist($trading212PieMetaData);
 		}
 		$this->entityManager->flush();
 
-        $io->success(
-			'Trading212 pie meta data succesful stored'
-		);
+		$io->success('Trading212 pie meta data succesful stored');
 
 		return Command::SUCCESS;
 	}

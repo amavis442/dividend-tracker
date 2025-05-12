@@ -46,6 +46,15 @@ class Trading212PieMetaData
     #[ORM\ManyToOne(inversedBy: 'trading212PieMetaData')]
     private ?Pie $pie = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?float $gained = 0.0;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $reinvested = 0.0;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $inCash = 0.0;
+
     public function __construct()
     {
         $this->trading212PieInstruments = new ArrayCollection();
@@ -191,6 +200,42 @@ class Trading212PieMetaData
     public function setPie(?Pie $pie): static
     {
         $this->pie = $pie;
+
+        return $this;
+    }
+
+    public function getGained(): ?float
+    {
+        return $this->gained;
+    }
+
+    public function setGained(?float $gained): static
+    {
+        $this->gained = $gained;
+
+        return $this;
+    }
+
+    public function getReinvested(): ?float
+    {
+        return $this->reinvested;
+    }
+
+    public function setReinvested(?float $reinvested): static
+    {
+        $this->reinvested = $reinvested;
+
+        return $this;
+    }
+
+    public function getInCash(): ?float
+    {
+        return $this->inCash;
+    }
+
+    public function setInCash(?float $inCash): static
+    {
+        $this->inCash = $inCash;
 
         return $this;
     }

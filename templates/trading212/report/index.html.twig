@@ -17,6 +17,9 @@
                     Avg value
                 </twig:Table:ThCol>
                 <twig:Table:ThCol>
+                    Gained
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
                     Created At
                 </twig:Table:ThCol>
                 <twig:Table:ThCol>
@@ -41,6 +44,9 @@
                     </twig:Table:Td>
                     <twig:Table:Td>
                         {{ item.priceAvgValue }}
+                    </twig:Table:Td>
+                    <twig:Table:Td>
+                        {{ item.gained|default('0.0') }}
                     </twig:Table:Td>
                     <twig:Table:Td>
                         {{ item.createdAt ? item.createdAt|date("Y-m-d H:i:s") : '' }}

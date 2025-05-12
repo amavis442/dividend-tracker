@@ -45,30 +45,30 @@ final class Trading212Controller extends AbstractController
 	public function graph(
 		Pie $pie,
 		Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
-		Trading212PieInstrumentRepository $trading212PieInstrumentRepository,
-        TranslatorInterface $translator,
-        ChartBuilderInterface $chartBuilder,
+		TranslatorInterface $translator,
+		ChartBuilderInterface $chartBuilder
 	): Response {
 		$data = $trading212PieMetaDataRepository->findBy(
 			['pie' => $pie],
 			['createdAt' => 'ASC']
 		);
 
-        $metaData = $trading212PieMetaDataRepository->findOneBy(
+		$metaData = $trading212PieMetaDataRepository->findOneBy(
 			['pie' => $pie],
 			['createdAt' => 'DESC']
 		);
-        $instruments = $metaData->getTrading212PieInstruments();
+		$instruments = $metaData->getTrading212PieInstruments();
 
 		$labels = [];
 		$allocationData = [];
 		$valueData = [];
+		$gained = [];
 
 		$colors = Colors::COLORS;
 
-        /**
-         * @var \App\Entity\Trading212PieMetaData $item
-         */
+		/**
+		 * @var \App\Entity\Trading212PieMetaData $item
+		 */
 		foreach ($data as $item) {
 			$allocationData[] = round($item->getPriceAvgInvestedValue(), 2);
 			$valueData[] = round($item->getPriceAvgValue(), 2);
@@ -82,6 +82,10 @@ final class Trading212Controller extends AbstractController
 			[
 				'label' => $translator->trans('Current value'),
 				'data' => $valueData,
+			],
+			[
+				'label' => $translator->trans('Gained'),
+				'data' => $gained,
 			],
 		];
 
@@ -100,6 +104,12 @@ final class Trading212Controller extends AbstractController
 					'backgroundColor' => $colors[1],
 					'borderColor' => $colors,
 					'data' => $chartData[1]['data'],
+				],
+				[
+					'label' => $chartData[2]['label'],
+					'backgroundColor' => $colors[2],
+					'borderColor' => $colors,
+					'data' => $chartData[2]['data'],
 				],
 			],
 		]);
@@ -121,12 +131,12 @@ final class Trading212Controller extends AbstractController
 			],
 		]);
 
-        //$trading212PieInstrumentRepository;
+		//$trading212PieInstrumentRepository;
 
 		return $this->render('trading212/report/graph.html.twig', [
 			'title' => 'Trading212Controller',
-            'chart' => $chart,
-            'instruments' => $instruments,
+			'chart' => $chart,
+			'instruments' => $instruments,
 		]);
 	}
 }
