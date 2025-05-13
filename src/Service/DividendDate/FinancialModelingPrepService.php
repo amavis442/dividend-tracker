@@ -4,33 +4,12 @@ namespace App\Service\DividendDate;
 
 use App\Contracts\Service\DividendDatePluginInterface;
 use App\Entity\Calendar;
-use RuntimeException;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class FinancialModelingPrepService implements DividendDatePluginInterface
+class FinancialModelingPrepService extends AbstractDividendDate implements DividendDatePluginInterface
 {
 	public const URL = 'https://financialmodelingprep.com/api/v3/historical-price-full/stock_dividend/[SYMBOL]?apikey=[API_KEY]'; // source https://github.com/AlmaWeb3/dividend-web
 
 	private array $ignore = ['QQQY'];
-
-
-	/**
-	 * Http client
-	 *
-	 * @var HttpClientInterface
-	 */
-	protected $client;
-	protected $apiKey;
-
-	public function __construct(HttpClientInterface $client)
-	{
-		$this->client = $client;
-	}
-
-	public function setApiKey(?string $apiKey): void
-	{
-		$this->apiKey = $apiKey;
-	}
 
 	public function getData(string $symbol, string $isin): ?array
 	{
@@ -39,12 +18,12 @@ class FinancialModelingPrepService implements DividendDatePluginInterface
 		}
 
 		// API key is only usefull for US stocks so we ignore the rest
-		if (!stripos($isin, 'us')) {
+		if (stripos($isin, 'us') === false) {
 			return [];
 		}
 
 		$url = '';
-		$url = str_replace('[SYMBOL]', $symbol, self::URL);
+		$url = str_replace('[SYMBOL]', $symbol, static::URL);
 		$url = str_replace('[API_KEY]', (string) $this->apiKey, $url);
 
 		$response = $this->client->request('GET', $url);

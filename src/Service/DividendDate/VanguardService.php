@@ -6,7 +6,7 @@ use App\Contracts\Service\DividendDatePluginInterface;
 use RuntimeException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class VanguardService implements DividendDatePluginInterface
+class VanguardService extends AbstractDividendDate implements DividendDatePluginInterface
 {
     public const URL = 'https://api.vanguard.com/rs/gre/gra/1.7.0/datasets/urd-product-port-specific.jsonp?vars=portId:[PORTID],issueType:F&callback=angular.callbacks._4';
 
@@ -17,22 +17,6 @@ class VanguardService implements DividendDatePluginInterface
     public const VAPX_PORTID = 9522;
     public const VUSA_PORTID = 9503;
     public const VGOV_PORTID = 9501;
-
-    /**
-     * Http client
-     *
-     * @var HttpClientInterface
-     */
-    protected $client;
-
-    public function __construct(HttpClientInterface $client)
-    {
-        $this->client = $client;
-    }
-
-    public function setApiKey(?string $api_key): void{
-
-    }
 
     public function getData(string $symbol, string $isin): ?array
     {

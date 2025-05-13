@@ -9,7 +9,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
-class SeekingAlphaService implements DividendDatePluginInterface
+class SeekingAlphaService extends AbstractDividendDate implements DividendDatePluginInterface
 {
     public const TOKEN_URL = "https://seekingalpha.com/market_data/xignite_token";
     public const URL = "https://globalhistorical.xignite.com/";
@@ -17,16 +17,6 @@ class SeekingAlphaService implements DividendDatePluginInterface
     public $translate = [
         'NESN' => 'NSRGY',
     ];
-
-    private HttpClientInterface $client;
-
-    public function __construct(HttpClientInterface $client)
-    {
-        $this->client = $client;
-    }
-
-    public function setApiKey(?string $api_key): void{
-    }
 
     private function getToken()
     {

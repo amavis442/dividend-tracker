@@ -9,30 +9,12 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class NasdaqService implements DividendDatePluginInterface
+class NasdaqService extends AbstractDividendDate implements DividendDatePluginInterface
 {
 	public const URL = 'https://api.nasdaq.com/api/calendar/dividends';
 	public const API_URL = 'https://api.nasdaq.com/api/quote/[SYMBOL]/dividends?assetclass=stocks';
 
 	private array $ignore = [];
-
-	/**
-	 * Http client
-	 *
-	 * @var HttpClientInterface
-	 */
-	protected $client;
-	protected $apiKey;
-
-	public function __construct(HttpClientInterface $client)
-	{
-		$this->client = $client;
-	}
-
-	public function setApiKey(?string $apiKey): void
-	{
-		$this->apiKey = $apiKey;
-	}
 
 	public function getData(string $symbol, string $isin): ?array
 	{
@@ -45,9 +27,16 @@ class NasdaqService implements DividendDatePluginInterface
 		return $this->apiCall($symbol);
 	}
 
+	public function getUrl(string $symbol): string
+	{
+		$apiUrl = str_replace('[SYMBOL]', strtoupper($symbol), static::API_URL);
+
+		return $apiUrl;
+	}
+
 	protected function apiCall($symbol): array
 	{
-		$apiUrl = str_replace('[SYMBOL]', strtoupper($symbol), self::API_URL);
+		$apiUrl = str_replace('[SYMBOL]', strtoupper($symbol), static::API_URL);
 
 		$response = $this->client->request('GET', $apiUrl);
 

@@ -4,11 +4,10 @@ namespace App\Service\DividendDate;
 
 use App\Contracts\Service\DividendDatePluginInterface;
 use OpenSpout\Reader\Common\Creator\ReaderEntityFactory;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use DateTime;
 use DateInterval;
 
-class PimcoService implements DividendDatePluginInterface
+class PimcoService extends AbstractDividendDate implements DividendDatePluginInterface
 {
     public const SSHY_FEED = 'https://nl.pimco.com/en-NL/data/DataExport/DownloadXlsx?exportName=dividendsCapitalGains&cusip=G7110H164&columnNames=DistributionDate,DistributionNav,Dividens,DistributionFactor';
     public const STHS_FEED = 'https://nl.pimco.com/en-NL/data/DataExport/DownloadXlsx?exportName=dividendsCapitalGains&cusip=G7110H321&columnNames=DistributionDate,DistributionNav,Dividens,DistributionFactor';
@@ -24,23 +23,6 @@ class PimcoService implements DividendDatePluginInterface
         '2021-11-18' => ['2021-11-30', '2021-11-19'],
         '2021-12-16' => ['2021-12-30', '2021-12-17'],
     ];
-
-    /**
-     * Http client
-     *
-     * @var HttpClientInterface
-     */
-    protected $client;
-
-    public function __construct(HttpClientInterface $client)
-    {
-        $this->client = $client;
-    }
-
-    public function setApiKey(?string $api_key): void
-    {
-
-    }
 
     public function getData(string $symbol, string $isin): ?array
     {

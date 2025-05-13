@@ -3,29 +3,10 @@
 namespace App\Service\DividendDate;
 
 use App\Contracts\Service\DividendDatePluginInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class IncomeSharesService implements DividendDatePluginInterface
+class IncomeSharesService extends AbstractDividendDate implements DividendDatePluginInterface
 {
 	public const API_URL = 'https://stage.incomeshares.com/api/products/{ISIN}';
-
-	/**
-	 * Http client
-	 *
-	 * @var HttpClientInterface
-	 */
-	protected $client;
-	protected $apiKey;
-
-	public function __construct(HttpClientInterface $client)
-	{
-		$this->client = $client;
-	}
-
-	public function setApiKey(?string $apiKey): void
-	{
-		$this->apiKey = $apiKey;
-	}
 
 	public function getData(string $symbol, string $isin): ?array
 	{

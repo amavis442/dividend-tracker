@@ -174,7 +174,7 @@ class DividendDateService
 			return $this->services[$serviceClass];
 		}
 
-		return $this->services['_default'] ?? null;
+		return $this->services['_default'] ?: null;
 	}
 
 	/**

@@ -3,9 +3,8 @@
 namespace App\Service\DividendDate;
 
 use App\Contracts\Service\DividendDatePluginInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class ISharesService implements DividendDatePluginInterface
+class ISharesService extends AbstractDividendDate implements DividendDatePluginInterface
 {
     public const SEMB_FEED = 'https://www.blackrock.com/nl/particuliere-beleggers/produkten/251824/ishares-jp-morgan-emerging-markets-bond-ucits-etf/1495092399598.ajax?tab=distributions&fileType=json&subtab=table';
     public const ISPA_FEED = 'https://www.ishares.com/nl/particuliere-belegger/nl/producten/251973/ishares-stoxx-global-select-dividend-100-ucits-etf-de-fund/1497735778843.ajax?tab=distributions&fileType=json&subtab=table';
@@ -15,22 +14,6 @@ class ISharesService implements DividendDatePluginInterface
     public const IUS3_SEED = 'https://www.ishares.com/nl/particuliere-belegger/nl/producten/251920/ishares-sp-smallcap-600-ucits-etf/1497735778843.ajax?tab=distributions&fileType=json&subtab=table';
     public const IWDP_SEED = 'https://www.ishares.com/nl/particuliere-belegger/nl/producten/251801/ishares-developed-markets-property-yield-ucits-etf/1497735778843.ajax?tab=distributions&fileType=json&subtab=table';
 
-    /**
-     * Http client
-     *
-     * @var HttpClientInterface
-     */
-    protected $client;
-
-    public function __construct(HttpClientInterface $client)
-    {
-        $this->client = $client;
-    }
-
-    public function setApiKey(?string $api_key): void
-    {
-
-    }
 
     public function getData(string $symbol, string $isin): ?array
     {
