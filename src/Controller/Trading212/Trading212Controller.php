@@ -26,7 +26,7 @@ final class Trading212Controller extends AbstractController
 	#[Route('/', name: 'app_report_trading212_index')]
 	public function index(
 		Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
-		#[MapQueryParameter] $page = 1
+		#[MapQueryParameter] int $page = 1
 	): Response {
 		$queryBuilder = $trading212PieMetaDataRepository->all();
 
@@ -85,7 +85,7 @@ final class Trading212Controller extends AbstractController
 				'data' => $valueData,
 			],
 			[
-				'label' => $translator->trans('Gained'),
+				'label' => $translator->trans('Dividend'),
 				'data' => $gained,
 			],
 		];

@@ -16,14 +16,21 @@
                 <twig:Table:ThCol>
                     {{ 'Average value'|trans }}
                 </twig:Table:ThCol>
+
+                <twig:Table:ThCol>
+                    {{ 'Dividend'|trans }}
+                </twig:Table:ThCol>
+                <twig:Table:ThCol>
+                    {{ 'Dividend percentage'|trans }}
+                </twig:Table:ThCol>
                 <twig:Table:ThCol>
                     {{ 'Average value - average invested'|trans }}
                 </twig:Table:ThCol>
                 <twig:Table:ThCol>
-                    {{ 'Gained'|trans }}
+                    {{ 'Total return'|trans }}
                 </twig:Table:ThCol>
                 <twig:Table:ThCol>
-                    {{ 'Total return'|trans }}
+                    {{ 'Total return percentage'|trans }}
                 </twig:Table:ThCol>
                 <twig:Table:ThCol>
                     {{ 'Created At'|trans }}
@@ -51,24 +58,40 @@
                     <twig:Table:Td>
                         {{ item.priceAvgValue }}
                     </twig:Table:Td>
+
                     <twig:Table:Td>
-                        {% if item.diffValue < 0 %}
-                            <span class="bg-red-500 text-white p-2 rounded-lg flex">{{ item.diffValue|number_format(2) }}</span>
-                        {% else %}
-                            <span class="bg-green-500  p-2 rounded-lg flex">{{ item.diffValue|number_format(2) }}</span>
-                        {% endif %}
+                        <div class="flex">&euro;{{ item.gained|default("0.0") |number_format(2) }}</div>
                     </twig:Table:Td>
                     <twig:Table:Td>
-                        {{ item.gained|default("0.0") }} ( {{ item.gainedPercentage|number_format(2) }} %)
+                        <div class="flex">{{ item.gainedPercentage|default("0.0") |number_format(2) }}%</div>
+                    </twig:Table:Td>
+                                        <twig:Table:Td>
+                        <div class="flex">
+                            {% if item.diffValue < 0 %}
+                                <span class="bg-red-500 text-white p-2 rounded-lg flex">{{ item.diffValue|number_format(2) }}</span>
+                            {% else %}
+                                <span class="bg-green-500 text_white p-2 rounded-lg flex">{{ item.diffValue|number_format(2) }}</span>
+                            {% endif %}
+                        </div>
                     </twig:Table:Td>
                     <twig:Table:Td>
                         {% if item.totalReturn < 0 %}
-                            <span class="bg-red-500 text-white p-2 rounded-lg flex">{{ item.totalReturn|number_format(2) }}</span>
+                            <div class="bg-red-500 text-white p-2 rounded-lg flex align-middle">{{ item.totalReturn|number_format(2) }}</div>
                         {% else %}
-                            <span class="bg-green-500  p-2 rounded-lg flex">{{ item.totalReturn|number_format(2) }}</span>
+                            <div class="bg-green-500 text-white p-2 rounded-lg flex align-middle">{{ item.totalReturn|number_format(2) }}</div>
                         {% endif %}
                     </twig:Table:Td>
-
+                    <twig:Table:Td>
+                        {% if item.totalReturn < 0 %}
+                            <div class="bg-red-500 text-white p-2 rounded-lg flex align-middle">
+                                {{ item.totalReturnPercentage|default("0.0") |number_format(2) }}%
+                            </div>
+                        {% else %}
+                            <div class="bg-green-500 text-white p-2 rounded-lg flex align-middle">
+                                {{ item.totalReturnPercentage|default("0.0") |number_format(2) }}%
+                            </div>
+                        {% endif %}
+                    </twig:Table:Td>
                     <twig:Table:Td>
                         {{ item.createdAt ? item.createdAt|date("Y-m-d H:i:s") : '' }}
                     </twig:Table:Td>

@@ -271,4 +271,9 @@ class Trading212PieMetaData
     {
         return $this->priceAvgValue + $this->gained - $this->priceAvgInvestedValue;
     }
+
+	public function getTotalReturnPercentage(): float
+    {
+        return ($this->getTotalReturn() / $this->priceAvgInvestedValue) * 100;
+    }
 }
