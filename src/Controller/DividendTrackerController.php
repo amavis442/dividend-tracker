@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Helper\Colors;
 use App\Repository\DividendTrackerRepository;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\ExpressionBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,13 +16,23 @@ use Symfony\UX\Chartjs\Model\Chart;
 #[Route(path: "/{_locale<%app.supported_locales%>}/dashboard/tracker")]
 class DividendTrackerController extends AbstractController
 {
-    #[Route(path: "/dividend", name: "dividend_tracker")]
+    #[Route(path: "/dividend/{year}", name: "dividend_tracker", requirements: ['year' => '\d+'])]
     public function index(
         DividendTrackerRepository $dividendTrackerRepository,
         TranslatorInterface $translator,
-        ChartBuilderInterface $chartBuilder
+        ChartBuilderInterface $chartBuilder,
+        int $year = 1,
     ): Response {
-        $data = $dividendTrackerRepository->findAll();
+        if ($year == 1) {
+            $year = date('Y');
+        }
+        $year -= 1;
+
+        $startDate = new \DateTime($year.'-12-31 00:00:00');
+        $expression = (new ExpressionBuilder())->gt('sampleDate', $startDate);
+        $criteria = new Criteria($expression);
+
+        $data = $dividendTrackerRepository->matching($criteria);
         $labels = [];
         $dividendData = [];
         $principleData = [];
