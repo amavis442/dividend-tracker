@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Trading212PieMetaData;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,7 +20,12 @@ class Trading212PieMetaDataRepository extends ServiceEntityRepository
 
 	public function all(): QueryBuilder
 	{
-		return $this->createQueryBuilder('t')->orderBy('t.createdAt', 'DESC');
+		$orderBy = new OrderBy();
+		$orderBy->add('t.createdAt', 'DESC');
+		$orderBy->add('pie.label', 'ASC');
+		return $this->createQueryBuilder('t')
+			->leftJoin('t.pie', 'pie')
+			->orderBy($orderBy);
 	}
 
 	//    /**
