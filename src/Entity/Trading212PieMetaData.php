@@ -43,6 +43,7 @@ class Trading212PieMetaData
 			mappedBy: 'trading212PieMetaData'
 		)
 	]
+	#[ORM\OrderBy(['tickerName'=> 'ASC'])]
 	private Collection $trading212PieInstruments;
 
 	#[ORM\Column(length: 255, nullable: true)]

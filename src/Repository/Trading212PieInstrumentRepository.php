@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Ticker;
 use App\Entity\Trading212PieInstrument;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -14,6 +15,17 @@ class Trading212PieInstrumentRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Trading212PieInstrument::class);
+    }
+
+    public function updateTicker(Ticker $ticker, string $symbol): void
+    {
+        $qb = $this->createQueryBuilder('t')
+        ->update()
+        ->set('t.ticker', $ticker->getId())
+        ->where('t.tickerName = :symbol')
+        ->setParameter(':symbol', $symbol)
+        ->getQuery();
+        $qb->execute();
     }
 
     //    /**
