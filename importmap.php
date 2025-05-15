@@ -301,9 +301,6 @@ return [
     '@stimulus-components/dropdown' => [
         'version' => '3.0.0',
     ],
-    'alpine' => [
-        'version' => '0.2.1',
-    ],
     'byline' => [
         'version' => '4.1.1',
     ],
@@ -330,5 +327,8 @@ return [
     ],
     'string_decoder' => [
         'version' => '0.10.25',
+    ],
+    'alpinejs' => [
+        'version' => '3.14.9',
     ],
 ];
