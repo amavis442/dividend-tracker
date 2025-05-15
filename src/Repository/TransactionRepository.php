@@ -218,4 +218,15 @@ class TransactionRepository extends ServiceEntityRepository
         ;
     }
     */
+
+	public function removePie(Pie $pie): void
+	{
+		$this->createQueryBuilder('t')
+			->update(Transaction::class, 't')
+			->set('t.pie', 'null')
+			->where('t.pie = :pie')
+			->setParameter('pie', $pie)
+			->getQuery()
+			->execute();
+	}
 }

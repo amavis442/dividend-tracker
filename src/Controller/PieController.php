@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Pie;
 use App\Form\PieType;
 use App\Repository\PieRepository;
+use App\Repository\PositionRepository;
+use App\Repository\TransactionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -69,17 +71,15 @@ class PieController extends AbstractController
     }
 
     #[Route(path: '/delete/{id}', name: 'pie_delete', methods: ['POST', 'DELETE'])]
-    public function delete(Request $request, EntityManagerInterface $entityManager, Pie $pie): Response
+    public function delete(Request $request,
+        EntityManagerInterface $entityManager,
+        Pie $pie,
+        TransactionRepository $transactionRepository,
+        ): Response
     {
         if ($this->isCsrfTokenValid('delete' . $pie->getId(), $request->request->get('_token'))) {
-            $positions = $pie->getPositions();
-            foreach ($positions as $position) {
-                $position->removePie($pie);
-            }
-            $transactions = $pie->getTransactions();
-            foreach ($transactions as $transaction) {
-                $transaction->setPie(null);
-            }
+            $entityManager->getConnection()->executeQuery('DELETE FROM pie_position WHERE pie_id = :pie', ['pie'=>$pie->getId()]);
+            $transactionRepository->removePie($pie);
 
             $entityManager->remove($pie);
             $entityManager->flush();
