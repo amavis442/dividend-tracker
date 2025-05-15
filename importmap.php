@@ -231,7 +231,7 @@ return [
         'version' => '2.0.5',
     ],
     'marked' => [
-        'version' => '14.1.2',
+        'version' => '4.0.12',
     ],
     'turndown' => [
         'version' => '7.2.0',
@@ -240,7 +240,7 @@ return [
         'version' => '1.0.2',
     ],
     'color-parse' => [
-        'version' => '2.0.2',
+        'version' => '1.4.2',
     ],
     'color-convert' => [
         'version' => '2.0.1',
@@ -249,7 +249,7 @@ return [
         'version' => '0.7.2',
     ],
     'color-name' => [
-        'version' => '2.0.0',
+        'version' => '1.1.4',
     ],
     'js-confetti' => [
         'version' => '0.12.0',
@@ -300,5 +300,35 @@ return [
     ],
     '@stimulus-components/dropdown' => [
         'version' => '3.0.0',
+    ],
+    'alpine' => [
+        'version' => '0.2.1',
+    ],
+    'byline' => [
+        'version' => '4.1.1',
+    ],
+    'underscore.string' => [
+        'version' => '2.3.3',
+    ],
+    'through2' => [
+        'version' => '0.6.2',
+    ],
+    'readable-stream/transform' => [
+        'version' => '1.0.31',
+    ],
+    'xtend' => [
+        'version' => '4.0.0',
+    ],
+    'core-util-is' => [
+        'version' => '1.0.1',
+    ],
+    'inherits' => [
+        'version' => '2.0.1',
+    ],
+    'isarray' => [
+        'version' => '0.0.1',
+    ],
+    'string_decoder' => [
+        'version' => '0.10.25',
     ],
 ];
