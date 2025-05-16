@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+{% block title %}Result of import csv file!{% endblock %}
+{% block body %}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <div class="w-1/2 mx-auto border rounded-lg shadow-white bg-white px-3 py-2 ">
+                    <div id="header" class="px-3 py-2 w-full mb-4">
+                        <twig:Head>
+                            {{ 'Import Globalx'|trans }}
+                        </twig:Head>
+                    </div>
+                    <div class="mb-4">
+                        {% for notice in app.flashes('notice') %}
+                            <twig:Alert variant="danger">
+                                {{ notice|trans }}
+                            </twig:Alert>
+                        {% endfor %}
+                    </div>
+                    <twig:Button tag="a" href="{{ path("globalx_import") }}">
+                        Back
+                    </twig:Button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

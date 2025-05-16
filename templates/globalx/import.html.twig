@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+{% block title %}Import csv file!{% endblock %}
+{% block body %}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <div class="w-1/2 mx-auto border rounded-lg shadow-white bg-white px-3 py-2 ">
+                    <div class="mb-4">
+                        {% for notice in app.flashes('notice') %}
+                            <twig:Alert variant="danger">
+                                {{ notice|trans }}
+                            </twig:Alert variant="danger">
+                        {% endfor %}
+                    </div>
+                    <div id="header" class="px-3 py-2 w-full mb-4">
+                        <twig:Head>
+                            {{ 'Import globalx html'|trans }}
+                        </twig:Head>
+                    </div>
+                    {{ form_start(form,{
+                                            'attr': {'class': 'p-10',
+                                             }
+                                            }) }}
+                        {{ form_errors(form) }}
+                        <div class="flex flex-col">
+                            <div class="w-full flex-inline mb-4">
+                                {{ form_widget(form.importfile) }}
+
+                                {{ form_help(form.importfile, {'attr': {'class': 'mt-1 text-sm text-gray-500 dark:text-gray-300','id': 'file_upload_help' }}) }}
+                            </div>
+                            {% if form.importfile.vars.errors|length %}
+                                <twig:Alert variant="danger">
+                                    {{ form_errors(form.importfile) }}
+                                </twig:Alert>
+                            {% endif %}
+                            {{ form_row(form.ticker) }}
+                            <div>
+                                <twig:Button>
+                                    <i class="far fa-save"></i>
+                                </twig:Button>
+                            </div>
+                        </div>
+                    {{ form_end(form) }}
+                    <div class="mb-4">
+                        <twig:Button tag="a"
+                                     class="btn btn-secondary"
+                                     href="{{ path("portfolio_index") }}">
+                            {{ 'Back'|trans }}
+                        </twig:Button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

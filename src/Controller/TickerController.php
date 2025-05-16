@@ -17,7 +17,7 @@ use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
-#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/ticker')]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/admin/ticker')]
 class TickerController extends AbstractController
 {
     public const SESSION_KEY = 'tickercontroller_session';
