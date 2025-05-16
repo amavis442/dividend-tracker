@@ -27,10 +27,6 @@ class AllocationPerPositionController extends AbstractController
 		ChartBuilderInterface $chartBuilder,
 		CacheInterface $pool
 	) {
-		//$positions = $positionRepository->getOpenPositions();
-		//$allocated = $positionRepository->getSumAllocated();
-		$pool->delete('allocation_per_position_report');
-
 		$colors = Colors::COLORS;
 		$result = $pool->get('allocation_per_position_report', function (
 			ItemInterface $item
