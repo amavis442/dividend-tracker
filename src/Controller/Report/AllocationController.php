@@ -37,7 +37,7 @@ class AllocationController extends AbstractController
 			'labels' => $result['labels'],
 			'datasets' => [
 				[
-					'label' => 'Allocation',
+					'label' => 'Percentage',
 					'data' => $result['data'],
 				],
 			],

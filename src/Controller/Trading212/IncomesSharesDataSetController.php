@@ -249,6 +249,7 @@ final class IncomesSharesDataSetController extends AbstractController
 		$allocationData = [];
 		$totalReturnData = [];
 		$distributionData = [];
+		$currentValueData = [];
 
 		$colors = Colors::COLORS;
 
@@ -261,7 +262,7 @@ final class IncomesSharesDataSetController extends AbstractController
 				2
 			);
 			$distributionData[] = round($item->getTotalDistribution(), 2);
-
+			$currentValueData[] = $item->getTotalAllocation() + $item->getTotalProfitLoss();
 			$labels[] = $item->getCreatedAt()->format('d-m-Y');
 		}
 		$chartData = [
@@ -276,6 +277,10 @@ final class IncomesSharesDataSetController extends AbstractController
 			[
 				'label' => $translator->trans('Distributions'),
 				'data' => $distributionData,
+			],
+			[
+				'label' => $translator->trans('Current value'),
+				'data' => $currentValueData,
 			],
 		];
 
@@ -301,6 +306,12 @@ final class IncomesSharesDataSetController extends AbstractController
 					'backgroundColor' => $colors[2],
 					'borderColor' => $colors,
 					'data' => $chartData[2]['data'],
+				],
+				[
+					'label' => $chartData[3]['label'],
+					'backgroundColor' => $colors[3],
+					'borderColor' => $colors,
+					'data' => $chartData[3]['data'],
 				],
 			],
 		]);
