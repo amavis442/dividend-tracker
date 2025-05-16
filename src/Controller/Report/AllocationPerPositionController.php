@@ -24,48 +24,53 @@ class AllocationPerPositionController extends AbstractController
 	#[Route(path: '/allocation/position', name: 'report_allocation_position')]
 	public function index(
 		PositionRepository $positionRepository,
-		PortfolioRepository $portfolioRepository,
-		AllocationModel $allocation,
 		ChartBuilderInterface $chartBuilder,
 		CacheInterface $pool
 	) {
-		/**
-		 * @var \App\Entity\User $user
-		 */
-		$user = $this->getUser();
-		/**
-		 * @var Portfolio|null $portfolio
-		 */
-		$portfolio = $portfolioRepository->findOneBy([
-			'user' => $user->getId(),
-		]);
-		if (!$portfolio) {
-			$portfolio = new Portfolio(); // do not want to trhow an exception but just use an empty entity
-		}
-
-		$result = $pool->get('allocation_per_position_report', function (
-			ItemInterface $item
-		) use ($allocation, $positionRepository, $portfolio) {
-			$item->expiresAfter(3600);
-			return $allocation->position(
-				$positionRepository,
-				$portfolio->getInvested()
-			);
-		});
-		//$result = $allocation->position($positionRepository, $portfolio->getInvested());
+		//$positions = $positionRepository->getOpenPositions();
+		//$allocated = $positionRepository->getSumAllocated();
+		$pool->delete('allocation_per_position_report');
 
 		$colors = Colors::COLORS;
+		$result = $pool->get('allocation_per_position_report', function (
+			ItemInterface $item
+		) use ($positionRepository, $colors) {
+			$item->expiresAfter(3600);
 
-		$chart = $chartBuilder->createChart(Chart::TYPE_PIE);
+			$positions = $positionRepository->getOpenPositions();
+			$allocated = $positionRepository->getSumAllocated();
+
+			$labels = [];
+			$data = [];
+			$backgroundColor = [];
+			$index = 0;
+			foreach ($positions as $position) {
+				$labels[] = $position->getTicker()->getFullname();
+				$percentage = round(
+					($position->getAllocation() / $allocated) * 100,
+					2
+				);
+				$data[] = $percentage;
+				$backgroundColor[] = $colors[$index];
+				$index++;
+			}
+
+			return ['labels' => $labels, 'data' => $data, 'backgroundColor' => $backgroundColor];
+		});
+
+		$labels = $result['labels'];
+		$data = $result['data'];
+		$backgroundColor = $result['backgroundColor'];
+
+		$chart = $chartBuilder->createChart(Chart::TYPE_DOUGHNUT);
 
 		$chart->setData([
-			'labels' => $result['labels'],
+			'labels' => $labels,
 			'datasets' => [
 				[
-					'label' => 'Allocation',
-					'backgroundColor' => $colors,
-					'borderColor' => $colors,
-					'data' => $result['data'],
+					'label' => 'Percentage',
+					'backgroundColor' => $backgroundColor,
+					'data' => $data,
 				],
 			],
 		]);
@@ -88,8 +93,6 @@ class AllocationPerPositionController extends AbstractController
 		]);
 
 		return $this->render('report/allocation/position.html.twig', [
-			'portfolio' => $portfolio,
-			'controller_name' => 'ReportController',
 			'chart' => $chart,
 		]);
 	}
