@@ -36,6 +36,7 @@ class IncomeSharesService extends AbstractDividendDate implements DividendDatePl
             'GET',
             $url
         );
+		$content = '';
 		if ($response->getStatusCode() === 200) {
 			$content = $response->getContent(false);
 		}
