@@ -68,7 +68,7 @@
                                                 {{ incomes_shares_data_set.totalAllocation }}
                                             </twig:Table:Td>
                                             <twig:Table:Td>
-                                                {{ incomes_shares_data_set.yield }}
+                                                {{ incomes_shares_data_set.yield|number_format(2) }}%
                                             </twig:Table:Td>
                                             <twig:Table:Td>
                                                 {{ incomes_shares_data_set.createdAt ? incomes_shares_data_set.createdAt|date("Y-m-d H:i:s") : '' }}
