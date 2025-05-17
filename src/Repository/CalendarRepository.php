@@ -143,6 +143,55 @@ class CalendarRepository extends ServiceEntityRepository
 		return $queryBuilder->getOneOrNullResult();
 	}
 
+	public function getCurrentDividend(Ticker $ticker)
+	{
+		$date = new DateTime('now');
+		$date->modify('last day of this month');
+		$paymentLimit = $date->format('Y-m-d');
+
+		$queryBuilder = $this->createQueryBuilder('c')
+			->select('c')
+			->innerJoin('c.ticker', 't')
+			->where('t = :ticker')
+			->andWhere('c.paymentDate < :paymentDate')
+			->setParameter('ticker', $ticker)
+			->setParameter('paymentDate', $paymentLimit)
+			->orderBy('c.paymentDate', 'DESC')
+			->setMaxResults(1)
+			->getQuery();
+
+		$result = $queryBuilder->getOneOrNullResult();
+		if (!$result) {
+			return 0.0;
+		}
+		return $result->getCashAmount();
+	}
+
+	public function getAvgDividend(Ticker $ticker)
+	{
+		$date = new DateTime('now');
+		$date->modify('first day of January this year');
+		$paymentLimit = $date->format('Y-m-d');
+
+		$queryBuilder = $this->createQueryBuilder('c')
+			->select('AVG(c.cashAmount) avgDividend')
+			->innerJoin('c.ticker', 't')
+			->where('t = :ticker')
+			->andWhere('c.paymentDate >= :paymentDate')
+			->setParameter('ticker', $ticker)
+			->setParameter('paymentDate', $paymentLimit)
+			->groupBy('c.ticker')
+			->setMaxResults(1)
+			->getQuery();
+
+		$result = $queryBuilder->getOneOrNullResult();
+		if (!$result) {
+			return 0.0;
+		}
+		return $result['avgDividend'];
+	}
+
+
 	public function getLastestDividends(array $ticker_ids): mixed
 	{
 		$em = $this->getEntityManager();

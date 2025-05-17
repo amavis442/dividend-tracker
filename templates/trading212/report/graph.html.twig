@@ -9,6 +9,9 @@
                         'data-controller': 'chartjs-add-euro-sign'
                         }) }}
         </div>
+        <div style="width:900px;
+                    height:600px"
+             class="border border-gray-500 p-2 mb-4 rounded-lg">{{ render_chart(chartInstruments) }}</div>
         <div style="w-full">
             <div class="mb-2">
                 <twig:Head variant="h4">
@@ -19,12 +22,6 @@
                 <twig:Table:THead>
                     <tr>
                         <twig:Table:ThCol class="rounded-l-lg">
-                            Id
-                        </twig:Table:ThCol>
-                        <twig:Table:ThCol>
-                            {{'Ticker'|trans}}
-                        </twig:Table:ThCol>
-                        <twig:Table:ThCol>
                             {{'Ticker'|trans}}
                         </twig:Table:ThCol>
                         <twig:Table:ThCol>
@@ -40,59 +37,78 @@
                             {{'Avg value - Invested'|trans}}
                         </twig:Table:ThCol>
                         <twig:Table:ThCol>
-                            {{'Created At'|trans}}
+                            {{'Current dividend per share'|trans}}
                         </twig:Table:ThCol>
                         <twig:Table:ThCol>
-                            {{'Updated At'|trans}}
+                            {{'Current Dividend'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Current Yearly Yield'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Avg dividend per share'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Avg expected'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Avg Yearly Yield'|trans}}
                         </twig:Table:ThCol>
                     </tr>
                 </twig:Table:THead>
                 <tbody>
                     {% for instrument in instruments %}
+                        {% set sign = instrument.ticker and instrument.ticker.currency ? instrument.ticker.currency.sign : '$' %}
                         <twig:Table:Tr>
                             <twig:Table:ThRow>
-                                {{ instrument.id }}
-                            </twig:Table:ThRow>
-                            <twig:Table:Td>
-                                {{ instrument.tickerName }}
-                            </twig:Table:Td>
-                            <twig:Table:Td>
                                 {% if instrument.ticker %}
                                     {{ instrument.ticker.fullname }}
                                 {% else %}
-                                    &mdash;
+                                    {{ instrument.tickerName }}
                                 {% endif %}
+                            </twig:Table:ThRow>
+                            <twig:Table:Td>
+                               {{ instrument.ownedQuantity }}
                             </twig:Table:Td>
                             <twig:Table:Td>
-                                {{ instrument.ownedQuantity }}
-                            </twig:Table:Td>
-                            <twig:Table:Td>
-                                {{ instrument.priceAvgInvestedValue }}
+                                &euro;{{ instrument.priceAvgInvestedValue|number_format(2) }}
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 {% if instrument.priceAvgValue < instrument.priceAvgInvestedValue %}
-                                    <span class="bg-red-500 text-white p-2 rounded-lg flex">{{ instrument.priceAvgValue }}</span>
+                                    <span class="bg-red-500 text-white p-2 rounded-lg flex">&euro;{{ instrument.priceAvgValue|number_format(2) }}</span>
                                 {% else %}
-                                    <span class="bg-green-500  p-2 rounded-lg flex">{{ instrument.priceAvgValue }}</span>
+                                    <span class="bg-green-500  p-2 rounded-lg flex">&euro;{{ instrument.priceAvgValue|number_format(2) }}</span>
                                 {% endif %}
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 {% if instrument.priceAvgValue < instrument.priceAvgInvestedValue %}
-                                    <span class="bg-red-500 text-white p-2 rounded-lg flex">{{ instrument.priceAvgValue - instrument.priceAvgInvestedValue }}</span>
+                                    <span class="bg-red-500 text-white p-2 rounded-lg flex">&euro;{{ (instrument.priceAvgValue - instrument.priceAvgInvestedValue)|number_format(3) }}</span>
                                 {% else %}
-                                    <span class="bg-green-500  p-2 rounded-lg flex">{{ instrument.priceAvgValue - instrument.priceAvgInvestedValue }}</span>
+                                    <span class="bg-green-500  p-2 rounded-lg flex">&euro;{{ (instrument.priceAvgValue - instrument.priceAvgInvestedValue)|number_format(3) }}</span>
                                 {% endif %}
                             </twig:Table:Td>
                             <twig:Table:Td>
-                                {{ instrument.createdAt ? instrument.createdAt|date("Y-m-d H:i:s") : '' }}
+                                {{sign }}{{ instrument.currentDividendPerShare|number_format(2) }}
                             </twig:Table:Td>
                             <twig:Table:Td>
-                                {{ instrument.updatedAt ? instrument.updatedAt|date("Y-m-d H:i:s") : '' }}
+                                &euro;{{ instrument.currentDividend|number_format(2) }}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {{ instrument.currentYearlyYield|number_format(2) }}%
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                 {{sign }}{{ instrument.avgDividendPerShare|number_format(2) }}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                 &euro;{{ instrument.avgExpectedDividend|number_format(2) }}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {{ instrument.avgYearlyYield|number_format(2) }}%
                             </twig:Table:Td>
                         </twig:Table:Tr>
                     {% else %}
                         <tr>
-                            <twig:Table:Td colspan="8">
+                            <twig:Table:Td colspan="11">
                                 no records found
                             </twig:Table:Td>
                         </tr>

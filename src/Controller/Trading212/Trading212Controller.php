@@ -4,8 +4,10 @@ namespace App\Controller\Trading212;
 
 use App\Entity\Pie;
 use App\Helper\Colors;
+use App\Repository\CalendarRepository;
 use App\Repository\Trading212PieInstrumentRepository;
 use App\Repository\Trading212PieMetaDataRepository;
+use App\Service\ExchangeRate\ExchangeRateInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -45,19 +47,73 @@ final class Trading212Controller extends AbstractController
 	public function graph(
 		Pie $pie,
 		Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
+		CalendarRepository $calendarRepository,
 		TranslatorInterface $translator,
+		ExchangeRateInterface $exchangeRate,
 		ChartBuilderInterface $chartBuilder
 	): Response {
-		$data = $trading212PieMetaDataRepository->findBy(
-			['pie' => $pie],
-			['createdAt' => 'ASC']
-		);
 
+		/**
+		 * @var \App\Entity\Trading212PieMetaData $metaData
+		 */
 		$metaData = $trading212PieMetaDataRepository->findOneBy(
 			['pie' => $pie],
 			['createdAt' => 'DESC']
 		);
 		$instruments = $metaData->getTrading212PieInstruments();
+		$pieAvgInvested = $metaData->getPriceAvgInvestedValue();
+		$rates = $exchangeRate->getRates();
+		$rateDollarEuro = 1 / $rates['USD'];
+
+		$pieInstruments = [];
+
+		/**
+		 * @var \App\Entity\Trading212PieInstrument $instrument
+		 */
+		foreach ($instruments as $instrument) {
+			$ticker = $instrument->getTicker();
+			if (!$ticker || $instrument->getPriceAvgInvestedValue() == 0) continue;
+			$tax = $ticker->getTax()->getTaxRate() / 100;
+
+			$owned = $instrument->getOwnedQuantity();
+			// Current
+			$currentDividend = $calendarRepository->getCurrentDividend($ticker);
+			$instrument->setCurrentDividendPerShare($currentDividend);
+
+			$totalCurrentDividend =
+				$currentDividend * $owned * (1 - $tax) * $rateDollarEuro;
+			$instrument->setCurrentDividend($totalCurrentDividend);
+
+			$currentYearlYield = (($ticker->getPayoutFrequency() * $totalCurrentDividend) / $instrument->getPriceAvgInvestedValue()) *100;
+			$instrument->setCurrentYearlyYield($currentYearlYield);
+
+			// Avg
+			$avgDividend = $calendarRepository->getAvgDividend($ticker);
+			$instrument->setAvgDividendPerShare($avgDividend);
+
+			$avgExpectedDividend =
+				$avgDividend * $owned * (1 - $tax) * $rateDollarEuro;
+			$instrument->setAvgExpectedDividend($avgExpectedDividend);
+
+			$avgYearlYield = (($ticker->getPayoutFrequency() * $avgExpectedDividend) / $instrument->getPriceAvgInvestedValue()) *100;
+			$instrument->setAvgYearlyYield($avgYearlYield);
+
+			$pieShare = round(($instrument->getPriceAvgInvestedValue() / $pieAvgInvested) * 100, 2);
+			$pieInstruments['labels'][] = $ticker->getFullname();
+			$pieInstruments['data'][] = $pieShare;
+
+		}
+
+		$chartInstruments = $chartBuilder->createChart(Chart::TYPE_DOUGHNUT);
+		$chartInstruments->setData([
+			'labels' => $pieInstruments['labels'],
+			'datasets' => [
+				[
+					'label' => 'Percentage',
+					'data' => $pieInstruments['data'],
+				],
+			],
+		]);
 
 		$labels = [];
 		$allocationData = [];
@@ -66,13 +122,18 @@ final class Trading212Controller extends AbstractController
 
 		$colors = Colors::COLORS;
 
+		$data = $trading212PieMetaDataRepository->findBy(
+			['pie' => $pie],
+			['createdAt' => 'ASC']
+		);
+
 		/**
 		 * @var \App\Entity\Trading212PieMetaData $item
 		 */
 		foreach ($data as $item) {
 			$allocationData[] = round($item->getPriceAvgInvestedValue(), 2);
 			$valueData[] = round($item->getPriceAvgValue(), 2);
-			$gained[] =  round($item->getGained(), 2);
+			$gained[] = round($item->getGained(), 2);
 			$labels[] = $item->getCreatedAt()->format('d-m-Y');
 		}
 		$chartData = [
@@ -138,6 +199,7 @@ final class Trading212Controller extends AbstractController
 			'title' => 'Trading212Controller',
 			'chart' => $chart,
 			'instruments' => $instruments,
+			'chartInstruments' => $chartInstruments,
 		]);
 	}
 }

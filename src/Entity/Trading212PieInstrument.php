@@ -49,6 +49,14 @@ class Trading212PieInstrument
     #[ORM\ManyToOne(inversedBy: 'trading212PieInstruments')]
     private ?Ticker $ticker = null;
 
+    private ?float $avgDividendPerShare = 0.0;
+    private ?float $avgExpectedDividend = 0.0;
+    private ?float $currentDividendPerShare = 0.0;
+    private ?float $currentDividend = 0.0;
+    private ?float $currentYearlyYield = 0.0;
+    private ?float $avgYearlyYield = 0.0;
+
+
     #[ORM\PrePersist]
 	public function setCreatedAtValue(): void
 	{
@@ -198,4 +206,148 @@ class Trading212PieInstrument
 
         return $this;
     }
+
+	/**
+	 * Get the value of avgDividendPerShare
+	 *
+	 * @return  float
+	 */
+	public function getAvgDividendPerShare(): float
+	{
+		return $this->avgDividendPerShare;
+	}
+
+	/**
+	 * Set the value of avgDividendPerShare
+	 *
+	 * @param   float  $avgDividendPerShare
+	 *
+	 * @return  self
+	 */
+	public function setAvgDividendPerShare(float $avgDividendPerShare): self
+	{
+		$this->avgDividendPerShare = $avgDividendPerShare;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of currentDividendPerShare
+	 *
+	 * @return  float
+	 */
+	public function getCurrentDividendPerShare(): float
+	{
+		return $this->currentDividendPerShare;
+	}
+
+	/**
+	 * Set the value of currentDividendPerShare
+	 *
+	 * @param   float  $currentDividendPerShare
+	 *
+	 * @return  self
+	 */
+	public function setCurrentDividendPerShare(float $currentDividendPerShare): self
+	{
+		$this->currentDividendPerShare = $currentDividendPerShare;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of avgExpectedDividend
+	 *
+	 * @return  float
+	 */
+	public function getAvgExpectedDividend(): float
+	{
+		return $this->avgExpectedDividend;
+	}
+
+	/**
+	 * Set the value of avgExpectedDividend
+	 *
+	 * @param   float  $avgExpectedDividend
+	 *
+	 * @return  self
+	 */
+	public function setAvgExpectedDividend(float $avgExpectedDividend): self
+	{
+		$this->avgExpectedDividend = $avgExpectedDividend;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of currentDividend
+	 *
+	 * @return  float
+	 */
+	public function getCurrentDividend(): float
+	{
+		return $this->currentDividend;
+	}
+
+	/**
+	 * Set the value of currentDividend
+	 *
+	 * @param   float  $currentDividend
+	 *
+	 * @return  self
+	 */
+	public function setCurrentDividend(float $currentDividend): self
+	{
+		$this->currentDividend = $currentDividend;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of currentYearlyYield
+	 *
+	 * @return  float
+	 */
+	public function getCurrentYearlyYield(): float
+	{
+		return $this->currentYearlyYield;
+	}
+
+	/**
+	 * Set the value of currentYearlyYield
+	 *
+	 * @param   float  $currentYearlyYield
+	 *
+	 * @return  self
+	 */
+	public function setCurrentYearlyYield(float $currentYearlyYield): self
+	{
+		$this->currentYearlyYield = $currentYearlyYield;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of avgYearlyYield
+	 *
+	 * @return  float
+	 */
+	public function getAvgYearlyYield(): float
+	{
+		return $this->avgYearlyYield;
+	}
+
+	/**
+	 * Set the value of avgYearlyYield
+	 *
+	 * @param   float  $avgYearlyYield
+	 *
+	 * @return  self
+	 */
+	public function setAvgYearlyYield(float $avgYearlyYield): self
+	{
+		$this->avgYearlyYield = $avgYearlyYield;
+
+		return $this;
+	}
 }
