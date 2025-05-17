@@ -88,7 +88,7 @@
                                 {% endif %}
                             </twig:Table:Td>
                             <twig:Table:Td>
-                                {{sign }}{{ instrument.currentDividendPerShare|number_format(2) }}
+                                {{sign|raw }}{{ instrument.currentDividendPerShare|number_format(2) }}
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 &euro;{{ instrument.currentDividend|number_format(2) }}
@@ -97,7 +97,7 @@
                                 {{ instrument.currentYearlyYield|number_format(2) }}%
                             </twig:Table:Td>
                             <twig:Table:Td>
-                                 {{sign }}{{ instrument.avgDividendPerShare|number_format(2) }}
+                                 {{sign|raw }}{{ instrument.avgDividendPerShare|number_format(2) }}
                             </twig:Table:Td>
                             <twig:Table:Td>
                                  &euro;{{ instrument.avgExpectedDividend|number_format(2) }}
