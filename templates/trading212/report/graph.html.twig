@@ -15,7 +15,7 @@
         <div style="w-full">
             <div class="mb-2">
                 <twig:Head variant="h4">
-                    Instruments
+                    {{'Instruments in %pie%'|trans{'%pie%': metaData.pieName|default('')} }}
                 </twig:Head>
                 <div class="font-bold font-lg border rounded bg-green-500 p-1 text-white text-center">
                     {{ 'Dividend received'|trans }}: &euro;{{ metaData.gained }}
