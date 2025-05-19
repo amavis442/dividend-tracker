@@ -5,6 +5,7 @@ namespace App\Controller\Trading212;
 use App\Entity\Pie;
 use App\Helper\Colors;
 use App\Repository\CalendarRepository;
+use App\Repository\PaymentRepository;
 use App\Repository\Trading212PieInstrumentRepository;
 use App\Repository\Trading212PieMetaDataRepository;
 use App\Service\ExchangeRate\ExchangeRateInterface;
@@ -48,11 +49,11 @@ final class Trading212Controller extends AbstractController
 		Pie $pie,
 		Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
 		CalendarRepository $calendarRepository,
+		PaymentRepository $paymentRepository,
 		TranslatorInterface $translator,
 		ExchangeRateInterface $exchangeRate,
 		ChartBuilderInterface $chartBuilder
 	): Response {
-
 		/**
 		 * @var \App\Entity\Trading212PieMetaData $metaData
 		 */
@@ -66,13 +67,17 @@ final class Trading212Controller extends AbstractController
 		$rateDollarEuro = 1 / $rates['USD'];
 
 		$pieInstruments = [];
-
+		$pieDividend = 0.0; // What is actually paid will be a computed on latest paydat so can be inaccurate. Trading212 does not split up payments by pie instruments :(
+		$pieCurrentDividend = 0.0;
+		$pieAvgDividend = 0.0;
 		/**
 		 * @var \App\Entity\Trading212PieInstrument $instrument
 		 */
 		foreach ($instruments as $instrument) {
 			$ticker = $instrument->getTicker();
-			if (!$ticker || $instrument->getPriceAvgInvestedValue() == 0) continue;
+			if (!$ticker || $instrument->getPriceAvgInvestedValue() == 0) {
+				continue;
+			}
 			$tax = $ticker->getTax()->getTaxRate() / 100;
 
 			$owned = $instrument->getOwnedQuantity();
@@ -84,8 +89,12 @@ final class Trading212Controller extends AbstractController
 				$currentDividend * $owned * (1 - $tax) * $rateDollarEuro;
 			$instrument->setCurrentDividend($totalCurrentDividend);
 
-			$currentYearlYield = (($ticker->getPayoutFrequency() * $totalCurrentDividend) / $instrument->getPriceAvgInvestedValue()) *100;
+			$currentYearlYield =
+				(($ticker->getPayoutFrequency() * $totalCurrentDividend) /
+					$instrument->getPriceAvgInvestedValue()) *
+				100;
 			$instrument->setCurrentYearlyYield($currentYearlYield);
+			$pieCurrentDividend += $totalCurrentDividend;
 
 			// Avg
 			$avgDividend = $calendarRepository->getAvgDividend($ticker);
@@ -95,13 +104,35 @@ final class Trading212Controller extends AbstractController
 				$avgDividend * $owned * (1 - $tax) * $rateDollarEuro;
 			$instrument->setAvgExpectedDividend($avgExpectedDividend);
 
-			$avgYearlYield = (($ticker->getPayoutFrequency() * $avgExpectedDividend) / $instrument->getPriceAvgInvestedValue()) *100;
+			$avgYearlYield =
+				(($ticker->getPayoutFrequency() * $avgExpectedDividend) /
+					$instrument->getPriceAvgInvestedValue()) *
+				100;
 			$instrument->setAvgYearlyYield($avgYearlYield);
+			$pieAvgDividend += $avgExpectedDividend;
 
-			$pieShare = round(($instrument->getPriceAvgInvestedValue() / $pieAvgInvested) * 100, 2);
+			$pieShare = round(
+				($instrument->getPriceAvgInvestedValue() / $pieAvgInvested) *
+					100,
+				2
+			);
 			$pieInstruments['labels'][] = $ticker->getFullname();
 			$pieInstruments['data'][] = $pieShare;
 
+			/**
+			 * @var \App\Entity\Payment $payment
+			 */
+			$payment = $paymentRepository->getLastDividend(
+				$ticker,
+				$instrument->getCreatedAt()
+			);
+			if ($payment) {
+				$amount = $payment->getAmount();
+				$dividend = $payment->getDividend();
+				$instrumentDividendPaid = ($dividend / $amount) * $owned;
+				$instrument->setDividendPaid($instrumentDividendPaid);
+				$pieDividend += $instrumentDividendPaid;
+			}
 		}
 
 		$chartInstruments = $chartBuilder->createChart(Chart::TYPE_DOUGHNUT);
@@ -197,6 +228,10 @@ final class Trading212Controller extends AbstractController
 
 		return $this->render('trading212/report/graph.html.twig', [
 			'title' => 'Trading212Controller',
+			'metaData' => $metaData,
+			'pieDividend' => $pieDividend,
+			'pieCurrentDividend' => $pieCurrentDividend,
+			'pieAvgDividend' => $pieAvgDividend,
 			'chart' => $chart,
 			'instruments' => $instruments,
 			'chartInstruments' => $chartInstruments,

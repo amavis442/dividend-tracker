@@ -17,6 +17,9 @@
                 <twig:Head variant="h4">
                     Instruments
                 </twig:Head>
+                <div class="font-bold font-lg border rounded bg-green-500 p-1 text-white text-center">
+                    {{ 'Dividend received'|trans }}: &euro;{{ metaData.gained }}
+                </div>
             </div>
             <twig:Table:Table class="max-w-min min-w-full">
                 <twig:Table:THead>
@@ -54,6 +57,9 @@
                         <twig:Table:ThCol>
                             {{'Avg Yearly Yield'|trans}}
                         </twig:Table:ThCol>
+                        <twig:Table:ThCol class="w-1/12">
+                            {{'Dividend Paid'|trans}}
+                        </twig:Table:ThCol>
                     </tr>
                 </twig:Table:THead>
                 <tbody>
@@ -68,7 +74,7 @@
                                 {% endif %}
                             </twig:Table:ThRow>
                             <twig:Table:Td>
-                               {{ instrument.ownedQuantity }}
+                                {{ instrument.ownedQuantity }}
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 &euro;{{ instrument.priceAvgInvestedValue|number_format(2) }}
@@ -77,18 +83,18 @@
                                 {% if instrument.priceAvgValue < instrument.priceAvgInvestedValue %}
                                     <span class="bg-red-500 text-white p-2 rounded-lg flex">&euro;{{ instrument.priceAvgValue|number_format(2) }}</span>
                                 {% else %}
-                                    <span class="bg-green-500  p-2 rounded-lg flex">&euro;{{ instrument.priceAvgValue|number_format(2) }}</span>
+                                    <span class="bg-green-500 text-white p-2 rounded-lg flex">&euro;{{ instrument.priceAvgValue|number_format(2) }}</span>
                                 {% endif %}
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 {% if instrument.priceAvgValue < instrument.priceAvgInvestedValue %}
                                     <span class="bg-red-500 text-white p-2 rounded-lg flex">&euro;{{ (instrument.priceAvgValue - instrument.priceAvgInvestedValue)|number_format(3) }}</span>
                                 {% else %}
-                                    <span class="bg-green-500  p-2 rounded-lg flex">&euro;{{ (instrument.priceAvgValue - instrument.priceAvgInvestedValue)|number_format(3) }}</span>
+                                    <span class="bg-green-500 text-white p-2 rounded-lg flex">&euro;{{ (instrument.priceAvgValue - instrument.priceAvgInvestedValue)|number_format(3) }}</span>
                                 {% endif %}
                             </twig:Table:Td>
                             <twig:Table:Td>
-                                {{sign|raw }}{{ instrument.currentDividendPerShare|number_format(2) }}
+                                {{ sign|raw }}{{ instrument.currentDividendPerShare|number_format(2) }}
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 &euro;{{ instrument.currentDividend|number_format(2) }}
@@ -97,23 +103,60 @@
                                 {{ instrument.currentYearlyYield|number_format(2) }}%
                             </twig:Table:Td>
                             <twig:Table:Td>
-                                 {{sign|raw }}{{ instrument.avgDividendPerShare|number_format(2) }}
+                                {{ sign|raw }}{{ instrument.avgDividendPerShare|number_format(2) }}
                             </twig:Table:Td>
                             <twig:Table:Td>
-                                 &euro;{{ instrument.avgExpectedDividend|number_format(2) }}
+                                &euro;{{ instrument.avgExpectedDividend|number_format(2) }}
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 {{ instrument.avgYearlyYield|number_format(2) }}%
                             </twig:Table:Td>
+                            <twig:Table:Td>
+                                {{ instrument.dividendPaid|number_format(2) }}
+                            </twig:Table:Td>
                         </twig:Table:Tr>
                     {% else %}
                         <tr>
-                            <twig:Table:Td colspan="11">
+                            <twig:Table:Td colspan="12">
                                 no records found
                             </twig:Table:Td>
                         </tr>
                     {% endfor %}
                 </tbody>
+                <tfoot class="font-semibold">
+                    <tr>
+                        <twig:Table:Tr>
+                            <twig:Table:Td colspan="2">
+                            </twig:Table:Td>
+                            <twig:Table:Td class="flex content-start">
+                                <div class="font-bold border text-white rounded bg-green-500 p-1 text-center">
+                                    &euro;{{ metaData.priceAvgInvestedValue|number_format(2) }}
+                                </div>
+                            </twig:Table:Td>
+                            <twig:Table:Td colspan="3">
+                            </twig:Table:Td>
+                            <twig:Table:Td colspan="2" class="flex content-start">
+                                <div class="font-semibold rounded bg-orange-500 text-sm text-white text-center p-1">
+                                    &euro;{{ pieCurrentDividend|number_format(2) }}
+                                </div>
+                            </twig:Table:Td>
+                            <twig:Table:Td colspan="2">
+                            </twig:Table:Td>
+                            <twig:Table:Td colspan="2" class="flex content-start">
+                                <div class="font-semibold rounded bg-orange-500 text-sm text-white text-center p-1">
+                                    &euro;{{ pieAvgDividend|number_format(2) }}
+                                </div>
+                            </twig:Table:Td>
+                            <twig:Table:Td colspan="1">
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                <div class="font-semibold rounded bg-orange-500 text-sm text-white text-center p-1">
+                                    (&euro;{{ pieDividend|number_format(2) }})
+                                </div>
+                            </twig:Table:Td>
+                        </twig:Table:Tr>
+                    </tr>
+                </tfoot>
             </twig:Table:Table>
         </div>
         <div class="mt-4">

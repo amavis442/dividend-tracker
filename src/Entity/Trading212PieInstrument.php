@@ -55,7 +55,7 @@ class Trading212PieInstrument
     private ?float $currentDividend = 0.0;
     private ?float $currentYearlyYield = 0.0;
     private ?float $avgYearlyYield = 0.0;
-
+    private ?float $dividendPaid = 0.0;
 
     #[ORM\PrePersist]
 	public function setCreatedAtValue(): void
@@ -347,6 +347,30 @@ class Trading212PieInstrument
 	public function setAvgYearlyYield(float $avgYearlyYield): self
 	{
 		$this->avgYearlyYield = $avgYearlyYield;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of dividendPaid
+	 *
+	 * @return  float
+	 */
+	public function getDividendPaid(): float
+	{
+		return $this->dividendPaid;
+	}
+
+	/**
+	 * Set the value of dividendPaid
+	 *
+	 * @param   float  $dividendPaid
+	 *
+	 * @return  self
+	 */
+	public function setDividendPaid(float $dividendPaid): self
+	{
+		$this->dividendPaid = $dividendPaid;
 
 		return $this;
 	}

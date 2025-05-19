@@ -146,6 +146,29 @@ class PaymentRepository extends ServiceEntityRepository
 			->getResult();
 	}
 
+	public function getLastDividend(
+		Ticker $ticker,
+		?\DateTimeInterface $before
+	): ?Payment {
+		$subQuery = $this->createQueryBuilder('pa')
+			->select('MAX(pa.id)')
+			->innerJoin('pa.ticker', 'ti')
+			->where('ti = :ticker AND pa.payDate < :payDate')
+			->getDQL();
+
+		return $this->createQueryBuilder('p')
+			->select('p')
+			->andWhere('p.id = (' . $subQuery . ')')
+			->setParameters(
+				new ArrayCollection([
+					new Parameter('ticker', $ticker),
+					new Parameter('payDate', $before->format('Y-m-d')),
+				])
+			)
+			->getQuery()
+			->getOneOrNullResult();
+	}
+
 	public function getForPositionQueryBuilder(Position $position): QueryBuilder
 	{
 		return $this->createQueryBuilder('p')
