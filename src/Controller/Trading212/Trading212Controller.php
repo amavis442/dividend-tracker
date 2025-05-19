@@ -135,6 +135,13 @@ final class Trading212Controller extends AbstractController
 			}
 		}
 
+		$monthsEstimatedBreakEven = ceil(($metaData->getPriceAvgInvestedValue() - $metaData->getGained()) / $pieDividend);
+		$yearsEstimatedBreakEven = floor($monthsEstimatedBreakEven / 12);
+		$periodEstimatedBreakEven['years'] = $yearsEstimatedBreakEven;
+		$periodEstimatedBreakEven['months'] = $monthsEstimatedBreakEven- ($yearsEstimatedBreakEven *12);
+		$pieYield = (12 * $pieDividend / $metaData->getPriceAvgInvestedValue()) * 100;
+		$pieYieldAvg = (12 * $pieAvgDividend / $metaData->getPriceAvgInvestedValue()) * 100;
+
 		$chartInstruments = $chartBuilder->createChart(Chart::TYPE_DOUGHNUT);
 		$chartInstruments->setData([
 			'labels' => $pieInstruments['labels'],
@@ -229,9 +236,14 @@ final class Trading212Controller extends AbstractController
 		return $this->render('trading212/report/graph.html.twig', [
 			'title' => 'Trading212Controller',
 			'metaData' => $metaData,
+			'monthsEstimatedBreakEven' => $monthsEstimatedBreakEven,
+			'yearsEstimatedBreakEven' => $yearsEstimatedBreakEven,
+			'periodEstimatedBreakEven' => $periodEstimatedBreakEven,
 			'pieDividend' => $pieDividend,
+			'pieYield' => $pieYield,
 			'pieCurrentDividend' => $pieCurrentDividend,
 			'pieAvgDividend' => $pieAvgDividend,
+			'pieYieldAvg' => $pieYieldAvg,
 			'chart' => $chart,
 			'instruments' => $instruments,
 			'chartInstruments' => $chartInstruments,

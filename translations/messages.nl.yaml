@@ -384,3 +384,8 @@ Back: Terug
 'Avg Yearly Yield': 'Gemiddeld jaarlijks dividend'
 'Dividend Paid': 'Dividend uitgekeerd'
 'Dividend received': 'Dividend ontvangen'
+'Estimated breakeven time in months %months%': 'Geschatte terugverdien tijd in maanden %months%'
+'Estimated breakeven time in years %years%': 'Geschatte terugverdien tijd in jaren %years%'
+'Estimated breakeven time: %years% years and %months% months': 'Geschatte terugverdien tijd: %years% jaren en %months% maanden'
+'Current Yield: %yield%': 'Huidig rendement: %yield%'
+'Avg Yield: %yield%': 'Gemiddeld rendement: %yield%'
