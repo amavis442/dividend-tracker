@@ -154,6 +154,7 @@ class CompoundCalculator
 			$period = $month;
 		}
 		$reportRange = $years * $frequency;
+		$periodYear = $startYear;
 		for ($i = 0; $i < $reportRange; $i++) {
 			$data[$i]['capital_before'] = $capital;
 			$data[$i]['quator'] = '';
@@ -182,18 +183,16 @@ class CompoundCalculator
 					$data[$i - 1]['acumulated_dividend'];
 			}
 
-
+			if ($i > 0) {
+				$yearlySummary[$periodYear]['capital'] =
+					$data[$i]['capital_after'];
+				$yearlySummary[$periodYear]['acumulated_dividend'] =
+					$data[$i]['acumulated_dividend'];
+				$yearlySummary[$periodYear]['dividend'] = $data[$i]['dividend'];
+			}
 
 			if ($period > $frequency - 1) {
 				$periodYear = $startYear + $year;
-				if ($i > 0) {
-					$yearlySummary[$periodYear]['capital'] =
-						$data[$i - 1]['capital_after'];
-					$yearlySummary[$periodYear]['acumulated_dividend'] =
-						$data[$i - 1]['acumulated_dividend'];
-					$yearlySummary[$periodYear]['dividend'] =
-						$data[$i - 1]['dividend'];
-				}
 				$year++;
 				$period = 0;
 			}
