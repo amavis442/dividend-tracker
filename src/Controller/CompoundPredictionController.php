@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use App\Entity\CalcCompound;
 use App\Entity\Compound;
+use App\Entity\Drip;
 use App\Form\CalcCompoundType;
 use App\Form\CompoundType;
+use App\Form\DripType;
 use App\Model\CompoundCalculator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -51,16 +53,16 @@ class CompoundPredictionController extends AbstractController
 		]);
 	}
 
-	#[Route(path: '/calc-compound', name: 'calc_compound_prediction')]
+	#[Route(path: '/drip', name: 'calc_compound_prediction')]
 	public function calcCompound(
 		Request $request,
 		CompoundCalculator $compoundCalculator,
 		TranslatorInterface $translator,
 		ChartBuilderInterface $chartBuilder
 	): Response {
-		$compound = new CalcCompound();
+		$compound = new Drip();
 
-		$form = $this->createForm(CalcCompoundType::class, $compound);
+		$form = $this->createForm(DripType::class, $compound);
 		$form->handleRequest($request);
 
 		if ($form->isSubmitted() && $form->isValid()) {
@@ -76,6 +78,7 @@ class CompoundPredictionController extends AbstractController
 				[
 					'data' => $data['data'],
 					'deposits_withdrawals' => $compound->getInvestPerMonth(),
+					'dividendReinvested' => $compound->isDividendReinvested(),
 					'yearlySummary' => $data['yearlySummary'],
 					//'startCapital' => $startCapital,
 					'frequency' => $compound->getFrequency(),

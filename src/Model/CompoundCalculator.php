@@ -4,7 +4,7 @@ namespace App\Model;
 
 use App\Entity\CalcCompound;
 use App\Entity\Compound;
-
+use App\Entity\Drip;
 
 class CompoundCalculator
 {
@@ -125,7 +125,7 @@ class CompoundCalculator
 		return $data;
 	}
 
-	public function calc(CalcCompound $compound): array
+	public function calc(Drip $compound): array
 	{
 		$data = [];
         $yearlySummary = [];
@@ -156,7 +156,10 @@ class CompoundCalculator
             } else {
                 $dividend = 0;
             }
-			$capital += $dividend;
+			if ($compound->isDividendReinvested()) {
+				$capital += $dividend;
+			}
+
 			$capital += $investPerMonth;
 			$data[$i]['dividend'] = $dividend;
 			$data[$i]['capital_after'] = $capital;

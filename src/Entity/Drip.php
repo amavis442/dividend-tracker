@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class CalcCompound
+class Drip
 {
 	/**
 	 * Dividend percentage per year.
@@ -55,6 +55,8 @@ class CalcCompound
 	 * @var float
 	 */
 	private ?float $taxRate = 0;
+
+	private bool $dividendReinvested = true;
 
 	/**
 	 * Get the value of dividendPercentage
@@ -220,6 +222,30 @@ class CalcCompound
 	public function setInflation(?float $inflation): self
 	{
 		$this->inflation = $inflation;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of dividendReinvested
+	 *
+	 * @return  bool
+	 */
+	public function isDividendReinvested(): bool
+	{
+		return $this->dividendReinvested;
+	}
+
+	/**
+	 * Set the value of dividendReinvested
+	 *
+	 * @param   bool  $dividendReinvested
+	 *
+	 * @return  self
+	 */
+	public function setDividendReinvested(bool $dividendReinvested): self
+	{
+		$this->dividendReinvested = $dividendReinvested;
 
 		return $this;
 	}
