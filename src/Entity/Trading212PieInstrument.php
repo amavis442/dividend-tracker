@@ -57,6 +57,9 @@ class Trading212PieInstrument
     private ?float $avgYearlyYield = 0.0;
     private ?float $dividendPaid = 0.0;
 
+	private ?float $taxRate = 0.15;
+	private ?float $exchangeRate = 0.0;
+
     #[ORM\PrePersist]
 	public function setCreatedAtValue(): void
 	{
@@ -371,6 +374,54 @@ class Trading212PieInstrument
 	public function setDividendPaid(float $dividendPaid): self
 	{
 		$this->dividendPaid = $dividendPaid;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of taxRate
+	 *
+	 * @return  float
+	 */
+	public function getTaxRate(): float
+	{
+		return $this->taxRate;
+	}
+
+	/**
+	 * Set the value of taxRate
+	 *
+	 * @param   float  $taxRate
+	 *
+	 * @return  self
+	 */
+	public function setTaxRate(float $taxRate): self
+	{
+		$this->taxRate = $taxRate;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of exchangeRate
+	 *
+	 * @return  float
+	 */
+	public function getExchangeRate(): float
+	{
+		return $this->exchangeRate;
+	}
+
+	/**
+	 * Set the value of exchangeRate
+	 *
+	 * @param   float  $exchangeRate
+	 *
+	 * @return  self
+	 */
+	public function setExchangeRate(float $exchangeRate): self
+	{
+		$this->exchangeRate = $exchangeRate;
 
 		return $this;
 	}

@@ -105,7 +105,22 @@
                                 {{ sign|raw }}{{ instrument.currentDividendPerShare|number_format(2) }}
                             </twig:Table:Td>
                             <twig:Table:Td>
-                                &euro;{{ instrument.currentDividend|number_format(2) }}
+                                <div class="flex" {{ stimulus_controller("tooltip") }} data-tooltip-placement-value="right">
+                                    <span class="border p-2" data-tooltip-target="element"
+    data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">&euro;{{ instrument.currentDividend|number_format(2) }}</span>
+                                    <div class="card" role="tooltip" data-tooltip-target="tooltip">
+                                        <h5 class="bg-gray-300 p-2 rounded-t-lg mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                                            {{ 'Tax and Exchangerate info'|trans }}
+                                        </h5>
+                                        <div class='pl-5 pr-5 pb-5'>
+                                            <div class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                                                {{ 'Tax rate'|trans }}: {{ instrument.taxRate }} <br/>
+                                                {{ 'Exchange rate'| trans}}: {{ instrument.exchangeRate }}
+                                            </div>
+                                        </div>
+                                        <div class="arrow-card" data-tooltip-target="tooltipArrow"></div>
+                                    </div>
+                                </div>
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 {{ instrument.currentYearlyYield|number_format(2) }}%

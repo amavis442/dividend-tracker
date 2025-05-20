@@ -84,7 +84,9 @@ final class Trading212Controller extends AbstractController
 			if (!$ticker || $instrument->getPriceAvgInvestedValue() == 0) {
 				continue;
 			}
-			$tax = $ticker->getTax()->getTaxRate() / 100;
+			$tax = $ticker->getTax()->getTaxRate();
+			$instrument->setTaxRate($tax);
+			$instrument->setExchangeRate($rateDollarEuro);
 
 			$owned = $instrument->getOwnedQuantity();
 			// Current
