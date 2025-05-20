@@ -4,6 +4,7 @@
         'data-controller': 'chartjs-add-euro-sign'
         }) }}
 </div>
+
 <twig:Table:Table>
     <twig:Table:THead>
         <twig:Table:Tr>
@@ -20,7 +21,7 @@
                 {{ 'Deposits/Withdrawals'|trans }}
             </twig:Table:ThCol>
             <twig:Table:ThCol>
-                {{ 'Reinvested'|trans }}
+                {{ 'Capital added'|trans }}
             </twig:Table:ThCol>
             <twig:Table:ThCol>
                 {{ 'Capital after'|trans }}
@@ -45,7 +46,7 @@
             {% endif %}
             <twig:Table:Tr>
                 <twig:Table:Td>
-                    {{ item.quator }}
+                    {{ item.period }}
                 </twig:Table:Td>
                 <twig:Table:Td>
                     {{ item.capital_before|format_number({"fraction_digit": 2}) }}
@@ -57,7 +58,7 @@
                     {{ deposits_withdrawals|format_number({"fraction_digit": 2}) }}
                 </twig:Table:Td>
                 <twig:Table:Td>
-                    {{ (deposits_withdrawals + item.dividend)|format_number({"fraction_digit": 2}) }}
+                    {{ (item.investPerMonth)|format_number({"fraction_digit": 2}) }}
                 </twig:Table:Td>
                 <twig:Table:Td>
                     {{ item.capital_after|format_number({"fraction_digit": 2}) }}

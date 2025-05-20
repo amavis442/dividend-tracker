@@ -128,7 +128,7 @@ class CompoundCalculator
 	public function calc(Drip $compound): array
 	{
 		$data = [];
-        $yearlySummary = [];
+		$yearlySummary = [];
 
 		$dividendPercentage = $compound->getDividendPercentage();
 		$invested = $compound->getInvested();
@@ -140,54 +140,74 @@ class CompoundCalculator
 
 		$capital = $invested;
 		$startYear = (int) date('Y');
-		if (date('m') > 9) {
+		$month = (int) date('n');
+		$period = 0;
+		$year = 0;
+
+		if ($month > 9 && $frequency === 4) {
 			$startYear++;
 		}
-		$quator = date('m');
-		$year = 0;
+		if ($frequency === 4) {
+			$period = ceil($month / 3);
+		}
+		if ($frequency === 12) {
+			$period = $month;
+		}
 		$reportRange = $years * $frequency;
 		for ($i = 0; $i < $reportRange; $i++) {
-			//$capital += $investPerMonth;
 			$data[$i]['capital_before'] = $capital;
-            $data[$i]['quator'] = '';
+			$data[$i]['quator'] = '';
+			$data[$i]['investPerMonth'] = 0.0;
 
-            if ($dividendPercentage > 0) {
-			    $dividend = $capital * ($dividendPercentage / 100 / $frequency);
-            } else {
-                $dividend = 0;
-            }
+			if ($dividendPercentage > 0) {
+				$dividend =
+					($capital * ($dividendPercentage / 100)) / $frequency;
+			} else {
+				$dividend = 0;
+			}
+			$investPerMonth = $compound->getInvestPerMonth();
 			if ($compound->isDividendReinvested()) {
 				$capital += $dividend;
+				$investPerMonth += $dividend;
 			}
+			$data[$i]['investPerMonth'] = $investPerMonth;
 
 			$capital += $investPerMonth;
 			$data[$i]['dividend'] = $dividend;
 			$data[$i]['capital_after'] = $capital;
 
-            $data[$i]['acumulated_dividend'] = $dividend;
-            if ($i > 0) {
-                $data[$i]['acumulated_dividend'] += $data[$i - 1]['acumulated_dividend'];
-            }
-
-			if ($quator > $frequency - 1) {
-                $periodYear = $startYear + $year;
-                $yearlySummary[$periodYear]['capital'] = $data[$i-1]['capital_after'];
-                $yearlySummary[$periodYear]['acumulated_dividend'] = $data[$i-1]['acumulated_dividend'];
-                $yearlySummary[$periodYear]['dividend'] = $data[$i-1]['dividend'];
-				$year++;
-				$quator = 0;
+			$data[$i]['acumulated_dividend'] = $dividend;
+			if ($i > 0) {
+				$data[$i]['acumulated_dividend'] +=
+					$data[$i - 1]['acumulated_dividend'];
 			}
 
-			$data[$i]['quator'] = $startYear + $year;
+
+
+			if ($period > $frequency - 1) {
+				$periodYear = $startYear + $year;
+				if ($i > 0) {
+					$yearlySummary[$periodYear]['capital'] =
+						$data[$i - 1]['capital_after'];
+					$yearlySummary[$periodYear]['acumulated_dividend'] =
+						$data[$i - 1]['acumulated_dividend'];
+					$yearlySummary[$periodYear]['dividend'] =
+						$data[$i - 1]['dividend'];
+				}
+				$year++;
+				$period = 0;
+			}
+
+			$data[$i]['period'] = $startYear + $year;
 			if ($frequency === 4) {
-				$data[$i]['quator'] .= 'Q';
+				$data[$i]['period'] .= 'Q';
 			}
 			if ($frequency === 12) {
-				$data[$i]['quator'] .= 'M';
+				$data[$i]['period'] .= 'M';
 			}
-			$data[$i]['quator'] .= $quator + 1;
+			$data[$i]['period'] .= $period + 1;
 
-			$quator++;
+			$period++;
 		}
 
 		return ['data' => $data, 'yearlySummary' => $yearlySummary];
