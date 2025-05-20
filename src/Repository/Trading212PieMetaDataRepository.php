@@ -28,6 +28,20 @@ class Trading212PieMetaDataRepository extends ServiceEntityRepository
 			->orderBy($orderBy);
 	}
 
+	public function latest($pieIds): mixed
+	{
+		return $this->all()->setMaxResults(count($pieIds))->getQuery()->getResult();
+
+	}
+
+	public function getDistinctPieIds(): ?array
+	{
+		return $this->createQueryBuilder('t')
+			->select('DISTINCT(t.trading212PieId) pieId')
+			->getQuery()
+			->getResult();
+	}
+
 	//    /**
 	//     * @return Trading212PieMetaData[] Returns an array of Trading212PieMetaData objects
 	//     */

@@ -1,4 +1,4 @@
-{% extends 'layouts/index_no_add.html.twig' %}
+{% extends 'layouts/index_no_add_default.html.twig' %}
 {% block title %}Trading212{% endblock %}
 {% block content %}
     <twig:Table:Table class="max-w-min min-w-full">
@@ -44,7 +44,7 @@
             </tr>
         </twig:Table:THead>
         <tbody>
-            {% for item in pager %}
+            {% for item in data %}
                 <twig:Table:Tr>
                     <twig:Table:ThRow>
                         {{ item.id }} - {{ item.trading212PieId }}

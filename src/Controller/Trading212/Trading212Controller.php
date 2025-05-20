@@ -31,16 +31,22 @@ final class Trading212Controller extends AbstractController
 		Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
 		#[MapQueryParameter] int $page = 1
 	): Response {
-		$queryBuilder = $trading212PieMetaDataRepository->all();
 
+
+		$pieIds = $trading212PieMetaDataRepository->getDistinctPieIds();
+		$data = $trading212PieMetaDataRepository->latest($pieIds);
+
+		/*
 		$adapter = new QueryAdapter($queryBuilder);
 		$pager = new Pagerfanta($adapter);
 		$pager->setMaxPerPage(10);
 		$pager->setCurrentPage($page);
+		*/
 
 		return $this->render('trading212/report/index.html.twig', [
 			'title' => 'Trading212Controller',
-			'pager' => $pager,
+			//'pager' => $pager,
+			'data' => $data
 		]);
 	}
 
