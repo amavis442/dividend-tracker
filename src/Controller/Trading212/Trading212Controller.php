@@ -165,6 +165,7 @@ final class Trading212Controller extends AbstractController
 		$allocationData = [];
 		$valueData = [];
 		$gained = [];
+		$totalReturn= [];
 
 		$colors = Colors::COLORS;
 
@@ -181,6 +182,7 @@ final class Trading212Controller extends AbstractController
 			$valueData[] = round($item->getPriceAvgValue(), 2);
 			$gained[] = round($item->getGained(), 2);
 			$labels[] = $item->getCreatedAt()->format('d-m-Y');
+			$totalReturn[] = $item->getGained() + $item->getPriceAvgValue();
 		}
 		$chartData = [
 			[
@@ -195,6 +197,10 @@ final class Trading212Controller extends AbstractController
 				'label' => $translator->trans('Dividend'),
 				'data' => $gained,
 			],
+			[
+				'label' => $translator->trans('Total return'),
+				'data' => $totalReturn,
+			]
 		];
 
 		$chart = $chartBuilder->createChart(Chart::TYPE_LINE);
@@ -218,6 +224,12 @@ final class Trading212Controller extends AbstractController
 					'backgroundColor' => $colors[2],
 					'borderColor' => $colors,
 					'data' => $chartData[2]['data'],
+				],
+				[
+					'label' => $chartData[3]['label'],
+					'backgroundColor' => $colors[3],
+					'borderColor' => $colors,
+					'data' => $chartData[3]['data'],
 				],
 			],
 		]);
