@@ -45,7 +45,7 @@ class Trading212PieMetaDataRepository extends ServiceEntityRepository
 	public function getSumAllocatedAndDistributedPerData(\DateTimeInterface $dt): ?array
 	{
 		return $this->createQueryBuilder('t')
-			->select('t.createdAt, SUM(t.priceAvgInvestedValue) invested, SUM(t.gained) gained, SUM(t.reinvested) reinvested')
+			->select('t.createdAt, SUM(t.priceAvgInvestedValue) invested, SUM(t.priceAvgValue) currentvalue, SUM(t.gained) gained, SUM(t.reinvested) reinvested')
 			->where('t.createdAt > :dt')
 			->groupBy('t.createdAt')
 			->orderBy('t.createdAt', 'ASC')
