@@ -9,6 +9,7 @@ use App\Repository\PaymentRepository;
 use App\Repository\Trading212PieInstrumentRepository;
 use App\Repository\Trading212PieMetaDataRepository;
 use App\Service\ExchangeRate\ExchangeRateInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,7 +32,6 @@ final class Trading212Controller extends AbstractController
 		Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
 		#[MapQueryParameter] int $page = 1
 	): Response {
-
 
 		$pieIds = $trading212PieMetaDataRepository->getDistinctPieIds();
 		$data = $trading212PieMetaDataRepository->latest($pieIds);
@@ -58,6 +58,7 @@ final class Trading212Controller extends AbstractController
 		PaymentRepository $paymentRepository,
 		TranslatorInterface $translator,
 		ExchangeRateInterface $exchangeRate,
+		EntityManagerInterface $entityManager,
 		ChartBuilderInterface $chartBuilder
 	): Response {
 		/**
@@ -251,7 +252,47 @@ final class Trading212Controller extends AbstractController
 			],
 		]);
 
-		//$trading212PieInstrumentRepository;
+		$yieldLabels = [];
+		$yieldData = [];
+		$sql = sprintf('SELECT * FROM trading212_yield WHERE trading212_pie_id = %d', $pie->getTrading212PieId());
+		$data = $entityManager->getConnection()->prepare($sql)->executeQuery()->fetchAllAssociative();
+		foreach ($data as $itemData) {
+			$yieldLabels[] = $itemData['month']. '-'. $itemData['year'];
+			$yield = 0.0;
+			if ($itemData['start_invested'] > 0 ){
+				$deltaGained = $itemData['end_gained'] - $itemData['start_gained'];
+				$yield =  round(( $deltaGained / $itemData['start_invested']) * 100,2);
+			}
+			$yieldData[] = $yield;
+		}
+
+		$chartYield = $chartBuilder->createChart(Chart::TYPE_LINE);
+		$chartYield->setData([
+			'labels' => $yieldLabels,
+			'datasets' => [
+				[
+					'label' => 'Yield',
+					'data' => $yieldData,
+				],
+			],
+		]);
+
+		$chartYield->setOptions([
+			'maintainAspectRatio' => false,
+			'responsive' => true,
+			'plugins' => [
+				'title' => [
+					'display' => true,
+					'text' => $translator->trans($pie->getLabel()),
+					'font' => [
+						'size' => 24,
+					],
+				],
+				'legend' => [
+					'position' => 'top',
+				],
+			],
+		]);
 
 		return $this->render('trading212/report/graph.html.twig', [
 			'title' => 'Trading212Controller',
@@ -267,6 +308,7 @@ final class Trading212Controller extends AbstractController
 			'chart' => $chart,
 			'instruments' => $instruments,
 			'chartInstruments' => $chartInstruments,
+			'chartYield' => $chartYield,
 		]);
 	}
 }

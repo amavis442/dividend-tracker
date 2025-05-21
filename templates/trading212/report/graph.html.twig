@@ -3,15 +3,18 @@
 {% block body %}
     <div class="flex flex-col items-center mb-6 mt-6 bg-white shadow-md rounded-lg p-6">
         <div style="width:900px;
-                    height:600px"
+                    height:300px"
              class="border border-gray-500 p-2 mb-4 rounded-lg">
             {{ render_chart(chart, {
                         'data-controller': 'chartjs-add-euro-sign'
                         }) }}
         </div>
         <div style="width:900px;
-                    height:600px"
+                    height:300px"
              class="border border-gray-500 p-2 mb-4 rounded-lg">{{ render_chart(chartInstruments) }}</div>
+        <div style="width:900px;
+                    height:300px"
+             class="border border-gray-500 p-2 mb-4 rounded-lg">{{ render_chart(chartYield) }}</div>
         <div style="w-full">
             <div class="mb-4 mt-4">
                 <twig:Head variant="h4" class="mb-2">
@@ -106,15 +109,17 @@
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 <div class="flex" {{ stimulus_controller("tooltip") }} data-tooltip-placement-value="right">
-                                    <span class="border p-2" data-tooltip-target="element"
-    data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">&euro;{{ instrument.currentDividend|number_format(2) }}</span>
+                                    <span class="border p-2"
+                                          data-tooltip-target="element"
+                                          data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">&euro;{{ instrument.currentDividend|number_format(2) }}</span>
                                     <div class="card" role="tooltip" data-tooltip-target="tooltip">
                                         <h5 class="bg-gray-300 p-2 rounded-t-lg mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                                             {{ 'Tax and Exchangerate info'|trans }}
                                         </h5>
                                         <div class='pl-5 pr-5 pb-5'>
                                             <div class="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                                                {{ 'Tax rate'|trans }}: {{ instrument.taxRate }} <br/>
+                                                {{ 'Tax rate'|trans }}: {{ instrument.taxRate }}
+                                                <br />
                                                 {{ 'Exchange rate'| trans}}: {{ instrument.exchangeRate }}
                                             </div>
                                         </div>
