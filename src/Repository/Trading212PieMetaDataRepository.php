@@ -42,6 +42,18 @@ class Trading212PieMetaDataRepository extends ServiceEntityRepository
 			->getResult();
 	}
 
+	public function getSumAllocatedAndDistributedPerData(\DateTimeInterface $dt): ?array
+	{
+		return $this->createQueryBuilder('t')
+			->select('t.createdAt, SUM(t.priceAvgInvestedValue) invested, SUM(t.gained) gained, SUM(t.reinvested) reinvested')
+			->where('t.createdAt > :dt')
+			->groupBy('t.createdAt')
+			->orderBy('t.createdAt', 'ASC')
+			->setParameter('dt', $dt->format('Y-m-d'))
+			->getQuery()
+			->getResult();
+	}
+
 	//    /**
 	//     * @return Trading212PieMetaData[] Returns an array of Trading212PieMetaData objects
 	//     */
