@@ -37,7 +37,7 @@ final class PieChartController extends AbstractController
 
 		$totalInvested = 0.0;
 		/**
-		 * @var \App\Entity\Trading212PieMetaData
+		 * @var \App\Entity\Trading212PieMetaData $pie
 		 */
 		foreach ($data as $pie) {
 			$totalInvested += $pie->getPriceAvgInvestedValue();
