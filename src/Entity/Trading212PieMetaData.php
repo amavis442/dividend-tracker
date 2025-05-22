@@ -52,13 +52,13 @@ class Trading212PieMetaData
 	#[ORM\ManyToOne(inversedBy: 'trading212PieMetaData')]
 	private ?Pie $pie = null;
 
-	#[ORM\Column(nullable: true)]
+	#[ORM\Column]
 	private ?float $gained = 0.0;
 
-	#[ORM\Column(nullable: true)]
+	#[ORM\Column]
 	private ?float $reinvested = 0.0;
 
-	#[ORM\Column(nullable: true)]
+	#[ORM\Column]
 	private ?float $inCash = 0.0;
 
 	public function __construct()
@@ -231,7 +231,7 @@ class Trading212PieMetaData
 		return $this->gained;
 	}
 
-	public function setGained(?float $gained): static
+	public function setGained(float $gained): static
 	{
 		$this->gained = $gained;
 
@@ -248,7 +248,7 @@ class Trading212PieMetaData
 		return $this->reinvested;
 	}
 
-	public function setReinvested(?float $reinvested): static
+	public function setReinvested(float $reinvested): static
 	{
 		$this->reinvested = $reinvested;
 
@@ -260,7 +260,7 @@ class Trading212PieMetaData
 		return $this->inCash;
 	}
 
-	public function setInCash(?float $inCash): static
+	public function setInCash(float $inCash): static
 	{
 		$this->inCash = $inCash;
 

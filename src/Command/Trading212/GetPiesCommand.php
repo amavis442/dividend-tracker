@@ -72,13 +72,13 @@ class GetPiesCommand extends Command
 			);
 
 			$trading212PieMetaData->setGained(
-				$metaData['dividendDetails']['gained']
+				$metaData['dividendDetails']['gained'] ?: 0.0
 			);
 			$trading212PieMetaData->setReinvested(
-				$metaData['dividendDetails']['reinvested']
+				$metaData['dividendDetails']['reinvested']  ?: 0.0
 			);
 			$trading212PieMetaData->setInCash(
-				$metaData['dividendDetails']['inCash']
+				$metaData['dividendDetails']['inCash']  ?: 0.0
 			);
 
 			$trading212PieMetaData->setRaw($metaData);
