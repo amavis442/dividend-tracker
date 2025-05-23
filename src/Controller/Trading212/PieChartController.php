@@ -89,11 +89,14 @@ final class PieChartController extends AbstractController
 		$reinvested = [];
 		$currentValue = [];
 		$pieDates = [];
+		$totalReturn = [];
 		foreach ($data as $item) {
 			$invested[] = $item['invested'] ?: 0;
 			$gained[] = $item['gained'] ?: 0;
 			$reinvested[] = $item['reinvested'] ?: 0;
 			$currentValue[] = $item['currentvalue'] ?: 0;
+			$totalReturn[] = $item['currentvalue'] + $item['gained'];
+
 			$pieDates[] = $item['createdAt']->format('Y-m-d');
 		}
 
@@ -116,6 +119,10 @@ final class PieChartController extends AbstractController
 				[
 					'label' => $translator->trans('Current value'),
 					'data' => $currentValue,
+				],
+				[
+					'label' => $translator->trans('Total return'),
+					'data' => $totalReturn,
 				],
 			],
 		]);
