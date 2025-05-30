@@ -3,28 +3,27 @@
 namespace App\Command;
 
 use App\Repository\TickerRepository;
-use App\Service\DividendDate\GlobalXImportService;
+use App\Service\DividendDate\IncomeSharesService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'import:globalx', description: 'Reads html file for dividend dates')]
-class GlobalXDividendDateCommand extends Command
+#[AsCommand(name: 'import:incomeshares', description: 'Scrapes website for dividend dates')]
+class IncomeSharesDividendDateCommand extends Command
 {
-	protected GlobalXImportService $globalXImportService;
+	protected IncomeSharesService $incomeSharesImportService;
 	protected TickerRepository $tickerRepository;
 
 	public function __construct(
-		GlobalXImportService $globalXImportService,
+		IncomeSharesService $incomeSharesImportService,
 		TickerRepository $tickerRepository
 	) {
 		parent::__construct();
 
-		$this->globalXImportService = $globalXImportService;
+		$this->incomeSharesImportService = $incomeSharesImportService;
 		$this->tickerRepository = $tickerRepository;
 	}
 
@@ -34,10 +33,6 @@ class GlobalXDividendDateCommand extends Command
 			'symbol',
 			InputArgument::REQUIRED,
 			'Ticker symbol for relation calendar'
-		)->addArgument(
-			'filename',
-			InputArgument::REQUIRED,
-			'full path to html filename'
 		);
 	}
 
@@ -47,19 +42,14 @@ class GlobalXDividendDateCommand extends Command
 	): int {
 		$io = new SymfonyStyle($input, $output);
 		$symbol = $input->getArgument('symbol');
-		$filename = $input->getArgument('filename');
 
 		$ticker = $this->tickerRepository->findOneBy(['symbol' => $symbol]);
 		if (!$ticker) {
 			$io->warning('Please use valid ticker symbol. Used invalid ticker: "'. $symbol.'"');
 			return 0;
 		}
-		if (!file_exists($filename)) {
-			$io->warning('File could not be found: "' . $filename. '"');
-			return 0;
-		}
 
-		$records = $this->globalXImportService->process($filename, $ticker);
+		$records = $this->incomeSharesImportService->getData($ticker->getSymbol(), $ticker->getIsin());
 
 		$io->success(
 			'Added ' . $records . ' records for ticker "' . $ticker->getFullname(). '"'
