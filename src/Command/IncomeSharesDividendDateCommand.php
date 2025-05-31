@@ -52,7 +52,7 @@ class IncomeSharesDividendDateCommand extends Command
 		$records = $this->incomeSharesImportService->getData($ticker->getSymbol(), $ticker->getIsin());
 
 		$io->success(
-			'Added ' . $records . ' records for ticker "' . $ticker->getFullname(). '"'
+			'Added ' . count($records) . ' records for ticker "' . $ticker->getFullname(). '"'
 		);
 
 		return 0;
