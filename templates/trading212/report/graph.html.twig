@@ -52,6 +52,7 @@
                         </twig:Table:ThCol>
                         <twig:Table:ThCol>
                             {{'Current dividend per share'|trans}}
+                            (&lt;= {{ paymentLimit|format_datetime('long', 'none', locale='nl') }})
                         </twig:Table:ThCol>
                         <twig:Table:ThCol>
                             {{'Current Dividend'|trans}}

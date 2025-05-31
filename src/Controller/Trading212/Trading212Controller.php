@@ -32,7 +32,6 @@ final class Trading212Controller extends AbstractController
 		Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
 		#[MapQueryParameter] int $page = 1
 	): Response {
-
 		$pieIds = $trading212PieMetaDataRepository->getDistinctPieIds();
 		$data = $trading212PieMetaDataRepository->latest($pieIds);
 
@@ -46,7 +45,7 @@ final class Trading212Controller extends AbstractController
 		return $this->render('trading212/report/index.html.twig', [
 			'title' => 'Trading212Controller',
 			//'pager' => $pager,
-			'data' => $data
+			'data' => $data,
 		]);
 	}
 
@@ -77,6 +76,11 @@ final class Trading212Controller extends AbstractController
 		$pieDividend = 0.0; // What is actually paid will be a computed on latest paydat so can be inaccurate. Trading212 does not split up payments by pie instruments :(
 		$pieCurrentDividend = 0.0;
 		$pieAvgDividend = 0.0;
+
+		$date = new \DateTime('now');
+		$date->modify('last day of this month');
+		$paymentLimit = $date->format('Y-m-d');
+
 		/**
 		 * @var \App\Entity\Trading212PieInstrument $instrument
 		 */
@@ -91,7 +95,10 @@ final class Trading212Controller extends AbstractController
 
 			$owned = $instrument->getOwnedQuantity();
 			// Current
-			$currentDividend = $calendarRepository->getCurrentDividend($ticker);
+			$currentDividend = $calendarRepository->getCurrentDividend(
+				$ticker,
+				$paymentLimit
+			);
 			$instrument->setCurrentDividendPerShare($currentDividend);
 
 			$totalCurrentDividend =
@@ -144,12 +151,19 @@ final class Trading212Controller extends AbstractController
 			}
 		}
 
-		$monthsEstimatedBreakEven = ceil(($metaData->getPriceAvgInvestedValue() - $metaData->getGained()) / $pieDividend);
+		$monthsEstimatedBreakEven = ceil(
+			($metaData->getPriceAvgInvestedValue() - $metaData->getGained()) /
+				$pieDividend
+		);
 		$yearsEstimatedBreakEven = floor($monthsEstimatedBreakEven / 12);
 		$periodEstimatedBreakEven['years'] = $yearsEstimatedBreakEven;
-		$periodEstimatedBreakEven['months'] = $monthsEstimatedBreakEven- ($yearsEstimatedBreakEven *12);
-		$pieYield = (12 * $pieDividend / $metaData->getPriceAvgInvestedValue()) * 100;
-		$pieYieldAvg = (12 * $pieAvgDividend / $metaData->getPriceAvgInvestedValue()) * 100;
+		$periodEstimatedBreakEven['months'] =
+			$monthsEstimatedBreakEven - $yearsEstimatedBreakEven * 12;
+		$pieYield =
+			((12 * $pieDividend) / $metaData->getPriceAvgInvestedValue()) * 100;
+		$pieYieldAvg =
+			((12 * $pieAvgDividend) / $metaData->getPriceAvgInvestedValue()) *
+			100;
 
 		$chartInstruments = $chartBuilder->createChart(Chart::TYPE_DOUGHNUT);
 		$chartInstruments->setData([
@@ -166,7 +180,7 @@ final class Trading212Controller extends AbstractController
 		$allocationData = [];
 		$valueData = [];
 		$gained = [];
-		$totalReturn= [];
+		$totalReturn = [];
 
 		$colors = Colors::COLORS;
 
@@ -201,7 +215,7 @@ final class Trading212Controller extends AbstractController
 			[
 				'label' => $translator->trans('Total return'),
 				'data' => $totalReturn,
-			]
+			],
 		];
 
 		$chart = $chartBuilder->createChart(Chart::TYPE_LINE);
@@ -254,14 +268,25 @@ final class Trading212Controller extends AbstractController
 
 		$yieldLabels = [];
 		$yieldData = [];
-		$sql = sprintf('SELECT * FROM trading212_yield WHERE trading212_pie_id = %d', $pie->getTrading212PieId());
-		$data = $entityManager->getConnection()->prepare($sql)->executeQuery()->fetchAllAssociative();
+		$sql = sprintf(
+			'SELECT * FROM trading212_yield WHERE trading212_pie_id = %d',
+			$pie->getTrading212PieId()
+		);
+		$data = $entityManager
+			->getConnection()
+			->prepare($sql)
+			->executeQuery()
+			->fetchAllAssociative();
 		foreach ($data as $itemData) {
-			$yieldLabels[] = $itemData['month']. '-'. $itemData['year'];
+			$yieldLabels[] = $itemData['month'] . '-' . $itemData['year'];
 			$yield = 0.0;
-			if ($itemData['start_invested'] > 0 ){
-				$deltaGained = $itemData['end_gained'] - $itemData['start_gained'];
-				$yield =  round(( $deltaGained / $itemData['start_invested']) * 100,2);
+			if ($itemData['start_invested'] > 0) {
+				$deltaGained =
+					$itemData['end_gained'] - $itemData['start_gained'];
+				$yield = round(
+					($deltaGained / $itemData['start_invested']) * 100,
+					2
+				);
 			}
 			$yieldData[] = $yield;
 		}
@@ -309,6 +334,7 @@ final class Trading212Controller extends AbstractController
 			'instruments' => $instruments,
 			'chartInstruments' => $chartInstruments,
 			'chartYield' => $chartYield,
+			'paymentLimit' => $paymentLimit,
 		]);
 	}
 }

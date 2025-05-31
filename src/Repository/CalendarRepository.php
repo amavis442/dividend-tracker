@@ -143,12 +143,13 @@ class CalendarRepository extends ServiceEntityRepository
 		return $queryBuilder->getOneOrNullResult();
 	}
 
-	public function getCurrentDividend(Ticker $ticker)
+	public function getCurrentDividend(Ticker $ticker, string $paymentLimit)
 	{
+		/*
 		$date = new DateTime('now');
 		$date->modify('last day of this month');
 		$paymentLimit = $date->format('Y-m-d');
-
+		*/
 		$queryBuilder = $this->createQueryBuilder('c')
 			->select('c')
 			->innerJoin('c.ticker', 't')
