@@ -345,7 +345,7 @@ Tickers: Tickers
 'Edit Industry': 'Bewerk branch'
 'Create new industry': 'Maak een nieuwe branch'
 'Create new Pie': 'Maak een nieuwe schijf'
-Positions: Posities
+'Positions': 'Posities'
 'show portfolio': 'Laat portfolio zien'
 'add dividend payment': 'Voeg dividend uitkering toe'
 'Close position': 'Sluit positie'
@@ -374,3 +374,5 @@ Positions: Posities
 'Gained percentage': 'Percentage toegenomen'
 'Total return percentage': 'Totaal rendement percentage'
 'Instruments in %pie%': 'Instrumenten in %pie%'
+'Yield per year': 'Jaarlijks rendement'
+'Yield (%num% times)': 'Rendement (%num% keer)'

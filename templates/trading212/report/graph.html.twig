@@ -164,8 +164,23 @@
                             <twig:Table:Td colspan="3">
                             </twig:Table:Td>
                             <twig:Table:Td colspan="2" class="flex content-start">
-                                <div class="font-semibold rounded bg-orange-500 text-sm text-white text-center p-1">
-                                    &euro;{{ pieCurrentDividend|number_format(2) }}
+                                <div class="flex" {{ stimulus_controller("tooltip") }} data-tooltip-placement-value="right">
+                                    <span class="border p-2 font-semibold rounded bg-orange-500 text-sm text-white text-center"
+                                          data-tooltip-target="element"
+                                          data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">&euro;{{ pieCurrentDividend|number_format(3) }}</span>
+                                    <div class="card" role="tooltip" data-tooltip-target="tooltip">
+                                        <h5 class="bg-gray-300 p-2 rounded-t-lg mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                                            {{ 'Yield per year'|trans }}
+                                        </h5>
+                                        <div class='pl-5 pr-5 pb-5'>
+                                            <div class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                                                {{ 'Yield (%num% times)'|trans({'%num%':12}) }}: {{ (((pieCurrentDividend * 12) / metaData.priceAvgInvestedValue) *100)|number_format(3) }}%
+                                                <br/>
+                                                {{ 'Yield (%num% times)'|trans({'%num%':4}) }}: {{ (((pieCurrentDividend * 4) / metaData.priceAvgInvestedValue) *100)|number_format(3) }}%
+                                            </div>
+                                        </div>
+                                        <div class="arrow-card" data-tooltip-target="tooltipArrow"></div>
+                                    </div>
                                 </div>
                             </twig:Table:Td>
                             <twig:Table:Td colspan="2">
