@@ -20,7 +20,7 @@ class IncomeSharesService extends AbstractDividendDate implements DividendDatePl
 		'YMSF' => 'https://incomeshares.com/en-eu/etps/income-shares-microsoft-options-etp/', // Microschrot
 		'QQQY' => 'https://incomeshares.com/en-eu/etps/income-shares-nasdaq-100-options-etp/', // Nasdaq
 		'SPYY' => 'https://incomeshares.com/en-eu/etps/income-shares-s-p-500-options-etp/', //SP500
-		'GLDE' => 'https://incomeshares.com/en-eu/etps/income-shares-s-p-500-options-etp/',  //Gold
+		'GLDE' => 'https://incomeshares.com/en-eu/etps/income-shares-gold-yield-etp/',  //Gold
 
 	];
 
