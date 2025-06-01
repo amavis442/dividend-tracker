@@ -28,7 +28,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
-#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/trading212/incomesshares')]
+#[
+	Route(
+		path: '/{_locale<%app.supported_locales%>}/dashboard/trading212/incomesshares'
+	)
+]
 final class IncomesSharesDataSetController extends AbstractController
 {
 	#[Route(name: 'app_incomes_shares_data_set_index', methods: ['GET'])]
@@ -250,6 +254,7 @@ final class IncomesSharesDataSetController extends AbstractController
 		$totalReturnData = [];
 		$distributionData = [];
 		$currentValueData = [];
+		$breakEven = []; // should be under zero then you can sell without loss
 
 		$colors = Colors::COLORS;
 
@@ -262,7 +267,13 @@ final class IncomesSharesDataSetController extends AbstractController
 				2
 			);
 			$distributionData[] = round($item->getTotalDistribution(), 2);
-			$currentValueData[] = $item->getTotalAllocation() + $item->getTotalProfitLoss();
+			$currentValueData[] =
+				$item->getTotalAllocation() + $item->getTotalProfitLoss();
+			$breakEvenData[] =
+				$item->getTotalAllocation() -
+				($item->getTotalAllocation() +
+					$item->getTotalDistribution() +
+					$item->getTotalProfitLoss());
 			$labels[] = $item->getCreatedAt()->format('d-m-Y');
 		}
 		$chartData = [
@@ -333,9 +344,37 @@ final class IncomesSharesDataSetController extends AbstractController
 			],
 		]);
 
+		$chartBreakEven = $chartBuilder->createChart(Chart::TYPE_LINE);
+		$chartBreakEven->setData([
+			'labels' => $labels,
+			'datasets' => [
+				[
+					'label' => 'Breakeven (under zero is good)',
+					'data' => $breakEvenData,
+				],
+			],
+		]);
+		$chartBreakEven->setOptions([
+			'maintainAspectRatio' => false,
+			'responsive' => true,
+			'plugins' => [
+				'title' => [
+					'display' => true,
+					'text' => $translator->trans('Break even'),
+					'font' => [
+						'size' => 24,
+					],
+				],
+				'legend' => [
+					'position' => 'top',
+				],
+			],
+		]);
+
 		return $this->render('incomes_shares_data_set/graph.html.twig', [
 			'controller_name' => 'IncomesSharesController',
 			'chart' => $chart,
+			'chartBreakEven' => $chartBreakEven,
 		]);
 	}
 
@@ -349,7 +388,7 @@ final class IncomesSharesDataSetController extends AbstractController
 	public function show(
 		IncomesSharesDataSet $incomesSharesDataSet,
 		IncomesSharesDataRepository $incomesSharesDataRepository,
-		ExchangeRateInterface $exchangeRateService,
+		ExchangeRateInterface $exchangeRateService
 	): Response {
 		$uuid = $incomesSharesDataSet->getUuid();
 		/*$dataIshares = $incomesSharesDataRepository->findBy([
@@ -410,7 +449,7 @@ final class IncomesSharesDataSetController extends AbstractController
 			'totalProfitLoss' => $incomesSharesDataSet->getTotalProfitLoss(),
 			'totalDistribution' => $incomesSharesDataSet->getTotalDistribution(),
 			'totalAllocation' => $incomesSharesDataSet->getTotalAllocation(),
-			'totalExpectedDistribution' =>$totalExpectedDistribution,
+			'totalExpectedDistribution' => $totalExpectedDistribution,
 			'yield' => $incomesSharesDataSet->getYield(),
 		]);
 	}
@@ -555,7 +594,6 @@ final class IncomesSharesDataSetController extends AbstractController
 				[],
 				Response::HTTP_SEE_OTHER
 			);
-
 		}
 
 		return $this->render('incomes_shares_data_set/uploadfile.html.twig', [

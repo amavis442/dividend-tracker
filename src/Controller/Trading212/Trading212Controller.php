@@ -276,7 +276,7 @@ final class Trading212Controller extends AbstractController
 		$valueData = [];
 		$gained = [];
 		$totalReturn = [];
-
+		$breakEvenData = [];
 		$colors = Colors::COLORS;
 
 		$data = $trading212PieMetaDataRepository->findBy(
@@ -293,6 +293,9 @@ final class Trading212Controller extends AbstractController
 			$gained[] = round($item->getGained(), 2);
 			$labels[] = $item->getCreatedAt()->format('d-m-Y');
 			$totalReturn[] = $item->getGained() + $item->getPriceAvgValue();
+
+
+			$breakEvenData[] = $item->getPriceAvgInvestedValue() - ($item->getGained() + $item->getPriceAvgValue());
 		}
 		$chartData = [
 			[
@@ -361,6 +364,8 @@ final class Trading212Controller extends AbstractController
 			],
 		]);
 
+		$breakEvenChart = $this->breakEvenChart($labels, $breakEvenData, $chartBuilder, $translator);
+
 		$yieldLabels = [];
 		$yieldData = [];
 		$sql = sprintf(
@@ -414,6 +419,10 @@ final class Trading212Controller extends AbstractController
 			],
 		]);
 
+
+
+
+
 		return $this->render('trading212/report/graph.html.twig', [
 			'title' => 'Trading212Controller',
 			'metaData' => $metaData,
@@ -426,10 +435,45 @@ final class Trading212Controller extends AbstractController
 			'pieAvgDividend' => $pieAvgDividend,
 			'pieYieldAvg' => $pieYieldAvg,
 			'chart' => $chart,
+			'breakEvenChart' => $breakEvenChart,
 			'instruments' => $instruments,
 			'chartInstruments' => $chartInstruments,
 			'chartYield' => $chartYield,
 			'paymentLimit' => $paymentLimit,
 		]);
+	}
+
+
+	protected function breakEvenChart(array $labels, array $data, ChartBuilderInterface $chartBuilder,		TranslatorInterface $translator,)
+	{
+				$chart = $chartBuilder->createChart(Chart::TYPE_LINE);
+		$chart->setData([
+			'labels' => $labels,
+			'datasets' => [
+				[
+					'label' => $translator->trans('Break even'),
+					'data' => $data,
+				],
+			],
+		]);
+
+		$chart->setOptions([
+			'maintainAspectRatio' => false,
+			'responsive' => true,
+			'plugins' => [
+				'title' => [
+					'display' => true,
+					'text' => $translator->trans('Break even (under zero is good)'),
+					'font' => [
+						'size' => 24,
+					],
+				],
+				'legend' => [
+					'position' => 'top',
+				],
+			],
+		]);
+
+		return $chart;
 	}
 }

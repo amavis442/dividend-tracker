@@ -391,3 +391,5 @@ Back: Terug
 'Avg Yield: %yield%': 'Gemiddeld rendement: %yield%'
 'Tax and Exchangerate info': 'Belasting en wisselkoers info'
 'Capital added': 'Kapitaal toegevoegd'
+'Break even (under zero is good)': 'Break-even (negatief is goed)'
+'Break even': 'Break-even'

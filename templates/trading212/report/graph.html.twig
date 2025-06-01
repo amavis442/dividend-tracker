@@ -2,19 +2,40 @@
 {% block title %}Trading212 Tracker!{% endblock %}
 {% block body %}
     <div class="flex flex-col items-center mb-6 mt-6 bg-white shadow-md rounded-lg p-6">
+        <div class="mb-4">
+            <a class="px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-green-500 hover:bg-green-700 p-2"
+               href="{{ path("app_report_trading212_index") }}">
+                <i class="fas fa-angle-double-left"></i> {{ 'back to list'|trans }}
+            </a>
+        </div>
         <div style="width:900px;
-                    height:300px"
+                    height:400px"
              class="border border-gray-500 p-2 mb-4 rounded-lg">
             {{ render_chart(chart, {
                         'data-controller': 'chartjs-add-euro-sign'
                         }) }}
         </div>
         <div style="width:900px;
-                    height:300px"
+                    height:400px"
              class="border border-gray-500 p-2 mb-4 rounded-lg">{{ render_chart(chartInstruments) }}</div>
+        <div class="mb-4">
+            <a class="px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-green-500 hover:bg-green-700 p-2"
+               href="{{ path("app_report_trading212_index") }}">
+                <i class="fas fa-angle-double-left"></i> {{ 'back to list'|trans }}
+            </a>
+        </div>
         <div style="width:900px;
                     height:300px"
              class="border border-gray-500 p-2 mb-4 rounded-lg">{{ render_chart(chartYield) }}</div>
+        <div style="width:900px;
+                    height:300px"
+             class="border border-gray-500 p-2 mb-4 rounded-lg">{{ render_chart(breakEvenChart) }}</div>
+        <div class="mb-4">
+            <a class="px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-green-500 hover:bg-green-700 p-2"
+               href="{{ path("app_report_trading212_index") }}">
+                <i class="fas fa-angle-double-left"></i> {{ 'back to list'|trans }}
+            </a>
+        </div>
         <div style="w-full">
             <div class="mb-4 mt-4">
                 <twig:Head variant="h4" class="mb-2">
