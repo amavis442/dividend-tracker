@@ -61,6 +61,7 @@ class Trading212PieInstrument
 	private ?float $exchangeRate = 0.0;
 	private array $calendars = [];
 	private array $dividend = [];
+	private float $monthlyYield = 0.0;
 
     #[ORM\PrePersist]
 	public function setCreatedAtValue(): void
@@ -472,6 +473,30 @@ class Trading212PieInstrument
 	public function setDividend(array $dividend): self
 	{
 		$this->dividend = $dividend;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of monthlyYield
+	 *
+	 * @return  float
+	 */
+	public function getMonthlyYield(): float
+	{
+		return $this->monthlyYield;
+	}
+
+	/**
+	 * Set the value of monthlyYield
+	 *
+	 * @param   float  $monthlyYield
+	 *
+	 * @return  self
+	 */
+	public function setMonthlyYield(float $monthlyYield): self
+	{
+		$this->monthlyYield = $monthlyYield;
 
 		return $this;
 	}

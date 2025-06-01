@@ -123,7 +123,7 @@
                                                     <li>{{ 'Tax rate'|trans }}: {{ instrument.taxRate }}</li>
                                                     <li>{{ 'Exchange rate'| trans}}: {{ instrument.exchangeRate }}</li>
                                                     <li>
-                                                        {{ 'Monthly yield'| trans}}: {{ ((instrument.currentDividend/instrument.priceAvgInvestedValue) *100)|number_format(3) }}%
+                                                        {{ 'Monthly yield'| trans}}: {{ instrument.monthlyYield|number_format(3) }}%
                                                     </li>
                                                     {% if instrument.calendars %}
                                                         <li class="border p-2">
