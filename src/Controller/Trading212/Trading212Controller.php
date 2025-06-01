@@ -123,7 +123,7 @@ final class Trading212Controller extends AbstractController
 		foreach ($tickerCalendars as $tickerCalendar) {
 			$id = $tickerCalendar->getTicker()->getId();
 
-			$cId = $tickerCalendar->getPaymentDate()->format('Ym');
+			$cId = (int)$tickerCalendar->getPaymentDate()->format('Ym');
 			$tickers[$id]['calendars'][$cId] = $tickerCalendar;
 
 			if (!isset($tickers[$id]['dividend'])) {
@@ -180,25 +180,24 @@ final class Trading212Controller extends AbstractController
 
 			$owned = $instrument->getOwnedQuantity();
 			// Current
-			$yearMonth = date('Ym');
+			$yearMonth = (int)date('Ym');
+			$currentDividend = 0.0;
 			if (isset($instrumentTicker['calendars'][$yearMonth])) {
 				$currentDividend = $instrumentTicker['calendars'][
 					$yearMonth
 				]->getCashAmount();
-			} else {
-				$currentDividend = 0.0;
 			}
 			$instrument->setCurrentDividendPerShare($currentDividend);
-			$instrument->setMonthlyYield(0.0);
-			if ($instrument->getPriceAvgInvestedValue() > 0) {
-				$monthlyYield = ($currentDividend / $instrument->getPriceAvgInvestedValue()) * 100;
-				$instrument->setMonthlyYield($monthlyYield);
-			}
-
 
 			$totalCurrentDividend =
 				$currentDividend * $owned * (1 - $tax) * $rateDollarEuro;
 			$instrument->setCurrentDividend($totalCurrentDividend);
+
+			$instrument->setMonthlyYield(0.0);
+			if ($instrument->getPriceAvgInvestedValue() > 0) {
+				$monthlyYield = ($totalCurrentDividend / $instrument->getPriceAvgInvestedValue()) * 100;
+				$instrument->setMonthlyYield($monthlyYield);
+			}
 
 			$currentYearlYield =
 				(($ticker->getPayoutFrequency() * $totalCurrentDividend) /
