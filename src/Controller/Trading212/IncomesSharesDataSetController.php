@@ -349,7 +349,7 @@ final class IncomesSharesDataSetController extends AbstractController
 			'labels' => $labels,
 			'datasets' => [
 				[
-					'label' => 'Breakeven (under zero is good)',
+					'label' => $translator->trans('Break even (under zero is good)'),
 					'data' => $breakEvenData,
 				],
 			],
