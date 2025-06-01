@@ -71,7 +71,6 @@ class PayoutController extends AbstractController
 		]);
 	}
 
-
 	#[Route(path: '/payments', name: 'report_payments')]
 	public function payments(
 		PaymentRepository $paymentRepository,
@@ -87,6 +86,11 @@ class PayoutController extends AbstractController
 				[
 					'label' => 'Dividend payout',
 					'data' => $result['dividends'],
+				],
+				[
+					'label' => 'Trendline',
+					'data' => $result['trendline'],
+					'type' => 'line',
 				],
 			],
 		]);
