@@ -20,6 +20,7 @@ class OnRequestListener
 
     public function onKernelRequest(RequestEvent $event): void
     {
+
         $token = $this->tokenStorage->getToken();
         if ($token != null) {
             $user = $token->getUser();

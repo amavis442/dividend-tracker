@@ -193,11 +193,17 @@
                                    role="menuitem"
                                    tabindex="-1"
                                    id="report-menu-item-3">{{ 'Dividend month Tickers'|trans }}</a>
+                                <div class="border border-solid h-0 bg-[##e5e7eb] "></div>
                                 <a href="{{ url('report_payout', parameters = [], schemeRelative = false) }}"
                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
                                    role="menuitem"
                                    tabindex="-1"
-                                   id="report-menu-item-4">{{ 'Dividend payout'|trans }}</a>
+                                   id="report-menu-item-4"><i class="fa-solid fa-dollar-sign"></i> {{ 'Dividend payout'|trans }}</a>
+                                <a href="{{ url('report_payments', parameters = [], schemeRelative = false) }}"
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
+                                   role="menuitem"
+                                   tabindex="-1"
+                                   id="report-menu-item-4"><i class="fa-solid fa-money-bill-trend-up"></i> {{ 'Payments'|trans }}</a>
                                 <div class="border border-solid h-0 bg-[##e5e7eb] "></div>
                                 <a href="{{ url('app_monthly_summary_index', parameters = [], schemeRelative = false) }}"
                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"

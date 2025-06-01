@@ -304,30 +304,12 @@ class PaymentRepository extends ServiceEntityRepository
 		return $output;
 	}
 
-	public function getDividendsPerInterval(
-		User $user,
-		string $interval = 'Month'
-	): array {
-		$con = $this->getEntityManager()->getConnection();
-		$em = $this->getEntityManager();
-
-		$qb = $this->createQueryBuilder('p')
-			->select(
-				'YEAR(p.payDate) periodYear, MONTH(p.payDate) as periodMonth, SUM(p.dividend) dividend'
-			)
-			->join('p.user', 'u')
-			->where('u.id = :userID')
-			->setParameter('userID', $user->getId())
-			->groupBy('periodYear, periodMonth')
-			->orderBy('periodYear, periodMonth');
-
-		$result = $qb->getQuery()->getResult();
+	public function getDividendsPerInterval(): array
+	{
+		$result = $this->getSumPayments();
 
 		$qb = $this->createQueryBuilder('p')
 			->select('YEAR(MIN(p.payDate)) startdate')
-			->join('p.user', 'u')
-			->where('u.id = :userID')
-			->setParameter('userID', $user->getId())
 			->setMaxResults(1);
 
 		$years = $qb->getQuery()->getResult();
@@ -372,5 +354,26 @@ class PaymentRepository extends ServiceEntityRepository
 		}
 		ksort($output);
 		return $output;
+	}
+
+	public function getSumPayments(?string $paydate = null): array
+	{
+		$qb = $this->createQueryBuilder('p')
+			->select(
+				'YEAR(p.payDate) periodYear, MONTH(p.payDate) as periodMonth, SUM(p.dividend) dividend'
+			)
+			->groupBy('periodYear, periodMonth')
+			->orderBy('periodYear, periodMonth');
+
+		if ($paydate) {
+			$qb->where('p.payDate > :paydate')->setParameter(
+				'paydate',
+				$paydate
+			);
+		}
+
+		$result = $qb->getQuery()->getResult();
+
+		return $result;
 	}
 }
