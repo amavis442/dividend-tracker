@@ -59,6 +59,8 @@ class Trading212PieInstrument
 
 	private ?float $taxRate = 0.15;
 	private ?float $exchangeRate = 0.0;
+	private array $calendars = [];
+	private array $dividend = [];
 
     #[ORM\PrePersist]
 	public function setCreatedAtValue(): void
@@ -422,6 +424,54 @@ class Trading212PieInstrument
 	public function setExchangeRate(float $exchangeRate): self
 	{
 		$this->exchangeRate = $exchangeRate;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of calendars
+	 *
+	 * @return  array
+	 */
+	public function getCalendars(): array
+	{
+		return $this->calendars;
+	}
+
+	/**
+	 * Set the value of calendars
+	 *
+	 * @param   array  $calendars
+	 *
+	 * @return  self
+	 */
+	public function setCalendars(array $calendars): self
+	{
+		$this->calendars = $calendars;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of dividend
+	 *
+	 * @return  array
+	 */
+	public function getDividend(): array
+	{
+		return $this->dividend;
+	}
+
+	/**
+	 * Set the value of dividend
+	 *
+	 * @param   array  $dividend
+	 *
+	 * @return  self
+	 */
+	public function setDividend(array $dividend): self
+	{
+		$this->dividend = $dividend;
 
 		return $this;
 	}

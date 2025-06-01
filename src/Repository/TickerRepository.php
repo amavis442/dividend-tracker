@@ -165,4 +165,14 @@ class TickerRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getTaxForTickers(array $tickers):array {
+        return $this->createQueryBuilder('t','t.id')
+        ->select('t, ta')
+        ->join('t.tax', 'ta')
+        ->where('t in (:tickers)')
+        ->setParameter('tickers', $tickers)
+        ->getQuery()
+        ->getResult();
+    }
 }

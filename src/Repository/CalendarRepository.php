@@ -422,4 +422,19 @@ class CalendarRepository extends ServiceEntityRepository
 		}
 		return $data;
 	}
+
+
+	public function getCalendarsForTickers(array $tickers, string $lastYear): array
+	{
+		return $this->createQueryBuilder('c')
+		->select('t ,c')
+		->join('c.ticker','t')
+		->where('c.ticker in (:tickers)')
+		->andWhere('c.paymentDate > :lastYear')
+		->setParameter('tickers',$tickers)
+		->setParameter('lastYear',$lastYear)
+		->groupBy('t.id, c.id')
+		->getQuery()
+		->getResult();
+	}
 }

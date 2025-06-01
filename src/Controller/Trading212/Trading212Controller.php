@@ -6,6 +6,8 @@ use App\Entity\Pie;
 use App\Helper\Colors;
 use App\Repository\CalendarRepository;
 use App\Repository\PaymentRepository;
+use App\Repository\TickerRepository;
+
 use App\Repository\Trading212PieInstrumentRepository;
 use App\Repository\Trading212PieMetaDataRepository;
 use App\Service\ExchangeRate\ExchangeRateInterface;
@@ -55,6 +57,7 @@ final class Trading212Controller extends AbstractController
 		Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
 		CalendarRepository $calendarRepository,
 		PaymentRepository $paymentRepository,
+		TickerRepository $tickerRepository,
 		TranslatorInterface $translator,
 		ExchangeRateInterface $exchangeRate,
 		EntityManagerInterface $entityManager,
@@ -81,24 +84,110 @@ final class Trading212Controller extends AbstractController
 		$date->modify('last day of this month');
 		$paymentLimit = $date->format('Y-m-d');
 
+		$tickers = [];
+		// Get the tickers needed foor the rest
+		foreach ($instruments as $instrument) {
+			if (!$instrument->getTicker()) {
+				throw new \RuntimeException(
+					$instrument->getTickerName() .
+						' has not been assigned a ticker'
+				);
+				continue;
+			}
+			$tickers[$instrument->getTicker()->getId()] = [
+				'ticker' => $instrument->getTicker(),
+				'instrument' => $instrument,
+			];
+		}
+		// Get the taxrate for each ticker
+		$tickerTaxes = $tickerRepository->getTaxForTickers(
+			array_keys($tickers)
+		);
+		foreach ($tickerTaxes as $id => $tickerTax) {
+			$tickers[$id]['tax'] = $tickerTax->getTax();
+		}
+
+		$lastYear = sprintf(
+			'%04d-%02d-%02d',
+			date('Y') - 1,
+			date('m'),
+			date('d')
+		);
+		// Get Calendars for at least 1 year
+		$tickerCalendars = $calendarRepository->getCalendarsForTickers(
+			$tickers,
+			$lastYear
+		);
+		$lastYear = (new \Datetime('-1 years -1 months'))->format('Ym');
+
+		foreach ($tickerCalendars as $tickerCalendar) {
+			$id = $tickerCalendar->getTicker()->getId();
+
+			$cId = $tickerCalendar->getPaymentDate()->format('Ym');
+			$tickers[$id]['calendars'][$cId] = $tickerCalendar;
+
+			if (!isset($tickers[$id]['dividend'])) {
+				$tickers[$id]['dividend']['sumDividend'] = 0.0;
+				$tickers[$id]['dividend']['records'] = 0;
+				$tickers[$id]['dividend']['avg'] = 0.0;
+				$tickers[$id]['dividend']['predicted_payment'] = [];
+			}
+
+			if ($cId > $lastYear) {
+				$tickers[$id]['dividend'][
+					$cId
+				] = $tickerCalendar->getCashAmount();
+				$tickers[$id]['dividend'][
+					'sumDividend'
+				] += $tickerCalendar->getCashAmount();
+				$tickers[$id]['dividend']['records'] += 1;
+
+				$owned = $tickers[$id]['instrument']->getOwnedQuantity();
+				$tax = $tickers[$id]['tax']->getTaxRate();
+				$predictedPayment = $owned * $tickerCalendar->getCashAmount() * $rateDollarEuro * (1-$tax);
+				$tickers[$id]['dividend']['predicted_payment'][$cId] = $predictedPayment;
+			}
+		}
+
 		/**
 		 * @var \App\Entity\Trading212PieInstrument $instrument
 		 */
 		foreach ($instruments as $instrument) {
 			$ticker = $instrument->getTicker();
+			$tickerId = $instrument->getTicker()->getId();
 			if (!$ticker || $instrument->getPriceAvgInvestedValue() == 0) {
 				continue;
 			}
-			$tax = $ticker->getTax()->getTaxRate();
+			$instrumentTicker = $tickers[$tickerId];
+			if (isset($instrumentTicker['dividend']['avg'])) {
+				$instrumentTicker['dividend']['avg'] =
+					$instrumentTicker['dividend']['sumDividend'] /
+					$instrumentTicker['dividend']['records'];
+			} else {
+				$instrumentTicker['dividend']['avg'] = 0.0;
+			}
+			if (isset($instrumentTicker['calendars'])) {
+				//dd(array_slice($instrumentTicker['dividend'], -6, null, true) );
+				//array_slice($instrumentTicker['calendars'], -6);
+				$cals = array_slice($instrumentTicker['calendars'], -6, null, true);
+				ksort($cals);
+				$instrument->setCalendars($cals); // Last 6 months if data is available
+				$instrument->setDividend($instrumentTicker['dividend']);
+			}
+			$tax = $instrumentTicker['tax']->getTaxRate();
 			$instrument->setTaxRate($tax);
 			$instrument->setExchangeRate($rateDollarEuro);
 
 			$owned = $instrument->getOwnedQuantity();
 			// Current
-			$currentDividend = $calendarRepository->getCurrentDividend(
-				$ticker,
-				$paymentLimit
-			);
+			$yearMonth = date('Ym');
+			if (isset($instrumentTicker['calendars'][$yearMonth])) {
+				$currentDividend = $instrumentTicker['calendars'][
+					$yearMonth
+				]->getCashAmount();
+			} else {
+				$currentDividend = 0.0;
+			}
 			$instrument->setCurrentDividendPerShare($currentDividend);
 
 			$totalCurrentDividend =
@@ -113,7 +202,8 @@ final class Trading212Controller extends AbstractController
 			$pieCurrentDividend += $totalCurrentDividend;
 
 			// Avg
-			$avgDividend = $calendarRepository->getAvgDividend($ticker);
+			//$avgDividend = $calendarRepository->getAvgDividend($ticker);
+			$avgDividend = $instrumentTicker['dividend']['avg'];
 			$instrument->setAvgDividendPerShare($avgDividend);
 
 			$avgExpectedDividend =

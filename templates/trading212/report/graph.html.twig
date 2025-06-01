@@ -119,9 +119,31 @@
                                         </h5>
                                         <div class='pl-5 pr-5 pb-5'>
                                             <div class="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                                                {{ 'Tax rate'|trans }}: {{ instrument.taxRate }}
-                                                <br />
-                                                {{ 'Exchange rate'| trans}}: {{ instrument.exchangeRate }}
+                                                <ul>
+                                                    <li>{{ 'Tax rate'|trans }}: {{ instrument.taxRate }}</li>
+                                                    <li>{{ 'Exchange rate'| trans}}: {{ instrument.exchangeRate }}</li>
+                                                    <li>
+                                                        {{ 'Monthly yield'| trans}}: {{ ((instrument.currentDividend/instrument.priceAvgInvestedValue) *100)|number_format(3) }}%
+                                                    </li>
+                                                    {% if instrument.calendars %}
+                                                        <li class="border p-2">
+                                                            <div class="font-bold underline mb-1 mt-1">{{'Estimated payouts'|trans}}</div>
+                                                            <ul class="mt-2 list-disc">
+                                                                {% for ckey, calendar in instrument.calendars %}
+                                                                    <li>
+                                                                        <ul>
+                                                                            <li>#{{ ckey }}</li>
+                                                                            <li><span class="font-semibold">{{ calendar.paymentDate|format_datetime('long', 'none', locale: 'nl') }}:</span> ${{ calendar.cashAmount }}</li>
+                                                                            <li class="font-bold mb-2">{{'estimated payout'|trans}} &euro;
+{{ instrument.dividend.predicted_payment[ckey]|number_format(2) }}
+                                                                            </li>
+                                                                        </ul>
+                                                                    </li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                        </li>
+                                                    {% endif %}
+                                                </ul>
                                             </div>
                                         </div>
                                         <div class="arrow-card" data-tooltip-target="tooltipArrow"></div>
@@ -175,9 +197,9 @@
                                         </h5>
                                         <div class='pl-5 pr-5 pb-5'>
                                             <div class="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                                                {{ 'Yield (%num% times)'|trans({'%num%':12}) }}: {{ (((pieCurrentDividend * 12) / metaData.priceAvgInvestedValue) *100)|number_format(3) }}%
-                                                <br/>
-                                                {{ 'Yield (%num% times)'|trans({'%num%':4}) }}: {{ (((pieCurrentDividend * 4) / metaData.priceAvgInvestedValue) *100)|number_format(3) }}%
+                                                {{ 'Yield (%num% times)'|trans({"%num%": 12}) }}: {{ (((pieCurrentDividend * 12) / metaData.priceAvgInvestedValue) *100)|number_format(3) }}%
+                                                <br />
+                                                {{ 'Yield (%num% times)'|trans({"%num%": 4}) }}: {{ (((pieCurrentDividend * 4) / metaData.priceAvgInvestedValue) *100)|number_format(3) }}%
                                             </div>
                                         </div>
                                         <div class="arrow-card" data-tooltip-target="tooltipArrow"></div>
