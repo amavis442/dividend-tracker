@@ -190,8 +190,8 @@ final class Trading212Controller extends AbstractController
 			}
 			$instrument->setCurrentDividendPerShare($currentDividend);
 			$instrument->setMonthlyYield(0.0);
-			if ($instrument->getPriceAvgInvestedValue()) {
-				$monthlyYield = ($instrument->getCurrentDividend() / $instrument->getPriceAvgInvestedValue()) * 100;
+			if ($instrument->getPriceAvgInvestedValue() > 0) {
+				$monthlyYield = ($currentDividend / $instrument->getPriceAvgInvestedValue()) * 100;
 				$instrument->setMonthlyYield($monthlyYield);
 			}
 

@@ -122,9 +122,7 @@
                                                 <ul>
                                                     <li>{{ 'Tax rate'|trans }}: {{ instrument.taxRate }}</li>
                                                     <li>{{ 'Exchange rate'| trans}}: {{ instrument.exchangeRate }}</li>
-                                                    <li>
-                                                        {{ 'Monthly yield'| trans}}: {{ instrument.monthlyYield|number_format(3) }}%
-                                                    </li>
+                                                    <li>{{ 'Monthly yield'| trans}}: {{ instrument.MonthlyYield|number_format(3) }}%</li>
                                                     {% if instrument.calendars %}
                                                         <li class="border p-2">
                                                             <div class="font-bold underline mb-1 mt-1">{{'Estimated payouts'|trans}}</div>
@@ -133,9 +131,12 @@
                                                                     <li>
                                                                         <ul>
                                                                             <li>#{{ ckey }}</li>
-                                                                            <li><span class="font-semibold">{{ calendar.paymentDate|format_datetime('long', 'none', locale: 'nl') }}:</span> ${{ calendar.cashAmount }}</li>
-                                                                            <li class="font-bold mb-2">{{'estimated payout'|trans}} &euro;
-{{ instrument.dividend.predicted_payment[ckey]|number_format(2) }}
+                                                                            <li>
+                                                                                <span class="font-semibold">{{ calendar.paymentDate|format_datetime('long', 'none', locale: 'nl') }}:</span> ${{ calendar.cashAmount }}
+                                                                            </li>
+                                                                            <li class="font-bold mb-2">
+                                                                                {{'estimated payout'|trans}} &euro;
+                                                                                {{ instrument.dividend.predicted_payment[ckey]|number_format(2) }} <span class="font-semibold"><small>({{ ((instrument.dividend.predicted_payment[ckey] / instrument.priceAvgInvestedValue) *100)|number_format(2) }}%)</small></span>
                                                                             </li>
                                                                         </ul>
                                                                     </li>
