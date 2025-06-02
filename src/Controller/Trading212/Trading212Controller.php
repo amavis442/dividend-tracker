@@ -92,7 +92,6 @@ final class Trading212Controller extends AbstractController
 					$instrument->getTickerName() .
 						' has not been assigned a ticker'
 				);
-				continue;
 			}
 			$tickers[$instrument->getTicker()->getId()] = [
 				'ticker' => $instrument->getTicker(),

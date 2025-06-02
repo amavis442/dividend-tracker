@@ -254,7 +254,7 @@ final class IncomesSharesDataSetController extends AbstractController
 		$totalReturnData = [];
 		$distributionData = [];
 		$currentValueData = [];
-		$breakEven = []; // should be under zero then you can sell without loss
+		$breakEvenData = []; // should be under zero then you can sell without loss
 
 		$colors = Colors::COLORS;
 
