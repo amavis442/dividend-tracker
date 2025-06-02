@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Repository\PaymentRepository;
+use App\Repository\DividendTrackerRepository;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class Payouts
@@ -31,28 +32,44 @@ class Payouts
 		];
 	}
 
-	public function payments(PaymentRepository $paymentRepository): array
+	public function payments(PaymentRepository $paymentRepository, DividendTrackerRepository $dividendTrackerRepository): array
 	{
 		$paydate = (new \DateTime('first day of this month -1 years'))->format(
 			'Y-m-d'
 		);
 		$data = $paymentRepository->getSumPayments($paydate);
-
+		$alloctionData = $dividendTrackerRepository->getAllocationsPerMonth($paydate);
+		$allocations = [];
+		foreach ($alloctionData as $item) {
+			$id = (int)sprintf(
+				'%04d%02d',
+				$item['periodYear'],
+				$item['periodMonth']
+			);
+			$allocations[$id] = $item['allocation'];
+		}
 		$labels = [];
 		$dates = [];
 		$dividends = [];
+		$yields = [];
 		foreach ($data as $item) {
 			$labels[] = sprintf(
 				'%04d-%02d',
 				$item['periodYear'],
 				$item['periodMonth']
 			);
-			$dates[] = (int)sprintf(
+			$date = (int)sprintf(
 				'%04d%02d',
 				$item['periodYear'],
 				$item['periodMonth']
 			);
+
+			$dates[] = $date;
 			$dividends[] = $item['dividend'];
+
+			if (isset($allocations[$date])) {
+				$yields[$date] = (($item['dividend'] * 12) / $allocations[$date])*100;
+			}
 		}
 
 		$trendarray = $this->trendline(array_keys($dividends), $dividends);
@@ -62,10 +79,24 @@ class Payouts
      		$number = ( $number <= 0 )? 0 : $number;
 			$trendline[] = $number;
 		}
+
+
+		$range = range(0,count($yields)-1);
+		$trendarrayYield = $this->trendline($range, array_values($yields));
+		$trendlineYield = [];
+		foreach ( $range as $item ) {
+     		$number = ( $trendarrayYield['slope'] * $item ) + $trendarrayYield['intercept'];
+     		$number = ( $number <= 0 )? 0 : $number;
+			$trendlineYield[] = $number;
+		}
+
+
 		return [
 			'labels' => $labels,
 			'dividends' => $dividends,
 			'trendline' => $trendline,
+			'yields' => $yields,
+			'trendlineYield' => $trendlineYield,
 		];
 	}
 

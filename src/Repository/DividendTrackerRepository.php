@@ -19,6 +19,28 @@ class DividendTrackerRepository extends ServiceEntityRepository
         parent::__construct($registry, DividendTracker::class);
     }
 
+    public function getAllocationsPerMonth(?string $sampleDate = null): array
+	{
+		$qb = $this->createQueryBuilder('d')
+			->select(
+				'YEAR(d.sampleDate) periodYear, MONTH(d.sampleDate) as periodMonth, d.principle as allocation'
+			)
+			->groupBy('periodYear, periodMonth, allocation')
+			->orderBy('periodYear, periodMonth');
+
+		if ($sampleDate) {
+			$qb->where('d.sampleDate > :sampleDate')->setParameter(
+				'sampleDate',
+				$sampleDate
+			);
+		}
+
+		$result = $qb->getQuery()->getResult();
+
+		return $result;
+	}
+
+
     // /**
     //  * @return DividendTracker[] Returns an array of DividendTracker objects
     //  */

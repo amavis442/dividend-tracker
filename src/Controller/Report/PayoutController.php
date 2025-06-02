@@ -4,11 +4,11 @@ namespace App\Controller\Report;
 
 use App\Helper\Colors;
 use App\Repository\PaymentRepository;
+use App\Repository\DividendTrackerRepository;
 use App\Service\Payouts;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
@@ -74,10 +74,11 @@ class PayoutController extends AbstractController
 	#[Route(path: '/payments', name: 'report_payments')]
 	public function payments(
 		PaymentRepository $paymentRepository,
+		DividendTrackerRepository $dividendTrackerRepository,
 		Payouts $payout,
 		ChartBuilderInterface $chartBuilder
 	): Response {
-		$result = $payout->payments($paymentRepository);
+		$result = $payout->payments($paymentRepository,$dividendTrackerRepository);
 		$chart = $chartBuilder->createChart(Chart::TYPE_BAR);
 
 		$chart->setData([
@@ -112,9 +113,49 @@ class PayoutController extends AbstractController
 			],
 		]);
 
+		$yieldChart = $this->yields($result['yields'],$result['trendlineYield'], $chartBuilder);
+
 		return $this->render('report/payout/index.html.twig', [
 			'controller_name' => 'ReportController',
 			'chart' => $chart,
+			'yieldChart' => $yieldChart,
 		]);
+	}
+
+	protected function yields(array $data, array $trendline, ChartBuilderInterface $chartBuilder) {
+		$chart = $chartBuilder->createChart(Chart::TYPE_BAR);
+		$chart->setData([
+			'labels' => array_keys($data),
+			'datasets' => [
+				[
+					'label' => 'Dividend yield',
+					'data' => array_values($data),
+				],
+				[
+					'label' => 'Trendline',
+					'data' =>  $trendline,
+					'type' => 'line',
+				],
+			],
+		]);
+
+		$chart->setOptions([
+			'maintainAspectRatio' => false,
+			'responsive' => true,
+			'plugins' => [
+				'title' => [
+					'display' => true,
+					'text' => 'Dividends payout',
+					'font' => [
+						'size' => 24,
+					],
+				],
+				'legend' => [
+					'position' => 'top',
+				],
+			],
+		]);
+
+		return $chart;
 	}
 }
