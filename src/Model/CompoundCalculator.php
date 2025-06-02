@@ -155,6 +155,7 @@ class CompoundCalculator
 		}
 		$reportRange = $years * $frequency;
 		$periodYear = $startYear;
+		$addedInvestPerMonth = 0.0;
 		for ($i = 0; $i < $reportRange; $i++) {
 			$data[$i]['capital_before'] = $capital;
 			$data[$i]['quator'] = '';
@@ -167,13 +168,13 @@ class CompoundCalculator
 				$dividend = 0;
 			}
 			$investPerMonth = $compound->getInvestPerMonth();
+			$addedInvestPerMonth = $investPerMonth;
 			if ($compound->isDividendReinvested()) {
-				$capital += $dividend;
-				$investPerMonth += $dividend;
+				$addedInvestPerMonth += $dividend;
 			}
-			$data[$i]['investPerMonth'] = $investPerMonth;
+			$data[$i]['investPerMonth'] = $addedInvestPerMonth;
 
-			$capital += $investPerMonth;
+			$capital += $addedInvestPerMonth;
 			$data[$i]['dividend'] = $dividend;
 			$data[$i]['capital_after'] = $capital;
 
