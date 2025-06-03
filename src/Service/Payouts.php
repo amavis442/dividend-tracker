@@ -92,6 +92,7 @@ class Payouts
 			$labels[] = $date;
 			$yields[$date] = 0.0;
 		}
+		$date = date('Ym');
 		if (isset($allocations[$date]) && isset($foreCastDividend[$date])) {
 			$yields[$date] = (($foreCastDividend[$date] * 12) / $allocations[$date])*100;
 		}
