@@ -424,6 +424,71 @@ class CalendarRepository extends ServiceEntityRepository
 	}
 
 
+		/**
+	 * Get the calendars between startDate and endDate
+	 *
+	 * @param DividendService $dividendService
+	 * @param integer $year
+	 * @param string|null $startDate
+	 * @param string|null $endDate
+	 * @return array|null
+	 */
+	public function foreCast(
+		DividendService $dividendService,
+		string $startDate,
+		string $endDate,
+	): ?array {
+		$qb = $this->createQueryBuilder('c')
+			->select('c, t, p, tr, pies, cur, tax')
+			->innerJoin('c.ticker', 't')
+			->innerJoin(
+				't.positions',
+				'p',
+				'WITH',
+				'(p.closed = false) OR (p.closedAt > :closedAt and p.closed = true AND p.ignore_for_dividend = false)'
+			)
+			->leftJoin('t.tax', 'tax')
+			->leftJoin('p.transactions', 'tr', 'WITH', '(p.closed = false)')
+			->leftJoin('p.pies', 'pies')
+			->leftJoin('c.currency', 'cur')
+			->where('c.paymentDate >= :start and c.paymentDate <= :end')
+
+			->setParameter('start', $startDate)
+			->setParameter('end', $endDate)
+			->setParameter(
+				'closedAt',
+				(new DateTime('-2 month'))->format('Y-m-d')
+			);
+
+		$result = $qb->getQuery()->getResult();
+
+		if (!$result) {
+			return null;
+		}
+
+		$dividendService->setCummulateDividendAmount(false);
+
+		$totalDividend = [];
+		foreach ($result as $item) {
+			$positionAmount = $dividendService->getPositionAmount($item);
+			if ($positionAmount < 0.001) {
+				// filter out ones that have no amount of stocks for dividend payout
+				continue;
+			}
+			$positionDividend = $dividendService->getTotalNetDividend($item);
+			if ($positionDividend < 0.01) {
+				// filter out ones that have no payout of dividend or to small to matter
+				continue;
+			}
+			if (!isset($totalDividend[$item->getPaymentDate()->format('Ym')])) {
+				$totalDividend[$item->getPaymentDate()->format('Ym')] = 0.0;
+			}
+			$totalDividend[$item->getPaymentDate()->format('Ym')] += $positionDividend;
+		}
+
+		return $totalDividend;
+	}
+
 	public function getCalendarsForTickers(array $tickers, string $lastYear): array
 	{
 		return $this->createQueryBuilder('c')

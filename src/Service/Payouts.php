@@ -4,7 +4,8 @@ namespace App\Service;
 
 use App\Repository\PaymentRepository;
 use App\Repository\DividendTrackerRepository;
-use Symfony\Component\Security\Core\User\UserInterface;
+use App\Repository\CalendarRepository;
+use App\Service\DividendService;
 
 class Payouts
 {
@@ -32,7 +33,8 @@ class Payouts
 		];
 	}
 
-	public function payments(PaymentRepository $paymentRepository, DividendTrackerRepository $dividendTrackerRepository): array
+	public function payments(PaymentRepository $paymentRepository, DividendTrackerRepository $dividendTrackerRepository,
+	DividendService $dividendService,CalendarRepository $calendarRepository): array
 	{
 		$paydate = (new \DateTime('first day of this month -1 years'))->format(
 			'Y-m-d'
@@ -48,9 +50,16 @@ class Payouts
 			);
 			$allocations[$id] = $item['allocation'];
 		}
+
+		//$startDate = (new \DateTime('first day of this month'))->format('Y-m-d');
+		$endDate = (new \DateTime('last day of this month'))->format('Y-m-d');
+		$foreCastDividend = $calendarRepository->foreCast($dividendService, $paydate, $endDate);
+		ksort($foreCastDividend);
+
 		$labels = [];
 		$dates = [];
 		$dividends = [];
+		$foreCastYields = [];
 		$yields = [];
 		foreach ($data as $item) {
 			$labels[] = sprintf(
@@ -69,9 +78,30 @@ class Payouts
 
 			if (isset($allocations[$date])) {
 				$yields[$date] = (($item['dividend'] * 12) / $allocations[$date])*100;
+
+				if (isset($foreCastDividend[$date])) {
+					$foreCastYields[$date] = (($foreCastDividend[$date] * 12) / $allocations[$date])*100;
+				}
 			}
 		}
 
+		$currentMonth = sprintf(
+				'%04d-%02d',
+				date('Y'),
+				date('m')
+		);
+		$labelMonths = array_fill_keys($labels, 'filler');
+
+		if (!isset($labelMonths[$currentMonth])) {
+			$date = date('Y-m');
+			$labels[] = $date;
+			$yields[$date] = 0.0;
+
+		}
+		if (isset($allocations[$date]) && isset($foreCastDividend[$date])) {
+			$yields[$date] = (($foreCastDividend[$date] * 12) / $allocations[$date])*100;
+		}
+		
 		$trendarray = $this->trendline(array_keys($dividends), $dividends);
 		$trendline = [];
 		foreach ( array_keys($dividends) as $item ) {
@@ -79,7 +109,6 @@ class Payouts
      		$number = ( $number <= 0 )? 0 : $number;
 			$trendline[] = $number;
 		}
-
 
 		$range = range(0,count($yields)-1);
 		$trendarrayYield = $this->trendline($range, array_values($yields));
@@ -90,6 +119,15 @@ class Payouts
 			$trendlineYield[] = $number;
 		}
 
+		$range = range(0,count($foreCastYields)-1);
+		$trendarrayYield = $this->trendline($range, array_values($foreCastYields));
+		$trendlineForeCastYield = [];
+		foreach ( $range as $item ) {
+     		$number = ( $trendarrayYield['slope'] * $item ) + $trendarrayYield['intercept'];
+     		$number = ( $number <= 0 )? 0 : $number;
+			$trendlineForeCastYield[] = $number;
+		}
+
 
 		return [
 			'labels' => $labels,
@@ -97,6 +135,8 @@ class Payouts
 			'trendline' => $trendline,
 			'yields' => $yields,
 			'trendlineYield' => $trendlineYield,
+			'forecast' => $foreCastDividend,
+			'trendlineForeCastYield' => $trendlineForeCastYield,
 		];
 	}
 

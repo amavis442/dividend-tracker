@@ -5,7 +5,9 @@ namespace App\Controller\Report;
 use App\Helper\Colors;
 use App\Repository\PaymentRepository;
 use App\Repository\DividendTrackerRepository;
+use App\Repository\CalendarRepository;
 use App\Service\Payouts;
+use App\Service\DividendService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -75,18 +77,23 @@ class PayoutController extends AbstractController
 	public function payments(
 		PaymentRepository $paymentRepository,
 		DividendTrackerRepository $dividendTrackerRepository,
+		CalendarRepository $calendarRepository,
 		Payouts $payout,
+		DividendService $dividendService,
 		ChartBuilderInterface $chartBuilder
 	): Response {
-		$result = $payout->payments($paymentRepository,$dividendTrackerRepository);
+		$result = $payout->payments($paymentRepository,$dividendTrackerRepository, $dividendService, $calendarRepository);
 		$chart = $chartBuilder->createChart(Chart::TYPE_BAR);
-
 		$chart->setData([
 			'labels' => $result['labels'],
 			'datasets' => [
 				[
 					'label' => 'Dividend payout',
 					'data' => $result['dividends'],
+				],
+				[
+					'label' => 'forecast payout',
+					'data' => array_values($result['forecast'])
 				],
 				[
 					'label' => 'Trendline',
@@ -124,17 +131,25 @@ class PayoutController extends AbstractController
 
 	protected function yields(array $data, array $trendline, ChartBuilderInterface $chartBuilder) {
 		$chart = $chartBuilder->createChart(Chart::TYPE_BAR);
+		$colors = [];
+		for ($i = 0; $i < count($data)-1;$i++) {
+			$colors[] = 'rgba(54, 162, 235, 0.8)';
+		}
+		$colors[] = 'rgba(255, 99, 132, 0.8)';
+
 		$chart->setData([
 			'labels' => array_keys($data),
 			'datasets' => [
 				[
 					'label' => 'Dividend yield',
 					'data' => array_values($data),
+					'backgroundColor'=> $colors,
 				],
 				[
 					'label' => 'Trendline',
 					'data' =>  $trendline,
 					'type' => 'line',
+					'borderColor' =>  'rgb(75, 192, 192)',
 				],
 			],
 		]);
