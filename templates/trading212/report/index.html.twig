@@ -99,10 +99,12 @@
                         {{ item.updatedAt ? item.updatedAt|date("Y-m-d H:i:s") : '' }}
                     </twig:Table:Td>
                     <twig:Table:Td>
+                        {% if item.pie %}
                         <twig:Button tag="a"
                                      href="{{ path("app_report_trading212_graph", {'pie': item.pie.id}) }}">
                             <i class="fa fa-line-chart"></i>
                         </twig:Button>
+                        {% endif %}
                     </twig:Table:Td>
                 </twig:Table:Tr>
             {% else %}

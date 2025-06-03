@@ -79,6 +79,8 @@ class PieController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete' . $pie->getId(), $request->request->get('_token'))) {
             $entityManager->getConnection()->executeQuery('DELETE FROM pie_position WHERE pie_id = :pie', ['pie'=>$pie->getId()]);
+            $entityManager->getConnection()->executeQuery('UPDATE trading212_pie_meta_data SET pie_id = null WHERE pie_id = :pie', ['pie'=>$pie->getId()]);
+
             $transactionRepository->removePie($pie);
 
             $entityManager->remove($pie);

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Trading212PieMetaData;
+use App\Entity\Pie;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
@@ -30,8 +31,10 @@ class Trading212PieMetaDataRepository extends ServiceEntityRepository
 
 	public function latest($pieIds): mixed
 	{
-		return $this->all()->setMaxResults(count($pieIds))->getQuery()->getResult();
-
+		return $this->all()
+			->setMaxResults(count($pieIds))
+			->getQuery()
+			->getResult();
 	}
 
 	public function getDistinctPieIds(): ?array
@@ -42,16 +45,38 @@ class Trading212PieMetaDataRepository extends ServiceEntityRepository
 			->getResult();
 	}
 
-	public function getSumAllocatedAndDistributedPerData(\DateTimeInterface $dt): ?array
-	{
+	public function getSumAllocatedAndDistributedPerData(
+		\DateTimeInterface $dt
+	): ?array {
 		return $this->createQueryBuilder('t')
-			->select('t.createdAt, SUM(t.priceAvgInvestedValue) invested, SUM(t.priceAvgValue) currentvalue, SUM(t.gained) gained, SUM(t.reinvested) reinvested')
+			->select(
+				't.createdAt, SUM(t.priceAvgInvestedValue) invested, SUM(t.priceAvgValue) currentvalue, SUM(t.gained) gained, SUM(t.reinvested) reinvested'
+			)
 			->where('t.createdAt > :dt')
 			->groupBy('t.createdAt')
 			->orderBy('t.createdAt', 'ASC')
 			->setParameter('dt', $dt->format('Y-m-d'))
 			->getQuery()
 			->getResult();
+	}
+
+	public function updatePie(Pie $pie): void
+	{
+		if ($pie->getTrading212PieId() == null) {
+			return;
+		}
+
+		$qb = $this->createQueryBuilder('t')
+			->update()
+			->set('t.pie', ':pieID')
+			->set('t.pieName', ':label')
+			->where('t.trading212PieId = :trading212PieId')
+			->andWhere('t.pie is null')
+			->setParameter(':trading212PieId', $pie->getTrading212PieId())
+			->setParameter('label',$pie->getLabel())
+			->setParameter('pieID', $pie->getId())
+			->getQuery();
+		$qb->execute();
 	}
 
 	//    /**
