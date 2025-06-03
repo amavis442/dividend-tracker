@@ -424,14 +424,8 @@ class CalendarRepository extends ServiceEntityRepository
 	}
 
 
-		/**
+    /**
 	 * Get the calendars between startDate and endDate
-	 *
-	 * @param DividendService $dividendService
-	 * @param integer $year
-	 * @param string|null $startDate
-	 * @param string|null $endDate
-	 * @return array|null
 	 */
 	public function foreCast(
 		DividendService $dividendService,

@@ -85,23 +85,17 @@ class Payouts
 			}
 		}
 
-		$currentMonth = sprintf(
-				'%04d-%02d',
-				date('Y'),
-				date('m')
-		);
 		$labelMonths = array_fill_keys($labels, 'filler');
 
-		if (!isset($labelMonths[$currentMonth])) {
-			$date = date('Y-m');
+		$date = date('Y-m');
+		if (!isset($labelMonths[$date])) {
 			$labels[] = $date;
 			$yields[$date] = 0.0;
-
 		}
 		if (isset($allocations[$date]) && isset($foreCastDividend[$date])) {
 			$yields[$date] = (($foreCastDividend[$date] * 12) / $allocations[$date])*100;
 		}
-		
+
 		$trendarray = $this->trendline(array_keys($dividends), $dividends);
 		$trendline = [];
 		foreach ( array_keys($dividends) as $item ) {
