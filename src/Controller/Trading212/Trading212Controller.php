@@ -500,7 +500,7 @@ final class Trading212Controller extends AbstractController
 		$summary['breakEven'] = [];
 		$summaryData = $trading212PieMetaDataRepository->getSummary();
 		foreach ($summaryData as $createdAt => $item) {
-			$summary['label'][] = $createdAt;
+			$summary['label'][] = $item['createdAt']->format('Y-m-d');
 
 			$invested = round($item['invested'], 2);
 			$summary['invested'][] = $invested;
