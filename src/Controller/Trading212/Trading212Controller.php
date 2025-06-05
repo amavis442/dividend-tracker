@@ -7,13 +7,9 @@ use App\Helper\Colors;
 use App\Repository\CalendarRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\TickerRepository;
-
-use App\Repository\Trading212PieInstrumentRepository;
 use App\Repository\Trading212PieMetaDataRepository;
 use App\Service\ExchangeRate\ExchangeRateInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Pagerfanta\Doctrine\ORM\QueryAdapter;
-use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
@@ -37,16 +33,8 @@ final class Trading212Controller extends AbstractController
 		$pieIds = $trading212PieMetaDataRepository->getDistinctPieIds();
 		$data = $trading212PieMetaDataRepository->latest($pieIds);
 
-		/*
-		$adapter = new QueryAdapter($queryBuilder);
-		$pager = new Pagerfanta($adapter);
-		$pager->setMaxPerPage(10);
-		$pager->setCurrentPage($page);
-		*/
-
 		return $this->render('trading212/report/index.html.twig', [
-			'title' => 'Trading212Controller',
-			//'pager' => $pager,
+			'title' => 'Trading212',
 			'data' => $data,
 		]);
 	}
@@ -122,7 +110,7 @@ final class Trading212Controller extends AbstractController
 		foreach ($tickerCalendars as $tickerCalendar) {
 			$id = $tickerCalendar->getTicker()->getId();
 
-			$cId = (int)$tickerCalendar->getPaymentDate()->format('Ym');
+			$cId = (int) $tickerCalendar->getPaymentDate()->format('Ym');
 			$tickers[$id]['calendars'][$cId] = $tickerCalendar;
 
 			if (!isset($tickers[$id]['dividend'])) {
@@ -143,8 +131,14 @@ final class Trading212Controller extends AbstractController
 
 				$owned = $tickers[$id]['instrument']->getOwnedQuantity();
 				$tax = $tickers[$id]['tax']->getTaxRate();
-				$predictedPayment = $owned * $tickerCalendar->getCashAmount() * $rateDollarEuro * (1-$tax);
-				$tickers[$id]['dividend']['predicted_payment'][$cId] = $predictedPayment;
+				$predictedPayment =
+					$owned *
+					$tickerCalendar->getCashAmount() *
+					$rateDollarEuro *
+					(1 - $tax);
+				$tickers[$id]['dividend']['predicted_payment'][
+					$cId
+				] = $predictedPayment;
 			}
 		}
 
@@ -168,7 +162,12 @@ final class Trading212Controller extends AbstractController
 			if (isset($instrumentTicker['calendars'])) {
 				//dd(array_slice($instrumentTicker['dividend'], -6, null, true) );
 				//array_slice($instrumentTicker['calendars'], -6);
-				$cals = array_slice($instrumentTicker['calendars'], -6, null, true);
+				$cals = array_slice(
+					$instrumentTicker['calendars'],
+					-6,
+					null,
+					true
+				);
 				ksort($cals);
 				$instrument->setCalendars($cals); // Last 6 months if data is available
 				$instrument->setDividend($instrumentTicker['dividend']);
@@ -179,7 +178,7 @@ final class Trading212Controller extends AbstractController
 
 			$owned = $instrument->getOwnedQuantity();
 			// Current
-			$yearMonth = (int)date('Ym');
+			$yearMonth = (int) date('Ym');
 			$currentDividend = 0.0;
 			if (isset($instrumentTicker['calendars'][$yearMonth])) {
 				$currentDividend = $instrumentTicker['calendars'][
@@ -194,7 +193,10 @@ final class Trading212Controller extends AbstractController
 
 			$instrument->setMonthlyYield(0.0);
 			if ($instrument->getPriceAvgInvestedValue() > 0) {
-				$monthlyYield = ($totalCurrentDividend / $instrument->getPriceAvgInvestedValue()) * 100;
+				$monthlyYield =
+					($totalCurrentDividend /
+						$instrument->getPriceAvgInvestedValue()) *
+					100;
 				$instrument->setMonthlyYield($monthlyYield);
 			}
 
@@ -293,8 +295,9 @@ final class Trading212Controller extends AbstractController
 			$labels[] = $item->getCreatedAt()->format('d-m-Y');
 			$totalReturn[] = $item->getGained() + $item->getPriceAvgValue();
 
-
-			$breakEvenData[] = $item->getPriceAvgInvestedValue() - ($item->getGained() + $item->getPriceAvgValue());
+			$breakEvenData[] =
+				$item->getPriceAvgInvestedValue() -
+				($item->getGained() + $item->getPriceAvgValue());
 		}
 		$chartData = [
 			[
@@ -363,7 +366,12 @@ final class Trading212Controller extends AbstractController
 			],
 		]);
 
-		$breakEvenChart = $this->breakEvenChart($labels, $breakEvenData, $chartBuilder, $translator);
+		$breakEvenChart = $this->breakEvenChart(
+			$labels,
+			$breakEvenData,
+			$chartBuilder,
+			$translator
+		);
 
 		$yieldLabels = [];
 		$yieldData = [];
@@ -418,10 +426,6 @@ final class Trading212Controller extends AbstractController
 			],
 		]);
 
-
-
-
-
 		return $this->render('trading212/report/graph.html.twig', [
 			'title' => 'Trading212Controller',
 			'metaData' => $metaData,
@@ -442,10 +446,13 @@ final class Trading212Controller extends AbstractController
 		]);
 	}
 
-
-	protected function breakEvenChart(array $labels, array $data, ChartBuilderInterface $chartBuilder,		TranslatorInterface $translator,)
-	{
-				$chart = $chartBuilder->createChart(Chart::TYPE_LINE);
+	protected function breakEvenChart(
+		array $labels,
+		array $data,
+		ChartBuilderInterface $chartBuilder,
+		TranslatorInterface $translator
+	) {
+		$chart = $chartBuilder->createChart(Chart::TYPE_LINE);
 		$chart->setData([
 			'labels' => $labels,
 			'datasets' => [
@@ -462,7 +469,145 @@ final class Trading212Controller extends AbstractController
 			'plugins' => [
 				'title' => [
 					'display' => true,
-					'text' => $translator->trans('Break even (under zero is good)'),
+					'text' => $translator->trans(
+						'Break even (under zero is good)'
+					),
+					'font' => [
+						'size' => 24,
+					],
+				],
+				'legend' => [
+					'position' => 'top',
+				],
+			],
+		]);
+
+		return $chart;
+	}
+
+	#[Route('/summary', name: 'app_report_trading212_summary')]
+	public function graphSummary(
+		Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
+		ChartBuilderInterface $chartBuilder,
+		TranslatorInterface $translator
+	): Response {
+		$summary = [];
+		$summary['label'] = [];
+		$summary['invested'] = [];
+		$summary['price'] = [];
+		$summary['gained'] = [];
+		$summary['totalReturn'] = [];
+		$summary['breakEven'] = [];
+		$summaryData = $trading212PieMetaDataRepository->getSummary();
+		foreach ($summaryData as $createdAt => $item) {
+			$summary['label'][] = $createdAt;
+
+			$invested = round($item['invested'], 2);
+			$summary['invested'][] = $invested;
+
+			$price = round($item['price'], 2);
+			$summary['price'][] = $price;
+
+			$gained = round($item['dividend'], 2);
+			$summary['gained'][] = $gained;
+
+			$summary['totalReturn'][] = $price + $gained;
+
+			$summary['breakEven'][] = $invested - $price - $gained;
+		}
+
+		$summaryChart = $this->summaryChart(
+			$summary,
+			$chartBuilder,
+			$translator
+		);
+		$summaryBreakEvenChart = $this->summaryBreakEvenChart(
+			$summary,
+			$chartBuilder,
+			$translator
+		);
+
+		return $this->render('trading212/report/summary_chart.html.twig', [
+			'summaryChart' => $summaryChart,
+			'breakEvenChart' => $summaryBreakEvenChart,
+		]);
+	}
+
+	protected function summaryChart(
+		array $summary,
+		ChartBuilderInterface $chartBuilder,
+		TranslatorInterface $translator
+	) {
+		$chart = $chartBuilder->createChart(Chart::TYPE_LINE);
+		$chart->setData([
+			'labels' => $summary['label'],
+			'datasets' => [
+				[
+					'label' => $translator->trans('Invested'),
+					'data' => $summary['invested'],
+				],
+				[
+					'label' => $translator->trans('Price'),
+					'data' => $summary['price'],
+				],
+				[
+					'label' => $translator->trans('Gained'),
+					'data' => $summary['gained'],
+				],
+				[
+					'label' => $translator->trans('Total return'),
+					'data' => $summary['totalReturn'],
+				],
+			],
+		]);
+
+		$chart->setOptions([
+			'maintainAspectRatio' => false,
+			'responsive' => true,
+			'plugins' => [
+				'title' => [
+					'display' => true,
+					'text' => $translator->trans(
+						'Break even (under zero is good)'
+					),
+					'font' => [
+						'size' => 24,
+					],
+				],
+				'legend' => [
+					'position' => 'top',
+				],
+			],
+		]);
+
+		return $chart;
+	}
+
+	protected function summaryBreakEvenChart(
+		array $summary,
+		ChartBuilderInterface $chartBuilder,
+		TranslatorInterface $translator
+	) {
+		$chart = $chartBuilder->createChart(Chart::TYPE_LINE);
+		$chart->setData([
+			'labels' => $summary['label'],
+			'datasets' => [
+				[
+					'label' => $translator->trans('Break even'),
+					'data' => $summary['breakEven'],
+				],
+			],
+		]);
+
+		$chart->setOptions([
+			'maintainAspectRatio' => false,
+			'responsive' => true,
+			'plugins' => [
+				'title' => [
+					'display' => true,
+					'text' => $translator->trans(
+						'Break even (under zero is good)'
+					),
 					'font' => [
 						'size' => 24,
 					],

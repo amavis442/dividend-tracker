@@ -79,6 +79,15 @@ class Trading212PieMetaDataRepository extends ServiceEntityRepository
 		$qb->execute();
 	}
 
+	public function getSummary(): ?array {
+		return $this->createQueryBuilder('t','t.createdAt')
+		->select("t.createdAt, SUM(t.priceAvgInvestedValue) invested, SUM(t.priceAvgValue) price, SUM(t.gained) dividend")
+		->groupBy('t.createdAt')
+		->orderBy('t.createdAt','ASC')
+		->getQuery()
+		->getResult();
+	}
+
 	//    /**
 	//     * @return Trading212PieMetaData[] Returns an array of Trading212PieMetaData objects
 	//     */

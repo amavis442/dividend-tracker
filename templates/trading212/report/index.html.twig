@@ -1,6 +1,11 @@
 {% extends 'layouts/index_no_add_default.html.twig' %}
 {% block title %}Trading212{% endblock %}
 {% block content %}
+    <div class="w-full pr-3 py-2 mb-2 space-x-1">
+        <twig:Button tag="a" href="{{ path("app_report_trading212_summary") }}">
+            <i class="fa fa-line-chart"></i>
+        </twig:Button>
+    </div>
     <twig:Table:Table class="max-w-min min-w-full">
         <twig:Table:THead>
             <tr>
@@ -16,7 +21,6 @@
                 <twig:Table:ThCol>
                     {{ 'Average value'|trans }}
                 </twig:Table:ThCol>
-
                 <twig:Table:ThCol>
                     {{ 'Dividend'|trans }}
                 </twig:Table:ThCol>
@@ -58,14 +62,13 @@
                     <twig:Table:Td>
                         {{ item.priceAvgValue }}
                     </twig:Table:Td>
-
                     <twig:Table:Td>
                         <div class="flex">&euro;{{ item.gained|default("0.0") |number_format(2) }}</div>
                     </twig:Table:Td>
                     <twig:Table:Td>
                         <div class="flex">{{ item.gainedPercentage|default("0.0") |number_format(2) }}%</div>
                     </twig:Table:Td>
-                                        <twig:Table:Td>
+                    <twig:Table:Td>
                         <div class="flex">
                             {% if item.diffValue < 0 %}
                                 <span class="bg-red-500 text-white p-2 rounded-lg flex">{{ item.diffValue|number_format(2) }}</span>
@@ -100,10 +103,10 @@
                     </twig:Table:Td>
                     <twig:Table:Td>
                         {% if item.pie %}
-                        <twig:Button tag="a"
-                                     href="{{ path("app_report_trading212_graph", {'pie': item.pie.id}) }}">
-                            <i class="fa fa-line-chart"></i>
-                        </twig:Button>
+                            <twig:Button tag="a"
+                                         href="{{ path("app_report_trading212_graph", {'pie': item.pie.id}) }}">
+                                <i class="fa fa-line-chart"></i>
+                            </twig:Button>
                         {% endif %}
                     </twig:Table:Td>
                 </twig:Table:Tr>
