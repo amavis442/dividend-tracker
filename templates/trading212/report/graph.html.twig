@@ -127,10 +127,13 @@
                                 {% endif %}
                             </twig:Table:Td>
                             <twig:Table:Td>
+                            {% set diffValueInvested = ((instrument.priceAvgValue - instrument.priceAvgInvestedValue)/instrument.priceAvgInvestedValue) * 100 %}
                                 {% if instrument.priceAvgValue < instrument.priceAvgInvestedValue %}
-                                    <span class="bg-red-500 text-white p-2 rounded-lg flex">&euro;{{ (instrument.priceAvgValue - instrument.priceAvgInvestedValue)|number_format(3) }}</span>
+                                    <div class="bg-red-500 text-white p-2 rounded-lg flex">&euro;{{ (instrument.priceAvgValue - instrument.priceAvgInvestedValue)|number_format(3) }}
+                                        <div class="inline-block w-full text-right ml-2"><twig:Badge variant="info" type="pill">{{ diffValueInvested|number_format(2) }}%</twig:Badge></div></div>
                                 {% else %}
-                                    <span class="bg-green-500 text-white p-2 rounded-lg flex">&euro;{{ (instrument.priceAvgValue - instrument.priceAvgInvestedValue)|number_format(3) }}</span>
+                                    <div class="bg-green-500 text-white p-2 rounded-lg flex">&euro;{{ (instrument.priceAvgValue - instrument.priceAvgInvestedValue)|number_format(3) }}
+                                        <div class="inline-block w-full text-right ml-2"><twig:Badge variant="info" type="pill">{{ diffValueInvested|number_format(2) }}%</twig:Badge></div></div>
                                 {% endif %}
                             </twig:Table:Td>
                             <twig:Table:Td>
