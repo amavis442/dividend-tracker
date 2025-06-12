@@ -76,10 +76,17 @@ final class Trading212Controller extends AbstractController
 		// Get the tickers needed foor the rest
 		foreach ($instruments as $instrument) {
 			if (!$instrument->getTicker()) {
-				throw new \RuntimeException(
+				$this->addFlash(
+					'notice',
 					$instrument->getTickerName() .
 						' has not been assigned a ticker'
 				);
+				/* throw new \RuntimeException(
+					$instrument->getTickerName() .
+						' has not been assigned a ticker'
+				);
+				*/
+				continue;
 			}
 			$tickers[$instrument->getTicker()->getId()] = [
 				'ticker' => $instrument->getTicker(),
@@ -147,8 +154,11 @@ final class Trading212Controller extends AbstractController
 		 */
 		foreach ($instruments as $instrument) {
 			$ticker = $instrument->getTicker();
+			if (!$ticker) {
+				continue;
+			}
 			$tickerId = $instrument->getTicker()->getId();
-			if (!$ticker || $instrument->getPriceAvgInvestedValue() == 0) {
+			if ($instrument->getPriceAvgInvestedValue() == 0) {
 				continue;
 			}
 			$instrumentTicker = $tickers[$tickerId];
