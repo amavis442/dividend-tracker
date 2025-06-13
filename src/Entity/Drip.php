@@ -58,6 +58,8 @@ class Drip
 
 	private bool $dividendReinvested = true;
 
+	private int $dividendPercentageWithDrawn = 0;
+
 	/**
 	 * Get the value of dividendPercentage
 	 *
@@ -246,6 +248,30 @@ class Drip
 	public function setDividendReinvested(bool $dividendReinvested): self
 	{
 		$this->dividendReinvested = $dividendReinvested;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of dividendPercentageWithDrawn
+	 *
+	 * @return  int
+	 */
+	public function getDividendPercentageWithDrawn(): int
+	{
+		return $this->dividendPercentageWithDrawn;
+	}
+
+	/**
+	 * Set the value of dividendPercentageWithDrawn
+	 *
+	 * @param   int  $dividendPercentageWithDrawn
+	 *
+	 * @return  static
+	 */
+	public function setDividendPercentageWithDrawn(int $dividendPercentageWithDrawn): static
+	{
+		$this->dividendPercentageWithDrawn = $dividendPercentageWithDrawn;
 
 		return $this;
 	}

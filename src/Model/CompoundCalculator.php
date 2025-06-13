@@ -132,11 +132,12 @@ class CompoundCalculator
 
 		$dividendPercentage = $compound->getDividendPercentage();
 		$invested = $compound->getInvested();
-		$investPerMonth = $compound->getInvestPerMonth();
+		$investPerMonthInit = $compound->getInvestPerMonth();
 		$inflation = $compound->getInflation();
 		$frequency = $compound->getFrequency();
 		$years = $compound->getYears();
 		$taxRate = $compound->getTaxRate();
+		$takeOutPercentage = $compound->getDividendPercentageWithDrawn();
 
 		$capital = $invested;
 		$startYear = (int) date('Y');
@@ -167,7 +168,12 @@ class CompoundCalculator
 			} else {
 				$dividend = 0;
 			}
-			$investPerMonth = $compound->getInvestPerMonth();
+			$investPerMonth = $investPerMonthInit;
+			if ($takeOutPercentage > 0) {
+				$investPerMonth -= ($dividend * ($takeOutPercentage / 100));
+			}
+			$data[$i]['deposits_withdrawals'] = $investPerMonth;
+
 			$addedInvestPerMonth = $investPerMonth;
 			if ($compound->isDividendReinvested()) {
 				$addedInvestPerMonth += $dividend;

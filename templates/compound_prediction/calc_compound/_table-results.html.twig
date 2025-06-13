@@ -55,7 +55,11 @@
                     {{ item.dividend|format_number({"fraction_digit": 2}) }}
                 </twig:Table:Td>
                 <twig:Table:Td>
-                    {{ deposits_withdrawals|format_number({"fraction_digit": 2}) }}
+                 {% if item.deposits_withdrawals < 0 %}
+                    <div class="bg-red-500 text-white p-2">&euro;{{ item.deposits_withdrawals|format_number({"fraction_digit": 2}) }}</div>
+                    {% else %}
+                    <div class="bg-green-500 text-white p-2">&euro;{{ item.deposits_withdrawals|format_number({"fraction_digit": 2}) }}</div>
+                    {% endif %}
                 </twig:Table:Td>
                 <twig:Table:Td>
                     {{ (item.investPerMonth)|format_number({"fraction_digit": 2}) }}
