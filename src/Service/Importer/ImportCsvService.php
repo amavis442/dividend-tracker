@@ -153,6 +153,7 @@ class ImportCsvService extends AbstractImporter
             if (
                 false !== stripos($cellVal, 'deposit') ||
                 false !== stripos($cellVal, 'withdraw') ||
+                false !== stripos($cellVal, 'dividend adjustment') ||
                 (!(stripos($cellVal, 'dividend') !== false) && false !== stripos($cellVal, 'interest'))
             ) {
                 continue;
@@ -203,7 +204,7 @@ class ImportCsvService extends AbstractImporter
                             )
                         ) {
                             throw new RuntimeException(
-                                'ISIN Number not correct: ' . $isin
+                                'ISIN Number not correct: ' . $isin. ' '. print_r($csvRow, true)
                             );
                         }
                         break;
