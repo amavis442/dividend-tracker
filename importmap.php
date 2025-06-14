@@ -25,27 +25,21 @@ return [
     '@popperjs/core' => [
         'version' => '2.11.8',
     ],
-    'tom-select' => [
-        'version' => '2.3.1',
-    ],
     '@hotwired/turbo' => [
-        'version' => '8.0.10',
+        'version' => '8.0.13',
     ],
     '@fortawesome/fontawesome-free/css/all.css' => [
-        'version' => '6.6.0',
+        'version' => '6.7.2',
         'type' => 'css',
     ],
     '@symfony/stimulus-bridge' => [
-        'version' => '3.2.2',
-    ],
-    'sweetalert2' => [
-        'version' => '11.14.1',
+        'version' => '4.0.1',
     ],
     'chart.js' => [
-        'version' => '4.4.4',
+        'version' => '4.4.9',
     ],
     '@kurkle/color' => [
-        'version' => '0.3.2',
+        'version' => '0.3.4',
     ],
     'bs-custom-file-input' => [
         'version' => '1.3.4',
@@ -54,175 +48,175 @@ return [
         'version' => '3.7.1',
     ],
     'ckeditor5' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-adapter-ckfinder/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-alignment/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-autoformat/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-autosave/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-basic-styles/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-block-quote/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-ckbox/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-ckfinder/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-clipboard/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-cloud-services/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-code-block/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-core/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-easy-image/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-editor-balloon/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-editor-classic/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-editor-decoupled/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-editor-inline/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-editor-multi-root/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-engine/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-enter/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-essentials/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-find-and-replace/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-font/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-heading/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-highlight/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-horizontal-line/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-html-embed/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-html-support/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-image/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-indent/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-language/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-link/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-list/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-markdown-gfm/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-media-embed/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-mention/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-minimap/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-page-break/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-paragraph/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-paste-from-office/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-remove-format/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-restricted-editing/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-select-all/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-show-blocks/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-source-editing/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-special-characters/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-style/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-table/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-typing/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-ui/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-undo/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-upload/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-utils/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-watchdog/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-widget/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     '@ckeditor/ckeditor5-word-count/dist/index.js' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
     ],
     'lodash-es' => [
         'version' => '4.17.21',
@@ -255,80 +249,129 @@ return [
         'version' => '0.12.0',
     ],
     'ckeditor5/dist/ckeditor5.css' => [
-        'version' => '43.1.1',
+        'version' => '45.2.0',
         'type' => 'css',
     ],
     'just-extend' => [
         'version' => '6.2.0',
     ],
     '@tailwindcss/forms' => [
-        'version' => '0.5.9',
+        'version' => '0.5.10',
     ],
     'mini-svg-data-uri' => [
         'version' => '1.4.4',
     ],
     'tailwindcss/plugin' => [
-        'version' => '3.4.10',
+        'version' => '4.1.10',
     ],
     'tailwindcss/defaultTheme' => [
-        'version' => '3.4.10',
+        'version' => '4.1.10',
     ],
     'tailwindcss/colors' => [
-        'version' => '3.4.10',
+        'version' => '4.1.10',
     ],
     'picocolors' => [
-        'version' => '1.0.1',
+        'version' => '1.1.1',
     ],
     'tom-select/dist/css/tom-select.default.css' => [
-        'version' => '2.3.1',
+        'version' => '2.4.3',
         'type' => 'css',
     ],
     '@floating-ui/dom' => [
-        'version' => '1.6.11',
+        'version' => '1.7.1',
     ],
     '@floating-ui/core' => [
-        'version' => '1.6.8',
+        'version' => '1.7.1',
     ],
     '@floating-ui/utils' => [
-        'version' => '0.2.8',
+        'version' => '0.2.9',
     ],
     '@floating-ui/utils/dom' => [
-        'version' => '0.2.8',
-    ],
-    'stimulus-use' => [
-        'version' => '0.52.2',
+        'version' => '0.2.9',
     ],
     '@stimulus-components/dropdown' => [
         'version' => '3.0.0',
     ],
-    'byline' => [
-        'version' => '4.1.1',
-    ],
-    'underscore.string' => [
-        'version' => '2.3.3',
-    ],
-    'through2' => [
-        'version' => '0.6.2',
-    ],
-    'readable-stream/transform' => [
-        'version' => '1.0.31',
-    ],
-    'xtend' => [
-        'version' => '4.0.0',
-    ],
-    'core-util-is' => [
-        'version' => '1.0.1',
-    ],
-    'inherits' => [
-        'version' => '2.0.1',
-    ],
-    'isarray' => [
-        'version' => '0.0.1',
-    ],
-    'string_decoder' => [
-        'version' => '0.10.25',
-    ],
     'alpinejs' => [
         'version' => '3.14.9',
+    ],
+    '@orchidjs/sifter' => [
+        'version' => '1.1.0',
+    ],
+    '@orchidjs/unicode-variants' => [
+        'version' => '1.1.2',
+    ],
+    'tom-select/dist/css/tom-select.default.min.css' => [
+        'version' => '2.4.3',
+        'type' => 'css',
+    ],
+    'sweetalert2' => [
+        'version' => '11.22.0',
+    ],
+    'isarray' => [
+        'version' => '2.0.5',
+    ],
+    'string_decoder' => [
+        'version' => '1.3.0',
+    ],
+    'safe-buffer' => [
+        'version' => '5.2.0',
+    ],
+    'stimulus-use' => [
+        'version' => '0.52.3',
+    ],
+    'tom-select' => [
+        'version' => '2.4.3',
+    ],
+    'byline' => [
+        'version' => '5.0.0',
+    ],
+    'underscore.string' => [
+        'version' => '3.3.6',
+    ],
+    'util-deprecate' => [
+        'version' => '1.0.2',
+    ],
+    'through2' => [
+        'version' => '4.0.2',
+    ],
+    'xtend' => [
+        'version' => '4.0.2',
+    ],
+    'core-util-is' => [
+        'version' => '1.0.3',
+    ],
+    'inherits' => [
+        'version' => '2.0.4',
+    ],
+    'abort-controller' => [
+        'version' => '3.0.0',
+    ],
+    'process' => [
+        'version' => '0.11.10',
+    ],
+    'sprintf-js' => [
+        'version' => '1.1.3',
+    ],
+    'readable-stream' => [
+        'version' => '3.6.2',
+    ],
+    '@ckeditor/ckeditor5-bookmark/dist/index.js' => [
+        'version' => '45.2.0',
+    ],
+    '@ckeditor/ckeditor5-emoji/dist/index.js' => [
+        'version' => '45.2.0',
+    ],
+    '@ckeditor/ckeditor5-fullscreen/dist/index.js' => [
+        'version' => '45.2.0',
+    ],
+    '@ckeditor/ckeditor5-icons/dist/index.js' => [
+        'version' => '45.2.0',
+    ],
+    'fuzzysort' => [
+        'version' => '3.1.0',
+    ],
+    'es-toolkit/compat' => [
+        'version' => '1.32.0',
     ],
 ];
