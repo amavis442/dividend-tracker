@@ -28,10 +28,9 @@ final class Trading212Controller extends AbstractController
 	#[Route('/', name: 'app_report_trading212_index')]
 	public function index(
 		Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
-		#[MapQueryParameter] int $page = 1
 	): Response {
-		$pieIds = $trading212PieMetaDataRepository->getDistinctPieIds();
-		$data = $trading212PieMetaDataRepository->latest($pieIds);
+		//$pieIds = $trading212PieMetaDataRepository->getDistinctPieIds();
+		$data = $trading212PieMetaDataRepository->latest();
 
 		return $this->render('trading212/report/index.html.twig', [
 			'title' => 'Trading212',
@@ -116,7 +115,7 @@ final class Trading212Controller extends AbstractController
 
 		foreach ($tickerCalendars as $tickerCalendar) {
 			$id = $tickerCalendar->getTicker()->getId();
-
+			$frequency = $tickerCalendar->getTicker()->getPayoutFrequency();
 			$cId = (int) $tickerCalendar->getPaymentDate()->format('Ym');
 			$tickers[$id]['calendars'][$cId] = $tickerCalendar;
 
@@ -125,6 +124,7 @@ final class Trading212Controller extends AbstractController
 				$tickers[$id]['dividend']['records'] = 0;
 				$tickers[$id]['dividend']['avg'] = 0.0;
 				$tickers[$id]['dividend']['predicted_payment'] = [];
+				$tickers[$id]['dividend']['frequency'] = $frequency;
 			}
 
 			if ($cId > $lastYear) {
@@ -408,7 +408,7 @@ final class Trading212Controller extends AbstractController
 			$yieldData[] = $yield;
 		}
 
-		$chartYield = $chartBuilder->createChart(Chart::TYPE_LINE);
+		$chartYield = $chartBuilder->createChart(Chart::TYPE_BAR);
 		$chartYield->setData([
 			'labels' => $yieldLabels,
 			'datasets' => [

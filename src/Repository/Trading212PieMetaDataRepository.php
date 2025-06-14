@@ -29,12 +29,33 @@ class Trading212PieMetaDataRepository extends ServiceEntityRepository
 			->orderBy($orderBy);
 	}
 
-	public function latest($pieIds): mixed
+	public function latest(): mixed
 	{
+		$result = $this->createQueryBuilder('t')
+		->select('MAX(t.createdAt) created')
+		->orderBy('t.createdAt', 'DESC')
+		->groupBy('t.createdAt')
+		->getQuery()
+		->setMaxResults(1)
+		->getOneOrNullResult()
+		;
+		$startDate = date('Y-m-d'). ' 00:00:00';
+		if ($result) {
+			$startDate = (new \DateTime($result['created']))->format('Y-m-d 21:45:00)'); // This depends on wehn the cronjob will run. Should be set in .env.local, but i am lazy
+		}
+
+		return $this->createQueryBuilder('t')
+		->where('t.createdAt > :startDate')
+		->setParameter('startDate', $startDate)
+		->getQuery()
+		->getResult();
+
+		/*
 		return $this->all()
 			->setMaxResults(count($pieIds))
 			->getQuery()
 			->getResult();
+		*/
 	}
 
 	public function getDistinctPieIds(): ?array
