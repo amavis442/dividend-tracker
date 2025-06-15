@@ -7,5 +7,16 @@
                         'data-controller': 'chartjs-add-euro-sign'
                         }) }}
         </div>
+
+        <div style="width:900px;height:600px">
+            {{ render_chart(chartYield, {
+                        'data-controller': 'chartjs-add-percentage-sign'
+                        }) }}
+        </div>
+        <div style="width:900px;height:600px">
+            {{ render_chart(chartRealized, {
+                        'data-controller': 'chartjs-add-euro-sign'
+                        }) }}
+        </div>
     </div>
 {% endblock %}

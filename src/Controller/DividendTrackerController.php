@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Helper\Colors;
+use App\Repository\PaymentRepository;
 use App\Repository\DividendTrackerRepository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\ExpressionBuilder;
@@ -13,90 +14,207 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
-#[Route(path: "/{_locale<%app.supported_locales%>}/dashboard/tracker")]
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/tracker')]
 class DividendTrackerController extends AbstractController
 {
-    #[Route(path: "/dividend/{year}", name: "dividend_tracker", requirements: ['year' => '\d+'])]
-    public function index(
-        DividendTrackerRepository $dividendTrackerRepository,
-        TranslatorInterface $translator,
-        ChartBuilderInterface $chartBuilder,
-        int $year = 1,
-    ): Response {
-        if ($year == 1) {
-            $year = date('Y');
-        }
-        $year -= 1;
+	#[
+		Route(
+			path: '/dividend/{year}',
+			name: 'dividend_tracker',
+			requirements: ['year' => '\d+']
+		)
+	]
+	public function index(
+		DividendTrackerRepository $dividendTrackerRepository,
+		PaymentRepository $paymentRepository,
+		TranslatorInterface $translator,
+		ChartBuilderInterface $chartBuilder,
+		int $year = 1
+	): Response {
+		if ($year == 1) {
+			$year = date('Y');
+		}
+		$year -= 1;
 
-        $startDate = new \DateTime($year.'-12-31 00:00:00');
-        $expression = (new ExpressionBuilder())->gt('sampleDate', $startDate);
-        $criteria = new Criteria($expression);
+		$payments = $paymentRepository->getSumPaymentsPerMonth($year + 1);
 
-        $data = $dividendTrackerRepository->matching($criteria);
-        $labels = [];
-        $dividendData = [];
-        $principleData = [];
+		$startDate = new \DateTime($year . '-12-31 00:00:00');
+		$expression = (new ExpressionBuilder())->gt('sampleDate', $startDate);
+		$criteria = new Criteria($expression);
 
-        $colors = Colors::COLORS;
+		$data = $dividendTrackerRepository->matching($criteria);
+		$labels = [];
+		$dividendData = [];
+		$principleData = [];
+		$receivedDividends = [];
+		$yieldReceivedDividends = [];
 
-        foreach ($data as $item) {
-            $dividendData[] = round($item->getDividend(), 2);
-            $principleData[] = round($item->getPrinciple(), 2);
-            $labels[] = $item->getSampleDate()->format("d-m-Y");
-        }
-        $chartData = [
-            [
-                "label" => $translator->trans("Expected dividend"),
-                "data" => $dividendData,
-            ],
-            [
-                "label" => $translator->trans("Principle"),
-                "data" => $principleData,
-            ],
-        ];
+		$colors = Colors::COLORS;
 
-        $colors = Colors::COLORS;
+		foreach ($data as $item) {
+			$pKey = $item->getSampleDate()->format('Ym');
+			if (isset($payments[$pKey])) {
+				$receivedDividends[$pKey] = $payments[$pKey];
+				$yieldReceivedDividends[$pKey] = round(
+					(($payments[$pKey] * 12) / $item->getPrinciple()) * 100,
+					2
+				);
+			} else {
+				$yieldReceivedDividends[$pKey] = 0.0;
+				$receivedDividends[$pKey] = 0.0;
+			}
+			$dividendData[$pKey] = round($item->getDividend(), 2);
+			$principleData[$pKey] = round($item->getPrinciple(), 2);
+			$labels[$pKey] = $item->getSampleDate()->format('m-Y');
+		}
+		ksort($dividendData);
+		ksort($principleData);
+		ksort($labels);
 
-        $chart = $chartBuilder->createChart(Chart::TYPE_BAR);
+		$chartData = [
+			[
+				'label' => $translator->trans('Expected dividend'),
+				'data' => array_values($dividendData),
+			],
+			[
+				'label' => $translator->trans('Principle'),
+				'data' => array_values($principleData),
+			],
+		];
 
-        $chart->setData([
-            "labels" => $labels,
-            "datasets" => [
-                [
-                    "label" => $chartData[0]['label'],
-                    "backgroundColor" => $colors[0],
-                    "borderColor" => $colors,
-                    "data" => $chartData[0]['data'],
-                ],
-                [
-                    "label" => $chartData[1]['label'],
-                    "backgroundColor" => $colors[1],
-                    "borderColor" => $colors,
-                    "data" => $chartData[1]['data'],
-                ],
-            ],
-        ]);
+		$colors = Colors::COLORS;
 
-        $chart->setOptions([
-            "maintainAspectRatio" => false,
-            "responsive" => true,
-            "plugins" => [
-                "title" => [
-                    "display" => true,
-                    "text" => $translator->trans("Expected dividend"),
-                    "font" => [
-                        "size" => 24,
-                    ],
-                ],
-                "legend" => [
-                    "position" => "top",
-                ],
-            ],
-        ]);
+		$chart = $chartBuilder->createChart(Chart::TYPE_BAR);
 
-        return $this->render("dividend_tracker/index.html.twig", [
-            "controller_name" => "DividendController",
-            "chart" => $chart,
-        ]);
-    }
+		$chart->setData([
+			'labels' => array_values($labels),
+			'datasets' => [
+				[
+					'label' => $chartData[0]['label'],
+					'backgroundColor' => $colors[0],
+					'borderColor' => $colors,
+					'data' => $chartData[0]['data'],
+				],
+				[
+					'label' => $chartData[1]['label'],
+					'backgroundColor' => $colors[1],
+					'borderColor' => $colors,
+					'data' => $chartData[1]['data'],
+				],
+			],
+		]);
+
+		$chart->setOptions([
+			'maintainAspectRatio' => false,
+			'responsive' => true,
+			'plugins' => [
+				'title' => [
+					'display' => true,
+					'text' => $translator->trans('Expected dividend'),
+					'font' => [
+						'size' => 24,
+					],
+				],
+				'legend' => [
+					'position' => 'top',
+				],
+			],
+		]);
+
+		$chartYield = $this->yieldChart(
+			$translator,
+			$chartBuilder,
+			$labels,
+			$yieldReceivedDividends
+		);
+
+		$chartRealized = $this->realizedDividendsChart(
+			$translator,
+			$chartBuilder,
+			$labels,
+			$receivedDividends
+		);
+
+		return $this->render('dividend_tracker/index.html.twig', [
+			'controller_name' => 'DividendController',
+			'chart' => $chart,
+			'chartYield' => $chartYield,
+			'chartRealized' => $chartRealized,
+		]);
+	}
+
+	private function yieldChart(
+		TranslatorInterface $translator,
+		ChartBuilderInterface $chartBuilder,
+		array $labels,
+		array $yieldReceivedDividends
+	): \Symfony\UX\Chartjs\Model\Chart {
+		ksort($yieldReceivedDividends);
+
+		$chartYield = $chartBuilder->createChart(Chart::TYPE_BAR);
+		$chartYield->setData([
+			'labels' => array_values($labels),
+			'datasets' => [
+				[
+					'label' => $translator->trans('Yield'),
+					'data' => array_values($yieldReceivedDividends),
+				],
+			],
+		]);
+		$chartYield->setOptions([
+			'maintainAspectRatio' => false,
+			'responsive' => true,
+			'plugins' => [
+				'title' => [
+					'display' => true,
+					'text' => $translator->trans('Realized dividend yield'),
+					'font' => [
+						'size' => 24,
+					],
+				],
+				'legend' => [
+					'position' => 'top',
+				],
+			],
+		]);
+		return $chartYield;
+	}
+
+	private function realizedDividendsChart(
+		TranslatorInterface $translator,
+		ChartBuilderInterface $chartBuilder,
+		array $labels,
+		array $receivedDividends
+	): \Symfony\UX\Chartjs\Model\Chart {
+        ksort($receivedDividends);
+
+		$chartRealized = $chartBuilder->createChart(Chart::TYPE_BAR);
+		$chartRealized->setData([
+			'labels' => array_values($labels),
+			'datasets' => [
+				[
+					'label' => $translator->trans('Received'),
+					'data' => array_values($receivedDividends),
+				],
+			],
+		]);
+		$chartRealized->setOptions([
+			'maintainAspectRatio' => false,
+			'responsive' => true,
+			'plugins' => [
+				'title' => [
+					'display' => true,
+					'text' => $translator->trans('Realized dividend yield'),
+					'font' => [
+						'size' => 24,
+					],
+				],
+				'legend' => [
+					'position' => 'top',
+				],
+			],
+		]);
+
+		return $chartRealized;
+	}
 }

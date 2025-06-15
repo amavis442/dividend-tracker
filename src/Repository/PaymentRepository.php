@@ -53,8 +53,8 @@ class PaymentRepository extends ServiceEntityRepository
 		string $orderBy = 'exDividendDate',
 		string $sort = 'DESC',
 		?Ticker $ticker = null,
-		string $startDate = null,
-		string $endDate = null
+		?string $startDate = null,
+		?string $endDate = null
 	): Paginator {
 		$order = 'p.' . $orderBy;
 		if ($orderBy === 'symbol') {
@@ -375,5 +375,32 @@ class PaymentRepository extends ServiceEntityRepository
 		$result = $qb->getQuery()->getResult();
 
 		return $result;
+	}
+
+	public function getSumPaymentsPerMonth(?string $year = null): array
+	{
+		$qb = $this->createQueryBuilder('p')
+			->select(
+				'YEAR(p.payDate) periodYear, MONTH(p.payDate) as periodMonth, SUM(p.dividend) dividend'
+			)
+			->groupBy('periodYear, periodMonth')
+			->orderBy('periodYear, periodMonth');
+
+		if ($year) {
+			$qb->where('YEAR(p.payDate) = :year')->setParameter(
+				'year',
+				$year
+			);
+		}
+
+		$result = $qb->getQuery()->getResult();
+
+		$output = [];
+		foreach ($result as $item) {
+			$output[$item['periodYear'].sprintf("%02d",$item['periodMonth'])] = $item['dividend'];
+		}
+		ksort($output);
+
+		return $output;
 	}
 }
