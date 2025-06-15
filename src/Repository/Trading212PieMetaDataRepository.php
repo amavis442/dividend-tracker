@@ -41,21 +41,20 @@ class Trading212PieMetaDataRepository extends ServiceEntityRepository
 		;
 		$startDate = date('Y-m-d'). ' 00:00:00';
 		if ($result) {
-			$startDate = (new \DateTime($result['created']))->format('Y-m-d 21:45:00)'); // This depends on wehn the cronjob will run. Should be set in .env.local, but i am lazy
+			$startDate = (new \DateTime($result['created']))->format('Y-m-d 00:00:00)');
 		}
 
+		$orderBy = new OrderBy();
+		$orderBy->add('t.createdAt', 'DESC');
+		$orderBy->add('pie.label', 'ASC');
+
 		return $this->createQueryBuilder('t')
+		->leftJoin('t.pie', 'pie')
 		->where('t.createdAt > :startDate')
+		->orderBy($orderBy)
 		->setParameter('startDate', $startDate)
 		->getQuery()
 		->getResult();
-
-		/*
-		return $this->all()
-			->setMaxResults(count($pieIds))
-			->getQuery()
-			->getResult();
-		*/
 	}
 
 	public function getDistinctPieIds(): ?array
