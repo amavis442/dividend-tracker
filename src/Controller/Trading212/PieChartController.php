@@ -32,8 +32,8 @@ final class PieChartController extends AbstractController
 		ChartBuilderInterface $chartBuilder,
 		TranslatorInterface $translator
 	): Response {
-		$pieIds = $trading212PieMetaDataRepository->getDistinctPieIds();
-		$data = $trading212PieMetaDataRepository->latest($pieIds);
+
+		$data = $trading212PieMetaDataRepository->latest();
 
 		$totalInvested = 0.0;
 		/**

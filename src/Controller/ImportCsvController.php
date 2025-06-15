@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Psr\Log\LoggerInterface;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/csv')]
 class ImportCsvController extends AbstractController
@@ -24,7 +25,8 @@ class ImportCsvController extends AbstractController
 		Request $request,
 		EntityManagerInterface $entityManager,
 		ImportCsvService $importCsv,
-		ImportFilesRepository $importFilesRepository
+		ImportFilesRepository $importFilesRepository,
+		LoggerInterface $logger,
 	): Response {
 		$importfile = new fileUpload();
 		$form = $this->createForm(FileUploadType::class, $importfile);
@@ -50,12 +52,13 @@ class ImportCsvController extends AbstractController
 				}
 
 				$result = [];
+
 				try {
 					$result = $importCsv->importFile($transactionFile);
-				} catch (\Exception $e) {
+				} catch (\RuntimeException $e) { // @phpstan-ignore-line
 					$this->addFlash('notice', $e->getMessage());
+					$logger->error($e->getMessage(), [ 'exception' => $e ]);
 				}
-
 				if (count($result) > 0) {
 					$importFiles = new ImportFiles();
 					$importFiles->setName(

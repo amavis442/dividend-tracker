@@ -377,7 +377,7 @@ class PaymentRepository extends ServiceEntityRepository
 		return $result;
 	}
 
-	public function getSumPaymentsPerMonth(?string $year = null): array
+	public function getSumPaymentsPerMonth(?int $year = null): array
 	{
 		$qb = $this->createQueryBuilder('p')
 			->select(
