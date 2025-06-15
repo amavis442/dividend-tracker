@@ -52,13 +52,13 @@ class Trading212PieMetaData
 	#[ORM\ManyToOne(inversedBy: 'trading212PieMetaData')]
 	private ?Pie $pie = null;
 
-	#[ORM\Column]
+	#[ORM\Column(nullable:true)]
 	private ?float $gained = 0.0;
 
-	#[ORM\Column]
+	#[ORM\Column(nullable:true)]
 	private ?float $reinvested = 0.0;
 
-	#[ORM\Column]
+	#[ORM\Column(nullable:true)]
 	private ?float $inCash = 0.0;
 
 	public function __construct()
