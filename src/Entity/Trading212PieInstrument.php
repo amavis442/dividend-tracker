@@ -62,6 +62,8 @@ class Trading212PieInstrument
 	private array $calendars = [];
 	private array $dividend = [];
 	private float $monthlyYield = 0.0;
+	private float $price = 0.0;
+	private float $avgPrice = 0.0;
 
     #[ORM\PrePersist]
 	public function setCreatedAtValue(): void
@@ -499,5 +501,27 @@ class Trading212PieInstrument
 		$this->monthlyYield = $monthlyYield;
 
 		return $this;
+	}
+
+	/**
+	 * Get the value of price
+	 *
+	 * @return  float
+	 */
+	public function getPrice(): float
+	{
+		$this->price = $this->priceAvgValue / $this->ownedQuantity;
+		return $this->price;
+	}
+
+	/**
+	 * Get the value of avgPrice
+	 *
+	 * @return  float
+	 */
+	public function getAvgPrice(): float
+	{
+		$this->avgPrice = $this->priceAvgInvestedValue / $this->ownedQuantity;
+		return $this->avgPrice;
 	}
 }

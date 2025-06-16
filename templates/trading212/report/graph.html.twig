@@ -68,10 +68,13 @@
                             {{'Owned Quantity'|trans}}
                         </twig:Table:ThCol>
                         <twig:Table:ThCol>
-                            {{'Invested'|trans}}
+                            {{'Invested'|trans}} / ({{ 'Price'|trans}})
                         </twig:Table:ThCol>
                         <twig:Table:ThCol>
-                            {{'Avg value'|trans}}
+                            {{'Avg value'|trans}} / ({{ 'Price'|trans}})
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Price loss/gain'|trans}}
                         </twig:Table:ThCol>
                         <twig:Table:ThCol>
                             {{'Avg value - Invested'|trans}}
@@ -115,13 +118,20 @@
                                 {{ instrument.ownedQuantity }}
                             </twig:Table:Td>
                             <twig:Table:Td>
-                                &euro;{{ instrument.priceAvgInvestedValue|number_format(2) }}
+                                &euro;{{ instrument.priceAvgInvestedValue|number_format(2) }} (&euro;{{instrument.avgPrice|number_format(2)}})
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 {% if instrument.priceAvgValue < instrument.priceAvgInvestedValue %}
-                                    <span class="bg-red-500 text-white p-2 rounded-lg flex">&euro;{{ instrument.priceAvgValue|number_format(2) }}</span>
+                                    <span class="bg-red-500 text-white p-2 rounded-lg flex">&euro;{{ instrument.priceAvgValue|number_format(2) }} (&euro;{{instrument.price|number_format(2)}})</span>
                                 {% else %}
-                                    <span class="bg-green-500 text-white p-2 rounded-lg flex">&euro;{{ instrument.priceAvgValue|number_format(2) }}</span>
+                                    <span class="bg-green-500 text-white p-2 rounded-lg flex">&euro;{{ instrument.priceAvgValue|number_format(2) }} (&euro;{{instrument.price|number_format(2)}})</span>
+                                {% endif %}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {% if instrument.price < instrument.avgPrice %}
+                                    <span class="bg-red-500 text-white p-2 rounded-lg flex">&euro; {{ (instrument.price - instrument.avgPrice)|number_format(2)}}</span>
+                                {% else %}
+                                    <span class="bg-green-500 text-white p-2 rounded-lg flex">&euro; {{ (instrument.price - instrument.avgPrice)|number_format(2)}}</span>
                                 {% endif %}
                             </twig:Table:Td>
                             <twig:Table:Td>
@@ -133,9 +143,10 @@
                                     <div class="bg-green-500 text-white p-2 rounded-lg flex">&euro;{{ (instrument.priceAvgValue - instrument.priceAvgInvestedValue)|number_format(3) }}
                                         <div class="inline-block w-full text-right ml-2"><twig:Badge variant="info" type="pill">{{ diffValueInvested|number_format(2) }}%</twig:Badge></div></div>
                                 {% endif %}
+
                             </twig:Table:Td>
                             <twig:Table:Td>
-                                {{ sign|raw }}{{ instrument.currentDividendPerShare|number_format(2) }}
+                                {{ sign|raw }}{{ instrument.currentDividendPerShare|number_format(4) }}
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 <div class="flex" {{ stimulus_controller("tooltip") }} data-tooltip-placement-value="right">
@@ -199,7 +210,7 @@
                                 {{ instrument.avgYearlyYield|number_format(2) }}%
                             </twig:Table:Td>
                             <twig:Table:Td>
-                                {{ instrument.dividendPaid|number_format(2) }}
+                                &euro;{{ instrument.dividendPaid|number_format(2) }}
                             </twig:Table:Td>
                         </twig:Table:Tr>
                     {% else %}
@@ -242,7 +253,7 @@
                                     </div>
                                 </div>
                             </twig:Table:Td>
-                            <twig:Table:Td colspan="2">
+                            <twig:Table:Td colspan="3">
                             </twig:Table:Td>
                             <twig:Table:Td colspan="2" class="flex content-start">
                                 <div class="font-semibold rounded bg-orange-500 text-sm text-white text-center p-1">
