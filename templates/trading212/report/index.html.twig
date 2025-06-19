@@ -48,7 +48,7 @@
             </tr>
         </twig:Table:THead>
         <tbody>
-            {% for item in data %}
+                {% for item in data %}
                 <twig:Table:Tr>
                     <twig:Table:ThRow>
                         {{ item.id }} - {{ item.trading212PieId }}
@@ -118,5 +118,22 @@
                 </tr>
             {% endfor %}
         </tbody>
+        <tfoot>
+            <twig:Table:Tr>
+                {% set bgColor = totalReturn < 0 ? 'bg-red-500 text-white' : 'bg-green-500' %}
+                <twig:Table:Td></twig:Table:Td>
+                <twig:Table:Td></twig:Table:Td>
+                <twig:Table:Td class="font-bold">&euro;{{ totalInvested|number_format(2) }}</twig:Table:Td>
+                <twig:Table:Td class="font-bold">&euro;{{ totalValue|number_format(2) }}</twig:Table:Td>
+                <twig:Table:Td class="font-bold">&euro;{{ totalGained|number_format(2) }}</twig:Table:Td>
+                <twig:Table:Td></twig:Table:Td>
+                <twig:Table:Td></twig:Table:Td>
+                <twig:Table:Td class="font-bold {{ bgColor }} border">&euro;{{totalReturn|number_format(2) }} </twig:Table:Td>
+                <twig:Table:Td class="font-bold {{ bgColor }}">{{ totalReturnYield|number_format(2) }}%</twig:Table:Td>
+                <twig:Table:Td></twig:Table:Td>
+                <twig:Table:Td></twig:Table:Td>
+                <twig:Table:Td></twig:Table:Td>
+            </twig:Table:Tr>
+        </tfoot>
     </twig:Table:Table>
 {% endblock %}

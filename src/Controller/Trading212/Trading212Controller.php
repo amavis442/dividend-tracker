@@ -27,14 +27,31 @@ final class Trading212Controller extends AbstractController
 {
 	#[Route('/', name: 'app_report_trading212_index')]
 	public function index(
-		Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
+		Trading212PieMetaDataRepository $trading212PieMetaDataRepository
 	): Response {
 		//$pieIds = $trading212PieMetaDataRepository->getDistinctPieIds();
 		$data = $trading212PieMetaDataRepository->latest();
 
+		$totalInvested = 0.0;
+		$totalValue = 0.0;
+		$totalGained = 0.0;
+		$totalReturn = 0.0;
+		$totalReturnYield = 0.0;
+		foreach ($data as $item) {
+			$totalInvested += $item->getPriceAvgInvestedValue();
+			$totalValue += $item->getPriceAvgValue();
+			$totalGained += $item->getGained();
+		}
+		$totalReturn = $totalValue + $totalGained - $totalInvested;
+		$totalReturnYield = ($totalReturn / $totalInvested)*100;
 		return $this->render('trading212/report/index.html.twig', [
 			'title' => 'Trading212',
 			'data' => $data,
+			'totalInvested' => $totalInvested,
+			'totalValue' => $totalValue,
+			'totalGained' => $totalGained,
+			'totalReturn' => $totalReturn,
+			'totalReturnYield' =>$totalReturnYield,
 		]);
 	}
 
