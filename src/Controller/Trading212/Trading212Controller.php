@@ -29,9 +29,23 @@ final class Trading212Controller extends AbstractController
 	public function index(
 		Trading212PieMetaDataRepository $trading212PieMetaDataRepository
 	): Response {
-		//$pieIds = $trading212PieMetaDataRepository->getDistinctPieIds();
 		$data = $trading212PieMetaDataRepository->latest();
 
+		$stats = $this->calcStats($data);
+		return $this->render(
+			'trading212/report/index.html.twig',
+			array_merge(
+				[
+					'title' => 'Trading212',
+					'data' => $data,
+				],
+				$stats
+			)
+		);
+	}
+
+	private function calcStats(array $data): array
+	{
 		$totalInvested = 0.0;
 		$totalValue = 0.0;
 		$totalGained = 0.0;
@@ -43,16 +57,15 @@ final class Trading212Controller extends AbstractController
 			$totalGained += $item->getGained();
 		}
 		$totalReturn = $totalValue + $totalGained - $totalInvested;
-		$totalReturnYield = ($totalReturn / $totalInvested)*100;
-		return $this->render('trading212/report/index.html.twig', [
-			'title' => 'Trading212',
-			'data' => $data,
+		$totalReturnYield = ($totalReturn / $totalInvested) * 100;
+
+		return [
 			'totalInvested' => $totalInvested,
 			'totalValue' => $totalValue,
 			'totalGained' => $totalGained,
 			'totalReturn' => $totalReturn,
-			'totalReturnYield' =>$totalReturnYield,
-		]);
+			'totalReturnYield' => $totalReturnYield,
+		];
 	}
 
 	#[Route('/graph/{pie}', name: 'app_report_trading212_graph')]
@@ -518,6 +531,9 @@ final class Trading212Controller extends AbstractController
 		ChartBuilderInterface $chartBuilder,
 		TranslatorInterface $translator
 	): Response {
+		$data = $trading212PieMetaDataRepository->latest();
+		$stats = $this->calcStats($data);
+
 		$summary = [];
 		$summary['label'] = [];
 		$summary['invested'] = [];
@@ -554,10 +570,16 @@ final class Trading212Controller extends AbstractController
 			$translator
 		);
 
-		return $this->render('trading212/report/summary_chart.html.twig', [
-			'summaryChart' => $summaryChart,
-			'breakEvenChart' => $summaryBreakEvenChart,
-		]);
+		return $this->render(
+			'trading212/report/summary_chart.html.twig',
+			array_merge(
+				[
+					'summaryChart' => $summaryChart,
+					'breakEvenChart' => $summaryBreakEvenChart,
+				],
+				$stats
+			)
+		);
 	}
 
 	protected function summaryChart(

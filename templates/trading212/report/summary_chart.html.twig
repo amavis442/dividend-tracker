@@ -2,6 +2,49 @@
 {% block title %}Trading212!{% endblock %}
 {% block body %}
     <div class="flex flex-col items-center mb-6 mt-6 bg-white shadow-md rounded-lg p-6">
+        <div>
+            <twig:Table:Table class="w-full mb-4">
+                <twig:Table:THead>
+                    <tr>
+                        <twig:Table:ThCol>
+                            {{ 'Average invested'|trans }}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{ 'Average value'|trans }}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{ 'Dividend'|trans }}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{ 'Total return'|trans }}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{ 'Total return percentage'|trans }}
+                        </twig:Table:ThCol>
+                    </tr>
+                </twig:Table:THead>
+                <tbody>
+                    <twig:Table:Tr>
+                        {% set bgColor = totalReturn < 0 ? 'bg-red-500 text-white' : 'bg-green-500' %}
+                        <twig:Table:Td class="font-bold">
+                            &euro;{{ totalInvested|number_format(2) }}
+                        </twig:Table:Td>
+                        <twig:Table:Td class="font-bold">
+                            &euro;{{ totalValue|number_format(2) }}
+                        </twig:Table:Td>
+                        <twig:Table:Td class="font-bold">
+                            &euro;{{ totalGained|number_format(2) }}
+                        </twig:Table:Td>
+                        <twig:Table:Td class="font-bold {{ bgColor }} border">
+                            &euro;{{ totalReturn|number_format(2) }}
+                        </twig:Table:Td>
+                        <twig:Table:Td class="font-bold {{ bgColor }}">
+                            {{ totalReturnYield|number_format(2) }}%
+                        </twig:Table:Td>
+                    </twig:Table:Tr>
+                </tbody>
+            </twig:Table:Table>
+        </div>
         <div style="width:900px;
                     height:600px"
              class="border border-gray-500 p-2 mb-4 rounded-lg">
