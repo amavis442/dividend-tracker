@@ -107,7 +107,7 @@
                     {% for instrument in instruments %}
                         {% set sign = instrument.ticker and instrument.ticker.currency ? instrument.ticker.currency.sign : '$' %}
                         <twig:Table:Tr>
-                            <twig:Table:ThRow>
+                            <twig:Table:ThRow class="text-wrap">
                                 {% if instrument.ticker %}
                                     {{ instrument.ticker.fullname }}
                                 {% else %}
@@ -253,7 +253,7 @@
                                     </div>
                                 </div>
                             </twig:Table:Td>
-                            <twig:Table:Td colspan="3">
+                            <twig:Table:Td colspan="2">
                             </twig:Table:Td>
                             <twig:Table:Td colspan="2" class="flex content-start">
                                 <div class="font-semibold rounded bg-orange-500 text-sm text-white text-center p-1">
