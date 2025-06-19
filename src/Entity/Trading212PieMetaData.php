@@ -43,7 +43,7 @@ class Trading212PieMetaData
 			mappedBy: 'trading212PieMetaData'
 		)
 	]
-	#[ORM\OrderBy(['tickerName'=> 'ASC'])]
+	#[ORM\OrderBy(['tickerName' => 'ASC'])]
 	private Collection $trading212PieInstruments;
 
 	#[ORM\Column(length: 255, nullable: true)]
@@ -52,13 +52,13 @@ class Trading212PieMetaData
 	#[ORM\ManyToOne(inversedBy: 'trading212PieMetaData')]
 	private ?Pie $pie = null;
 
-	#[ORM\Column(nullable:true)]
+	#[ORM\Column(nullable: true)]
 	private ?float $gained = 0.0;
 
-	#[ORM\Column(nullable:true)]
+	#[ORM\Column(nullable: true)]
 	private ?float $reinvested = 0.0;
 
-	#[ORM\Column(nullable:true)]
+	#[ORM\Column(nullable: true)]
 	private ?float $inCash = 0.0;
 
 	public function __construct()
@@ -240,7 +240,9 @@ class Trading212PieMetaData
 
 	public function getGainedPercentage(): float
 	{
-		return ($this->gained / $this->priceAvgInvestedValue) * 100;
+		return $this->priceAvgInvestedValue > 0
+			? ($this->gained / $this->priceAvgInvestedValue) * 100
+			: 0.0;
 	}
 
 	public function getReinvested(): ?float
@@ -267,13 +269,17 @@ class Trading212PieMetaData
 		return $this;
 	}
 
-    public function getTotalReturn(): float
-    {
-        return $this->priceAvgValue + $this->gained - $this->priceAvgInvestedValue;
-    }
+	public function getTotalReturn(): float
+	{
+		return $this->priceAvgValue +
+			$this->gained -
+			$this->priceAvgInvestedValue;
+	}
 
 	public function getTotalReturnPercentage(): float
-    {
-        return ($this->getTotalReturn() / $this->priceAvgInvestedValue) * 100;
-    }
+	{
+		return $this->priceAvgInvestedValue > 0
+			? ($this->getTotalReturn() / $this->priceAvgInvestedValue) * 100
+			: 0.0;
+	}
 }

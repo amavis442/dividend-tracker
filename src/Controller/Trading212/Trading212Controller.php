@@ -58,8 +58,10 @@ final class Trading212Controller extends AbstractController
 			$totalGained += $item->getGained();
 		}
 		$totalReturn = $totalValue + $totalGained - $totalInvested;
-		$totalReturnYield = ($totalReturn / $totalInvested) * 100;
-		$totalGainedYield = ($totalGained/ $totalInvested) * 100;
+		$totalReturnYield =
+			$totalInvested > 0 ? ($totalReturn / $totalInvested) * 100 : 0.0;
+		$totalGainedYield =
+			$totalInvested > 0 ? ($totalGained / $totalInvested) * 100 : 0.0;
 		return [
 			'totalInvested' => $totalInvested,
 			'totalValue' => $totalValue,
