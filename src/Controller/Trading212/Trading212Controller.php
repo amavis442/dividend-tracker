@@ -49,6 +49,7 @@ final class Trading212Controller extends AbstractController
 		$totalInvested = 0.0;
 		$totalValue = 0.0;
 		$totalGained = 0.0;
+		$totalGainedYield = 0.0;
 		$totalReturn = 0.0;
 		$totalReturnYield = 0.0;
 		foreach ($data as $item) {
@@ -58,11 +59,12 @@ final class Trading212Controller extends AbstractController
 		}
 		$totalReturn = $totalValue + $totalGained - $totalInvested;
 		$totalReturnYield = ($totalReturn / $totalInvested) * 100;
-
+		$totalGainedYield = ($totalGained/ $totalInvested) * 100;
 		return [
 			'totalInvested' => $totalInvested,
 			'totalValue' => $totalValue,
 			'totalGained' => $totalGained,
+			'totalGainedYield' => $totalGainedYield,
 			'totalReturn' => $totalReturn,
 			'totalReturnYield' => $totalReturnYield,
 		];

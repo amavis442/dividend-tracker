@@ -16,6 +16,9 @@
                             {{ 'Dividend'|trans }}
                         </twig:Table:ThCol>
                         <twig:Table:ThCol>
+                            {{ 'Dividend percentage'|trans }}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
                             {{ 'Total return'|trans }}
                         </twig:Table:ThCol>
                         <twig:Table:ThCol>
@@ -34,6 +37,9 @@
                         </twig:Table:Td>
                         <twig:Table:Td class="font-bold">
                             &euro;{{ totalGained|number_format(2) }}
+                        </twig:Table:Td>
+                        <twig:Table:Td class="font-bold">
+                            {{ totalGainedYield|number_format(2) }}%
                         </twig:Table:Td>
                         <twig:Table:Td class="font-bold {{ bgColor }} border">
                             &euro;{{ totalReturn|number_format(2) }}
