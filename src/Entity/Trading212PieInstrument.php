@@ -11,51 +11,51 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\HasLifecycleCallbacks]
 class Trading212PieInstrument
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+	#[ORM\Id]
+	#[ORM\GeneratedValue]
+	#[ORM\Column]
+	private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $tickerName = null;
+	#[ORM\Column(length: 255)]
+	private ?string $tickerName = null;
 
-    #[ORM\Column]
-    private ?float $ownedQuantity = null;
+	#[ORM\Column]
+	private ?float $ownedQuantity = null;
 
-    #[ORM\Column]
-    private ?float $priceAvgInvestedValue = null;
+	#[ORM\Column]
+	private ?float $priceAvgInvestedValue = null;
 
-    #[ORM\Column]
-    private ?float $priceAvgValue = null;
+	#[ORM\Column]
+	private ?float $priceAvgValue = null;
 
-    #[ORM\Column]
-    private ?float $priceAvgResult = null;
+	#[ORM\Column]
+	private ?float $priceAvgResult = null;
 
-    #[ORM\Column]
-    private array $raw = [];
+	#[ORM\Column]
+	private array $raw = [];
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+	#[ORM\Column]
+	private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $updatedAt = null;
+	#[ORM\Column(nullable: true)]
+	private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column]
-    private ?int $trading212PieId = null;
+	#[ORM\Column]
+	private ?int $trading212PieId = null;
 
-    #[ORM\ManyToOne(inversedBy: 'trading212PieInstruments')]
-    private ?Trading212PieMetaData $trading212PieMetaData = null;
+	#[ORM\ManyToOne(inversedBy: 'trading212PieInstruments')]
+	private ?Trading212PieMetaData $trading212PieMetaData = null;
 
-    #[ORM\ManyToOne(inversedBy: 'trading212PieInstruments')]
-    private ?Ticker $ticker = null;
+	#[ORM\ManyToOne(inversedBy: 'trading212PieInstruments')]
+	private ?Ticker $ticker = null;
 
-    private ?float $avgDividendPerShare = 0.0;
-    private ?float $avgExpectedDividend = 0.0;
-    private ?float $currentDividendPerShare = 0.0;
-    private ?float $currentDividend = 0.0;
-    private ?float $currentYearlyYield = 0.0;
-    private ?float $avgYearlyYield = 0.0;
-    private ?float $dividendPaid = 0.0;
+	private ?float $avgDividendPerShare = 0.0;
+	private ?float $avgExpectedDividend = 0.0;
+	private ?float $currentDividendPerShare = 0.0;
+	private ?float $currentDividend = 0.0;
+	private ?float $currentYearlyYield = 0.0;
+	private ?float $avgYearlyYield = 0.0;
+	private ?float $dividendPaid = 0.0;
 
 	private ?float $taxRate = 0.15;
 	private ?float $exchangeRate = 0.0;
@@ -65,7 +65,7 @@ class Trading212PieInstrument
 	private float $price = 0.0;
 	private float $avgPrice = 0.0;
 
-    #[ORM\PrePersist]
+	#[ORM\PrePersist]
 	public function setCreatedAtValue(): void
 	{
 		$this->createdAt = new \DateTimeImmutable();
@@ -78,142 +78,144 @@ class Trading212PieInstrument
 		$this->updatedAt = new \DateTimeImmutable();
 	}
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+	public function getId(): ?int
+	{
+		return $this->id;
+	}
 
-    public function getTickerName(): ?string
-    {
-        return $this->tickerName;
-    }
+	public function getTickerName(): ?string
+	{
+		return $this->tickerName;
+	}
 
-    public function setTickerName(string $tickerName): static
-    {
-        $this->tickerName = $tickerName;
+	public function setTickerName(string $tickerName): static
+	{
+		$this->tickerName = $tickerName;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    public function getOwnedQuantity(): ?float
-    {
-        return $this->ownedQuantity;
-    }
+	public function getOwnedQuantity(): ?float
+	{
+		return $this->ownedQuantity;
+	}
 
-    public function setOwnedQuantity(float $ownedQuantity): static
-    {
-        $this->ownedQuantity = $ownedQuantity;
+	public function setOwnedQuantity(float $ownedQuantity): static
+	{
+		$this->ownedQuantity = $ownedQuantity;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    public function getPriceAvgInvestedValue(): ?float
-    {
-        return $this->priceAvgInvestedValue;
-    }
+	public function getPriceAvgInvestedValue(): ?float
+	{
+		return $this->priceAvgInvestedValue;
+	}
 
-    public function setPriceAvgInvestedValue(float $priceAvgInvestedValue): static
-    {
-        $this->priceAvgInvestedValue = $priceAvgInvestedValue;
+	public function setPriceAvgInvestedValue(
+		float $priceAvgInvestedValue
+	): static {
+		$this->priceAvgInvestedValue = $priceAvgInvestedValue;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    public function getPriceAvgValue(): ?float
-    {
-        return $this->priceAvgValue;
-    }
+	public function getPriceAvgValue(): ?float
+	{
+		return $this->priceAvgValue;
+	}
 
-    public function setPriceAvgValue(float $priceAvgValue): static
-    {
-        $this->priceAvgValue = $priceAvgValue;
+	public function setPriceAvgValue(float $priceAvgValue): static
+	{
+		$this->priceAvgValue = $priceAvgValue;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    public function getPriceAvgResult(): ?float
-    {
-        return $this->priceAvgResult;
-    }
+	public function getPriceAvgResult(): ?float
+	{
+		return $this->priceAvgResult;
+	}
 
-    public function setPriceAvgResult(float $priceAvgResult): static
-    {
-        $this->priceAvgResult = $priceAvgResult;
+	public function setPriceAvgResult(float $priceAvgResult): static
+	{
+		$this->priceAvgResult = $priceAvgResult;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    public function getRaw(): array
-    {
-        return $this->raw;
-    }
+	public function getRaw(): array
+	{
+		return $this->raw;
+	}
 
-    public function setRaw(array $raw): static
-    {
-        $this->raw = $raw;
+	public function setRaw(array $raw): static
+	{
+		$this->raw = $raw;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
+	public function getCreatedAt(): ?\DateTimeImmutable
+	{
+		return $this->createdAt;
+	}
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
+	public function setCreatedAt(\DateTimeImmutable $createdAt): static
+	{
+		$this->createdAt = $createdAt;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
+	public function getUpdatedAt(): ?\DateTimeImmutable
+	{
+		return $this->updatedAt;
+	}
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
+	public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+	{
+		$this->updatedAt = $updatedAt;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    public function getTrading212PieId(): ?int
-    {
-        return $this->trading212PieId;
-    }
+	public function getTrading212PieId(): ?int
+	{
+		return $this->trading212PieId;
+	}
 
-    public function setTrading212PieId(int $trading212PieId): static
-    {
-        $this->trading212PieId = $trading212PieId;
+	public function setTrading212PieId(int $trading212PieId): static
+	{
+		$this->trading212PieId = $trading212PieId;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    public function getTrading212PieMetaData(): ?Trading212PieMetaData
-    {
-        return $this->trading212PieMetaData;
-    }
+	public function getTrading212PieMetaData(): ?Trading212PieMetaData
+	{
+		return $this->trading212PieMetaData;
+	}
 
-    public function setTrading212PieMetaData(?Trading212PieMetaData $trading212PieMetaData): static
-    {
-        $this->trading212PieMetaData = $trading212PieMetaData;
+	public function setTrading212PieMetaData(
+		?Trading212PieMetaData $trading212PieMetaData
+	): static {
+		$this->trading212PieMetaData = $trading212PieMetaData;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    public function getTicker(): ?Ticker
-    {
-        return $this->ticker;
-    }
+	public function getTicker(): ?Ticker
+	{
+		return $this->ticker;
+	}
 
-    public function setTicker(?Ticker $ticker): static
-    {
-        $this->ticker = $ticker;
+	public function setTicker(?Ticker $ticker): static
+	{
+		$this->ticker = $ticker;
 
-        return $this;
-    }
+		return $this;
+	}
 
 	/**
 	 * Get the value of avgDividendPerShare
@@ -256,8 +258,9 @@ class Trading212PieInstrument
 	 *
 	 * @return  self
 	 */
-	public function setCurrentDividendPerShare(float $currentDividendPerShare): self
-	{
+	public function setCurrentDividendPerShare(
+		float $currentDividendPerShare
+	): self {
 		$this->currentDividendPerShare = $currentDividendPerShare;
 
 		return $this;
@@ -510,7 +513,10 @@ class Trading212PieInstrument
 	 */
 	public function getPrice(): float
 	{
-		$this->price = $this->priceAvgValue / $this->ownedQuantity;
+		$this->price =
+			$this->ownedQuantity > 0
+				? $this->priceAvgValue / $this->ownedQuantity
+				: 0.0;
 		return $this->price;
 	}
 
@@ -521,7 +527,10 @@ class Trading212PieInstrument
 	 */
 	public function getAvgPrice(): float
 	{
-		$this->avgPrice = $this->priceAvgInvestedValue / $this->ownedQuantity;
+		$this->avgPrice =
+			$this->ownedQuantity > 0
+				? $this->priceAvgInvestedValue / $this->ownedQuantity
+				: 0.0;
 		return $this->avgPrice;
 	}
 }

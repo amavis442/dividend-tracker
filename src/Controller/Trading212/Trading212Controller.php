@@ -100,6 +100,8 @@ final class Trading212Controller extends AbstractController
 		$pieDividend = 0.0; // What is actually paid will be a computed on latest paydat so can be inaccurate. Trading212 does not split up payments by pie instruments :(
 		$pieCurrentDividend = 0.0;
 		$pieAvgDividend = 0.0;
+		$pieProfitLoss = 0.0;
+		$priceProfitLoss = 0.0;
 
 		$date = new \DateTime('now');
 		$date->modify('last day of this month');
@@ -121,6 +123,8 @@ final class Trading212Controller extends AbstractController
 				*/
 				continue;
 			}
+			$pieProfitLoss += $instrument->getPriceAvgValue() - $instrument->getPriceAvgInvestedValue();
+			$priceProfitLoss += $instrument->getPrice() - $instrument->getAvgPrice();
 			$tickers[$instrument->getTicker()->getId()] = [
 				'ticker' => $instrument->getTicker(),
 				'instrument' => $instrument,
@@ -487,6 +491,8 @@ final class Trading212Controller extends AbstractController
 			'chartInstruments' => $chartInstruments,
 			'chartYield' => $chartYield,
 			'paymentLimit' => $paymentLimit,
+			'pieProfitLoss' =>$pieProfitLoss,
+			'priceProfitLoss' => $priceProfitLoss,
 		]);
 	}
 
