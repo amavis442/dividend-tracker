@@ -15,7 +15,7 @@
 
 <div class="flex mb-4">
 	<twig:Alert variant="default" class="text-right">
-		<strong class="font-sans">{{ ((dividend / position.allocation) *100)|format_number({"fraction_digit": 2}) }}% </strong>
+		<strong class="font-sans">{{ position.allocation > 0 ? ((dividend / position.allocation) *100)|format_number({"fraction_digit": 2}): 0.0 }}% </strong>
 	</twig:Alert>
 </div>
 
