@@ -3,6 +3,7 @@
 namespace App\Controller\Trading212;
 
 use App\Entity\Pie;
+use App\Entity\Ticker;
 use App\Entity\Trading212PieMetaData;
 use App\Helper\Colors;
 use App\Repository\CalendarRepository;
@@ -169,6 +170,7 @@ final class Trading212Controller extends AbstractController
 				continue;
 			}
 			$tickerId = $instrument->getTicker()->getId();
+
 			if ($instrument->getPriceAvgInvestedValue() == 0) {
 				continue;
 			}
@@ -567,6 +569,7 @@ final class Trading212Controller extends AbstractController
 				'instrument' => $instrument,
 			];
 		}
+
 		// Get the taxrate for each ticker
 		$tickerTaxes = $tickerRepository->getTaxForTickers(
 			array_keys($tickers)
@@ -586,7 +589,6 @@ final class Trading212Controller extends AbstractController
 		$pieCurrentDividend = 0.0;
 		$pieAvgDividend = 0.0;
 
-
 		$dataInstruments = $this->decorateInstruments(
 			$paymentRepository,
 			$instruments,
@@ -595,6 +597,11 @@ final class Trading212Controller extends AbstractController
 			$pieAvgInvested,
 			$rateDollarEuro
 		);
+
+		if (!$pieInstruments) {
+			return $this->render('trading212/report/no_graph.html.twig');
+		}
+
 		$chartInstruments = $this->createPieChart(
 			$chartBuilder,
 			$pieInstruments
@@ -602,14 +609,13 @@ final class Trading212Controller extends AbstractController
 
 		$data = $this->getChartData($trading212PieMetaDataRepository, $pie);
 
-		$chart = $this->createChart(
+		$chart = $this->createChart($data, $pie, $chartBuilder, $translator);
+
+		$breakEvenChart = $this->breakEvenChart(
 			$data,
-			$pie,
 			$chartBuilder,
 			$translator
 		);
-
-		$breakEvenChart = $this->breakEvenChart($data, $chartBuilder, $translator);
 
 		$chartYield = $this->createYieldChart(
 			$chartBuilder,
@@ -640,7 +646,6 @@ final class Trading212Controller extends AbstractController
 			((12 * $pieAvgDividend) / $metaData->getPriceAvgInvestedValue()) *
 			100;
 
-
 		return $this->render(
 			'trading212/report/graph.html.twig',
 			array_merge(
@@ -668,8 +673,6 @@ final class Trading212Controller extends AbstractController
 			)
 		);
 	}
-
-
 
 	#[Route('/summary', name: 'app_report_trading212_summary')]
 	public function graphSummary(
