@@ -28,6 +28,21 @@ class Trading212PieInstrumentRepository extends ServiceEntityRepository
         $qb->execute();
     }
 
+    /**
+     * @return array<int,<float,float,\DateTimeImmutable>>
+     */
+    public function findByTicker(Ticker $ticker): array
+    {
+        return $this->createQueryBuilder('t')
+        ->select('DATE(t.createdAt) createdAt,SUM(t.priceAvgInvestedValue) invested, SUM(t.priceAvgValue) value, SUM(t.ownedQuantity) quantity')
+        ->where('t.ticker = :ticker')
+        ->groupBy('createdAt')
+        ->orderBy('createdAt','ASC')
+        ->setParameter('ticker', $ticker->getId())
+        ->getQuery()->getResult();
+
+    }
+
     //    /**
     //     * @return Trading212PieInstrument[] Returns an array of Trading212PieInstrument objects
     //     */

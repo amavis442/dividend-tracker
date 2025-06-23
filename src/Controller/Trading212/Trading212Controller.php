@@ -650,6 +650,7 @@ final class Trading212Controller extends AbstractController
 					'monthsEstimatedBreakEven' => $monthsEstimatedBreakEven,
 					'yearsEstimatedBreakEven' => $yearsEstimatedBreakEven,
 					'periodEstimatedBreakEven' => $periodEstimatedBreakEven,
+					'pie' => $pie,
 					'pieDividend' => $pieDividend,
 					'pieYield' => $pieYield,
 					'pieCurrentDividend' => $pieCurrentDividend,

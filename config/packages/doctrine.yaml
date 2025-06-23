@@ -34,6 +34,7 @@ doctrine:
                 DATEPART: DoctrineExtensions\Query\Postgresql\DatePart
                 DATEFORMAT: DoctrineExtensions\Query\Postgresql\DateFormat
                 EXTRACT: DoctrineExtensions\Query\Postgresql\ExtractFunction
+                DATE: DoctrineExtensions\Query\Postgresql\Date
 
 when@test:
     doctrine:

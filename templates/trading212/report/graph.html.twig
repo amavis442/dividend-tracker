@@ -113,6 +113,10 @@
                                 {% else %}
                                     {{ instrument.tickerName }}
                                 {% endif %}
+
+                                <div class="flex border rounded p-1 mt-1">
+                                <a href="{{path('app_report_trading212_instrument_index', {'pie':pie.id,'ticker': instrument.ticker.id})}}"><i class="fa fa-line-chart"></i> detail</a>
+                                </div>
                             </twig:Table:ThRow>
                             <twig:Table:Td>
                                 {{ instrument.ownedQuantity }}
