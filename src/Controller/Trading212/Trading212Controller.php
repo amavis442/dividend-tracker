@@ -632,10 +632,10 @@ final class Trading212Controller extends AbstractController
 		$pieCurrentDividend = $dataInstruments['pieCurrentDividend'];
 		$pieAvgDividend = $dataInstruments['pieAvgDividend'];
 
-		$monthsEstimatedBreakEven = ceil(
+		$monthsEstimatedBreakEven = $pieDividend > 0 ? ceil(
 			($metaData->getPriceAvgInvestedValue() - $metaData->getGained()) /
 				$pieDividend
-		);
+		) : 0.0;
 		$yearsEstimatedBreakEven = floor($monthsEstimatedBreakEven / 12);
 		$periodEstimatedBreakEven['years'] = $yearsEstimatedBreakEven;
 		$periodEstimatedBreakEven['months'] =
