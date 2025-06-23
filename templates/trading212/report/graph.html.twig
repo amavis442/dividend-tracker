@@ -23,8 +23,8 @@
         </div>
         <div style="height:600px"
              class="flex w-1/2 border border-gray-500 p-2 mb-4 rounded-lg justify-center">
-             {{ render_chart(chartInstruments) }}
-             </div>
+            {{ render_chart(chartInstruments) }}
+        </div>
         <div class="mb-4">
             <a class="px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-green-500 hover:bg-green-700 p-2"
                href="{{ path("app_report_trading212_index") }}">
@@ -118,32 +118,43 @@
                                 {{ instrument.ownedQuantity }}
                             </twig:Table:Td>
                             <twig:Table:Td>
-                                &euro;{{ instrument.priceAvgInvestedValue|number_format(2) }} (&euro;{{instrument.avgPrice|number_format(2)}})
+                                &euro;{{ instrument.priceAvgInvestedValue|number_format(2) }} (&euro;{{ instrument.avgPrice|number_format(2) }})
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 {% if instrument.priceAvgValue < instrument.priceAvgInvestedValue %}
-                                    <span class="bg-red-500 text-white p-2 rounded-lg flex">&euro;{{ instrument.priceAvgValue|number_format(2) }} (&euro;{{instrument.price|number_format(2)}})</span>
+                                    <span class="bg-red-500 text-white p-2 rounded-lg flex">&euro;{{ instrument.priceAvgValue|number_format(2) }} (&euro;{{ instrument.price|number_format(2) }})</span>
                                 {% else %}
-                                    <span class="bg-green-500 text-white p-2 rounded-lg flex">&euro;{{ instrument.priceAvgValue|number_format(2) }} (&euro;{{instrument.price|number_format(2)}})</span>
+                                    <span class="bg-green-500 text-white p-2 rounded-lg flex">&euro;{{ instrument.priceAvgValue|number_format(2) }} (&euro;{{ instrument.price|number_format(2) }})</span>
                                 {% endif %}
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 {% if instrument.price < instrument.avgPrice %}
-                                    <span class="bg-red-500 text-white p-2 rounded-lg flex">&euro; {{ (instrument.price - instrument.avgPrice)|number_format(2)}}</span>
+                                    <span class="bg-red-500 text-white p-2 rounded-lg flex">&euro; {{ (instrument.price - instrument.avgPrice)|number_format(2) }}</span>
                                 {% else %}
-                                    <span class="bg-green-500 text-white p-2 rounded-lg flex">&euro; {{ (instrument.price - instrument.avgPrice)|number_format(2)}}</span>
+                                    <span class="bg-green-500 text-white p-2 rounded-lg flex">&euro; {{ (instrument.price - instrument.avgPrice)|number_format(2) }}</span>
                                 {% endif %}
                             </twig:Table:Td>
                             <twig:Table:Td>
-                            {% set diffValueInvested = instrument.priceAvgInvestedValue> 0 ? ((instrument.priceAvgValue - instrument.priceAvgInvestedValue)/instrument.priceAvgInvestedValue) * 100 : 0 %}
+                                {% set diffValueInvested = instrument.priceAvgInvestedValue> 0 ? ((instrument.priceAvgValue - instrument.priceAvgInvestedValue)/instrument.priceAvgInvestedValue) * 100 : 0 %}
                                 {% if instrument.priceAvgValue < instrument.priceAvgInvestedValue %}
-                                    <div class="bg-red-500 text-white p-2 rounded-lg flex">&euro;{{ (instrument.priceAvgValue - instrument.priceAvgInvestedValue)|number_format(3) }}
-                                        <div class="inline-block w-full text-right ml-2"><twig:Badge variant="info" type="pill">{{ diffValueInvested|number_format(2) }}%</twig:Badge></div></div>
+                                    <div class="bg-red-500 text-white p-2 rounded-lg flex">
+                                        &euro;{{ (instrument.priceAvgValue - instrument.priceAvgInvestedValue)|number_format(3) }}
+                                        <div class="inline-block w-full text-right ml-2">
+                                            <twig:Badge variant="info" type="pill">
+                                                {{ diffValueInvested|number_format(2) }}%
+                                            </twig:Badge>
+                                        </div>
+                                    </div>
                                 {% else %}
-                                    <div class="bg-green-500 text-white p-2 rounded-lg flex">&euro;{{ (instrument.priceAvgValue - instrument.priceAvgInvestedValue)|number_format(3) }}
-                                        <div class="inline-block w-full text-right ml-2"><twig:Badge variant="info" type="pill">{{ diffValueInvested|number_format(2) }}%</twig:Badge></div></div>
+                                    <div class="bg-green-500 text-white p-2 rounded-lg flex">
+                                        &euro;{{ (instrument.priceAvgValue - instrument.priceAvgInvestedValue)|number_format(3) }}
+                                        <div class="inline-block w-full text-right ml-2">
+                                            <twig:Badge variant="info" type="pill">
+                                                {{ diffValueInvested|number_format(2) }}%
+                                            </twig:Badge>
+                                        </div>
+                                    </div>
                                 {% endif %}
-
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 {{ sign|raw }}{{ instrument.currentDividendPerShare|number_format(4) }}
@@ -177,7 +188,6 @@
                                                                                 {{'estimated payout'|trans}} &euro;
                                                                                 {{ instrument.dividend.predicted_payment[ckey]|number_format(2) }}
                                                                                 <span class="font-semibold">
-
                                                                                     {% set monthlyPayment = instrument.dividend.predicted_payment[ckey] *(instrument.dividend.frequency/12) %}
                                                                                     {% set monthlyYield = (monthlyPayment / instrument.priceAvgInvestedValue) *100 %}
                                                                                     {% set yearlyYield = monthlyYield * 12 %}
@@ -237,7 +247,25 @@
                                 &euro;{{ priceProfitLoss|number_format(2) }}
                             </twig:Table:Td>
                             <twig:Table:Td>
-                                &euro;{{ pieProfitLoss|number_format(2) }}
+                                {% if profitLoss < 0 %}
+                                    <div class="flex bg-red-500 border rounded text-white p-2">
+                                        &euro;{{ profitLoss|number_format(2) }}
+                                        <div class="inline-block w-full text-right ml-2">
+                                            <twig:Badge variant="info" type="pill">
+                                                {{ profitLossPercentage|number_format(2) }}%
+                                            </twig:Badge>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="flex bg-green-500 border rounded text-white p-2">
+                                        &euro;{{ profitLoss|number_format(2) }}
+                                        <div class="inline-block w-full text-right ml-2">
+                                            <twig:Badge variant="info" type="pill">
+                                                {{ profitLossPercentage|number_format(2) }}%
+                                            </twig:Badge>
+                                        </div>
+                                    </div>
+                                {% endif %}
                             </twig:Table:Td>
                             <twig:Table:Td>
                             </twig:Table:Td>

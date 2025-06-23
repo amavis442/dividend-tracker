@@ -3,6 +3,7 @@
 namespace App\Controller\Trading212;
 
 use App\Entity\Pie;
+use App\Entity\Trading212PieMetaData;
 use App\Helper\Colors;
 use App\Repository\CalendarRepository;
 use App\Repository\PaymentRepository;
@@ -44,7 +45,10 @@ final class Trading212Controller extends AbstractController
 		);
 	}
 
-	private function calcStats(array $data): array
+	/**
+	 * array<Trading212PieMetaData>|Trading212PieMetaData $data
+	 */
+	private function calcStats(array|Trading212PieMetaData $data): array
 	{
 		$totalInvested = 0.0;
 		$totalValue = 0.0;
@@ -52,16 +56,29 @@ final class Trading212Controller extends AbstractController
 		$totalGainedYield = 0.0;
 		$totalReturn = 0.0;
 		$totalReturnYield = 0.0;
-		foreach ($data as $item) {
-			$totalInvested += $item->getPriceAvgInvestedValue();
-			$totalValue += $item->getPriceAvgValue();
-			$totalGained += $item->getGained();
+		$profitLoss = 0.0;
+		$profitLossPercentage = 0.0;
+
+		if ($data instanceof Trading212PieMetaData) {
+			$totalInvested = $data->getPriceAvgInvestedValue();
+			$totalValue = $data->getPriceAvgValue();
+			$totalGained = $data->getGained();
+		}
+		if (is_array($data)) {
+			foreach ($data as $item) {
+				$totalInvested += $item->getPriceAvgInvestedValue();
+				$totalValue += $item->getPriceAvgValue();
+				$totalGained += $item->getGained();
+			}
 		}
 		$totalReturn = $totalValue + $totalGained - $totalInvested;
 		$totalReturnYield =
 			$totalInvested > 0 ? ($totalReturn / $totalInvested) * 100 : 0.0;
 		$totalGainedYield =
 			$totalInvested > 0 ? ($totalGained / $totalInvested) * 100 : 0.0;
+		$profitLoss = $totalValue - $totalInvested;
+		$profitLossPercentage =
+			$totalInvested > 0 ? ($profitLoss / $totalInvested) * 100 : 0.0;
 		return [
 			'totalInvested' => $totalInvested,
 			'totalValue' => $totalValue,
@@ -69,9 +86,13 @@ final class Trading212Controller extends AbstractController
 			'totalGainedYield' => $totalGainedYield,
 			'totalReturn' => $totalReturn,
 			'totalReturnYield' => $totalReturnYield,
+			'profitLoss' => $profitLoss,
+			'profitLossPercentage' => $profitLossPercentage,
 		];
 	}
 
+	//Todo Refactor. Controller has become to fat and should be split
+	// up into several parts.
 	#[Route('/graph/{pie}', name: 'app_report_trading212_graph')]
 	public function graph(
 		Pie $pie,
@@ -91,6 +112,7 @@ final class Trading212Controller extends AbstractController
 			['pie' => $pie],
 			['createdAt' => 'DESC']
 		);
+		$stats = $this->calcStats($metaData);
 		$instruments = $metaData->getTrading212PieInstruments();
 		$pieAvgInvested = $metaData->getPriceAvgInvestedValue();
 		$rates = $exchangeRate->getRates();
@@ -100,7 +122,6 @@ final class Trading212Controller extends AbstractController
 		$pieDividend = 0.0; // What is actually paid will be a computed on latest paydat so can be inaccurate. Trading212 does not split up payments by pie instruments :(
 		$pieCurrentDividend = 0.0;
 		$pieAvgDividend = 0.0;
-		$pieProfitLoss = 0.0;
 		$priceProfitLoss = 0.0;
 
 		$date = new \DateTime('now');
@@ -123,8 +144,8 @@ final class Trading212Controller extends AbstractController
 				*/
 				continue;
 			}
-			$pieProfitLoss += $instrument->getPriceAvgValue() - $instrument->getPriceAvgInvestedValue();
-			$priceProfitLoss += $instrument->getPrice() - $instrument->getAvgPrice();
+			$priceProfitLoss +=
+				$instrument->getPrice() - $instrument->getAvgPrice();
 			$tickers[$instrument->getTicker()->getId()] = [
 				'ticker' => $instrument->getTicker(),
 				'instrument' => $instrument,
@@ -474,26 +495,31 @@ final class Trading212Controller extends AbstractController
 			],
 		]);
 
-		return $this->render('trading212/report/graph.html.twig', [
-			'title' => 'Trading212Controller',
-			'metaData' => $metaData,
-			'monthsEstimatedBreakEven' => $monthsEstimatedBreakEven,
-			'yearsEstimatedBreakEven' => $yearsEstimatedBreakEven,
-			'periodEstimatedBreakEven' => $periodEstimatedBreakEven,
-			'pieDividend' => $pieDividend,
-			'pieYield' => $pieYield,
-			'pieCurrentDividend' => $pieCurrentDividend,
-			'pieAvgDividend' => $pieAvgDividend,
-			'pieYieldAvg' => $pieYieldAvg,
-			'chart' => $chart,
-			'breakEvenChart' => $breakEvenChart,
-			'instruments' => $instruments,
-			'chartInstruments' => $chartInstruments,
-			'chartYield' => $chartYield,
-			'paymentLimit' => $paymentLimit,
-			'pieProfitLoss' =>$pieProfitLoss,
-			'priceProfitLoss' => $priceProfitLoss,
-		]);
+		return $this->render(
+			'trading212/report/graph.html.twig',
+			array_merge(
+				[
+					'title' => 'Trading212Controller',
+					'metaData' => $metaData,
+					'monthsEstimatedBreakEven' => $monthsEstimatedBreakEven,
+					'yearsEstimatedBreakEven' => $yearsEstimatedBreakEven,
+					'periodEstimatedBreakEven' => $periodEstimatedBreakEven,
+					'pieDividend' => $pieDividend,
+					'pieYield' => $pieYield,
+					'pieCurrentDividend' => $pieCurrentDividend,
+					'pieAvgDividend' => $pieAvgDividend,
+					'pieYieldAvg' => $pieYieldAvg,
+					'chart' => $chart,
+					'breakEvenChart' => $breakEvenChart,
+					'instruments' => $instruments,
+					'chartInstruments' => $chartInstruments,
+					'chartYield' => $chartYield,
+					'paymentLimit' => $paymentLimit,
+					'priceProfitLoss' => $priceProfitLoss,
+				],
+				$stats
+			)
+		);
 	}
 
 	protected function breakEvenChart(
