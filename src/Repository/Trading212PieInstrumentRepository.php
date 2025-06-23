@@ -29,7 +29,7 @@ class Trading212PieInstrumentRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<int,<float,float,\DateTimeImmutable>>
+     * @return array // <int,<float,float,\DateTimeImmutable>>
      */
     public function findByTicker(Ticker $ticker): array
     {
