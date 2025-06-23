@@ -21,13 +21,17 @@
                         'data-controller': 'chartjs-add-euro-sign'
                         }) }}
         </div>
-
-        </div>
-        <div class="mt-4">
+        <div class="mb-4">
             <a class="px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-green-500 hover:bg-green-700 p-2"
                href="{{ path("app_report_trading212_graph",{'pie':pie.id}) }}">
                 <i class="fas fa-angle-double-left"></i> {{ 'back to list'|trans }}
             </a>
+        </div>
+        <div style="height:400px"
+             class="flex w-1/2 border border-gray-500 p-2 mb-4 rounded-lg">
+            {{ render_chart(chartProfitLoss, {
+                        'data-controller': 'chartjs-add-euro-sign'
+                        }) }}
         </div>
     </div>
 {% endblock %}

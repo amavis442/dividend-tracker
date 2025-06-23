@@ -43,6 +43,7 @@ final class Trading212InstrumentController extends AbstractController
 		$dataChart['data']['value'] = [];
 		$dataChart['data']['result'] = [];
 		$dataChart['data']['total_return'] = [];
+		$dataChart['data']['profiloss'] = [];
 
 		/**
 		 * @var Trading212PieInstrument $instrument
@@ -52,6 +53,8 @@ final class Trading212InstrumentController extends AbstractController
 			$dataChart['data']['invested'][] = $instrument['invested'];
 			$dataChart['data']['value'][] = $instrument['value'];
 			//$dataChart['data']['result'][] = $instrument->getPriceAvgResult();
+
+			$dataChart['data']['profiloss'][] = $instrument['value'] - $instrument['invested'];
 		}
 
 		$chart = $chartBuilder->createChart(Chart::TYPE_LINE);
@@ -59,11 +62,11 @@ final class Trading212InstrumentController extends AbstractController
 			'labels' => $dataChart['labels'],
 			'datasets' => [
 				[
-					'label' => 'Invested',
+					'label' => $translator->trans('Invested'),
 					'data' => $dataChart['data']['invested'],
 				],
 				[
-					'label' => 'Value',
+					'label' => $translator->trans('Value'),
 					'data' => $dataChart['data']['value'],
 				],
 			],
@@ -86,12 +89,41 @@ final class Trading212InstrumentController extends AbstractController
 			],
 		]);
 
+		$chartProfitLoss = $chartBuilder->createChart(Chart::TYPE_LINE);
+		$chartProfitLoss->setData([
+			'labels' => $dataChart['labels'],
+			'datasets' => [
+				[
+					'label' => $translator->trans('Profit/Loss'),
+					'data' => $dataChart['data']['profiloss'],
+				],
+			],
+		]);
+
+		$chartProfitLoss->setOptions([
+			'maintainAspectRatio' => false,
+			'responsive' => true,
+			'plugins' => [
+				'title' => [
+					'display' => true,
+					'text' => $translator->trans($ticker->getFullname()),
+					'font' => [
+						'size' => 24,
+					],
+				],
+				'legend' => [
+					'position' => 'top',
+				],
+			],
+		]);
+
 		return $this->render(
 			'trading212/report/instrument.html.twig',
 
 			[
 				'title' => 'Trading212',
 				'chart' => $chart,
+				'chartProfitLoss' => $chartProfitLoss,
 				'pie' => $pie,
 			]
 		);
