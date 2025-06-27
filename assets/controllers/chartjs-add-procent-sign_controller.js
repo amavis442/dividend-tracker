@@ -28,5 +28,22 @@ export default class extends Controller {
                 },
             },
         };
+
+        event.detail.config.options.plugins.tooltip = {
+
+            callbacks: {
+                label: function (context) {
+                    var label = context.dataset.label || '';
+                    if (label) {
+                        label += ': ';
+                    }
+                    if (context.parsed.y !== null) {
+                        label += context.parsed.y + '%';
+                    }
+
+                    return label;
+                },
+            }
+        };
     }
 }

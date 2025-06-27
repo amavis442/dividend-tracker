@@ -23,7 +23,9 @@
         </div>
         <div style="height:600px"
              class="flex w-1/2 border border-gray-500 p-2 mb-4 rounded-lg justify-center">
-            {{ render_chart(chartInstruments) }}
+            {{ render_chart(chartInstruments, {
+                        'data-controller': 'chartjs-add-procent-sign-pie'
+                        }) }}
         </div>
         <div class="mb-4">
             <a class="px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-green-500 hover:bg-green-700 p-2"
@@ -32,9 +34,13 @@
             </a>
         </div>
         <div style="height:300px"
-             class="flex w-1/2 border border-gray-500 p-2 mb-4 rounded-lg">{{ render_chart(chartYield) }}</div>
+             class="flex w-1/2 border border-gray-500 p-2 mb-4 rounded-lg">{{ render_chart(chartYield, {
+                        'data-controller': 'chartjs-add-procent-sign'
+                        }) }}</div>
         <div style="height:300px"
-             class="flex w-1/2 border border-gray-500 p-2 mb-4 rounded-lg">{{ render_chart(breakEvenChart) }}</div>
+             class="flex w-1/2 border border-gray-500 p-2 mb-4 rounded-lg">{{ render_chart(breakEvenChart, {
+                        'data-controller': 'chartjs-add-euro-sign'
+                        }) }}</div>
         <div class="mb-4">
             <a class="px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-green-500 hover:bg-green-700 p-2"
                href="{{ path("app_report_trading212_index") }}">
@@ -114,9 +120,9 @@
                                     {{ instrument.tickerName }}
                                 {% endif %}
                                 {% if instrument.ticker %}
-                                <div class="flex border rounded p-1 mt-1">
-                                <a href="{{path('app_report_trading212_instrument_index', {'pie':pie.id,'ticker': instrument.ticker.id})}}"><i class="fa fa-line-chart"></i> detail</a>
-                                </div>
+                                    <div class="flex border rounded p-1 mt-1">
+                                        <a href="{{ path('app_report_trading212_instrument_index', {'pie':pie.id,'ticker': instrument.ticker.id}) }}"><i class="fa fa-line-chart"></i> detail</a>
+                                    </div>
                                 {% endif %}
                             </twig:Table:ThRow>
                             <twig:Table:Td>

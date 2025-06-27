@@ -158,6 +158,7 @@ class DividendTrackerController extends AbstractController
 				[
 					'label' => $translator->trans('Yield'),
 					'data' => array_values($yieldReceivedDividends),
+					'backgroundColor' => ['#ffbe00'],
 				],
 			],
 		]);
@@ -167,7 +168,9 @@ class DividendTrackerController extends AbstractController
 			'plugins' => [
 				'title' => [
 					'display' => true,
-					'text' => $translator->trans('Realized dividend yield'),
+					'text' => $translator->trans(
+						'Realized dividend yield per year'
+					),
 					'font' => [
 						'size' => 24,
 					],
@@ -186,7 +189,7 @@ class DividendTrackerController extends AbstractController
 		array $labels,
 		array $receivedDividends
 	): \Symfony\UX\Chartjs\Model\Chart {
-        ksort($receivedDividends);
+		ksort($receivedDividends);
 
 		$chartRealized = $chartBuilder->createChart(Chart::TYPE_BAR);
 		$chartRealized->setData([
@@ -195,6 +198,7 @@ class DividendTrackerController extends AbstractController
 				[
 					'label' => $translator->trans('Received'),
 					'data' => array_values($receivedDividends),
+					'backgroundColor' => ['#40ac1c'],
 				],
 			],
 		]);
@@ -204,7 +208,7 @@ class DividendTrackerController extends AbstractController
 			'plugins' => [
 				'title' => [
 					'display' => true,
-					'text' => $translator->trans('Realized dividend yield'),
+					'text' => $translator->trans('Received dividend per month'),
 					'font' => [
 						'size' => 24,
 					],
