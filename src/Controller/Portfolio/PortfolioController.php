@@ -35,6 +35,7 @@ use RuntimeException;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** @psalm-suppress PropertyNotSetInConstructor */
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/portfolio')]
@@ -524,10 +525,12 @@ class PortfolioController extends AbstractController
 	public function showDividendProgression(
 		Position $position,
 		DividendGrowthService $dividendGrowth,
-		ChartBuilderInterface $chartBuilder
+		ChartBuilderInterface $chartBuilder,
+		TranslatorInterface $translator,
 	): Response {
 		$ticker = $position->getTicker();
 		$growth = $dividendGrowth->getData($ticker);
+		$dividendHistory = $growth['cashPayout'];
 
 		$colors = Colors::COLORS;
 
@@ -537,7 +540,7 @@ class PortfolioController extends AbstractController
 			'labels' => $growth['labels'],
 			'datasets' => [
 				[
-					'label' => 'Dividend payout',
+					'label' => $translator->trans('Dividend payout'),
 					'backgroundColor' => $colors,
 					'borderColor' => $colors,
 					'data' => $growth['payout'],
@@ -551,7 +554,7 @@ class PortfolioController extends AbstractController
 			'plugins' => [
 				'title' => [
 					'display' => true,
-					'text' => 'Dividend forward',
+					'text' => $translator->trans('Dividend history'),
 					'font' => [
 						'size' => 24,
 					],
@@ -568,7 +571,7 @@ class PortfolioController extends AbstractController
 			'labels' => $growth['labels'],
 			'datasets' => [
 				[
-					'label' => 'Dividend yield',
+					'label' => $translator->trans('Dividend yield'),
 					'backgroundColor' => $colors,
 					'borderColor' => $colors,
 					'data' => $growth['data'],
@@ -582,7 +585,39 @@ class PortfolioController extends AbstractController
 			'plugins' => [
 				'title' => [
 					'display' => true,
-					'text' => 'Yield',
+					'text' => $translator->trans('Yield'),
+					'font' => [
+						'size' => 24,
+					],
+				],
+				'legend' => [
+					'position' => 'top',
+				],
+			],
+		]);
+
+		$chartYieldHistory = $chartBuilder->createChart(Chart::TYPE_BAR);
+
+		ksort($dividendHistory);
+		$chartYieldHistory->setData([
+			'labels' => array_keys($dividendHistory),
+			'datasets' => [
+				[
+					'label' => $translator->trans('Dividend history'),
+					'backgroundColor' => '#0055ff',
+					'borderColor' => '#000dff',
+					'data' => array_values($dividendHistory),
+				],
+			],
+		]);
+
+		$chartYieldHistory->setOptions([
+			'maintainAspectRatio' => false,
+			'responsive' => true,
+			'plugins' => [
+				'title' => [
+					'display' => true,
+					'text' => $translator->trans('Yield'),
 					'font' => [
 						'size' => 24,
 					],
@@ -596,6 +631,7 @@ class PortfolioController extends AbstractController
 		return $this->render('portfolio/show/_growth.html.twig', [
 			'chartYield' => $chartYield,
 			'chartPayout' => $chartPayout,
+			'chartYieldHistory' =>$chartYieldHistory,
 		]);
 	}
 

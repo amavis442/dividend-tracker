@@ -10,6 +10,7 @@ class DividendGrowthService
     {
         $calendars = $ticker->getCalendars();
         $data = [];
+        $cashPayouts = [];
         $labels = [];
         $payout = [];
         $values = [];
@@ -23,16 +24,18 @@ class DividendGrowthService
                 if ($dividendType == 'Special' || $dividendType == 'Supplement') {
                     continue;
                 }
-                $timeStamp = $calendar->getPaymentDate()->format('Y');
+                $year = $calendar->getPaymentDate()->format('Y');
+                $month = $calendar->getPaymentDate()->format('m');
                 $cashPayout = $calendar->getCashAmount();
-                if (!isset($data[$timeStamp])) {
-                    $data[$timeStamp] = [];
-                    $data[$timeStamp]['dividend'] = 0.0;
-                    $data[$timeStamp]['payoutfreq'] = $payoutFreq;
-                    $data[$timeStamp]['payouts'] = 0;
+                if (!isset($data[$year])) {
+                    $data[$year] = [];
+                    $data[$year]['dividend'] = 0.0;
+                    $data[$year]['payoutfreq'] = $payoutFreq;
+                    $data[$year]['payouts'] = 0;
                 }
-                $data[$timeStamp]['dividend'] += $cashPayout;
-                $data[$timeStamp]['payouts'] += 1;
+                $cashPayouts[$year.$month] = $cashPayout;
+                $data[$year]['dividend'] += $cashPayout;
+                $data[$year]['payouts'] += 1;
             }
             ksort($data);
             foreach ($data as $year => &$item) {
@@ -57,6 +60,7 @@ class DividendGrowthService
             'data' => $values,
             'payout' => $payout,
             'labels' => $labels,
+            'cashPayout'=> $cashPayouts,
         ];
     }
 }
