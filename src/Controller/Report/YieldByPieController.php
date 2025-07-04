@@ -21,28 +21,14 @@ class YieldByPieController extends AbstractController
 {
 	public const TAX_DIVIDEND = 0.15; // %
 	public const EXCHANGE_RATE = 1.19; // dollar to euro
-	public const YIELD_PIE_KEY = 'yieldpie_searchPie';
 
 	#[Route(path: '/pieyield', name: 'report_dividend_yield_by_pie')]
 	public function index(
-		Request $request,
 		YieldsService $yields,
 		ChartBuilderInterface $chartBuilder,
 		#[MapQueryParameter] string $sort = 'symbol',
 		#[MapQueryParameter] string $sortDirection = 'asc'
 	): Response {
-		$pie = null;
-		$pieSelect = new PieSelect();
-		$form = $this->createForm(PieSelectFormType::class, $pieSelect);
-		$form->handleRequest($request);
-		if ($form->isSubmitted() && $form->isValid()) {
-			$pieSelect = $form->getData();
-			$request->getSession()->set(self::YIELD_PIE_KEY, $pieSelect);
-			if ($pieSelect && $pieSelect->getPie()) {
-				$pie = $pieSelect->getPie();
-			}
-		}
-
 		$validSorts = ['symbol', 'dividend', 'yield'];
 		$sort = in_array($sort, $validSorts) ? $sort : 'symbol';
 		$sortDirection = in_array($sortDirection, [
@@ -54,8 +40,7 @@ class YieldByPieController extends AbstractController
 			? $sortDirection
 			: 'ASC';
 
-		$pieSelected = $request->getSession()->get(self::YIELD_PIE_KEY, null);
-		$result = $yields->yield($sort, $sortDirection, $pie);
+		$result = $yields->yield($sort, $sortDirection, null);
 
 		$colors = Colors::COLORS;
 
@@ -93,12 +78,8 @@ class YieldByPieController extends AbstractController
 		return $this->render(
 			'report/yield/pie.html.twig',
 			array_merge($result, [
-				'controller_name' => 'ReportController',
-				//'pies' => $pies,
-				'form' => $form,
 				'sort' => $sort,
 				'sortDirection' => $sortDirection,
-				'pieSelected' => $pieSelected,
 				'chart' => $chart,
 			])
 		);

@@ -39,16 +39,6 @@
                     </div>
                 </twig:Card>
                 <div class="block w-full border p-2 mb-4 rounded-lg border-gray-400 mx-auto">
-                    {{ form_start(form) }}
-                        <div class="flex w-full justify-center">
-                            <div class="w-1/2 me-2">{{ form_widget(form.pie) }}</div>
-                            <div class="flex-none">
-                                <twig:Button type="submit"	title="Search Ticker">
-                                    <i class="fas fa-search"></i>
-                                </twig:Button>
-                            </div>
-                        </div>
-                    {{ form_end(form) }}
                     <div class"w-full">
                         <div class="w-1/2 mx-auto p-2 mb-4" style="height:600px">
                             {{ render_chart(chart, {
