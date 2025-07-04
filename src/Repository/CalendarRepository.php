@@ -371,12 +371,6 @@ class CalendarRepository extends ServiceEntityRepository
 				(new DateTime('-2 month'))->format('Y-m-d')
 			);
 
-		if ($pie && $pie->getId() != null) {
-			$qb->andWhere('tr.pie IN (:pie)')->setParameter(
-				'pie',
-				[$pie->getId()]
-			);
-		}
 		$result = $qb->getQuery()->getResult();
 
 		if (!$result) {

@@ -11,6 +11,7 @@ use App\Form\CalendarType;
 use App\Form\TickerAutocompleteType;
 use App\Repository\CalendarRepository;
 use App\Repository\TickerRepository;
+use App\Repository\PositionRepository;
 use App\Service\DividendService;
 use App\Service\Referer;
 use DateTime;
@@ -159,6 +160,7 @@ class CalendarController extends AbstractController
 	public function viewCalendarTable(
 		Request $request,
 		CalendarRepository $calendarRepository,
+		PositionRepository $positionRepository,
 		DividendService $dividendService
 	): Response {
 		$year = (int) date('Y');
@@ -179,8 +181,7 @@ class CalendarController extends AbstractController
 			$dividendService,
 			$year,
 			$dateSelect->getStartdate()->format('Y-m-d'),
-			$dateSelect->getEnddate()->format('Y-m-d'),
-			$dateSelect->getPie()
+			$dateSelect->getEnddate()->format('Y-m-d')
 		);
 
 		return $this->render('calendar/view_table.html.twig', [

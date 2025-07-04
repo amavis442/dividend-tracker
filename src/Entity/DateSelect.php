@@ -21,12 +21,6 @@ class DateSelect
      */
     private $enddate;
 
-    /**
-     * All, Undocumented variable
-     *
-     * @var Pie
-     */
-    private $pie;
 
     /**
      * Get date
@@ -72,18 +66,6 @@ class DateSelect
     public function setEnddate(DateTimeInterface $enddate)
     {
         $this->enddate = $enddate;
-
-        return $this;
-    }
-
-    public function getPie(): ?Pie
-    {
-        return $this->pie;
-    }
-
-    public function setPie(Pie $pie): self
-    {
-        $this->pie = $pie;
 
         return $this;
     }
