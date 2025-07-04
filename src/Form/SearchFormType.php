@@ -22,9 +22,6 @@ class SearchFormType extends AbstractType
                         $options["extra_options"]["include_all_tickers"] ?? false,
                 ],
                 'required' => false,
-            ])
-            ->add("pie", PieSelectType::class, [
-                "required" => false,
             ]);
     }
 

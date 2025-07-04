@@ -78,11 +78,6 @@ class PortfolioController extends AbstractController
 		$sessionForm = $request->getSession()->get(self::SESSION_KEY, null);
 
 		if ($sessionForm instanceof SearchForm) {
-			if ($sessionForm->getPie() instanceof Pie) {
-				$pie = $sessionForm->getPie();
-				$searchForm->setPie($pie);
-			}
-
 			if (
 				$sessionForm->getTicker() &&
 				$sessionForm->getTicker()->getId()
@@ -99,7 +94,6 @@ class PortfolioController extends AbstractController
 		$form->handleRequest($request);
 
 		if ($form->isSubmitted() && $form->isValid()) {
-			$pie = $searchForm->getPie();
 			$ticker = $searchForm->getTicker();
 			$request->getSession()->set(self::SESSION_KEY, $searchForm);
 		}
@@ -141,8 +135,6 @@ class PortfolioController extends AbstractController
 			'thisPage' => $page,
 			'orderBy' => $orderBy,
 			'sort' => $sort,
-			//'ticker' => $ticker != null ? $ticker->getId() : 0,
-			//'pie' => $pie != null ? $pie->getId() : 0,
 		]);
 	}
 
