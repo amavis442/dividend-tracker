@@ -38,7 +38,8 @@ export default class extends Controller {
                         label += ': ';
                     }
                     if (context.parsed.y !== null) {
-                        label += context.parsed.y + '%';
+                        //label += context.parsed.y + '%';
+                        label += new Intl.NumberFormat('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(context.parsed.y) + '%';
                     }
 
                     return label;
