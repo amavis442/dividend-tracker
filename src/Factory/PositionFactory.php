@@ -35,7 +35,7 @@ final class PositionFactory extends PersistentProxyObjectFactory
             'allocation' => self::faker()->randomFloat(),
             'amount' => self::faker()->randomFloat(),
             'closed' => self::faker()->boolean(),
-            'createdAt' => self::faker()->dateTime(),
+            //'createdAt' => self::faker()->dateTime(),
             'currency' => CurrencyFactory::new(),
             'ignore_for_dividend' => self::faker()->boolean(),
             'price' => self::faker()->randomFloat(),

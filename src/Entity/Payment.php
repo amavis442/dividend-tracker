@@ -52,7 +52,7 @@ class Payment
     #[ORM\JoinColumn(nullable: true)]
     private ?Calendar $calendar;
 
-    #[ORM\ManyToOne(targetEntity: 'App\Entity\User', inversedBy: 'payments')]
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\User', inversedBy: 'payments', cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 

@@ -26,7 +26,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use DOMNode;
 use Symfony\Component\Uid\Uuid;
 
-class ImportCsvService extends AbstractImporter
+class ImportCsvService extends AbstractImporter implements CsvInterface
 {
     private int $importedDividendLines = 0;
     private string $filename = '';
@@ -71,7 +71,7 @@ class ImportCsvService extends AbstractImporter
         $md5key = md5(
             (string) $row['isin'] .
                 (string) $row['time'] .
-                (string) $row['total']
+                (string) number_format((float)$row['total'], 2, '.', '')
         );
 
         $ticker = $this->tickerRepository->findOneBy(['isin' => $isin]);
@@ -292,17 +292,12 @@ class ImportCsvService extends AbstractImporter
         return $rows;
     }
 
-    public function importFile(
-        UploadedFile $uploadedFile,
-    ): array {
+    public function processRows(array $rows, string $filename): array
+    {
         $transactionsAdded = 0;
         $totalTransaction = 0;
         $transactionAlreadyExists = [];
 
-        $filename = $uploadedFile->getClientOriginalName();
-        $this->filename = $filename;
-        $reader = new CsvReader($uploadedFile->getRealPath());
-        $rows = $reader->getRows();
         $rows = $this->formatImportData($rows);
         $defaultCurrency = $this->currencyRepository->findOneBy(['symbol' => 'EUR']);
 
@@ -310,6 +305,7 @@ class ImportCsvService extends AbstractImporter
         if (!$defaultTax) {
             $defaultTax = new Tax();
             $defaultTax->setTaxRate(15);
+            $defaultTax->setValidFrom((new \DateTime()));
             $this->entityManager->persist($defaultTax);
             $this->entityManager->flush();
         }
@@ -359,8 +355,6 @@ class ImportCsvService extends AbstractImporter
                     $transaction = new Transaction();
                     $transaction
                         ->setSide($row['direction'])
-                        //->setPrice($row['price'])
-                        //->setAllocation($row['allocation'])
                         ->setAmount($row['amount'])
                         ->setTransactionDate($row['transactionDate'])
                         ->setAllocationCurrency($defaultCurrency)
@@ -396,7 +390,7 @@ class ImportCsvService extends AbstractImporter
                     }
 
                     if ($row['direction'] == Transaction::SELL) {
-                        $transaction->setProfit($row['profit']);
+                        $transaction->setProfit($row['profit'] ?? 0.0);
                     }
                     $position->addTransaction($transaction);
                     $this->weightedAverage->calc($position);
@@ -423,16 +417,32 @@ class ImportCsvService extends AbstractImporter
                 $totalTransaction++;
             }
         }
+
         return [
             'totalTransaction' => $totalTransaction,
             'transactionsAdded' => $transactionsAdded,
             'transactionAlreadyExists' => $transactionAlreadyExists,
             'dividendsImported' => $this->importedDividendLines,
+        ];
+    }
+
+
+    public function importFile(
+        UploadedFile $uploadedFile,
+    ): array {
+        $filename = $uploadedFile->getClientOriginalName();
+        $this->filename = $filename;
+        $reader = new CsvReader($uploadedFile->getRealPath());
+        $rows = $reader->getRows();
+
+        $report = $this->processRows($rows, $filename);
+
+        return array_merge($report, [
             'status' => 'ok',
             'msg' =>
             'File [' .
                 $uploadedFile->getClientOriginalName() .
                 '] imported.',
-        ];
+        ]);
     }
 }

@@ -42,7 +42,7 @@ class SummaryService implements SummaryInterface
             ->setNumActivePosition($numActivePosition)
             ->setNumTickers($numTickers)
             ->setProfit($profit)
-            ->setTotalDividend($totalDividend)
+            ->setTotalDividend($totalDividend ?? 0.0)
             ->setAllocated($allocated);
 
         return $summary;

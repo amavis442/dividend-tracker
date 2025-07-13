@@ -376,6 +376,29 @@ class Ticker
         return $this->positions;
     }
 
+    public function addPosition(Position $position): static
+    {
+        if (!$this->positions->contains($position)) {
+            $this->positions->add($position);
+            $position->setTicker($this);
+        }
+
+        return $this;
+    }
+
+    public function removePosition(Position $position): static
+    {
+        if ($this->positions->removeElement($position)) {
+            // set the owning side to null (unless already changed)
+            //if ($position->getTicker() === $this) {
+                //$position->setTicker(null);
+            //}
+        }
+
+        return $this;
+    }
+
+
     public function getTax(): ?Tax
     {
         return $this->tax;
