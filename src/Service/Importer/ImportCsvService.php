@@ -301,7 +301,7 @@ class ImportCsvService extends AbstractImporter implements CsvInterface
         $rows = $this->formatImportData($rows);
         $defaultCurrency = $this->currencyRepository->findOneBy(['symbol' => 'EUR']);
 
-        $defaultTax = $this->taxRepository->find(1);
+        $defaultTax = $this->taxRepository->findOneBy(['taxRate' => 15]); //Current dividend tax rate in the Netherlands
         if (!$defaultTax) {
             $defaultTax = new Tax();
             $defaultTax->setTaxRate(15);
