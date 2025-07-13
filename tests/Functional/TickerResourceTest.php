@@ -6,6 +6,7 @@ use App\Factory\TaxFactory;
 use App\Factory\UserFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Browser\Test\HasBrowser;
+use Zenstruck\Foundry\Test\ResetDatabase;
 use App\Repository\UserRepository;
 use Zenstruck\Foundry\Test\Factories;
 
@@ -18,6 +19,7 @@ class TickerResourceTest extends WebTestCase
 {
     use HasBrowser;
     use Factories;
+    use ResetDatabase;
 
     public function testGetCollectionTickers(): void
     {
