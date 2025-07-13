@@ -126,6 +126,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	]
 	private Collection $apikeys;
 
+    /**
+     * @var Collection<int, ImportFiles>
+     */
+    #[ORM\OneToMany(targetEntity: ImportFiles::class, mappedBy: 'owner')]
+    private Collection $importFiles;
+
 	#[ORM\PrePersist]
 	public function setCreatedAtValue(): void
 	{
@@ -148,6 +154,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 		$this->pies = new ArrayCollection();
 		$this->taxonomies = new ArrayCollection();
 		$this->apikeys = new ArrayCollection();
+        $this->importFiles = new ArrayCollection();
 	}
 
 	public function getId(): ?int
@@ -487,4 +494,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
 		return $this;
 	}
+
+    /**
+     * @return Collection<int, ImportFiles>
+     */
+    public function getImportFiles(): Collection
+    {
+        return $this->importFiles;
+    }
+
+    public function addImportFile(ImportFiles $importFile): static
+    {
+        if (!$this->importFiles->contains($importFile)) {
+            $this->importFiles->add($importFile);
+            $importFile->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImportFile(ImportFiles $importFile): static
+    {
+        if ($this->importFiles->removeElement($importFile)) {
+            // set the owning side to null (unless already changed)
+            if ($importFile->getOwner() === $this) {
+                $importFile->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
 }

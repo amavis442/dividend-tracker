@@ -26,5 +26,12 @@ class AddUser
             }
             $entity->setUser($user);
         };
+
+        if (method_exists(get_class($entity), 'setOwner')) {
+            if (method_exists(get_class($entity), 'getOwner') && $entity->getOwner() !== null) {
+                return;
+            }
+            $entity->setOwner($user);
+        };
     }
 }

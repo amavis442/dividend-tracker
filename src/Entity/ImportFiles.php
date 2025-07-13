@@ -23,6 +23,9 @@ class ImportFiles
     #[ORM\Column]
     private \DateTimeImmutable $created_at;
 
+    #[ORM\ManyToOne(inversedBy: 'importFiles')]
+    private ?User $owner = null;
+
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
     {
@@ -49,5 +52,17 @@ class ImportFiles
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->created_at;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
+
+        return $this;
     }
 }
