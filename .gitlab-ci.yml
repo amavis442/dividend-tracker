@@ -1,7 +1,7 @@
 stages:
   - analysis
   - test
-  #- deployment
+  - deployment
 
 default:
   image: phpdockerio/php:8.3-fpm
