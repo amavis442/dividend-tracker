@@ -214,7 +214,11 @@ class ImportCsvService extends AbstractImporter implements CsvInterface
                     case 'name':
                         $row['name'] = $val;
                         break;
-                    case 'no. of shares':
+                    case 'no. of shares': // Changed the headers to quantity
+                        $rawAmount = $val;
+                        $row['amount'] = $val;
+                        break;
+                    case 'quantity':
                         $rawAmount = $val;
                         $row['amount'] = $val;
                         break;
