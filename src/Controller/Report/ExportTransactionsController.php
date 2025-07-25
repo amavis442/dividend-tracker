@@ -4,10 +4,7 @@ namespace App\Controller\Report;
 
 use App\Entity\Transaction;
 use App\Repository\PaymentRepository;
-use App\Repository\PieRepository;
 use App\Repository\PositionRepository;
-use App\Service\DividendService;
-use App\Service\Export;
 use App\Service\CsvWriter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;

@@ -1,0 +1,42 @@
+name: Run PHP Unit and Functional Tests
+
+on: [push, pull_request]
+
+jobs:
+  unit-tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run Unit Tests
+        run: ./vendor/bin/phpunit --testsuite="Unit Test Suite"
+
+  functional-tests:
+    name: 🔬 Functional Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run Functional Tests
+        run: ./vendor/bin/phpunit --testsuite="Functional Test Suite"

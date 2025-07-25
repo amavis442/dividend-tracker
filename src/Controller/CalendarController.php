@@ -2,27 +2,29 @@
 
 namespace App\Controller;
 
-use App\Entity\Calendar;
-use App\Entity\DateSelect;
+use DateTime;
 use App\Entity\Ticker;
+use App\Entity\Calendar;
+use App\Service\Referer;
+use App\Entity\DateSelect;
+use App\Form\CalendarType;
+use Pagerfanta\Pagerfanta;
 use App\Entity\TickerAutocomplete;
 use App\Form\CalendarDividendType;
-use App\Form\CalendarType;
 use App\Form\TickerAutocompleteType;
-use App\Repository\CalendarRepository;
 use App\Repository\TickerRepository;
+use App\Repository\CalendarRepository;
 use App\Repository\PositionRepository;
-use App\Service\DividendService;
-use App\Service\Referer;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Service\DividendServiceInterface;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Pagerfanta\Doctrine\ORM\QueryAdapter;
-use Pagerfanta\Pagerfanta;
+use App\Service\DividendTaxRateResolverInterface;
+use App\Service\DividendExchangeRateResolverInterface;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/calendar')]
 class CalendarController extends AbstractController
@@ -160,8 +162,9 @@ class CalendarController extends AbstractController
 	public function viewCalendarTable(
 		Request $request,
 		CalendarRepository $calendarRepository,
-		PositionRepository $positionRepository,
-		DividendService $dividendService
+		DividendServiceInterface $dividendService,
+		DividendExchangeRateResolverInterface $dividendExchangeRateResolver,
+		DividendTaxRateResolverInterface $dividendTaxRateResolver
 	): Response {
 		$year = (int) date('Y');
 		$endDate = $year . '-12-31';
@@ -177,8 +180,13 @@ class CalendarController extends AbstractController
 			$dateSelect = $form->getData();
 		}
 
+
+
+
 		$calendars = $calendarRepository->groupByMonth(
 			$dividendService,
+			$dividendExchangeRateResolver,
+			$dividendTaxRateResolver,
 			$year,
 			$dateSelect->getStartdate()->format('Y-m-d'),
 			$dateSelect->getEnddate()->format('Y-m-d')

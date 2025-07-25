@@ -7,10 +7,14 @@ use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Transaction;
-use App\Service\DividendService;
+
+use App\Service\DividendExchangeRateResolverInterface;
+use App\Service\DividendServiceInterface;
+use App\Service\DividendTaxRateResolverInterface;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -328,15 +332,11 @@ class CalendarRepository extends ServiceEntityRepository
 
 	/**
 	 * Get the calendars between startDate and endDate
-	 *
-	 * @param DividendService $dividendService
-	 * @param integer $year
-	 * @param string|null $startDate
-	 * @param string|null $endDate
-	 * @return array|null
 	 */
 	public function groupByMonth(
-		DividendService $dividendService,
+		DividendServiceInterface $dividendService,
+		DividendExchangeRateResolverInterface $dividendExchangeRateResolver,
+		DividendTaxRateResolverInterface $dividendTaxRateResolver,
 		int $year,
 		?string $startDate = null,
 		?string $endDate = null,
@@ -394,8 +394,8 @@ class CalendarRepository extends ServiceEntityRepository
 
 			$ticker = $item->getTicker()->getSymbol();
 
-			$taxRate = $dividendService->getTaxRate($item);
-			$exchangeRate = $dividendService->getExchangeRate($item);
+			$taxRate = $dividendTaxRateResolver->getTaxRateForCalendar($item);
+			$exchangeRate = $dividendExchangeRateResolver->getRateForCalendar($item);
 			$tax = $item->getCashAmount() * $exchangeRate * $taxRate;
 
 			$data[$item->getPaymentDate()->format('Ym')][
@@ -422,7 +422,7 @@ class CalendarRepository extends ServiceEntityRepository
 	 * Get the calendars between startDate and endDate
 	 */
 	public function foreCast(
-		DividendService $dividendService,
+		DividendServiceInterface $dividendService,
 		string $startDate,
 		string $endDate,
 	): ?array {

@@ -1,23 +1,26 @@
 <?php
 
-namespace App\Model;
-
-use App\Contracts\Service\DividendServiceInterface;
-use App\Entity\Pie;
+namespace App\ViewModel;use App\Entity\Pie;
 use App\Entity\Ticker;
 use App\Entity\Position;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
-use App\Service\DividendService;
+use App\Service\DividendServiceInterface;
 use DateTime;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
+//use App\Service\MetricsUpdateService;
 
-class PortfolioModel
+class PortfolioViewModel
 {
     public function __construct(
         private Stopwatch $stopwatch,
+        //private MetricsUpdateService $metricsUpdate,
+        private DividendServiceInterface $dividendService,
+        private PositionRepository $positionRepository,
+        private AdjustedPositionDecoratorFactory $adjustedFactory,
         private int $maxPerPage = 10
     ) {
     }
@@ -25,13 +28,12 @@ class PortfolioModel
     /**
      * Page Decorator
      */
-    private function createPortfolioItem(
+    public function createPortfolioItem(
         /**
          * @var \Traversable<Position> $positions
          */
         \Traversable $positions,
         float $totalInvested,
-        DividendServiceInterface $dividendService
     ): void {
         $this->stopwatch->start('portfoliomodel-createPortfolioItem');
 
@@ -41,6 +43,10 @@ class PortfolioModel
          * @var Position $position
          */
         foreach ($positions as $position) {
+            $decorator = $this->adjustedFactory->decorate($position);
+            $amount = $decorator->getAdjustedAmount();
+            $note = $decorator->getAdjustmentNote();
+
             /**
              * @var Ticker $ticker
              */
@@ -55,23 +61,23 @@ class PortfolioModel
                 ->computeReceivedDividends();
 
             // Dividend part
-            $calendar = $dividendService->getRegularCalendar(
+            $calendar = $this->dividendService->getRegularCalendar(
                 $position->getTicker()
             );
 
             if ($calendar) {
-                $forwardNetDividend = $dividendService->getForwardNetDividend(
+                $forwardNetDividend = $this->dividendService->getForwardNetDividend(
                     $position->getTicker(),
                     $position->getAmount()
                 );
-                $forwardNetDividendYield = $dividendService->getForwardNetDividendYield(
+                $forwardNetDividendYield = $this->dividendService->getForwardNetDividendYield(
                     $position,
                     $position->getTicker(),
                     $position->getAmount(),
                     $position->getAllocation()
                 );
                 $forwardNetDividendYieldPerShare = 0;
-                $netDividendPerShare = $dividendService->getNetDividendPerShare(
+                $netDividendPerShare = $this->dividendService->getNetDividendPerShare(
                     $position
                 );
 
@@ -101,8 +107,6 @@ class PortfolioModel
     }
 
     public function getPager(
-        PositionRepository $positionRepository,
-        DividendServiceInterface $dividendService,
         float $totalInvested = 0.0,
         int $page = 1,
         string $sort = 'symbol',
@@ -120,7 +124,7 @@ class PortfolioModel
 
         $orderBy = in_array($orderBy, ['asc', 'desc', 'ASC', 'DESC']) ? $orderBy: 'asc';
 
-        $queryBuilder = $positionRepository->getAllQuery(
+        $queryBuilder = $this->positionRepository->getAllQuery(
             $sort,
             $orderBy,
             $ticker,
@@ -135,8 +139,7 @@ class PortfolioModel
 
         $this->createPortfolioItem(
             $pagerfanta,
-            $totalInvested,
-            $dividendService
+            $totalInvested
         );
 
         return $pagerfanta;

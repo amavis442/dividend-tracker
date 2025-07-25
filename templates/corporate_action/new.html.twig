@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New CorporateAction{% endblock %}
+
+{% block body %}
+    <h1>Create new CorporateAction</h1>
+
+    {{ include('corporate_action/_form.html.twig') }}
+
+    <a href="{{ path('app_corporate_action_index') }}">back to list</a>
+{% endblock %}

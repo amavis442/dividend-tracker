@@ -130,7 +130,9 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "App\\Tests\\": "tests/"
+            "App\\Tests\\": "tests/",
+            "App\\Tests\\Unit\\": "tests/Unit/",
+            "App\\Tests\\Functional\\": "tests/Functional/"
         }
     },
     "replace": {
