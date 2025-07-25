@@ -2,16 +2,12 @@
 
 namespace App\Service;
 
-use App\Contracts\Service\DividendServiceInterface;
 use App\Entity\Calendar;
 use App\Entity\Constants;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Transaction;
-use App\Repository\TaxRepository;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use App\Service\ExchangeRate\ExchangeRateInterface;
 
 class DividendService implements DividendServiceInterface
 {
@@ -21,30 +17,20 @@ class DividendService implements DividendServiceInterface
      * @var null|float
      */
     protected null|float $forwardNetDividend;
+
     /**
      * Position
      *
      * @var Position
      */
     protected Position $position;
-    /**
-     * Current exchangerate
-     *
-     * @var ExchangeRateInterface
-     */
-    protected ExchangeRateInterface $exchangeRateService;
-    /**
-     * Dividend tax withhold
-     *
-     * @var TaxRepository
-     */
-    protected TaxRepository $taxRepository;
+
     /**
      * What is the net dividend per payout per share
      *
      * @var null|float
      */
-    protected null|float $netDividendPerShare;
+    protected null|float $netDividendPerShare = 0.0;
 
     /**
      * Should all dividend paid on same day to same ticker be accumulated?
@@ -54,87 +40,13 @@ class DividendService implements DividendServiceInterface
      */
     protected bool $cummulateDividendAmount = true;
 
-    protected TranslatorInterface $translator;
+    protected float $netDividendYield = 0.0;
 
-    protected float $netDividendYield = 0;
-
-    public function __construct(ExchangeRateInterface $exchangeRateService, TaxRepository $taxRepository, TranslatorInterface $translator)
-    {
-        $this->exchangeRateService = $exchangeRateService;
-        $this->taxRepository = $taxRepository;
-        $this->netDividendPerShare = null;
-        $this->translator = $translator;
-    }
-
-    /**
-     * Get the exchange rat for this calendar event
-     *
-     * @param Calendar $calendar
-     * @return float|null
-     */
-    public function getExchangeRate(Calendar $calendar): ?float
-    {
-        $rates = $this->exchangeRateService->getRates();
-        if (count($rates) < 1 && $calendar->getCurrency()->getSymbol() != 'EUR' || !isset($rates[$calendar->getCurrency()->getSymbol()])) {
-            $msg = $this->translator->trans('tickerSymbol:: Exchange rate for [Symbol] is currently unavailable. Available are: jsonSymbol', [
-                'tickerSymbol' => $calendar->getTicker()->getSymbol(),
-                'Symbol' => $calendar->getCurrency()->getSymbol(),
-                'jsonSymbol' => json_encode($rates)
-            ]);
-
-            throw new \RuntimeException($msg);
-        }
-
-        $exchangeRate = match ($calendar->getCurrency()->getSymbol()) {
-            'EUR' => 1,
-            'USD' => 1 / $rates['USD'],
-            'GB' => 1 / $rates['GBP'],
-            'CAD' => 1 / $rates['CAD'],
-            'CHF' => 1 / $rates['CHF'],
-            default => 1 / $rates['USD']
-        };
-
-        return $exchangeRate;
-    }
-
-    /**
-     * WHat is the dividend tax
-     *
-     * @param Calendar $calendar
-     * @return float|null
-     */
-    public function getTaxRate(Calendar $calendar): ?float
-    {
-        $dividendTax = 0.15;
-        $taxRate = 0;
-
-        $ticker = $calendar->getTicker();
-        $tax = $ticker->getTax();
-        if ($tax) {
-            $taxRate = $tax->getTaxRate();
-            return $taxRate;
-        }
-
-        switch ($calendar->getCurrency()->getSymbol()) {
-            case 'EUR':
-                $dividendTax = Constants::TAX / 100;
-                break;
-            case 'USD':
-                $dividendTax = Constants::TAX / 100;
-                break;
-            case 'GB':
-                $dividendTax = Constants::TAX_GB / 100;
-                break;
-            case 'CAD':
-                $dividendTax = Constants::TAX / 100;
-                break;
-            default:
-                $dividendTax = Constants::TAX / 100;
-                break;
-        }
-
-        return $dividendTax;
-    }
+    public function __construct(
+        protected DividendExchangeRateResolverInterface $dividendExchangeRateResolver,
+        protected DividendTaxRateResolverInterface $dividendTaxRateResolver,
+        )
+    {}
 
     /**
      * Get the exchange rate and tax rate
@@ -150,7 +62,7 @@ class DividendService implements DividendServiceInterface
         $ticker = $position->getTicker();
 
         $dividendTax = $ticker->getTax() ? $ticker->getTax()->getTaxRate() : Constants::TAX / 100;
-        $exchangeRate = $this->getExchangeRate($calendar);
+        $exchangeRate = $this->dividendExchangeRateResolver->getRateForCalendar($calendar);
 
         return [$exchangeRate, $dividendTax];
     }
@@ -238,7 +150,7 @@ class DividendService implements DividendServiceInterface
         if ($this->cummulateDividendAmount) {
             $cashAmount = $this->getCashAmount($ticker);
         }
-        $exchangeRate = $this->getExchangeRate($calendar);
+        $exchangeRate = $this->dividendExchangeRateResolver->getRateForCalendar($calendar);
 
         return $cashAmount * (1 - $dividendTax) * $exchangeRate;
     }
@@ -315,7 +227,7 @@ class DividendService implements DividendServiceInterface
                 }
 
                 $dividendTax = $ticker->getTax() ? $ticker->getTax()->getTaxRate() : Constants::TAX / 100;
-                $exchangeRate = $this->getExchangeRate($calendar);
+                $exchangeRate = $this->dividendExchangeRateResolver->getRateForCalendar($calendar);
                 $this->netDividendPerShare = $cashAmount * $exchangeRate * (1 - $dividendTax);
                 $forwardNetDividend = (float) $amount * $cashAmount * $exchangeRate * (1 - $dividendTax);
             }

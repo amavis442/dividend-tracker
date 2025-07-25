@@ -56,10 +56,9 @@ services:
             $client: '@http_client'
             $exchangerateCache: '@exchangerate.cache'
 
-    App\Service\DividendService:
+    App\Service\DividendExchangeRateResolver:
         arguments:
             $exchangeRateService: '@App\Service\ExchangeRate\WisselkoersNlExchangeRateService'
-            #$exchangerateCache: '@exchangerate.cache'
 
     # Yahoo api does not work anymore
     App\Service\StockPriceService:
@@ -142,7 +141,7 @@ services:
                 '@service_container',
             ]
 
-    App\Model\PortfolioModel:
+    App\ViewModel\PortfolioViewModel:
         bind:
             $maxPerPage: '%app.max_per_page%'
 
@@ -159,6 +158,12 @@ services:
     App\EventListener\AddUser:
         tags:
             - { name: doctrine.event_listener, event: prePersist }
+
+    # Needed to autowire the first argument of the constructor for custom Faker providers
+    Faker\Generator: ~
+
+    App\Factory\Provider\ISINProvider:
+        tags: ['foundry.faker_provider']
 
     #Pagerfanta\Twig\Extension\PagerfantaExtension:
     #    tags: ['twig.extension']

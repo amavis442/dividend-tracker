@@ -5,7 +5,7 @@ namespace App\Command;
 use App\Entity\DividendTracker;
 use App\Repository\PositionRepository;
 use App\Repository\UserRepository;
-use App\Service\DividendService;
+use App\Service\DividendServiceInterface;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -20,16 +20,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class DividendTrackerCommand extends Command
 {
-    protected UserRepository $userRepository;
-    protected DividendService $dividendService;
-    protected PositionRepository $positionRepository;
-    protected EntityManagerInterface $entityManager;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        UserRepository $userRepository,
-        PositionRepository $positionRepository,
-        DividendService $dividendService
+        protected EntityManagerInterface $entityManager,
+        protected UserRepository $userRepository,
+        protected PositionRepository $positionRepository,
+        protected DividendServiceInterface $dividendService
     ) {
 
         parent::__construct();

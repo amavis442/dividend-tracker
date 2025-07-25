@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CorporateAction index{% endblock %}
+
+{% block body %}
+    <h1>CorporateAction index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Type</th>
+                <th>EventDate</th>
+                <th>Ratio</th>
+                <th>CreatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for corporate_action in corporate_actions %}
+            <tr>
+                <td>{{ corporate_action.id }}</td>
+                <td>{{ corporate_action.type }}</td>
+                <td>{{ corporate_action.eventDate ? corporate_action.eventDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ corporate_action.ratio }}</td>
+                <td>{{ corporate_action.createdAt ? corporate_action.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_corporate_action_show', {'id': corporate_action.id}) }}">show</a>
+                    <a href="{{ path('app_corporate_action_edit', {'id': corporate_action.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_corporate_action_new') }}">Create new</a>
+{% endblock %}

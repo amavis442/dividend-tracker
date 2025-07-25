@@ -10,6 +10,7 @@ use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
  */
 final class CurrencyFactory extends PersistentProxyObjectFactory
 {
+    const CURRENCY_SYMBOL = ['USD','EUR','GBX'];
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
      *
@@ -32,7 +33,7 @@ final class CurrencyFactory extends PersistentProxyObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'symbol' => self::faker()->text(10),
+            'symbol' => array_rand(self::CURRENCY_SYMBOL),
         ];
     }
 

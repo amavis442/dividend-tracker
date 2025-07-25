@@ -2,17 +2,13 @@
 
 namespace App\Service;
 
-use App\Entity\Calendar;
-use App\Entity\Pie;
 use App\Entity\Constants;
+use App\Entity\Pie;
 use App\Entity\PositionYield;
-use App\Repository\CalendarRepository;
-use App\Repository\DividendMonthRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TransactionRepository;
+use App\Service\DividendExchangeRateResolverInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
 
 class YieldsService
 {
@@ -21,7 +17,8 @@ class YieldsService
 		private Stopwatch $stopwatch,
 		private PositionRepository $positionRepository,
 		private TransactionRepository $transactionRepository,
-		private DividendService $dividendService
+		private DividendService $dividendService,
+		private DividendExchangeRateResolverInterface $dividendExchangeRateResolver
 	) {
 	}
 	public function yield(
@@ -112,7 +109,7 @@ class YieldsService
 				? $ticker->getTax()->getTaxRate() * 100
 				: Constants::TAX;
 			$exchangeRate = $firstCalendarEntry
-				? $dividendService->getExchangeRate($firstCalendarEntry)
+				? $this->dividendExchangeRateResolver->getRateForCalendar($firstCalendarEntry)
 				: 0;
 
 			if ($firstCalendarEntry) {

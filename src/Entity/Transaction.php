@@ -66,7 +66,7 @@ class Transaction
 
     /**
      * @see https://github.com/doctrine/dbal/issues/3690
-     * 32 bit system sets amount to string for bigint and that will fuck up strong typing and will give a useless 500 error page.
+     * 32 bit system sets amount to string for bigint and that will mess up strong typing and will give a useless 500 error page.
      * @var float
      */
     #[Groups(['transaction:read', 'transaction:write'])]

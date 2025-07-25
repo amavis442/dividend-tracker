@@ -2,9 +2,8 @@
 
 namespace App\Controller\Portfolio;
 
-use App\Entity\Pie;
 use App\Entity\Position;
-use App\Service\DividendService;
+use App\Service\DividendServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -35,7 +34,7 @@ class TransactionController extends AbstractController
 	public function showOrders(
 		Position $position,
 		TransactionRepository $transactionRepository,
-		DividendService $dividendService,
+		DividendServiceInterface $dividendService,
 		int $page = 1
 	): Response {
 		$ticker = $position->getTicker();

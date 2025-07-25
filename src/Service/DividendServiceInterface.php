@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Contracts\Service;
+namespace App\Service;
 
 use App\Entity\Calendar;
 use App\Entity\Position;
@@ -9,8 +9,6 @@ use Doctrine\Common\Collections\Collection;
 
 interface DividendServiceInterface
 {
-    public function getExchangeRate(Calendar $calendar): ?float;
-    public function getTaxRate(Calendar $calendar): ?float;
     public function getExchangeAndTax(Position $position, Calendar $calendar): array;
     public function getPositionSize(Collection $transactions, Calendar $calendar): ?float;
     public function getRegularCalendar(Ticker $ticker): ?Calendar;

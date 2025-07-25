@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Service\Importer;
+namespace App\Tests\Functional\Service;
 
 use App\Entity\Payment;
 use App\Entity\Transaction;
@@ -33,7 +33,19 @@ class ImportCsvServiceTest extends KernelTestCase
 		self::bootKernel();
 		$container = static::getContainer();
 
-		// Create test fixtures via factories
+		/*$entityManager = $container->get('doctrine.orm.entity_manager');
+		$connection = $entityManager->getConnection();
+
+		if (!$connection->isConnected()) {
+    		$connection->connect(); // Force a reconnect
+		}*/
+
+		$this->importCsvService = $container->get(ImportCsvService::class);
+	}
+
+	private function setUpFactories() {
+		$container = static::getContainer();
+
 		$userFactory = UserFactory::createOne();
 		$user = $userFactory->_real();
 		$currency = CurrencyFactory::createOne(['symbol' => 'EUR']);
@@ -50,14 +62,24 @@ class ImportCsvServiceTest extends KernelTestCase
 		]);
 
 		$tokenStorage = $container->get(TokenStorageInterface::class);
-		$tokenStorage->setToken(new UsernamePasswordToken($user, 'main', $user->getRoles()));
+		$tokenStorage->setToken(
+			new UsernamePasswordToken($user, 'main', $user->getRoles())
+		);
+	}
 
-	 	$this->importCsvService = $container->get(ImportCsvService::class);
+	protected function tearDown(): void
+	{
+		parent::tearDown();
 
+		self::bootKernel();
+		$entityManager = self::getContainer()->get('doctrine')->getManager();
+		$entityManager->clear(); // Optional: $entityManager->close();
 	}
 
 	public function testImportsDividendWithAuthenticatedUser(): void
 	{
+		$this->setUpFactories();
+
 		// Prepare a simple CSV content with one dividend row
 		$csvContent = <<<CSV
 Action,Time,ISIN,No. of Shares,Price / Share,Currency (price / share),Exchange Rate,Total,Currency (total),Withholding Tax,Currency (withholding tax),ID
@@ -101,39 +123,48 @@ CSV;
 		unlink($path);
 	}
 
-
 	public function testImportsBuyAndSellTransactions(): void
-    {
-        $csvContent = <<<CSV
+	{
+		$this->setUpFactories();
+
+		$csvContent = <<<CSV
 Action,Time,ISIN,No. of Shares,Price / Share,Currency (price / share),Exchange Rate,Total,Currency (total),Withholding Tax,Currency (withholding tax),ID
 Buy,2024-06-02 12:00:00,US1234567890,5,100.0,USD,1.0,500.00,USD,0.0,USD,TXN1
 Sell,2024-06-03 14:00:00,US1234567890,5,120.0,USD,1.0,600.00,USD,0.0,USD,TXN2
 CSV;
 
-        $path = sys_get_temp_dir() . '/test_trades.csv';
-        file_put_contents($path, $csvContent);
-        $file = new UploadedFile($path, 'test_trades.csv', 'text/csv', null, true);
+		$path = sys_get_temp_dir() . '/test_trades.csv';
+		file_put_contents($path, $csvContent);
+		$file = new UploadedFile(
+			$path,
+			'test_trades.csv',
+			'text/csv',
+			null,
+			true
+		);
 
-        $result = $this->importCsvService->importFile($file);
+		$result = $this->importCsvService->importFile($file);
 
-        $this->assertSame('ok', $result['status']);
-        $this->assertEquals(2, $result['transactionsAdded']);
-        $this->assertEquals(2, $result['totalTransaction']);
+		$this->assertSame('ok', $result['status']);
+		$this->assertEquals(2, $result['transactionsAdded']);
+		$this->assertEquals(2, $result['totalTransaction']);
 
-        $transactionRepo = static::getContainer()->get('doctrine')->getRepository(Transaction::class);
+		$transactionRepo = static::getContainer()
+			->get('doctrine')
+			->getRepository(Transaction::class);
 
-        $buy = $transactionRepo->findOneBy(['jobid' => 'TXN1']);
-        $sell = $transactionRepo->findOneBy(['jobid' => 'TXN2']);
+		$buy = $transactionRepo->findOneBy(['jobid' => 'TXN1']);
+		$sell = $transactionRepo->findOneBy(['jobid' => 'TXN2']);
 
-        $this->assertNotNull($buy);
-        $this->assertNotNull($sell);
+		$this->assertNotNull($buy);
+		$this->assertNotNull($sell);
 
-        $this->assertEquals(5, $buy->getAmount());
-        $this->assertEquals(500.00, $buy->getTotal());
+		$this->assertEquals(5, $buy->getAmount());
+		$this->assertEquals(500.0, $buy->getTotal());
 
-        $this->assertEquals(5, $sell->getAmount());
-        $this->assertEquals(600.00, $sell->getTotal());
+		$this->assertEquals(5, $sell->getAmount());
+		$this->assertEquals(600.0, $sell->getTotal());
 
-        unlink($path);
-    }
+		unlink($path);
+	}
 }

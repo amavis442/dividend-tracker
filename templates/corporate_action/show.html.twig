@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CorporateAction{% endblock %}
+
+{% block body %}
+    <h1>CorporateAction</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ corporate_action.id }}</td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td>{{ corporate_action.type }}</td>
+            </tr>
+            <tr>
+                <th>EventDate</th>
+                <td>{{ corporate_action.eventDate ? corporate_action.eventDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Ratio</th>
+                <td>{{ corporate_action.ratio }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ corporate_action.createdAt ? corporate_action.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_corporate_action_index') }}">back to list</a>
+
+    <a href="{{ path('app_corporate_action_edit', {'id': corporate_action.id}) }}">edit</a>
+
+    {{ include('corporate_action/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,11 +1,18 @@
 <?php
 
-namespace App\Tests\Controller;
+namespace App\Tests\Functional\Controller;
 
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
 
+#[Group('controller')]
 class PortfolioControllerTest extends WebTestCase
 {
+    use Factories;
+	use ResetDatabase;
+
     public function testHomePage(): void
     {
         $client = static::createClient();

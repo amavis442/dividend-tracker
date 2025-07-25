@@ -2,7 +2,6 @@
 
 namespace App\Controller\Portfolio;
 
-use App\Contracts\Service\DividendServiceInterface;
 use App\Entity\Calendar;
 use App\Entity\Pie;
 use App\Entity\Portfolio;
@@ -12,12 +11,12 @@ use App\Entity\SearchForm;
 use App\Entity\User;
 use App\Form\PortfolioGoalType;
 use App\Form\SearchFormType;
-use App\Model\PortfolioModel;
+use App\ViewModel\PortfolioViewModel;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Service\DividendGrowthService;
-use App\Service\DividendService;
+use App\Service\DividendServiceInterface;
 use App\Service\Referer;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -36,6 +35,7 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 
 /** @psalm-suppress PropertyNotSetInConstructor */
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/portfolio')]
@@ -51,10 +51,8 @@ class PortfolioController extends AbstractController
 	public function index(
 		Request $request,
 		TickerRepository $tickerRepository,
-		PositionRepository $positionRepository,
 		PortfolioRepository $portfolioRepository,
-		PortfolioModel $model,
-		DividendServiceInterface $dividendService,
+		PortfolioViewModel $model,
 		Referer $referer,
 		#[MapQueryParameter] int $page = 1,
 		#[MapQueryParameter] string $sort = 'fullname',
@@ -112,8 +110,6 @@ class PortfolioController extends AbstractController
 		$this->stopwatch->start('portfoliomodel-getpage');
 
 		$pager = $model->getPager(
-			$positionRepository,
-			$dividendService,
 			$portfolio->getInvested() ?? 0.0,
 			$page,
 			$sort,
@@ -147,7 +143,7 @@ class PortfolioController extends AbstractController
 		PaymentRepository $paymentRepository,
 		PortfolioRepository $portfolioRepository,
 		DividendGrowthService $dividendGrowth,
-		DividendService $dividendService,
+		DividendServiceInterface $dividendService,
 		Referer $referer,
 		ChartBuilderInterface $chartBuilder
 	): Response {
@@ -241,7 +237,7 @@ class PortfolioController extends AbstractController
 
 		if ($allocated > 0) {
 			$percentageAllocation =
-				($position->getAllocation() ?? 0 / $allocated) * 100;
+				($position->getAllocation() / $allocated) * 100;
 		}
 
 		$calendars = $ticker->getCalendars()->slice(0, 30);
@@ -370,7 +366,7 @@ class PortfolioController extends AbstractController
 		PositionRepository $positionRepository,
 		PaymentRepository $paymentRepository,
 		PortfolioRepository $portfolioRepository,
-		DividendService $dividendService
+		DividendServiceInterface $dividendService
 	): Response {
 		$ticker = $position->getTicker();
 		$calendarRecentDividendDate = $ticker->getRecentDividendDate();
@@ -453,7 +449,7 @@ class PortfolioController extends AbstractController
 
 		if ($allocated > 0) {
 			$percentageAllocation =
-				($position->getAllocation() ?? 0 / $allocated) * 100;
+				($position->getAllocation() / $allocated) * 100;
 		}
 
 		$yearlyForwardDividendPayout =

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Service\DividendDate;
+namespace App\Tests\Unit\Service\DividendDate;
 
 use App\Service\DividendDate\ISharesService;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
