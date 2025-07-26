@@ -2,6 +2,8 @@
 
 namespace App\Controller\Portfolio;
 
+use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
+use App\Dto\ExchangeTaxDto;
 use App\Entity\Calendar;
 use App\Entity\Pie;
 use App\Entity\Portfolio;
@@ -11,31 +13,31 @@ use App\Entity\SearchForm;
 use App\Entity\User;
 use App\Form\PortfolioGoalType;
 use App\Form\SearchFormType;
-use App\ViewModel\PortfolioViewModel;
+use App\Helper\Colors;
 use App\Repository\PaymentRepository;
+use App\Repository\PortfolioRepository;
 use App\Repository\PositionRepository;
+use App\Repository\ResearchRepository;
 use App\Repository\TickerRepository;
 use App\Service\DividendGrowthService;
 use App\Service\DividendServiceInterface;
+use App\Service\ExchangeAndTaxResolverInterface;
 use App\Service\Referer;
+use App\ViewModel\PortfolioViewModel;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Stopwatch\Stopwatch;
-use App\Helper\Colors;
-use App\Repository\PortfolioRepository;
-use App\Repository\ResearchRepository;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use RuntimeException;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 
 /** @psalm-suppress PropertyNotSetInConstructor */
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/portfolio')]
@@ -144,6 +146,7 @@ class PortfolioController extends AbstractController
 		PortfolioRepository $portfolioRepository,
 		DividendGrowthService $dividendGrowth,
 		DividendServiceInterface $dividendService,
+		ExchangeAndTaxResolverInterface $exchangeAndTaxResolver,
 		Referer $referer,
 		ChartBuilderInterface $chartBuilder
 	): Response {
@@ -158,10 +161,10 @@ class PortfolioController extends AbstractController
 		$nextDividendPayout = null;
 
 		if ($calendarRecentDividendDate) {
-			[$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax(
-				$position,
-				$calendarRecentDividendDate
-			);
+			$exchangeTaxDto = $exchangeAndTaxResolver->resolve($position->getTicker(), $calendarRecentDividendDate);
+			$exchangeRate = $exchangeTaxDto->exchangeRate;
+			$dividendTax =$exchangeTaxDto->taxAmount;
+
 			$netCashAmount =
 				$calendarRecentDividendDate->getCashAmount() *
 				$exchangeRate *
@@ -174,15 +177,16 @@ class PortfolioController extends AbstractController
 			$nextDividendPayout = $calendarRecentDividendDate->getPaymentDate();
 		}
 
-		$position = $positionRepository->getForPosition($position);
+		//$position = $positionRepository->getForPosition($position);
 		$netYearlyDividend = 0.0;
 
 		if (count($calenders) > 0) {
 			$cal = $dividendService->getRegularCalendar($ticker);
-			[$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax(
-				$position,
-				$cal
-			);
+
+			$exchangeTaxDto = $exchangeAndTaxResolver->resolve($ticker, $cal);
+			$exchangeRate = $exchangeTaxDto->exchangeRate;
+			$dividendTax =$exchangeTaxDto->taxAmount;
+
 			$dividendFrequentie = $ticker->getPayoutFrequency();
 			$netYearlyDividend =
 				$dividendFrequentie *
@@ -363,10 +367,10 @@ class PortfolioController extends AbstractController
 	]
 	public function showInfo(
 		Position $position,
-		PositionRepository $positionRepository,
 		PaymentRepository $paymentRepository,
 		PortfolioRepository $portfolioRepository,
-		DividendServiceInterface $dividendService
+		DividendServiceInterface $dividendService,
+		ExchangeAndTaxResolverInterface $exchangeAndTaxResolver,
 	): Response {
 		$ticker = $position->getTicker();
 		$calendarRecentDividendDate = $ticker->getRecentDividendDate();
@@ -379,10 +383,10 @@ class PortfolioController extends AbstractController
 		$nextDividendPayout = null;
 
 		if ($calendarRecentDividendDate) {
-			[$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax(
-				$position,
-				$calendarRecentDividendDate
-			);
+			$exchangeTaxDto = $exchangeAndTaxResolver->resolve($ticker, $calendarRecentDividendDate);
+			$exchangeRate = $exchangeTaxDto->exchangeRate;
+			$dividendTax =$exchangeTaxDto->taxAmount;
+
 			$netCashAmount =
 				$calendarRecentDividendDate->getCashAmount() *
 				$exchangeRate *
@@ -395,14 +399,11 @@ class PortfolioController extends AbstractController
 			$nextDividendPayout = $calendarRecentDividendDate->getPaymentDate();
 		}
 
-		$position = $positionRepository->getForPosition($position);
-
 		if (count($calenders) > 0) {
 			$cal = $dividendService->getRegularCalendar($ticker);
-			[$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax(
-				$position,
-				$cal
-			);
+			$exchangeTaxDto = $exchangeAndTaxResolver->resolve($ticker, $cal);
+			$exchangeRate = $exchangeTaxDto->exchangeRate;
+			$dividendTax =$exchangeTaxDto->taxAmount;
 		}
 		$dividendRaises = [];
 

@@ -3,20 +3,21 @@
 namespace App\Controller\Portfolio;
 
 use App\Entity\Position;
-use App\Service\DividendServiceInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use App\Repository\TransactionRepository;
-use Pagerfanta\Doctrine\ORM\QueryAdapter;
-use Pagerfanta\Pagerfanta;
-use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Transaction;
 use App\Form\PositionPieType;
 use App\Form\TransactionPieType;
 use App\Repository\PieRepository;
 use App\Repository\PositionRepository;
+use App\Repository\TransactionRepository;
+use App\Service\DividendServiceInterface;
+use App\Service\ExchangeAndTaxResolverInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /** @psalm-suppress PropertyNotSetInConstructor */
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/portfolio')]
@@ -35,6 +36,7 @@ class TransactionController extends AbstractController
 		Position $position,
 		TransactionRepository $transactionRepository,
 		DividendServiceInterface $dividendService,
+		ExchangeAndTaxResolverInterface $exchangeAndTaxResolver,
 		int $page = 1
 	): Response {
 		$ticker = $position->getTicker();
@@ -47,10 +49,11 @@ class TransactionController extends AbstractController
 
 		if (count($calenders) > 0) {
 			$cal = $dividendService->getRegularCalendar($ticker);
-			[$exchangeRate, $dividendTax] = $dividendService->getExchangeAndTax(
-				$position,
-				$cal
-			);
+
+			$exchangeTaxDto = $exchangeAndTaxResolver->resolve($ticker, $cal);
+			$exchangeRate = $exchangeTaxDto->exchangeRate;
+			$dividendTax =$exchangeTaxDto->taxAmount;
+
 			$dividendFrequentie = $ticker->getPayoutFrequency();
 			$netYearlyDividend =
 				$dividendFrequentie *

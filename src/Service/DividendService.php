@@ -45,6 +45,8 @@ class DividendService implements DividendServiceInterface
     public function __construct(
         protected DividendExchangeRateResolverInterface $dividendExchangeRateResolver,
         protected DividendTaxRateResolverInterface $dividendTaxRateResolver,
+        protected ShareEligibilityCalculatorInterface $shareEligibilityCalculator,
+        protected ExchangeAndTaxResolverInterface $exchangeAndTaxResolver,
         )
     {}
 
@@ -52,8 +54,12 @@ class DividendService implements DividendServiceInterface
      * Get the exchange rate and tax rate
      *
      * @param Position $position
+     *
      * @param Calendar $calendar
+     *
      * @return array
+     *
+     * @deprecated Use ExchangeAndTaxResolver::class or ExchangeAndTaxResolverInterface
      */
     public function getExchangeAndTax(Position $position, Calendar $calendar): array
     {
@@ -71,8 +77,12 @@ class DividendService implements DividendServiceInterface
      * Which amount of shares should be considered for the dividend on a certain date
      *
      * @param Collection $transactions
+     *
      * @param Calendar $calendar
+     *
      * @return null|float
+     *
+     * @deprecated Use App\Service\ShareEligibilityCalculator::calculate(Collection $transactions, Calendar $calendar): float
      */
     public function getPositionSize(Collection $transactions, Calendar $calendar): ?float
     {
@@ -131,7 +141,7 @@ class DividendService implements DividendServiceInterface
         $ticker = $calendar->getTicker();
         $position = $ticker->getPositions()->first();
         if ($position) {
-            $amount = $this->getPositionSize($position->getTransactions(), $calendar);
+            $amount = $this->shareEligibilityCalculator->calculate($position->getTransactions(), $calendar);
         }
         return $amount > 0 ? $amount : 0.0;
     }
@@ -170,7 +180,7 @@ class DividendService implements DividendServiceInterface
         if (count($positions) > 0) {
             $position = $positions->first();
             if ($position) {
-                $amount = $this->getPositionSize($position->getTransactions(), $calendar);
+                $amount = $this->shareEligibilityCalculator->calculate($position->getTransactions(), $calendar);
                 if ($amount > 0) {
                     $netDividend = $this->getNetDividend($position, $calendar);
                     $dividend = $amount * $netDividend;
