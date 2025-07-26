@@ -1,10 +1,8 @@
 <?php
 
-namespace App\Entity;
+namespace App\Util;
 
-/**
- * @deprecated Use App\Util\Constants::class
- */
+
 class Constants
 {
     public const AMOUNT_PRECISION = 10000000;
