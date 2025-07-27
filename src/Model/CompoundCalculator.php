@@ -116,9 +116,6 @@ class CompoundCalculator
 				($netDividendPerSharePerYear / $data[$i]['shareprice']) * 100;
 
 			$dividendShares = $oldShares;
-
-			//$data[$i]['yoc'] = $data[$i]['net_dividend'] / ($oldShares )
-
 			$quator++;
 		}
 
