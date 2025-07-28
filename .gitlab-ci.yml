@@ -50,9 +50,7 @@ phpunit:
 deployment:
   stage: deployment
   script:
-    - php vendor/bin/dep deploy {{DEPLOY_TARGET}} -vvv
+    - php vendor/bin/dep deploy prod -vvv
   when: manual
   only:
-    - main
-  environment:
-    name: $DEPLOY_TARGET
+    - never
