@@ -1,0 +1,104 @@
+{% extends 'layouts/index_no_add_default.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+    {% for pieGroup, payoutsByMonth in reportData %}
+        <div class="mb-4 border rounded p-2">
+            <div class="text-4xl font-extrabold dark:text-white">{{ pieGroup }}</div>
+        </div>
+        {% for month, payoutsByDate in payoutsByMonth %}
+            <div class="mb-4 bg-gray-300 border rounded-md p-2">
+                <div class="font-extrabold">{{ month|date("F Y") }}</div>
+            </div>
+            <twig:Table:Table class="max-w-min min-w-full">
+                <twig:Table:THead>
+                    <tr>
+                        <twig:Table:ThCol class="rounded-l-lg">
+                            {{ 'Pay Date'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Ticker'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Full Name'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Quantity'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Payout'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Dividend'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Currency'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Ex Date'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{'Tax Withheld'|trans}}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol class="rounded-r-lg">
+                            {{'Exchange Rate'|trans}}
+                        </twig:Table:ThCol>
+                    </tr>
+                </twig:Table:THead>
+                <tbody>
+                    {% set totalPayout = 0.0 %}
+                    {% for dateKey in payoutsByDate|keys|sort %}
+                        {% set tickers = payoutsByDate[dateKey] %}
+                        {% for ticker, entries in tickers %}
+                            {% for info in entries %}
+                                {% set totalPayout = totalPayout + info.payout %}
+                                <twig:Table:Tr>
+                                    <twig:Table:Td>
+                                        {{ info.payDate|date("Y-m-d") }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        <div>{{ info.ticker }}</div>
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        <div class="text-wrap">{{ info.fullname }}</div>
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        {{ info.quantity|number_format(2, '.', ',') }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        &euro;{{ info.payout|number_format(2, '.', ',') }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        {{ info.cashAmount|number_format(2, '.', ',') }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        {{ info.currency }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        {{ info.exDate|date("Y-m-d") }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        {{ info.taxWithheld * 100 }}%
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        {{ info.exchangeRate|number_format(6) }}
+                                    </twig:Table:Td>
+                                </twig:Table:Tr>
+                            {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                {% endfor %}
+                <tfoot>
+                    <twig:Table:Tr>
+                        <twig:Table:Td colspan="4">
+                        </twig:Table:Td>
+                        <twig:Table:Td class="font-bold">
+                            &euro;{{ totalPayout|number_format(2, '.', ',') }}
+                        </twig:Table:Td>
+                        <twig:Table:Td colspan="5">
+                        </twig:Table:Td>
+                    </twig:Table:Tr>
+                </tfoot>
+            </twig:Table:Table>
+        {% endfor %}
+    {% endfor %}
+{% endblock %}

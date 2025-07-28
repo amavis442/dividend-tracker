@@ -228,11 +228,6 @@
                                    tabindex="-1"
                                    id="report-menu-item-6b"><i class="fas fa-calculator pr-2"></i> {{ 'Drip'|trans }}</a>
                                 <div class="border border-solid h-0 bg-[##e5e7eb] "></div>
-                                <a href="{{ url('app_incomes_shares_data_set_index', parameters = [], schemeRelative = false) }}"
-                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
-                                   role="menuitem"
-                                   tabindex="-1"
-                                   id="report-menu-item-6a"><i class="fa-solid fa-chart-line"></i> {{ 'IncomesShares'|trans }}</a>
                                 <a href="{{ url('app_report_trading212_index', parameters = [], schemeRelative = false) }}"
                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
                                    role="menuitem"
@@ -243,6 +238,11 @@
                                    role="menuitem"
                                    tabindex="-1"
                                    id="report-menu-item-6a"><i class="fa-solid fa-chart-line"></i> {{ 'Trading212 Pies'|trans }}</a>
+                                <a href="{{ url('app_report_trading212_dividend_forecast_index', parameters = [], schemeRelative = false) }}"
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
+                                   role="menuitem"
+                                   tabindex="-1"
+                                   id="report-menu-item-6a"><i class="fa-solid fa-chart-line"></i> {{ 'Dividend forecast'|trans }}</a>
                                 <div class="border border-solid h-0 bg-[##e5e7eb] "></div>
                                 <a href="{{ url('report_export_transactions', parameters = [], schemeRelative = false) }}"
                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"

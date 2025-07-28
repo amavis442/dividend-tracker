@@ -93,8 +93,8 @@ class PaymentRepository extends ServiceEntityRepository
 		string $orderBy = 'DESC',
 		?Ticker $ticker = null,
 		?Pie $pie = null,
-		string $startDate = '',
-		string $endDate = ''
+		?string $startDate = null,
+		?string $endDate = null
 	): \Doctrine\ORM\QueryBuilder {
 		$sort = match ($sort) {
 			'symbol' => 't.symbol',
@@ -107,7 +107,7 @@ class PaymentRepository extends ServiceEntityRepository
 			->leftJoin('p.calendar', 'c')
 			->orderBy($sort, $orderBy);
 
-		if ($startDate !== null) {
+		if ($startDate !== null && $endDate != null) {
 			$this->setDateRange(
 				$queryBuilder,
 				$startDate . ' 00:00:00',
@@ -126,11 +126,6 @@ class PaymentRepository extends ServiceEntityRepository
 				->leftJoin('pos.pies', 'pies')
 				->andWhere('pies IN (:pies)')
 				->setParameter('pies', $pie->getId());
-
-			/*$queryBuilder->andWhere(
-                'pos.pies IN (:pie)'
-            );
-            $queryBuilder->setParameter('pie', $pie->getId()); */
 		}
 		return $queryBuilder;
 	}
@@ -387,17 +382,16 @@ class PaymentRepository extends ServiceEntityRepository
 			->orderBy('periodYear, periodMonth');
 
 		if ($year) {
-			$qb->where('YEAR(p.payDate) = :year')->setParameter(
-				'year',
-				$year
-			);
+			$qb->where('YEAR(p.payDate) = :year')->setParameter('year', $year);
 		}
 
 		$result = $qb->getQuery()->getResult();
 
 		$output = [];
 		foreach ($result as $item) {
-			$output[$item['periodYear'].sprintf("%02d",$item['periodMonth'])] = $item['dividend'];
+			$output[
+				$item['periodYear'] . sprintf('%02d', $item['periodMonth'])
+			] = $item['dividend'];
 		}
 		ksort($output);
 

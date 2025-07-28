@@ -25,9 +25,8 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface
 			);
 			$rates = $item->get();
 
- 			return $rates;
+			return $rates;
 		}
-
 
 		$apiCallUrl = self::URL_EXCHANGERATE;
 		$client = $this->client;
@@ -39,14 +38,18 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface
 		}
 
 		$rates = [];
-        if (false !== $content) {
-            $response = json_decode($content, true);
-            if ($response == null) {
-                throw new \RuntimeException("Data for exchangerate is empty or can not be read");
-            }
+		if ($content != '') {
+			$response = json_decode($content, true);
+			if ($response == null) {
+				throw new \RuntimeException(
+					'Data for exchangerate is empty or can not be read'
+				);
+			}
 			foreach ($response as $data) {
-				if ($data['Shortname'] != "") {
-					$rates[strtoupper($data['Shortname'])] = (float)str_replace(",",".",$data['Last']);
+				if ($data['Shortname'] != '') {
+					$rates[
+						strtoupper($data['Shortname'])
+					] = (float) str_replace(',', '.', $data['Last']);
 				}
 			}
 		}
@@ -57,9 +60,9 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface
 		}
 
 		$item = $this->exchangerateCache->getItem(
-				ExchangeRateInterface::CACHE_KEY
-			);
-		$Minutes15 = 60*15;
+			ExchangeRateInterface::CACHE_KEY
+		);
+		$Minutes15 = 60 * 15;
 		$item->expiresAfter($Minutes15);
 		$item->set($rates);
 

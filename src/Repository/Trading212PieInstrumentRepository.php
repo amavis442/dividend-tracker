@@ -43,6 +43,15 @@ class Trading212PieInstrumentRepository extends ServiceEntityRepository
 
     }
 
+    public function getSnapshotsByDate(\DateTime $snapshotDate): array
+    {
+        return $this->createQueryBuilder('t')
+        ->where('DATE(t.createdAt) = :snapshotDate')
+        ->setParameter('snapshotDate', $snapshotDate->format('Y-m-d'))
+        ->getQuery()
+        ->getResult();
+    }
+
     //    /**
     //     * @return Trading212PieInstrument[] Returns an array of Trading212PieInstrument objects
     //     */
