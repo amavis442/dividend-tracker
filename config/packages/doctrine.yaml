@@ -36,7 +36,8 @@ doctrine:
                 DATEFORMAT: DoctrineExtensions\Query\Postgresql\DateFormat
                 EXTRACT: DoctrineExtensions\Query\Postgresql\ExtractFunction
                 DATE: DoctrineExtensions\Query\Postgresql\Date
-
+            string_functions:
+                CAST: App\Doctrine\Functions\CastFunction
 when@test:
     doctrine:
         dbal:
