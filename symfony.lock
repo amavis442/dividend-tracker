@@ -701,9 +701,6 @@
     "symfonycasts/tailwind-bundle": {
         "version": "v0.6.0"
     },
-    "thecodingmachine/phpstan-strict-rules": {
-        "version": "v0.12.1"
-    },
     "twig/extra-bundle": {
         "version": "3.x-dev"
     },
