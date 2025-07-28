@@ -28,6 +28,7 @@ add('shared_files', ['.env.local', 'public/uploads']);
 // Hosts
 host('prod')
     ->set('hostname', '127.0.0.1')
+    ->set('branch' ,'main')
     ->setRemoteUser('deployer')
     ->setDeployPath('/var/www/prod/{{application}}')
     ->setLabels([
@@ -39,6 +40,7 @@ host('prod')
 
 host('acc')
     ->set('hostname', '127.0.0.1')
+    ->set('branch' ,'main')
     ->setRemoteUser('deployer')
     ->setDeployPath('/var/www/acc/{{application}}')
     ->setLabels([
@@ -50,6 +52,7 @@ host('acc')
 
 host('acerdeploy')
     ->set('hostname', 'acerdeploy')
+    ->set('branch' ,'main')
     ->setRemoteUser('deployer')
     ->setDeployPath('/var/www/prod/{{application}}')
     ->setLabels([
@@ -60,6 +63,7 @@ host('acerdeploy')
 
 host('proxmox')
     ->set('hostname', 'proxmox')
+    ->set('branch' ,'main')
     ->setRemoteUser('deployer')
     ->setDeployPath('/var/www/prod/{{application}}')
     ->setLabels([
@@ -70,6 +74,7 @@ host('proxmox')
 
 host('test')
     ->set('hostname', '127.0.0.1')
+    ->set('branch' ,'main')
     ->setRemoteUser('deployer')
     ->setDeployPath('/var/www/test/{{application}}')
     ->setLabels([
@@ -115,6 +120,11 @@ task('info', function () {
 
 task('tailwind:build', function () {
     run('{{bin/console}} tailwind:build');
+});
+
+task('ci:run', function () {
+    runLocally('php vendor/bin/phpstan analyse src/ -c phpstan.neon --level=5 --no-progress -vvv --memory-limit=1024M');
+    runLocally('SYMFONY_DEPRECATIONS_HELPER=disabled XDEBUG_MODE=coverage php bin/phpunit --do-not-fail-on-warning --do-not-fail-on-risky --coverage-html var/coverage');
 });
 
 // Hooks

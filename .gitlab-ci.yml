@@ -49,9 +49,10 @@ phpunit:
 
 deployment:
   stage: deployment
-  environment:
-    name: staging
-    url: http://example.com
   script:
-    - sh ci/git-install.sh
-  when: never
+    - php vendor/bin/dep deploy {{DEPLOY_TARGET}} -vvv
+  when: manual
+  only:
+    - main
+  environment:
+    name: $DEPLOY_TARGET
