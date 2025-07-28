@@ -24,10 +24,8 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Calendar|null findOneBy(array $criteria, array $orderBy = null)
  * @method Calendar[]    findAll()
  * @method Calendar[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- *
- * @deprecated Renamed to DividendCalendarRepository to be more precise
  */
-class CalendarRepository extends ServiceEntityRepository
+class DividendCalendarRepository extends ServiceEntityRepository
 {
 	use PagerTrait;
 
@@ -64,9 +62,9 @@ class CalendarRepository extends ServiceEntityRepository
 		string $orderBy = 'DESC',
 		?Ticker $ticker = null
 	): Paginator {
-		$sort = match($sort) {
+		$sort = match ($sort) {
 			'symbol' => 't.symbol',
-			default => 'c.' . $sort
+			default => 'c.' . $sort,
 		};
 
 		$queryBuilder2 = $this->getEntityManager()
@@ -103,10 +101,9 @@ class CalendarRepository extends ServiceEntityRepository
 		string $orderBy = 'DESC',
 		?Ticker $ticker = null
 	): \Doctrine\ORM\QueryBuilder {
-
-		$sort = match($sort) {
-			'symbol' => $sort = 't.symbol',
-			default => 'c.' . $sort
+		$sort = match ($sort) {
+			'symbol' => ($sort = 't.symbol'),
+			default => 'c.' . $sort,
 		};
 
 		$queryBuilder2 = $this->getEntityManager()
@@ -198,7 +195,6 @@ class CalendarRepository extends ServiceEntityRepository
 		return $result['avgDividend'];
 	}
 
-
 	public function getLastestDividends(array $ticker_ids): mixed
 	{
 		$em = $this->getEntityManager();
@@ -247,6 +243,34 @@ class CalendarRepository extends ServiceEntityRepository
 			->getQuery();
 
 		return $queryBuilder->getOneOrNullResult();
+	}
+
+	/**
+	 * Retrieves the latest dividend calendar entry for a given ticker,
+	 * where the payment date is on or after the specified date.
+	 *
+	 * This method performs an inner join with the ticker, filters by the provided
+	 * ticker and payment threshold, and returns the most recent payment entry.
+	 *
+	 * @param Ticker    $ticker       The ticker symbol to query dividend entries for.
+	 * @param \DateTime $paymentDate  The payment date threshold to filter entries.
+	 *
+	 * @return array Returns an array of Calendar entries (maximum one result) ordered by payment date descending.
+	 */
+	public function getEntriesByTickerAndPayoutDate(
+		Ticker $ticker,
+		\DateTime $paymentDate
+	): array {
+		return $this->createQueryBuilder('c')
+			->select('c')
+			->innerJoin('c.ticker', 't')
+			->where('t = :ticker')
+			->andWhere('c.paymentDate >= :paymentDate')
+			->setParameter('ticker', $ticker)
+			->setParameter('paymentDate', $paymentDate->format('Y-m-d'))
+			->orderBy('c.paymentDate', 'DESC')
+			->getQuery()
+			->getResult();
 	}
 
 	private function getPositionSize(Collection $transactions, Calendar $item)
@@ -397,7 +421,9 @@ class CalendarRepository extends ServiceEntityRepository
 			$ticker = $item->getTicker()->getSymbol();
 
 			$taxRate = $dividendTaxRateResolver->getTaxRateForCalendar($item);
-			$exchangeRate = $dividendExchangeRateResolver->getRateForCalendar($item);
+			$exchangeRate = $dividendExchangeRateResolver->getRateForCalendar(
+				$item
+			);
 			$tax = $item->getCashAmount() * $exchangeRate * $taxRate;
 
 			$data[$item->getPaymentDate()->format('Ym')][
@@ -419,14 +445,13 @@ class CalendarRepository extends ServiceEntityRepository
 		return $data;
 	}
 
-
-    /**
+	/**
 	 * Get the calendars between startDate and endDate
 	 */
 	public function foreCast(
 		DividendServiceInterface $dividendService,
 		string $startDate,
-		string $endDate,
+		string $endDate
 	): ?array {
 		$qb = $this->createQueryBuilder('c')
 			->select('c, t, p, tr, pies, cur, tax')
@@ -473,23 +498,27 @@ class CalendarRepository extends ServiceEntityRepository
 			if (!isset($totalDividend[$item->getPaymentDate()->format('Ym')])) {
 				$totalDividend[$item->getPaymentDate()->format('Ym')] = 0.0;
 			}
-			$totalDividend[$item->getPaymentDate()->format('Ym')] += $positionDividend;
+			$totalDividend[
+				$item->getPaymentDate()->format('Ym')
+			] += $positionDividend;
 		}
 
 		return $totalDividend;
 	}
 
-	public function getCalendarsForTickers(array $tickers, string $lastYear): array
-	{
+	public function getCalendarsForTickers(
+		array $tickers,
+		string $lastYear
+	): array {
 		return $this->createQueryBuilder('c')
-		->select('t ,c')
-		->join('c.ticker','t')
-		->where('c.ticker in (:tickers)')
-		->andWhere('c.paymentDate > :lastYear')
-		->setParameter('tickers',$tickers)
-		->setParameter('lastYear',$lastYear)
-		->groupBy('t.id, c.id')
-		->getQuery()
-		->getResult();
+			->select('t ,c')
+			->join('c.ticker', 't')
+			->where('c.ticker in (:tickers)')
+			->andWhere('c.paymentDate > :lastYear')
+			->setParameter('tickers', $tickers)
+			->setParameter('lastYear', $lastYear)
+			->groupBy('t.id, c.id')
+			->getQuery()
+			->getResult();
 	}
 }

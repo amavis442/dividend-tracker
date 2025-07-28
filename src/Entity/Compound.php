@@ -30,9 +30,9 @@ class Compound
     /**
      * Rise of market gain in percentage per year around 7.43%
      *
-     * @var float|null
+     * @var float
      */
-    private ?float $priceAppreciation = 0.0;
+    private float $priceAppreciation = 0.0;
 
     /**
      * Maximum price
@@ -44,21 +44,21 @@ class Compound
     /**
      * Dividend growth for the first 5 years
      *
-     * @var float|null
+     * @var float
      */
-    private ?float $growth = 0.0;
+    private float $growth = 0.0;
     /**
      * Growth after 5 years and into infinity will normally be around 3%
      *
-     * @var float|null
+     * @var float
      */
-    private ?float $growthAfter5Years = 0.0;
+    private float $growthAfter5Years = 0.0;
     /**
      * How many times does a company pay dividends per year. Default will be 4
      *
-     * @var int|null
+     * @var int
      */
-    private ?int $frequency;
+    private int $frequency = 4;
 
     /**
      * Extra per month

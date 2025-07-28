@@ -55,7 +55,7 @@ class ImportCsvController extends AbstractController
 
 				try {
 					$result = $importCsv->importFile($transactionFile);
-				} catch (\RuntimeException $e) { // @phpstan-ignore-line
+				} catch (\RuntimeException $e) {
 					$this->addFlash('notice', $e->getMessage());
 					$logger->error($e->getMessage(), [ 'exception' => $e ]);
 				}

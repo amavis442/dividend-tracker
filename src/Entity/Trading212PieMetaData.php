@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\Trading212PieMetaDataRepository;
+use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,11 +21,27 @@ class Trading212PieMetaData
 	#[ORM\Column]
 	private ?int $trading212PieId = null;
 
-	#[ORM\Column]
-	private ?float $priceAvgInvestedValue = null;
+	#[
+		ORM\Column(
+			type: 'decimal',
+			precision: 20,
+			scale: 8,
+			nullable: false,
+			options: ['default' => '0.00000000']
+		)
+	]
+	private string $priceAvgInvestedValue = '0.00000000';
 
-	#[ORM\Column]
-	private ?float $priceAvgValue = null;
+	#[
+		ORM\Column(
+			type: 'decimal',
+			precision: 20,
+			scale: 8,
+			nullable: false,
+			options: ['default' => '0.00000000']
+		)
+	]
+	private string $priceAvgValue = '0.00000000';
 
 	#[ORM\Column]
 	private array $raw = [];
@@ -52,14 +70,30 @@ class Trading212PieMetaData
 	#[ORM\ManyToOne(inversedBy: 'trading212PieMetaData')]
 	private ?Pie $pie = null;
 
-	#[ORM\Column(nullable: true)]
-	private ?float $gained = 0.0;
+	#[
+		ORM\Column(
+			type: 'decimal',
+			precision: 20,
+			scale: 8,
+			nullable: false,
+			options: ['default' => '0.00000000']
+		)
+	]
+	private string $gained = '0.00000000';
 
 	#[ORM\Column(nullable: true)]
-	private ?float $reinvested = 0.0;
+	private string $reinvested = '0.00000000';
 
-	#[ORM\Column(nullable: true)]
-	private ?float $inCash = 0.0;
+	#[
+		ORM\Column(
+			type: 'decimal',
+			precision: 20,
+			scale: 8,
+			nullable: false,
+			options: ['default' => '0.00000000']
+		)
+	]
+	private string $inCash = '0.00000000';
 
 	public function __construct()
 	{
@@ -96,34 +130,46 @@ class Trading212PieMetaData
 		return $this;
 	}
 
-	public function getPriceAvgInvestedValue(): ?float
+	public function getPriceAvgInvestedValue(): float
 	{
-		return $this->priceAvgInvestedValue;
+		return (float) $this->priceAvgInvestedValue;
 	}
 
 	public function setPriceAvgInvestedValue(
 		float $priceAvgInvestedValue
 	): static {
-		$this->priceAvgInvestedValue = $priceAvgInvestedValue;
+		$this->priceAvgInvestedValue = number_format(
+			$priceAvgInvestedValue,
+			8,
+			'.',
+			''
+		);
 
 		return $this;
 	}
 
-	public function getPriceAvgValue(): ?float
+	public function getPriceAvgValue(): float
 	{
-		return $this->priceAvgValue;
+		return (float) $this->priceAvgValue;
 	}
 
 	public function setPriceAvgValue(float $priceAvgValue): static
 	{
-		$this->priceAvgValue = $priceAvgValue;
+		$this->priceAvgValue = number_format($priceAvgValue, 8, '.', '');
 
 		return $this;
 	}
 
 	public function getDiffValue(): float
 	{
-		return $this->priceAvgValue - $this->priceAvgInvestedValue;
+		$avgValue = BigDecimal::of($this->priceAvgValue);
+		$invested = BigDecimal::of($this->priceAvgInvestedValue);
+
+		$diff = $avgValue->minus($invested);
+
+		return $diff->toScale(8, RoundingMode::HALF_UP)->toFloat();
+
+		//return $this->priceAvgValue - $this->priceAvgInvestedValue;
 	}
 
 	public function getRaw(): array
@@ -226,60 +272,97 @@ class Trading212PieMetaData
 		return $this;
 	}
 
-	public function getGained(): ?float
+	public function getGained(): float
 	{
-		return $this->gained;
+		return (float) $this->gained;
 	}
 
 	public function setGained(float $gained): static
 	{
-		$this->gained = $gained;
+		$this->gained = number_format($gained, 8, '.', '');
 
 		return $this;
 	}
 
 	public function getGainedPercentage(): float
 	{
+		$priceAvgInvestedValue = BigDecimal::of($this->priceAvgInvestedValue);
+		$gained = BigDecimal::of($this->gained);
+
+		$percentage = $gained
+			->dividedBy($priceAvgInvestedValue, 8, RoundingMode::HALF_UP)
+			->multipliedBy(BigDecimal::of('100'));
+
+		return $percentage->toScale(2, RoundingMode::HALF_UP)->toFloat();
+
+		/*
 		return $this->priceAvgInvestedValue > 0
 			? ($this->gained / $this->priceAvgInvestedValue) * 100
 			: 0.0;
+		*/
 	}
 
-	public function getReinvested(): ?float
+	public function getReinvested(): float
 	{
-		return $this->reinvested;
+		return (float) $this->reinvested;
 	}
 
 	public function setReinvested(float $reinvested): static
 	{
-		$this->reinvested = $reinvested;
+		$this->reinvested = number_format($reinvested, 8, '.', '');
 
 		return $this;
 	}
 
-	public function getInCash(): ?float
+	public function getInCash(): float
 	{
-		return $this->inCash;
+		return (float) $this->inCash;
 	}
 
 	public function setInCash(float $inCash): static
 	{
-		$this->inCash = $inCash;
+		$this->inCash = number_format($inCash, 8, '.', '');
 
 		return $this;
 	}
 
 	public function getTotalReturn(): float
 	{
-		return $this->priceAvgValue +
-			$this->gained -
-			$this->priceAvgInvestedValue;
+		$avgValue = BigDecimal::of($this->priceAvgValue);
+		$gained = BigDecimal::of($this->gained);
+		$invested = BigDecimal::of($this->priceAvgInvestedValue);
+
+		$totalReturn = $avgValue->plus($gained)->minus($invested);
+
+		return $totalReturn->toScale(8, RoundingMode::HALF_UP)->toFloat();
 	}
 
+	// This also needs to use Brick\Math like getTotalReturn
 	public function getTotalReturnPercentage(): float
 	{
+		$priceAvgValue = BigDecimal::of($this->priceAvgValue);
+		$priceAvgInvestedValue = BigDecimal::of($this->priceAvgInvestedValue);
+		$gained = BigDecimal::of($this->gained);
+
+		// Total return = (ending value + dividends) - initial investment
+		$totalReturn = $priceAvgValue
+			->plus($gained)
+			->minus($priceAvgInvestedValue);
+
+		if ($priceAvgInvestedValue->isZero()) {
+			return 0.0; // Or throw an exception if zero investment should be invalid
+		}
+
+		$percentage = $totalReturn
+			->dividedBy($priceAvgInvestedValue, 8, RoundingMode::HALF_UP)
+			->multipliedBy(BigDecimal::of('100'));
+
+		return $percentage->toScale(2, RoundingMode::HALF_UP)->toFloat();
+
+		/*
 		return $this->priceAvgInvestedValue > 0
 			? ($this->getTotalReturn() / $this->priceAvgInvestedValue) * 100
 			: 0.0;
+		*/
 	}
 }

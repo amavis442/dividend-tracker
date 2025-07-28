@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\Trading212PieInstrumentRepository;
+use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,17 +21,51 @@ class Trading212PieInstrument
 	#[ORM\Column(length: 255)]
 	private ?string $tickerName = null;
 
-	#[ORM\Column]
-	private ?float $ownedQuantity = null;
+	#[
+		ORM\Column(
+			type: 'decimal',
+			precision: 20,
+			scale: 8,
+			nullable: false,
+			options: ['default' => '0.00000000']
+		)
+	]
+	private string $ownedQuantity = '0.00000000';
 
-	#[ORM\Column]
-	private ?float $priceAvgInvestedValue = null;
+	#[
+		ORM\Column(
+			type: 'decimal',
+			precision: 20,
+			scale: 8,
+			nullable: false,
+			options: ['default' => '0.00000000']
+		)
+	]
+	private string $priceAvgInvestedValue = '0.00000000';
 
-	#[ORM\Column]
-	private ?float $priceAvgValue = null;
+	#[
+		ORM\Column(
+			type: 'decimal',
+			precision: 20,
+			scale: 8,
+			nullable: false,
+			options: ['default' => '0.00000000']
+		)
+	]
+	private string $priceAvgValue = '0.00000000';
 
-	#[ORM\Column]
-	private ?float $priceAvgResult = null;
+	// Fix this code and create a setter and getter function that does the transformation
+	// from float to string and back
+	#[
+		ORM\Column(
+			type: 'decimal',
+			precision: 20,
+			scale: 8,
+			nullable: false,
+			options: ['default' => '0.00000000']
+		)
+	]
+	private string $priceAvgResult = '0.00000000';
 
 	#[ORM\Column]
 	private array $raw = [];
@@ -49,16 +85,16 @@ class Trading212PieInstrument
 	#[ORM\ManyToOne(inversedBy: 'trading212PieInstruments')]
 	private ?Ticker $ticker = null;
 
-	private ?float $avgDividendPerShare = 0.0;
-	private ?float $avgExpectedDividend = 0.0;
-	private ?float $currentDividendPerShare = 0.0;
-	private ?float $currentDividend = 0.0;
-	private ?float $currentYearlyYield = 0.0;
-	private ?float $avgYearlyYield = 0.0;
-	private ?float $dividendPaid = 0.0;
+	private float $avgDividendPerShare = 0.0;
+	private float $avgExpectedDividend = 0.0;
+	private float $currentDividendPerShare = 0.0;
+	private float $currentDividend = 0.0;
+	private float $currentYearlyYield = 0.0;
+	private float $avgYearlyYield = 0.0;
+	private float $dividendPaid = 0.0;
 
-	private ?float $taxRate = 0.15;
-	private ?float $exchangeRate = 0.0;
+	private float $taxRate = 0.15;
+	private float $exchangeRate = 0.0;
 	private array $calendars = [];
 	private array $dividend = [];
 	private float $monthlyYield = 0.0;
@@ -95,51 +131,52 @@ class Trading212PieInstrument
 		return $this;
 	}
 
-	public function getOwnedQuantity(): ?float
+	public function getOwnedQuantity(): float
 	{
-		return $this->ownedQuantity;
+		return (float)$this->ownedQuantity;
 	}
 
 	public function setOwnedQuantity(float $ownedQuantity): static
 	{
-		$this->ownedQuantity = $ownedQuantity;
+		$this->ownedQuantity = number_format($ownedQuantity, 8, '.', '');
 
 		return $this;
 	}
 
-	public function getPriceAvgInvestedValue(): ?float
+	public function getPriceAvgInvestedValue(): float
 	{
-		return $this->priceAvgInvestedValue;
+		return (float)$this->priceAvgInvestedValue;
 	}
 
 	public function setPriceAvgInvestedValue(
 		float $priceAvgInvestedValue
 	): static {
-		$this->priceAvgInvestedValue = $priceAvgInvestedValue;
+		$this->priceAvgInvestedValue = number_format($priceAvgInvestedValue, 8, '.', '');
 
 		return $this;
 	}
 
-	public function getPriceAvgValue(): ?float
+	public function getPriceAvgValue(): float
 	{
-		return $this->priceAvgValue;
+		return (float)$this->priceAvgValue;
 	}
 
 	public function setPriceAvgValue(float $priceAvgValue): static
 	{
-		$this->priceAvgValue = $priceAvgValue;
+		$this->priceAvgValue = number_format($priceAvgValue, 8, '.', '');
 
 		return $this;
 	}
 
-	public function getPriceAvgResult(): ?float
+	public function getPriceAvgResult(): float
 	{
-		return $this->priceAvgResult;
+		return (float) $this->priceAvgResult;
 	}
 
 	public function setPriceAvgResult(float $priceAvgResult): static
 	{
-		$this->priceAvgResult = $priceAvgResult;
+		// Format to 8 decimal places as string
+		$this->priceAvgResult = number_format($priceAvgResult, 8, '.', '');
 
 		return $this;
 	}
@@ -513,10 +550,15 @@ class Trading212PieInstrument
 	 */
 	public function getPrice(): float
 	{
-		$this->price =
-			$this->ownedQuantity > 0
-				? $this->priceAvgValue / $this->ownedQuantity
-				: 0.0;
+		$priceAvgValue = BigDecimal::of($this->priceAvgValue);
+		$ownedQuantityValue = BigDecimal::of($this->ownedQuantity);
+
+		$this->price = 0.0;
+		if ($ownedQuantityValue->toFloat() > 0) {
+			$priceValue = $priceAvgValue->dividedBy($ownedQuantityValue, 8, RoundingMode::HALF_UP);
+			$this->price = $priceValue->toScale(2, RoundingMode::HALF_UP)->toFLoat();
+		}
+
 		return $this->price;
 	}
 
@@ -527,10 +569,16 @@ class Trading212PieInstrument
 	 */
 	public function getAvgPrice(): float
 	{
-		$this->avgPrice =
-			$this->ownedQuantity > 0
-				? $this->priceAvgInvestedValue / $this->ownedQuantity
-				: 0.0;
+		$this->avgPrice = 0.0;
+
+		$investedValue = BigDecimal::of($this->priceAvgInvestedValue);
+		$ownedQuantityValue = BigDecimal::of($this->ownedQuantity);
+
+		if ($ownedQuantityValue->toFloat() > 0) {
+			$avgPriceValue = $investedValue->dividedBy($ownedQuantityValue, 8, RoundingMode::HALF_UP);
+			$this->avgPrice = $avgPriceValue->toScale(2, RoundingMode::HALF_UP)->toFLoat();
+		}
+
 		return $this->avgPrice;
 	}
 }

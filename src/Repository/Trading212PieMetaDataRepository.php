@@ -70,7 +70,9 @@ class Trading212PieMetaDataRepository extends ServiceEntityRepository
 	): ?array {
 		return $this->createQueryBuilder('t')
 			->select(
-				't.createdAt, SUM(t.priceAvgInvestedValue) invested, SUM(t.priceAvgValue) currentvalue, SUM(t.gained) gained, SUM(t.reinvested) reinvested'
+
+				"t.createdAt, SUM(CAST(t.priceAvgInvestedValue AS 'NUMERIC(20,8)')) invested, SUM(CAST(t.priceAvgValue AS 'NUMERIC')) currentvalue,
+				SUM(CAST(t.gained AS 'NUMERIC')) gained, SUM(CAST(t.reinvested AS 'NUMERIC')) reinvested"
 			)
 			->where('t.createdAt > :dt')
 			->groupBy('t.createdAt')

@@ -107,7 +107,7 @@ class PaymentController extends AbstractController
 		}
 
 		[$startDate, $endDate] = [$year . '-01-01', $year . '-12-31'];
-		if ($month && $month !== 0) {
+		if ($month && $month > 0) {
 			[$startDate, $endDate] = (new DateHelper())->monthToDates(
 				$month,
 				$year

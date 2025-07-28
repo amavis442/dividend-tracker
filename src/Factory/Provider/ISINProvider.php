@@ -5,7 +5,7 @@ use Faker\Provider\Base;
 
 final class ISINProvider extends Base
 {
-	public function isin()
+	public function isin(): string
 	{
         $countryCode = strtoupper($this->lexify('??')); // Two uppercase letters
 		$identifier = $this->numerify('############'); // 10 digits

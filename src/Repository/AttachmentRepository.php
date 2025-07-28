@@ -7,10 +7,10 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Files|null find($id, $lockMode = null, $lockVersion = null)
- * @method Files|null findOneBy(array $criteria, array $orderBy = null)
- * @method Files[]    findAll()
- * @method Files[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Attachment|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Attachment|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Attachment[]    findAll()
+ * @method Attachment[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class AttachmentRepository extends ServiceEntityRepository
 {
