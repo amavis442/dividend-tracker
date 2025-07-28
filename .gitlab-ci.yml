@@ -54,4 +54,4 @@ deployment:
     url: http://example.com
   script:
     - sh ci/git-install.sh
-  when: manual
+  when: never
