@@ -16,6 +16,13 @@
                         'data-controller': 'chartjs-add-euro-sign'
                         }) }}
         </div>
+        <div style="width:900px;
+                    height:600px"
+             class="border border-gray-500 p-2 mb-4 rounded-lg">
+            {{ render_chart(trChart, {
+                        'data-controller': 'chartjs-add-procent-sign'
+                        }) }}
+        </div>
         <div class="mt-4">
             <a class="px-4 py-2 text-sm font-medium mb-4 rounded-lg text-white bg-green-500 hover:bg-green-700 p-2"
                href="{{ path("app_report_trading212_index") }}">

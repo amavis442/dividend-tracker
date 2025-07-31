@@ -6,7 +6,7 @@ use App\Entity\Pie;
 use App\Entity\Ticker;
 use App\Entity\Trading212PieMetaData;
 use App\Helper\Colors;
-use App\Repository\CalendarRepository;
+use App\Repository\DividendCalendarRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\TickerRepository;
 use App\Repository\Trading212PieMetaDataRepository;
@@ -94,7 +94,7 @@ final class Trading212Controller extends AbstractController
 	}
 
 	protected function decorateWithDividend(
-		CalendarRepository $calendarRepository,
+		DividendCalendarRepository $calendarRepository,
 		array &$tickers,
 		float $rateDollarEuro
 	): void {
@@ -529,7 +529,7 @@ final class Trading212Controller extends AbstractController
 	public function graph(
 		Pie $pie,
 		Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
-		CalendarRepository $calendarRepository,
+		DividendCalendarRepository $calendarRepository,
 		PaymentRepository $paymentRepository,
 		TickerRepository $tickerRepository,
 		TranslatorInterface $translator,

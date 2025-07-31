@@ -32,7 +32,32 @@ final class PieChartController extends AbstractController
 		ChartBuilderInterface $chartBuilder,
 		TranslatorInterface $translator
 	): Response {
+		$pieChart = $this->createPieChart(
+			$trading212PieMetaDataRepository,
+			$chartBuilder,
+			$translator
+		);
 
+		$charts = $this->createChartSummary(
+			$trading212PieMetaDataRepository,
+			$chartBuilder,
+			$translator
+		);
+		$chart = $charts['summaryChart'];
+		$trChart = $charts['totalReturnChart'];
+
+		return $this->render('trading212/report/pie_chart.html.twig', [
+			'pieChart' => $pieChart,
+			'chart' => $chart,
+			'trChart' => $trChart,
+		]);
+	}
+
+	private function createPieChart(
+		Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
+		ChartBuilderInterface $chartBuilder,
+		TranslatorInterface $translator
+	): \Symfony\UX\Chartjs\Model\Chart {
 		$data = $trading212PieMetaDataRepository->latest();
 
 		$totalInvested = 0.0;
@@ -80,6 +105,14 @@ final class PieChartController extends AbstractController
 			],
 		]);
 
+		return $pieChart;
+	}
+
+	private function createChartSummary(
+		Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
+		ChartBuilderInterface $chartBuilder,
+		TranslatorInterface $translator
+	): array {
 		$dt = new \DateTime('first day of january');
 		$data = $trading212PieMetaDataRepository->getSumAllocatedAndDistributedPerData(
 			$dt
@@ -90,13 +123,21 @@ final class PieChartController extends AbstractController
 		$currentValue = [];
 		$pieDates = [];
 		$totalReturn = [];
+		$trPercentage = []; // totalreturn Percentage
 		foreach ($data as $item) {
 			$invested[] = $item['invested'] ?: 0;
 			$gained[] = $item['gained'] ?: 0;
 			$reinvested[] = $item['reinvested'] ?: 0;
 			$currentValue[] = $item['currentvalue'] ?: 0;
 			$totalReturn[] = $item['currentvalue'] + $item['gained'];
-
+			$trPercentage[] =
+				$item['invested'] > 0
+					? (($item['currentvalue'] +
+							$item['gained'] -
+							$item['invested']) /
+							$item['invested']) *
+						100
+					: 0.0;
 			$pieDates[] = $item['createdAt']->format('Y-m-d');
 		}
 
@@ -143,9 +184,51 @@ final class PieChartController extends AbstractController
 				],
 			],
 		]);
-		return $this->render('trading212/report/pie_chart.html.twig', [
-			'pieChart' => $pieChart,
-			'chart' => $chart,
+
+		$trChart = $this->createTotalReturnChart(
+			$trPercentage,
+			$pieDates,
+			$chartBuilder,
+			$translator
+		);
+
+		return ['summaryChart' => $chart, 'totalReturnChart' => $trChart];
+	}
+
+	private function createTotalReturnChart(
+		array $trPercentage,
+		array $pieDates,
+		ChartBuilderInterface $chartBuilder,
+		TranslatorInterface $translator
+	): \Symfony\UX\Chartjs\Model\Chart {
+		$chart = $chartBuilder->createChart(Chart::TYPE_LINE);
+		$chart->setData([
+			'labels' => $pieDates,
+			'datasets' => [
+				[
+					'label' => $translator->trans('Total return %'),
+					'data' => $trPercentage,
+				],
+			],
 		]);
+
+		$chart->setOptions([
+			'maintainAspectRatio' => false,
+			'responsive' => true,
+			'plugins' => [
+				'title' => [
+					'display' => true,
+					'text' => $translator->trans('Total return %'),
+					'font' => [
+						'size' => 24,
+					],
+				],
+				'legend' => [
+					'position' => 'top',
+				],
+			],
+		]);
+
+		return $chart;
 	}
 }
