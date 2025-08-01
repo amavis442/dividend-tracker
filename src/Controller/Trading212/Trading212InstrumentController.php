@@ -34,7 +34,7 @@ final class Trading212InstrumentController extends AbstractController
 		/**
 		 * array<int, Trading212PieInstrument> $data
 		 */
-		$data = $instrumentRepository->findByTicker($ticker);
+		$data = $instrumentRepository->findByTicker($ticker, $pie);
 
 		$dataChart = [];
 		$dataChart['labels'] = [];

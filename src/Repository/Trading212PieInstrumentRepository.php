@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Ticker;
+use App\ENtity\Pie;
 use App\Entity\Trading212PieInstrument;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -31,14 +32,17 @@ class Trading212PieInstrumentRepository extends ServiceEntityRepository
     /**
      * @return array // <int,<float,float,\DateTimeImmutable>>
      */
-    public function findByTicker(Ticker $ticker): array
+    public function findByTicker(Ticker $ticker, Pie $pie): array
     {
         return $this->createQueryBuilder('t')
         ->select('DATE(t.createdAt) createdAt,SUM(t.priceAvgInvestedValue) invested, SUM(t.priceAvgValue) value, SUM(t.ownedQuantity) quantity')
+        ->join('t.trading212PieMetaData', 'tm')
         ->where('t.ticker = :ticker')
-        ->groupBy('createdAt')
-        ->orderBy('createdAt','ASC')
+        ->andWhere('tm.pie = :pie')
+        ->groupBy('t.createdAt')
+        ->orderBy('t.createdAt','ASC')
         ->setParameter('ticker', $ticker->getId())
+        ->setParameter('pie', $pie->getId())
         ->getQuery()->getResult();
 
     }
