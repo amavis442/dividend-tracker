@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Ticker;
-use App\ENtity\Pie;
+use App\Entity\Pie;
 use App\Entity\Trading212PieInstrument;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
