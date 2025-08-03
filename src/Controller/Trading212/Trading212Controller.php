@@ -123,6 +123,8 @@ final class Trading212Controller extends AbstractController
 				$tickers[$id]['dividend']['records'] = 0;
 				$tickers[$id]['dividend']['avg'] = 0.0;
 				$tickers[$id]['dividend']['predicted_payment'] = [];
+				$tickers[$id]['dividend']['predicted_payment_monthly'] = [];
+
 				$tickers[$id]['dividend']['frequency'] = $frequency;
 			}
 
@@ -137,6 +139,9 @@ final class Trading212Controller extends AbstractController
 
 				$owned = $tickers[$id]['instrument']->getOwnedQuantity();
 				$tax = $tickers[$id]['tax']->getTaxRate();
+
+				$normalizeToMonthlyPaymentMultiplier = $frequency / 12;
+
 				$predictedPayment =
 					$owned *
 					$tickerCalendar->getCashAmount() *
@@ -145,6 +150,8 @@ final class Trading212Controller extends AbstractController
 				$tickers[$id]['dividend']['predicted_payment'][
 					$cId
 				] = $predictedPayment;
+				$tickers[$id]['dividend']['predicted_payment_monthly'][$cId] =
+					$predictedPayment * $normalizeToMonthlyPaymentMultiplier;
 			}
 		}
 	}
@@ -584,6 +591,24 @@ final class Trading212Controller extends AbstractController
 			$rateDollarEuro
 		);
 
+		$currentMonth = date('Ym');
+		$totalMonthlyDividend = 0.0;
+		foreach ($tickers as $id => $item) {
+			$lastDividend = 0.0;
+			foreach ($item['dividend']['predicted_payment_monthly'] as $month => $predictedMonthlyDividend) {
+				if ($month > $currentMonth) {
+					continue;
+				}
+				$lastDividend = $predictedMonthlyDividend;
+			}
+			$totalMonthlyDividend += $lastDividend;
+		}
+		$yearlyDividendPercentage = $metaData->getPriceAvgInvestedValue() > 0 ? ($totalMonthlyDividend * 12) / $metaData->getPriceAvgInvestedValue() : 0;
+		$stats['yearlyDividendPercentage'] = $yearlyDividendPercentage * 100;
+		$stats['monthlyDividend'] = $totalMonthlyDividend;
+		$stats['yearlyDividend'] = $totalMonthlyDividend * 12;
+
+
 		$pieInstruments = [];
 		$pieDividend = 0.0; // What is actually paid will be a computed on latest paydat so can be inaccurate. Trading212 does not split up payments by pie instruments :(
 		$pieCurrentDividend = 0.0;
@@ -632,10 +657,14 @@ final class Trading212Controller extends AbstractController
 		$pieCurrentDividend = $dataInstruments['pieCurrentDividend'];
 		$pieAvgDividend = $dataInstruments['pieAvgDividend'];
 
-		$monthsEstimatedBreakEven = $pieDividend > 0 ? ceil(
-			($metaData->getPriceAvgInvestedValue() - $metaData->getGained()) /
-				$pieDividend
-		) : 0.0;
+		$monthsEstimatedBreakEven =
+			$pieDividend > 0
+				? ceil(
+					($metaData->getPriceAvgInvestedValue() -
+						$metaData->getGained()) /
+						$pieDividend
+				)
+				: 0.0;
 		$yearsEstimatedBreakEven = floor($monthsEstimatedBreakEven / 12);
 		$periodEstimatedBreakEven['years'] = $yearsEstimatedBreakEven;
 		$periodEstimatedBreakEven['months'] =

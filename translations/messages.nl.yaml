@@ -408,3 +408,6 @@ Back: Terug
 'Ex Date': 'Ex Datum'
 'Pay Date': 'Uitkeer datum'
 'Tax Withheld': 'Belasting ingehouden (diefstal)'
+'Payout monthly': 'Uitkeerbedrag per maand'
+'Payout yearly': 'Uitkeerbedrag per jaar'
+'Forecast (normalized to month)': 'Voorspelling (genormaliseerd naar maand)'

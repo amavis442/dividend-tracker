@@ -291,9 +291,17 @@
                                         </h5>
                                         <div class='pl-5 pr-5 pb-5'>
                                             <div class="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                                                {{ 'Yield (%num% times)'|trans({"%num%": 12}) }}: {{ (((pieCurrentDividend * 12) / metaData.priceAvgInvestedValue) *100)|number_format(3) }}%
-                                                <br />
-                                                {{ 'Yield (%num% times)'|trans({"%num%": 4}) }}: {{ (((pieCurrentDividend * 4) / metaData.priceAvgInvestedValue) *100)|number_format(3) }}%
+                                                <ul class="list-disc p-2">
+                                                    <li>{{ 'Yield (%num% times)'|trans({"%num%": 12}) }}: {{ (((pieCurrentDividend * 12) / metaData.priceAvgInvestedValue) *100)|number_format(3) }}%</li>
+                                                    <li>{{ 'Yield (%num% times)'|trans({"%num%": 4}) }}: {{ (((pieCurrentDividend * 4) / metaData.priceAvgInvestedValue) *100)|number_format(3) }}%</li>
+                                                </ul>
+                                                <hr/>
+                                                <div class="mb-2 mt-2 font-semibold">{{ 'Forecast (normalized to month)'|trans }}</div>
+                                                <ul class="list-disc p-2">
+                                                    <li>{{ 'Yield (%num% times)'|trans({"%num%": 12}) }}: {{ yearlyDividendPercentage|number_format(3)}}%</li>
+                                                    <li>{{ 'Payout monthly'|trans }}: &euro;{{ monthlyDividend|number_format(3)}}</li>
+                                                    <li>{{ 'Payout yearly'|trans }}: &euro;{{ yearlyDividend|number_format(3)}}</li>
+                                                </ul>
                                             </div>
                                         </div>
                                         <div class="arrow-card" data-tooltip-target="tooltipArrow"></div>
