@@ -36,6 +36,7 @@ class DividendForecastService
 
 		foreach ($snapshots as $snapshot) {
 			$ticker = $snapshot->getTicker();
+			if (!$ticker) continue;
 
 			$calendarEntries = $this->dividendCalendarRepository->getEntriesByTickerAndPayoutDate(
 				$ticker,
