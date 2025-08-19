@@ -26,10 +26,7 @@
                     }}
                     {{ form_errors(form) }}
                     <div class="w-1/2 me-2">
-                        <select placeholder="{{ 'Select a ticker'|trans }}" name="{{ field_name(form.ticker) }}" {{ stimulus_controller('symfony/ux-autocomplete/autocomplete',{
-                             url: path('ux_entity_autocomplete', { alias: 'ticker'})
-                            }) }}>
-                        </select>
+                        {{ form_widget(form.ticker, { 'attr': {'class': 'foo'} }) }}
                     </div>
                     <div data-controller="tooltip">
                         <twig:Button type="submit" title="{{ 'Search ticker'|trans }}" data-tooltip-target="element" data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">

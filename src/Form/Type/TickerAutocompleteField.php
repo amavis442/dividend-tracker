@@ -11,7 +11,8 @@ use Symfony\UX\Autocomplete\Form\AsEntityAutocompleteField;
 use Symfony\UX\Autocomplete\Form\BaseEntityAutocompleteType;
 use Symfony\Component\OptionsResolver\Options;
 
-#[AsEntityAutocompleteField]
+// With the alias this code is used, else you need a custom autocompleter with #[AutoconfigureTag('ux.entity_autocompleter', ['alias' => 'ticker'])]
+#[AsEntityAutocompleteField(alias: 'ticker')]
 class TickerAutocompleteField extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
@@ -32,13 +33,14 @@ class TickerAutocompleteField extends AbstractType
                     $qb = $er->createQueryBuilder('t');
 
                     $includeAllTickers =
-                        $options['extra_options']['include_all_tickers'] ?? [];
+                        $options['extra_options']['include_all_tickers'] ?? false;
                     $qb->select('t')
                         ->where('lower(t.isin) NOT LIKE :ignore')
                         ->orderBy('t.fullname')
                         ->setParameter('ignore', 'nvt%');
 
-                    if ([] !== $includeAllTickers && $includeAllTickers === false) {
+                    if ($includeAllTickers === false) {
+
                         $qb->join(
                             't.positions',
                             'p',

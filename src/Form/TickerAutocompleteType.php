@@ -13,10 +13,11 @@ class TickerAutocompleteType extends AbstractType
         FormBuilderInterface $builder,
         array $options
     ): void {
+
         $builder->add("ticker", TickerAutocompleteField::class, [
             "extra_options" => [
                 "include_all_tickers" =>
-                    $options['extra_options']['include_all_tickers'] ?? [],
+                    $options['extra_options']['include_all_tickers'] ?? true,
             ],
         ]);
     }

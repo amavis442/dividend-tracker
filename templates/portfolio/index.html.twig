@@ -25,10 +25,7 @@
                         {{ form_start(autoCompleteForm, { 'action': path('portfolio_index') , 'attr': { 'data-turbo-frame': 'portfolio_results' }}) }}
                             <div class="flex flex-row">
                                 <div class="flex-auto p-2">
-                                    <select placeholder="{{ 'Select a ticker'|trans }}" name="{{ field_name(autoCompleteForm.ticker) }}" {{ stimulus_controller('symfony/ux-autocomplete/autocomplete',{
-                                         url: path('ux_entity_autocomplete', { alias: 'ticker'})
-                                        }) }}>
-                                    </select>
+                                    {{ form_widget(autoCompleteForm.ticker, { 'attr': {'class': 'foo'} }) }}
                                 </div>
                                 <div class="flex-none p-2">
                                     <twig:Button variant="secondary" title="Search Ticker" type="submit">

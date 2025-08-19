@@ -3,7 +3,6 @@
 namespace App\Form;
 
 use App\Entity\SearchForm;
-use App\Form\Type\PieSelectType;
 use App\Form\Type\TickerAutocompleteField;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -25,6 +24,7 @@ class SearchFormType extends AbstractType
             ]);
     }
 
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -33,4 +33,5 @@ class SearchFormType extends AbstractType
             "extra_options" => [],
         ]);
     }
+
 }
