@@ -79,7 +79,10 @@ class WeightedAverage
 		return round($adjustedShares, 4);
 	}
 
-	public function calc(Position $position): void
+	/**
+	 * Returns number of transactions processed
+	 */
+	public function calc(Position $position): int
 	{
 		$corporateActions = $this->corporateActionRepository->findBy(
 			[
@@ -97,7 +100,7 @@ class WeightedAverage
         $transactions = $this->transactionRepository->findBy(['position' => $position->getId()], ['transactionDate' => 'ASC']);
 
 		if (count($transactions) < 1) {
-			return;
+			return 0;
 		}
 		// Sort on transaction date
         usort(
@@ -171,5 +174,7 @@ class WeightedAverage
 			->setProfit(round($totalProfit, 3))
 			->setAdjustedAmount($adjustedShares)
 			->setAdjustedAveragePrice($averagePrice);
+
+		return count($transactions);
 	}
 }

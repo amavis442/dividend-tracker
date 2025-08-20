@@ -397,10 +397,19 @@ class ImportCsvService extends AbstractImporter implements CsvInterface
                         $transaction->setProfit($row['profit'] ?? 0.0);
                     }
                     $position->addTransaction($transaction);
-                    $this->weightedAverage->calc($position);
+                    $numTransactions = $this->weightedAverage->calc($position);
+                    if ($numTransactions == 0) { // When it is a new position
+                        $position
+                            ->setAllocation($transaction->getTotal())
+                            ->setAmount($transaction->getAmount())
+                            ->setPrice($transaction->getPrice())
+                            ->setProfit(0.0)
+                            ->setAdjustedAmount($transaction->getAmount())
+                            ->setAdjustedAveragePrice($transaction->getTotal());
+                    }
 
                     if (
-                        (float) $position->getAmount() == 0 ||
+                        (float) $position->getAmount() === 0.0 ||
                         (float) $position->getAmount() <= 0.00000001
                     ) {
                         $position->setClosed(true);
