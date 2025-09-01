@@ -397,20 +397,15 @@ class ImportCsvService extends AbstractImporter implements CsvInterface
                         $transaction->setProfit($row['profit'] ?? 0.0);
                     }
                     $position->addTransaction($transaction);
-                    $numTransactions = $this->weightedAverage->calc($position);
-                    if ($numTransactions == 0) { // When it is a new position
-                        $position
-                            ->setAllocation($transaction->getTotal())
-                            ->setAmount($transaction->getAmount())
-                            ->setPrice($transaction->getPrice())
-                            ->setProfit(0.0)
-                            ->setAdjustedAmount($transaction->getAmount())
-                            ->setAdjustedAveragePrice($transaction->getTotal());
-                    }
+                    $this->entityManager->persist($transaction); // need to save the transaction else flow calc() will not work correctly.
+                    $this->entityManager->flush();
+
+                    $this->weightedAverage->calc($position);
 
                     if (
-                        (float) $position->getAmount() === 0.0 ||
-                        (float) $position->getAmount() <= 0.00000001
+                        $row['direction'] == Transaction::SELL &&
+                        ((float) $position->getAmount() === 0.0 ||
+                        (float) $position->getAmount() <= 0.00000001)
                     ) {
                         $position->setClosed(true);
                         $position->setClosedAt($row['transactionDate']);

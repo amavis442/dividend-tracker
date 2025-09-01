@@ -4,6 +4,7 @@ namespace App\Tests\Functional\Service;
 
 use App\Entity\Payment;
 use App\Entity\Transaction;
+use App\Entity\Position;
 use App\Service\Importer\ImportCsvService;
 use App\Factory\UserFactory;
 use App\Factory\CurrencyFactory;
@@ -43,7 +44,8 @@ class ImportCsvServiceTest extends KernelTestCase
 		$this->importCsvService = $container->get(ImportCsvService::class);
 	}
 
-	private function setUpFactories() {
+	private function setUpFactories()
+	{
 		$container = static::getContainer();
 
 		$userFactory = UserFactory::createOne();
@@ -164,6 +166,92 @@ CSV;
 
 		$this->assertEquals(5, $sell->getAmount());
 		$this->assertEquals(600.0, $sell->getTotal());
+
+		unlink($path);
+	}
+
+	public function testImportsBuyAndSellTransactionsPositionClosed(): void
+	{
+		$this->setUpFactories();
+
+		$csvContent = <<<CSV
+Action,Time,ISIN,No. of Shares,Price / Share,Currency (price / share),Exchange Rate,Total,Currency (total),Withholding Tax,Currency (withholding tax),ID
+Buy,2024-06-02 12:00:00,US1234567890,5,100.0,USD,1.0,500.00,USD,0.0,USD,TXN1
+Sell,2024-06-03 14:00:00,US1234567890,5,120.0,USD,1.0,600.00,USD,0.0,USD,TXN2
+CSV;
+
+		$path = sys_get_temp_dir() . '/test_trades.csv';
+		file_put_contents($path, $csvContent);
+		$file = new UploadedFile(
+			$path,
+			'test_trades.csv',
+			'text/csv',
+			null,
+			true
+		);
+
+		$result = $this->importCsvService->importFile($file);
+
+		$this->assertSame('ok', $result['status']);
+		$this->assertEquals(2, $result['transactionsAdded']);
+		$this->assertEquals(2, $result['totalTransaction']);
+
+		$transactionRepo = static::getContainer()
+			->get('doctrine')
+			->getRepository(Transaction::class);
+
+		$buy = $transactionRepo->findOneBy(['jobid' => 'TXN1']);
+
+		/**
+		 * @var App\Entity\Position
+		 */
+		$position = $buy->getPosition();
+
+		$this->assertEquals(0.0, (float)$position->getAmount());
+		$this->assertTrue($position->getClosed());
+
+		unlink($path);
+	}
+
+		public function testImportsBuyAndSellTransactionsPositionStillOpen(): void
+	{
+		$this->setUpFactories();
+
+		$csvContent = <<<CSV
+Action,Time,ISIN,No. of Shares,Price / Share,Currency (price / share),Exchange Rate,Total,Currency (total),Withholding Tax,Currency (withholding tax),ID
+Buy,2024-06-02 12:00:00,US1234567890,6,100.0,USD,1.0,500.00,USD,0.0,USD,TXN1
+Sell,2024-06-03 14:00:00,US1234567890,5,120.0,USD,1.0,600.00,USD,0.0,USD,TXN2
+CSV;
+
+		$path = sys_get_temp_dir() . '/test_trades.csv';
+		file_put_contents($path, $csvContent);
+		$file = new UploadedFile(
+			$path,
+			'test_trades.csv',
+			'text/csv',
+			null,
+			true
+		);
+
+		$result = $this->importCsvService->importFile($file);
+
+		$this->assertSame('ok', $result['status']);
+		$this->assertEquals(2, $result['transactionsAdded']);
+		$this->assertEquals(2, $result['totalTransaction']);
+
+		$transactionRepo = static::getContainer()
+			->get('doctrine')
+			->getRepository(Transaction::class);
+
+		$buy = $transactionRepo->findOneBy(['jobid' => 'TXN1']);
+
+		/**
+		 * @var App\Entity\Position
+		 */
+		$position = $buy->getPosition();
+
+		$this->assertEquals(1.0, (float)$position->getAmount());
+		$this->assertFalse($position->getClosed());
 
 		unlink($path);
 	}
