@@ -156,10 +156,10 @@ class WeightedAverage
 			}
 
 			// Accumulate share count
-			if ($side === 1) {
+			if ($side === Transaction::BUY) {
 				$adjustedShares += $adjustedAmount;
 				$totalCost += $adjustedAmount * $price;
-			} elseif ($side === 2) {
+			} elseif ($side === Transaction::SELL) {
 				$adjustedShares -= $adjustedAmount;
 				$totalCost -= $adjustedAmount * $price;
 			}
