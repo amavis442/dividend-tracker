@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/corporate/action')]
+#[Route('/{_locale<%app.supported_locales%>}/dashboard/corporate/action')]
 final class CorporateActionController extends AbstractController
 {
     #[Route(name: 'app_corporate_action_index', methods: ['GET'])]
