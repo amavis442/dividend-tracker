@@ -187,6 +187,39 @@ class DividendService implements DividendServiceInterface
 	}
 
 	/**
+	 * How many shares are applicable on ex dividenddate
+	 *
+	 * @param Position $position
+	 * @return float|null
+	 */
+	public function getSharesPerPositionAmount(Position $position): ?float
+	{
+		$ticker = $position->getTicker();
+		if (!$position) {
+			return 0.0;
+		}
+
+		$transactions = $position->getTransactions();
+		$actions = $position->getCorporateActions(); // or use $position->getCorporateActions() if scoped
+		$adjustedAmount = 0.0;
+
+		foreach ($transactions as $transaction) {
+			$adjusted = $this->transactionAdjuster->getAdjustedAmount(
+				$transaction,
+				$actions
+			);
+			if ($transaction->getSide() === Transaction::BUY) {
+				$adjustedAmount += $adjusted;
+			} elseif ($transaction->getSide() === Transaction::SELL) {
+				$adjustedAmount -= $adjusted;
+			}
+		}
+
+		return $adjustedAmount > 0 ? $adjustedAmount : 0.0;
+	}
+
+
+	/**
 	 * Get the net dividend payout. Todo return adjusted and unadjusted cashAmount
 	 *
 	 * @param Calendar $calendar

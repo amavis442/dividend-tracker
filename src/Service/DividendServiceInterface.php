@@ -69,6 +69,14 @@ interface DividendServiceInterface
 	public function getPositionAmount(Calendar $calendar): ?float;
 
 	/**
+	 * Return the number of shares in a position adjusted by corporate events like
+	 * splits and reverse-splits
+	 *
+	 * @param Position $position
+	 */
+	public function getSharesPerPositionAmount(Position $position): ?float;
+
+	/**
 	 * Returns the expected netto dividend payment (exchange rate and taxes) for 1 share in a position
 	 *
 	 * @param Position $position

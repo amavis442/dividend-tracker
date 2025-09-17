@@ -81,10 +81,16 @@ class YieldsService
 				$pie && $report[$position->getId()]
 					? $report[$position->getId()]['avgPrice']
 					: $position->getPrice();
+
+			$amount = $dividendService->getSharesPerPositionAmount($position);
+
+			/*
 			$amount =
 				$pie && $report[$position->getId()]
 					? $report[$position->getId()]['amount']
 					: $position->getAmount();
+			*/
+
 			$allocation =
 				$pie && $report[$position->getId()]
 					? $report[$position->getId()]['allocation']
