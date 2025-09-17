@@ -193,7 +193,7 @@
                                                                         <ul>
                                                                             <li>#{{ ckey }}</li>
                                                                             <li>
-                                                                                <span class="font-semibold">{{ calendar.paymentDate|format_datetime('long', 'none', locale: 'nl') }}:</span> ${{ calendar.cashAmount }}
+                                                                                <span class="font-semibold">{{ calendar.paymentDate|format_datetime('long', 'none', locale: 'nl') }}:</span> ${{ calendar.adjustedCashAmount }}
                                                                             </li>
                                                                             <li class="font-bold mb-2">
                                                                                 {{'estimated payout'|trans}} &euro;

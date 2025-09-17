@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\CorporateAction;
+use App\Entity\Position;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -15,6 +17,32 @@ class CorporateActionRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, CorporateAction::class);
     }
+
+    /**
+     * Returns querybuilder with all the events for given position
+     * @param Position $position
+     * @return QueryBuilder
+     */
+    public function getBuilderFindAllByPosition(Position $position): QueryBuilder {
+        return $this->createQueryBuilder('c')
+        ->innerJoin('c.position', 'p')
+        ->where('p.id = :position')
+        ->andWhere('p.closed = false')
+        ->setParameter('position', $position->getId());
+    }
+
+    /**
+     * Get all corporate actions with related position and ticker
+     */
+    public function findAllWithPositionAndTicker(): mixed {
+        return $this->createQueryBuilder('c')
+        ->innerJoin('c.position', 'p')
+        ->innerJoin('p.ticker','t')
+        ->andWhere('p.closed = false')
+        ->orderBy('c.eventDate')
+        ->getQuery()->getResult();
+    }
+
 
     //    /**
     //     * @return CorporateAction[] Returns an array of CorporateAction objects

@@ -1,0 +1,106 @@
+<turbo-frame id="portfolio_tab_results">
+<div class="w-full flex flex-col">
+    <div class="flex flex-col md:container mx-auto px-4">
+        <div>
+            {% for notice in app.flashes('notice') %}
+                <twig:Alert variant="danger">
+                    {{ notice|trans }}
+                </twig:Alert>
+            {% endfor %}
+        </div>
+        <div id="header" class="px-3 py-2 w-full">
+            <twig:Head>
+                {{ 'CorporateAction'|trans }}
+            </twig:Head>
+        </div>
+        <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+            <div class="w-full pr-3 py-2 mt-2 mb-2">
+                <twig:Button tag="a"
+                             href="{{ path('portfolio_create_corporate_action', { position: position.id }) }}"
+                             data-turbo-frame="add-corporateaction">
+                    <i class="fas fa-plus"></i>
+                </twig:Button>
+            </div>
+            <twig:Table:Table class="max-w-min min-w-full">
+                <twig:Table:THead>
+                    <tr>
+                        <twig:Table:ThCol>
+                            {{ 'Type'|trans }}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{ 'EventDate'|trans }}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{ 'Ratio'|trans }}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{ 'CreatedAt'|trans }}
+                        </twig:Table:ThCol>
+                        <twig:Table:ThCol>
+                            {{ 'Actions'|trans }}
+                        </twig:Table:ThCol>
+                    </tr>
+                </twig:Table:THead>
+                <tbody>
+                    <turbo-frame id="add-corporateaction"></turbo-frame>
+                    {% for corporate_action in pager %}
+                        <twig:Table:Tr>
+                            <twig:Table:Td>
+                                {{ corporate_action.type }}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {{ corporate_action.eventDate ? corporate_action.eventDate|date("Y-m-d") : '' }}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {{ corporate_action.ratio }}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                {{ corporate_action.createdAt ? corporate_action.createdAt|date("Y-m-d H:i:s") : '' }}
+                            </twig:Table:Td>
+                            <twig:Table:Td>
+                                <div class="inline-flex rounded-md shadow-sm" role="group">
+                                    <div class="inline-block" data-controller="tooltip">
+                                        <a href="{{ path('app_corporate_action_show', {'id': corporate_action.id}) }}"
+                                           data-turbo-frame="_top"
+                                           data-tooltip-target="element"
+                                           data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                           class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                            <i class="fas fa-book-open"></i>
+                                        </a>
+                                        <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                            {{ 'show corporate action'|trans }}
+                                            <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                        </div>
+                                    </div>
+                                    <div class="inline-block" data-controller="tooltip">
+                                        <a href="{{ path('app_corporate_action_edit', {'id': corporate_action.id}) }}"
+                                           data-turbo-frame="_top"
+                                           data-tooltip-target="element"
+                                           data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                           class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                        <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                            {{ 'Edit corporate action'|trans }}
+                                            <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </twig:Table:Td>
+                        </twig:Table:Tr>
+                    {% else %}
+                        <twig:Table:Tr>
+                            <twig:Table:Td colspan="6">
+                                no records found
+                            </twig:Table:Td>
+                        </twig:Table:Tr>
+                    {% endfor %}
+                </tbody>
+            </twig:Table:Table>
+        </div>
+    </div>
+</div>
+<div class="mb-2">
+    {% if pager.haveToPaginate %}{{ pagerfanta(pager) }}{% endif %}
+</div>
+</turbo-frame>

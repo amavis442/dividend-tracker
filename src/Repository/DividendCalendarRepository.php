@@ -360,9 +360,6 @@ class DividendCalendarRepository extends ServiceEntityRepository
 	 * Get the calendars between startDate and endDate
 	 */
 	public function groupByMonth(
-		DividendServiceInterface $dividendService,
-		DividendExchangeRateResolverInterface $dividendExchangeRateResolver,
-		DividendTaxRateResolverInterface $dividendTaxRateResolver,
 		int $year,
 		?string $startDate = null,
 		?string $endDate = null,
@@ -402,47 +399,7 @@ class DividendCalendarRepository extends ServiceEntityRepository
 		if (!$result) {
 			return null;
 		}
-
-		$data = [];
-		$dividendService->setCummulateDividendAmount(false);
-
-		foreach ($result as $item) {
-			$positionAmount = $dividendService->getPositionAmount($item);
-			if ($positionAmount < 0.001) {
-				// filter out ones that have no amount of stocks for dividend payout
-				continue;
-			}
-			$positionDividend = $dividendService->getTotalNetDividend($item);
-			if ($positionDividend < 0.01) {
-				// filter out ones that have no payout of dividend or to small to matter
-				continue;
-			}
-
-			$ticker = $item->getTicker()->getSymbol();
-
-			$taxRate = $dividendTaxRateResolver->getTaxRateForCalendar($item);
-			$exchangeRate = $dividendExchangeRateResolver->getRateForCalendar(
-				$item
-			);
-			$tax = $item->getCashAmount() * $exchangeRate * $taxRate;
-
-			$data[$item->getPaymentDate()->format('Ym')][
-				$item->getPaymentDate()->format('j')
-			][] = [
-				'calendar' => $item,
-				'ticker' => $ticker,
-				'positionAmount' => $positionAmount,
-				'positionDividend' => $positionDividend,
-				'taxRate' => $taxRate,
-				'exchangeRate' => $exchangeRate,
-				'tax' => $tax,
-			];
-		}
-		ksort($data);
-		foreach ($data as &$month) {
-			ksort($month);
-		}
-		return $data;
+		return $result;
 	}
 
 	/**
@@ -481,7 +438,7 @@ class DividendCalendarRepository extends ServiceEntityRepository
 			return null;
 		}
 
-		$dividendService->setCummulateDividendAmount(false);
+		$dividendService->setAccumulateDividendAmount(false);
 
 		$totalDividend = [];
 		foreach ($result as $item) {

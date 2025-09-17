@@ -2,7 +2,10 @@
 
 namespace App\Tests\Functional\Controller;
 
+use App\Entity\User;
 use App\Entity\CorporateAction;
+use App\Repository\UserRepository;
+use App\Repository\PositionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use PHPUnit\Framework\Attributes\Group;
@@ -16,6 +19,7 @@ use App\Factory\CurrencyFactory;
 use App\Factory\UserFactory;
 use App\Factory\BranchFactory;
 
+
 #[Group('controller')]
 final class CorporateActionControllerTest extends WebTestCase
 {
@@ -25,7 +29,9 @@ final class CorporateActionControllerTest extends WebTestCase
 	private KernelBrowser $client;
 	private EntityManagerInterface $manager;
 	private EntityRepository $corporateActionRepository;
-	private string $path = '/corporate/action/';
+	private string $path = '/nl/dashboard/corporate/action/';
+
+	private User $testUser;
 
 	protected function setUp(): void
 	{
@@ -34,6 +40,20 @@ final class CorporateActionControllerTest extends WebTestCase
 		$this->corporateActionRepository = $this->manager->getRepository(
 			CorporateAction::class
 		);
+
+		$user = UserFactory::createOne(['email' => 'test@test.nl']);
+        $this->assertSame('test@test.nl', $user->getEmail());
+
+        $this->manager->persist($user->_real());
+		$this->manager->flush();
+
+
+		$userRepository = static::getContainer()->get(UserRepository::class);
+		$this->testUser = $userRepository->findOneByEmail('test@test.nl');
+		//dump('test user data:', $testUser);
+
+        // simulate $testUser being logged in
+        $this->client->loginUser($this->testUser);
 
 		/* using ResetDatabase already
 		foreach ($this->corporateActionRepository->findAll() as $object) {
@@ -52,11 +72,13 @@ final class CorporateActionControllerTest extends WebTestCase
 		self::assertResponseStatusCodeSame(200);
 		self::assertPageTitleContains('CorporateAction index');
 
+		//dump($crawler);
+
 		// Use the $crawler to perform additional assertions e.g.
 		// self::assertSame('Some text on the page', $crawler->filter('.p')->first()->text());
 	}
 
-	public function testNew(): void
+	private function setUpPosition(): \App\Entity\Position
 	{
 		//$start = microtime(true);
 		$currency = CurrencyFactory::createOne(['symbol'=> 'USD']);
@@ -78,7 +100,7 @@ final class CorporateActionControllerTest extends WebTestCase
 		//dump('TickerFactory took ' . ($end - $start) . ' seconds');
 
         //$start = microtime(true);
-		$user = UserFactory::new();
+		//$user = UserFactory::new();
 		//$end = microtime(true);
 		//dump('CurrencyFactory took ' . ($end - $start) . ' seconds');
 
@@ -91,53 +113,65 @@ final class CorporateActionControllerTest extends WebTestCase
 			'price' => 10.0,
 			'profit' => 0.0,
 			'ticker' => $ticker,
-			'user' => $user,
+			'user' => $this->testUser,
 		]);
 		$position = $positionProxy->_real();
 
 		$this->manager->persist($position);
 		$this->manager->flush();
 
+		return $position;
+	}
 
-		$this->client->request('GET', sprintf('%snew', $this->path));
+
+	public function testNew(): void
+	{
+		$position = $this->setUpPosition();
+
+		//$positionRepository = static::getContainer()->get(PositionRepository::class);
+		//$positions = $positionRepository->findAll();
+		//dd('Current positions:', $positions);
+
+		$crawler = $this->client->request('GET', sprintf('%snew', $this->path));
 		self::assertResponseStatusCodeSame(200);
+
+		//dump($crawler);
 
 		$this->client->submitForm('Save', [
 			'corporate_action[type]' => 'reverse_split',
-			'corporate_action[eventDate][day]' => 25,
-			'corporate_action[eventDate][month]' => 7,
-			'corporate_action[eventDate][year]' => 2025,
+			'corporate_action[eventDate]' => '2025-07-25',
 			'corporate_action[ratio]' => '0.5',
 			'corporate_action[position]' => $position->getId(),
 		]);
 
-		self::assertResponseRedirects('/corporate/action');
+		self::assertResponseRedirects('/nl/dashboard/corporate/action');
 
 		self::assertSame(1, $this->corporateActionRepository->count([]));
 	}
 
-	/** TODO: will fix these test later
 	public function testShow(): void
 	{
-		$this->markTestIncomplete();
+		$position = $this->setUpPosition();
+
 		$fixture = new CorporateAction();
-		$fixture->setType('My Title');
-		$fixture->setEventDate('My Title');
-		$fixture->setRatio('My Title');
-		$fixture->setCreatedAt('My Title');
-		$fixture->setPosition('My Title');
+		$fixture->setType('My Test Type');
+		$fixture->setEventDate(new \DateTime());
+		$fixture->setRatio(2);
+		$fixture->setCreatedAt(new \DateTimeImmutable());
+		$fixture->setPosition($position);
 
 		$this->manager->persist($fixture);
 		$this->manager->flush();
 
-		$this->client->request(
+		$crawler = $this->client->request(
 			'GET',
 			sprintf('%s%s', $this->path, $fixture->getId())
 		);
 
+		//dump($crawler);
 		self::assertResponseStatusCodeSame(200);
 		self::assertPageTitleContains('CorporateAction');
-
+		//self::assertContains('My Test Type',$crawler->filter('.table')->filter('td'), 'Missing My Test Type');
 		// Use assertions to check that the properties are properly displayed.
 	}
 
@@ -197,8 +231,8 @@ final class CorporateActionControllerTest extends WebTestCase
 		);
 		$this->client->submitForm('Delete');
 
-		self::assertResponseRedirects('/corporate/action/');
+		self::assertResponseRedirects('/nl/dashboard/corporate/action');
 		self::assertSame(0, $this->corporateActionRepository->count([]));
 	}
-		*/
+
 }

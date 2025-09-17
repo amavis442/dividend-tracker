@@ -7,92 +7,160 @@ use App\Repository\CorporateActionRepository;
 use App\Repository\TransactionRepository;
 use App\Service\TransactionAdjuster;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
 class AdjustedPositionDecorator
 {
-    public function __construct(
-        private Position $position,
-        private TransactionRepository $transactionRepo,
-        private CorporateActionRepository $actionRepo,
-        private TransactionAdjuster $transactionAdjuster,
-    ) {}
+	private ?array $cachedTransactions = null;
+	private ?array $cachedActions = null;
 
-    public function getAdjustedAmount(): float
-    {
-        $transactions = $this->transactionRepo->findBy(['position' => $this->position->getId()]);
-        $actions = $this->actionRepo->findBy(['position' => $this->position->getId(), 'type' => 'reverse_split'], ['eventDate' => 'ASC']);
+	public function __construct(
+		private Position $position,
+		private TransactionRepository $transactionRepo,
+		private CorporateActionRepository $actionRepo,
+		private TransactionAdjuster $transactionAdjuster
+	) {
+	}
 
-        $total = 0.0;
+	/**
+	 * Caches the transactions so it will not waste resources
+	 */
+	private function getTransactions(): array
+	{
+		if ($this->cachedTransactions === null) {
+			$this->cachedTransactions = $this->transactionRepo->findBy([
+				'position' => $this->position->getId(),
+			]);
+		}
 
-        foreach ($transactions as $tx) {
-            $adjustedAmount = $this->transactionAdjuster->getAdjustedAmount($tx, new ArrayCollection($actions));
+		return $this->cachedTransactions;
+	}
 
-            $side = $tx->getSide();
-            $total += ($side === Transaction::BUY ? $adjustedAmount : -$adjustedAmount);
-        }
+	/**
+	 * Caches the actions so it will not waste resources
+	 */
+	private function getActions(): array
+	{
+		if ($this->cachedActions === null) {
+			$this->cachedActions = $this->actionRepo->findBy(
+				[
+					'position' => $this->position->getId(),
+					'type' => 'reverse_split',
+				],
+				['eventDate' => 'ASC']
+			);
+		}
 
-        return round($total, 4);
-    }
+		return $this->cachedActions;
+	}
 
-    public function getAdjustedAveragePrice(Collection $transactions, Collection $actions): float
-    {
-        $transactions = $this->transactionRepo->findBy(['position' => $this->position->getId()]);
-        $actions = $this->actionRepo->findBy(['position' => $this->position->getId(), 'type' => 'reverse_split'], ['eventDate' => 'ASC']);
+	/**
+	 * Calculates the adjusted number of shares held for a given position,
+	 * taking into account reverse split corporate actions.
+	 *
+	 * This method retrieves all transactions associated with the current position
+	 * and applies reverse split adjustments using the TransactionAdjuster service.
+	 * It sums the adjusted amounts, treating BUY transactions as positive and
+	 * SELL transactions as negative, to compute the net adjusted share count.
+	 *
+	 * @return float The total adjusted share amount, rounded to 7 decimal places.
+	 */
+	public function getAdjustedAmount(): float
+	{
+		$transactions = $this->getTransactions();
+		$actions = new ArrayCollection($this->getActions());
 
-        $totalShares = 0.0;
-        $totalCost = 0.0;
+		$total = 0.0;
 
-        foreach ($transactions as $tx) {
-            $amount = $tx->getAmount();
-            $price = $tx->getPrice();
-            $txDate = $tx->getTransactionDate();
+		foreach ($transactions as $tx) {
+			$adjustedAmount = $this->transactionAdjuster->getAdjustedAmount(
+				$tx,
+				$actions
+			);
 
-            foreach ($actions as $action) {
-                if ($txDate < $action->getEventDate()) {
-                    $amount *= $action->getRatio();
-                }
-            }
+			$side = $tx->getSide();
+			$total +=
+				$side === Transaction::BUY ? $adjustedAmount : -$adjustedAmount;
+		}
 
-            $side = $tx->getSide();
-            if ($side === 1) {
-                $totalShares += $amount;
-                $totalCost += $amount * $price;
-            } elseif ($side === 2) {
-                $totalShares -= $amount;
-                $totalCost -= $amount * $price;
-            }
-        }
+		return round($total, 7);
+	}
 
-        return $totalShares > 0 ? round($totalCost / $totalShares, 4) : 0.0;
-    }
+	/**
+	 * Calculates the adjusted average purchase price per share for the current position,
+	 * factoring in reverse split corporate actions.
+	 *
+	 * This method retrieves all transactions linked to the position and applies reverse split
+	 * ratios to the share amounts if the transaction occurred before the action's event date.
+	 * It then computes the total cost and total adjusted shares, treating BUY transactions
+	 * as additions and SELL transactions as subtractions.
+	 *
+	 * The final result is the weighted average price per share after adjustment,
+	 * rounded to 4 decimal places. If no shares remain, it returns 0.0.
+	 *
+	 * @return float The adjusted average price per share, or 0.0 if no shares remain.
+	 */
+	public function getAdjustedAveragePrice(): float
+	{
+		$transactions = $this->getTransactions();
+		$actions = new ArrayCollection($this->getActions());
 
-    public function getAdjustmentNote(): ?string
-    {
-        $actions = $this->actionRepo->findBy(['position' => $this->position->getId(), 'type' => 'reverse_split'], ['eventDate' => 'ASC']);
+		$totalShares = 0.0;
+		$totalCost = 0.0;
 
-        if (empty($actions)) {
-            return null;
-        }
+		foreach ($transactions as $tx) {
+			$amount = $tx->getAmount();
+			$price = $tx->getPrice();
+			$txDate = $tx->getTransactionDate();
 
-        $notes = array_map(function ($action) {
-            return sprintf(
-                "Adjusted due to reverse split on %s (ratio: %s)",
-                $action->getEventDate()->format('Y-m-d'),
-                $action->getRatio()
-            );
-        }, $actions);
+			foreach ($actions as $action) {
+				if ($txDate < $action->getEventDate()) {
+					$amount *= $action->getRatio();
+                    $price /= $action->getRatio();
+				}
+			}
 
-        return implode('; ', $notes);
-    }
+			$side = $tx->getSide();
+			if ($side === 1) {
+				$totalShares += $amount;
+				$totalCost += $amount * $price;
+			} elseif ($side === 2) {
+				$totalShares -= $amount;
+				$totalCost -= $amount * $price;
+			}
+		}
 
-    public function getOriginalPosition(): Position
-    {
-        return $this->position;
-    }
+		return $totalShares > 0 ? round($totalCost / $totalShares, 4) : 0.0;
+	}
 
-    public function getSymbol(): string
-    {
-        return $this->position->getTicker()->getSymbol();
-    }
+	public function getAdjustmentNote(): ?string
+	{
+		$actions = $this->actionRepo->findBy(
+			['position' => $this->position->getId(), 'type' => 'reverse_split'],
+			['eventDate' => 'ASC']
+		);
+
+		if (empty($actions)) {
+			return null;
+		}
+
+		$notes = array_map(function ($action) {
+			return sprintf(
+				'Adjusted due to reverse split on %s (ratio: %s)',
+				$action->getEventDate()->format('Y-m-d'),
+				$action->getRatio()
+			);
+		}, $actions);
+
+		return implode('; ', $notes);
+	}
+
+	public function getOriginalPosition(): Position
+	{
+		return $this->position;
+	}
+
+	public function getSymbol(): string
+	{
+		return $this->position->getTicker()->getSymbol();
+	}
 }

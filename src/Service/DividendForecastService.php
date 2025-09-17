@@ -5,13 +5,16 @@ namespace App\Service;
 use App\Repository\Trading212PieInstrumentRepository;
 use App\Repository\DividendCalendarRepository;
 use App\Service\ExchangeAndTaxResolver;
+use App\Service\DividendAdjuster;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class DividendForecastService
 {
 	public function __construct(
 		protected Trading212PieInstrumentRepository $holdingsSnapshotInstrumentRepository,
 		protected DividendCalendarRepository $dividendCalendarRepository,
-		protected ExchangeAndTaxResolver $exchangeAndTaxResolver
+		protected ExchangeAndTaxResolver $exchangeAndTaxResolver,
+		protected DividendAdjuster $dividendAdjuster
 	) {
 	}
 
@@ -34,15 +37,23 @@ class DividendForecastService
 		);
 		$payouts = [];
 
+		/**
+		 * @var \App\Entity\Trading212PieInstrument $snapshot
+		 */
 		foreach ($snapshots as $snapshot) {
+			/**
+			 * @var \App\Entity\Ticker $ticker
+			 */
 			$ticker = $snapshot->getTicker();
-			if (!$ticker) continue;
-
+			if (!$ticker) {
+				continue;
+			}
 			$calendarEntries = $this->dividendCalendarRepository->getEntriesByTickerAndPayoutDate(
 				$ticker,
 				$snapshotDate
 			);
 
+			$position = $ticker->getPositions()->last();
 			foreach ($calendarEntries as $entry) {
 				$exchangeTaxDto = $this->exchangeAndTaxResolver->resolve(
 					$ticker,
@@ -52,18 +63,28 @@ class DividendForecastService
 				$exchangeRate = $exchangeTaxDto->exchangeRate;
 
 				if ($snapshot->getCreatedAt() < $entry->getPaymentDate()) {
+					$adjustedCashAmount = $this->dividendAdjuster->getAdjustedDividend(
+						$entry ? $entry->getCashAmount() : 0.0,
+						$entry->getCreatedAt(),
+						$position->getCorporateActions()
+					);
+
 					$payout =
 						$snapshot->getOwnedQuantity() *
-						$entry->getCashAmount() *
+						$adjustedCashAmount *
 						(1 - $taxRate) *
 						$exchangeRate;
+
 					$payouts[] = [
 						'ticker' => $ticker->getSymbol(),
 						'fullname' => $ticker->getFullname(),
 						'quantity' => $snapshot->getOwnedQuantity(),
-						'pie' => $snapshot->getTrading212PieMetaData()->getPie()->getLabel(),
+						'pieLabel' => $snapshot
+							->getTrading212PieMetaData()
+							->getPie()
+							->getLabel(),
 						'payout' => $payout,
-						'payDate' => $entry->getPaymentDate(),
+						'paymentDate' => $entry->getPaymentDate(),
 						'exDate' => $entry->getExDividendDate(),
 						'taxWithheld' => $taxRate,
 						'exchangeRate' => $exchangeRate,
