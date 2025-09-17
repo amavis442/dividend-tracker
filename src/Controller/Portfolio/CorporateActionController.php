@@ -33,8 +33,6 @@ class CorporateActionController extends AbstractController
 		#[MapQueryParameter] string $orderBy = 'eventDate',
 		#[MapQueryParameter] string $sort = 'desc'
 	): Response {
-		$corporateActionRepository->getBuilderFindAllByPosition($position);
-
 		$adapter = new QueryAdapter(
 			$corporateActionRepository->getBuilderFindAllByPosition($position)
 		);
