@@ -61,7 +61,7 @@ class AdjustedDividendDecorator
 		$adjusted = [];
 
 		foreach ($dividends as $dividend) {
-			$adjusted[] = [
+			$adjusted[$dividend->getId()] = [
 				'original' => $dividend->getCashAmount(),
 				'adjusted' => $this->dividendAdjuster->getAdjustedDividend(
 					$dividend->getCashAmount(),

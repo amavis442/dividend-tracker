@@ -20,6 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 use Doctrine\Common\Collections\Collection;
+use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
 
 #[
 	Route(
@@ -116,6 +117,12 @@ final class Trading212Controller extends AbstractController
 			$id = $tickerCalendar->getTicker()->getId();
 			$frequency = $tickerCalendar->getTicker()->getPayoutFrequency();
 			$cId = (int) $tickerCalendar->getPaymentDate()->format('Ym');
+
+			$adjustedCalendar = $tickers[$id]['adjustedDividend'][$tickerCalendar->getId()];
+			$cashAmount = $adjustedCalendar['adjusted'];
+
+			$tickerCalendar->setCashAmount($cashAmount);
+
 			$tickers[$id]['calendars'][$cId] = $tickerCalendar;
 
 			if (!isset($tickers[$id]['dividend'])) {
@@ -129,12 +136,18 @@ final class Trading212Controller extends AbstractController
 			}
 
 			if ($cId > $lastYear) {
+				/*
 				$tickers[$id]['dividend'][
 					$cId
 				] = $tickerCalendar->getCashAmount();
+				*/
+				$tickers[$id]['dividend'][
+					$cId
+				] = $cashAmount;
+
 				$tickers[$id]['dividend'][
 					'sumDividend'
-				] += $tickerCalendar->getCashAmount();
+				] += $cashAmount;
 				$tickers[$id]['dividend']['records'] += 1;
 
 				$owned = $tickers[$id]['instrument']->getOwnedQuantity();
@@ -144,7 +157,7 @@ final class Trading212Controller extends AbstractController
 
 				$predictedPayment =
 					$owned *
-					$tickerCalendar->getCashAmount() *
+					$cashAmount *
 					$rateDollarEuro *
 					(1 - $tax);
 				$tickers[$id]['dividend']['predicted_payment'][
@@ -542,7 +555,8 @@ final class Trading212Controller extends AbstractController
 		TranslatorInterface $translator,
 		ExchangeRateInterface $exchangeRate,
 		EntityManagerInterface $entityManager,
-		ChartBuilderInterface $chartBuilder
+		ChartBuilderInterface $chartBuilder,
+		AdjustedDividendDecoratorFactory $adjustedDividendDecoratorFactory,
 	): Response {
 		/**
 		 * @var \App\Entity\Trading212PieMetaData $metaData
@@ -569,12 +583,22 @@ final class Trading212Controller extends AbstractController
 				);
 				continue;
 			}
+			/**
+			 * @var \App\Entity\Ticker $ticker
+			 */
+			$ticker = $instrument->getTicker();
 			$priceProfitLoss +=
 				$instrument->getPrice() - $instrument->getAvgPrice();
-			$tickers[$instrument->getTicker()->getId()] = [
+			$tickers[$ticker->getId()] = [
 				'ticker' => $instrument->getTicker(),
 				'instrument' => $instrument,
+				'adjustedDividend' => [],
 			];
+
+			$position = $ticker->getPositions()->first();
+			$adjustedDividendDecorator = $adjustedDividendDecoratorFactory->decorate($position);
+			$adjustedDividends = $adjustedDividendDecorator->getAdjustedDividend();
+			$tickers[$ticker->getId()]['adjustedDividend'] = $adjustedDividends;
 		}
 
 		// Get the taxrate for each ticker
