@@ -194,11 +194,6 @@ class DividendService implements DividendServiceInterface
 	 */
 	public function getSharesPerPositionAmount(Position $position): ?float
 	{
-		$ticker = $position->getTicker();
-		if (!$position) {
-			return 0.0;
-		}
-
 		$transactions = $position->getTransactions();
 		$actions = $position->getCorporateActions(); // or use $position->getCorporateActions() if scoped
 		$adjustedAmount = 0.0;
