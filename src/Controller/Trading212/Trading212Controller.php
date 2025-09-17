@@ -121,7 +121,7 @@ final class Trading212Controller extends AbstractController
 			$adjustedCalendar = $tickers[$id]['adjustedDividend'][$tickerCalendar->getId()];
 			$cashAmount = $adjustedCalendar['adjusted'];
 
-			$tickerCalendar->setCashAmount($cashAmount);
+			$tickerCalendar->setAdjustedCashAmount($cashAmount);
 
 			$tickers[$id]['calendars'][$cId] = $tickerCalendar;
 
@@ -226,7 +226,7 @@ final class Trading212Controller extends AbstractController
 			if (isset($instrumentTicker['calendars'][$yearMonth])) {
 				$currentDividend = $instrumentTicker['calendars'][
 					$yearMonth
-				]->getCashAmount();
+				]->getAdjustedCashAmount();
 			}
 			$instrument->setCurrentDividendPerShare($currentDividend);
 
