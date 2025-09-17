@@ -38,7 +38,7 @@ class DividendForecastService
 		$payouts = [];
 
 		/**
-		 * @var App\Entity\Trading212PieInstrument $snapshot
+		 * @var \App\Entity\Trading212PieInstrument $snapshot
 		 */
 		foreach ($snapshots as $snapshot) {
 			/**

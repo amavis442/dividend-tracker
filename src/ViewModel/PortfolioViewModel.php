@@ -8,7 +8,6 @@ use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Repository\PositionRepository;
-use App\Service\DividendAdjuster;
 use App\Service\DividendServiceInterface;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,7 +24,6 @@ class PortfolioViewModel
 		private PositionRepository $positionRepository,
 		private AdjustedPositionDecoratorFactory $adjustedFactory,
 		private AdjustedDividendDecoratorFactory $adjustedDividendDecoratorFactory,
-		private DividendAdjuster $dividendAdjuster,
 		private int $maxPerPage = 10
 	) {
 	}

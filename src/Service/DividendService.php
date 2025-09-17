@@ -202,6 +202,10 @@ class DividendService implements DividendServiceInterface
 			: Constants::TAX / 100;
 
 		$cashAmount = $calendar->getCashAmount();
+		if (!$calendar->getCreatedAt()) {
+			return 0.0;
+		}
+
 		$adjustedCashAmount = $this->dividendAdjuster->getAdjustedDividend(
 			$cashAmount,
 			$calendar->getCreatedAt(),
