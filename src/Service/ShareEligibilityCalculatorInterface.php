@@ -13,4 +13,5 @@ interface ShareEligibilityCalculatorInterface
      * based on transaction history and ex-dividend cutoff.
      */
     public function calculate(Collection $transactions, Calendar $calendar): float;
+    public function filterEligibleTransactions(Collection $transactions, Calendar $calendar): array;
 }

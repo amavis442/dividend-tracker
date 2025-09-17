@@ -20,7 +20,9 @@ class CorporateActionType extends AbstractType
 	): void {
 		$builder
 			->add('type')
-			->add('eventDate', DateType::class)
+			->add('eventDate', DateType::class, [
+				'widget' => 'single_text',
+			])
 			->add('ratio')
 			->add('position', EntityType::class, [
 				'class' => Position::class,
@@ -29,15 +31,18 @@ class CorporateActionType extends AbstractType
 				): QueryBuilder {
 					return $er
 						->createQueryBuilder('p')
-                        ->innerJoin('p.ticker', 't')
-                        ->where('p.closed = false')
+						->innerJoin('p.ticker', 't')
+						->where('p.closed = false')
 						->orderBy('t.fullname', 'ASC');
 				},
 				//'choice_label' => 't.fullname',
-                'choice_label' => function (Position $position): string {
-                    return $position->getTicker()->getFullname() . ' ('. $position->getTicker()->getSymbol(). '), position Id: '. $position->getId();
-                },
-
+				'choice_label' => function (Position $position): string {
+					return $position->getTicker()->getFullname() .
+						' (' .
+						$position->getTicker()->getSymbol() .
+						'), position Id: ' .
+						$position->getId();
+				},
 			]);
 	}
 

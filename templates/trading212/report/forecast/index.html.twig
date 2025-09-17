@@ -53,7 +53,7 @@
                                 {% set totalPayout = totalPayout + info.payout %}
                                 <twig:Table:Tr>
                                     <twig:Table:Td>
-                                        {{ info.payDate|date("Y-m-d") }}
+                                        {{ info.paymentDate|date("Y-m-d") }}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
                                         <div>{{ info.ticker }}</div>

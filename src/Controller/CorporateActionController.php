@@ -18,7 +18,7 @@ final class CorporateActionController extends AbstractController
     public function index(CorporateActionRepository $corporateActionRepository): Response
     {
         return $this->render('corporate_action/index.html.twig', [
-            'corporate_actions' => $corporateActionRepository->findAll(),
+            'corporate_actions' => $corporateActionRepository->findAllWithPositionAndTicker(),
         ]);
     }
 

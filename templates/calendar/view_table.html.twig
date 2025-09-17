@@ -73,13 +73,15 @@
 									{% set netDividend = calData.positionDividend %}
 									{% set estimatedAmount = calData.positionAmount %}
 									{% set currentDate = cal.getPaymentDate %}
+									{% set grossDividendCash = calData.adjustedDividendCash %}
 									<twig:Table:Tr>
 										<twig:Table:Td>{{ numPositions}}</twig:Table:Td>
 										<twig:Table:ThCol>
 											{{ currentDate|date('l')|trans }},
 											{{ currentDate|date('d') }}
 											{{ currentDate|date('F')|trans|lower }}
-											{{ currentDate|date('Y') }}</twig:Table:ThCol>
+											{{ currentDate|date('Y') }}
+										</twig:Table:ThCol>
 										<twig:Table:Td>
 											{% set tickerInfo  = '' %}
 											{% set tickerInfo %}
@@ -117,7 +119,7 @@
 												{{ 'shares'|trans }}</small>
 										</twig:Table:Td>
 										<twig:Table:Td>
-											{{ cal.currency.sign|raw}}{{ cal.cashAmount|format_number({fraction_digit: 4}) }}
+											{{ cal.currency.sign|raw}}{{grossDividendCash|format_number({fraction_digit: 4}) }}
 										</twig:Table:Td>
 										<twig:Table:Td>&euro;{{ netDividend|format_number({fraction_digit: 4}) }}</twig:Table:Td>
 									</twig:Table:Tr>

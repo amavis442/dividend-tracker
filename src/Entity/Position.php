@@ -875,7 +875,7 @@ class Position
     /**
      * @return Collection<int, CorporateAction>
      */
-    public function getCorporateAction(): Collection
+    public function getCorporateActions(): Collection
     {
         return $this->corporateActions;
     }

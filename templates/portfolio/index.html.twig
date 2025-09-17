@@ -130,10 +130,10 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <small>{{ position.amount|format_number({"fraction_digit": 7}) }} {{ 'shares'|trans }}</small>
+                                        <small>{{ position.adjustedAmount|format_number({"fraction_digit": 7}) }} {{ 'shares'|trans }} <br/>(orginal: {{ position.amount|format_number({"fraction_digit": 7}) }})</small>
                                     </twig:Table:Td>
                                     <twig:Table:Td>
-                                        &euro; {{ position.price|format_number({"fraction_digit": 2}) }}
+                                        &euro; {{ position.adjustedAveragePrice|format_number({"fraction_digit": 2}) }} (original: {{ position.price|format_number({"fraction_digit": 2}) }})
                                     </twig:Table:Td>
                                     <twig:Table:Td>
                                         <twig:Badge class="flex">
@@ -170,6 +170,7 @@
                                         {% endif %}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
+                                    
                                         {% if position.divDate %}
                                             <twig:Badge class="block">
                                                 {{ position.cashCurrency.sign|raw }}

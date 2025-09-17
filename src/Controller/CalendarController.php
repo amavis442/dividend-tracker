@@ -25,6 +25,7 @@ use App\Service\DividendTaxRateResolverInterface;
 use App\Service\DividendExchangeRateResolverInterface;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Pager\AdjustedPositionAdapter;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/calendar')]
 class CalendarController extends AbstractController
@@ -180,13 +181,7 @@ class CalendarController extends AbstractController
 			$dateSelect = $form->getData();
 		}
 
-
-
-
-		$calendars = $calendarRepository->groupByMonth(
-			$dividendService,
-			$dividendExchangeRateResolver,
-			$dividendTaxRateResolver,
+		$calendars = $dividendService->getCalendarDataPerMonth(
 			$year,
 			$dateSelect->getStartdate()->format('Y-m-d'),
 			$dateSelect->getEnddate()->format('Y-m-d')

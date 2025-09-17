@@ -28,6 +28,9 @@
                                 Id
                             </twig:Table:ThCol>
                             <twig:Table:ThCol>
+                                {{ 'Position'|trans }}
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>
                                 {{ 'Type'|trans }}
                             </twig:Table:ThCol>
                             <twig:Table:ThCol>
@@ -50,6 +53,10 @@
                                 <twig:Table:Td>
                                     {{ corporate_action.id }}
                                 </twig:Table:Td>
+                                <twig:Table:Td>
+                                    {{ corporate_action.position.ticker.fullname }}
+                                </twig:Table:Td>
+
                                 <twig:Table:Td>
                                     {{ corporate_action.type }}
                                 </twig:Table:Td>

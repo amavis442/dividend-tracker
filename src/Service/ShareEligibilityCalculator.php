@@ -29,4 +29,20 @@ class ShareEligibilityCalculator implements ShareEligibilityCalculatorInterface
 
         return $shares;
     }
+
+    public function filterEligibleTransactions(Collection $transactions, Calendar $calendar): array
+    {
+        $exDate = $calendar->getExdividendDate();
+        $eligibleTransactions = [];
+
+        foreach ($transactions as $transaction) {
+            if ($transaction->getTransactionDate() >= $exDate) {
+                continue;
+            }
+            $eligibleTransactions[] = $transaction;
+        }
+
+        return $eligibleTransactions;
+    }
+
 }

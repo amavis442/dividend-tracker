@@ -89,6 +89,8 @@ class Calendar
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    private ?float $adjustedCashAmount = null;
+
     /**
      * Gets triggered only on insert
      */
@@ -286,4 +288,28 @@ class Calendar
     {
         return $this->updatedAt;
     }
+
+	/**
+	 * Get the value of adjustedCashAmount
+	 *
+	 * @return  float
+	 */
+	public function getAdjustedCashAmount(): float
+	{
+		return $this->adjustedCashAmount;
+	}
+
+	/**
+	 * Set the value of adjustedCashAmount
+	 *
+	 * @param   float  $adjustedCashAmount
+	 *
+	 * @return  self
+	 */
+	public function setAdjustedCashAmount(float $adjustedCashAmount): self
+	{
+		$this->adjustedCashAmount = $adjustedCashAmount;
+
+		return $this;
+	}
 }

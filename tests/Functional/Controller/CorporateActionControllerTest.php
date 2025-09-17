@@ -139,9 +139,7 @@ final class CorporateActionControllerTest extends WebTestCase
 
 		$this->client->submitForm('Save', [
 			'corporate_action[type]' => 'reverse_split',
-			'corporate_action[eventDate][day]' => 25,
-			'corporate_action[eventDate][month]' => 7,
-			'corporate_action[eventDate][year]' => 2025,
+			'corporate_action[eventDate]' => '2025-07-25',
 			'corporate_action[ratio]' => '0.5',
 			'corporate_action[position]' => $position->getId(),
 		]);

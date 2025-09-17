@@ -77,9 +77,21 @@
 						{{ 'Dividend'|trans }}
 					</a>
 				</li>
+
+				<li class="me-2" role="presentation">
+					<a href="{{ path('portfolio_list_corporate_action', {'position': position.id}) }}"
+					id="tab6"
+					data-turbo-frame="portfolio_tab_results"
+					data-tabs-target="btn" data-action="click->tabs#select"
+						class="rounded-tl-lg rounded-tr-lg border-l border-t border-r border-l-gray-200 border-t-gray-200 border-r-gray-200 p-4 hover:bg-gray-200">
+						{{ 'Corporate Actions'|trans }}
+					</a>
+				</li>
+
+
 				<li class="me-2" role="presentation">
 					<a href="{{ path('portfolio_show_dividend_progression', {'id': position.id}) }}"
-					id="tab6"
+					id="tab7"
 					data-turbo-frame="portfolio_tab_results"
 					data-tabs-target="btn" data-action="click->tabs#select"
 						class="rounded-tl-lg rounded-tr-lg border-l border-t border-r border-l-gray-200 border-t-gray-200 border-r-gray-200 p-4 hover:bg-gray-200">
@@ -89,7 +101,7 @@
 				</li>
 				<li class="me-2" role="presentation">
 					<a href="{{ path('portfolio_show_research', {'id': position.id}) }}"
-					id="tab7"
+					id="tab8"
 					data-turbo-frame="portfolio_tab_results"
 					data-tabs-target="btn" data-action="click->tabs#select"
 						class="rounded-tl-lg rounded-tr-lg border-l border-t border-r border-l-gray-200 border-t-gray-200 border-r-gray-200 p-4 hover:bg-gray-200">

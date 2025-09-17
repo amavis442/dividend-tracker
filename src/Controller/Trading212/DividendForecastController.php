@@ -33,7 +33,7 @@ final class DividendForecastController extends AbstractController
 			);
 
 			foreach ($result as $item) {
-				$reportData[$item['pie']][$item['payDate']->format('Y-m')][$item['payDate']->format('Y-m-d')][
+				$reportData[$item['pieLabel']][$item['paymentDate']->format('Y-m')][$item['paymentDate']->format('Y-m-d')][
 					$item['ticker']
 				][] = $item;
 			}
