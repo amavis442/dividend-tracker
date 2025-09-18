@@ -23,6 +23,16 @@
                 <twig:Table:Td>{{ api_key_name.keyName }}</twig:Table:Td>
             </twig:Table:Tr>
             <twig:Table:Tr>
+                <twig:Table:ThRow>Api Key</twig:Table:ThRow>
+                <twig:Table:Td>
+                    {% for apiKey in api_key_name.apiKeys%}
+                        <div class="mb-4">{{ apiKey.apiKey }}</div>
+                    {% endfor %}
+
+                </twig:Table:Td>
+            </twig:Table:Tr>
+
+            <twig:Table:Tr>
                 <twig:Table:ThRow>Created</twig:Table:ThRow>
                 <twig:Table:Td>{{ api_key_name.createdAt ? api_key_name.createdAt|date('Y-m-d H:i:s') : '' }}</twig:Table:Td>
             </twig:Table:Tr>

@@ -9,6 +9,7 @@ use App\Repository\PositionRepository;
 use App\Repository\TransactionRepository;
 use App\Service\DividendExchangeRateResolverInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
+use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 
 class YieldsService
 {
@@ -18,7 +19,8 @@ class YieldsService
 		private PositionRepository $positionRepository,
 		private TransactionRepository $transactionRepository,
 		private DividendService $dividendService,
-		private DividendExchangeRateResolverInterface $dividendExchangeRateResolver
+		private DividendExchangeRateResolverInterface $dividendExchangeRateResolver,
+		private AdjustedPositionDecoratorFactory $adjustedPositionDecoratorFactory,
 	) {
 	}
 	public function yield(
@@ -82,7 +84,12 @@ class YieldsService
 					? $report[$position->getId()]['avgPrice']
 					: $position->getPrice();
 
-			$amount = $dividendService->getSharesPerPositionAmount($position);
+			//$amount = $dividendService->getSharesPerPositionAmount($position);
+			$amount = $position->getAmount();
+
+			$positionDecorator = $this->adjustedPositionDecoratorFactory->decorate($position);
+			$position->setAdjustedAmount($positionDecorator->getAdjustedAmount());
+			$position->setAdjustedAveragePrice($positionDecorator->getAdjustedAveragePrice());
 
 			/*
 			$amount =
@@ -129,7 +136,7 @@ class YieldsService
 					$numPayoutsPerYear *
 					$dividendService->getForwardNetDividend(
 						$position->getTicker(),
-						$amount
+						$position->getAdjustedAmount()
 					);
 				$netForwardYearlyPayout =
 					$numPayoutsPerYear *

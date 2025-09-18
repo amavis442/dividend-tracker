@@ -132,13 +132,19 @@
                                                 <div class="arrow" data-tooltip-target="tooltipArrow"></div>
                                             </div>
                                         </div>
-                                        <small>({{ item.amount }})</small>
+                                        <small>({{ item.position.adjustedAmount }})</small>
+                                        {% if item.position.adjustedAmount|number_format(4) != item.position.amount|number_format(4) %}
+                                            <div class="flex"><small class="font-bold">({{ item.position.amount }})</small></div>
+                                        {% endif %}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
                                         &euro;{{ item.allocation|format_number({"fraction_digit": 2}) }}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
-                                        &euro;{{ (item.avgPrice)|format_number({"fraction_digit": 2}) }}
+                                        &euro;{{ (item.position.adjustedAveragePrice)|format_number({"fraction_digit": 2}) }}
+                                        {% if item.position.adjustedAmount|number_format(4) != item.position.amount|number_format(4) %}
+                                            <div class="flex"><small class="font-bold">&euro;{{ item.position.price }}</small></div>
+                                        {% endif %}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
                                         {% if item.payout > 0 %}
