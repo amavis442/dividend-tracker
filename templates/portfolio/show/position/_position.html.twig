@@ -18,8 +18,8 @@
         <twig:Table:Td>
           <strong>{{ 'Summary'|trans }}</strong>
         </twig:Table:Td>
-        <twig:Table:Td>{{ position.amount|format_number({ fraction_digit: 7 }) }}</twig:Table:Td>
-        <twig:Table:Td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ position.price|format_number({ fraction_digit: 2 }) }}</twig:Table:Td>
+        <twig:Table:Td>{{ position.adjustedAmount|format_number({ fraction_digit: 7 }) }}</twig:Table:Td>
+        <twig:Table:Td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ position.adjustedAveragePrice|format_number({ fraction_digit: 2 }) }}</twig:Table:Td>
         <twig:Table:Td>{{ position.allocationCurrency.Sign|raw }}{{ position.allocation|format_number({ fraction_digit: 2 }) }}</twig:Table:Td>
         <twig:Table:Td>
           <div class="flex">

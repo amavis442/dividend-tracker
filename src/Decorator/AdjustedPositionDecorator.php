@@ -86,6 +86,39 @@ class AdjustedPositionDecorator
 	}
 
 	/**
+	 * Returns the number of shares brefore a specific cutoff date
+	 *
+	 * @param \DateTimeInterface $datetime
+	 *
+	 * @return float
+	 */
+	public function getAdjustedAmountPerDate(\DateTimeInterface $datetime): float
+	{
+		$transactions = $this->getTransactions();
+		$actions = new ArrayCollection($this->getActions());
+
+		$total = 0.0;
+		$timestamp = $datetime->format('Ymd');
+
+		foreach ($transactions as $tx) {
+			 if ($tx->getTransactionDate()->format('Ymd') > $timestamp) {
+				continue;
+			 }
+				$adjustedAmount = $this->transactionAdjuster->getAdjustedAmount(
+					$tx,
+					$actions
+				);
+
+				$side = $tx->getSide();
+				$total +=
+					$side === Transaction::BUY ? $adjustedAmount : -$adjustedAmount;
+
+		}
+
+		return round($total, 7);
+	}
+
+	/**
 	 * Calculates the adjusted average purchase price per share for the current position,
 	 * factoring in reverse split corporate actions.
 	 *
@@ -131,6 +164,46 @@ class AdjustedPositionDecorator
 
 		return $totalShares > 0 ? round($totalCost / $totalShares, 4) : 0.0;
 	}
+
+
+	public function getAdjustedAveragePricePerDate(\DateTimeInterface $datetime): float
+	{
+		$transactions = $this->getTransactions();
+		$actions = new ArrayCollection($this->getActions());
+
+		$totalShares = 0.0;
+		$totalCost = 0.0;
+		$timestamp = $datetime->format('Ymd');
+
+		foreach ($transactions as $tx) {
+			if ($tx->getTransactionDate()->format('Ymd') > $timestamp) {
+				continue;
+			}
+
+			$amount = $tx->getAmount();
+			$price = $tx->getPrice();
+			$txDate = $tx->getTransactionDate();
+
+			foreach ($actions as $action) {
+				if ($txDate < $action->getEventDate()) {
+					$amount *= $action->getRatio();
+                    $price /= $action->getRatio();
+				}
+			}
+
+			$side = $tx->getSide();
+			if ($side === 1) {
+				$totalShares += $amount;
+				$totalCost += $amount * $price;
+			} elseif ($side === 2) {
+				$totalShares -= $amount;
+				$totalCost -= $amount * $price;
+			}
+		}
+
+		return $totalShares > 0 ? round($totalCost / $totalShares, 4) : 0.0;
+	}
+
 
 	public function getAdjustmentNote(): ?string
 	{

@@ -2,6 +2,7 @@
 
 namespace App\Controller\Portfolio;
 
+use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 use App\Dto\ExchangeTaxDto;
 use App\Entity\Calendar;
@@ -141,7 +142,6 @@ class PortfolioController extends AbstractController
 	public function show(
 		Request $request,
 		Position $position,
-		PositionRepository $positionRepository,
 		PaymentRepository $paymentRepository,
 		PortfolioRepository $portfolioRepository,
 		DividendGrowthService $dividendGrowth,
@@ -371,6 +371,8 @@ class PortfolioController extends AbstractController
 		PortfolioRepository $portfolioRepository,
 		DividendServiceInterface $dividendService,
 		ExchangeAndTaxResolverInterface $exchangeAndTaxResolver,
+		AdjustedDividendDecoratorFactory $adjustedDividendDecorator,
+		AdjustedPositionDecoratorFactory $adjustedPositionDecorator,
 	): Response {
 		$ticker = $position->getTicker();
 		$calendarRecentDividendDate = $ticker->getRecentDividendDate();
@@ -382,18 +384,29 @@ class PortfolioController extends AbstractController
 		$nextDividendExDiv = null;
 		$nextDividendPayout = null;
 
+		$positionDecorator = $adjustedPositionDecorator->decorate($position);
+		$dividendDecorator = $adjustedDividendDecorator->decorate($position);
+		$adjustedDividends = $dividendDecorator->getAdjustedDividend();
+
 		if ($calendarRecentDividendDate) {
 			$exchangeTaxDto = $exchangeAndTaxResolver->resolve($ticker, $calendarRecentDividendDate);
 			$exchangeRate = $exchangeTaxDto->exchangeRate;
 			$dividendTax =$exchangeTaxDto->taxAmount;
 
+			$adjustedDividend = $adjustedDividends[$calendarRecentDividendDate->getId()];
+
 			$netCashAmount =
-				$calendarRecentDividendDate->getCashAmount() *
+				$adjustedDividend['adjusted'] *
 				$exchangeRate *
 				(1 - $dividendTax);
-			$amountPerDate = $position->getAmountPerDate(
+			/* $amountPerDate = $position->getAmountPerDate(
 				$calendarRecentDividendDate->getExDividendDate()
-			);
+			); */
+			$cutoffDate = $calendarRecentDividendDate->getExDividendDate();
+			$amountPerDate =  $positionDecorator->getAdjustedAmountPerDate($cutoffDate);
+			$position->setAdjustedAmount($amountPerDate);
+			$adjustedAvgPrice = $positionDecorator->getAdjustedAveragePricePerDate($cutoffDate);
+			$position->setAdjustedAveragePrice($adjustedAvgPrice);
 
 			$nextDividendExDiv = $calendarRecentDividendDate->getExDividendDate();
 			$nextDividendPayout = $calendarRecentDividendDate->getPaymentDate();
@@ -408,8 +421,10 @@ class PortfolioController extends AbstractController
 		$dividendRaises = [];
 
 		$reverseCalendars = array_reverse($calenders->toArray(), true);
-		// Cals start with latest and descent
+
 		/**
+		 * Calculates the dividend percentage increases from start with latest and descent
+		 *
 		 * @var Calendar $calendar
 		 */
 		foreach ($reverseCalendars as $index => $calendar) {
@@ -428,10 +443,10 @@ class PortfolioController extends AbstractController
 			}
 		}
 
-		$dividends = $paymentRepository->getSumDividends([$ticker->getId()]);
-		$dividend = 0;
-		if (!empty($dividends) && $ticker->getId() != null) {
-			$dividend = $dividends[$ticker->getId()];
+		$dividendsReceivedPerTicker = $paymentRepository->getSumDividends([$ticker->getId()]);
+		$dividendsReceived = 0.0;
+		if (!empty($dividendsReceivedPerTicker) && $ticker->getId() != null) {
+			$dividendsReceived = $dividendsReceivedPerTicker[$ticker->getId()];
 		}
 
 		/**
@@ -473,11 +488,11 @@ class PortfolioController extends AbstractController
 		return $this->render('portfolio/show/_info.html.twig', [
 			'ticker' => $ticker,
 			'position' => $position,
-			'dividend' => $dividend,
+			'dividend' => $dividendsReceived,
 			'percentageAllocated' => $percentageAllocation,
 			'netCashAmount' => $netCashAmount,
 			'amountPerDate' => $amountPerDate,
-			'expectedPayout' => $netCashAmount * $amountPerDate,
+			'expectedPayout' => $netCashAmount * $position->getAdjustedAmount(),
 			'yearlyForwardDividendPayout' => $yearlyForwardDividendPayout,
 			'singleTimeForwarddividendPayout' => $singleTimeForwarddividendPayout,
 			'dividendYield' => $dividendYield,
@@ -495,9 +510,16 @@ class PortfolioController extends AbstractController
 	]
 	public function showPosition(
 		Position $position,
-		PositionRepository $positionRepository
+		PositionRepository $positionRepository,
+		AdjustedPositionDecoratorFactory $adjustedPositionDecorator,
+
 	): Response {
 		$position = $positionRepository->getForPosition($position);
+
+		$positionDecorator = $adjustedPositionDecorator->decorate($position);
+		$position->setAdjustedAmount($positionDecorator->getAdjustedAmount());
+		$position->setAdjustedAveragePrice($positionDecorator->getAdjustedAveragePrice());
+
 
 		return $this->render('portfolio/show/position/_position.html.twig', [
 			'position' => $position,

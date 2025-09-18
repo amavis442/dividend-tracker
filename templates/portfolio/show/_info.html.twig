@@ -52,7 +52,7 @@
 		<twig:Table:Tr>
 			<twig:Table:ThRow>{{ 'Amount'|trans }}
 				#</twig:Table:ThRow>
-			<twig:Table:Td>{{ (position.amount)|format_number({fraction_digit: 7}) }}</twig:Table:Td>
+			<twig:Table:Td>{{ (position.adjustedAmount)|format_number({fraction_digit: 7}) }}</twig:Table:Td>
 		</twig:Table:Tr>
 		<twig:Table:Tr>
 			<twig:Table:ThRow>{{ 'Dividend frequency'|trans }}</twig:Table:ThRow>
@@ -98,7 +98,7 @@
 		</twig:Table:Tr>
 		<twig:Table:Tr>
 			<twig:Table:ThRow>{{ 'Weighted average price'|trans }}</twig:Table:ThRow>
-			<twig:Table:Td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.price)|format_number({fraction_digit: 2}) }}</twig:Table:Td>
+			<twig:Table:Td>{{ (position.currency ? position.currency.sign : '$')|raw }}{{ (position.adjustedAveragePrice)|format_number({fraction_digit: 2}) }}</twig:Table:Td>
 		</twig:Table:Tr>
 		<twig:Table:Tr>
 			<twig:Table:ThRow>{{ 'Allocation'|trans }}</twig:Table:ThRow>
