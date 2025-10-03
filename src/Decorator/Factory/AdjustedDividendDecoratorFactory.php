@@ -3,6 +3,7 @@ namespace App\Decorator\Factory;
 
 use App\Entity\Position;
 use App\Decorator\AdjustedDividendDecorator;
+use App\Decorator\AdjustedDividendDecoratorInterface;
 use App\Repository\DividendCalendarRepository;
 use App\Repository\CorporateActionRepository;
 use App\Service\DividendAdjuster;
@@ -16,7 +17,7 @@ class AdjustedDividendDecoratorFactory
 	) {
 	}
 
-	public function decorate(Position $position): AdjustedDividendDecorator
+	public function decorate(Position $position): AdjustedDividendDecoratorInterface
 	{
 		return new AdjustedDividendDecorator(
 			position: $position,

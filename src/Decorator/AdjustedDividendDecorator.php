@@ -3,12 +3,13 @@ namespace App\Decorator;
 
 use App\Entity\Position;
 use App\Entity\Calendar;
+use App\Entity\CorporateAction;
 use App\Repository\CorporateActionRepository;
 use App\Repository\DividendCalendarRepository;
 use App\Service\DividendAdjuster;
 use Doctrine\Common\Collections\ArrayCollection;
 
-class AdjustedDividendDecorator
+class AdjustedDividendDecorator implements AdjustedDecoratorInterface, AdjustedDividendDecoratorInterface
 {
 	private ?array $cachedDividends = null;
 	private ?array $cachedActions = null;
@@ -44,7 +45,7 @@ class AdjustedDividendDecorator
 			$this->cachedActions = $this->actionRepo->findBy(
 				[
 					'position' => $this->position->getId(),
-					'type' => 'reverse_split',
+					'type' => [CorporateAction::REVERSE_SPLIT, CorporateAction::SPLIT],
 				],
 				['eventDate' => 'ASC']
 			);
