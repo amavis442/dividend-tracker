@@ -5,6 +5,8 @@ namespace App\Controller\Portfolio;
 use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 use App\DataProvider\PositionDataProvider;
+use App\DataProvider\CorporateActionDataProvider;
+
 use App\Entity\Calendar;
 use App\Entity\Portfolio;
 use App\Entity\PortfolioGoal;
@@ -372,6 +374,7 @@ class PortfolioController extends AbstractController
 		ExchangeAndTaxResolverInterface $exchangeAndTaxResolver,
 		AdjustedDividendDecoratorFactory $adjustedDividendDecorator,
 		PositionDataProvider $positionDataProvider,
+		CorporateActionDataProvider $corporateActionDataProvider,
 		AdjustedPositionDecoratorFactory $adjustedPositionDecorator,
 	): Response {
 		$ticker = $position->getTicker();
@@ -384,8 +387,9 @@ class PortfolioController extends AbstractController
 		$nextDividendExDiv = null;
 		$nextDividendPayout = null;
 
-		$data = $positionDataProvider->load([$position]);
-		$adjustedPositionDecorator->load($data['transactions'], $data['actions']);
+		$transactions = $positionDataProvider->load([$position]);
+		$actions = $corporateActionDataProvider->load([$position]);
+		$adjustedPositionDecorator->load($transactions, $actions);
 		$positionDecorator = $adjustedPositionDecorator->decorate($position);
 
 
@@ -516,13 +520,16 @@ class PortfolioController extends AbstractController
 		Position $position,
 		PositionRepository $positionRepository,
 		PositionDataProvider $positionDataProvider,
+		CorporateActionDataProvider $corporateActionDataProvider,
 		AdjustedPositionDecoratorFactory $adjustedPositionDecorator,
 
 	): Response {
 		$position = $positionRepository->getForPosition($position);
 
-		$data = $positionDataProvider->load([$position]);
-		$adjustedPositionDecorator->load($data['transactions'], $data['actions']);
+		$transactions = $positionDataProvider->load([$position]);
+		$corporateActions = $corporateActionDataProvider->load([$position]);
+
+		$adjustedPositionDecorator->load($transactions,$corporateActions);
 		$positionDecorator = $adjustedPositionDecorator->decorate($position);
 
 		$position->setAdjustedAmount($positionDecorator->getAdjustedAmount());

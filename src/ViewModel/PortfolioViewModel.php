@@ -5,6 +5,7 @@ namespace App\ViewModel;
 use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 use App\DataProvider\PositionDataProvider;
+use App\DataProvider\CorporateActionDataProvider;
 use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
@@ -25,6 +26,7 @@ class PortfolioViewModel
 		private AdjustedPositionDecoratorFactory $adjustedPositionFactory,
 		private AdjustedDividendDecoratorFactory $adjustedDividendDecoratorFactory,
 		private PositionDataProvider $positionDataProvider,
+		private CorporateActionDataProvider $corporateActionDataProvider,
 		private int $maxPerPage = 10
 	) {
 	}
@@ -43,14 +45,16 @@ class PortfolioViewModel
 
 		$currentDate = new DateTime();
 
-		$data = $this->positionDataProvider->load(iterator_to_array($positions));
+		$transactions = $this->positionDataProvider->load(iterator_to_array($positions));
+		$actions = $this->corporateActionDataProvider->load(iterator_to_array($positions));
 
 		/**
 		 * @var Position $position
 		 */
 		foreach ($positions as $position) {
+			$pid = $position->getId();
 
-			$this->adjustedPositionFactory->load($data['transactions'], $data['actions']);
+			$this->adjustedPositionFactory->load($transactions[$pid], $actions[$pid]);
 			$decorator = $this->adjustedPositionFactory->decorate($position);
 			$amount = $decorator->getAdjustedAmount();
 			$note = $decorator->getAdjustmentNote();

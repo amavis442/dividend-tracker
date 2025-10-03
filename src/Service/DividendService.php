@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\Collection;
 
 use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
 use App\DataProvider\PositionDataProvider;
+use App\DataProvider\CorporateActionDataProvider;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 
 class DividendService implements DividendServiceInterface
@@ -58,6 +59,7 @@ class DividendService implements DividendServiceInterface
 		protected ShareEligibilityCalculatorInterface $shareEligibilityCalculator,
 		protected ExchangeAndTaxResolverInterface $exchangeAndTaxResolver,
 		protected PositionDataProvider $positionDataProvider,
+		protected CorporateActionDataProvider $corporateActionDataProvider,
 		protected AdjustedPositionDecoratorFactory $adjustedPositionDecoratorFactory,
 		protected AdjustedDividendDecoratorFactory $adjustedDividendDecoratorFactory,
 		protected DividendCalendarRepository $dividendCalendarRepository
@@ -80,9 +82,10 @@ class DividendService implements DividendServiceInterface
 		if (isset($this->cachedPositionData[$pid])) {
 			return $this->cachedPositionData[$pid];
 		}
-		$data = $this->positionDataProvider->load([$position]);
+		$transactions = $this->positionDataProvider->load([$position]);
+		$actions = $this->corporateActionDataProvider->load([$position]);
 
-		$this->cachedPositionData[$pid] = $data;
+		$this->cachedPositionData[$pid] = ['transactions' => $transactions, 'actions' => $actions];
 
 		return $this->cachedPositionData[$pid];
 	}

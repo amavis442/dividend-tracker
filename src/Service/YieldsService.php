@@ -11,6 +11,7 @@ use App\Service\DividendExchangeRateResolverInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 use App\DataProvider\PositionDataProvider;
+use App\DataProvider\CorporateActionDataProvider;
 
 class YieldsService
 {
@@ -22,6 +23,7 @@ class YieldsService
 		private DividendService $dividendService,
 		private DividendExchangeRateResolverInterface $dividendExchangeRateResolver,
 		private PositionDataProvider $positionDataProvider,
+		private CorporateActionDataProvider $corporateActionDataProvider,
 		private AdjustedPositionDecoratorFactory $adjustedPositionDecoratorFactory,
 	) {
 	}
@@ -62,6 +64,9 @@ class YieldsService
 		$dividendYieldOnCost = 0.0;
 		$totalAvgYield = 0.0;
 
+		$transactions = $this->positionDataProvider->load($positions);
+		$actions = $this->corporateActionDataProvider->load($positions);
+
 		/**
 		 * @var \App\Entity\Position $position
 		 */
@@ -73,8 +78,9 @@ class YieldsService
 
 			$amount = $position->getAmount();
 
-			$data = $this->positionDataProvider->load([$position]);
-			$this->adjustedPositionDecoratorFactory->load($data['transactions'], $data['actions']);
+			$pid = $position->getId();
+
+			$this->adjustedPositionDecoratorFactory->load($transactions[$pid], $actions[$pid]);
 			$positionDecorator = $this->adjustedPositionDecoratorFactory->decorate($position);
 			$position->setAdjustedAmount($positionDecorator->getAdjustedAmount());
 			$position->setAdjustedAveragePrice($positionDecorator->getAdjustedAveragePrice());

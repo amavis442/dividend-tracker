@@ -478,4 +478,12 @@ class DividendCalendarRepository extends ServiceEntityRepository
 			->getQuery()
 			->getResult();
 	}
+
+	public function findByTickerIds(array $tickerIds): array
+	{
+		return $this->findBy(
+			['ticker' => $tickerIds],
+			['paymentDate' => 'ASC']
+		);
+	}
 }

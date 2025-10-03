@@ -2,13 +2,13 @@
 
 namespace App\DataProvider;
 
-use App\Repository\TransactionRepository;
+use App\Repository\CorporateActionRepository;
 use App\Entity\Position;
 
-class PositionDataProvider
+class CorporateActionDataProvider
 {
 	public function __construct(
-		private TransactionRepository $txRepo,
+		private CorporateActionRepository $actionRepo
 	) {
 	}
 
@@ -17,16 +17,15 @@ class PositionDataProvider
 	 *
 	 * @param Position[] $positions
 	 *
-	 * @return array<int, array<int ,\App\Entity\Transaction>>
+	 * @return array<int, array<int, \App\Entity\CorporateAction>>
 	 */
 	public function load(array $positions): array
 	{
 		$ids = array_map(fn(Position $p) => $p->getId(), $positions);
 
-		return
-			$this->mapByPosition(
-				$this->txRepo->findByPositionIds($ids)
-			);
+		return  $this->mapByPosition(
+				$this->actionRepo->findByPositionIds($ids)
+		);
 	}
 
 	private function mapByPosition(array $entities): array
