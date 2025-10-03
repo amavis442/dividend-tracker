@@ -54,7 +54,7 @@ class PortfolioViewModel
 		foreach ($positions as $position) {
 			$pid = $position->getId();
 
-			$this->adjustedPositionFactory->load($transactions[$pid], $actions[$pid]);
+			$this->adjustedPositionFactory->load($transactions[$pid] ?? [], $actions[$pid] ?? []);
 			$decorator = $this->adjustedPositionFactory->decorate($position);
 			$amount = $decorator->getAdjustedAmount();
 			$note = $decorator->getAdjustmentNote();

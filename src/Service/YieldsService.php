@@ -80,7 +80,7 @@ class YieldsService
 
 			$pid = $position->getId();
 
-			$this->adjustedPositionDecoratorFactory->load($transactions[$pid], $actions[$pid]);
+			$this->adjustedPositionDecoratorFactory->load($transactions[$pid] ?? [], $actions[$pid] ?? []);
 			$positionDecorator = $this->adjustedPositionDecoratorFactory->decorate($position);
 			$position->setAdjustedAmount($positionDecorator->getAdjustedAmount());
 			$position->setAdjustedAveragePrice($positionDecorator->getAdjustedAveragePrice());
