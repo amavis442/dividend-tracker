@@ -74,7 +74,7 @@ class CorporateActionRepository extends ServiceEntityRepository
 
 	public function findByPositionIds(array $positionIds): array
 	{
-		return $this->findBy([
+		return $this->findBy(
 			[
 				'position' => $positionIds,
 				'type' => [
@@ -83,6 +83,6 @@ class CorporateActionRepository extends ServiceEntityRepository
 				],
 			],
 			['eventDate' => 'ASC'],
-		]);
+		);
 	}
 }
