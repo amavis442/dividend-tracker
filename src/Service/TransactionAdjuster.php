@@ -6,7 +6,7 @@ use App\Entity\Transaction;
 use App\Entity\CorporateAction;
 use Doctrine\Common\Collections\Collection;
 
-class TransactionAdjuster
+class TransactionAdjuster implements TransactionAdjusterInterface
 {
     /**
      * Adjusts a transaction amount based on corporate actions.

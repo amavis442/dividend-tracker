@@ -255,8 +255,8 @@ class PositionRepository extends ServiceEntityRepository
 	}
 
 	public function getAllOpenForProjection(
-		int $pieId = null,
-		int $year = null
+		?int $pieId = null,
+		?int $year = null
 	): array {
 		$qb = $this->createQueryBuilder('p')
 			->select('p, t, pa, pac, c, dm, tr')
@@ -285,8 +285,8 @@ class PositionRepository extends ServiceEntityRepository
 	}
 
 	public function getAllOpenPaymentsForProjection(
-		int $pieId = null,
-		int $year = null
+		?int $pieId = null,
+		?int $year = null
 	): array {
 		$qb = $this->createQueryBuilder('p')
 			->select('p, t, pa, pac')
@@ -322,7 +322,7 @@ class PositionRepository extends ServiceEntityRepository
 
 	public function getAllOpen(
 		?Pie $pie = null,
-		int $year = null,
+		?int $year = null,
 		string $sort = 'symbol',
 		string $sortDirection = 'ASC'
 	): array {

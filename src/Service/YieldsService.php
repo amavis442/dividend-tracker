@@ -10,6 +10,7 @@ use App\Repository\TransactionRepository;
 use App\Service\DividendExchangeRateResolverInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
+use App\DataProvider\PositionDataProvider;
 
 class YieldsService
 {
@@ -20,6 +21,7 @@ class YieldsService
 		private TransactionRepository $transactionRepository,
 		private DividendService $dividendService,
 		private DividendExchangeRateResolverInterface $dividendExchangeRateResolver,
+		private PositionDataProvider $positionDataProvider,
 		private AdjustedPositionDecoratorFactory $adjustedPositionDecoratorFactory,
 	) {
 	}
@@ -33,14 +35,7 @@ class YieldsService
 
 		$this->stopwatch->start('yield-data', 'pie-yield');
 
-		$poolKey = 'positions_for_yield' . ($pie ? '_' . $pie->getId() : '');
-		/* $yieldData = $this->pool->get($poolKey, function (
-			ItemInterface $item
-		) use ($positionRepository, $dividendService, $pie): PositionYield {
-		*/
 		$positionYield = new PositionYield();
-
-		//$item->expiresAfter(3600);
 
 		$this->stopwatch->start('getting-positions-from-database', 'parsing');
 		if ($pie) {
@@ -56,14 +51,6 @@ class YieldsService
 			return [];
 		}
 
-		/*
-		$this->stopwatch->start(
-			'getting-sumallocated-from-database',
-			'parsing'
-		);
-		$allocated = $positionRepository->getSumAllocated($pie);
-		$this->stopwatch->stop('getting-sumallocated-from-database');
-		*/
 		$allocated = 0.0;
 
 		$this->stopwatch->start('processing-file', 'parsing');
@@ -84,19 +71,13 @@ class YieldsService
 					? $report[$position->getId()]['avgPrice']
 					: $position->getPrice();
 
-			//$amount = $dividendService->getSharesPerPositionAmount($position);
 			$amount = $position->getAmount();
 
+			$data = $this->positionDataProvider->load([$position]);
+			$this->adjustedPositionDecoratorFactory->load($data['transactions'], $data['actions']);
 			$positionDecorator = $this->adjustedPositionDecoratorFactory->decorate($position);
 			$position->setAdjustedAmount($positionDecorator->getAdjustedAmount());
 			$position->setAdjustedAveragePrice($positionDecorator->getAdjustedAveragePrice());
-
-			/*
-			$amount =
-				$pie && $report[$position->getId()]
-					? $report[$position->getId()]['amount']
-					: $position->getAmount();
-			*/
 
 			$allocation =
 				$pie && $report[$position->getId()]

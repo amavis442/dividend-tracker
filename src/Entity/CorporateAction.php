@@ -9,6 +9,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\HasLifecycleCallbacks]
 class CorporateAction
 {
+    public const REVERSE_SPLIT = 'reverse_split';
+    public const SPLIT = 'split';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

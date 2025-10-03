@@ -3,33 +3,39 @@ namespace App\Decorator;
 
 use App\Entity\Position;
 use App\Entity\Transaction;
-use App\Repository\CorporateActionRepository;
-use App\Repository\TransactionRepository;
-use App\Service\TransactionAdjuster;
+use App\Entity\CorporateAction;
+use App\Service\TransactionAdjusterInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 
-class AdjustedPositionDecorator
+class AdjustedPositionDecorator implements AdjustedDecoratorInterface,AdjustedPositionDecoratorInterface
 {
-	private ?array $cachedTransactions = null;
-	private ?array $cachedActions = null;
+	private ?ArrayCollection $cachedTransactions = null;
+	private ?ArrayCollection $cachedActions = null;
 
+	/**
+	 * @param Position $position
+	 *
+	 * @param array<int, \App\Entity\Transaction> $transactions
+	 *
+	 * @param array<int, \App\Entity\CorporateAction> $actions
+	 *
+	 * @param App\Service\TransactionAdjusterInterface $transactionAdjuster
+	 */
 	public function __construct(
 		private Position $position,
-		private TransactionRepository $transactionRepo,
-		private CorporateActionRepository $actionRepo,
-		private TransactionAdjuster $transactionAdjuster
+		private array $transactions,
+		private array $actions,
+		private TransactionAdjusterInterface $transactionAdjuster
 	) {
 	}
 
 	/**
 	 * Caches the transactions so it will not waste resources
 	 */
-	private function getTransactions(): array
+	private function getTransactions(): ArrayCollection
 	{
 		if ($this->cachedTransactions === null) {
-			$this->cachedTransactions = $this->transactionRepo->findBy([
-				'position' => $this->position->getId(),
-			]);
+			$this->cachedTransactions = new ArrayCollection($this->transactions);
 		}
 
 		return $this->cachedTransactions;
@@ -38,16 +44,10 @@ class AdjustedPositionDecorator
 	/**
 	 * Caches the actions so it will not waste resources
 	 */
-	private function getActions(): array
+	private function getActions(): ArrayCollection
 	{
 		if ($this->cachedActions === null) {
-			$this->cachedActions = $this->actionRepo->findBy(
-				[
-					'position' => $this->position->getId(),
-					'type' => 'reverse_split',
-				],
-				['eventDate' => 'ASC']
-			);
+			$this->cachedActions = new ArrayCollection($this->actions);
 		}
 
 		return $this->cachedActions;
@@ -67,7 +67,7 @@ class AdjustedPositionDecorator
 	public function getAdjustedAmount(): float
 	{
 		$transactions = $this->getTransactions();
-		$actions = new ArrayCollection($this->getActions());
+		$actions =$this->getActions();
 
 		$total = 0.0;
 
@@ -95,7 +95,7 @@ class AdjustedPositionDecorator
 	public function getAdjustedAmountPerDate(\DateTimeInterface $datetime): float
 	{
 		$transactions = $this->getTransactions();
-		$actions = new ArrayCollection($this->getActions());
+		$actions = $this->getActions();
 
 		$total = 0.0;
 		$timestamp = $datetime->format('Ymd');
@@ -135,7 +135,7 @@ class AdjustedPositionDecorator
 	public function getAdjustedAveragePrice(): float
 	{
 		$transactions = $this->getTransactions();
-		$actions = new ArrayCollection($this->getActions());
+		$actions = $this->getActions();
 
 		$totalShares = 0.0;
 		$totalCost = 0.0;
@@ -169,7 +169,7 @@ class AdjustedPositionDecorator
 	public function getAdjustedAveragePricePerDate(\DateTimeInterface $datetime): float
 	{
 		$transactions = $this->getTransactions();
-		$actions = new ArrayCollection($this->getActions());
+		$actions = $this->getActions();
 
 		$totalShares = 0.0;
 		$totalCost = 0.0;
@@ -207,10 +207,11 @@ class AdjustedPositionDecorator
 
 	public function getAdjustmentNote(): ?string
 	{
-		$actions = $this->actionRepo->findBy(
-			['position' => $this->position->getId(), 'type' => 'reverse_split'],
+		/* $actions = $this->actionRepo->findBy(
+			['position' => $this->position->getId(), 'type' => [CorporateAction::REVERSE_SPLIT, CorporateAction::SPLIT]],
 			['eventDate' => 'ASC']
-		);
+		); */
+		$actions = $this->actions;
 
 		if (empty($actions)) {
 			return null;

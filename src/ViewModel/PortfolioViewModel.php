@@ -4,6 +4,7 @@ namespace App\ViewModel;
 
 use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
+use App\DataProvider\PositionDataProvider;
 use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
@@ -19,11 +20,11 @@ class PortfolioViewModel
 {
 	public function __construct(
 		private Stopwatch $stopwatch,
-		//private MetricsUpdateService $metricsUpdate,
 		private DividendServiceInterface $dividendService,
 		private PositionRepository $positionRepository,
-		private AdjustedPositionDecoratorFactory $adjustedFactory,
+		private AdjustedPositionDecoratorFactory $adjustedPositionFactory,
 		private AdjustedDividendDecoratorFactory $adjustedDividendDecoratorFactory,
+		private PositionDataProvider $positionDataProvider,
 		private int $maxPerPage = 10
 	) {
 	}
@@ -42,13 +43,15 @@ class PortfolioViewModel
 
 		$currentDate = new DateTime();
 
-
+		$data = $this->positionDataProvider->load(iterator_to_array($positions));
 
 		/**
 		 * @var Position $position
 		 */
 		foreach ($positions as $position) {
-			$decorator = $this->adjustedFactory->decorate($position);
+
+			$this->adjustedPositionFactory->load($data['transactions'], $data['actions']);
+			$decorator = $this->adjustedPositionFactory->decorate($position);
 			$amount = $decorator->getAdjustedAmount();
 			$note = $decorator->getAdjustmentNote();
 
@@ -165,7 +168,7 @@ class PortfolioViewModel
 		$baseAdapter = new QueryAdapter($queryBuilder);
 		$adapter = new AdjustedPositionAdapter(
 			$baseAdapter,
-			$this->adjustedFactory
+			$this->adjustedPositionFactory
 		);
 
 		$pagerfanta = new Pagerfanta($adapter);

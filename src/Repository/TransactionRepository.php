@@ -229,4 +229,10 @@ class TransactionRepository extends ServiceEntityRepository
 			->getQuery()
 			->execute();
 	}
+
+	public function findByPositionIds(array $positionIds): array {
+		return $this->findBy([
+				'position' => $positionIds,
+			]);
+	}
 }

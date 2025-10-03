@@ -45,19 +45,16 @@ class AdjustedPositionDecoratorTest extends TestCase
 		$tx3->setSide(Transaction::BUY);
 		$tx3->setTransactionDate(new \DateTime('2024-07-01')); // after split
 
+		$transactions = [$transaction,$tx2,$tx3];
+
 		$action = new CorporateAction();
 		$action->setPosition($position);
 		$action->setType('reverse_split');
 		$action->setRatio(0.2); // 5:1 reverse split
 		$action->setEventDate(new \DateTime('2024-06-15'));
 
-		$transactionRepoMock = $this->createMock(TransactionRepository::class);
-		$transactionRepoMock
-			->method('findBy')
-			->willReturn([$transaction, $tx2, $tx3]);
+		$corporateActions = [$action];
 
-		$actionRepoMock = $this->createMock(CorporateActionRepository::class);
-		$actionRepoMock->method('findBy')->willReturn([$action]);
 
 		$adjusterMock = $this->createMock(TransactionAdjuster::class);
 		$adjusterMock
@@ -74,8 +71,8 @@ class AdjustedPositionDecoratorTest extends TestCase
 
 		$decorator = new AdjustedPositionDecorator(
 			position: $position,
-			transactionRepo: $transactionRepoMock,
-			actionRepo: $actionRepoMock,
+			transactions: $transactions,
+			actions: $corporateActions,
 			transactionAdjuster: $adjusterMock
 		);
 

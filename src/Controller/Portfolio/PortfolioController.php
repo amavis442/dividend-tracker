@@ -4,9 +4,8 @@ namespace App\Controller\Portfolio;
 
 use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
-use App\Dto\ExchangeTaxDto;
+use App\DataProvider\PositionDataProvider;
 use App\Entity\Calendar;
-use App\Entity\Pie;
 use App\Entity\Portfolio;
 use App\Entity\PortfolioGoal;
 use App\Entity\Position;
@@ -233,7 +232,7 @@ class PortfolioController extends AbstractController
 			'user' => $user->getId(),
 		]);
 		if (!$portfolio) {
-			$portfolio = new Portfolio(); // do not want to trhow an exception but just use an empty entity
+			$portfolio = new Portfolio(); // do not want to throw an exception, but just use an empty entity
 		}
 
 		$allocated = $portfolio->getInvested();
@@ -372,6 +371,7 @@ class PortfolioController extends AbstractController
 		DividendServiceInterface $dividendService,
 		ExchangeAndTaxResolverInterface $exchangeAndTaxResolver,
 		AdjustedDividendDecoratorFactory $adjustedDividendDecorator,
+		PositionDataProvider $positionDataProvider,
 		AdjustedPositionDecoratorFactory $adjustedPositionDecorator,
 	): Response {
 		$ticker = $position->getTicker();
@@ -384,7 +384,11 @@ class PortfolioController extends AbstractController
 		$nextDividendExDiv = null;
 		$nextDividendPayout = null;
 
+		$data = $positionDataProvider->load([$position]);
+		$adjustedPositionDecorator->load($data['transactions'], $data['actions']);
 		$positionDecorator = $adjustedPositionDecorator->decorate($position);
+
+
 		$dividendDecorator = $adjustedDividendDecorator->decorate($position);
 		$adjustedDividends = $dividendDecorator->getAdjustedDividend();
 
@@ -511,12 +515,16 @@ class PortfolioController extends AbstractController
 	public function showPosition(
 		Position $position,
 		PositionRepository $positionRepository,
+		PositionDataProvider $positionDataProvider,
 		AdjustedPositionDecoratorFactory $adjustedPositionDecorator,
 
 	): Response {
 		$position = $positionRepository->getForPosition($position);
 
+		$data = $positionDataProvider->load([$position]);
+		$adjustedPositionDecorator->load($data['transactions'], $data['actions']);
 		$positionDecorator = $adjustedPositionDecorator->decorate($position);
+
 		$position->setAdjustedAmount($positionDecorator->getAdjustedAmount());
 		$position->setAdjustedAveragePrice($positionDecorator->getAdjustedAveragePrice());
 

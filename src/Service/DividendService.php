@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Calendar;
-use App\Entity\Constants;
+use App\Util\Constants;
 use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
@@ -12,6 +12,10 @@ use App\Repository\DividendCalendarRepository;
 use App\Service\DividendAdjuster;
 use App\Service\TransactionAdjuster;
 use Doctrine\Common\Collections\Collection;
+
+use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
+use App\DataProvider\PositionDataProvider;
+use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 
 class DividendService implements DividendServiceInterface
 {
@@ -46,16 +50,43 @@ class DividendService implements DividendServiceInterface
 
 	protected float $netDividendYield = 0.0;
 
+	protected ?array $cachedPositionData;
+
 	public function __construct(
 		protected DividendExchangeRateResolverInterface $dividendExchangeRateResolver,
 		protected DividendTaxRateResolverInterface $dividendTaxRateResolver,
 		protected ShareEligibilityCalculatorInterface $shareEligibilityCalculator,
 		protected ExchangeAndTaxResolverInterface $exchangeAndTaxResolver,
-		protected DividendAdjuster $dividendAdjuster,
-		protected TransactionAdjuster $transactionAdjuster,
+		protected PositionDataProvider $positionDataProvider,
+		protected AdjustedPositionDecoratorFactory $adjustedPositionDecoratorFactory,
+		protected AdjustedDividendDecoratorFactory $adjustedDividendDecoratorFactory,
 		protected DividendCalendarRepository $dividendCalendarRepository
 	) {
 	}
+
+	/**
+	 * Loads the data for an decorator or returns it from cache if it is already loaded
+	 *
+	 * @param Position $position
+	 *
+	 * @return array{
+	 *     transactions: array<int, array<int, \App\Entity\Transaction>>,
+	 *     actions: array<int, array<int, \App\Entity\CorporateAction>>
+	 * }
+	 */
+	protected function getChachedDataForPosition(Position $position): array {
+		$pid = $position->getId();
+
+		if (isset($this->cachedPositionData[$pid])) {
+			return $this->cachedPositionData[$pid];
+		}
+		$data = $this->positionDataProvider->load([$position]);
+
+		$this->cachedPositionData[$pid] = $data;
+
+		return $this->cachedPositionData[$pid];
+	}
+
 
 	/**
 	 * Get the exchange rate and tax rate
@@ -152,6 +183,7 @@ class DividendService implements DividendServiceInterface
 	 * How many shares are applicable on ex dividenddate
 	 *
 	 * @param Calendar $calendar
+	 *
 	 * @return float|null
 	 */
 	public function getPositionAmount(Calendar $calendar): ?float
@@ -162,28 +194,11 @@ class DividendService implements DividendServiceInterface
 			return 0.0;
 		}
 
-		$transactions = $position->getTransactions();
-		$actions = $position->getCorporateActions(); // or use $position->getCorporateActions() if scoped
-		$eligibleTransactions = $this->shareEligibilityCalculator->filterEligibleTransactions(
-			$transactions,
-			$calendar
-		);
+		$data = $this->getChachedDataForPosition($position);
+		$this->adjustedPositionDecoratorFactory->load($data['transactions'], $data['actions']);
+		$decoratePosition = $this->adjustedPositionDecoratorFactory->decorate($position);
 
-		$adjustedAmount = 0.0;
-
-		foreach ($eligibleTransactions as $transaction) {
-			$adjusted = $this->transactionAdjuster->getAdjustedAmount(
-				$transaction,
-				$actions
-			);
-			if ($transaction->getSide() === Transaction::BUY) {
-				$adjustedAmount += $adjusted;
-			} elseif ($transaction->getSide() === Transaction::SELL) {
-				$adjustedAmount -= $adjusted;
-			}
-		}
-
-		return $adjustedAmount > 0 ? $adjustedAmount : 0.0;
+		return $decoratePosition->getAdjustedAmountPerDate($calendar->getExDividendDate());
 	}
 
 	/**
@@ -194,23 +209,12 @@ class DividendService implements DividendServiceInterface
 	 */
 	public function getSharesPerPositionAmount(Position $position): ?float
 	{
-		$transactions = $position->getTransactions();
-		$actions = $position->getCorporateActions(); // or use $position->getCorporateActions() if scoped
-		$adjustedAmount = 0.0;
 
-		foreach ($transactions as $transaction) {
-			$adjusted = $this->transactionAdjuster->getAdjustedAmount(
-				$transaction,
-				$actions
-			);
-			if ($transaction->getSide() === Transaction::BUY) {
-				$adjustedAmount += $adjusted;
-			} elseif ($transaction->getSide() === Transaction::SELL) {
-				$adjustedAmount -= $adjusted;
-			}
-		}
+		$data = $this->getChachedDataForPosition($position);
+		$this->adjustedPositionDecoratorFactory->load($data['transactions'], $data['actions']);
+		$decoratePosition = $this->adjustedPositionDecoratorFactory->decorate($position);
 
-		return $adjustedAmount > 0 ? $adjustedAmount : 0.0;
+		return $decoratePosition->getAdjustedAmount();
 	}
 
 
@@ -234,11 +238,9 @@ class DividendService implements DividendServiceInterface
 			return 0.0;
 		}
 
-		$adjustedCashAmount = $this->dividendAdjuster->getAdjustedDividend(
-			$cashAmount,
-			$calendar->getCreatedAt(),
-			$position->getCorporateActions()
-		);
+		$dividendDecorator = $this->adjustedDividendDecoratorFactory->decorate($position);
+		$adjustedDividends = $dividendDecorator->getAdjustedDividend();
+		$adjustedCashAmount = $adjustedDividends[$calendar->getId()]['adjusted'];
 
 		if ($this->accumulateDividendAmount) {
 			$cashAmount = $this->getCashAmount($ticker);
@@ -290,14 +292,10 @@ class DividendService implements DividendServiceInterface
 		$calendar = $this->getRegularCalendar($ticker);
 		$position = $ticker->getPositions()->first();
 
-		$adjustedCashAmount = $this->dividendAdjuster->getAdjustedDividend(
-			$calendar ? $calendar->getCashAmount() : 0.0,
-			$calendar->getCreatedAt(),
-			$position->getCorporateActions()
-		);
+		$dividendDecorator = $this->adjustedDividendDecoratorFactory->decorate($position);
+		$dividends = $dividendDecorator->getAdjustedDividend();
+		$adjustedCashAmount = $dividends[$calendar->getId()]['adjusted'];
 
-
-		//return $calendar ? $calendar->getCashAmount() : 0.0;
 		return $adjustedCashAmount;
 	}
 
@@ -389,8 +387,6 @@ class DividendService implements DividendServiceInterface
 				continue;
 			}
 
-			//$this->dividendAdjuster->getAdjustedDividend(); TODO
-
 			$ticker = $calendar->getTicker()->getSymbol();
 			$position = $calendar->getTicker()->getPositions()->first();
 			$taxRate = $this->dividendTaxRateResolver->getTaxRateForCalendar($calendar);
@@ -398,11 +394,9 @@ class DividendService implements DividendServiceInterface
 				$calendar
 			);
 
-			$adjustedCashAmount = $this->dividendAdjuster->getAdjustedDividend(
-				$calendar ? $calendar->getCashAmount() : 0.0,
-				$calendar->getCreatedAt(),
-				$position->getCorporateActions()
-			);
+			$dividendDecorator = $this->adjustedDividendDecoratorFactory->decorate($position);
+			$dividends = $dividendDecorator->getAdjustedDividend();
+			$adjustedCashAmount = $dividends[$calendar->getId()]['adjusted'];
 
 			$tax = $adjustedCashAmount * $exchangeRate * $taxRate;
 
@@ -477,9 +471,14 @@ class DividendService implements DividendServiceInterface
 	public function getNetDividendPerShare(?Position $position): ?float
 	{
 		if (!$this->netDividendPerShare && $position) {
+			$data = $this->getChachedDataForPosition($position);
+			$this->adjustedPositionDecoratorFactory->load($data['transactions'], $data['actions']);
+			$positionDecorator = $this->adjustedPositionDecoratorFactory->decorate($position);
+			$amount = $positionDecorator->getAdjustedAmount();
+
 			$this->getForwardNetDividend(
 				$position->getTicker(),
-				$position->getAmount()
+				$amount ,//$position->getAmount()
 			);
 		}
 

@@ -4,31 +4,75 @@ namespace App\Decorator\Factory;
 
 use App\Entity\Position;
 use App\Decorator\AdjustedPositionDecorator;
-use App\Repository\TransactionRepository;
-use App\Repository\CorporateActionRepository;
-use App\Service\TransactionAdjuster;
+use App\Decorator\AdjustedPositionDecoratorInterface;
+use App\Service\TransactionAdjusterInterface;
 
 class AdjustedPositionDecoratorFactory
 {
+	private ?array $transactions = null;
+	private ?array $actions = null;
+
 	public function __construct(
-		private TransactionRepository $transactionRepo,
-		private CorporateActionRepository $actionRepo,
-        private TransactionAdjuster $transactionAdjuster,
+		private TransactionAdjusterInterface $transactionAdjuster
 	) {
 	}
 
-	public function decorate(Position $position): AdjustedPositionDecorator
+	public function setActions(array $actions): self
 	{
+		$this->actions = $actions;
+
+		return $this;
+	}
+
+	public function setTransactions(array $transactions): self
+	{
+		$this->transactions = $transactions;
+
+		return $this;
+	}
+
+	/**
+	 * Mass load needed data for decorator(s)
+	 *
+	 * @param array $transactions
+	 *
+	 * @param array $actions
+	 *
+	 * @return self
+	 *
+	 */
+	public function load(array $transactions, array $actions): self
+	{
+		$this->transactions = $transactions;
+		$this->actions = $actions;
+
+		return $this;
+	}
+
+	/**
+	 * Returns a decorator for 1 specific position
+	 *
+	 * @param Position $position
+	 *
+	 * @return AdjustedPositionDecoratorInterface
+	 */
+	public function decorate(
+		Position $position
+	): AdjustedPositionDecoratorInterface {
+		$pid = $position->getId();
+
 		return new AdjustedPositionDecorator(
 			position: $position,
-			transactionRepo: $this->transactionRepo,
-			actionRepo: $this->actionRepo,
+			transactions: $this->transactions[$pid] ?? [],
+			actions: $this->actions[$pid] ?? [],
 			transactionAdjuster: $this->transactionAdjuster
 		);
 	}
 
 	/**
-	 * Optionally decorate a batch of positions
+	 * Returns an array of decorators for all specified positions.
+	 *
+	 * @return array
 	 */
 	public function decorateBatch(array $positions): array
 	{
