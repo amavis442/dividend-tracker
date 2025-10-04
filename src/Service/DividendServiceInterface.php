@@ -19,6 +19,16 @@ use Doctrine\Common\Collections\Collection;
 interface DividendServiceInterface
 {
 	/**
+	 *
+	 * @param array<int, array<int, \App\Entity\Transaction>>
+	 *
+	 * @param array<int, array<int, \App\Entity\CorporateAction>>
+	 *
+	 * @param array<int, array<int, \App\Entity\Calendar>>
+	 */
+	public function load(array $transactions, array $corporateActions, array $dividends): self;
+
+	/**
 	 * Get the exchange rate and tax rate
 	 *
 	 * @param Position $position

@@ -6,6 +6,7 @@ use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 use App\DataProvider\PositionDataProvider;
 use App\DataProvider\CorporateActionDataProvider;
+use App\DataProvider\DividendDataProvider;
 use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
@@ -27,6 +28,7 @@ class PortfolioViewModel
 		private AdjustedDividendDecoratorFactory $adjustedDividendDecoratorFactory,
 		private PositionDataProvider $positionDataProvider,
 		private CorporateActionDataProvider $corporateActionDataProvider,
+		private DividendDataProvider $dividendDataProvider,
 		private int $maxPerPage = 10
 	) {
 	}
@@ -45,8 +47,24 @@ class PortfolioViewModel
 
 		$currentDate = new DateTime();
 
-		$transactions = $this->positionDataProvider->load(iterator_to_array($positions));
-		$actions = $this->corporateActionDataProvider->load(iterator_to_array($positions));
+		$transactions = $this->positionDataProvider->load(
+			iterator_to_array($positions)
+		);
+		$actions = $this->corporateActionDataProvider->load(
+			iterator_to_array($positions)
+		);
+
+		$tickers = array_map(function ($position) {
+			return $position->getTicker();
+		}, iterator_to_array($positions));
+
+		$dividends = $this->dividendDataProvider->load($tickers);
+
+		$this->dividendService->load(
+			transactions: $transactions,
+			corporateActions: $actions,
+			dividends: $dividends
+		);
 
 		/**
 		 * @var Position $position
@@ -54,15 +72,21 @@ class PortfolioViewModel
 		foreach ($positions as $position) {
 			$pid = $position->getId();
 
-			$this->adjustedPositionFactory->load($transactions[$pid] ?? [], $actions[$pid] ?? []);
+			$this->adjustedPositionFactory->load($transactions, $actions);
 			$decorator = $this->adjustedPositionFactory->decorate($position);
 			$amount = $decorator->getAdjustedAmount();
+
 			$note = $decorator->getAdjustmentNote();
 
-			$decoratorDividend = $this->adjustedDividendDecoratorFactory->decorate($position);
+			$this->adjustedDividendDecoratorFactory->load($dividends, $actions);
+			$decoratorDividend = $this->adjustedDividendDecoratorFactory->decorate(
+				$position
+			);
 			$adjustedDividends = $decoratorDividend->getAdjustedDividend();
 
-			$position->setAdjustedAveragePrice($decorator->getAdjustedAveragePrice());
+			$position->setAdjustedAveragePrice(
+				$decorator->getAdjustedAveragePrice()
+			);
 			/**
 			 * @var Ticker $ticker
 			 */
@@ -74,7 +98,7 @@ class PortfolioViewModel
 				->setPercentageAllocation($totalInvested)
 				->computeIsMaxAllocation()
 				->computeCurrentDividendDates($currentDate)
-                ->setAdjustedAmount($amount)
+				->setAdjustedAmount($amount)
 				->computeReceivedDividends();
 
 			// Dividend part
@@ -85,11 +109,12 @@ class PortfolioViewModel
 			if ($calendar) {
 				// Get adjusted cashAmount
 				//if ($position->getTicker()->getSymbol() == 'OXLC'){
-					$adjustedDividendsArray =  new ArrayCollection($adjustedDividends);
+				$adjustedDividendsArray = new ArrayCollection(
+					$adjustedDividends
+				);
 
-					$adjustedCashAmount = $adjustedDividendsArray->last() ?? 0.0;
+				$adjustedCashAmount = $adjustedDividendsArray->last() ?? 0.0;
 				//}
-
 
 				$forwardNetDividend = $this->dividendService->getForwardNetDividend(
 					$position->getTicker(),
@@ -132,9 +157,9 @@ class PortfolioViewModel
 		$this->stopwatch->stop('portfoliomodel-createPortfolioItem');
 	}
 
-    /**
-     *
-     */
+	/**
+	 *
+	 */
 	public function getPager(
 		float $totalInvested = 0.0,
 		int $page = 1,
@@ -162,13 +187,12 @@ class PortfolioViewModel
 			$pie
 		);
 
+		$adapter = new QueryAdapter($queryBuilder);
+		$pagerfanta = new Pagerfanta($adapter);
+		$pagerfanta->setMaxPerPage($this->maxPerPage);
+		$pagerfanta->setCurrentPage($page);
 
-        $adapter = new QueryAdapter($queryBuilder);
-        $pagerfanta = new Pagerfanta($adapter);
-        $pagerfanta->setMaxPerPage($this->maxPerPage);
-        $pagerfanta->setCurrentPage($page);
-
-        /*
+		/*
 		$baseAdapter = new QueryAdapter($queryBuilder);
 		$adapter = new AdjustedPositionAdapter(
 			$baseAdapter,

@@ -12,6 +12,8 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 use App\DataProvider\PositionDataProvider;
 use App\DataProvider\CorporateActionDataProvider;
+use App\DataProvider\DividendDataProvider;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class YieldsService
 {
@@ -24,6 +26,7 @@ class YieldsService
 		private DividendExchangeRateResolverInterface $dividendExchangeRateResolver,
 		private PositionDataProvider $positionDataProvider,
 		private CorporateActionDataProvider $corporateActionDataProvider,
+		private DividendDataProvider $dividendDataProvider,
 		private AdjustedPositionDecoratorFactory $adjustedPositionDecoratorFactory,
 	) {
 	}
@@ -33,12 +36,8 @@ class YieldsService
 		?Pie $pie = null
 	): array {
 		$positionRepository = $this->positionRepository;
-		$dividendService = $this->dividendService;
-
 		$this->stopwatch->start('yield-data', 'pie-yield');
-
 		$positionYield = new PositionYield();
-
 		$this->stopwatch->start('getting-positions-from-database', 'parsing');
 		if ($pie) {
 			$report = $this->transactionRepository->getSummaryByPie($pie);
@@ -57,6 +56,16 @@ class YieldsService
 
 		$this->stopwatch->start('processing-file', 'parsing');
 
+		$tickerList = array_map(function($position) {
+			return $position->getTicker();
+		}, $positions);
+
+		$transactions = $this->positionDataProvider->load($positions);
+		$actions = $this->corporateActionDataProvider->load($positions);
+		$dividends = $this->dividendDataProvider->load($tickerList);
+
+		$dividendService =  $this->dividendService->load(transactions: $transactions, corporateActions: $actions, dividends: $dividends);
+
 		$totalDividend = 0.0;
 		$totalNetYearlyDividend = 0.0;
 		$totalNetYearlyDividendPerStock = 0.0;
@@ -64,8 +73,7 @@ class YieldsService
 		$dividendYieldOnCost = 0.0;
 		$totalAvgYield = 0.0;
 
-		$transactions = $this->positionDataProvider->load($positions);
-		$actions = $this->corporateActionDataProvider->load($positions);
+		$this->adjustedPositionDecoratorFactory->load($transactions, $actions);
 
 		/**
 		 * @var \App\Entity\Position $position
@@ -78,12 +86,12 @@ class YieldsService
 
 			$amount = $position->getAmount();
 
-			$pid = $position->getId();
-
-			$this->adjustedPositionDecoratorFactory->load($transactions[$pid] ?? [], $actions[$pid] ?? []);
 			$positionDecorator = $this->adjustedPositionDecoratorFactory->decorate($position);
-			$position->setAdjustedAmount($positionDecorator->getAdjustedAmount());
-			$position->setAdjustedAveragePrice($positionDecorator->getAdjustedAveragePrice());
+			$adjustedAmount = $positionDecorator->getAdjustedAmount();
+			$adjustedAveragePrice = $positionDecorator->getAdjustedAveragePrice();
+
+			$position->setAdjustedAmount($adjustedAmount);
+			$position->setAdjustedAveragePrice($adjustedAveragePrice);
 
 			$allocation =
 				$pie && $report[$position->getId()]
@@ -97,7 +105,10 @@ class YieldsService
 			$lastDividendDate = null;
 
 			$numPayoutsPerYear = $ticker->getDividendMonths()->count();
-			$firstCalendarEntry = $ticker->getCalendars()->first();
+			$calendarList = new ArrayCollection($dividends[$position->getId()] ?? []);
+
+			//$firstCalendarEntry = $ticker->getCalendars()->first();
+			$firstCalendarEntry = $calendarList->first();
 
 			$netTotalForwardYearlyPayout = 0;
 			$netForwardYearlyPayout = 0;
@@ -113,7 +124,9 @@ class YieldsService
 				: 0;
 
 			if ($firstCalendarEntry) {
-				$lastCash = $dividendService->getCashAmount($ticker); // $firstCalendarEntry->getCashAmount();
+//				$lastCash = $dividendService->getCashAmount($ticker);
+				$lastCash = $dividendService->getCashAmount($ticker);
+
 				$lastCashCurrency = $firstCalendarEntry
 					->getCurrency()
 					->getSign();

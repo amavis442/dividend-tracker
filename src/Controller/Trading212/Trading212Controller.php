@@ -3,7 +3,6 @@
 namespace App\Controller\Trading212;
 
 use App\Entity\Pie;
-use App\Entity\Ticker;
 use App\Entity\Trading212PieMetaData;
 use App\Helper\Colors;
 use App\Repository\DividendCalendarRepository;
@@ -14,13 +13,16 @@ use App\Service\ExchangeRate\ExchangeRateInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 use Doctrine\Common\Collections\Collection;
 use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
+use App\DataProvider\CorporateActionDataProvider;
+use App\DataProvider\DividendDataProvider;
+
 
 #[
 	Route(
@@ -556,6 +558,8 @@ final class Trading212Controller extends AbstractController
 		ExchangeRateInterface $exchangeRate,
 		EntityManagerInterface $entityManager,
 		ChartBuilderInterface $chartBuilder,
+		CorporateActionDataProvider $corporateActionDataProvider,
+		DividendDataProvider $dividendDataProvider,
 		AdjustedDividendDecoratorFactory $adjustedDividendDecoratorFactory,
 	): Response {
 		/**
@@ -570,6 +574,19 @@ final class Trading212Controller extends AbstractController
 		$pieAvgInvested = $metaData->getPriceAvgInvestedValue();
 		$rates = $exchangeRate->getRates();
 		$rateDollarEuro = 1 / $rates['USD'];
+
+		/**
+		 * \App\Entity\Trading212PieInstrument $instrument
+		 */
+		$positions = array_map(function($instrument) {
+			return $instrument->getPosition();
+		}, $instruments->toArray());
+		$tickerList = array_map(function($position) {
+			return $position->getTicker();
+		}, $positions);
+
+		$corporateActions = $corporateActionDataProvider->load($positions);
+		$dividends = $dividendDataProvider->load($tickerList);
 
 		$tickers = [];
 		$priceProfitLoss = 0.0;
@@ -595,8 +612,13 @@ final class Trading212Controller extends AbstractController
 				'adjustedDividend' => [],
 			];
 
-			$position = $ticker->getPositions()->first();
+
+			$position = $instrument->getPosition();
+			$pid = $position->getId();
+
+			$adjustedDividendDecoratorFactory->load($dividends, $corporateActions);
 			$adjustedDividendDecorator = $adjustedDividendDecoratorFactory->decorate($position);
+
 			$adjustedDividends = $adjustedDividendDecorator->getAdjustedDividend();
 			$tickers[$ticker->getId()]['adjustedDividend'] = $adjustedDividends;
 		}
@@ -618,14 +640,16 @@ final class Trading212Controller extends AbstractController
 		$currentMonth = date('Ym');
 		$totalMonthlyDividend = 0.0;
 		foreach ($tickers as $id => $item) {
+			if (isset($item['dividend'])) {
 			$lastDividend = 0.0;
-			foreach ($item['dividend']['predicted_payment_monthly'] as $month => $predictedMonthlyDividend) {
-				if ($month > $currentMonth) {
-					continue;
+				foreach ($item['dividend']['predicted_payment_monthly'] as $month => $predictedMonthlyDividend) {
+					if ($month > $currentMonth) {
+						continue;
+					}
+					$lastDividend = $predictedMonthlyDividend;
 				}
-				$lastDividend = $predictedMonthlyDividend;
+				$totalMonthlyDividend += $lastDividend;
 			}
-			$totalMonthlyDividend += $lastDividend;
 		}
 		$yearlyDividendPercentage = $metaData->getPriceAvgInvestedValue() > 0 ? ($totalMonthlyDividend * 12) / $metaData->getPriceAvgInvestedValue() : 0;
 		$stats['yearlyDividendPercentage'] = $yearlyDividendPercentage * 100;

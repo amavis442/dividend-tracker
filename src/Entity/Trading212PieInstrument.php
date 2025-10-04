@@ -5,9 +5,8 @@ namespace App\Entity;
 use App\Repository\Trading212PieInstrumentRepository;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Position;
 
 #[ORM\Entity(repositoryClass: Trading212PieInstrumentRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -252,6 +251,10 @@ class Trading212PieInstrument
 		$this->ticker = $ticker;
 
 		return $this;
+	}
+
+	public function getPosition(): Position {
+		return $this->ticker->getPositions()->first();
 	}
 
 	/**

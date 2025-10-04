@@ -6,6 +6,7 @@ use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 use App\DataProvider\PositionDataProvider;
 use App\DataProvider\CorporateActionDataProvider;
+use App\DataProvider\DividendDataProvider;
 
 use App\Entity\Calendar;
 use App\Entity\Portfolio;
@@ -375,6 +376,7 @@ class PortfolioController extends AbstractController
 		AdjustedDividendDecoratorFactory $adjustedDividendDecorator,
 		PositionDataProvider $positionDataProvider,
 		CorporateActionDataProvider $corporateActionDataProvider,
+		DividendDataProvider $dividendDataProvider,
 		AdjustedPositionDecoratorFactory $adjustedPositionDecorator,
 	): Response {
 		$ticker = $position->getTicker();
@@ -389,9 +391,11 @@ class PortfolioController extends AbstractController
 
 		$transactions = $positionDataProvider->load([$position]);
 		$actions = $corporateActionDataProvider->load([$position]);
+		$dividends = $dividendDataProvider->load([$ticker]);
 		$adjustedPositionDecorator->load($transactions, $actions);
 		$positionDecorator = $adjustedPositionDecorator->decorate($position);
 
+		$adjustedDividendDecorator->load($dividends, $actions);
 
 		$dividendDecorator = $adjustedDividendDecorator->decorate($position);
 		$adjustedDividends = $dividendDecorator->getAdjustedDividend();

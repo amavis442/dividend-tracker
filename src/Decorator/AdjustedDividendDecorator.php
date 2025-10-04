@@ -2,62 +2,24 @@
 namespace App\Decorator;
 
 use App\Entity\Position;
-use App\Entity\Calendar;
 use App\Entity\CorporateAction;
-use App\Repository\CorporateActionRepository;
-use App\Repository\DividendCalendarRepository;
 use App\Service\DividendAdjuster;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class AdjustedDividendDecorator implements AdjustedDecoratorInterface, AdjustedDividendDecoratorInterface
 {
-	private ?array $cachedDividends = null;
-	private ?array $cachedActions = null;
-
 	public function __construct(
 		private Position $position,
-		private DividendCalendarRepository $dividendRepo,
-		private CorporateActionRepository $actionRepo,
+		private array $dividends,
+		private array $actions,
 		private DividendAdjuster $dividendAdjuster
 	) {
 	}
 
-	/**
-	 * Caches the dividends so it will not waste resources
-	 */
-	private function getDividends(): array
-	{
-		if ($this->cachedDividends === null) {
-			$this->cachedDividends = $this->dividendRepo->findBy([
-				'ticker' => $this->position->getTicker()->getId(),
-			],['paymentDate' => 'ASC']);
-		}
-
-		return $this->cachedDividends;
-	}
-
-	/**
-	 * Caches the actions so it will not waste resources
-	 */
-	private function getActions(): array
-	{
-		if ($this->cachedActions === null) {
-			$this->cachedActions = $this->actionRepo->findBy(
-				[
-					'position' => $this->position->getId(),
-					'type' => [CorporateAction::REVERSE_SPLIT, CorporateAction::SPLIT],
-				],
-				['eventDate' => 'ASC']
-			);
-		}
-
-		return $this->cachedActions;
-	}
-
 	public function getAdjustedDividend(): array
 	{
-		$dividends = $this->getDividends();
-		$actions = new ArrayCollection($this->getActions());
+		$dividends = $this->dividends;
+		$actions = new ArrayCollection($this->actions);
 
 		$adjusted = [];
 
@@ -71,7 +33,8 @@ class AdjustedDividendDecorator implements AdjustedDecoratorInterface, AdjustedD
 				),
 				'declareDate' => $dividend->getCreatedAt(),
 				'paymentDate' => $dividend->getPaymentDate(),
-				'ticker' => $dividend->getTicker()->getSymbol(),
+				'ticker' => $dividend->getTicker(),
+				'symbol' => $dividend->getTicker()->getSymbol(),
 			];
 		}
 
@@ -80,10 +43,7 @@ class AdjustedDividendDecorator implements AdjustedDecoratorInterface, AdjustedD
 
 	public function getAdjustmentNote(): ?string
 	{
-		$actions = $this->actionRepo->findBy(
-			['position' => $this->position->getId(), 'type' => 'reverse_split'],
-			['eventDate' => 'ASC']
-		);
+		$actions = $this->actions;
 
 		if (empty($actions)) {
 			return null;

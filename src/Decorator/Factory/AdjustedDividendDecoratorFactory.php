@@ -4,25 +4,59 @@ namespace App\Decorator\Factory;
 use App\Entity\Position;
 use App\Decorator\AdjustedDividendDecorator;
 use App\Decorator\AdjustedDividendDecoratorInterface;
-use App\Repository\DividendCalendarRepository;
-use App\Repository\CorporateActionRepository;
 use App\Service\DividendAdjuster;
 
 class AdjustedDividendDecoratorFactory
 {
+	private ?array $dividends = null;
+	private ?array $actions = null;
+
 	public function __construct(
-		private DividendCalendarRepository $dividendRepo,
-		private CorporateActionRepository $actionRepo,
         private DividendAdjuster $dividendAdjuster,
 	) {
 	}
 
+	public function setActions(array $actions): self
+	{
+		$this->actions = $actions;
+
+		return $this;
+	}
+
+	public function setDividends(array $dividends): self
+	{
+		$this->dividends = $dividends;
+
+		return $this;
+	}
+
+	/**
+	 * Mass load needed data for decorator(s)
+	 *
+	 * @param array<int, array<int, \App\Entity\Calendar>> $dividends
+	 *
+	 * @param array<int , array<int, \App\Entity\CorporateAction>> $actions
+	 *
+	 * @return self
+	 *
+	 */
+	public function load(array $dividends, array $actions): self
+	{
+		$this->dividends = $dividends;
+		$this->actions = $actions;
+
+		return $this;
+	}
+
+
 	public function decorate(Position $position): AdjustedDividendDecoratorInterface
 	{
+		$pid = $position->getId();
+
 		return new AdjustedDividendDecorator(
 			position: $position,
-			dividendRepo: $this->dividendRepo,
-			actionRepo: $this->actionRepo,
+			dividends: $this->dividends[$pid] ?? [],
+			actions: $this->actions[$pid] ?? [],
 			dividendAdjuster: $this->dividendAdjuster
 		);
 	}

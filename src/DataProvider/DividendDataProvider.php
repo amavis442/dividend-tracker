@@ -17,7 +17,7 @@ class DividendDataProvider
 	 *
 	 * @param Ticker[] $tickers
 	 *
-	 * @return array<int, \App\Entity\Calendar[]>
+	 * @return array<int, array<int, \App\Entity\Calendar>>
 	 */
 	public function load(array $tickers): array
 	{
@@ -32,8 +32,8 @@ class DividendDataProvider
 	{
 		$map = [];
 		foreach ($entities as $entity) {
-			$pid = $entity->getPosition()->getId();
-			$map[$pid][] = $entity;
+			$pid = $entity->getTicker()->getPositions()->first()->getId();
+			$map[$pid][$entity->getId()] = $entity;
 		}
 		return $map;
 	}
