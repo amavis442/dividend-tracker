@@ -60,11 +60,12 @@ class AdjustedPositionDecoratorFactory
 		Position $position
 	): AdjustedPositionDecoratorInterface {
 		$pid = $position->getId();
+		$tid = $position->getTicker()->getId();
 
 		return new AdjustedPositionDecorator(
 			position: $position,
 			transactions: $this->transactions[$pid] ?? [],
-			actions: $this->actions[$pid] ?? [],
+			actions: $this->actions[$tid] ?? [],
 			transactionAdjuster: $this->transactionAdjuster
 		);
 	}

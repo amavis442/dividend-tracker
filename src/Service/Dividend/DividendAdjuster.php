@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Dividend;
 
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Transaction;

@@ -1,22 +1,24 @@
 <?php
 namespace App\Decorator;
 
-use App\Entity\Position;
-use App\Entity\CorporateAction;
-use App\Service\DividendAdjuster;
+use App\Entity\Ticker;
+use App\Service\Dividend\DividendAdjuster;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class AdjustedDividendDecorator implements AdjustedDecoratorInterface, AdjustedDividendDecoratorInterface
 {
-	public function __construct(
-		private Position $position,
+	const SORT_BY_CALENDAR_ID = 1;
+	const SORT_BY_PAYMENT_DATE = 2;
+
+    public function __construct(
 		private array $dividends,
 		private array $actions,
 		private DividendAdjuster $dividendAdjuster
 	) {
 	}
 
-	public function getAdjustedDividend(): array
+
+	private function getAdjustedDividendByKey(int $key): array
 	{
 		$dividends = $this->dividends;
 		$actions = new ArrayCollection($this->actions);
@@ -24,7 +26,10 @@ class AdjustedDividendDecorator implements AdjustedDecoratorInterface, AdjustedD
 		$adjusted = [];
 
 		foreach ($dividends as $dividend) {
-			$adjusted[$dividend->getId()] = [
+			$indexBy = $key == self::SORT_BY_CALENDAR_ID ? $dividend->getId() : $dividend->getPaymentDate()->format('Ymd');
+
+
+			$adjusted[$indexBy] = [
 				'original' => $dividend->getCashAmount(),
 				'adjusted' => $this->dividendAdjuster->getAdjustedDividend(
 					$dividend->getCashAmount(),
@@ -38,6 +43,19 @@ class AdjustedDividendDecorator implements AdjustedDecoratorInterface, AdjustedD
 			];
 		}
 
+		return $adjusted;
+
+
+	}
+	public function getAdjustedDividend(): array
+	{
+		return $this->getAdjustedDividendByKey(self::SORT_BY_CALENDAR_ID);
+	}
+
+	public function getAdjustedDividendSortByPaymentDate(): array
+	{
+		$adjusted = $this->getAdjustedDividendByKey(self::SORT_BY_PAYMENT_DATE);
+		ksort($adjusted);
 		return $adjusted;
 	}
 
@@ -58,15 +76,5 @@ class AdjustedDividendDecorator implements AdjustedDecoratorInterface, AdjustedD
 		}, $actions);
 
 		return implode('; ', $notes);
-	}
-
-	public function getOriginalPosition(): Position
-	{
-		return $this->position;
-	}
-
-	public function getSymbol(): string
-	{
-		return $this->position->getTicker()->getSymbol();
 	}
 }

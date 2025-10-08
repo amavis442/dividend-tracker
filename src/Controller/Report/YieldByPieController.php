@@ -4,8 +4,8 @@ namespace App\Controller\Report;
 
 use App\Entity\PieSelect;
 use App\Repository\PositionRepository;
-use App\Service\DividendService;
-use App\Service\YieldsService;
+use App\Service\Dividend\DividendService;
+use App\Service\Dividend\YieldsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

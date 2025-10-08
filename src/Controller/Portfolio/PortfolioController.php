@@ -2,11 +2,11 @@
 
 namespace App\Controller\Portfolio;
 
-use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
-use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
-use App\DataProvider\PositionDataProvider;
 use App\DataProvider\CorporateActionDataProvider;
 use App\DataProvider\DividendDataProvider;
+use App\DataProvider\PositionDataProvider;
+use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
+use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 
 use App\Entity\Calendar;
 use App\Entity\Portfolio;
@@ -22,9 +22,9 @@ use App\Repository\PortfolioRepository;
 use App\Repository\PositionRepository;
 use App\Repository\ResearchRepository;
 use App\Repository\TickerRepository;
-use App\Service\DividendGrowthService;
-use App\Service\DividendServiceInterface;
-use App\Service\ExchangeAndTaxResolverInterface;
+use App\Service\Dividend\DividendGrowthService;
+use App\Service\Dividend\DividendServiceInterface;
+use App\Service\ExchangeRate\ExchangeAndTaxResolverInterface;
 use App\Service\Referer;
 use App\ViewModel\PortfolioViewModel;
 use DateTime;
@@ -149,6 +149,9 @@ class PortfolioController extends AbstractController
 		DividendGrowthService $dividendGrowth,
 		DividendServiceInterface $dividendService,
 		ExchangeAndTaxResolverInterface $exchangeAndTaxResolver,
+		PositionDataProvider $positionDataProvider,
+		CorporateActionDataProvider $corporateActionDataProvider,
+		DividendDataProvider $dividendDataProvider,
 		Referer $referer,
 		ChartBuilderInterface $chartBuilder
 	): Response {
@@ -161,6 +164,22 @@ class PortfolioController extends AbstractController
 
 		$nextDividendExDiv = null;
 		$nextDividendPayout = null;
+
+		$transactions = $positionDataProvider->load(
+			[$position]
+		);
+		$actions = $corporateActionDataProvider->load(
+			[$ticker]
+		);
+
+		$dividends = $dividendDataProvider->load([$ticker]);
+
+		$dividendService->load(
+			transactions: $transactions,
+			corporateActions: $actions,
+			dividends: $dividends
+		);
+
 
 		if ($calendarRecentDividendDate) {
 			$exchangeTaxDto = $exchangeAndTaxResolver->resolve($position->getTicker(), $calendarRecentDividendDate);
@@ -390,14 +409,17 @@ class PortfolioController extends AbstractController
 		$nextDividendPayout = null;
 
 		$transactions = $positionDataProvider->load([$position]);
-		$actions = $corporateActionDataProvider->load([$position]);
+		$actions = $corporateActionDataProvider->load([$ticker]);
 		$dividends = $dividendDataProvider->load([$ticker]);
+
+		$dividendService->load(transactions: $transactions, corporateActions: $actions, dividends: $dividends);
+
 		$adjustedPositionDecorator->load($transactions, $actions);
 		$positionDecorator = $adjustedPositionDecorator->decorate($position);
 
 		$adjustedDividendDecorator->load($dividends, $actions);
 
-		$dividendDecorator = $adjustedDividendDecorator->decorate($position);
+		$dividendDecorator = $adjustedDividendDecorator->decorate($position->getTicker());
 		$adjustedDividends = $dividendDecorator->getAdjustedDividend();
 
 		if ($calendarRecentDividendDate) {
@@ -531,7 +553,7 @@ class PortfolioController extends AbstractController
 		$position = $positionRepository->getForPosition($position);
 
 		$transactions = $positionDataProvider->load([$position]);
-		$corporateActions = $corporateActionDataProvider->load([$position]);
+		$corporateActions = $corporateActionDataProvider->load([$position->getTicker()]);
 
 		$adjustedPositionDecorator->load($transactions,$corporateActions);
 		$positionDecorator = $adjustedPositionDecorator->decorate($position);

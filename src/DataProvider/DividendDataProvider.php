@@ -13,7 +13,7 @@ class DividendDataProvider
 	}
 
 	/**
-	 * Loads the data for an decorator
+	 * Loads the data for an decorator keyed with \App\Entity\Ticker::Id()
 	 *
 	 * @param Ticker[] $tickers
 	 *
@@ -28,12 +28,12 @@ class DividendDataProvider
 		);
 	}
 
-	private function mapByTicker(array $entities): array
+	private function mapByTicker(mixed $calendars): array
 	{
 		$map = [];
-		foreach ($entities as $entity) {
-			$pid = $entity->getTicker()->getPositions()->first()->getId();
-			$map[$pid][$entity->getId()] = $entity;
+		foreach ($calendars as $calendar) {
+			$tid = $calendar->getTicker()->getId();
+			$map[$tid][$calendar->getId()] = $calendar;
 		}
 		return $map;
 	}

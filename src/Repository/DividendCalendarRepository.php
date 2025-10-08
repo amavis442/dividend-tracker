@@ -8,9 +8,9 @@ use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Transaction;
 
-use App\Service\DividendExchangeRateResolverInterface;
-use App\Service\DividendServiceInterface;
-use App\Service\DividendTaxRateResolverInterface;
+use App\Service\ExchangeRate\DividendExchangeRateResolverInterface;
+use App\Service\Dividend\DividendServiceInterface;
+use App\Service\Dividend\DividendTaxRateResolverInterface;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -245,6 +245,8 @@ class DividendCalendarRepository extends ServiceEntityRepository
 		return $queryBuilder->getOneOrNullResult();
 	}
 
+
+
 	/**
 	 * Retrieves the latest dividend calendar entry for a given ticker,
 	 * where the payment date is on or after the specified date.
@@ -467,10 +469,10 @@ class DividendCalendarRepository extends ServiceEntityRepository
 		array $tickers,
 		string $lastYear
 	): array {
-		return $this->createQueryBuilder('c')
-			->select('t ,c')
+		return $this->createQueryBuilder('c','c.id')
+			->select('c, t')
 			->join('c.ticker', 't')
-			->where('c.ticker in (:tickers)')
+			->andWhere('c.ticker in (:tickers)')
 			->andWhere('c.paymentDate > :lastYear')
 			->setParameter('tickers', $tickers)
 			->setParameter('lastYear', $lastYear)
@@ -479,11 +481,22 @@ class DividendCalendarRepository extends ServiceEntityRepository
 			->getResult();
 	}
 
-	public function findByTickerIds(array $tickerIds): array
+	public function findByTickerIds(array $tickerIds): mixed
 	{
-		return $this->findBy(
+		return $this->createQueryBuilder('c','c.id')
+		->select('c, t')
+		->join('c.ticker', 't')
+		->andWhere('c.ticker in (:tickers)')
+		->andWhere('c.dividendType IN (:dividendType)')
+		->setParameter('tickers', $tickerIds)
+		->setParameter('dividendType', [Calendar::REGULAR])
+		->groupBy('t.id, c.id')
+		->getQuery()
+		->getResult();
+
+		/* return $this->findBy(
 			['ticker' => $tickerIds, 'dividendType' => Calendar::REGULAR],
 			['paymentDate' => 'ASC']
-		);
+		); */
 	}
 }

@@ -25,7 +25,8 @@ final class CorporateActionListener
 		CorporateAction $action,
 		PrePersistEventArgs $event
 	): void {
-		$position = $action->getPosition();
+		$ticker = $action->getTicker();
+		$position = $ticker->getPositions()->first();
 		if ($position) {
 			$this->metricsUpdate->update($position);
 		}

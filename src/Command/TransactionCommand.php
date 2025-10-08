@@ -5,7 +5,7 @@ namespace App\Command;
 use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
-use App\Service\WeightedAverage;
+use App\Service\Position\WeightedAverage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;

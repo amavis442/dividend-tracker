@@ -2,30 +2,30 @@
 
 namespace App\Controller;
 
-use DateTime;
-use App\Entity\Ticker;
 use App\Entity\Calendar;
-use App\Service\Referer;
 use App\Entity\DateSelect;
-use App\Form\CalendarType;
-use Pagerfanta\Pagerfanta;
+use App\Entity\Ticker;
 use App\Entity\TickerAutocomplete;
 use App\Form\CalendarDividendType;
+use App\Form\CalendarType;
 use App\Form\TickerAutocompleteType;
-use App\Repository\TickerRepository;
+use App\Pager\AdjustedPositionAdapter;
 use App\Repository\CalendarRepository;
 use App\Repository\PositionRepository;
+use App\Repository\TickerRepository;
+use App\Service\Dividend\DividendServiceInterface;
+use App\Service\Dividend\DividendTaxRateResolverInterface;
+use App\Service\ExchangeRate\DividendExchangeRateResolverInterface;
+use App\Service\Referer;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Service\DividendServiceInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use App\Service\DividendTaxRateResolverInterface;
-use App\Service\DividendExchangeRateResolverInterface;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use App\Pager\AdjustedPositionAdapter;
+use Symfony\Component\Routing\Annotation\Route;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/calendar')]
 class CalendarController extends AbstractController

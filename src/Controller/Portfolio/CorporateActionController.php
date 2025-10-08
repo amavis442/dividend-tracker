@@ -4,6 +4,7 @@ namespace App\Controller\Portfolio;
 
 use App\Entity\CorporateAction;
 use App\Entity\Position;
+use App\Form\CorporateActionType;
 use App\Repository\CorporateActionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
@@ -13,7 +14,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Form\CorporateActionType;
 
 /** @psalm-suppress PropertyNotSetInConstructor */
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/portfolio')]
@@ -84,7 +84,7 @@ class CorporateActionController extends AbstractController
 	): Response {
 		$corporateAction = new CorporateAction();
 		if ($position) {
-			$corporateAction->setPosition($position);
+			$corporateAction->setTicker($position->getTicker());
 		}
 
 		$form = $this->createForm(CorporateActionType::class, $corporateAction);

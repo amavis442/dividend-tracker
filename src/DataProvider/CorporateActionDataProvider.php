@@ -3,7 +3,7 @@
 namespace App\DataProvider;
 
 use App\Repository\CorporateActionRepository;
-use App\Entity\Position;
+use App\Entity\Ticker;
 
 class CorporateActionDataProvider
 {
@@ -15,25 +15,25 @@ class CorporateActionDataProvider
 	/**
 	 * Loads the data for an decorator
 	 *
-	 * @param Position[] $positions
+	 * @param Ticker[] $tickers
 	 *
 	 * @return array<int, array<int, \App\Entity\CorporateAction>>
 	 */
-	public function load(array $positions): array
+	public function load(array $tickers): array
 	{
-		$ids = array_map(fn(Position $p) => $p->getId(), $positions);
+		$ids = array_map(fn(Ticker $t) => $t->getId(), $tickers);
 
 		return  $this->mapByPosition(
-				$this->actionRepo->findByPositionIds($ids)
+				$this->actionRepo->findByTickerIds($ids)
 		);
 	}
 
-	private function mapByPosition(array $entities): array
+	private function mapByPosition(array $corporateActions): array
 	{
 		$map = [];
-		foreach ($entities as $entity) {
-			$pid = $entity->getPosition()->getId();
-			$map[$pid][] = $entity;
+		foreach ($corporateActions as $corporateAction) {
+			$id = $corporateAction->getTicker()->getId();
+			$map[$id][] = $corporateAction;
 		}
 		return $map;
 	}

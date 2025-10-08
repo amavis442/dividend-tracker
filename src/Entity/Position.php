@@ -156,11 +156,6 @@ class Position
     private ?Collection $dividendCalendars = null;
     private float $dividend = 0.0;
 
-    /**
-     * @var Collection<int, CorporateAction>
-     */
-    #[ORM\OneToMany(targetEntity: CorporateAction::class, mappedBy: 'position')]
-    private Collection $corporateActions;
 
     #[ORM\Column(nullable: true)]
     private ?float $adjustedAmount = null;
@@ -221,7 +216,6 @@ class Position
         $this->pies = new ArrayCollection();
         $this->dividendCalendars = new ArrayCollection();
         $this->isMaxAllocation = false;
-        $this->corporateActions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -868,36 +862,6 @@ class Position
     public function setPortfolio(?Portfolio $portfolio): static
     {
         $this->portfolio = $portfolio;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, CorporateAction>
-     */
-    public function getCorporateActions(): Collection
-    {
-        return $this->corporateActions;
-    }
-
-    public function addCorporateAction(CorporateAction $corporateAction): static
-    {
-        if (!$this->corporateActions->contains($corporateAction)) {
-            $this->corporateActions->add($corporateAction);
-            $corporateAction->setPosition($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCorporateAction(CorporateAction $corporateAction): static
-    {
-        if ($this->corporateActions->removeElement($corporateAction)) {
-            // set the owning side to null (unless already changed)
-            if ($corporateAction->getPosition() === $this) {
-                $corporateAction->setPosition(null);
-            }
-        }
 
         return $this;
     }

@@ -79,30 +79,30 @@ class PositionAmountServiceTest extends TestCase{
         $property->setAccessible(true);
         $property->setValue($position, 1);
 
+        $ticker = new Ticker();
+        // Set id
+        $reflection = new \ReflectionClass($ticker);
+        $property = $reflection->getProperty('id');
+        $property->setAccessible(true);
+        $property->setValue($ticker, 1);
+        $ticker->setSymbol('AAPL');
+        $ticker->setFullName('Apple computers');
+
+        $position->setTicker($ticker);
+
         $ca1 = $this->createCorporateAction(CorporateAction::REVERSE_SPLIT, 0.2, new \DateTime('2025-01-20'));
         $ca2 = $this->createCorporateAction(CorporateAction::SPLIT, 2, new \DateTime('2025-07-25'));
         $corporateActions = [];
-        $corporateActions[$position->GetId()] = [$ca1, $ca2];
+        $corporateActions[$ticker->getId()] = [$ca1, $ca2];
 
-        $position->addCorporateAction($ca1);
-        $position->addCorporateAction($ca2);
+        $ticker->addCorporateAction($ca1);
+        $ticker->addCorporateAction($ca2);
 
         $tx1 = $this->createTransaction(100.0, new \DateTime('2024-06-10'), Transaction::BUY); // (100 * 0.2) * 2 = 40
         $tx2 = $this->createTransaction(50.0, new \DateTime('2025-06-10'), Transaction::BUY); // 50 * 2 = 100
         $tx3 = $this->createTransaction(50.0, new \DateTime('2025-08-10'), Transaction::BUY); // 50 = 50 -> total should be 40 + 100 + 50 = 190
         $transactions = [];
         $transactions[$position->GetId()] = [$tx1, $tx2, $tx3];
-
-
-        $ticker = new Ticker();
-        $reflection = new \ReflectionClass($position);
-        $property = $reflection->getProperty('id');
-        $property->setAccessible(true);
-        $property->setValue($position, 1);
-        $ticker->setSymbol('AAPL');
-        $ticker->setFullName('Apple computers');
-
-        $position->setTicker($ticker);
 
         $adjustedDecoratorFactory = new AdjustedPositionDecoratorFactory(new transactionAdjuster());
 

@@ -5,6 +5,8 @@ use PHPUnit\Framework\TestCase;
 use App\Entity\Transaction;
 use App\Entity\CorporateAction;
 use App\Entity\Position;
+use App\Entity\Ticker;
+
 use App\Service\WeightedAverage;
 use App\Repository\TransactionRepository;
 use App\Repository\CorporateActionRepository;
@@ -46,8 +48,15 @@ class WeightedAverageTest extends TestCase
         $property->setAccessible(true);
         $property->setValue($position, 42);
 
-        //$positionMock = $this->createMock(Position::class);
-        //$positionMock->method('getId')->willReturn(42);
+		$ticker = new Ticker();
+        $reflection = new \ReflectionClass($ticker);
+        $property = $reflection->getProperty('id');
+        $property->setAccessible(true);
+        $property->setValue($ticker, 1);
+        $ticker->setSymbol('AAPL');
+        $ticker->setFullName('Apple computers');
+
+		$position->setTicker($ticker);
 
 		// Mock transactions
 		$tx1 = new Transaction();
@@ -70,7 +79,7 @@ class WeightedAverageTest extends TestCase
 
 		// Mock corporate action
 		$split = new CorporateAction();
-        $split->setPosition($position);
+        $split->setTicker($ticker);
 		$split->setType('reverse_split');
 		$split->setRatio(0.1); // 10-for-1 reverse split
 		$split->setEventDate(new DateTime('2022-06-01'));
@@ -85,7 +94,7 @@ class WeightedAverageTest extends TestCase
 			->expects($this->once())
 			->method('findBy')
 			->with(
-				['position' => 42, 'type' => 'reverse_split'],
+				['ticker' => 1, 'type' => 'reverse_split'],
 				['eventDate' => 'ASC']
 			)
 			->willReturn([$split]);

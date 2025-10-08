@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\ExchangeRate;
 
 use App\Dto\ExchangeTaxDto;
 use App\Entity\Ticker;

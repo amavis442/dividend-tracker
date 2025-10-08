@@ -5,6 +5,8 @@ namespace App\Tests\Unit\Decorator;
 use App\Entity\Transaction;
 use App\Entity\CorporateAction;
 use App\Entity\Position;
+use App\Entity\Ticker;
+
 use App\Decorator\AdjustedPositionDecorator;
 use App\Repository\TransactionRepository;
 use App\Repository\CorporateActionRepository;
@@ -23,6 +25,14 @@ class AdjustedPositionDecoratorTest extends TestCase
 		$property = $reflection->getProperty('id');
 		$property->setAccessible(true);
 		$property->setValue($position, 1);
+
+		$ticker = new Ticker();
+		$reflection = new \ReflectionClass($ticker);
+		$property = $reflection->getProperty('id');
+		$property->setAccessible(true);
+		$property->setValue($ticker, 1);
+
+		$ticker->addPosition($position);
 
 		$transaction = new Transaction();
 		$transaction->setPosition($position);
@@ -48,7 +58,7 @@ class AdjustedPositionDecoratorTest extends TestCase
 		$transactions = [$transaction,$tx2,$tx3];
 
 		$action = new CorporateAction();
-		$action->setPosition($position);
+		$action->setTicker($ticker);
 		$action->setType('reverse_split');
 		$action->setRatio(0.2); // 5:1 reverse split
 		$action->setEventDate(new \DateTime('2024-06-15'));

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\DividendDate;
 
 use App\Contracts\Service\DividendDatePluginInterface;
 use RuntimeException;

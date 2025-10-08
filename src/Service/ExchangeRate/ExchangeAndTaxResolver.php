@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\ExchangeRate;
 
 use App\Entity\Calendar;
 use App\Entity\Ticker;

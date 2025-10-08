@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\ExchangeRate;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Service\ExchangeRate\ExchangeRateInterface;

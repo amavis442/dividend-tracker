@@ -11,7 +11,8 @@ use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Repository\PositionRepository;
-use App\Service\DividendServiceInterface;
+use App\Repository\DividendCalendarRepository;
+use App\Service\Dividend\DividendServiceInterface;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
@@ -50,13 +51,14 @@ class PortfolioViewModel
 		$transactions = $this->positionDataProvider->load(
 			iterator_to_array($positions)
 		);
-		$actions = $this->corporateActionDataProvider->load(
-			iterator_to_array($positions)
-		);
 
 		$tickers = array_map(function ($position) {
 			return $position->getTicker();
 		}, iterator_to_array($positions));
+
+		$actions = $this->corporateActionDataProvider->load(
+			$tickers
+		);
 
 		$dividends = $this->dividendDataProvider->load($tickers);
 
@@ -66,6 +68,8 @@ class PortfolioViewModel
 			dividends: $dividends
 		);
 
+
+		//dd($tickers, $tickerCalendars);
 		/**
 		 * @var Position $position
 		 */
@@ -78,11 +82,19 @@ class PortfolioViewModel
 
 			$note = $decorator->getAdjustmentNote();
 
+
+
 			$this->adjustedDividendDecoratorFactory->load($dividends, $actions);
 			$decoratorDividend = $this->adjustedDividendDecoratorFactory->decorate(
-				$position
+				$position->getTicker()
 			);
-			$adjustedDividends = $decoratorDividend->getAdjustedDividend();
+			$adjustedDividends = $decoratorDividend->getAdjustedDividendSortByPaymentDate();
+
+			/*
+			if ($position->getTicker()->getSymbol() == 'OXLC'){
+				dd($position, $amount, $actions, $adjustedDividends);
+			}
+			*/
 
 			$position->setAdjustedAveragePrice(
 				$decorator->getAdjustedAveragePrice()
@@ -108,13 +120,10 @@ class PortfolioViewModel
 
 			if ($calendar) {
 				// Get adjusted cashAmount
-				//if ($position->getTicker()->getSymbol() == 'OXLC'){
 				$adjustedDividendsArray = new ArrayCollection(
 					$adjustedDividends
 				);
-
 				$adjustedCashAmount = $adjustedDividendsArray->last() ?? 0.0;
-				//}
 
 				$forwardNetDividend = $this->dividendService->getForwardNetDividend(
 					$position->getTicker(),

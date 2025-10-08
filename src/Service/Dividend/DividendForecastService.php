@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Dividend;
 
 use App\Repository\Trading212PieInstrumentRepository;
 use App\Repository\DividendCalendarRepository;
-use App\Service\ExchangeAndTaxResolver;
-use App\Service\DividendAdjuster;
+use App\Service\ExchangeRate\ExchangeAndTaxResolver;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class DividendForecastService
@@ -66,7 +65,7 @@ class DividendForecastService
 					$adjustedCashAmount = $this->dividendAdjuster->getAdjustedDividend(
 						$entry ? $entry->getCashAmount() : 0.0,
 						$entry->getCreatedAt(),
-						$position->getCorporateActions()
+						$position->getTicker()->getCorporateActions()
 					);
 
 					$payout =

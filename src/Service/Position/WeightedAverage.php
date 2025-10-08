@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Position;
 
 use App\Entity\Transaction;
 use App\Entity\Position;
@@ -31,54 +31,6 @@ class WeightedAverage
 		$this->transactions[$timeStamp] = $transaction;
 	}
 
-	public function getAdjustedShareCount(int $positionId): float
-	{
-		// Step 1: Fetch transactions and corporate actions
-		$transactions = $this->transactionRepository->findBy([
-			'position' => $positionId,
-		]);
-		$actions = $this->corporateActionRepository->findBy(
-			[
-				'position' => $positionId,
-				'type' => 'reverse_split',
-			],
-			['eventDate' => 'ASC']
-		);
-
-		// Step 2: Sort transactions by date
-		usort(
-			$transactions,
-			fn($a, $b) => $a->getTransactionDate() <=> $b->getTransactionDate()
-		);
-
-		// Step 3: Initialize share count
-		$adjustedShares = 0.0;
-
-		foreach ($transactions as $tx) {
-			$txDate = $tx->getTransactionDate();
-			$side = $tx->getSide();
-			$amount = $tx->getAmount();
-
-			// Apply reverse split ratio only for transactions before the split
-			$adjustedAmount = $amount;
-
-			foreach ($actions as $action) {
-				if ($txDate < $action->getEventDate()) {
-					$adjustedAmount *= $action->getRatio();
-				}
-			}
-
-			// Accumulate share count
-			if ($side === 1) {
-				$adjustedShares += $adjustedAmount;
-			} elseif ($side === 2) {
-				$adjustedShares -= $adjustedAmount;
-			}
-		}
-
-		return round($adjustedShares, 4);
-	}
-
 	/**
 	 * Returns number of transactions processed
 	 */
@@ -86,7 +38,7 @@ class WeightedAverage
 	{
 		$corporateActions = $this->corporateActionRepository->findBy(
 			[
-				'position' => $position->getId(),
+				'ticker' => $position->getTicker()->getId(),
 				'type' => 'reverse_split',
 			],
 			['eventDate' => 'ASC']
@@ -139,7 +91,6 @@ class WeightedAverage
 				$transaction->setAvgprice($aPrice);
 			}
 
-			// ========= CoPilot =====================
 			$tx = $transaction;
 			$txDate = $tx->getTransactionDate();
 			$side = $tx->getSide();

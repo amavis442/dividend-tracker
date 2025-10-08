@@ -115,26 +115,32 @@ final class Trading212Controller extends AbstractController
 		);
 		$lastYear = (new \Datetime('-1 years -1 months'))->format('Ym');
 
-		foreach ($tickerCalendars as $tickerCalendar) {
-			$id = $tickerCalendar->getTicker()->getId();
+
+		foreach ($tickerCalendars as $calId => $tickerCalendar) {
+			$tickerId = $tickerCalendar->getTicker()->getId();
 			$frequency = $tickerCalendar->getTicker()->getPayoutFrequency();
 			$cId = (int) $tickerCalendar->getPaymentDate()->format('Ym');
 
-			$adjustedCalendar = $tickers[$id]['adjustedDividend'][$tickerCalendar->getId()];
+
+			//$cashAmount = $tickerCalendar
+			$adjustedCalendar = $tickers[$tickerId]['adjustedDividend'][$calId] ?? ['adjusted' => $tickerCalendar->getCashAmount()];
+			if ($tickerId == 291 && $tickerCalendar->getPaymentDate()->format('Y-m-d') > '2025-10-01') {
+				dd($tickers[291]['adjustedDividend'], $calId, $tickerCalendar);
+			}
 			$cashAmount = $adjustedCalendar['adjusted'];
 
 			$tickerCalendar->setAdjustedCashAmount($cashAmount);
 
-			$tickers[$id]['calendars'][$cId] = $tickerCalendar;
+			$tickers[$tickerId]['calendars'][$cId] = $tickerCalendar;
 
-			if (!isset($tickers[$id]['dividend'])) {
-				$tickers[$id]['dividend']['sumDividend'] = 0.0;
-				$tickers[$id]['dividend']['records'] = 0;
-				$tickers[$id]['dividend']['avg'] = 0.0;
-				$tickers[$id]['dividend']['predicted_payment'] = [];
-				$tickers[$id]['dividend']['predicted_payment_monthly'] = [];
+			if (!isset($tickers[$tickerId]['dividend'])) {
+				$tickers[$tickerId]['dividend']['sumDividend'] = 0.0;
+				$tickers[$tickerId]['dividend']['records'] = 0;
+				$tickers[$tickerId]['dividend']['avg'] = 0.0;
+				$tickers[$tickerId]['dividend']['predicted_payment'] = [];
+				$tickers[$tickerId]['dividend']['predicted_payment_monthly'] = [];
 
-				$tickers[$id]['dividend']['frequency'] = $frequency;
+				$tickers[$tickerId]['dividend']['frequency'] = $frequency;
 			}
 
 			if ($cId > $lastYear) {
@@ -143,17 +149,17 @@ final class Trading212Controller extends AbstractController
 					$cId
 				] = $tickerCalendar->getCashAmount();
 				*/
-				$tickers[$id]['dividend'][
+				$tickers[$tickerId]['dividend'][
 					$cId
 				] = $cashAmount;
 
-				$tickers[$id]['dividend'][
+				$tickers[$tickerId]['dividend'][
 					'sumDividend'
 				] += $cashAmount;
-				$tickers[$id]['dividend']['records'] += 1;
+				$tickers[$tickerId]['dividend']['records'] += 1;
 
-				$owned = $tickers[$id]['instrument']->getOwnedQuantity();
-				$tax = $tickers[$id]['tax']->getTaxRate();
+				$owned = $tickers[$tickerId]['instrument']->getOwnedQuantity();
+				$tax = $tickers[$tickerId]['tax']->getTaxRate();
 
 				$normalizeToMonthlyPaymentMultiplier = $frequency / 12;
 
@@ -162,10 +168,10 @@ final class Trading212Controller extends AbstractController
 					$cashAmount *
 					$rateDollarEuro *
 					(1 - $tax);
-				$tickers[$id]['dividend']['predicted_payment'][
+				$tickers[$tickerId]['dividend']['predicted_payment'][
 					$cId
 				] = $predictedPayment;
-				$tickers[$id]['dividend']['predicted_payment_monthly'][$cId] =
+				$tickers[$tickerId]['dividend']['predicted_payment_monthly'][$cId] =
 					$predictedPayment * $normalizeToMonthlyPaymentMultiplier;
 			}
 		}
@@ -585,7 +591,7 @@ final class Trading212Controller extends AbstractController
 			return $position->getTicker();
 		}, $positions);
 
-		$corporateActions = $corporateActionDataProvider->load($positions);
+		$corporateActions = $corporateActionDataProvider->load($tickerList);
 		$dividends = $dividendDataProvider->load($tickerList);
 
 		$tickers = [];
@@ -617,7 +623,7 @@ final class Trading212Controller extends AbstractController
 			$pid = $position->getId();
 
 			$adjustedDividendDecoratorFactory->load($dividends, $corporateActions);
-			$adjustedDividendDecorator = $adjustedDividendDecoratorFactory->decorate($position);
+			$adjustedDividendDecorator = $adjustedDividendDecoratorFactory->decorate($position->getTicker());
 
 			$adjustedDividends = $adjustedDividendDecorator->getAdjustedDividend();
 			$tickers[$ticker->getId()]['adjustedDividend'] = $adjustedDividends;

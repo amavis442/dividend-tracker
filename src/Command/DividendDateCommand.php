@@ -6,7 +6,7 @@ use App\Entity\Calendar;
 use App\Repository\CalendarRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\TickerRepository;
-use App\Service\DividendDateService;
+use App\Service\DividendDate\DividendDateService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;

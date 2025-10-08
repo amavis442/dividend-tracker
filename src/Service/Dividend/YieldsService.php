@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Dividend;
 
 use App\Entity\Constants;
 use App\Entity\Pie;
 use App\Entity\PositionYield;
 use App\Repository\PositionRepository;
 use App\Repository\TransactionRepository;
-use App\Service\DividendExchangeRateResolverInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 use App\DataProvider\PositionDataProvider;
 use App\DataProvider\CorporateActionDataProvider;
 use App\DataProvider\DividendDataProvider;
 use Doctrine\Common\Collections\ArrayCollection;
+use App\Service\ExchangeRate\DividendExchangeRateResolverInterface;
 
 class YieldsService
 {
@@ -61,7 +61,7 @@ class YieldsService
 		}, $positions);
 
 		$transactions = $this->positionDataProvider->load($positions);
-		$actions = $this->corporateActionDataProvider->load($positions);
+		$actions = $this->corporateActionDataProvider->load($tickerList);
 		$dividends = $this->dividendDataProvider->load($tickerList);
 
 		$dividendService =  $this->dividendService->load(transactions: $transactions, corporateActions: $actions, dividends: $dividends);
@@ -105,7 +105,7 @@ class YieldsService
 			$lastDividendDate = null;
 
 			$numPayoutsPerYear = $ticker->getDividendMonths()->count();
-			$calendarList = new ArrayCollection($dividends[$position->getId()] ?? []);
+			$calendarList = new ArrayCollection($dividends[$position->getTicker()->getId()] ?? []);
 
 			//$firstCalendarEntry = $ticker->getCalendars()->first();
 			$firstCalendarEntry = $calendarList->first();

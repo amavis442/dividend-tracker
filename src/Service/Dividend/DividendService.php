@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Dividend;
 
 use App\Entity\Calendar;
 use App\Util\Constants;
@@ -9,8 +9,6 @@ use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Transaction;
 use App\Repository\DividendCalendarRepository;
-use App\Service\DividendAdjuster;
-use App\Service\TransactionAdjuster;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -19,6 +17,9 @@ use App\DataProvider\PositionDataProvider;
 use App\DataProvider\CorporateActionDataProvider;
 use App\DataProvider\DividendDataProvider;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
+use App\Service\ExchangeRate\DividendExchangeRateResolverInterface;
+use App\Service\Transaction\ShareEligibilityCalculatorInterface;
+use App\Service\ExchangeRate\ExchangeAndTaxResolverInterface;
 
 class DividendService implements DividendServiceInterface
 {
@@ -56,7 +57,7 @@ class DividendService implements DividendServiceInterface
 	protected ?array $cachedPositionData;
 
 	/**
-	 * @var array<int, array<int, \App\Entity\Transactition>>|null
+	 * @var array<int, array<int, \App\Entity\Transaction>>|null
 	 */
 	protected ?array $cachedTransactions;
 
@@ -95,13 +96,14 @@ class DividendService implements DividendServiceInterface
 
 	/**
 	 * Loads the data for an decorator or returns it from cache if it is already loaded
+	 * Returns data based on Position::id
 	 *
 	 * @param Position $position
 	 *
 	 * @return array{
-	 *     transactions: array<int, array<int, \App\Entity\Transaction>>,
-	 *     actions: array<int, array<int, \App\Entity\CorporateAction>>,
-	 *     dividends: array<int, array<int, \App\Entity\Calendar>>,
+	 *     transactions: array<int, \App\Entity\Transaction>,
+	 *     actions: array<int, \App\Entity\CorporateAction>,
+	 *     dividends: array<int, \App\Entity\Calendar>,
 	 * }
 	 */
 	protected function getChachedDataForPosition(Position $position): array {
@@ -267,13 +269,13 @@ class DividendService implements DividendServiceInterface
 			return 0.0;
 		}
 		$this->adjustedDividendDecoratorFactory->load($this->cachedDividendCalendars, $this->cachedCorporateActions);
-		$dividendDecorator = $this->adjustedDividendDecoratorFactory->decorate($position);
+		$dividendDecorator = $this->adjustedDividendDecoratorFactory->decorate($position->getTicker());
 		$adjustedDividends = $dividendDecorator->getAdjustedDividend();
 
 		try{
 			$adjustedCashAmount = $adjustedDividends[$calendar->getId()]['adjusted'];
 		} catch (\Exception $e) {
-			dd($this, $position->getId(), $position->getTicker(), $adjustedDividends, $calendar->getId());
+			//dd($this, $position->getId(), $position->getTicker(), $adjustedDividends, $calendar->getId());
 			throw $e;
 		}
 		if ($this->accumulateDividendAmount) {
@@ -323,11 +325,12 @@ class DividendService implements DividendServiceInterface
 	 */
 	private function resolveCashAmount(Ticker $ticker): float
 	{
+
 		$position = $ticker->getPositions()->first();
 
 		$this->adjustedDividendDecoratorFactory->load(dividends: $this->cachedDividendCalendars, actions: $this->cachedCorporateActions);
 
-		$dividendDecorator = $this->adjustedDividendDecoratorFactory->decorate($position);
+		$dividendDecorator = $this->adjustedDividendDecoratorFactory->decorate($position->getTicker());
 		$dividends = $dividendDecorator->getAdjustedDividend();
 		$dividendList = new ArrayCollection($dividends);
 		$lastDividend = $dividendList->last();
@@ -432,7 +435,7 @@ class DividendService implements DividendServiceInterface
 				$calendar
 			);
 
-			$dividendDecorator = $this->adjustedDividendDecoratorFactory->decorate($position);
+			$dividendDecorator = $this->adjustedDividendDecoratorFactory->decorate($position->getTicker());
 			$dividends = $dividendDecorator->getAdjustedDividend();
 			$adjustedCashAmount = $dividends[$calendar->getId()]['adjusted'];
 

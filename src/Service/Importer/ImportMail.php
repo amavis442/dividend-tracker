@@ -14,7 +14,7 @@ use App\Repository\PositionRepository;
 use App\Repository\TaxRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
-use App\Service\WeightedAverage;
+use App\Service\Position\WeightedAverage;
 use DateTime;
 use Doctrine\ORM\EntityManager;
 use DOMDocument;

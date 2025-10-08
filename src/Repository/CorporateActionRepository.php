@@ -72,11 +72,26 @@ class CorporateActionRepository extends ServiceEntityRepository
 	//        ;
 	//    }
 
-	public function findByPositionIds(array $positionIds): array
+	public function findByTickerIds(array $tickerIds): mixed
 	{
+		return $this->createQueryBuilder('c')
+			->select('c, t')
+			->innerJoin('c.ticker', 't')
+			->andWhere('c.ticker IN (:tickerIds)')
+			->andWhere('c.type IN (:types)')
+			->orderBy('c.eventDate', 'ASC')
+			->setParameter('tickerIds', $tickerIds)
+			->setParameter('types',[
+					CorporateAction::REVERSE_SPLIT,
+					CorporateAction::SPLIT,
+				])
+			->getQuery()
+			->getResult();
+
+		/*
 		return $this->findBy(
 			[
-				'position' => $positionIds,
+				'position' => $tickerIds,
 				'type' => [
 					CorporateAction::REVERSE_SPLIT,
 					CorporateAction::SPLIT,
@@ -84,5 +99,6 @@ class CorporateActionRepository extends ServiceEntityRepository
 			],
 			['eventDate' => 'ASC'],
 		);
+		*/
 	}
 }

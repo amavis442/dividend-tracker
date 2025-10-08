@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Position;
 
 use App\Entity\Position;
 use Doctrine\ORM\EntityManagerInterface;

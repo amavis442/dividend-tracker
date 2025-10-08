@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Transaction;
 
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Calendar;

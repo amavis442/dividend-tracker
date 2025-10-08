@@ -1,5 +1,5 @@
 <?php
-namespace App\Service;
+namespace App\Service\Dividend;
 
 use App\Entity\Calendar;
 

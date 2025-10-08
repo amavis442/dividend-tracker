@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Dividend;
 
 use App\Entity\Calendar;
 use App\Entity\Position;
@@ -19,14 +19,19 @@ use Doctrine\Common\Collections\Collection;
 interface DividendServiceInterface
 {
 	/**
+	 * Load arrays with data to be processed
 	 *
-	 * @param array<int, array<int, \App\Entity\Transaction>>
+	 * @param array<int, array<int, \App\Entity\Transaction>> $transactions
 	 *
-	 * @param array<int, array<int, \App\Entity\CorporateAction>>
+	 * @param array<int, array<int, \App\Entity\CorporateAction>> $corporateActions
 	 *
-	 * @param array<int, array<int, \App\Entity\Calendar>>
+	 * @param array<int, array<int, \App\Entity\Calendar>> $dividends
 	 */
-	public function load(array $transactions, array $corporateActions, array $dividends): self;
+	public function load(
+		array $transactions,
+		array $corporateActions,
+		array $dividends
+	): self;
 
 	/**
 	 * Get the exchange rate and tax rate

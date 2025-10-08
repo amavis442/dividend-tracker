@@ -5,7 +5,7 @@ namespace App\Service;
 use App\Repository\PaymentRepository;
 use App\Repository\DividendTrackerRepository;
 use App\Repository\CalendarRepository;
-use App\Service\DividendService;
+use App\Service\Dividend\DividendService;
 
 class Payouts
 {

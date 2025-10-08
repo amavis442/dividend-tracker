@@ -3,14 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\Calendar;
-use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Transaction;
 
-use App\Service\DividendExchangeRateResolverInterface;
-use App\Service\DividendServiceInterface;
-use App\Service\DividendTaxRateResolverInterface;
+use App\Service\Dividend\DividendServiceInterface;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

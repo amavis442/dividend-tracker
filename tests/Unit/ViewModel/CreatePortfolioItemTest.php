@@ -20,12 +20,11 @@ class CreatePortfolioItemTest extends TestCase
 {
     public function testPortfolioItemIsDecoratedAndEnriched(): void
     {
-        $this->assertTrue(true);
-    }
+        $this->markTestIncomplete(
+          'This test has not been implemented yet.'
+        );
 
-    /** Todo: fix this test
-    public function testPortfolioItemIsDecoratedAndEnriched(): void
-    {
+        /*
         // Mocks
         $tickerMock = $this->createMock(Ticker::class);
         $tickerMock->method('getSymbol')->willReturn('AAPL');
@@ -88,9 +87,9 @@ class CreatePortfolioItemTest extends TestCase
 
         // Act
         $model->createPortfolioItem(new \ArrayIterator([$positionMock]), 10000.0);
-
+        */
         // Assert that key methods were called
         $this->assertTrue(true); // If no exceptions were thrown, we're good
     }
-        */
+
 }

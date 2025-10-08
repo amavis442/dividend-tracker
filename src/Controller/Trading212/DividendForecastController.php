@@ -3,7 +3,7 @@
 namespace App\Controller\Trading212;
 
 use App\Repository\Trading212PieMetaDataRepository;
-use App\Service\DividendForecastService;
+use App\Service\Dividend\DividendForecastService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

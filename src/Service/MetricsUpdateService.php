@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Position;
-use App\Service\WeightedAverage;
+use App\Service\Position\WeightedAverage;
 use Doctrine\ORM\EntityManagerInterface;
 
 class MetricsUpdateService

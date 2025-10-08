@@ -1,10 +1,10 @@
 <?php
 namespace App\Decorator\Factory;
 
-use App\Entity\Position;
+use App\Entity\Ticker;
 use App\Decorator\AdjustedDividendDecorator;
 use App\Decorator\AdjustedDividendDecoratorInterface;
-use App\Service\DividendAdjuster;
+use App\Service\Dividend\DividendAdjuster;
 
 class AdjustedDividendDecoratorFactory
 {
@@ -49,26 +49,25 @@ class AdjustedDividendDecoratorFactory
 	}
 
 
-	public function decorate(Position $position): AdjustedDividendDecoratorInterface
+	public function decorate(Ticker $ticker): AdjustedDividendDecoratorInterface
 	{
-		$pid = $position->getId();
+		$tid = $ticker->getId();
 
 		return new AdjustedDividendDecorator(
-			position: $position,
-			dividends: $this->dividends[$pid] ?? [],
-			actions: $this->actions[$pid] ?? [],
+			dividends: $this->dividends[$tid] ?? [],
+			actions: $this->actions[$tid] ?? [],
 			dividendAdjuster: $this->dividendAdjuster
 		);
 	}
 
 	/**
-	 * Optionally decorate a batch of positions
+	 * Optionally decorate a batch of tickers
 	 */
-	public function decorateBatch(array $positions): array
+	public function decorateBatch(array $tickers): array
 	{
 		return array_map(
-			fn($position) => $this->decorate($position),
-			$positions
+			fn($ticker) => $this->decorate($ticker),
+			$tickers
 		);
 	}
 }
