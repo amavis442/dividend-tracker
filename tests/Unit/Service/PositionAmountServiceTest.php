@@ -2,19 +2,19 @@
 
 namespace App\Tests\Unit\Service;
 
-use App\Entity\Position;
-use App\Entity\Transaction;
+use App\DataProvider\PositionDataProvider;
+use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 use App\Entity\CorporateAction;
+use App\Entity\Position;
 use App\Entity\Ticker;
+use App\Entity\Transaction;
 use App\Repository\CorporateActionRepository;
 use App\Repository\TransactionRepository;
+use App\Service\Position\PositionAmountService;
+use App\Service\Transaction\TransactionAdjuster;
 use App\Tests\Unit\Service\Adjustment\AdjustmentStrategyTestTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
-use App\Service\PositionAmountService;
-use App\DataProvider\PositionDataProvider;
-use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
-use App\Service\TransactionAdjuster;
 
 /**
  * @test

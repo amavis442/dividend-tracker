@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 use App\Entity\Transaction;
 use App\Entity\CorporateAction;
 use Doctrine\Common\Collections\ArrayCollection;
-use App\Service\TransactionAdjuster;
+use App\Service\Transaction\TransactionAdjuster;
 
 class TransactionAdjusterTest extends TestCase
 {

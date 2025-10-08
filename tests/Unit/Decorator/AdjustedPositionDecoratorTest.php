@@ -2,15 +2,15 @@
 
 namespace App\Tests\Unit\Decorator;
 
-use App\Entity\Transaction;
+use App\Decorator\AdjustedPositionDecorator;
 use App\Entity\CorporateAction;
 use App\Entity\Position;
 use App\Entity\Ticker;
-
-use App\Decorator\AdjustedPositionDecorator;
-use App\Repository\TransactionRepository;
+use App\Entity\Transaction;
 use App\Repository\CorporateActionRepository;
-use App\Service\TransactionAdjuster;
+use App\Repository\TransactionRepository;
+use App\Service\Transaction\TransactionAdjuster;
+
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -55,7 +55,7 @@ class AdjustedPositionDecoratorTest extends TestCase
 		$tx3->setSide(Transaction::BUY);
 		$tx3->setTransactionDate(new \DateTime('2024-07-01')); // after split
 
-		$transactions = [$transaction,$tx2,$tx3];
+		$transactions = [$transaction, $tx2, $tx3];
 
 		$action = new CorporateAction();
 		$action->setTicker($ticker);
@@ -64,7 +64,6 @@ class AdjustedPositionDecoratorTest extends TestCase
 		$action->setEventDate(new \DateTime('2024-06-15'));
 
 		$corporateActions = [$action];
-
 
 		$adjusterMock = $this->createMock(TransactionAdjuster::class);
 		$adjusterMock

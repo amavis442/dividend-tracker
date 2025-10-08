@@ -12,11 +12,11 @@ use App\Entity\Trading212PieInstrument;
 use App\Entity\Trading212PieMetaData;
 use App\Repository\DividendCalendarRepository;
 use App\Repository\Trading212PieInstrumentRepository;
-use App\Service\DividendAdjuster;
-use App\Service\DividendForecastService;
-use App\Service\ExchangeAndTaxResolver;
-use PHPUnit\Framework\TestCase;
+use App\Service\Dividend\DividendAdjuster;
+use App\Service\Dividend\DividendForecastService;
+use App\Service\ExchangeRate\ExchangeAndTaxResolver;
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\TestCase;
 
 class DividendForecastServiceTest extends TestCase
 {
@@ -42,7 +42,6 @@ class DividendForecastServiceTest extends TestCase
 		$action->method('getRatio')->willReturn(0.5);
 
 		$position = $this->createMock(\App\Entity\Position::class);
-		$position->method('getCorporateActions')->willReturn(new ArrayCollection([$action]));
 
 		/*
 		$tickerEntity = $this->createMock(Ticker::class);
@@ -57,33 +56,26 @@ class DividendForecastServiceTest extends TestCase
 		    'getSymbol' => 'AAPL',
     		'getTax' => $taxEntity,
     		'getPositions' => new ArrayCollection([$position]),
+			'getCorporateActions' => new ArrayCollection([$action]),
 		]);
 
-		$snapshot = $this->createMock(Trading212PieInstrument::class);
-		$snapshot->method('getTicker')->willReturn($tickerEntity);
-		$snapshot
-			->method('getTrading212PieMetaData')
-			->willReturn($metaDataMock);
+		$snapshot = $this->createConfiguredMock(Trading212PieInstrument::class,[
+			'getTicker' => $tickerEntity,
+			'getCreatedAt' => new \DateTimeImmutable('2025-07-01'),
+			'getOwnedQuantity' => 100.0,
+			'getTrading212PieMetaData' => $metaDataMock,
+		]);
 
-		$snapshot
-			->method('getCreatedAt')
-			->willReturn(new \DateTimeImmutable('2025-07-01'));
-		$snapshot->method('getOwnedQuantity')->willReturn(100.0);
-
-		$entry = $this->createMock(Calendar::class);
-		$entry
-			->method('getExDividendDate')
-			->willReturn(new \DateTime('2025-07-15'));
-		$entry->method('getCashAmount')->willReturn(0.85);
-		$entry
-			->method('getPaymentDate')
-			->willReturn(new \DateTime('2025-08-15'));
 		$currency = $this->createConfiguredMock(Currency::class, [
 			'getSymbol' => 'USD',
 		]);
-		$entry->method('getCurrency')->willReturn($currency);
-		$entry->method('getCreatedAt')
-    		->willReturn(new \DateTimeImmutable('2025-06-30'));
+		$entry = $this->createConfiguredMock(Calendar::class,[
+			'getExDividendDate' => new \DateTime('2025-07-15'),
+			'getCashAmount' => 0.85,
+			'getPaymentDate' => new \DateTime('2025-08-15'),
+			'getCurrency'=> $currency,
+			'getCreatedAt' => new \DateTimeImmutable('2025-06-30'),
+		]);
 
 		$exchangeTaxDto = new ExchangeTaxDto(
 			taxAmount: 0.15,

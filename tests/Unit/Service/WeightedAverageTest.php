@@ -1,17 +1,17 @@
 <?php
 namespace App\Tests\Unit\Service;
 
-use PHPUnit\Framework\TestCase;
-use App\Entity\Transaction;
 use App\Entity\CorporateAction;
 use App\Entity\Position;
 use App\Entity\Ticker;
-
-use App\Service\WeightedAverage;
-use App\Repository\TransactionRepository;
+use App\Entity\Transaction;
 use App\Repository\CorporateActionRepository;
-use Doctrine\ORM\EntityManagerInterface;
+
+use App\Repository\TransactionRepository;
+use App\Service\Position\WeightedAverage;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\TestCase;
 
 class WeightedAverageTest extends TestCase
 {

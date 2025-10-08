@@ -52,7 +52,6 @@ class DividendForecastService
 				$snapshotDate
 			);
 
-			$position = $ticker->getPositions()->last();
 			foreach ($calendarEntries as $entry) {
 				$exchangeTaxDto = $this->exchangeAndTaxResolver->resolve(
 					$ticker,
@@ -65,7 +64,7 @@ class DividendForecastService
 					$adjustedCashAmount = $this->dividendAdjuster->getAdjustedDividend(
 						$entry ? $entry->getCashAmount() : 0.0,
 						$entry->getCreatedAt(),
-						$position->getTicker()->getCorporateActions()
+						$ticker->getCorporateActions()
 					);
 
 					$payout =
@@ -74,23 +73,23 @@ class DividendForecastService
 						(1 - $taxRate) *
 						$exchangeRate;
 
-					$payouts[] = [
-						'ticker' => $ticker->getSymbol(),
-						'fullname' => $ticker->getFullname(),
-						'quantity' => $snapshot->getOwnedQuantity(),
-						'pieLabel' => $snapshot
-							->getTrading212PieMetaData()
-							->getPie()
-							->getLabel(),
-						'payout' => $payout,
-						'paymentDate' => $entry->getPaymentDate(),
-						'exDate' => $entry->getExDividendDate(),
-						'taxWithheld' => $taxRate,
-						'exchangeRate' => $exchangeRate,
-						'cashAmount' => $entry->getCashAmount(),
-						'dividendType' => $entry->getDividendType(),
-						'currency' => $entry->getCurrency()->getSymbol(),
-					];
+						$payouts[] = [
+							'ticker' => $ticker->getSymbol(),
+							'fullname' => $ticker->getFullname(),
+							'quantity' => $snapshot->getOwnedQuantity(),
+							'pieLabel' => $snapshot
+								->getTrading212PieMetaData()
+								->getPie()
+								->getLabel(),
+							'payout' => $payout,
+							'paymentDate' => $entry->getPaymentDate(),
+							'exDate' => $entry->getExDividendDate(),
+							'taxWithheld' => $taxRate,
+							'exchangeRate' => $exchangeRate,
+							'cashAmount' => $entry->getCashAmount(),
+							'dividendType' => $entry->getDividendType(),
+							'currency' => $entry->getCurrency()->getSymbol(),
+						];
 				}
 			}
 		}

@@ -9,8 +9,8 @@ use App\Entity\Calendar;
 use App\Entity\Transaction;
 use App\Repository\CorporateActionRepository;
 use App\Repository\TransactionRepository;
-use App\Service\DividendAdjuster;
-use App\Service\TransactionAdjuster;
+use App\Service\Dividend\DividendAdjuster;
+use App\Service\Transaction\TransactionAdjuster;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use App\Decorator\AdjustedDividendDecorator;
@@ -82,7 +82,6 @@ class AdjustedDividendDecoratorTest extends TestCase
 		$adjuster = new DividendAdjuster();
 
 		$decorator = new AdjustedDividendDecorator(
-			ticker: $ticker,
 			dividends: $dividends,
 			actions: $corporateActions,
 			dividendAdjuster: $adjuster

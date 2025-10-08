@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\CorporateAction;
-use App\Entity\Position;
+use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -20,28 +20,25 @@ class CorporateActionRepository extends ServiceEntityRepository
 
 	/**
 	 * Returns querybuilder with all the events for given position
-	 * @param Position $position
+	 * @param Ticker $ticker
 	 * @return QueryBuilder
 	 */
 	public function getBuilderFindAllByPosition(
-		Position $position
+		Ticker $ticker
 	): QueryBuilder {
 		return $this->createQueryBuilder('c')
-			->innerJoin('c.position', 'p')
-			->where('p.id = :position')
-			->andWhere('p.closed = false')
-			->setParameter('position', $position->getId());
+			->innerJoin('c.ticker', 't')
+			->where('t.id = :ticker')
+			->setParameter('ticker', $ticker->getId());
 	}
 
 	/**
-	 * Get all corporate actions with related position and ticker
+	 * Get all corporate actions with related ticker
 	 */
 	public function findAllWithPositionAndTicker(): mixed
 	{
 		return $this->createQueryBuilder('c')
-			->innerJoin('c.position', 'p')
-			->innerJoin('p.ticker', 't')
-			->andWhere('p.closed = false')
+			->innerJoin('c.ticker', 't')
 			->orderBy('c.eventDate')
 			->getQuery()
 			->getResult();

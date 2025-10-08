@@ -78,7 +78,7 @@ final class CorporateActionControllerTest extends WebTestCase
 		// self::assertSame('Some text on the page', $crawler->filter('.p')->first()->text());
 	}
 
-	private function setUpPosition(): \App\Entity\Position
+	private function setUpTicker(): \App\Entity\Ticker
 	{
 		//$start = microtime(true);
 		$currency = CurrencyFactory::createOne(['symbol'=> 'USD']);
@@ -91,7 +91,7 @@ final class CorporateActionControllerTest extends WebTestCase
 		//dump('BranchFactory took ' . ($end - $start) . ' seconds');
 
         //$start = microtime(true);
-		$ticker = TickerFactory::createOne([
+		$tickerProxy = TickerFactory::createOne([
             'branch' => $branch,
             'fullname' => 'Apple',
             'symbol' => 'AAPL',
@@ -112,21 +112,23 @@ final class CorporateActionControllerTest extends WebTestCase
 			'ignore_for_dividend' => false,
 			'price' => 10.0,
 			'profit' => 0.0,
-			'ticker' => $ticker,
+			'ticker' => $tickerProxy,
 			'user' => $this->testUser,
 		]);
 		$position = $positionProxy->_real();
+		$ticker = $tickerProxy->_real();
 
+		$this->manager->persist($ticker);
 		$this->manager->persist($position);
 		$this->manager->flush();
 
-		return $position;
+		return $ticker;
 	}
 
 
 	public function testNew(): void
 	{
-		$position = $this->setUpPosition();
+		$ticker = $this->setUpTicker();
 
 		//$positionRepository = static::getContainer()->get(PositionRepository::class);
 		//$positions = $positionRepository->findAll();
@@ -141,7 +143,7 @@ final class CorporateActionControllerTest extends WebTestCase
 			'corporate_action[type]' => 'reverse_split',
 			'corporate_action[eventDate]' => '2025-07-25',
 			'corporate_action[ratio]' => '0.5',
-			'corporate_action[position]' => $position->getId(),
+			'corporate_action[ticker]' => $ticker->getId(),
 		]);
 
 		self::assertResponseRedirects('/nl/dashboard/corporate/action');
@@ -151,14 +153,14 @@ final class CorporateActionControllerTest extends WebTestCase
 
 	public function testShow(): void
 	{
-		$position = $this->setUpPosition();
+		$ticker = $this->setUpTicker();
 
 		$fixture = new CorporateAction();
 		$fixture->setType('My Test Type');
 		$fixture->setEventDate(new \DateTime());
 		$fixture->setRatio(2);
 		$fixture->setCreatedAt(new \DateTimeImmutable());
-		$fixture->setPosition($position);
+		$fixture->setTicker($ticker);
 
 		$this->manager->persist($fixture);
 		$this->manager->flush();
@@ -183,7 +185,7 @@ final class CorporateActionControllerTest extends WebTestCase
 		$fixture->setEventDate('Value');
 		$fixture->setRatio('Value');
 		$fixture->setCreatedAt('Value');
-		$fixture->setPosition('Value');
+		$fixture->setTicker(1);
 
 		$this->manager->persist($fixture);
 		$this->manager->flush();

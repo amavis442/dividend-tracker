@@ -5,7 +5,7 @@ namespace App\Decorator\Factory;
 use App\Entity\Position;
 use App\Decorator\AdjustedPositionDecorator;
 use App\Decorator\AdjustedPositionDecoratorInterface;
-use App\Service\TransactionAdjusterInterface;
+use App\Service\Transaction\TransactionAdjusterInterface;
 
 class AdjustedPositionDecoratorFactory
 {

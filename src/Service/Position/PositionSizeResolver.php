@@ -5,7 +5,7 @@ namespace App\Service\Position;
 use App\Entity\Calendar;
 use App\Entity\Transaction;
 use Doctrine\Common\Collections\Collection;
-use App\Service\TransactionAdjuster;
+use App\Service\Transaction\TransactionAdjuster;
 
 
 class PositionSizeResolver
