@@ -40,6 +40,7 @@ class AdjustedDividendDecorator implements AdjustedDecoratorInterface, AdjustedD
 				'paymentDate' => $dividend->getPaymentDate(),
 				'ticker' => $dividend->getTicker(),
 				'symbol' => $dividend->getTicker()->getSymbol(),
+				'calendar' => $dividend,
 			];
 		}
 

@@ -481,22 +481,32 @@ class DividendCalendarRepository extends ServiceEntityRepository
 			->getResult();
 	}
 
-	public function findByTickerIds(array $tickerIds): mixed
+	/**
+	 * Returns all calendars for tickers keyed by Calendar::id
+	 * Optional set the payment date for calendars in the future
+	 *
+	 * @param array<int> $tickerIds
+	 * @param null|\DateTime $afterDate
+	 * @param array $types
+	 * @return mixed
+	 */
+	public function findByTickerIds(array $tickerIds, ?\DateTime $afterDate, array $types = [Calendar::REGULAR]): mixed
 	{
-		return $this->createQueryBuilder('c','c.id')
+		$qb = $this->createQueryBuilder('c','c.id')
 		->select('c, t')
 		->join('c.ticker', 't')
 		->andWhere('c.ticker in (:tickers)')
 		->andWhere('c.dividendType IN (:dividendType)')
 		->setParameter('tickers', $tickerIds)
-		->setParameter('dividendType', [Calendar::REGULAR])
-		->groupBy('t.id, c.id')
-		->getQuery()
-		->getResult();
+		->setParameter('dividendType', $types)
+		->groupBy('t.id, c.id');
 
-		/* return $this->findBy(
-			['ticker' => $tickerIds, 'dividendType' => Calendar::REGULAR],
-			['paymentDate' => 'ASC']
-		); */
+		if ($afterDate) {
+			$qb->andWhere('c.paymentDate >= :paymentDate')
+			->setParameter('paymentDate', $afterDate->format('Y-m-d'));
+		}
+
+		return $qb->getQuery()
+		->getResult();
 	}
 }

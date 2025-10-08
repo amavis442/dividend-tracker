@@ -28,6 +28,7 @@ final class DividendForecastController extends AbstractController
 				$data[0]->getCreatedAt()->format('Y-m-d H:i:s')
 			);
 
+
 			$result = $dividendForecastService->calculateProjectedPayouts(
 				$snapshotDate
 			);

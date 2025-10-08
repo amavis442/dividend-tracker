@@ -15,7 +15,8 @@ interface AdjustedDividendDecoratorInterface
 	 *  declareDate: \DateTime,
 	 *  paymentDate: \DateTime,
 	 *  ticker: Ticker,
-	 *  symbol: string
+	 *  symbol: string,
+	 *  calendar: \App\Entity\Calendar
 	 * }>
 	 */
 	public function getAdjustedDividend(): array;
@@ -29,7 +30,8 @@ interface AdjustedDividendDecoratorInterface
 	 *  declareDate: \DateTime,
 	 *  paymentDate: \DateTime,
 	 *  ticker: Ticker,
-	 *  symbol: string
+	 *  symbol: string,
+	 * 	calendar: \App\Entity\Calendar
 	 * }>
 	 */
 	public function getAdjustedDividendSortByPaymentDate(): array;

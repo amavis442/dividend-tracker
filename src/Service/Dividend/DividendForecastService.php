@@ -2,10 +2,14 @@
 
 namespace App\Service\Dividend;
 
+use App\Entity\Calendar;
 use App\Repository\Trading212PieInstrumentRepository;
 use App\Repository\DividendCalendarRepository;
 use App\Service\ExchangeRate\ExchangeAndTaxResolver;
 use Doctrine\Common\Collections\ArrayCollection;
+use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
+use App\DataProvider\DividendDataProvider;
+use App\DataProvider\CorporateActionDataProvider;
 
 class DividendForecastService
 {
@@ -13,7 +17,10 @@ class DividendForecastService
 		protected Trading212PieInstrumentRepository $holdingsSnapshotInstrumentRepository,
 		protected DividendCalendarRepository $dividendCalendarRepository,
 		protected ExchangeAndTaxResolver $exchangeAndTaxResolver,
-		protected DividendAdjuster $dividendAdjuster
+		protected DividendAdjuster $dividendAdjuster,
+		protected AdjustedDividendDecoratorFactory $adjustedDividendDecoratorFactory,
+		protected DividendDataProvider $dividendDataProvider,
+		protected CorporateActionDataProvider $corporateActionDataProvider
 	) {
 	}
 
@@ -36,6 +43,18 @@ class DividendForecastService
 		);
 		$payouts = [];
 
+		$tickers = array_map(function ($snapshot) {
+			return $snapshot->getTicker();
+		}, $snapshots);
+
+		$dividends = $this->dividendDataProvider->load($tickers, $snapshotDate, [Calendar::REGULAR, Calendar::SPECIAL]);
+		$actions = $this->corporateActionDataProvider->load($tickers);
+
+		$this->adjustedDividendDecoratorFactory->load(
+			dividends: $dividends,
+			actions: $actions
+		);
+
 		/**
 		 * @var \App\Entity\Trading212PieInstrument $snapshot
 		 */
@@ -47,25 +66,40 @@ class DividendForecastService
 			if (!$ticker) {
 				continue;
 			}
-			$calendarEntries = $this->dividendCalendarRepository->getEntriesByTickerAndPayoutDate(
-				$ticker,
-				$snapshotDate
+
+			$dividendDecorator = $this->adjustedDividendDecoratorFactory->decorate(
+				$ticker
 			);
 
-			foreach ($calendarEntries as $entry) {
+			$adjustedDividends = $dividendDecorator->getAdjustedDividend();
+
+			/*$calendarEntries = $this->dividendCalendarRepository->getEntriesByTickerAndPayoutDate(
+				$ticker,
+				$snapshotDate
+			);*/
+
+			foreach ($adjustedDividends as $calendarId => $calendarItem) {
+				$calendarEntry = $calendarItem['calendar'];
+
 				$exchangeTaxDto = $this->exchangeAndTaxResolver->resolve(
 					$ticker,
-					$entry
+					$calendarEntry
 				);
 				$taxRate = $exchangeTaxDto->taxAmount;
 				$exchangeRate = $exchangeTaxDto->exchangeRate;
 
-				if ($snapshot->getCreatedAt() < $entry->getPaymentDate()) {
+				if (
+					$snapshot->getCreatedAt() < $calendarEntry->getPaymentDate()
+				) {
+					$adjustedCashAmount = $calendarItem['adjusted'];
+
+					/*
 					$adjustedCashAmount = $this->dividendAdjuster->getAdjustedDividend(
-						$entry ? $entry->getCashAmount() : 0.0,
-						$entry->getCreatedAt(),
+						$calendarEntry ? $calendarEntry->getCashAmount() : 0.0,
+						$calendarEntry->getCreatedAt(),
 						$ticker->getCorporateActions()
 					);
+					*/
 
 					$payout =
 						$snapshot->getOwnedQuantity() *
@@ -73,23 +107,26 @@ class DividendForecastService
 						(1 - $taxRate) *
 						$exchangeRate;
 
-						$payouts[] = [
-							'ticker' => $ticker->getSymbol(),
-							'fullname' => $ticker->getFullname(),
-							'quantity' => $snapshot->getOwnedQuantity(),
-							'pieLabel' => $snapshot
-								->getTrading212PieMetaData()
-								->getPie()
-								->getLabel(),
-							'payout' => $payout,
-							'paymentDate' => $entry->getPaymentDate(),
-							'exDate' => $entry->getExDividendDate(),
-							'taxWithheld' => $taxRate,
-							'exchangeRate' => $exchangeRate,
-							'cashAmount' => $entry->getCashAmount(),
-							'dividendType' => $entry->getDividendType(),
-							'currency' => $entry->getCurrency()->getSymbol(),
-						];
+					$payouts[] = [
+						'ticker' => $ticker->getSymbol(),
+						'fullname' => $ticker->getFullname(),
+						'quantity' => $snapshot->getOwnedQuantity(),
+						'pieLabel' => $snapshot
+							->getTrading212PieMetaData()
+							->getPie()
+							->getLabel(),
+						'payout' => $payout,
+						'paymentDate' => $calendarEntry->getPaymentDate(),
+						'exDate' => $calendarEntry->getExDividendDate(),
+						'taxWithheld' => $taxRate,
+						'exchangeRate' => $exchangeRate,
+						'originalCashAmount' => $calendarEntry->getCashAmount(),
+						'adjustedCashAmount' => $adjustedCashAmount,
+						'dividendType' => $calendarEntry->getDividendType(),
+						'currency' => $calendarEntry
+							->getCurrency()
+							->getSymbol(),
+					];
 				}
 			}
 		}

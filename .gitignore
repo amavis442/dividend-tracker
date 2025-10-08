@@ -53,3 +53,5 @@ phpstan.neon
 /.php-version
 php.ini
 cachetool.phar
+docs
+.phpdoc

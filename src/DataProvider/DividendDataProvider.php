@@ -4,6 +4,7 @@ namespace App\DataProvider;
 
 use App\Repository\DividendCalendarRepository;
 use App\Entity\Ticker;
+use App\Entity\Calendar;
 
 class DividendDataProvider
 {
@@ -19,12 +20,12 @@ class DividendDataProvider
 	 *
 	 * @return array<int, array<int, \App\Entity\Calendar>>
 	 */
-	public function load(array $tickers): array
+	public function load(array $tickers, ?\DateTime $afterDate = null, array $types = [Calendar::REGULAR]): array
 	{
 		$ids = array_map(fn(Ticker $t) => $t->getId(), $tickers);
 
 		return $this->mapByTicker(
-				$this->diviRepo->findByTickerIds($ids)
+				$this->diviRepo->findByTickerIds($ids, $afterDate, $types)
 		);
 	}
 

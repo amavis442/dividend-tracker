@@ -54,6 +54,7 @@
                                 <twig:Table:Tr>
                                     <twig:Table:Td>
                                         {{ info.paymentDate|date("Y-m-d") }}
+                                        ({{ info.dividendType|trans }})
                                     </twig:Table:Td>
                                     <twig:Table:Td>
                                         <div>{{ info.ticker }}</div>
@@ -68,7 +69,8 @@
                                         &euro;{{ info.payout|number_format(2, '.', ',') }}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
-                                        {{ info.cashAmount|number_format(2, '.', ',') }}
+                                        ${{ info.adjustedCashAmount|number_format(2, '.', ',') }}<br/>
+                                        <small>orignal: ${{ info.originalCashAmount|number_format(2, '.', ',') }}</small>
                                     </twig:Table:Td>
                                     <twig:Table:Td>
                                         {{ info.currency }}
