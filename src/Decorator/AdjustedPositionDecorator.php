@@ -18,7 +18,7 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface,AdjustedPo
 	 *
 	 * @param array<int, \App\Entity\CorporateAction> $actions
 	 *
-	 * @param \App\Service\TransactionAdjusterInterface $transactionAdjuster
+	 * @param \App\Service\Transaction\TransactionAdjusterInterface $transactionAdjuster
 	 */
 	public function __construct(
 		private Position $position,

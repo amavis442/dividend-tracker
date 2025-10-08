@@ -34,7 +34,7 @@ class CorporateActionController extends AbstractController
 		#[MapQueryParameter] string $sort = 'desc'
 	): Response {
 		$adapter = new QueryAdapter(
-			$corporateActionRepository->getBuilderFindAllByPosition($position)
+			$corporateActionRepository->getBuilderFindAllByPosition($position->getTicker())
 		);
 		$pager = new Pagerfanta($adapter);
 		$pager->setMaxPerPage(10);
