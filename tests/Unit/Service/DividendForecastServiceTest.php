@@ -17,6 +17,9 @@ use App\Service\Dividend\DividendForecastService;
 use App\Service\ExchangeRate\ExchangeAndTaxResolver;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
+use App\DataProvider\DividendDataProvider;
+use App\DataProvider\CorporateActionDataProvider;
+use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
 
 class DividendForecastServiceTest extends TestCase
 {
@@ -38,43 +41,45 @@ class DividendForecastServiceTest extends TestCase
 		]);
 
 		$action = $this->createMock(\App\Entity\CorporateAction::class);
-		$action->method('getEventDate')->willReturn(new \DateTime('2025-07-20'));
+		$action
+			->method('getEventDate')
+			->willReturn(new \DateTime('2025-07-20'));
 		$action->method('getRatio')->willReturn(0.5);
 
 		$position = $this->createMock(\App\Entity\Position::class);
 
-		/*
-		$tickerEntity = $this->createMock(Ticker::class);
-		$tickerEntity->method('getTax')->willReturn($taxEntity);
-
+		$tickerId = 1;
 		$tickerEntity = $this->createConfiguredMock(Ticker::class, [
+			'getId' => $tickerId,
 			'getSymbol' => 'AAPL',
-		]);
-		*/
-
-		$tickerEntity = $this->createConfiguredMock(Ticker::class, [
-		    'getSymbol' => 'AAPL',
-    		'getTax' => $taxEntity,
-    		'getPositions' => new ArrayCollection([$position]),
+			'getTax' => $taxEntity,
+			'getPositions' => new ArrayCollection([$position]),
 			'getCorporateActions' => new ArrayCollection([$action]),
 		]);
 
-		$snapshot = $this->createConfiguredMock(Trading212PieInstrument::class,[
-			'getTicker' => $tickerEntity,
-			'getCreatedAt' => new \DateTimeImmutable('2025-07-01'),
-			'getOwnedQuantity' => 100.0,
-			'getTrading212PieMetaData' => $metaDataMock,
-		]);
+		$snapshot = $this->createConfiguredMock(
+			Trading212PieInstrument::class,
+			[
+				'getTicker' => $tickerEntity,
+				'getCreatedAt' => new \DateTimeImmutable('2025-07-01'),
+				'getOwnedQuantity' => 100.0,
+				'getTrading212PieMetaData' => $metaDataMock,
+			]
+		);
 
 		$currency = $this->createConfiguredMock(Currency::class, [
 			'getSymbol' => 'USD',
 		]);
-		$entry = $this->createConfiguredMock(Calendar::class,[
+
+		$calId = 1;
+		$calendarMock = $this->createConfiguredMock(Calendar::class, [
+			'getId' => $calId,
 			'getExDividendDate' => new \DateTime('2025-07-15'),
 			'getCashAmount' => 0.85,
 			'getPaymentDate' => new \DateTime('2025-08-15'),
-			'getCurrency'=> $currency,
+			'getCurrency' => $currency,
 			'getCreatedAt' => new \DateTimeImmutable('2025-06-30'),
+			'getTicker' => $tickerEntity,
 		]);
 
 		$exchangeTaxDto = new ExchangeTaxDto(
@@ -91,12 +96,12 @@ class DividendForecastServiceTest extends TestCase
 		$calendarRepo = $this->createMock(DividendCalendarRepository::class);
 		$calendarRepo
 			->method('getEntriesByTickerAndPayoutDate')
-			->willReturn([$entry]);
+			->willReturn([$calendarMock]);
 
-		$resolver = $this->createMock(ExchangeAndTaxResolver::class);
-		$resolver
+		$exchangeAndTaxResolver = $this->createMock(ExchangeAndTaxResolver::class);
+		$exchangeAndTaxResolver
 			->method('resolve')
-			->with($tickerEntity, $entry)
+			->with($tickerEntity, $calendarMock)
 			->willReturn($exchangeTaxDto);
 
 		$dividendAdjust = $this->createMock(DividendAdjuster::class);
@@ -111,11 +116,35 @@ class DividendForecastServiceTest extends TestCase
 			)
 			->willReturn(1.7);
 
+		$actionsProvider = $this->createConfiguredMock(
+			CorporateActionDataProvider::class,
+			[
+				'load' => [$tickerId => [$action]],
+			]
+		);
+
+		$dividendProvider = $this->createConfiguredMock(
+			DividendDataProvider::class,
+			[
+				'load' => [$tickerId => [$calId => $calendarMock]],
+			]
+		);
+
+		$adjustedDividendDecoratorFactory = new AdjustedDividendDecoratorFactory($dividendAdjust);
+
+		/*
+		protected AdjustedDividendDecoratorFactory $adjustedDividendDecoratorFactory,
+		protected DividendDataProvider $dividendDataProvider,
+		protected CorporateActionDataProvider $corporateActionDataProvider
+		*/
 		$service = new DividendForecastService(
 			$holdingsRepo,
 			$calendarRepo,
-			$resolver,
-			$dividendAdjust
+			$exchangeAndTaxResolver,
+			$dividendAdjust,
+			$adjustedDividendDecoratorFactory,
+			$dividendProvider,
+			$actionsProvider
 		);
 
 		$result = $service->calculateProjectedPayouts($snapshotDate);
@@ -126,7 +155,10 @@ class DividendForecastServiceTest extends TestCase
 		$this->assertSame('AAPL', $result[0]['ticker']);
 		$this->assertEquals($expectedAmount, $result[0]['payout']);
 		$this->assertSame('USD', $result[0]['currency']);
-		$this->assertEquals('2025-08-15', $result[0]['paymentDate']->format('Y-m-d'));
+		$this->assertEquals(
+			'2025-08-15',
+			$result[0]['paymentDate']->format('Y-m-d')
+		);
 		$this->assertEquals('test pie', $result[0]['pieLabel']);
 	}
 }
