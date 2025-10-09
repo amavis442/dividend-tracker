@@ -132,11 +132,6 @@ class DividendForecastServiceTest extends TestCase
 
 		$adjustedDividendDecoratorFactory = new AdjustedDividendDecoratorFactory($dividendAdjust);
 
-		/*
-		protected AdjustedDividendDecoratorFactory $adjustedDividendDecoratorFactory,
-		protected DividendDataProvider $dividendDataProvider,
-		protected CorporateActionDataProvider $corporateActionDataProvider
-		*/
 		$service = new DividendForecastService(
 			$holdingsRepo,
 			$calendarRepo,
