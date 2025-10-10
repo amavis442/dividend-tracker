@@ -487,10 +487,11 @@ class DividendCalendarRepository extends ServiceEntityRepository
 	 *
 	 * @param array<int> $tickerIds
 	 * @param null|\DateTime $afterDate
+	 * @param null|\DateTime $beforeDate
 	 * @param array $types
 	 * @return mixed
 	 */
-	public function findByTickerIds(array $tickerIds, ?\DateTime $afterDate, array $types = [Calendar::REGULAR]): mixed
+	public function findByTickerIds(array $tickerIds, ?\DateTime $afterDate, ?\DateTime $beforeDate, array $types = [Calendar::REGULAR]): mixed
 	{
 		$qb = $this->createQueryBuilder('c','c.id')
 		->select('c, t')
@@ -502,8 +503,12 @@ class DividendCalendarRepository extends ServiceEntityRepository
 		->groupBy('t.id, c.id');
 
 		if ($afterDate) {
-			$qb->andWhere('c.paymentDate >= :paymentDate')
-			->setParameter('paymentDate', $afterDate->format('Y-m-d'));
+			$qb->andWhere('c.paymentDate >= :afterDate')
+			->setParameter('afterDate', $afterDate->format('Y-m-d'));
+		}
+		if ($beforeDate) {
+			$qb->andWhere('c.paymentDate <= :beforeDate')
+			->setParameter('beforeDate', $beforeDate->format('Y-m-d'));
 		}
 
 		return $qb->getQuery()

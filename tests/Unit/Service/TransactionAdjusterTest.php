@@ -4,7 +4,6 @@ namespace App\Tests\Unit\Service;
 use PHPUnit\Framework\TestCase;
 use App\Entity\Transaction;
 use App\Entity\CorporateAction;
-use Doctrine\Common\Collections\ArrayCollection;
 use App\Service\Transaction\TransactionAdjuster;
 
 class TransactionAdjusterTest extends TestCase
@@ -22,7 +21,7 @@ class TransactionAdjusterTest extends TestCase
 		$adjuster = new TransactionAdjuster();
 		$adjusted = $adjuster->getAdjustedAmount(
 			$transaction,
-			new ArrayCollection([$action])
+			[$action]
 		);
 
 		$this->assertEquals(50.0, $adjusted);

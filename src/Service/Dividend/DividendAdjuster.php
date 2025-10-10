@@ -2,20 +2,23 @@
 
 namespace App\Service\Dividend;
 
-use Doctrine\Common\Collections\Collection;
-use App\Entity\Transaction;
+use App\Entity\Calendar;
 
 class DividendAdjuster
 {
 
-    public function getAdjustedDividend(float $dividend, \DateTimeImmutable $declared, Collection $actions): float
+    public function getAdjustedDividend(Calendar $calendar, array $actions): float
     {
+        $cashAmount = $calendar->getCashAmount();
+
         foreach ($actions as $action) {
-            if ($declared < $action->getEventDate()) {
-                $dividend /= $action->getRatio(); // Applies reverse split
+            if ($calendar->getCreatedAt() < $action->getEventDate()) {
+                $cashAmount /= $action->getRatio(); // Applies reverse split
             }
         }
 
-        return $dividend;
+        $calendar->setAdjustedCashAmount($cashAmount);
+
+        return $cashAmount;
     }
 }

@@ -4,7 +4,6 @@ namespace App\Service\Position;
 
 use App\Entity\Calendar;
 use App\Entity\Transaction;
-use Doctrine\Common\Collections\Collection;
 use App\Service\Transaction\TransactionAdjuster;
 
 
@@ -16,7 +15,7 @@ class PositionSizeResolver
      * Calculates the effective position size on ex-dividend date,
      * adjusted for splits/reverse-splits.
      */
-    public function resolve(Collection $transactions, Collection $actions, Calendar $calendar): float
+    public function resolve(array $transactions, array $actions, Calendar $calendar): float
     {
         $exDate = $calendar->getExdividendDate();
         $shares = 0.0;

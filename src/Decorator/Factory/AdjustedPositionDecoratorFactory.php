@@ -9,7 +9,13 @@ use App\Service\Transaction\TransactionAdjusterInterface;
 
 class AdjustedPositionDecoratorFactory
 {
+	/**
+	 * @var array<int, array<int, \App\Entity\Transaction>> $transactions
+	 */
 	private ?array $transactions = null;
+	/**
+	 * @var array<int , array<int, \App\Entity\CorporateAction>> $actions
+	 */
 	private ?array $actions = null;
 
 	public function __construct(
@@ -34,9 +40,9 @@ class AdjustedPositionDecoratorFactory
 	/**
 	 * Mass load needed data for decorator(s)
 	 *
-	 * @param array $transactions
+	 * @param array<int, array<int, \App\Entity\Transaction>> $transactions
 	 *
-	 * @param array $actions
+	 * @param array<int , array<int, \App\Entity\CorporateAction>> $actions
 	 *
 	 * @return self
 	 *

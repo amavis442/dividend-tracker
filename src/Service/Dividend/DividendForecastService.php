@@ -47,7 +47,11 @@ class DividendForecastService
 			return $snapshot->getTicker();
 		}, $snapshots);
 
-		$dividends = $this->dividendDataProvider->load($tickers, $snapshotDate, [Calendar::REGULAR, Calendar::SPECIAL]);
+		$dividends = $this->dividendDataProvider->load(
+			tickers: $tickers,
+			afterDate: $snapshotDate,
+			types: [Calendar::REGULAR, Calendar::SPECIAL]
+		);
 		$actions = $this->corporateActionDataProvider->load($tickers);
 
 		$this->adjustedDividendDecoratorFactory->load(

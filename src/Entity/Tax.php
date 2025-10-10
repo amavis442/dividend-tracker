@@ -53,6 +53,11 @@ class Tax
         return $this->id;
     }
 
+    /**
+     * Returns the percentage so 15% will become 0.15.
+     *
+     * @return float
+     */
     public function getTaxRate(): float
     {
         return $this->taxRate / 100;

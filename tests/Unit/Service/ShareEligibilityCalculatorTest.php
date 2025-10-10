@@ -21,7 +21,7 @@ class ShareEligibilityCalculatorTest extends TestCase
 		$transaction2->setTransactionDate(new \DateTime('2025-07-01')); // After ex-date
 		$transaction2->setShares(50);
 
-		$transactions = new ArrayCollection([$transaction1, $transaction2]);
+		$transactions = [$transaction1, $transaction2];
 
 		// Setup calendar
 		$calendar = new Calendar();

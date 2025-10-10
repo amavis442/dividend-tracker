@@ -296,6 +296,9 @@ class Calendar
 	 */
 	public function getAdjustedCashAmount(): float
 	{
+        if (!isset($this->adjustedCashAmount)) {
+            $this->adjustedCashAmount = $this->cashAmount;
+        }
 		return $this->adjustedCashAmount;
 	}
 

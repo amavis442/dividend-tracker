@@ -23,6 +23,12 @@ class AdjustedDividendDecoratorTest extends TestCase
 	public function testDividendAdjusterWithReverseSplit(): void
 	{
 		$declared = new \DateTimeImmutable('2024-06-01');
+		$calendarMock = $this->createConfiguredMock(Calendar::class, [
+			'getCashAmount' => 1.0,
+			'getCreatedAt' => new \DateTimeImmutable('2024-06-01'),
+		]);
+
+
 		$action1 = new CorporateAction();
 		$action1->setEventDate(new \DateTime('2024-06-15'));
 		$action1->setRatio(0.5);
@@ -30,12 +36,11 @@ class AdjustedDividendDecoratorTest extends TestCase
 		$action2->setEventDate(new \DateTime('2024-07-01'));
 		$action2->setRatio(0.2);
 
-		$adjuster = new DividendAdjuster();
+		$dividendAdjuster = new DividendAdjuster();
 
-		$adjusted = $adjuster->getAdjustedDividend(
-			1.0,
-			$declared,
-			new ArrayCollection([$action1, $action2])
+		$adjusted = $dividendAdjuster->getAdjustedDividend(
+			$calendarMock,
+			[$action1, $action2]
 		);
 		$this->assertEquals(10.0, $adjusted);
 	}

@@ -22,16 +22,16 @@ class PositionSizeResolverTest extends TestCase
         $calendar = new Calendar();
         $calendar->setExdividendDate($exDate);
 
-        $transactions = new ArrayCollection([
+        $transactions = [
             $this->createTransaction(100.0, new \DateTime('2024-06-10'), Transaction::BUY),
             $this->createTransaction(50.0, new \DateTime('2024-06-20'), Transaction::SELL),
             $this->createTransaction(25.0, new \DateTime('2024-07-01'), Transaction::BUY), // ignored
             $this->createTransaction(80.0, new \DateTime('2024-07-02'), Transaction::BUY), // ignored
-        ]);
+        ];
 
-        $actions = new ArrayCollection([
+        $actions = [
             $this->createCorporateAction('reverse_split', 0.5, new \DateTime('2024-06-25')),
-        ]);
+        ];
 
         $adjusterMock = $this->createMock(TransactionAdjuster::class);
         $adjusterMock->method('getAdjustedAmount')->willReturnCallback(

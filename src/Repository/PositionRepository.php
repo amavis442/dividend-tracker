@@ -572,4 +572,22 @@ class PositionRepository extends ServiceEntityRepository
 			->getQuery()
 			->getArrayResult();
 	}
+
+	public function getForCalendarView(): mixed
+	{
+		return $this->createQueryBuilder('p')
+		->select('p, t, tax, currency')
+			->join('p.ticker','t')
+			->join('t.tax', 'tax')
+			->join('t.currency', 'currency')
+			->andWhere(
+				'(p.closed = false) OR (p.closedAt > :closedAt and p.closed = true AND p.ignore_for_dividend = false)'
+			)
+			->setParameter(
+				'closedAt',
+				(new DateTime('-2 month'))->format('Y-m-d')
+			)
+			->getQuery()
+			->getResult();
+	}
 }

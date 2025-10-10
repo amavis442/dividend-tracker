@@ -5,7 +5,7 @@ namespace App\DataProvider;
 use App\Repository\TransactionRepository;
 use App\Entity\Position;
 
-class PositionDataProvider
+class TransactionDataProvider
 {
 	public function __construct(
 		private TransactionRepository $txRepo,
@@ -29,12 +29,12 @@ class PositionDataProvider
 			);
 	}
 
-	private function mapByPosition(array $entities): array
+	private function mapByPosition(array $transactions): array
 	{
 		$map = [];
-		foreach ($entities as $entity) {
-			$pid = $entity->getPosition()->getId();
-			$map[$pid][] = $entity;
+		foreach ($transactions as $transaction) {
+			$pid = $transaction->getPosition()->getId();
+			$map[$pid][] = $transaction;
 		}
 		return $map;
 	}

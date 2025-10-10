@@ -2,9 +2,7 @@
 
 namespace App\Service\Transaction;
 
-use Doctrine\Common\Collections\Collection;
 use App\Entity\Calendar;
-use App\Entity\Transaction;
 
 interface ShareEligibilityCalculatorInterface
 {
@@ -12,6 +10,6 @@ interface ShareEligibilityCalculatorInterface
      * Calculate the number of shares eligible for dividend
      * based on transaction history and ex-dividend cutoff.
      */
-    public function calculate(Collection $transactions, Calendar $calendar): float;
-    public function filterEligibleTransactions(Collection $transactions, Calendar $calendar): array;
+    public function calculate(array $transactions, Calendar $calendar, bool $adjusted = true): float;
+    public function filterEligibleTransactions(array $transactions, Calendar $calendar): array;
 }

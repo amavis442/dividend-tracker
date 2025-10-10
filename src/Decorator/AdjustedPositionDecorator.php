@@ -8,8 +8,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 class AdjustedPositionDecorator implements AdjustedDecoratorInterface,AdjustedPositionDecoratorInterface
 {
-	private ?ArrayCollection $cachedTransactions = null;
-	private ?ArrayCollection $cachedActions = null;
+	private ?array $cachedTransactions = null;
+	private ?array $cachedActions = null;
 
 	/**
 	 * @param Position $position
@@ -31,10 +31,10 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface,AdjustedPo
 	/**
 	 * Caches the transactions so it will not waste resources
 	 */
-	private function getTransactions(): ArrayCollection
+	private function getTransactions(): array
 	{
 		if ($this->cachedTransactions === null) {
-			$this->cachedTransactions = new ArrayCollection($this->transactions);
+			$this->cachedTransactions = $this->transactions;
 		}
 
 		return $this->cachedTransactions;
@@ -43,10 +43,10 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface,AdjustedPo
 	/**
 	 * Caches the actions so it will not waste resources
 	 */
-	private function getActions(): ArrayCollection
+	private function getActions(): array
 	{
 		if ($this->cachedActions === null) {
-			$this->cachedActions = new ArrayCollection($this->actions);
+			$this->cachedActions = $this->actions;
 		}
 
 		return $this->cachedActions;
@@ -75,6 +75,8 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface,AdjustedPo
 				$tx,
 				$actions
 			);
+
+			$tx->setAdjustedAmount($adjustedAmount);
 
 			$side = $tx->getSide();
 			$total +=

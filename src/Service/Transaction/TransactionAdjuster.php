@@ -4,7 +4,6 @@ namespace App\Service\Transaction;
 
 use App\Entity\Transaction;
 use App\Entity\CorporateAction;
-use Doctrine\Common\Collections\Collection;
 
 class TransactionAdjuster implements TransactionAdjusterInterface
 {
@@ -12,10 +11,10 @@ class TransactionAdjuster implements TransactionAdjusterInterface
      * Adjusts a transaction amount based on corporate actions.
      *
      * @param Transaction $transaction
-     * @param Collection<int, CorporateAction> $actions
+     * @param array<int, CorporateAction> $actions
      * @return float
      */
-    public function getAdjustedAmount(Transaction $transaction, Collection $actions): float
+    public function getAdjustedAmount(Transaction $transaction, array $actions): float
     {
         $amount = $transaction->getAmount();
         $txDate = $transaction->getTransactionDate();
@@ -25,6 +24,8 @@ class TransactionAdjuster implements TransactionAdjusterInterface
                 $amount *= $action->getRatio(); // Applies reverse split
             }
         }
+
+        $transaction->setAdjustedAmount($amount);
 
         return $amount;
     }

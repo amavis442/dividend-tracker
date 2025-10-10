@@ -13,9 +13,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
-use App\DataProvider\PositionDataProvider;
-use App\DataProvider\CorporateActionDataProvider;
-use App\DataProvider\DividendDataProvider;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 use App\Service\ExchangeRate\DividendExchangeRateResolverInterface;
 use App\Service\Transaction\ShareEligibilityCalculatorInterface;
@@ -101,17 +98,17 @@ class DividendService implements DividendServiceInterface
 	 * @param Position $position
 	 *
 	 * @return array{
-	 *     transactions: array<int, \App\Entity\Transaction>,
-	 *     actions: array<int, \App\Entity\CorporateAction>,
-	 *     dividends: array<int, \App\Entity\Calendar>,
+	 *     transactions: array<int, array<int, \App\Entity\Transaction>>,
+	 *     actions: array<int, array<int, \App\Entity\CorporateAction>>,
+	 *     dividends: array<int, array<int, \App\Entity\Calendar>>,
 	 * }
 	 */
 	protected function getChachedDataForPosition(Position $position): array {
 		$pid = $position->getId();
 
-		$transactions = $this->cachedTransactions[$pid] ?? [];
-		$actions = $this->cachedCorporateActions[$pid] ?? [];
-		$dividends = $this->cachedDividendCalendars[$pid] ?? [];
+		$transactions = $this->cachedTransactions ?? [];
+		$actions = $this->cachedCorporateActions ?? [];
+		$dividends = $this->cachedDividendCalendars ?? [];
 
 		$this->cachedPositionData[$pid] = ['transactions' => $transactions, 'actions' => $actions, 'dividends' => $dividends];
 
@@ -400,29 +397,29 @@ class DividendService implements DividendServiceInterface
 		return $forwardNetDividend;
 	}
 
+	/**
+	 * @deprecated: Use DividendCalendarService::class
+	 */
 	public function getCalendarDataPerMonth(
-		int $year,
+		array $calendars,
 		?string $startDate = null,
 		?string $endDate = null,
 		?Pie $pie = null
 	): array {
-		$result = $this->dividendCalendarRepository->groupByMonth(
-			$year,
-			$startDate,
-			$endDate,
-			$pie
-		);
-
 		$data = [];
 		$this->setAccumulateDividendAmount(false);
 
-		foreach ($result as $calendar) {
+		foreach ($calendars as $calendar) {
+
 			$positionAmount = $this->getPositionAmount($calendar);
+
 			if ($positionAmount < 0.001) {
 				// filter out ones that have no amount of stocks for dividend payout
 				continue;
 			}
+
 			$positionDividend = $this->getTotalNetDividend($calendar);
+
 			if ($positionDividend < 0.01) {
 				// filter out ones that have no payout of dividend or to small to matter
 				continue;

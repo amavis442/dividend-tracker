@@ -140,8 +140,16 @@ interface DividendServiceInterface
 		bool $accumulateDividendAmount = true
 	): DividendServiceInterface;
 
+	/**
+	 * @param array<int, \App\Entity\Calendar> $calendars
+	 * @param null|string $startDate
+	 * @param null|string $endDate
+	 * @param \App\Entity\Pie|null $pie
+	 *
+	 * @return array
+	 */
 	public function getCalendarDataPerMonth(
-		int $year,
+		array $calendars,
 		?string $startDate = null,
 		?string $endDate = null,
 		?Pie $pie = null

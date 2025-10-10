@@ -20,22 +20,21 @@ class AdjustedDividendDecorator implements AdjustedDecoratorInterface, AdjustedD
 
 	private function getAdjustedDividendByKey(int $key): array
 	{
-		$dividends = $this->dividends;
-		$actions = new ArrayCollection($this->actions);
-
 		$adjusted = [];
 
-		foreach ($dividends as $dividend) {
+		foreach ($this->dividends as $dividend) {
 			$indexBy = $key == self::SORT_BY_CALENDAR_ID ? $dividend->getId() : $dividend->getPaymentDate()->format('Ymd');
 
+			$adjustedCashAmount = $this->dividendAdjuster->getAdjustedDividend(
+					calendar: $dividend,
+					actions: $this->actions
+			);
+
+			$dividend->setAdjustedCashAmount($adjustedCashAmount);
 
 			$adjusted[$indexBy] = [
 				'original' => $dividend->getCashAmount(),
-				'adjusted' => $this->dividendAdjuster->getAdjustedDividend(
-					$dividend->getCashAmount(),
-					$dividend->getCreatedAt(),
-					$actions
-				),
+				'adjusted' => $adjustedCashAmount,
 				'declareDate' => $dividend->getCreatedAt(),
 				'paymentDate' => $dividend->getPaymentDate(),
 				'ticker' => $dividend->getTicker(),

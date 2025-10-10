@@ -4,7 +4,7 @@ namespace App\Controller\Portfolio;
 
 use App\DataProvider\CorporateActionDataProvider;
 use App\DataProvider\DividendDataProvider;
-use App\DataProvider\PositionDataProvider;
+use App\DataProvider\TransactionDataProvider;
 use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 
@@ -149,7 +149,7 @@ class PortfolioController extends AbstractController
 		DividendGrowthService $dividendGrowth,
 		DividendServiceInterface $dividendService,
 		ExchangeAndTaxResolverInterface $exchangeAndTaxResolver,
-		PositionDataProvider $positionDataProvider,
+		TransactionDataProvider $transactionDataProvider,
 		CorporateActionDataProvider $corporateActionDataProvider,
 		DividendDataProvider $dividendDataProvider,
 		Referer $referer,
@@ -165,7 +165,7 @@ class PortfolioController extends AbstractController
 		$nextDividendExDiv = null;
 		$nextDividendPayout = null;
 
-		$transactions = $positionDataProvider->load(
+		$transactions = $transactionDataProvider->load(
 			[$position]
 		);
 		$actions = $corporateActionDataProvider->load(
@@ -393,7 +393,7 @@ class PortfolioController extends AbstractController
 		DividendServiceInterface $dividendService,
 		ExchangeAndTaxResolverInterface $exchangeAndTaxResolver,
 		AdjustedDividendDecoratorFactory $adjustedDividendDecorator,
-		PositionDataProvider $positionDataProvider,
+		TransactionDataProvider $transactionDataProvider,
 		CorporateActionDataProvider $corporateActionDataProvider,
 		DividendDataProvider $dividendDataProvider,
 		AdjustedPositionDecoratorFactory $adjustedPositionDecorator,
@@ -408,7 +408,7 @@ class PortfolioController extends AbstractController
 		$nextDividendExDiv = null;
 		$nextDividendPayout = null;
 
-		$transactions = $positionDataProvider->load([$position]);
+		$transactions = $transactionDataProvider->load([$position]);
 		$actions = $corporateActionDataProvider->load([$ticker]);
 		$dividends = $dividendDataProvider->load([$ticker]);
 
@@ -545,14 +545,14 @@ class PortfolioController extends AbstractController
 	public function showPosition(
 		Position $position,
 		PositionRepository $positionRepository,
-		PositionDataProvider $positionDataProvider,
+		TransactionDataProvider $transactionDataProvider,
 		CorporateActionDataProvider $corporateActionDataProvider,
 		AdjustedPositionDecoratorFactory $adjustedPositionDecorator,
 
 	): Response {
 		$position = $positionRepository->getForPosition($position);
 
-		$transactions = $positionDataProvider->load([$position]);
+		$transactions = $transactionDataProvider->load([$position]);
 		$corporateActions = $corporateActionDataProvider->load([$position->getTicker()]);
 
 		$adjustedPositionDecorator->load($transactions,$corporateActions);

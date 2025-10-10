@@ -8,7 +8,13 @@ use App\Service\Dividend\DividendAdjuster;
 
 class AdjustedDividendDecoratorFactory
 {
+	/**
+	 * @var array<int, array<int, \App\Entity\Calendar>> $dividends
+	 */
 	private ?array $dividends = null;
+	/**
+	 * @var array<int , array<int, \App\Entity\CorporateAction>> $actions
+	 */
 	private ?array $actions = null;
 
 	public function __construct(

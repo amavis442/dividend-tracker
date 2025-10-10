@@ -108,11 +108,8 @@ class DividendForecastServiceTest extends TestCase
 		$dividendAdjust
 			->method('getAdjustedDividend')
 			->with(
-				0.85, // the dividend amount
-				new \DateTimeImmutable('2025-06-30'),
-				$this->callback(
-					fn($actions) => $actions instanceof ArrayCollection
-				)
+				$calendarMock,
+				[$action]
 			)
 			->willReturn(1.7);
 

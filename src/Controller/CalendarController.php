@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\DataProvider\CorporateActionDataProvider;
+use App\DataProvider\DividendDataProvider;
+use App\DataProvider\TransactionDataProvider;
 use App\Entity\Calendar;
 use App\Entity\DateSelect;
 use App\Entity\Ticker;
@@ -9,10 +12,10 @@ use App\Entity\TickerAutocomplete;
 use App\Form\CalendarDividendType;
 use App\Form\CalendarType;
 use App\Form\TickerAutocompleteType;
-use App\Pager\AdjustedPositionAdapter;
-use App\Repository\CalendarRepository;
-use App\Repository\PositionRepository;
+use App\Repository\DividendCalendarRepository;
 use App\Repository\TickerRepository;
+use App\Repository\TransactionRepository;
+use App\Repository\PositionRepository;
 use App\Service\Dividend\DividendServiceInterface;
 use App\Service\Dividend\DividendTaxRateResolverInterface;
 use App\Service\ExchangeRate\DividendExchangeRateResolverInterface;
@@ -26,6 +29,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\Transaction\TransactionAdjuster;
+use App\Service\Dividend\DividendAdjuster;
+use App\Service\Dividend\DividendCalendarService;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/calendar')]
 class CalendarController extends AbstractController
@@ -35,7 +41,7 @@ class CalendarController extends AbstractController
 	#[Route(path: '/', name: 'calendar_index', methods: ['GET', 'POST'])]
 	public function index(
 		Request $request,
-		CalendarRepository $calendarRepository,
+		DividendCalendarRepository $calendarRepository,
 		TickerRepository $tickerRepository,
 		Referer $referer,
 		#[MapQueryParameter] int $page = 1,
@@ -54,7 +60,7 @@ class CalendarController extends AbstractController
 			'symbol',
 			'exDividendDate',
 			'createdAt',
-        ])
+		])
 			? $sort
 			: 'paymentDate';
 
@@ -162,10 +168,14 @@ class CalendarController extends AbstractController
 	]
 	public function viewCalendarTable(
 		Request $request,
-		CalendarRepository $calendarRepository,
-		DividendServiceInterface $dividendService,
+		PositionRepository $positionRepository,
+		DividendDataProvider $dividendDataProvider,
+		TransactionRepository $transactionRepository,
+		CorporateActionDataProvider $corporateActionDataProvider,
 		DividendExchangeRateResolverInterface $dividendExchangeRateResolver,
-		DividendTaxRateResolverInterface $dividendTaxRateResolver
+		TransactionAdjuster $transactionAdjuster,
+		DividendAdjuster $dividendAdjuster,
+		DividendCalendarService $dividendCalendarService
 	): Response {
 		$year = (int) date('Y');
 		$endDate = $year . '-12-31';
@@ -181,14 +191,96 @@ class CalendarController extends AbstractController
 			$dateSelect = $form->getData();
 		}
 
-		$calendars = $dividendService->getCalendarDataPerMonth(
-			$year,
-			$dateSelect->getStartdate()->format('Y-m-d'),
-			$dateSelect->getEnddate()->format('Y-m-d')
+		// 1. Get the positions
+		// 2. Get the tickers with joined tax and currency
+		// 3. Get the transactions
+		// 4. get the corporate actions
+		// 5. get the calendars for tickers and paymentDate in between start and end date
+		// 6. get the exchange rate -> This can be USD, EUR etc So it should be determined by ticker currency
+		// 7. get the adjusted amount
+		// 8. get  the adjusted dividends
+		// 9. execute generate() and gat the data array needed to build the view
+		// 10. build the view
+
+		// Step 1.
+		$positionData = $positionRepository->getForCalendarView();
+		$positionIds = array_map(function ($position) {
+			return $position->getId();
+		}, $positionData);
+
+		// Step 2.
+		$tickers = [];
+		$tickerIds = [];
+		$positions = [];
+		foreach ($positionData as $position) {
+			$ticker = $position->getTicker();
+			$tickers[$ticker->getId()] = $ticker;
+			$tickerIds[] =$ticker->getId();
+			$positions[$ticker->getId()] = $position;
+		}
+
+		// Step 3.
+		$transactionData = $transactionRepository->getForCalendarView(
+			$positionIds
+		);
+		unset($positionIds);
+		unset($positionData);
+
+
+		$transactions = [];
+		foreach ($transactionData as $transaction) {
+			$tickerId = $transaction->getPosition()->getTicker()->getId();
+			$transactions[$tickerId][] = $transaction;
+		}
+
+		// Step 4
+		$corporateActions = $corporateActionDataProvider->load($tickers);
+
+
+		// Set 5
+		$calendars = $dividendDataProvider->load(
+			tickers: $tickers,
+			afterDate: $dateSelect->getStartdate(),
+			beforeDate: $dateSelect->getEnddate(),
+			types: [Calendar::REGULAR, Calendar::SPECIAL]
 		);
 
+		$exchangeRates = [];
+		// Step 6, 7 and 8
+		foreach ($tickers as $ticker) {
+			$tickerId = $ticker->getId();
+			$exchangeRates[$tickerId] = $dividendExchangeRateResolver->getRateForTicker($ticker);
+
+			if (isset($transactions[$tickerId])) {
+				foreach ($transactions[$tickerId] as $transaction) {
+					$transactionAdjuster->getAdjustedAmount(
+						$transaction,
+						$corporateActions[$tickerId] ?? []
+					);
+				}
+			}
+			if (isset($calendars[$tickerId])) {
+				foreach ($calendars[$tickerId] as $calendar) {
+					$dividendAdjuster->getAdjustedDividend(
+						$calendar,
+						$corporateActions[$tickerId] ?? []
+					);
+				}
+			}
+		}
+
+		$dividendCalendarService->load(
+			tickers: $tickers,
+			calendars: $calendars,
+			transactions: $transactions,
+            positions: $positions,
+			exchangeRates: $exchangeRates
+		);
+
+		$calendarData = $dividendCalendarService->generate();
+
 		return $this->render('calendar/view_table.html.twig', [
-			'calendars' => $calendars,
+			'calendars' => $calendarData,
 			'year' => $year,
 			'form' => $form->createView(),
 		]);

@@ -9,7 +9,7 @@ use App\Repository\PositionRepository;
 use App\Repository\TransactionRepository;
 use Symfony\Component\Stopwatch\Stopwatch;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
-use App\DataProvider\PositionDataProvider;
+use App\DataProvider\TransactionDataProvider;
 use App\DataProvider\CorporateActionDataProvider;
 use App\DataProvider\DividendDataProvider;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -24,7 +24,7 @@ class YieldsService
 		private TransactionRepository $transactionRepository,
 		private DividendService $dividendService,
 		private DividendExchangeRateResolverInterface $dividendExchangeRateResolver,
-		private PositionDataProvider $positionDataProvider,
+		private TransactionDataProvider $transactionDataProvider,
 		private CorporateActionDataProvider $corporateActionDataProvider,
 		private DividendDataProvider $dividendDataProvider,
 		private AdjustedPositionDecoratorFactory $adjustedPositionDecoratorFactory,
@@ -60,7 +60,7 @@ class YieldsService
 			return $position->getTicker();
 		}, $positions);
 
-		$transactions = $this->positionDataProvider->load($positions);
+		$transactions = $this->transactionDataProvider->load($positions);
 		$actions = $this->corporateActionDataProvider->load($tickerList);
 		$dividends = $this->dividendDataProvider->load($tickerList);
 

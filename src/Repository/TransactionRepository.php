@@ -235,4 +235,15 @@ class TransactionRepository extends ServiceEntityRepository
 				'position' => $positionIds,
 			]);
 	}
+
+	public function getForCalendarView(array $positionIds): mixed {
+		return $this->createQueryBuilder('t')
+		->select('t, p, ti')
+		->join('t.position', 'p')
+		->join('p.ticker','ti')
+		->andWhere('t.position in (:positions)')
+		->setParameter('positions', $positionIds)
+		->getQuery()
+		->getResult();
+	}
 }
