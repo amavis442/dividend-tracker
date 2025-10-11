@@ -1,12 +1,16 @@
 <?php
-namespace App\Tests\Unit\Service;
+namespace App\Tests\Unit\Shares;
 
 use PHPUnit\Framework\TestCase;
 use App\Entity\Transaction;
 use App\Entity\CorporateAction;
 use App\Service\Transaction\TransactionAdjuster;
 
-class TransactionAdjusterTest extends TestCase
+/**
+ * When an corporate event happens like a split, we need to adjust the transaction shares amount, but keep
+ * the database intact for history.
+ */
+class TransactionAdjustTest extends TestCase
 {
 	public function testReverseSplitAdjustsTransactionAmount(): void
 	{

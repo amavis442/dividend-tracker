@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Decorator;
+namespace App\Tests\Unit\Position;
 
 use App\Decorator\AdjustedPositionDecorator;
 use App\Entity\CorporateAction;

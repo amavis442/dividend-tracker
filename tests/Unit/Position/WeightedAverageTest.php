@@ -1,5 +1,5 @@
 <?php
-namespace App\Tests\Unit\Service;
+namespace App\Tests\Unit\Position;
 
 use App\Entity\CorporateAction;
 use App\Entity\Position;
@@ -13,6 +13,10 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Behaviour/requirement: We want to know what the average price of the shares are so we can calculate the profit/loss and when to sell or when
+ * to buy more shares. This should also adjust the amount and price per share when an company event like a split has taken place.
+ */
 class WeightedAverageTest extends TestCase
 {
 	private $transactionRepoMock;

@@ -5,6 +5,10 @@ namespace App\Tests\Unit\Service\DividendDate;
 use App\Service\DividendDate\ISharesService;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
+/**
+ * We need a way to retrieve dividend data from external websites so we can predict when a dividend
+ * will be paid and how much it will be.
+ */
 class ISharesTest extends KernelTestCase
 {
 

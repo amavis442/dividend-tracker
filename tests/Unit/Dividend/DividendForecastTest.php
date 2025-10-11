@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Service;
+namespace App\Tests\Unit\Dividend;
 
 use App\Dto\ExchangeTaxDto;
 use App\Entity\Calendar;
@@ -21,7 +21,15 @@ use App\DataProvider\DividendDataProvider;
 use App\DataProvider\CorporateActionDataProvider;
 use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
 
-class DividendForecastServiceTest extends TestCase
+/**
+ * This does the same as DividendCalender but with data retrieved from Traiding212.
+ * Gives a prediction calendar for dividends to receive, split up by pie and per month/date.
+ * Shows which company pays dividends in a certain month.
+ *
+ * Since Tranding212 API gives th current state and we do not have the transaction dates for the transactions, this
+ * will be a hybrid.
+ */
+class DividendForecastTest extends TestCase
 {
 	public function testCalculateProjectedPayoutsReturnsCorrectPayouts(): void
 	{

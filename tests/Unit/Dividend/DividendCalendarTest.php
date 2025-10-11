@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Service;
+namespace App\Tests\Unit\Dividend;
 
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 use App\Entity\Calendar;

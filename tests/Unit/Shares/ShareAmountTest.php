@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Service;
+namespace App\Tests\Unit\Shares;
 
 use App\DataProvider\PositionDataProvider;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
@@ -18,8 +18,14 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @test
+ *
+ * Behaviour/requirement: During the lifetime of a position, a company can decide to split or reverse split the shares.
+ * This means that the mount of shares will be reduced or added. We need to make sure the original amount is kept for historical
+ * records, but we want to see the correct number of shares this position. That means that shares bought/sold after the event date
+ * of the (reverse) split have to be left alone and those bought/sold before the event date needs to be adjusted.
+ * It should handle more events that can be applied to the number of total shares.
  */
-class PositionAmountServiceTest extends TestCase{
+class ShareAmountTest extends TestCase{
 
     use AdjustmentStrategyTestTrait;
 

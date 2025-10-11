@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Service;
+namespace App\Tests\Unit\Shares;
 
 use App\Entity\Calendar;
 use App\Entity\Transaction;
@@ -8,6 +8,9 @@ use App\Service\Transaction\ShareEligibilityCalculator;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Behaviour/requirement: We need to now how many eligable shares can be used to calculate the total amount of dividends/cash we will receive.
+ */
 class ShareEligibilityCalculatorTest extends TestCase
 {
 	public function testCalculateEligibleShares(): void

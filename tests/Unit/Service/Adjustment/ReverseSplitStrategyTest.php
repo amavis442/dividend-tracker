@@ -8,6 +8,10 @@ use App\Service\Adjustment\ReverseSplitDividendStrategy;
 use App\Service\Adjustment\DividendAdjustmentStrategyResolver;
 use App\Entity\CorporateAction;
 
+/**
+ * Do we need this test? It is to test different strategies to adjust share mount and dividend amount.
+ * Not used.
+ */
 class ReverseSplitStrategyTest extends TestCase
 {
 	use AdjustmentStrategyTestTrait;

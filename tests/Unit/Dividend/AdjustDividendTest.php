@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Decorator;
+namespace App\Tests\Unit\Dividend;
 
 use App\Entity\CorporateAction;
 use App\Entity\Position;
@@ -17,8 +17,11 @@ use App\Decorator\AdjustedDividendDecorator;
 
 /**
  * @test
+ *
+ * When there is a corporate event like a split/reverse split, we need to adjust the dividend cash amount, while keeping the record
+ * in the database intact. This should be independant on how many of those events happen
  */
-class AdjustedDividendDecoratorTest extends TestCase
+class AdjustDividendTest extends TestCase
 {
 	public function testDividendAdjusterWithReverseSplit(): void
 	{
