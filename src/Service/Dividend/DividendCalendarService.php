@@ -101,6 +101,8 @@ final class DividendCalendarService
 		{
 			ksort($records);
 		}
+		ksort($data);
+
 		return $data;
 	}
 }

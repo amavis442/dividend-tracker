@@ -39,11 +39,12 @@ class TickerType extends AbstractType
             ])
             ->add('currency', EntityType::class, [
                 'class' => Currency::class,
+                'placeholder' => 'Please choose a currency',
                 'choice_label' => function ($currency) {
                     return $currency->getSymbol();
                 },
                 'required' => true,
-                'empty_data' => 'USD',
+                'empty_data' => '-',
                 'help' => 'Currency dividend will be paid out',
             ])
             ->add('dividendMonths', EntityType::class, [
