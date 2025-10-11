@@ -17,7 +17,15 @@ use App\Service\Dividend\DividendAdjuster;
 
 use PHPUnit\Framework\TestCase;
 
-class DividendCalendarServiceTest extends TestCase
+/**
+ * Behaviour/requirement: We want to produce a calendar that we can print out with
+ * dates when a company pays a dividend. We need to know how many stocks are eligable because of
+ * the e dividend date, how much the dividend per share is, how much it will pay in total in the selected
+ * currency. If a share pays in USD, then it also needs to convert this into EUR. If you have to pay dividend
+ * tax, then the end total needs to be reduced by that amount. Basically you want to know how much will be added
+ * to your bankaccount on different dates.
+ */
+class DividendCalendarTest extends TestCase
 {
 	/**
 	 * This test should be its own test class.
