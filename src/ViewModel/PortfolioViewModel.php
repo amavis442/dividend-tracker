@@ -82,8 +82,6 @@ class PortfolioViewModel
 
 			$note = $decorator->getAdjustmentNote();
 
-
-
 			$this->adjustedDividendDecoratorFactory->load($dividends, $actions);
 			$decoratorDividend = $this->adjustedDividendDecoratorFactory->decorate(
 				$position->getTicker()
@@ -118,7 +116,7 @@ class PortfolioViewModel
 				$position->getTicker()
 			);
 
-			if ($calendar) {
+			if ($calendar && isset($dividends[$position->getTicker()->getId()])) {
 				// Get adjusted cashAmount
 				$adjustedDividendsArray = new ArrayCollection(
 					$adjustedDividends

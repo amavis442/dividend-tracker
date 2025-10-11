@@ -71,7 +71,7 @@ class Calendar
     private $currency;
 
     #[Groups(['calendar:read', 'calendar:write', 'ticker:read:item', 'position:read:item', 'transaction:read'])]
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[ORM\Column(type: 'string', length: 255, nullable: false,options: ["default" => 'Regular'],)]
     private $dividendType;
 
     /**

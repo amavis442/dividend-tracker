@@ -208,6 +208,8 @@ class CalendarController extends AbstractController
 			return $position->getId();
 		}, $positionData);
 
+		dd($positionData);
+
 		// Step 2.
 		$tickers = [];
 		$tickerIds = [];
