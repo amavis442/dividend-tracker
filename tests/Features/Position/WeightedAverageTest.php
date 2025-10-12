@@ -1,5 +1,5 @@
 <?php
-namespace App\Tests\Unit\Position;
+namespace App\Tests\Features\Position;
 
 use App\Entity\CorporateAction;
 use App\Entity\Position;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Shares;
+namespace App\Tests\Features\Shares;
 
 use App\DataProvider\PositionDataProvider;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
@@ -12,7 +12,7 @@ use App\Repository\CorporateActionRepository;
 use App\Repository\TransactionRepository;
 use App\Service\Position\PositionAmountService;
 use App\Service\Transaction\TransactionAdjuster;
-use App\Tests\Unit\Service\Adjustment\AdjustmentStrategyTestTrait;
+use App\Tests\Features\Service\Adjustment\AdjustmentStrategyTestTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 

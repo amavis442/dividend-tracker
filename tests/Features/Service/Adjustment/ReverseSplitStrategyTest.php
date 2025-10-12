@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Service\Adjustment;
+namespace App\Tests\Features\Service\Adjustment;
 
 use PHPUnit\Framework\TestCase;
 use App\Service\Adjustment\ReverseSplitStrategy;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Dividend;
+namespace App\Tests\Features\Dividend;
 
 use App\Dto\ExchangeTaxDto;
 use App\Entity\Calendar;

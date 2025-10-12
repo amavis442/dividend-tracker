@@ -162,6 +162,7 @@ class Transaction
 
 	//Computed
 	private ?float $adjustedAmount = null;
+	private ?float $adjustedPrice = null;
 
 	#[Assert\Callback]
 	public function validate(ExecutionContextInterface $context, $payload)
@@ -639,6 +640,34 @@ class Transaction
 	public function setAdjustedAmount(float $adjustedAmount): self
 	{
 		$this->adjustedAmount = $adjustedAmount;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of adjustedPrice
+	 *
+	 * @return  float
+	 */
+	public function getAdjustedPrice(): float
+	{
+		if (!isset($this->adjustedPrice)) {
+			$this->adjustedPrice = $this->price;
+		}
+
+		return $this->adjustedPrice;
+	}
+
+	/**
+	 * Set the value of adjustedPrice
+	 *
+	 * @param   float  $adjustedPrice
+	 *
+	 * @return  self
+	 */
+	public function setAdjustedPrice(float $adjustedPrice): self
+	{
+		$this->adjustedPrice = $adjustedPrice;
 
 		return $this;
 	}

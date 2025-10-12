@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Shares;
+namespace App\Tests\Features\Shares;
 
 use App\Entity\Calendar;
 use App\Entity\Transaction;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Service\Adjustment;
+namespace App\Tests\Features\Service\Adjustment;
 
 use App\Entity\Transaction;
 use App\Entity\CorporateAction;

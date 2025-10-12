@@ -1,5 +1,5 @@
 <?php
-namespace App\Tests\Unit\Shares;
+namespace App\Tests\Features\Shares;
 
 use PHPUnit\Framework\TestCase;
 use App\Entity\Transaction;
