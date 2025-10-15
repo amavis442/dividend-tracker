@@ -23,21 +23,6 @@ use App\Service\Transaction\TransactionAdjuster;
  */
 class YieldTest extends TestCase
 {
-	private function createTransaction(
-		float $amount,
-		float $price,
-		\DateTimeInterface $date,
-		int $side
-	): Transaction {
-		$transaction = new Transaction();
-		$transaction->setAmount($amount);
-		$transaction->setPrice($price);
-		$transaction->setTransactionDate($date);
-		$transaction->setSide($side);
-
-		return $transaction;
-	}
-
 	private function createTicker(
 		int $id,
 		string $symbol,
@@ -84,7 +69,8 @@ class YieldTest extends TestCase
 		float $cashAmount,
 		\DateTimeInterface $createdAt,
 		\DateTimeInterface $exDivDate,
-		\DateTimeInterface $paymentDate
+		\DateTimeInterface $paymentDate,
+		string $dividendType = Calendar::REGULAR
 	): Calendar {
 		$calendar = new Calendar(); // Select with ticker id
 		$reflection = new \ReflectionClass($calendar);
@@ -95,9 +81,26 @@ class YieldTest extends TestCase
 		$calendar->setExDividendDate($exDivDate);
 		$calendar->setPaymentDate($paymentDate);
 		$calendar->setCashAmount($cashAmount);
-		$calendar->setDividendType(Calendar::REGULAR);
+		$calendar->setDividendType($dividendType);
 
 		return $calendar;
+	}
+
+	private function createTransaction(
+		Position $position,
+		float $amount,
+		float $price,
+		\DateTimeInterface $date,
+		int $side = Transaction::BUY
+	): Transaction {
+		$transaction = new Transaction();
+		$transaction->setAmount($amount);
+		$transaction->setPrice($price);
+		$transaction->setTransactionDate($date);
+		$transaction->setSide($side);
+		$transaction->setPosition($position);
+
+		return $transaction;
 	}
 
 	public function test_report_yield_without_corporate_actions(): void
@@ -115,13 +118,7 @@ class YieldTest extends TestCase
 		$taxRate = 15; // 15%
 		$invested = $originalAmount * $originalPrice;
 
-		$ticker = new Ticker();
-		$reflection = new \ReflectionClass($ticker);
-		$property = $reflection->getProperty('id');
-		$property->setAccessible(true);
-		$property->setValue($ticker, 1);
-		$ticker->setSymbol('AAPL');
-		$ticker->setFullName('Apple computers');
+		$ticker = $this->createTicker(1, 'AAPL', 'Apple computers');
 
 		for ($n = 1; $n < 13; $n++) {
 			$dividendMonth = new DividendMonth();
@@ -139,30 +136,22 @@ class YieldTest extends TestCase
 		$tax->setValidFrom(new \DateTime('2025-01-01'));
 		$ticker->setTax($tax);
 
-		$calendar = new Calendar(); // Select with ticker id
-		$reflection = new \ReflectionClass($calendar);
-		$property = $reflection->getProperty('createdAt');
-		$property->setAccessible(true);
-		$property->setValue($calendar, new \DateTimeImmutable('2025-09-30'));
-		$calendar->setTicker($ticker);
-		$calendar->setExDividendDate(new \DateTime('2025-10-01'));
-		$calendar->setPaymentDate(new \DateTime('2025-10-03'));
-		$calendar->setCashAmount($originalCashAmount);
-		$calendar->setDividendType(Calendar::REGULAR);
+		$calendar = $this->createCalendar(
+			ticker: $ticker,
+			cashAmount: $originalCashAmount,
+			createdAt: new \DateTimeImmutable('2025-09-30'),
+			exDivDate: new \DateTime('2025-10-01'),
+			paymentDate: new \DateTime('2025-10-03')
+		);
 
-		$position = new Position(); // Select with ticker id (only open position which should be 1 per ticker)
-		$position->setTicker($ticker);
-		$reflection = new \ReflectionClass($position);
-		$property = $reflection->getProperty('id');
-		$property->setAccessible(true);
-		$property->setValue($position, 1);
+		$position = $this->createPosition(1, $ticker);
 
-		$transaction = new Transaction(); // Select with position id
-		$transaction->setPosition($position);
-		$transaction->setTransactionDate(new \DateTime('2025-09-01'));
-		$transaction->setAmount($originalAmount);
-		$transaction->setPrice($originalPrice);
-
+		$transaction = $this->createTransaction(
+			$position,
+			$originalAmount,
+			$originalPrice,
+			new \DateTime('2025-09-01')
+		);
 		$position->setAdjustedAmount($transaction->getAdjustedAmount());
 		$position->setAllocation($invested);
 
@@ -207,37 +196,68 @@ class YieldTest extends TestCase
 				'total_shares' => $transaction->getAdjustedAmount(),
 				'exchange_rate' => $exchangeRates[$ticker->getId()],
 				'tax_rate' => $ticker->getTax()->getTaxRate(),
-				'currency' => $ticker->getCurrency()->getSymbol(),
+				'currency' => [
+					'symbol' => $ticker->getCurrency()->getSymbol(),
+					'sign' => $ticker->getCurrency()->getSign(),
+				],
 				'invested' =>
 					$transaction->getAdjustedPrice() *
 					$transaction->getAdjustedAmount(), // In dollars
 				'yield' => [
 					'percentage' => [
-						'gross' => $grossYieldPercentage, // percentage ((12 * cash.per_month_per_share.gross / )
-						'net' => $netYieldPercentage,
+						'year' => [
+							'gross' => $grossYieldPercentage, // percentage ((12 * cash.per_month_per_share.gross / )
+							'net' => $netYieldPercentage,
+						],
 					],
 					'cash' => [
-						'gross' => $grossCashYield, // Will be in original currency without exchange and tax
-						'net' => $netCashYield, // Will be in euro with tax dededucted
+						'year' => [
+							'gross' => $grossCashYield, // Will be in original currency without exchange and tax
+							'net' => $netCashYield, // Will be in euro with tax dededucted
+						],
 					],
 				],
 				'cash' => [
-					'per_month_per_share' => [
-						'gross' => $calendar->getAdjustedCashAmount(),
-						'net' =>
-							$exchangeRates[$ticker->getId()] *
-							$calendar->getAdjustedCashAmount() *
-							(1 - $ticker->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)
+					'per_share' => [
+						'month' => [
+							'gross' => $calendar->getAdjustedCashAmount(),
+							'net' =>
+								$exchangeRates[$ticker->getId()] *
+								$calendar->getAdjustedCashAmount() *
+								(1 - $ticker->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)
+						],
+						'year' => [
+							'gross' => 12 * $calendar->getAdjustedCashAmount(),
+							'net' =>
+								12 *
+								$exchangeRates[$ticker->getId()] *
+								$calendar->getAdjustedCashAmount() *
+								(1 - $ticker->getTax()->getTaxRate()),
+						],
 					],
-					'per_month_all_shares' => [
-						'gross' =>
-							$transaction->getAdjustedAmount() *
-							$calendar->getAdjustedCashAmount(), // total_shares * cash.per_month_per_share.gross
-						'net' =>
-							$calendar->getAdjustedCashAmount() *
-							$transaction->getAdjustedAmount() *
-							(1 - $ticker->getTax()->getTaxRate()) *
-							$exchangeRates[$ticker->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+					'all_shares' => [
+						'month' => [
+							'gross' =>
+								$transaction->getAdjustedAmount() *
+								$calendar->getAdjustedCashAmount(), // total_shares * cash.per_month_per_share.gross
+							'net' =>
+								$calendar->getAdjustedCashAmount() *
+								$transaction->getAdjustedAmount() *
+								(1 - $ticker->getTax()->getTaxRate()) *
+								$exchangeRates[$ticker->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+						],
+						'year' => [
+							'gross' =>
+								12 *
+								$transaction->getAdjustedAmount() *
+								$calendar->getAdjustedCashAmount(), // total_shares * cash.per_month_per_share.gross
+							'net' =>
+								12 *
+								$calendar->getAdjustedCashAmount() *
+								$transaction->getAdjustedAmount() *
+								(1 - $ticker->getTax()->getTaxRate()) *
+								$exchangeRates[$ticker->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+						],
 					],
 				],
 			],
@@ -261,13 +281,7 @@ class YieldTest extends TestCase
 		$taxRate = 15; // 15%
 		$invested = $originalAmount * $originalPrice;
 
-		$ticker = new Ticker();
-		$reflection = new \ReflectionClass($ticker);
-		$property = $reflection->getProperty('id');
-		$property->setAccessible(true);
-		$property->setValue($ticker, 1);
-		$ticker->setSymbol('AAPL');
-		$ticker->setFullName('Apple computers');
+		$ticker = $this->createTicker(1, 'AAPL', 'Apple computers');
 
 		for ($n = 1; $n < 13; $n++) {
 			$dividendMonth = new DividendMonth();
@@ -285,40 +299,40 @@ class YieldTest extends TestCase
 		$tax->setValidFrom(new \DateTime('2025-01-01'));
 		$ticker->setTax($tax);
 
-		$calendar1 = new Calendar(); // Select with ticker id
-		$reflection = new \ReflectionClass($calendar1);
-		$property = $reflection->getProperty('createdAt');
-		$property->setAccessible(true);
-		$property->setValue($calendar1, new \DateTimeImmutable('2025-08-30'));
-		$calendar1->setTicker($ticker);
-		$calendar1->setExDividendDate(new \DateTime('2025-9-01'));
-		$calendar1->setPaymentDate(new \DateTime('2025-9-03'));
-		$calendar1->setCashAmount($originalCashAmount);
-		$calendar1->setDividendType(Calendar::REGULAR);
+		$calendar1 = $this->createCalendar(
+			ticker: $ticker,
+			cashAmount: $originalCashAmount,
+			createdAt: new \DateTimeImmutable('2025-08-30'),
+			exDivDate: new \DateTime('2025-9-01'),
+			paymentDate: new \DateTime('2025-9-03')
+		);
 
-		$calendar2 = new Calendar(); // Select with ticker id
-		$reflection = new \ReflectionClass($calendar2);
-		$property = $reflection->getProperty('createdAt');
-		$property->setAccessible(true);
-		$property->setValue($calendar2, new \DateTimeImmutable('2025-09-30'));
-		$calendar2->setTicker($ticker);
-		$calendar2->setExDividendDate(new \DateTime('2025-10-01'));
-		$calendar2->setPaymentDate(new \DateTime('2025-10-03'));
-		$calendar2->setCashAmount($originalCashAmount + 0.02);
-		$calendar2->setDividendType(Calendar::REGULAR);
+		$position = $this->createPosition(1, $ticker);
 
-		$position = new Position(); // Select with ticker id (only open position which should be 1 per ticker)
-		$position->setTicker($ticker);
-		$reflection = new \ReflectionClass($position);
-		$property = $reflection->getProperty('id');
-		$property->setAccessible(true);
-		$property->setValue($position, 1);
+		$transaction = $this->createTransaction(
+			$position,
+			$originalAmount,
+			$originalPrice,
+			new \DateTime('2025-09-01')
+		);
+		$position->setAdjustedAmount($transaction->getAdjustedAmount());
+		$position->setAllocation($invested);
 
-		$transaction = new Transaction(); // Select with position id
-		$transaction->setPosition($position);
-		$transaction->setTransactionDate(new \DateTime('2025-09-01'));
-		$transaction->setAmount($originalAmount);
-		$transaction->setPrice($originalPrice);
+		$calendar2 = $this->createCalendar(
+			ticker: $ticker,
+			cashAmount: $originalCashAmount + 0.02,
+			createdAt: new \DateTimeImmutable('2025-09-30'),
+			exDivDate: new \DateTime('2025-10-01'),
+			paymentDate: new \DateTime('2025-10-03')
+		);
+
+		$position = $this->createPosition(id: 1, ticker: $ticker);
+		$transaction = $this->createTransaction(
+			position: $position,
+			amount: $originalAmount,
+			price: $originalPrice,
+			date: new \DateTime('2025-09-01')
+		);
 
 		$position->setAdjustedAmount($transaction->getAdjustedAmount());
 		$position->setAllocation($invested);
@@ -369,37 +383,68 @@ class YieldTest extends TestCase
 				'total_shares' => $transaction->getAdjustedAmount(),
 				'exchange_rate' => $exchangeRates[$ticker->getId()],
 				'tax_rate' => $ticker->getTax()->getTaxRate(),
-				'currency' => $ticker->getCurrency()->getSymbol(),
+				'currency' => [
+					'symbol' => $ticker->getCurrency()->getSymbol(),
+					'sign' => $ticker->getCurrency()->getSign(),
+				],
 				'invested' =>
 					$transaction->getAdjustedPrice() *
 					$transaction->getAdjustedAmount(), // In dollars
 				'yield' => [
 					'percentage' => [
-						'gross' => $grossYieldPercentage, // percentage ((12 * cash.per_month_per_share.gross / )
-						'net' => $netYieldPercentage,
+						'year' => [
+							'gross' => $grossYieldPercentage, // percentage ((12 * cash.per_month_per_share.gross / )
+							'net' => $netYieldPercentage,
+						],
 					],
 					'cash' => [
-						'gross' => $grossCashYield, // Will be in original currency without exchange and tax
-						'net' => $netCashYield, // Will be in euro with tax dededucted
+						'year' => [
+							'gross' => $grossCashYield, // Will be in original currency without exchange and tax
+							'net' => $netCashYield, // Will be in euro with tax dededucted
+						],
 					],
 				],
 				'cash' => [
-					'per_month_per_share' => [
-						'gross' => $calendar->getAdjustedCashAmount(),
-						'net' =>
-							$exchangeRates[$ticker->getId()] *
-							$calendar->getAdjustedCashAmount() *
-							(1 - $ticker->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)
+					'per_share' => [
+						'month' => [
+							'gross' => $calendar->getAdjustedCashAmount(),
+							'net' =>
+								$exchangeRates[$ticker->getId()] *
+								$calendar->getAdjustedCashAmount() *
+								(1 - $ticker->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)
+						],
+						'year' => [
+							'gross' => 12 * $calendar->getAdjustedCashAmount(),
+							'net' =>
+								12 *
+								$exchangeRates[$ticker->getId()] *
+								$calendar->getAdjustedCashAmount() *
+								(1 - $ticker->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)
+						],
 					],
-					'per_month_all_shares' => [
-						'gross' =>
-							$transaction->getAdjustedAmount() *
-							$calendar->getAdjustedCashAmount(), // total_shares * cash.per_month_per_share.gross
-						'net' =>
-							$calendar->getAdjustedCashAmount() *
-							$transaction->getAdjustedAmount() *
-							(1 - $ticker->getTax()->getTaxRate()) *
-							$exchangeRates[$ticker->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+					'all_shares' => [
+						'month' => [
+							'gross' =>
+								$transaction->getAdjustedAmount() *
+								$calendar->getAdjustedCashAmount(), // total_shares * cash.per_month_per_share.gross
+							'net' =>
+								$calendar->getAdjustedCashAmount() *
+								$transaction->getAdjustedAmount() *
+								(1 - $ticker->getTax()->getTaxRate()) *
+								$exchangeRates[$ticker->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+						],
+						'year' => [
+							'gross' =>
+								12 *
+								$transaction->getAdjustedAmount() *
+								$calendar->getAdjustedCashAmount(), // total_shares * cash.per_month_per_share.gross
+							'net' =>
+								12 *
+								$calendar->getAdjustedCashAmount() *
+								$transaction->getAdjustedAmount() *
+								(1 - $ticker->getTax()->getTaxRate()) *
+								$exchangeRates[$ticker->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+						],
 					],
 				],
 			],
@@ -471,18 +516,21 @@ class YieldTest extends TestCase
 		$position2 = $this->createPosition(2, $ticker2);
 
 		$tx1 = $this->createTransaction(
+			$position,
 			100.0,
 			10.0,
 			new \DateTime('2024-06-10'),
 			Transaction::BUY
 		); // (100 * 0.2) = 20
 		$tx2 = $this->createTransaction(
+			$position,
 			50.0,
 			12.0,
 			new \DateTime('2025-06-10'),
 			Transaction::BUY
 		); // 50 * 0.2 = 10
 		$tx3 = $this->createTransaction(
+			$position,
 			50.0,
 			15.0,
 			new \DateTime('2025-08-10'),
@@ -490,25 +538,24 @@ class YieldTest extends TestCase
 		); // 50 * 0.2 = 10 -> total should be 60
 		$invested = 100 * 10 + 50 * 12 + 50 * 15;
 
-		$tx1->setPosition($position);
-		$tx2->setPosition($position);
-		$tx3->setPosition($position);
-
 		$position->setAllocation($invested);
 
 		$tx4 = $this->createTransaction(
+			$position2,
 			500.0,
 			10.0,
 			new \DateTime('2024-06-10'),
 			Transaction::BUY
 		); // (500 * 0.2) = 100
 		$tx5 = $this->createTransaction(
+			$position2,
 			150.0,
 			12.0,
 			new \DateTime('2025-06-10'),
 			Transaction::BUY
 		); // 150 * 0.2 = 30
 		$tx6 = $this->createTransaction(
+			$position2,
 			50.0,
 			15.0,
 			new \DateTime('2025-08-10'),
@@ -516,9 +563,6 @@ class YieldTest extends TestCase
 		); // 50 * 0.2 = 10 -> total should be 140
 		$invested2 = 500 * 10 + 150 * 12 + 50 * 15;
 		$position2->setAllocation($invested2);
-		$tx1->setPosition($position2);
-		$tx2->setPosition($position2);
-		$tx3->setPosition($position2);
 
 		$tickers[$ticker->getId()] = $ticker;
 		$transactions[$ticker->getId()] = [$tx1, $tx2, $tx3];
@@ -594,35 +638,66 @@ class YieldTest extends TestCase
 			'total_shares' => $position->getAdjustedAmount(),
 			'exchange_rate' => $exchangeRates[$ticker->getId()],
 			'tax_rate' => $ticker->getTax()->getTaxRate(),
-			'currency' => $ticker->getCurrency()->getSymbol(),
+			'currency' => [
+				'symbol' => $ticker->getCurrency()->getSymbol(),
+				'sign' => $ticker->getCurrency()->getSign(),
+			],
 			'invested' => $position->getAllocation(), // In dollars
 			'yield' => [
 				'percentage' => [
-					'gross' => $grossYieldPercentage, // percentage ((12 * cash.per_month_per_share.gross / )
-					'net' => $netYieldPercentage,
+					'year' => [
+						'gross' => $grossYieldPercentage, // percentage ((12 * cash.per_month_per_share.gross / )
+						'net' => $netYieldPercentage,
+					],
 				],
 				'cash' => [
-					'gross' => $grossCashYield, // Will be in original currency without exchange and tax
-					'net' => $netCashYield, // Will be in euro with tax dededucted
+					'year' => [
+						'gross' => $grossCashYield, // Will be in original currency without exchange and tax
+						'net' => $netCashYield, // Will be in euro with tax dededucted
+					],
 				],
 			],
 			'cash' => [
-				'per_month_per_share' => [
-					'gross' => $calendar->getAdjustedCashAmount(),
-					'net' =>
-						$exchangeRates[$ticker->getId()] *
-						$calendar->getAdjustedCashAmount() *
-						(1 - $ticker->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)
+				'per_share' => [
+					'month' => [
+						'gross' => $calendar->getAdjustedCashAmount(),
+						'net' =>
+							$exchangeRates[$ticker->getId()] *
+							$calendar->getAdjustedCashAmount() *
+							(1 - $ticker->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)
+					],
+					'year' => [
+						'gross' => 12 * $calendar->getAdjustedCashAmount(),
+						'net' =>
+							12 *
+							$exchangeRates[$ticker->getId()] *
+							$calendar->getAdjustedCashAmount() *
+							(1 - $ticker->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)
+					],
 				],
-				'per_month_all_shares' => [
-					'gross' =>
-						$position->getAdjustedAmount() *
-						$calendar->getAdjustedCashAmount(), // total_shares * cash.per_month_per_share.gross
-					'net' =>
-						$calendar->getAdjustedCashAmount() *
-						$position->getAdjustedAmount() *
-						(1 - $ticker->getTax()->getTaxRate()) *
-						$exchangeRates[$ticker->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+				'all_shares' => [
+					'month' => [
+						'gross' =>
+							$position->getAdjustedAmount() *
+							$calendar->getAdjustedCashAmount(), // total_shares * cash.per_month_per_share.gross
+						'net' =>
+							$calendar->getAdjustedCashAmount() *
+							$position->getAdjustedAmount() *
+							(1 - $ticker->getTax()->getTaxRate()) *
+							$exchangeRates[$ticker->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+					],
+					'year' => [
+						'gross' =>
+							12 *
+							$position->getAdjustedAmount() *
+							$calendar->getAdjustedCashAmount(), // total_shares * cash.per_month_per_share.gross
+						'net' =>
+							12 *
+							$calendar->getAdjustedCashAmount() *
+							$position->getAdjustedAmount() *
+							(1 - $ticker->getTax()->getTaxRate()) *
+							$exchangeRates[$ticker->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+					],
 				],
 			],
 		];
@@ -648,42 +723,72 @@ class YieldTest extends TestCase
 			'total_shares' => $position2->getAdjustedAmount(),
 			'exchange_rate' => $exchangeRates[$ticker2->getId()],
 			'tax_rate' => $ticker2->getTax()->getTaxRate(),
-			'currency' => $ticker2->getCurrency()->getSymbol(),
+			'currency' => [
+				'symbol' => $ticker->getCurrency()->getSymbol(),
+				'sign' => $ticker->getCurrency()->getSign(),
+			],
 			'invested' => $position2->getAllocation(), // In dollars
 			'yield' => [
 				'percentage' => [
-					'gross' => $grossYieldPercentage2, // percentage ((12 * cash.per_month_per_share.gross / )
-					'net' => $netYieldPercentage2,
+					'year' => [
+						'gross' => $grossYieldPercentage2, // percentage ((12 * cash.per_month_per_share.gross / )
+						'net' => $netYieldPercentage2,
+					],
 				],
 				'cash' => [
-					'gross' => $grossCashYield2, // Will be in original currency without exchange and tax
-					'net' => $netCashYield2, // Will be in euro with tax dededucted
+					'year' => [
+						'gross' => $grossCashYield2, // Will be in original currency without exchange and tax
+						'net' => $netCashYield2, // Will be in euro with tax dededucted
+					],
 				],
 			],
 			'cash' => [
-				'per_month_per_share' => [
-					'gross' => $calendar->getAdjustedCashAmount(),
-					'net' =>
-						$exchangeRates[$ticker2->getId()] *
-						$calendar->getAdjustedCashAmount() *
-						(1 - $ticker2->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)
+				'per_share' => [
+					'month' => [
+						'gross' => $calendar->getAdjustedCashAmount(),
+						'net' =>
+							$exchangeRates[$ticker2->getId()] *
+							$calendar->getAdjustedCashAmount() *
+							(1 - $ticker2->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)
+					],
+					'year' => [
+						'gross' => 12 * $calendar->getAdjustedCashAmount(),
+						'net' =>
+							12 *
+							$exchangeRates[$ticker2->getId()] *
+							$calendar->getAdjustedCashAmount() *
+							(1 - $ticker2->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)],
+					],
 				],
-				'per_month_all_shares' => [
-					'gross' =>
-						$position2->getAdjustedAmount() *
-						$calendar->getAdjustedCashAmount(), // total_shares * cash.per_month_per_share.gross
-					'net' =>
-						$calendar->getAdjustedCashAmount() *
-						$position2->getAdjustedAmount() *
-						(1 - $ticker2->getTax()->getTaxRate()) *
-						$exchangeRates[$ticker2->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+				'all_shares' => [
+					'month' => [
+						'gross' =>
+							$position2->getAdjustedAmount() *
+							$calendar->getAdjustedCashAmount(), // total_shares * cash.per_month_per_share.gross
+						'net' =>
+							$calendar->getAdjustedCashAmount() *
+							$position2->getAdjustedAmount() *
+							(1 - $ticker2->getTax()->getTaxRate()) *
+							$exchangeRates[$ticker2->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+					],
+					'year' => [
+						'gross' =>
+							12 *
+							$position2->getAdjustedAmount() *
+							$calendar->getAdjustedCashAmount(), // total_shares * cash.per_month_per_share.gross
+						'net' =>
+							12 *
+							$calendar->getAdjustedCashAmount() *
+							$position2->getAdjustedAmount() *
+							(1 - $ticker2->getTax()->getTaxRate()) *
+							$exchangeRates[$ticker2->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)]
+					],
 				],
 			],
 		];
 
 		$this->assertEquals($expected, $actual);
 	}
-
 
 	public function test_report_yield_with_corporate_actions_and_multiple_calendars_and_one_ticker_without_dividends(): void
 	{
@@ -747,44 +852,45 @@ class YieldTest extends TestCase
 		$position2 = $this->createPosition(2, $ticker2);
 
 		$tx1 = $this->createTransaction(
+			$position,
 			100.0,
 			10.0,
 			new \DateTime('2024-06-10'),
 			Transaction::BUY
 		); // (100 * 0.2) = 20
 		$tx2 = $this->createTransaction(
+			$position,
 			50.0,
 			12.0,
 			new \DateTime('2025-06-10'),
 			Transaction::BUY
 		); // 50 * 0.2 = 10
 		$tx3 = $this->createTransaction(
+			$position,
 			50.0,
 			15.0,
 			new \DateTime('2025-08-10'),
 			Transaction::BUY
 		); // 50 * 0.2 = 10 -> total should be 60
 		$invested = 100 * 10 + 50 * 12 + 50 * 15;
-
-		$tx1->setPosition($position);
-		$tx2->setPosition($position);
-		$tx3->setPosition($position);
-
 		$position->setAllocation($invested);
 
 		$tx4 = $this->createTransaction(
+			$position2,
 			500.0,
 			10.0,
 			new \DateTime('2024-06-10'),
 			Transaction::BUY
 		); // (500 * 0.2) = 100
 		$tx5 = $this->createTransaction(
+			$position2,
 			150.0,
 			12.0,
 			new \DateTime('2025-06-10'),
 			Transaction::BUY
 		); // 150 * 0.2 = 30
 		$tx6 = $this->createTransaction(
+			$position2,
 			50.0,
 			15.0,
 			new \DateTime('2025-08-10'),
@@ -792,9 +898,6 @@ class YieldTest extends TestCase
 		); // 50 * 0.2 = 10 -> total should be 140
 		$invested2 = 500 * 10 + 150 * 12 + 50 * 15;
 		$position2->setAllocation($invested2);
-		$tx1->setPosition($position2);
-		$tx2->setPosition($position2);
-		$tx3->setPosition($position2);
 
 		$tickers[$ticker->getId()] = $ticker;
 		$transactions[$ticker->getId()] = [$tx1, $tx2, $tx3];
@@ -870,35 +973,66 @@ class YieldTest extends TestCase
 			'total_shares' => $position->getAdjustedAmount(),
 			'exchange_rate' => $exchangeRates[$ticker->getId()],
 			'tax_rate' => $ticker->getTax()->getTaxRate(),
-			'currency' => $ticker->getCurrency()->getSymbol(),
+			'currency' => [
+				'symbol' => $ticker->getCurrency()->getSymbol(),
+				'sign' => $ticker->getCurrency()->getSign(),
+			],
 			'invested' => $position->getAllocation(), // In dollars
 			'yield' => [
 				'percentage' => [
-					'gross' => $grossYieldPercentage, // percentage ((12 * cash.per_month_per_share.gross / )
-					'net' => $netYieldPercentage,
+					'year' => [
+						'gross' => $grossYieldPercentage, // percentage ((12 * cash.per_month_per_share.gross / )
+						'net' => $netYieldPercentage,
+					],
 				],
 				'cash' => [
-					'gross' => $grossCashYield, // Will be in original currency without exchange and tax
-					'net' => $netCashYield, // Will be in euro with tax dededucted
+					'year' => [
+						'gross' => $grossCashYield, // Will be in original currency without exchange and tax
+						'net' => $netCashYield, // Will be in euro with tax dededucted
+					],
 				],
 			],
 			'cash' => [
-				'per_month_per_share' => [
-					'gross' => $calendar->getAdjustedCashAmount(),
-					'net' =>
-						$exchangeRates[$ticker->getId()] *
-						$calendar->getAdjustedCashAmount() *
-						(1 - $ticker->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)
+				'per_share' => [
+					'month' => [
+						'gross' => $calendar->getAdjustedCashAmount(),
+						'net' =>
+							$exchangeRates[$ticker->getId()] *
+							$calendar->getAdjustedCashAmount() *
+							(1 - $ticker->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)
+					],
+					'year' => [
+						'gross' => 12 * $calendar->getAdjustedCashAmount(),
+						'net' =>
+							12 *
+							$exchangeRates[$ticker->getId()] *
+							$calendar->getAdjustedCashAmount() *
+							(1 - $ticker->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)
+					],
 				],
-				'per_month_all_shares' => [
-					'gross' =>
-						$position->getAdjustedAmount() *
-						$calendar->getAdjustedCashAmount(), // total_shares * cash.per_month_per_share.gross
-					'net' =>
-						$calendar->getAdjustedCashAmount() *
-						$position->getAdjustedAmount() *
-						(1 - $ticker->getTax()->getTaxRate()) *
-						$exchangeRates[$ticker->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+				'all_shares' => [
+					'month' => [
+						'gross' =>
+							$position->getAdjustedAmount() *
+							$calendar->getAdjustedCashAmount(), // total_shares * cash.per_month_per_share.gross
+						'net' =>
+							$calendar->getAdjustedCashAmount() *
+							$position->getAdjustedAmount() *
+							(1 - $ticker->getTax()->getTaxRate()) *
+							$exchangeRates[$ticker->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+					],
+					'year' => [
+						'gross' =>
+							12 *
+							$position->getAdjustedAmount() *
+							$calendar->getAdjustedCashAmount(), // total_shares * cash.per_month_per_share.gross
+						'net' =>
+							12 *
+							$calendar->getAdjustedCashAmount() *
+							$position->getAdjustedAmount() *
+							(1 - $ticker->getTax()->getTaxRate()) *
+							$exchangeRates[$ticker->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+					],
 				],
 			],
 		];
@@ -907,15 +1041,13 @@ class YieldTest extends TestCase
 		$freq2 = $ticker2->getDividendFrequency();
 		$tax2 = 1 - $ticker2->getTax()->getTaxRate();
 		$exchangeRate2 = $exchangeRates[$ticker2->getId()];
-		$grossYieldPercentage2 =
-			(($freq2 * 0 * $amount2) / $invested2) * 100;
+		$grossYieldPercentage2 = (($freq2 * 0 * $amount2) / $invested2) * 100;
 		$netYieldPercentage2 =
 			(($freq2 * 0 * $amount2 * $exchangeRate2 * $tax2) /
 				($invested2 * $exchangeRate2)) *
 			100;
 		$grossCashYield2 = $freq2 * 0 * $amount2;
-		$netCashYield2 =
-			$freq2 * 0 * $amount2 * $tax2 * $exchangeRate2;
+		$netCashYield2 = $freq2 * 0 * $amount2 * $tax2 * $exchangeRate2;
 
 		$expected[$ticker2->getId()] = [
 			'position' => $position2,
@@ -924,35 +1056,61 @@ class YieldTest extends TestCase
 			'total_shares' => $position2->getAdjustedAmount(),
 			'exchange_rate' => $exchangeRates[$ticker2->getId()],
 			'tax_rate' => $ticker2->getTax()->getTaxRate(),
-			'currency' => $ticker2->getCurrency()->getSymbol(),
+			'currency' => [
+				'symbol' => $ticker->getCurrency()->getSymbol(),
+				'sign' => $ticker->getCurrency()->getSign(),
+			],
 			'invested' => $position2->getAllocation(), // In dollars
 			'yield' => [
 				'percentage' => [
-					'gross' => $grossYieldPercentage2, // percentage ((12 * cash.per_month_per_share.gross / )
-					'net' => $netYieldPercentage2,
+					'year' => [
+						'gross' => $grossYieldPercentage2, // percentage ((12 * cash.per_month_per_share.gross / )
+						'net' => $netYieldPercentage2,
+					],
 				],
 				'cash' => [
-					'gross' => $grossCashYield2, // Will be in original currency without exchange and tax
-					'net' => $netCashYield2, // Will be in euro with tax dededucted
+					'year' => [
+						'gross' => $grossCashYield2, // Will be in original currency without exchange and tax
+						'net' => $netCashYield2, // Will be in euro with tax dededucted
+					],
 				],
 			],
 			'cash' => [
-				'per_month_per_share' => [
-					'gross' => 0,
-					'net' =>
-						$exchangeRates[$ticker2->getId()] *
-						0 *
-						(1 - $ticker2->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)
+				'per_share' => [
+					'month' => [
+						'gross' => 0,
+						'net' =>
+							$exchangeRates[$ticker2->getId()] *
+							0 *
+							(1 - $ticker2->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)
+					],
+					'year' => [
+						'gross' => 0,
+						'net' =>
+							12 *
+							$exchangeRates[$ticker2->getId()] *
+							0 *
+							(1 - $ticker2->getTax()->getTaxRate()), // exchange_rate * cash_amount_per_month_per_share * (1 - tax_rate)
+					],
 				],
-				'per_month_all_shares' => [
-					'gross' =>
-						$position2->getAdjustedAmount() *
-						0, // total_shares * cash.per_month_per_share.gross
-					'net' =>
-						0 *
-						$position2->getAdjustedAmount() *
-						(1 - $ticker2->getTax()->getTaxRate()) *
-						$exchangeRates[$ticker2->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+				'all_shares' => [
+					'month' => [
+						'gross' => $position2->getAdjustedAmount() * 0, // total_shares * cash.per_month_per_share.gross
+						'net' =>
+							0 *
+							$position2->getAdjustedAmount() *
+							(1 - $ticker2->getTax()->getTaxRate()) *
+							$exchangeRates[$ticker2->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+					],
+					'year' => [
+						'gross' => 12 * $position2->getAdjustedAmount() * 0, // total_shares * cash.per_month_per_share.gross
+						'net' =>
+							12 *
+							0 *
+							$position2->getAdjustedAmount() *
+							(1 - $ticker2->getTax()->getTaxRate()) *
+							$exchangeRates[$ticker2->getId()], // exchange_rate * total_shares * cash.per_month_per_share.gross * (1 - tax_rate)
+					],
 				],
 			],
 		];

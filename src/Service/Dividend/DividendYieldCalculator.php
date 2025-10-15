@@ -98,10 +98,9 @@ class DividendYieldCalculator
 			$invested = $position->getAllocation();
 
 			$freq = $ticker->getDividendFrequency(); // Normalize to month
-			$cashAmount = $cashAmount * ($freq/12); // Normalize to month
+			$cashAmount = $cashAmount * ($freq / 12); // Normalize to month
 
-
-			$amount = $position->getAdjustedAmount();
+			$amount = $position->getAdjustedAmount() ?? $position->getAmount(); // Adjusted is only filled if there asre corporate actions like share splits etc.
 			$tax = 1 - $ticker->getTax()->getTaxRate();
 
 			$yieldPercentageGross =
@@ -113,8 +112,7 @@ class DividendYieldCalculator
 
 			$yieldCashGross = 12 * $cashAmount * $amount;
 
-			$yieldCashNet =
-				12 * $cashAmount * $amount * $tax * $exchangeRate;
+			$yieldCashNet = 12 * $cashAmount * $amount * $tax * $exchangeRate;
 
 			$data[$ticker->getId()] = [
 				'position' => $position,
@@ -123,26 +121,52 @@ class DividendYieldCalculator
 				'total_shares' => $position->getAdjustedAmount(),
 				'exchange_rate' => $exchangeRate,
 				'tax_rate' => $ticker->getTax()->getTaxRate(),
-				'currency' => $ticker->getCurrency()->getSymbol(),
+				'currency' => [
+					'symbol' => $ticker->getCurrency()->getSymbol(),
+					'sign' => $ticker->getCurrency()->getSign(),
+				],
 				'invested' => $invested,
 				'yield' => [
+					// Based on yearly
 					'percentage' => [
-						'gross' => $yieldPercentageGross,
-						'net' => $yieldPercentageNet,
+						'year' => [
+							'gross' => $yieldPercentageGross,
+							'net' => $yieldPercentageNet,
+						],
 					],
 					'cash' => [
-						'gross' => $yieldCashGross,
-						'net' => $yieldCashNet,
+						'year' => [
+							'gross' => $yieldCashGross,
+							'net' => $yieldCashNet,
+						],
 					],
 				],
 				'cash' => [
-					'per_month_per_share' => [
-						'gross' => $cashAmount,
-						'net' => $exchangeRate * $cashAmount * $tax,
+					'per_share' => [
+						'month' => [
+							'gross' => $cashAmount,
+							'net' => $exchangeRate * $cashAmount * $tax,
+						],
+						'year' => [
+							'gross' => 12 * $cashAmount,
+							'net' => 12 * $exchangeRate * $cashAmount * $tax,
+						],
 					],
-					'per_month_all_shares' => [
-						'gross' => $amount * $cashAmount,
-						'net' => $cashAmount * $amount * $tax * $exchangeRate,
+					'all_shares' => [
+						'month' => [
+							'gross' => $amount * $cashAmount,
+							'net' =>
+								$cashAmount * $amount * $tax * $exchangeRate,
+						],
+						'year' => [
+							'gross' => 12 * $amount * $cashAmount,
+							'net' =>
+								12 *
+								$cashAmount *
+								$amount *
+								$tax *
+								$exchangeRate,
+						],
 					],
 				],
 			];

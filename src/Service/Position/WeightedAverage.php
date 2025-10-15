@@ -33,6 +33,7 @@ class WeightedAverage
 
 	/**
 	 * Returns number of transactions processed
+	 * @deprecated This is redundant with AdjustedPositionDecoratorFactory::class and flow
 	 */
 	public function calc(Position $position): int
 	{
@@ -122,9 +123,7 @@ class WeightedAverage
 			->setAllocation(round($costBase, 3))
 			->setAmount((float) $numShares)
 			->setPrice($aPrice)
-			->setProfit(round($totalProfit, 3))
-			->setAdjustedAmount($adjustedShares)
-			->setAdjustedAveragePrice($averagePrice);
+			->setProfit(round($totalProfit, 3));
 
 		return count($transactions);
 	}

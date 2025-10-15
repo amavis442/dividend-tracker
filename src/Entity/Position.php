@@ -157,16 +157,8 @@ class Position
     private float $dividend = 0.0;
 
 
-    #[ORM\Column(nullable: true)]
     private ?float $adjustedAmount = null;
-
-    #[ORM\Column(nullable: true)]
     private ?float $adjustedAveragePrice = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $adjustedMetricsLastUpdatedAt = null;
-
-
 
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
@@ -866,9 +858,9 @@ class Position
         return $this;
     }
 
-    public function getAdjustedAmount(): float
+    public function getAdjustedAmount(): ?float
     {
-        return $this->adjustedAmount ?? 0.0;
+        return $this->adjustedAmount;
     }
 
     public function setAdjustedAmount(?float $adjustedAmount): static
@@ -878,26 +870,14 @@ class Position
         return $this;
     }
 
-    public function getAdjustedAveragePrice(): float
+    public function getAdjustedAveragePrice(): ?float
     {
-        return $this->adjustedAveragePrice ?? 0.0;
+        return $this->adjustedAveragePrice;
     }
 
     public function setAdjustedAveragePrice(?float $adjustedAveragePrice): static
     {
         $this->adjustedAveragePrice = $adjustedAveragePrice;
-
-        return $this;
-    }
-
-    public function getAdjustedMetricsLastUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->adjustedMetricsLastUpdatedAt;
-    }
-
-    public function setAdjustedMetricsLastUpdatedAt(?\DateTimeImmutable $adjustedMetricsLastUpdatedAt): static
-    {
-        $this->adjustedMetricsLastUpdatedAt = $adjustedMetricsLastUpdatedAt;
 
         return $this;
     }
