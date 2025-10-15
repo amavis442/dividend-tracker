@@ -590,4 +590,18 @@ class PositionRepository extends ServiceEntityRepository
 			->getQuery()
 			->getResult();
 	}
+
+	public function getForYieldView(): mixed
+	{
+		return $this->createQueryBuilder('p')
+		->select('p, t, tax, currency')
+			->join('p.ticker','t')
+			->join('t.tax', 'tax')
+			->join('t.currency', 'currency')
+			->where(
+				'(p.closed = false and p.closedAt is null)'
+			)
+			->getQuery()
+			->getResult();
+	}
 }

@@ -13,13 +13,16 @@ use App\Form\CalendarDividendType;
 use App\Form\CalendarType;
 use App\Form\TickerAutocompleteType;
 use App\Repository\DividendCalendarRepository;
+use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
-use App\Repository\PositionRepository;
+use App\Service\Dividend\DividendAdjuster;
+use App\Service\Dividend\DividendCalendarService;
 use App\Service\Dividend\DividendServiceInterface;
 use App\Service\Dividend\DividendTaxRateResolverInterface;
 use App\Service\ExchangeRate\DividendExchangeRateResolverInterface;
 use App\Service\Referer;
+use App\Service\Transaction\TransactionAdjuster;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
@@ -29,9 +32,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\Transaction\TransactionAdjuster;
-use App\Service\Dividend\DividendAdjuster;
-use App\Service\Dividend\DividendCalendarService;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/calendar')]
 class CalendarController extends AbstractController

@@ -40,9 +40,9 @@ class AdjustedPositionDecoratorFactory
 	/**
 	 * Mass load needed data for decorator(s)
 	 *
-	 * @param array<int, array<int, \App\Entity\Transaction>> $transactions
+	 * @param array<int, array<int, \App\Entity\Transaction>> $transactions key is positionId
 	 *
-	 * @param array<int , array<int, \App\Entity\CorporateAction>> $actions
+	 * @param array<int , array<int, \App\Entity\CorporateAction>> $actions key is tickerId
 	 *
 	 * @return self
 	 *
@@ -63,14 +63,15 @@ class AdjustedPositionDecoratorFactory
 	 * @return AdjustedPositionDecoratorInterface
 	 */
 	public function decorate(
-		Position $position
+		Position $position,
+		bool $byTicker = false
 	): AdjustedPositionDecoratorInterface {
 		$pid = $position->getId();
 		$tid = $position->getTicker()->getId();
 
 		return new AdjustedPositionDecorator(
 			position: $position,
-			transactions: $this->transactions[$pid] ?? [],
+			transactions: $this->transactions[$byTicker ? $tid : $pid] ?? [],
 			actions: $this->actions[$tid] ?? [],
 			transactionAdjuster: $this->transactionAdjuster
 		);

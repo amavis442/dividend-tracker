@@ -30,28 +30,91 @@ class DividendYieldCalculator
 		array $positions,
 		array $exchangeRates
 	): void {
-     	$this->tickers = $tickers;
+		$this->tickers = $tickers;
 		$this->calendars = $calendars;
 		$this->positions = $positions;
-    	$this->exchangeRates = $exchangeRates;
-
+		$this->exchangeRates = $exchangeRates;
 	}
 
+	/**
+	 * Key is tickerId
+	 *
+	 * @return array<int|string, array{
+	 *     position: \App\Entity\Position,
+	 *     ticker: \App\Entity\Ticker,
+	 *     calendar_used: \App\Entity\Calendar|null,
+	 *     total_shares: float,
+	 *     exchange_rate: float,
+	 *     tax_rate: float,
+	 *     currency: string|null,
+	 *     invested: float,
+	 *     yield: array{
+	 *         percentage: array{
+	 *             gross: float,
+	 *             net: float
+	 *         },
+	 *         cash: array{
+	 *             gross: float,
+	 *             net: float
+	 *         }
+	 *     },
+	 *     cash: array{
+	 *         per_month_per_share: array{
+	 *             gross: float,
+	 *             net: float
+	 *         },
+	 *         per_month_all_shares: array{
+	 *             gross: float,
+	 *             net: float
+	 *         }
+	 *     }
+	 * }>
+	 */
 	public function process(): array
 	{
-    	$data = [];
+		$data = [];
 		foreach ($this->tickers as $tickerId => $ticker) {
-            if (!isset($this->positions[$tickerId])){
-                continue;
-            }
+			if (!isset($this->positions[$tickerId])) {
+				continue;
+			}
 			$position = $this->positions[$tickerId];
-			$calendar = $this->calendars[$tickerId][count($this->calendars[$tickerId]) - 1];
+			if ($position->getAllocation() <= 0) {
+				continue;
+			}
+
+			$cashAmount = 0.0;
+			$calendar = null;
+
+			if (
+				isset($this->calendars[$tickerId]) &&
+				count($this->calendars[$tickerId]) > 0
+			) {
+				$calId = array_key_last($this->calendars[$tickerId]);
+				$calendar = $this->calendars[$tickerId][$calId];
+				$cashAmount = $calendar->getAdjustedCashAmount();
+			}
+
 			$exchangeRate = $this->exchangeRates[$tickerId];
-            $invested = $position->getAllocation();
-            $freq = $ticker->getDividendFrequency();
-            $cashAmount = $calendar->getAdjustedCashAmount();
-            $amount = $position->getAdjustedAmount();
-            $tax = (1 - $ticker->getTax()->getTaxRate());
+			$invested = $position->getAllocation();
+
+			$freq = $ticker->getDividendFrequency(); // Normalize to month
+			$cashAmount = $cashAmount * ($freq/12); // Normalize to month
+
+
+			$amount = $position->getAdjustedAmount();
+			$tax = 1 - $ticker->getTax()->getTaxRate();
+
+			$yieldPercentageGross =
+				((12 * $cashAmount * $amount) / $invested) * 100;
+			$yieldPercentageNet =
+				((12 * $cashAmount * $amount * $tax * $exchangeRate) /
+					($invested * $exchangeRate)) *
+				100;
+
+			$yieldCashGross = 12 * $cashAmount * $amount;
+
+			$yieldCashNet =
+				12 * $cashAmount * $amount * $tax * $exchangeRate;
 
 			$data[$ticker->getId()] = [
 				'position' => $position,
@@ -61,55 +124,25 @@ class DividendYieldCalculator
 				'exchange_rate' => $exchangeRate,
 				'tax_rate' => $ticker->getTax()->getTaxRate(),
 				'currency' => $ticker->getCurrency()->getSymbol(),
-				'invested' =>
-					$invested,
+				'invested' => $invested,
 				'yield' => [
 					'percentage' => [
-						'gross' =>
-							(($freq *
-								$cashAmount *
-								$amount) /
-								$invested) *
-							100,
-						'net' =>
-							(($freq *
-								$cashAmount *
-								$amount *
-								$tax *
-								$exchangeRate) /
-								($invested * $exchangeRate)) *
-							100,
+						'gross' => $yieldPercentageGross,
+						'net' => $yieldPercentageNet,
 					],
 					'cash' => [
-						'gross' =>
-							$freq *
-							$cashAmount *
-							$amount,
-						'net' =>
-							$freq *
-							$cashAmount *
-							$amount *
-							$tax *
-							$exchangeRate,
+						'gross' => $yieldCashGross,
+						'net' => $yieldCashNet,
 					],
 				],
 				'cash' => [
 					'per_month_per_share' => [
 						'gross' => $cashAmount,
-						'net' =>
-							$exchangeRate *
-							$cashAmount *
-							$tax,
+						'net' => $exchangeRate * $cashAmount * $tax,
 					],
 					'per_month_all_shares' => [
-						'gross' =>
-							$amount *
-							$cashAmount,
-						'net' =>
-							$cashAmount *
-							$amount *
-							$tax *
-							$exchangeRate,
+						'gross' => $amount * $cashAmount,
+						'net' => $cashAmount * $amount * $tax * $exchangeRate,
 					],
 				],
 			];
