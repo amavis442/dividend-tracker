@@ -37,7 +37,7 @@ class DividendYieldCalculator
 	}
 
 	/**
-	 * Key is tickerId
+	 * Returns an array keyed by tickerId.
 	 *
 	 * @return array<int|string, array{
 	 *     position: \App\Entity\Position,
@@ -46,26 +46,42 @@ class DividendYieldCalculator
 	 *     total_shares: float,
 	 *     exchange_rate: float,
 	 *     tax_rate: float,
-	 *     currency: string|null,
+	 *     currency: array{symbol: string|null, sign: string|null},
 	 *     invested: float,
 	 *     yield: array{
 	 *         percentage: array{
-	 *             gross: float,
-	 *             net: float
+	 *             year: array{
+	 *                 gross: float,
+	 *                 net: float
+	 *             }
 	 *         },
 	 *         cash: array{
-	 *             gross: float,
-	 *             net: float
+	 *             year: array{
+	 *                 gross: float,
+	 *                 net: float
+	 *             }
 	 *         }
 	 *     },
 	 *     cash: array{
-	 *         per_month_per_share: array{
-	 *             gross: float,
-	 *             net: float
+	 *         per_share: array{
+	 *             month: array{
+	 *                 gross: float,
+	 *                 net: float
+	 *             },
+	 *             year: array{
+	 *                 gross: float,
+	 *                 net: float
+	 *             }
 	 *         },
-	 *         per_month_all_shares: array{
-	 *             gross: float,
-	 *             net: float
+	 *         all_shares: array{
+	 *             month: array{
+	 *                 gross: float,
+	 *                 net: float
+	 *             },
+	 *             year: array{
+	 *                 gross: float,
+	 *                 net: float
+	 *             }
 	 *         }
 	 *     }
 	 * }>
