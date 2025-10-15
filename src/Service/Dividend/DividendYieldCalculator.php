@@ -123,8 +123,8 @@ class DividendYieldCalculator
 				((12 * $cashAmount * $amount) / $invested) * 100;
 			$yieldPercentageNet =
 				((12 * $cashAmount * $amount * $tax * $exchangeRate) /
-					($invested * $exchangeRate)) *
-				100;
+					($invested)) *
+				100; // Invested is in the local currency and doe not need to be converted.
 
 			$yieldCashGross = 12 * $cashAmount * $amount;
 
