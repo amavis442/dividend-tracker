@@ -60,7 +60,7 @@
                                 <twig:Table:ThCol>
                                     <div class="flex items-center">
                                         Ticker
-                                        <a href="{{ path('report_dividend_yield_by_pie', {...app.request.query.all() , sort: 'symbol', sortDirection: sort == 'symbol' and sortDirection == 'asc' ? 'desc' : 'asc', }) }}"
+                                        <a href="{{ path('report_dividend_yield_by_pie', {...app.request.query.all() , sortBy: 'symbol', sortDirection: sortBy == 'symbol' and sortDirection == 'asc' ? 'desc' : 'asc', }) }}"
                                            data-turbo-frame="table-results">
                                             <svg class="w-3 h-3 ms-1.5"
                                                  aria-hidden="true"
@@ -81,7 +81,7 @@
                                 <twig:Table:ThCol>
                                     <div class="flex items-center">
                                         {{ 'Yearly forward dividend'|trans }}
-                                        <a href="{{ path('report_dividend_yield_by_pie', { ...app.request.query.all() , sort: 'dividend', sortDirection: sort == 'dividend' and sortDirection == 'asc' ? 'desc' : 'asc', }) }}"
+                                        <a href="{{ path('report_dividend_yield_by_pie', { ...app.request.query.all() , sortBy: 'dividend', sortDirection: sortBy == 'dividend' and sortDirection == 'asc' ? 'desc' : 'asc', }) }}"
                                            data-turbo-frame="table-results">
                                             <svg class="w-3 h-3 ms-1.5"
                                                  aria-hidden="true"
@@ -97,7 +97,7 @@
                                     {{ 'Net forward yearly dividend per share'|trans }}
                                 </twig:Table:ThCol>
                                 <twig:Table:ThCol>
-                                    {{ 'Net forward dividend per payout'|trans }}
+                                    {{ 'Net forward dividend per month'|trans }}
                                 </twig:Table:ThCol>
                                 <twig:Table:ThCol>
                                     {{ 'Net forward yearly dividend total'|trans }}
@@ -105,7 +105,7 @@
                                 <twig:Table:ThCol>
                                     <div class="flex items-center">
                                         {{ 'Yield'|trans }}
-                                        <a href="{{ path('report_dividend_yield_by_pie', { ...app.request.query.all() , sort: 'yield', sortDirection: sort == 'yield' and sortDirection == 'asc' ? 'desc' : 'asc',}) }}"
+                                        <a href="{{ path('report_dividend_yield_by_pie', { ...app.request.query.all() , sortBy: 'yield', sortDirection: sortBy == 'yield' and sortDirection == 'asc' ? 'desc' : 'asc',}) }}"
                                            data-turbo-frame="table-results">
                                             <svg class="w-3 h-3 ms-1.5"
                                                  aria-hidden="true"
@@ -173,6 +173,9 @@
                                     </twig:Table:Td>
                                     <twig:Table:Td>
                                         &euro;{{ item.cash.all_shares.month.net|format_number({"fraction_digit": 2}) }}
+                                        {% if item.ticker.dividendFrequency > 0  and item.ticker.dividendFrequency != 12 %}
+                                           <div class="flex"><small>eenmalig &euro; {{ ((12 / item.ticker.dividendFrequency) * item.cash.all_shares.month.net)|format_number({"fraction_digit": 2})  }}</small></div>
+                                        {% endif %}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
                                         &euro;{{ item.cash.all_shares.year.net|format_number({"fraction_digit": 2}) }}

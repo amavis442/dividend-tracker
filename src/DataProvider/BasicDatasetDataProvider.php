@@ -96,8 +96,8 @@ class BasicDatasetDataProvider
 
 		$calendars = $this->dividendDataProvider->load(
 			tickers: $tickers,
-			afterDate: $calendarStartDate ?? new \DateTime('-3 month'),
-			beforeDate: $calendarEndDate ?? new \DateTime('+3 month'),
+			afterDate: $calendarStartDate ?? new \DateTime('-4 month'),
+			beforeDate: $calendarEndDate ?? new \DateTime('+4 month'),
 			types: $calendarTypes
 		);
 

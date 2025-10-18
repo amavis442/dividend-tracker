@@ -23,11 +23,11 @@ class YieldByPieController extends AbstractController
 		ChartBuilderInterface $chartBuilder,
 		DividendYieldCalculator $dividendYieldCalculator,
 		BasicDatasetDataProvider $basicDatasetDataProvider,
-		#[MapQueryParameter] string $sort = 'symbol',
+		#[MapQueryParameter] string $sortBy = 'symbol',
 		#[MapQueryParameter] string $sortDirection = 'asc'
 	): Response {
 		$validSorts = ['symbol', 'dividend', 'yield'];
-		$sort = in_array($sort, $validSorts) ? $sort : 'symbol';
+		$sortBy = in_array($sortBy, $validSorts) ? $sortBy : 'symbol';
 		$sortDirection = in_array($sortDirection, [
 			'asc',
 			'ASC',
@@ -55,8 +55,30 @@ class YieldByPieController extends AbstractController
 		$totalDividendPerMonth = 0.0;
 		$totalInvested = 0.0;
 		$result = [];
+
+		// Sorting for this data structure. If used on other places, create a new service
+		// so it is DRY.
+		usort($dataCalc, function ($itemA, $itemB) use ($sortBy, $sortDirection): int {
+			if (strtolower($sortDirection) == 'asc') {
+				return match($sortBy) {
+					'symbol' => $itemA['ticker']->getSymbol() <=> $itemB['ticker']->getSymbol(),
+					'dividend' => $itemA['cash']['all_shares']['year']['net'] <=> $itemB['cash']['all_shares']['year']['net'],
+					'yield' => $itemA['yield']['percentage']['year']['net'] <=> $itemB['yield']['percentage']['year']['net'],
+					'default' => $itemA['ticker']->getSymbol() <=> $itemB['ticker']->getSymbol()
+				};
+			} else {
+				return match($sortBy) {
+					'symbol' => $itemB['ticker']->getSymbol() <=> $itemA['ticker']->getSymbol(),
+					'dividend' => $itemB['cash']['all_shares']['year']['net'] <=> $itemA['cash']['all_shares']['year']['net'],
+					'yield' => $itemB['yield']['percentage']['year']['net'] <=> $itemA['yield']['percentage']['year']['net'],
+					'default' => $itemB['ticker']->getSymbol() <=> $itemA['ticker']->getSymbol()
+				};
+			}
+		});
+
 		$result['datasource'] = $dataCalc;
-		foreach ($dataCalc as $tickerId => $item) {
+
+		foreach ($dataCalc as $index => $item) {
 			$ticker = $item['ticker'];
 			$dividendPerMonth = $item['cash']['all_shares']['month']['net'];
 			$invested = $item['invested'];
@@ -73,7 +95,6 @@ class YieldByPieController extends AbstractController
 		$yearlyEstimatedYield =
 			($yearlyEstimatedDividend / $totalInvested) * 100;
 
-		$result['items'] = $dataCalc;
 		$result['totalNetYearlyDividend'] = $yearlyEstimatedDividend;
 		$result['dividendYieldOnCost'] = $yearlyEstimatedYield;
 		$result['allocated'] = $totalInvested;
@@ -125,7 +146,7 @@ class YieldByPieController extends AbstractController
 		return $this->render(
 			'report/yield/pie2.html.twig',
 			array_merge($result, [
-				'sort' => $sort,
+				'sortBy' => $sortBy,
 				'sortDirection' => $sortDirection,
 				'chart' => $chart,
 				])
