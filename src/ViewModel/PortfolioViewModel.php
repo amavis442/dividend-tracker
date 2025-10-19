@@ -35,12 +35,12 @@ class PortfolioViewModel
 	}
 
 	/**
-	 * Page Decorator
+	 * Page Decorator for adjusted amount and dividend
+	 *
+	 * @param \Traversable<Position> $positions
+	 * @param float $totalInvested
 	 */
 	public function createPortfolioItem(
-		/**
-		 * @var \Traversable<Position> $positions
-		 */
 		\Traversable $positions,
 		float $totalInvested
 	): void {
@@ -68,8 +68,6 @@ class PortfolioViewModel
 			dividends: $dividends
 		);
 
-
-		//dd($tickers, $tickerCalendars);
 		/**
 		 * @var Position $position
 		 */
@@ -170,12 +168,12 @@ class PortfolioViewModel
 	public function getPager(
 		float $totalInvested = 0.0,
 		int $page = 1,
-		string $sort = 'symbol',
+		string $sortBy = 'symbol',
 		string $orderBy = 'asc',
 		?Ticker $ticker = null,
 		?Pie $pie = null
 	): Pagerfanta {
-		$sort = match ($sort) {
+		$sortBy = match ($sortBy) {
 			'industry' => 'i.label',
 			'symbol' => 't.symbol',
 			'fullname' => 't.fullname',
@@ -187,7 +185,7 @@ class PortfolioViewModel
 			: 'asc';
 
 		$queryBuilder = $this->positionRepository->getAllQuery(
-			$sort,
+			$sortBy,
 			$orderBy,
 			$ticker,
 			PositionRepository::OPEN,

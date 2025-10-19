@@ -60,13 +60,13 @@ class PositionRepository extends ServiceEntityRepository
 	}
 
 	public function getAllQuery(
-		string $sort = 't.symbol',
+		string $sortBy = 't.symbol',
 		string $orderBy = 'ASC',
 		?Ticker $ticker = null,
 		int $status = self::OPEN,
 		?Pie $pie = null
 	): QueryBuilder {
-		$queryBuilder = $this->getQueryBuilder($sort, $orderBy, $ticker);
+		$queryBuilder = $this->getQueryBuilder($sortBy, $orderBy, $ticker);
 		if ($status === self::OPEN) {
 			$queryBuilder->andWhere('p.closed = false');
 		}
@@ -323,7 +323,7 @@ class PositionRepository extends ServiceEntityRepository
 	public function getAllOpen(
 		?Pie $pie = null,
 		?int $year = null,
-		string $sort = 'symbol',
+		string $sortBy = 'symbol',
 		string $sortDirection = 'ASC'
 	): array {
 		$qb = $this->createQueryBuilder('p')
@@ -365,12 +365,12 @@ class PositionRepository extends ServiceEntityRepository
 	}
 
 	private function getQueryBuilder(
-		string $sort = 't.symbol',
+		string $sortBy = 't.symbol',
 		string $orderBy = 'ASC',
 		?Ticker $ticker = null
 	): QueryBuilder {
-		$sort = in_array($sort, ['t.symbol', 't.fullname', 'i.label'])
-			? $sort
+		$sortBy = in_array($sortBy, ['t.symbol', 't.fullname', 'i.label'])
+			? $sortBy
 			: 't.symbol';
 
 		// Create our query
@@ -384,7 +384,7 @@ class PositionRepository extends ServiceEntityRepository
 			->addSelect('tax')
 			->leftJoin('t.calendars', 'c')
 			->addSelect('c')
-			->orderBy($sort, $orderBy);
+			->orderBy($sortBy, $orderBy);
 
 		if ($ticker && $ticker->getId()) {
 			$queryBuilder->addSelect('b');

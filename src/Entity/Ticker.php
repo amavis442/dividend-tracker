@@ -280,6 +280,10 @@ class Ticker
         return false;
     }
 
+    /**
+     * @todo: This should be in its own field and updated when
+     * the dividend months are updated/changed.
+     */
     public function getPayoutFrequency(): int
     {
         return $this->getDividendMonths()->count() ?: 0;

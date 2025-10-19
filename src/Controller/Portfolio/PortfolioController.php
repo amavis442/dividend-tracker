@@ -60,16 +60,17 @@ class PortfolioController extends AbstractController
 		PortfolioViewModel $model,
 		Referer $referer,
 		#[MapQueryParameter] int $page = 1,
-		#[MapQueryParameter] string $sort = 'fullname',
+		#[MapQueryParameter] string $sortBy = 'fullname',
 		#[MapQueryParameter] string $orderBy = 'asc'
 	): Response {
 		$referer->clear();
 		$referer->set('portfolio_index', [
 			'page' => $page,
 			'orderBy' => $orderBy,
-			'sort' => $sort,
+			'sortBy' => $sortBy,
 		]);
 
+		// This can be an enum
 		$orderBy = in_array($orderBy, ['asc', 'desc', 'ASC', 'DESC'])
 			? $orderBy
 			: 'asc';
@@ -77,6 +78,7 @@ class PortfolioController extends AbstractController
 		$pie = null;
 		$ticker = null;
 
+		// Search form
 		$searchForm = new SearchForm();
 		$sessionForm = $request->getSession()->get(self::SESSION_KEY, null);
 
@@ -109,15 +111,16 @@ class PortfolioController extends AbstractController
 			'user' => $user->getId(),
 		]);
 		if (!$portfolio) {
-			$portfolio = new Portfolio(); // do not want to trhow an exception but just use an empty entity
+			$portfolio = new Portfolio(); // do not want to throw an exception, but just use an empty entity
 		}
 
 		$this->stopwatch->start('portfoliomodel-getpage');
 
+		// Get the data for the page
 		$pager = $model->getPager(
 			$portfolio->getInvested() ?? 0.0,
 			$page,
-			$sort,
+			$sortBy,
 			$orderBy,
 			$ticker,
 			$pie
@@ -126,7 +129,7 @@ class PortfolioController extends AbstractController
 		$referer->set('portfolio_index', [
 			'page' => $page,
 			'orderBy' => $orderBy,
-			'sort' => $sort,
+			'sortBy' => $sortBy,
 		]);
 
 		return $this->render('portfolio/index.html.twig', [
@@ -135,7 +138,7 @@ class PortfolioController extends AbstractController
 			'pager' => $pager,
 			'thisPage' => $page,
 			'orderBy' => $orderBy,
-			'sort' => $sort,
+			'sortBy' => $sortBy,
 		]);
 	}
 
