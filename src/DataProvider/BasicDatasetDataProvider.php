@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\DataProvider;
 
@@ -11,6 +12,8 @@ use App\Service\ExchangeRate\DividendExchangeRateResolverInterface;
 use App\Service\Transaction\TransactionAdjuster;
 use App\Dto\BasicDataSetDto;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
+use App\Enum\SortField;
+use App\Enum\SortDirection;
 
 class BasicDatasetDataProvider
 {
@@ -25,7 +28,7 @@ class BasicDatasetDataProvider
 		protected TransactionAdjuster $transactionAdjuster,
 		protected DividendAdjuster $dividendAdjuster,
 		protected DividendDataProvider $dividendDataProvider,
-        protected AdjustedPositionDecoratorFactory $adjustedPositionDecoratorFactory,
+		protected AdjustedPositionDecoratorFactory $adjustedPositionDecoratorFactory
 	) {
 	}
 
@@ -51,7 +54,7 @@ class BasicDatasetDataProvider
 				=> $this->positionRepository->getForCalendarView(),
 			self::YIELD_DATA_TYPE
 				=> $this->positionRepository->getForYieldView(),
-			default => $this->positionRepository->getForYieldView()
+			default => $this->positionRepository->getForYieldView(),
 		};
 
 		$positionIds = array_map(function ($position) {
@@ -78,21 +81,27 @@ class BasicDatasetDataProvider
 		$transactions = [];
 		foreach ($transactionData as $transaction) {
 			$tickerId = $transaction->getPosition()->getTicker()->getId();
-            $transactions[$tickerId][] = $transaction;
+			$transactions[$tickerId][] = $transaction;
 		}
 
 		$corporateActions = $this->corporateActionDataProvider->load($tickers);
 
-        foreach (array_keys($corporateActions) as $tickerId) {
-            $position = $positions[$tickerId];
-            $adjustedPositionDecorator =  $this->adjustedPositionDecoratorFactory->load($transactions, $corporateActions);
-            $positionDecorator = $adjustedPositionDecorator->decorate($position, true);
+		foreach (array_keys($corporateActions) as $tickerId) {
+			$position = $positions[$tickerId];
+			$adjustedPositionDecorator = $this->adjustedPositionDecoratorFactory->load(
+				$transactions,
+				$corporateActions
+			);
+			$positionDecorator = $adjustedPositionDecorator->decorate(
+				$position,
+				true
+			);
 
-            $adjustedAmount = $positionDecorator->getAdjustedAmount();
-            $position->setAdjustedAmount($adjustedAmount);
+			$adjustedAmount = $positionDecorator->getAdjustedAmount();
+			$position->setAdjustedAmount($adjustedAmount);
 			$adjustedAveragePrice = $positionDecorator->getAdjustedAveragePrice();
-            $position->setAdjustedAveragePrice($adjustedAveragePrice);
-        }
+			$position->setAdjustedAveragePrice($adjustedAveragePrice);
+		}
 
 		$calendars = $this->dividendDataProvider->load(
 			tickers: $tickers,
@@ -108,7 +117,10 @@ class BasicDatasetDataProvider
 				$tickerId
 			] = $this->dividendExchangeRateResolver->getRateForTicker($ticker);
 
-			if (isset($calendars[$tickerId]) && isset($corporateActions[$tickerId])) {
+			if (
+				isset($calendars[$tickerId]) &&
+				isset($corporateActions[$tickerId])
+			) {
 				foreach ($calendars[$tickerId] as $calendar) {
 					$this->dividendAdjuster->getAdjustedDividend(
 						$calendar,
@@ -118,7 +130,13 @@ class BasicDatasetDataProvider
 			}
 		}
 
-        return new BasicDatasetDto($tickers, $calendars, $transactions, $positions, $exchangeRates);
+		return new BasicDatasetDto(
+			$tickers,
+			$calendars,
+			$transactions,
+			$positions,
+			$exchangeRates
+		);
 	}
 
 	/**
@@ -167,5 +185,35 @@ class BasicDatasetDataProvider
 			$calendarEndDate,
 			$calendarTypes
 		);
+	}
+
+	/**
+	 * Sorts data by reference, but does not keep key intact.
+	 *
+	 * @param array $data
+	 * @param SortField $sortBy
+	 * @param SortDirection $sortDirection
+	 */
+	public static function sort(
+		array &$data,
+		SortField $sortBy = SortField::SYMBOL,
+		SortDirection $sortDirection = SortDirection::ASC
+	): void {
+		// Sorting for this data structure. If used on other places, create a new service
+		// so it is DRY.
+		$getValue = fn($item) => match ($sortBy) {
+			SortField::SYMBOL => $item['ticker']->getSymbol(),
+			SortField::DIVIDEND => $item['cash']['all_shares']['year']['net'],
+			SortField::YIELD => $item['yield']['percentage']['year']['net'],
+		};
+
+		usort($data, function ($itemA, $itemB) use (
+			$getValue,
+			$sortDirection
+		): int {
+			return $sortDirection === SortDirection::ASC
+				? $getValue($itemA) <=> $getValue($itemB)
+				: $getValue($itemB) <=> $getValue($itemA);
+		});
 	}
 }

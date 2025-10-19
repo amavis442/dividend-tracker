@@ -3,6 +3,7 @@
 namespace App\Controller\Report;
 
 use App\DataProvider\BasicDatasetDataProvider;
+
 use App\Helper\Colors;
 use App\Service\Dividend\DividendYieldCalculator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,6 +12,8 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
+use App\Enum\SortDirection;
+use App\Enum\SortField;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/report')]
 class YieldByPieController extends AbstractController
@@ -26,16 +29,8 @@ class YieldByPieController extends AbstractController
 		#[MapQueryParameter] string $sortBy = 'symbol',
 		#[MapQueryParameter] string $sortDirection = 'asc'
 	): Response {
-		$validSorts = ['symbol', 'dividend', 'yield'];
-		$sortBy = in_array($sortBy, $validSorts) ? $sortBy : 'symbol';
-		$sortDirection = in_array($sortDirection, [
-			'asc',
-			'ASC',
-			'desc',
-			'DESC',
-		])
-			? $sortDirection
-			: 'ASC';
+		$sortBy = SortField::fromString($sortBy);
+		$sortDirection = SortDirection::fromString($sortDirection);
 
 		$dataSet = $basicDatasetDataProvider->getDataForYield();
 		$tickers = $dataSet->tickers;
@@ -56,25 +51,7 @@ class YieldByPieController extends AbstractController
 		$totalInvested = 0.0;
 		$result = [];
 
-		// Sorting for this data structure. If used on other places, create a new service
-		// so it is DRY.
-		usort($dataCalc, function ($itemA, $itemB) use ($sortBy, $sortDirection): int {
-			if (strtolower($sortDirection) == 'asc') {
-				return match($sortBy) {
-					'symbol' => $itemA['ticker']->getSymbol() <=> $itemB['ticker']->getSymbol(),
-					'dividend' => $itemA['cash']['all_shares']['year']['net'] <=> $itemB['cash']['all_shares']['year']['net'],
-					'yield' => $itemA['yield']['percentage']['year']['net'] <=> $itemB['yield']['percentage']['year']['net'],
-					'default' => $itemA['ticker']->getSymbol() <=> $itemB['ticker']->getSymbol()
-				};
-			} else {
-				return match($sortBy) {
-					'symbol' => $itemB['ticker']->getSymbol() <=> $itemA['ticker']->getSymbol(),
-					'dividend' => $itemB['cash']['all_shares']['year']['net'] <=> $itemA['cash']['all_shares']['year']['net'],
-					'yield' => $itemB['yield']['percentage']['year']['net'] <=> $itemA['yield']['percentage']['year']['net'],
-					'default' => $itemB['ticker']->getSymbol() <=> $itemA['ticker']->getSymbol()
-				};
-			}
-		});
+		BasicDatasetDataProvider::sort($dataCalc,$sortBy, $sortDirection);
 
 		$result['datasource'] = $dataCalc;
 
@@ -146,8 +123,8 @@ class YieldByPieController extends AbstractController
 		return $this->render(
 			'report/yield/pie2.html.twig',
 			array_merge($result, [
-				'sortBy' => $sortBy,
-				'sortDirection' => $sortDirection,
+				'sortBy' => $sortBy->toString(),
+				'sortDirection' => $sortDirection->toString(),
 				'chart' => $chart,
 				])
 		);

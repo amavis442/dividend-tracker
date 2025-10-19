@@ -183,7 +183,7 @@ class YieldTest extends TestCase
 			(($freq * $cashAmount * $amount) / $invested) * 100;
 		$netYieldPercentage =
 			(($freq * $cashAmount * $amount * $exchangeRate * $tax) /
-				($invested * $exchangeRate)) *
+				($invested)) *
 			100;
 		$grossCashYield = $freq * $cashAmount * $amount;
 		$netCashYield = $freq * $cashAmount * $amount * $tax * $exchangeRate;
@@ -370,7 +370,7 @@ class YieldTest extends TestCase
 			(($freq * $cashAmount * $amount) / $invested) * 100;
 		$netYieldPercentage =
 			(($freq * $cashAmount * $amount * $exchangeRate * $tax) /
-				($invested * $exchangeRate)) *
+				($invested)) *
 			100;
 		$grossCashYield = $freq * $cashAmount * $amount;
 		$netCashYield = $freq * $cashAmount * $amount * $tax * $exchangeRate;
@@ -626,7 +626,7 @@ class YieldTest extends TestCase
 			(($freq * $cashAmount * $amount) / $invested) * 100;
 		$netYieldPercentage =
 			(($freq * $cashAmount * $amount * $exchangeRate * $tax) /
-				($invested * $exchangeRate)) *
+				($invested)) *
 			100;
 		$grossCashYield = $freq * $cashAmount * $amount;
 		$netCashYield = $freq * $cashAmount * $amount * $tax * $exchangeRate;
@@ -710,7 +710,7 @@ class YieldTest extends TestCase
 			(($freq2 * $cashAmount * $amount2) / $invested2) * 100;
 		$netYieldPercentage2 =
 			(($freq2 * $cashAmount * $amount2 * $exchangeRate2 * $tax2) /
-				($invested2 * $exchangeRate2)) *
+				($invested2)) *
 			100;
 		$grossCashYield2 = $freq2 * $cashAmount * $amount2;
 		$netCashYield2 =
@@ -961,7 +961,7 @@ class YieldTest extends TestCase
 			(($freq * $cashAmount * $amount) / $invested) * 100;
 		$netYieldPercentage =
 			(($freq * $cashAmount * $amount * $exchangeRate * $tax) /
-				($invested * $exchangeRate)) *
+				($invested)) *
 			100;
 		$grossCashYield = $freq * $cashAmount * $amount;
 		$netCashYield = $freq * $cashAmount * $amount * $tax * $exchangeRate;
@@ -1044,7 +1044,7 @@ class YieldTest extends TestCase
 		$grossYieldPercentage2 = (($freq2 * 0 * $amount2) / $invested2) * 100;
 		$netYieldPercentage2 =
 			(($freq2 * 0 * $amount2 * $exchangeRate2 * $tax2) /
-				($invested2 * $exchangeRate2)) *
+				($invested2)) *
 			100;
 		$grossCashYield2 = $freq2 * 0 * $amount2;
 		$netCashYield2 = $freq2 * 0 * $amount2 * $tax2 * $exchangeRate2;
