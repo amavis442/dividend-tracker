@@ -184,11 +184,49 @@
                                             {{ item.yield.percentage.year.net|format_number({"fraction_digit": 2}) }}%
                                     </twig:Table:Td>
                                     <twig:Table:Td>
+                                        {# Setup for info popup #}
+                                        {% set info = "" %}
+                                        {% set info %}
+                                            <twig:ListGroup>
+                                                <twig:ListGroupItem>
+                                                    {{ 'Last dividend'|trans }}:
+                                                    {% if item.calendar_used %}
+                                                        {{ item.calendar_used.currency.sign|raw }}{{ (item.calendar_used.adjustedCashAmount)|format_number({"fraction_digit": 2}) }}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </twig:ListGroupItem>
+                                                <twig:ListGroupItem>
+                                                    {{ 'Last payout date'|trans }}:
+                                                    {% if item.calendar_used is not null %}
+                                                        {{ item.calendar_used.paymentDate|date("d-m-Y") }}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </twig:ListGroupItem>
+                                                <twig:ListGroupItem>
+                                                    #{{ 'Payouts per year'|trans }}:
+                                                    {{ item.ticker.payoutFrequency ?: '-' }}
+                                                </twig:ListGroupItem>
+                                            </twig:ListGroup>
+                                        {% endset %}
+                                        <!-- // Info popup //-->
+                                        <div class="inline-block" {{ stimulus_controller("tooltip") }} data-tooltip-placement-value="right">
+                                            <i class="fas fa-info-circle"
+                                               data-tooltip-target="element"
+                                               data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"></i>
+                                            <div class="card" role="tooltip" data-tooltip-target="tooltip">
+                                                <h5 class="bg-gray-300 p-2 rounded-t-lg mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Info</h5>
+                                                <div class='pl-5 pr-5 pb-5'>
+                                                    <div class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{ info }}</div>
+                                                </div>
+                                                <div class="arrow-card" data-tooltip-target="tooltipArrow"></div>
+                                            </div>
+                                        </div>
 
                                     </twig:Table:Td>
                                 </twig:Table:Tr>
                             {% endfor %}
-
                         </tbody>
                     </twig:Table:Table>
                     </turbo-frame>
