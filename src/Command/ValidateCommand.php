@@ -8,7 +8,8 @@ use App\Repository\CurrencyRepository;
 use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
-use App\Service\WeightedAverage;
+use App\Service\Cvs\CsvReader;
+use App\Service\Position\WeightedAverage;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
@@ -18,7 +19,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use App\Service\CsvReader;
 
 #[AsCommand(
     name: 'validate',

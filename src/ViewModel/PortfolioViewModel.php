@@ -4,11 +4,15 @@ namespace App\ViewModel;
 
 use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
+use App\DataProvider\TransactionDataProvider;
+use App\DataProvider\CorporateActionDataProvider;
+use App\DataProvider\DividendDataProvider;
 use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Repository\PositionRepository;
-use App\Service\DividendServiceInterface;
+use App\Repository\DividendCalendarRepository;
+use App\Service\Dividend\DividendServiceInterface;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
@@ -19,22 +23,24 @@ class PortfolioViewModel
 {
 	public function __construct(
 		private Stopwatch $stopwatch,
-		//private MetricsUpdateService $metricsUpdate,
 		private DividendServiceInterface $dividendService,
 		private PositionRepository $positionRepository,
-		private AdjustedPositionDecoratorFactory $adjustedFactory,
+		private AdjustedPositionDecoratorFactory $adjustedPositionFactory,
 		private AdjustedDividendDecoratorFactory $adjustedDividendDecoratorFactory,
+		private TransactionDataProvider $transactionDataProvider,
+		private CorporateActionDataProvider $corporateActionDataProvider,
+		private DividendDataProvider $dividendDataProvider,
 		private int $maxPerPage = 10
 	) {
 	}
 
 	/**
-	 * Page Decorator
+	 * Page Decorator for adjusted amount and dividend
+	 *
+	 * @param \Traversable<Position> $positions
+	 * @param float $totalInvested
 	 */
 	public function createPortfolioItem(
-		/**
-		 * @var \Traversable<Position> $positions
-		 */
 		\Traversable $positions,
 		float $totalInvested
 	): void {
@@ -42,20 +48,53 @@ class PortfolioViewModel
 
 		$currentDate = new DateTime();
 
+		$transactions = $this->transactionDataProvider->load(
+			iterator_to_array($positions)
+		);
 
+		$tickers = array_map(function ($position) {
+			return $position->getTicker();
+		}, iterator_to_array($positions));
+
+		$actions = $this->corporateActionDataProvider->load(
+			$tickers
+		);
+
+		$dividends = $this->dividendDataProvider->load($tickers);
+
+		$this->dividendService->load(
+			transactions: $transactions,
+			corporateActions: $actions,
+			dividends: $dividends
+		);
 
 		/**
 		 * @var Position $position
 		 */
 		foreach ($positions as $position) {
-			$decorator = $this->adjustedFactory->decorate($position);
+			$pid = $position->getId();
+
+			$this->adjustedPositionFactory->load($transactions, $actions);
+			$decorator = $this->adjustedPositionFactory->decorate($position);
 			$amount = $decorator->getAdjustedAmount();
+
 			$note = $decorator->getAdjustmentNote();
 
-			$decoratorDividend = $this->adjustedDividendDecoratorFactory->decorate($position);
-			$adjustedDividends = $decoratorDividend->getAdjustedDividend();
+			$this->adjustedDividendDecoratorFactory->load($dividends, $actions);
+			$decoratorDividend = $this->adjustedDividendDecoratorFactory->decorate(
+				$position->getTicker()
+			);
+			$adjustedDividends = $decoratorDividend->getAdjustedDividendSortByPaymentDate();
 
-			$position->setAdjustedAveragePrice($decorator->getAdjustedAveragePrice());
+			/*
+			if ($position->getTicker()->getSymbol() == 'OXLC'){
+				dd($position, $amount, $actions, $adjustedDividends);
+			}
+			*/
+
+			$position->setAdjustedAveragePrice(
+				$decorator->getAdjustedAveragePrice()
+			);
 			/**
 			 * @var Ticker $ticker
 			 */
@@ -67,7 +106,7 @@ class PortfolioViewModel
 				->setPercentageAllocation($totalInvested)
 				->computeIsMaxAllocation()
 				->computeCurrentDividendDates($currentDate)
-                ->setAdjustedAmount($amount)
+				->setAdjustedAmount($amount)
 				->computeReceivedDividends();
 
 			// Dividend part
@@ -75,14 +114,12 @@ class PortfolioViewModel
 				$position->getTicker()
 			);
 
-			if ($calendar) {
+			if ($calendar && isset($dividends[$position->getTicker()->getId()])) {
 				// Get adjusted cashAmount
-				//if ($position->getTicker()->getSymbol() == 'OXLC'){
-					$adjustedDividendsArray =  new ArrayCollection($adjustedDividends);
-
-					$adjustedCashAmount = $adjustedDividendsArray->last() ?? 0.0;
-				//}
-
+				$adjustedDividendsArray = new ArrayCollection(
+					$adjustedDividends
+				);
+				$adjustedCashAmount = $adjustedDividendsArray->last() ?? 0.0;
 
 				$forwardNetDividend = $this->dividendService->getForwardNetDividend(
 					$position->getTicker(),
@@ -125,18 +162,18 @@ class PortfolioViewModel
 		$this->stopwatch->stop('portfoliomodel-createPortfolioItem');
 	}
 
-    /**
-     *
-     */
+	/**
+	 *
+	 */
 	public function getPager(
 		float $totalInvested = 0.0,
 		int $page = 1,
-		string $sort = 'symbol',
+		string $sortBy = 'symbol',
 		string $orderBy = 'asc',
 		?Ticker $ticker = null,
 		?Pie $pie = null
 	): Pagerfanta {
-		$sort = match ($sort) {
+		$sortBy = match ($sortBy) {
 			'industry' => 'i.label',
 			'symbol' => 't.symbol',
 			'fullname' => 't.fullname',
@@ -148,24 +185,23 @@ class PortfolioViewModel
 			: 'asc';
 
 		$queryBuilder = $this->positionRepository->getAllQuery(
-			$sort,
+			$sortBy,
 			$orderBy,
 			$ticker,
 			PositionRepository::OPEN,
 			$pie
 		);
 
+		$adapter = new QueryAdapter($queryBuilder);
+		$pagerfanta = new Pagerfanta($adapter);
+		$pagerfanta->setMaxPerPage($this->maxPerPage);
+		$pagerfanta->setCurrentPage($page);
 
-        $adapter = new QueryAdapter($queryBuilder);
-        $pagerfanta = new Pagerfanta($adapter);
-        $pagerfanta->setMaxPerPage($this->maxPerPage);
-        $pagerfanta->setCurrentPage($page);
-
-        /*
+		/*
 		$baseAdapter = new QueryAdapter($queryBuilder);
 		$adapter = new AdjustedPositionAdapter(
 			$baseAdapter,
-			$this->adjustedFactory
+			$this->adjustedPositionFactory
 		);
 
 		$pagerfanta = new Pagerfanta($adapter);

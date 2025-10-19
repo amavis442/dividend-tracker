@@ -4,14 +4,14 @@ namespace App\Controller\Report;
 
 use App\Repository\PieRepository;
 use App\Repository\PositionRepository;
-use App\Service\DividendServiceInterface;
+use App\Service\Dividend\DividendServiceInterface;
 use App\Service\Export;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\DividendExchangeRateResolverInterface;
+use App\Service\ExchangeRate\DividendExchangeRateResolverInterface;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/report')]
 class ExportController extends AbstractController

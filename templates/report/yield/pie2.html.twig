@@ -1,0 +1,237 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'Dividend Yield'|trans }}{% endblock %}
+{% block body %}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <div id="alerts">
+                    {% for notice in app.flashes('notice') %}
+                        <twig:Alert variant="danger">
+                            {{ notice|trans }}
+                        </twig:Alert>
+                    {% endfor %}
+                </div>
+                <div class="px-3 py-2 w-full">
+                    <twig:Head>
+                        {{ 'Yield'|trans }}
+                    </twig:Head>
+                </div>
+                <!--// Rendement|Yield //-->
+                <twig:Card title="{{ 'Yield on cost dividend'|trans }} ({{ dividendYieldOnCost|default(0) |format_number({"fraction_digit": 2}) }}%)"
+                           title_header_variant="h5"
+                           class="mb-4">
+                    <div class="mb-4">
+                        <div class="flex mt-2">
+                            {{ 'Total dividend in a year / total allocated'|trans }}:&nbsp;
+                            <twig:Badge variant="primary">
+                                &euro;{{ totalNetYearlyDividend|default(0) |format_number({"fraction_digit": 2}) }}
+                            </twig:Badge>
+                            /&nbsp;
+                            <twig:Badge variant="info">
+                                &euro;{{ allocated|default(0) |format_number({"fraction_digit": 2}) }}
+                            </twig:Badge>
+                        </div>
+                    </div>
+                    <div class="bg-gray-200 rounded-b-lg p-2 mt-4 -mx-3 -my-2">
+                        <small>
+                            {{ 'Per month'|trans }}
+                            <strong>&euro;{{ (totalNetYearlyDividend|default(0) / 12)|format_number({"fraction_digit": 2}) }}</strong>
+                        </small>
+                    </div>
+                </twig:Card>
+
+                <!--// Chart //-->
+                <div class="block w-full border p-2 mb-4 rounded-lg border-gray-400 mx-auto">
+                    <div class"w-full">
+                        <div class="w-1/2 mx-auto p-2 mb-4" style="height:600px">
+                            {{ render_chart(chart, {
+                                                        'data-controller': 'chartjs-add-percentage'
+                                                        }) }}
+                        </div>
+                    </div>
+                </div>
+
+                <!--// Table tickers //-->
+                <div class="border border-gray-400 rounded-lg p-2 mb-2">
+                    <turbo-frame id="table-results">
+                    <twig:Table:Table>
+                        <twig:Table:THead>
+                            <tr>
+                                <twig:Table:ThCol>
+                                    <div class="flex items-center">
+                                        Ticker
+                                        <a href="{{ path('report_dividend_yield_by_pie', {...app.request.query.all() , sortBy: 'symbol', sortDirection: sortBy == 'symbol' and sortDirection == 'asc' ? 'desc' : 'asc', }) }}"
+                                           data-turbo-frame="table-results">
+                                            <svg class="w-3 h-3 ms-1.5"
+                                                 aria-hidden="true"
+                                                 xmlns="http://www.w3.org/2000/svg"
+                                                 fill="currentColor"
+                                                 viewBox="0 0 24 24">
+                                                <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z" />
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    {{ 'Allocation'|trans }}
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    {{ 'avgPrice'|trans }}
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    <div class="flex items-center">
+                                        {{ 'Yearly forward dividend'|trans }}
+                                        <a href="{{ path('report_dividend_yield_by_pie', { ...app.request.query.all() , sortBy: 'dividend', sortDirection: sortBy == 'dividend' and sortDirection == 'asc' ? 'desc' : 'asc', }) }}"
+                                           data-turbo-frame="table-results">
+                                            <svg class="w-3 h-3 ms-1.5"
+                                                 aria-hidden="true"
+                                                 xmlns="http://www.w3.org/2000/svg"
+                                                 fill="currentColor"
+                                                 viewBox="0 0 24 24">
+                                                <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z" />
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    {{ 'Net forward yearly dividend per share'|trans }}
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    {{ 'Net forward dividend per month'|trans }}
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    {{ 'Net forward yearly dividend total'|trans }}
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    <div class="flex items-center">
+                                        {{ 'Yield'|trans }}
+                                        <a href="{{ path('report_dividend_yield_by_pie', { ...app.request.query.all() , sortBy: 'yield', sortDirection: sortBy == 'yield' and sortDirection == 'asc' ? 'desc' : 'asc',}) }}"
+                                           data-turbo-frame="table-results">
+                                            <svg class="w-3 h-3 ms-1.5"
+                                                 aria-hidden="true"
+                                                 xmlns="http://www.w3.org/2000/svg"
+                                                 fill="currentColor"
+                                                 viewBox="0 0 24 24">
+                                                <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z" />
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </twig:Table:ThCol>
+                                <twig:Table:ThCol>
+                                    info
+                                </twig:Table:ThCol>
+                            </tr>
+                        </twig:Table:THead>
+                        <tbody>
+                            {% for key, item in datasource|default([]) %}
+                                <twig:Table:Tr>
+                                    <twig:Table:Td>
+                                        <div data-controller="tooltip">
+                                            <a href="{{ path('portfolio_show', {'id': item.position.id}) }}"
+                                               data-turbo-frame="_top"
+                                               data-tooltip-target="element"
+                                               data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
+                                               class="text-blue-700 hover:text-blue-500 font-sans font-bold underline">{{ item.ticker.symbol }}</a>
+                                            <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
+                                                {{ item.ticker.fullname }}
+                                                <div class="arrow" data-tooltip-target="tooltipArrow"></div>
+                                            </div>
+                                        </div>
+                                        <small class="font-bold">({{ item.position.adjustedAmount ?? item.position.amount }})</small>
+                                        {% if item.position.adjustedAmount|number_format(4) != item.position.amount|number_format(4) %}
+                                            <div class="flex"><small >({{ item.position.amount }})</small></div>
+                                        {% endif %}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        &euro;{{ item.invested|format_number({"fraction_digit": 2}) }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        <div class="font-bold">
+                                        {% if item.position.adjustedAveragePrice%}
+                                            &euro;{{ (item.position.adjustedAveragePrice)|format_number({"fraction_digit": 2}) }}
+                                        {% else %}
+                                            &euro;{{ (item.position.price)|format_number({"fraction_digit": 2}) }}
+                                        {% endif %}
+                                        </div>
+                                        {% if item.position.adjustedAmount|number_format(4) != item.position.amount|number_format(4) %}
+                                            <div class="flex"><small>(&euro;{{ item.position.price|format_number({"fraction_digit": 2}) }})</small></div>
+                                        {% endif %}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        {{ item.currency.sign }}{{ item.cash.all_shares.year.gross|format_number({"fraction_digit": 2}) }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        <span data-html="true" title="{{ 'Exchangerate'|trans }}: {{ item.exchange_rate }}
+                                            <br/>
+                                            {{ 'Tax'|trans }}: {{ item.tax_rate }}%" data-toggle="tooltip" data-placement="top">
+                                            {% if item.cash.per_share.month.net > 0 %}
+                                                &euro;{{ (item.cash.per_share.month.net)|format_number({"fraction_digit": 2}) }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </span>
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        &euro;{{ item.cash.all_shares.month.net|format_number({"fraction_digit": 2}) }}
+                                        {% if item.ticker.dividendFrequency > 0  and item.ticker.dividendFrequency != 12 %}
+                                           <div class="flex"><small>eenmalig &euro; {{ ((12 / item.ticker.dividendFrequency) * item.cash.all_shares.month.net)|format_number({"fraction_digit": 2})  }}</small></div>
+                                        {% endif %}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        &euro;{{ item.cash.all_shares.year.net|format_number({"fraction_digit": 2}) }}
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                            {{ item.yield.percentage.year.net|format_number({"fraction_digit": 2}) }}%
+                                    </twig:Table:Td>
+                                    <twig:Table:Td>
+                                        {# Setup for info popup #}
+                                        {% set info = "" %}
+                                        {% set info %}
+                                            <twig:ListGroup>
+                                                <twig:ListGroupItem>
+                                                    {{ 'Last dividend'|trans }}:
+                                                    {% if item.calendar_used %}
+                                                        {{ item.calendar_used.currency.sign|raw }}{{ (item.calendar_used.adjustedCashAmount)|format_number({"fraction_digit": 2}) }}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </twig:ListGroupItem>
+                                                <twig:ListGroupItem>
+                                                    {{ 'Last payout date'|trans }}:
+                                                    {% if item.calendar_used is not null %}
+                                                        {{ item.calendar_used.paymentDate|date("d-m-Y") }}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </twig:ListGroupItem>
+                                                <twig:ListGroupItem>
+                                                    #{{ 'Payouts per year'|trans }}:
+                                                    {{ item.ticker.payoutFrequency ?: '-' }}
+                                                </twig:ListGroupItem>
+                                            </twig:ListGroup>
+                                        {% endset %}
+                                        <!-- // Info popup //-->
+                                        <div class="inline-block" {{ stimulus_controller("tooltip") }} data-tooltip-placement-value="right">
+                                            <i class="fas fa-info-circle"
+                                               data-tooltip-target="element"
+                                               data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"></i>
+                                            <div class="card" role="tooltip" data-tooltip-target="tooltip">
+                                                <h5 class="bg-gray-300 p-2 rounded-t-lg mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Info</h5>
+                                                <div class='pl-5 pr-5 pb-5'>
+                                                    <div class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{ info }}</div>
+                                                </div>
+                                                <div class="arrow-card" data-tooltip-target="tooltipArrow"></div>
+                                            </div>
+                                        </div>
+
+                                    </twig:Table:Td>
+                                </twig:Table:Tr>
+                            {% endfor %}
+                        </tbody>
+                    </twig:Table:Table>
+                    </turbo-frame>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

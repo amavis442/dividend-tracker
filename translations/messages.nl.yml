@@ -378,3 +378,5 @@ Tickers: Tickers
 'Yield (%num% times)': 'Rendement (%num% keer)'
 'estimated payout': 'geschat uitkeerbedrag'
 'Estimated payouts': 'Geschatte uitkeerbedragen'
+'Please choose a currency': 'Kies een valuta'
+'Please note that if the ticker has nog tax or currency attached, it will not show up in this list. Go to the ticker and set the currency and tax.': 'Let op. Als er geen belasting of valuta aan de ticker is gekoppeld, dan zie je hem hier niet terug. Ga naar de ticker om deze alsnog in te stellen'

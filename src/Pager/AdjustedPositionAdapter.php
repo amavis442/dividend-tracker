@@ -34,7 +34,9 @@ class AdjustedPositionAdapter implements AdapterInterface
 
     /**
      * Get the slice of data that we want to decorate so the adjusted amount and average price
-     * is up to date
+     * is up to date.
+     *
+     * Will not work anymore after refactoring of factory.
      *
      * @return iterable
      */

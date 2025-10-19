@@ -1,0 +1,193 @@
+<?php
+
+namespace App\Service\Dividend;
+
+class DividendYieldCalculator
+{
+	/**
+	 * @var array<int, \App\Entity\Ticker>
+	 */
+	private array $tickers;
+
+	/**
+	 * @var array<int,array<int, \App\Entity\Calendar>>
+	 */
+	private array $calendars;
+
+	/**
+	 * @var array<int, \App\Entity\Position>
+	 */
+
+	private array $positions;
+	/**
+	 * @var array<int, float>
+	 */
+	private array $exchangeRates;
+
+	public function load(
+		array $tickers,
+		array $calendars,
+		array $positions,
+		array $exchangeRates
+	): void {
+		$this->tickers = $tickers;
+		$this->calendars = $calendars;
+		$this->positions = $positions;
+		$this->exchangeRates = $exchangeRates;
+	}
+
+	/**
+	 * Returns an array keyed by tickerId.
+	 *
+	 * @return array<int|string, array{
+	 *     position: \App\Entity\Position,
+	 *     ticker: \App\Entity\Ticker,
+	 *     calendar_used: \App\Entity\Calendar|null,
+	 *     total_shares: float,
+	 *     exchange_rate: float,
+	 *     tax_rate: float,
+	 *     currency: array{symbol: string|null, sign: string|null},
+	 *     invested: float,
+	 *     yield: array{
+	 *         percentage: array{
+	 *             year: array{
+	 *                 gross: float,
+	 *                 net: float
+	 *             }
+	 *         },
+	 *         cash: array{
+	 *             year: array{
+	 *                 gross: float,
+	 *                 net: float
+	 *             }
+	 *         }
+	 *     },
+	 *     cash: array{
+	 *         per_share: array{
+	 *             month: array{
+	 *                 gross: float,
+	 *                 net: float
+	 *             },
+	 *             year: array{
+	 *                 gross: float,
+	 *                 net: float
+	 *             }
+	 *         },
+	 *         all_shares: array{
+	 *             month: array{
+	 *                 gross: float,
+	 *                 net: float
+	 *             },
+	 *             year: array{
+	 *                 gross: float,
+	 *                 net: float
+	 *             }
+	 *         }
+	 *     }
+	 * }>
+	 */
+	public function process(): array
+	{
+		$data = [];
+		foreach ($this->tickers as $tickerId => $ticker) {
+			if (!isset($this->positions[$tickerId])) {
+				continue;
+			}
+			$position = $this->positions[$tickerId];
+			if ($position->getAllocation() <= 0) {
+				continue;
+			}
+
+			$cashAmount = 0.0;
+			$calendar = null;
+
+			if (
+				isset($this->calendars[$tickerId]) &&
+				count($this->calendars[$tickerId]) > 0
+			) {
+				$calId = array_key_last($this->calendars[$tickerId]);
+				$calendar = $this->calendars[$tickerId][$calId];
+				$cashAmount = $calendar->getAdjustedCashAmount();
+			}
+
+			$exchangeRate = $this->exchangeRates[$tickerId];
+			$invested = $position->getAllocation();
+
+			$freq = $ticker->getDividendFrequency(); // Normalize to month
+			$cashAmount = $cashAmount * ($freq / 12); // Normalize to month
+
+			$amount = $position->getAdjustedAmount() ?? $position->getAmount(); // Adjusted is only filled if there asre corporate actions like share splits etc.
+			$tax = 1 - $ticker->getTax()->getTaxRate();
+
+			$yieldPercentageGross =
+				((12 * $cashAmount * $amount) / $invested) * 100;
+			$yieldPercentageNet =
+				((12 * $cashAmount * $amount * $tax * $exchangeRate) /
+					($invested)) *
+				100; // Invested is in the local currency and doe not need to be converted.
+
+			$yieldCashGross = 12 * $cashAmount * $amount;
+
+			$yieldCashNet = 12 * $cashAmount * $amount * $tax * $exchangeRate;
+
+			$data[$ticker->getId()] = [
+				'position' => $position,
+				'ticker' => $ticker,
+				'calendar_used' => $calendar, // Use the lastest
+				'total_shares' => $position->getAdjustedAmount(),
+				'exchange_rate' => $exchangeRate,
+				'tax_rate' => $ticker->getTax()->getTaxRate(),
+				'currency' => [
+					'symbol' => $ticker->getCurrency()->getSymbol(),
+					'sign' => $ticker->getCurrency()->getSign(),
+				],
+				'invested' => $invested,
+				'yield' => [
+					// Based on yearly
+					'percentage' => [
+						'year' => [
+							'gross' => $yieldPercentageGross,
+							'net' => $yieldPercentageNet,
+						],
+					],
+					'cash' => [
+						'year' => [
+							'gross' => $yieldCashGross,
+							'net' => $yieldCashNet,
+						],
+					],
+				],
+				'cash' => [
+					'per_share' => [
+						'month' => [
+							'gross' => $cashAmount,
+							'net' => $exchangeRate * $cashAmount * $tax,
+						],
+						'year' => [
+							'gross' => 12 * $cashAmount,
+							'net' => 12 * $exchangeRate * $cashAmount * $tax,
+						],
+					],
+					'all_shares' => [
+						'month' => [
+							'gross' => $amount * $cashAmount,
+							'net' =>
+								$cashAmount * $amount * $tax * $exchangeRate,
+						],
+						'year' => [
+							'gross' => 12 * $amount * $cashAmount,
+							'net' =>
+								12 *
+								$cashAmount *
+								$amount *
+								$tax *
+								$exchangeRate,
+						],
+					],
+				],
+			];
+		}
+
+		return $data;
+	}
+}

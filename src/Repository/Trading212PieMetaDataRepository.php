@@ -41,7 +41,7 @@ class Trading212PieMetaDataRepository extends ServiceEntityRepository
 		;
 		$startDate = date('Y-m-d'). ' 00:00:00';
 		if ($result) {
-			$startDate = (new \DateTime($result['created']))->format('Y-m-d 00:00:00)');
+			$startDate = (new \DateTime($result['created']))->format('Y-m-d 00:00:00');
 		}
 
 		$orderBy = new OrderBy();

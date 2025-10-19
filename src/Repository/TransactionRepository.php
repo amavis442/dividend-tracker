@@ -229,4 +229,19 @@ class TransactionRepository extends ServiceEntityRepository
 			->getQuery()
 			->execute();
 	}
+
+	public function findByPositionIds(array $positionIds): array {
+		return $this->createQueryBuilder('t')
+		->select('t, p, ti')
+		->join('t.position', 'p')
+		->join('p.ticker','ti')
+		->andWhere('t.position in (:positions)')
+		->setParameter('positions', $positionIds)
+		->getQuery()
+		->getResult();
+	}
+
+	public function getForCalendarView(array $positionIds): mixed {
+		return $this->findByPositionIds($positionIds);
+	}
 }

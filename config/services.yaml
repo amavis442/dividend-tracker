@@ -56,7 +56,7 @@ services:
             $client: '@http_client'
             $exchangerateCache: '@exchangerate.cache'
 
-    App\Service\DividendExchangeRateResolver:
+    App\Service\ExchangeRate\DividendExchangeRateResolver:
         arguments:
             $exchangeRateService: '@App\Service\ExchangeRate\WisselkoersNlExchangeRateService'
 
@@ -85,7 +85,7 @@ services:
                   ]
             - setDefault: ['App\Service\StockPrices\YahooFinanceService']
 
-    App\Service\DividendDateService:
+    App\Service\DividendDate\DividendDateService:
         arguments:
             $client: '@http_client'
         calls:
@@ -128,7 +128,7 @@ services:
         arguments:
             $entityManager: '@doctrine.orm.entity_manager'
 
-    App\Service\WeightedAverage:
+    App\Service\Position\WeightedAverage:
         arguments:
             $entityManager: '@doctrine.orm.entity_manager'
 

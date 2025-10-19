@@ -9,14 +9,13 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\HasLifecycleCallbacks]
 class CorporateAction
 {
+    public const REVERSE_SPLIT = 'reverse_split';
+    public const SPLIT = 'split';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
-    #[ORM\ManyToOne(inversedBy: 'corporateActions')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Position $position = null;
 
     #[ORM\Column(length: 255)]
     private ?string $type = null;
@@ -30,6 +29,10 @@ class CorporateAction
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\ManyToOne(inversedBy: 'corporateActions')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Ticker $ticker = null;
+
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
     {
@@ -39,18 +42,6 @@ class CorporateAction
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getPosition(): ?Position
-    {
-        return $this->position;
-    }
-
-    public function setPosition(?Position $position): static
-    {
-        $this->position = $position;
-
-        return $this;
     }
 
     public function getType(): ?string
@@ -97,6 +88,18 @@ class CorporateAction
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getTicker(): ?Ticker
+    {
+        return $this->ticker;
+    }
+
+    public function setTicker(?Ticker $ticker): static
+    {
+        $this->ticker = $ticker;
 
         return $this;
     }

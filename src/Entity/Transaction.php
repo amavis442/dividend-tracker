@@ -159,6 +159,11 @@ class Transaction
 	#[ORM\ManyToOne]
 	private ?Currency $totalCurrency = null;
 
+
+	//Computed
+	private ?float $adjustedAmount = null;
+	private ?float $adjustedPrice = null;
+
 	#[Assert\Callback]
 	public function validate(ExecutionContextInterface $context, $payload)
 	{
@@ -608,6 +613,61 @@ class Transaction
 	public function setTotalCurrency(?Currency $totalCurrency): static
 	{
 		$this->totalCurrency = $totalCurrency;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of adjustedAmount
+	 *
+	 * @return  float
+	 */
+	public function getAdjustedAmount(): float
+	{
+		if (!isset($this->adjustedAmount)) {
+			$this->adjustedAmount = $this->amount;
+		}
+		return $this->adjustedAmount;
+	}
+
+	/**
+	 * Set the value of adjustedAmount
+	 *
+	 * @param   float  $adjustedAmount
+	 *
+	 * @return  self
+	 */
+	public function setAdjustedAmount(float $adjustedAmount): self
+	{
+		$this->adjustedAmount = $adjustedAmount;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of adjustedPrice
+	 *
+	 * @return  float
+	 */
+	public function getAdjustedPrice(): float
+	{
+		if (!isset($this->adjustedPrice)) {
+			$this->adjustedPrice = $this->price;
+		}
+
+		return $this->adjustedPrice;
+	}
+
+	/**
+	 * Set the value of adjustedPrice
+	 *
+	 * @param   float  $adjustedPrice
+	 *
+	 * @return  self
+	 */
+	public function setAdjustedPrice(float $adjustedPrice): self
+	{
+		$this->adjustedPrice = $adjustedPrice;
 
 		return $this;
 	}

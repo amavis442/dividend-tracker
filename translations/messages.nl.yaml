@@ -180,6 +180,8 @@ positions: posities
 'Net forward yearly dividend per share': 'Netto verwachte jaarlijkse uitkering per aandeel'
 'Payouts per year': 'Uitkeringen per jaar'
 'Net forward dividend per payout': 'Netto verwachte dividend per uitkering'
+'Net forward dividend per month': 'Netto verwachte dividend genormaliseerde maanduitkering'
+
 'Net forward yearly dividend total': 'Netto verwachte jaarlijkse dividend totaal'
 Yield: Rendement
 'Yield on cost dividend': 'Rendement op kostendividend'
@@ -411,3 +413,4 @@ Back: Terug
 'Payout monthly': 'Uitkeerbedrag per maand'
 'Payout yearly': 'Uitkeerbedrag per jaar'
 'Forecast (normalized to month)': 'Voorspelling (genormaliseerd naar maand)'
+'Dividend gross': 'Bruto dividend'

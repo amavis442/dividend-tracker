@@ -8,9 +8,9 @@ use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Transaction;
 
-use App\Service\DividendExchangeRateResolverInterface;
-use App\Service\DividendServiceInterface;
-use App\Service\DividendTaxRateResolverInterface;
+use App\Service\ExchangeRate\DividendExchangeRateResolverInterface;
+use App\Service\Dividend\DividendServiceInterface;
+use App\Service\Dividend\DividendTaxRateResolverInterface;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -245,6 +245,8 @@ class DividendCalendarRepository extends ServiceEntityRepository
 		return $queryBuilder->getOneOrNullResult();
 	}
 
+
+
 	/**
 	 * Retrieves the latest dividend calendar entry for a given ticker,
 	 * where the payment date is on or after the specified date.
@@ -467,15 +469,49 @@ class DividendCalendarRepository extends ServiceEntityRepository
 		array $tickers,
 		string $lastYear
 	): array {
-		return $this->createQueryBuilder('c')
-			->select('t ,c')
+		return $this->createQueryBuilder('c','c.id')
+			->select('c, t')
 			->join('c.ticker', 't')
-			->where('c.ticker in (:tickers)')
+			->andWhere('c.ticker in (:tickers)')
 			->andWhere('c.paymentDate > :lastYear')
 			->setParameter('tickers', $tickers)
 			->setParameter('lastYear', $lastYear)
 			->groupBy('t.id, c.id')
 			->getQuery()
 			->getResult();
+	}
+
+	/**
+	 * Returns all calendars for tickers keyed by Calendar::id
+	 * Optional set the payment date for calendars in the future
+	 *
+	 * @param array<int> $tickerIds
+	 * @param null|\DateTime $afterDate
+	 * @param null|\DateTime $beforeDate
+	 * @param array $types
+	 * @return mixed
+	 */
+	public function findByTickerIds(array $tickerIds, ?\DateTime $afterDate, ?\DateTime $beforeDate, array $types = [Calendar::REGULAR]): mixed
+	{
+		$qb = $this->createQueryBuilder('c','c.id')
+		->select('c, t')
+		->join('c.ticker', 't')
+		->andWhere('c.ticker in (:tickers)')
+		->andWhere('c.dividendType IN (:dividendType)')
+		->setParameter('tickers', $tickerIds)
+		->setParameter('dividendType', $types)
+		->groupBy('t.id, c.id');
+
+		if ($afterDate) {
+			$qb->andWhere('c.paymentDate >= :afterDate')
+			->setParameter('afterDate', $afterDate->format('Y-m-d'));
+		}
+		if ($beforeDate) {
+			$qb->andWhere('c.paymentDate <= :beforeDate')
+			->setParameter('beforeDate', $beforeDate->format('Y-m-d'));
+		}
+
+		return $qb->getQuery()
+		->getResult();
 	}
 }

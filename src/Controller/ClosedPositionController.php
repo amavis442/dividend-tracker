@@ -8,7 +8,7 @@ use App\Form\PositionType;
 use App\Form\TickerAutocompleteType;
 use App\Repository\PositionRepository;
 use App\Repository\TickerRepository;
-use App\Service\PositionService;
+use App\Service\Position\PositionService;
 use App\Service\Referer;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

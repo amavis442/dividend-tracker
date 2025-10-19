@@ -2,19 +2,18 @@
 
 namespace App\Controller\Report;
 
-use App\Entity\PieSelect;
-use App\Repository\PositionRepository;
-use App\Service\DividendService;
-use App\Service\YieldsService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use App\Form\PieSelectFormType;
+use App\DataProvider\BasicDatasetDataProvider;
+
 use App\Helper\Colors;
+use App\Service\Dividend\DividendYieldCalculator;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
+use App\Enum\SortDirection;
+use App\Enum\SortField;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/report')]
 class YieldByPieController extends AbstractController
@@ -24,23 +23,60 @@ class YieldByPieController extends AbstractController
 
 	#[Route(path: '/pieyield', name: 'report_dividend_yield_by_pie')]
 	public function index(
-		YieldsService $yields,
 		ChartBuilderInterface $chartBuilder,
-		#[MapQueryParameter] string $sort = 'symbol',
+		DividendYieldCalculator $dividendYieldCalculator,
+		BasicDatasetDataProvider $basicDatasetDataProvider,
+		#[MapQueryParameter] string $sortBy = 'symbol',
 		#[MapQueryParameter] string $sortDirection = 'asc'
 	): Response {
-		$validSorts = ['symbol', 'dividend', 'yield'];
-		$sort = in_array($sort, $validSorts) ? $sort : 'symbol';
-		$sortDirection = in_array($sortDirection, [
-			'asc',
-			'ASC',
-			'desc',
-			'DESC',
-		])
-			? $sortDirection
-			: 'ASC';
+		$sortBy = SortField::fromString($sortBy);
+		$sortDirection = SortDirection::fromString($sortDirection);
 
-		$result = $yields->yield($sort, $sortDirection, null);
+		$dataSet = $basicDatasetDataProvider->getDataForYield();
+		$tickers = $dataSet->tickers;
+		$calendars = $dataSet->calendars;
+		$positions = $dataSet->positions;
+		$exchangeRates = $dataSet->exchangeRates;
+
+		$dividendYieldCalculator->load(
+			tickers: $tickers,
+			calendars: $calendars,
+			positions: $positions,
+			exchangeRates: $exchangeRates
+		);
+
+		$dataCalc = $dividendYieldCalculator->process();
+
+		$totalDividendPerMonth = 0.0;
+		$totalInvested = 0.0;
+		$result = [];
+
+		BasicDatasetDataProvider::sort($dataCalc,$sortBy, $sortDirection);
+
+		$result['datasource'] = $dataCalc;
+
+		foreach ($dataCalc as $index => $item) {
+			$ticker = $item['ticker'];
+			$dividendPerMonth = $item['cash']['all_shares']['month']['net'];
+			$invested = $item['invested'];
+			$yieldPerYear = ((12 * $dividendPerMonth) / $invested) * 100;
+
+			$totalDividendPerMonth += $dividendPerMonth;
+			$totalInvested += $invested;
+
+
+			$result['labels'][] = $ticker->getFullname();
+			$result['data'][] = $yieldPerYear;
+		}
+		$yearlyEstimatedDividend = $totalDividendPerMonth * 12;
+		$yearlyEstimatedYield =
+			($yearlyEstimatedDividend / $totalInvested) * 100;
+
+		$result['totalNetYearlyDividend'] = $yearlyEstimatedDividend;
+		$result['dividendYieldOnCost'] = $yearlyEstimatedYield;
+		$result['allocated'] = $totalInvested;
+
+		// $result = $yields->yield($sort, $sortDirection, null);
 
 		$colors = Colors::COLORS;
 
@@ -75,13 +111,22 @@ class YieldByPieController extends AbstractController
 				],
 			]);
 		}
+		// return $this->render(
+		// 	'report/yield/pie.html.twig',
+		// 	array_merge($result, [
+		// 		'sort' => $sort,
+		// 		'sortDirection' => $sortDirection,
+		// 		'chart' => $chart,
+		// 	])
+		// );
+
 		return $this->render(
-			'report/yield/pie.html.twig',
+			'report/yield/pie2.html.twig',
 			array_merge($result, [
-				'sort' => $sort,
-				'sortDirection' => $sortDirection,
+				'sortBy' => $sortBy->toString(),
+				'sortDirection' => $sortDirection->toString(),
 				'chart' => $chart,
-			])
+				])
 		);
 	}
 }

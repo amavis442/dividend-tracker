@@ -17,10 +17,13 @@
                     {{ 'Portfolio'|trans }}
                 </twig:Head>
             </section>
+            <!--// summary //-->
             {% include 'portfolio/_summary.html.twig' %}
+
             <div id="main"
                  class="relative overflow-x-auto border rounded-lg shadow-white bg-white px-3 py-2 ">
                 <div>
+                    <!--// Searchform //-->
                     <div class="mb-2 w-full">
                         {{ form_start(autoCompleteForm, { 'action': path('portfolio_index') , 'attr': { 'data-turbo-frame': 'portfolio_results' }}) }}
                             <div class="flex flex-row">
@@ -45,7 +48,7 @@
                                 <twig:Table:ThCol>
                                     <div class="flex items-center">
                                         {{ 'Fullname'|trans }}
-                                        <a href="{{ path('portfolio_index', { ...app.request.query.all() , sort: 'fullname', orderBy: sort == 'fullname' and orderBy == 'asc' ? 'desc' : 'asc',}) }}">
+                                        <a href="{{ path('portfolio_index', { ...app.request.query.all() , sortBy: 'fullname', orderBy: sortBy == 'fullname' and orderBy == 'asc' ? 'desc' : 'asc',}) }}">
                                             <svg class="w-3 h-3 ms-1.5"
                                                  aria-hidden="true"
                                                  xmlns="http://www.w3.org/2000/svg"
@@ -170,7 +173,7 @@
                                         {% endif %}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
-                                    
+
                                         {% if position.divDate %}
                                             <twig:Badge class="block">
                                                 {{ position.cashCurrency.sign|raw }}

@@ -7,7 +7,7 @@ use App\Repository\PaymentRepository;
 use App\Repository\DividendTrackerRepository;
 use App\Repository\CalendarRepository;
 use App\Service\Payouts;
-use App\Service\DividendService;
+use App\Service\Dividend\DividendService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;

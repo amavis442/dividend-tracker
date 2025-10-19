@@ -11,8 +11,8 @@ use OpenSpout\Common\Entity\Style\CellAlignment;
 use OpenSpout\Common\Entity\Style\Color;
 use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Writer\XLSX\Writer;
-use App\Service\DividendServiceInterface;
-use App\Service\DividendExchangeRateResolverInterface;
+use App\Service\Dividend\DividendServiceInterface;
+use App\Service\ExchangeRate\DividendExchangeRateResolverInterface;
 
 class Export
 {

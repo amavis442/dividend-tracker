@@ -42,6 +42,7 @@
 		</div>
 
 		<div>
+		<small class="border bg-red-500 rounded-lg p-2 text-white"><i class="fa-solid fa-circle-exclamation"></i> {{ 'Please note that if the ticker has nog tax or currency attached, it will not show up in this list. Go to the ticker and set the currency and tax.'|trans}}</small>
 		<turbo-frame id="calendar_per_date_table_frame">
 			<div class=" mx-auto">
 			{% if calendars %}
@@ -69,41 +70,41 @@
 							</tr>
 							{% for day, item in items %}
 								{% for key, calData in item %}
-									{% set cal = calData.calendar %}
-									{% set netDividend = calData.positionDividend %}
-									{% set estimatedAmount = calData.positionAmount %}
-									{% set currentDate = cal.getPaymentDate %}
-									{% set grossDividendCash = calData.adjustedDividendCash %}
+									{% set netDividend = calData.dividend %}
+									{% set estimatedAmount = calData.amount %}
+									{% set currentDate = day %}
+									{% set grossDividendCash = calData.cashAmount %}
 									<twig:Table:Tr>
 										<twig:Table:Td>{{ numPositions}}</twig:Table:Td>
 										<twig:Table:ThCol>
-											{{ currentDate|date('l')|trans }},
-											{{ currentDate|date('d') }}
-											{{ currentDate|date('F')|trans|lower }}
-											{{ currentDate|date('Y') }}
+											{{ day|date('l')|trans }},
+											{{ day|date('d') }}
+											{{ day|date('F')|trans|lower }}
+											{{ day|date('Y') }}
 										</twig:Table:ThCol>
 										<twig:Table:Td>
 											{% set tickerInfo  = '' %}
 											{% set tickerInfo %}
 											<twig:ListGroup>
-												<twig:ListGroupItem><h3>Ticker:&nbsp;{{ calData.ticker }}</h3></twig:ListGroupItem>
-												<twig:ListGroupItem>{{ 'Tax rate'|trans }}:&nbsp;{{ calData.taxRate * 100 }}%</twig:ListGroupItem>
+												<twig:ListGroupItem><h3>Ticker:&nbsp;{{ calData.ticker.fullname }}</h3></twig:ListGroupItem>
+												<twig:ListGroupItem>{{ 'Tax rate'|trans }}:&nbsp;{{ calData.tax.rate * 100 }}%</twig:ListGroupItem>
 												<twig:ListGroupItem>{{ 'Exchangerate'|trans }}:&nbsp;{{ calData.exchangeRate|format_number({fraction_digit: 4}) }}</twig:ListGroupItem>
-												<twig:ListGroupItem>{{ 'Tax'|trans }}: &euro;{{ (calData.tax * estimatedAmount)|format_number({fraction_digit: 2}) }}</twig:ListGroupItem>
+												<twig:ListGroupItem>{{ 'Dividend gross'|trans }}: &euro;{{ (calData.dividend/(1-calData.tax.rate))|format_number({fraction_digit: 2}) }}</twig:ListGroupItem>
+												<twig:ListGroupItem>{{ 'Tax'|trans }}: &euro;{{ ((calData.dividend/(1-calData.tax.rate)) - calData.dividend)|format_number({fraction_digit: 2}) }}</twig:ListGroupItem>
 												<twig:ListGroupItem>
 													<div class="flex p-1">
 														<div>Ex-div:&nbsp;</div>
 														<twig:Badge variant="info">
-															{{ calData.calendar.exDividendDate|date('D, d-m-Y')|format_date('full',locale='nl') }}
+															{{ calData.calendar.exDiv|date('D, d-m-Y')|format_date('full',locale='nl') }}
 														</twig:Badge>
 													</div>
 												</twig:ListGroupItem>
 											</twig:ListGroup>
 											{% endset %}
-											{% if cal.ticker.positions[0] %}
-												<a href="{{ path('portfolio_show', {id: cal.ticker.positions[0].id}) }}" class="text-blue-500 hover:text-blue-700 underline" data-turbo-frame="_top">{{ cal.ticker.fullname }}</a>
+											{% if calData.position %}
+												<a href="{{ path('portfolio_show', {id: calData.position.id}) }}" class="text-blue-500 hover:text-blue-700 underline" data-turbo-frame="_top">{{ calData.ticker.fullname }}</a>
 											{% else %}
-												{{ cal.ticker.fullname }}
+												{{ calData.ticker.fullname }}
 											{% endif %}
 
 											<div class="inline-block" {{ stimulus_controller('tooltip') }}>
@@ -119,9 +120,9 @@
 												{{ 'shares'|trans }}</small>
 										</twig:Table:Td>
 										<twig:Table:Td>
-											{{ cal.currency.sign|raw}}{{grossDividendCash|format_number({fraction_digit: 4}) }}
+											{{ calData.currency.sign|raw}}{{grossDividendCash|format_number({fraction_digit: 4}) }}
 										</twig:Table:Td>
-										<twig:Table:Td>&euro;{{ netDividend|format_number({fraction_digit: 4}) }}</twig:Table:Td>
+										<twig:Table:Td>&euro;{{ calData.dividend|format_number({fraction_digit: 4}) }}</twig:Table:Td>
 									</twig:Table:Tr>
 									{% set sumDividend = sumDividend + netDividend %}
 									{% set numPositions = numPositions  + 1 %}

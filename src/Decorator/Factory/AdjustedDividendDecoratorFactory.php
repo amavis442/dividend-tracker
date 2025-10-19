@@ -1,39 +1,79 @@
 <?php
 namespace App\Decorator\Factory;
 
-use App\Entity\Position;
+use App\Entity\Ticker;
 use App\Decorator\AdjustedDividendDecorator;
-use App\Repository\DividendCalendarRepository;
-use App\Repository\CorporateActionRepository;
-use App\Service\DividendAdjuster;
+use App\Decorator\AdjustedDividendDecoratorInterface;
+use App\Service\Dividend\DividendAdjuster;
 
 class AdjustedDividendDecoratorFactory
 {
+	/**
+	 * @var array<int, array<int, \App\Entity\Calendar>> $dividends
+	 */
+	private ?array $dividends = null;
+	/**
+	 * @var array<int , array<int, \App\Entity\CorporateAction>> $actions
+	 */
+	private ?array $actions = null;
+
 	public function __construct(
-		private DividendCalendarRepository $dividendRepo,
-		private CorporateActionRepository $actionRepo,
         private DividendAdjuster $dividendAdjuster,
 	) {
 	}
 
-	public function decorate(Position $position): AdjustedDividendDecorator
+	public function setActions(array $actions): self
 	{
+		$this->actions = $actions;
+
+		return $this;
+	}
+
+	public function setDividends(array $dividends): self
+	{
+		$this->dividends = $dividends;
+
+		return $this;
+	}
+
+	/**
+	 * Mass load needed data for decorator(s)
+	 *
+	 * @param array<int, array<int, \App\Entity\Calendar>> $dividends
+	 *
+	 * @param array<int , array<int, \App\Entity\CorporateAction>> $actions
+	 *
+	 * @return self
+	 *
+	 */
+	public function load(array $dividends, array $actions): self
+	{
+		$this->dividends = $dividends;
+		$this->actions = $actions;
+
+		return $this;
+	}
+
+
+	public function decorate(Ticker $ticker): AdjustedDividendDecoratorInterface
+	{
+		$tid = $ticker->getId();
+
 		return new AdjustedDividendDecorator(
-			position: $position,
-			dividendRepo: $this->dividendRepo,
-			actionRepo: $this->actionRepo,
+			dividends: $this->dividends[$tid] ?? [],
+			actions: $this->actions[$tid] ?? [],
 			dividendAdjuster: $this->dividendAdjuster
 		);
 	}
 
 	/**
-	 * Optionally decorate a batch of positions
+	 * Optionally decorate a batch of tickers
 	 */
-	public function decorateBatch(array $positions): array
+	public function decorateBatch(array $tickers): array
 	{
 		return array_map(
-			fn($position) => $this->decorate($position),
-			$positions
+			fn($ticker) => $this->decorate($ticker),
+			$tickers
 		);
 	}
 }

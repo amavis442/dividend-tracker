@@ -156,22 +156,9 @@ class Position
     private ?Collection $dividendCalendars = null;
     private float $dividend = 0.0;
 
-    /**
-     * @var Collection<int, CorporateAction>
-     */
-    #[ORM\OneToMany(targetEntity: CorporateAction::class, mappedBy: 'position')]
-    private Collection $corporateActions;
 
-    #[ORM\Column(nullable: true)]
     private ?float $adjustedAmount = null;
-
-    #[ORM\Column(nullable: true)]
     private ?float $adjustedAveragePrice = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $adjustedMetricsLastUpdatedAt = null;
-
-
 
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
@@ -221,7 +208,6 @@ class Position
         $this->pies = new ArrayCollection();
         $this->dividendCalendars = new ArrayCollection();
         $this->isMaxAllocation = false;
-        $this->corporateActions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -872,39 +858,9 @@ class Position
         return $this;
     }
 
-    /**
-     * @return Collection<int, CorporateAction>
-     */
-    public function getCorporateActions(): Collection
+    public function getAdjustedAmount(): ?float
     {
-        return $this->corporateActions;
-    }
-
-    public function addCorporateAction(CorporateAction $corporateAction): static
-    {
-        if (!$this->corporateActions->contains($corporateAction)) {
-            $this->corporateActions->add($corporateAction);
-            $corporateAction->setPosition($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCorporateAction(CorporateAction $corporateAction): static
-    {
-        if ($this->corporateActions->removeElement($corporateAction)) {
-            // set the owning side to null (unless already changed)
-            if ($corporateAction->getPosition() === $this) {
-                $corporateAction->setPosition(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getAdjustedAmount(): float
-    {
-        return $this->adjustedAmount ?? 0.0;
+        return $this->adjustedAmount;
     }
 
     public function setAdjustedAmount(?float $adjustedAmount): static
@@ -914,26 +870,14 @@ class Position
         return $this;
     }
 
-    public function getAdjustedAveragePrice(): float
+    public function getAdjustedAveragePrice(): ?float
     {
-        return $this->adjustedAveragePrice ?? 0.0;
+        return $this->adjustedAveragePrice;
     }
 
     public function setAdjustedAveragePrice(?float $adjustedAveragePrice): static
     {
         $this->adjustedAveragePrice = $adjustedAveragePrice;
-
-        return $this;
-    }
-
-    public function getAdjustedMetricsLastUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->adjustedMetricsLastUpdatedAt;
-    }
-
-    public function setAdjustedMetricsLastUpdatedAt(?\DateTimeImmutable $adjustedMetricsLastUpdatedAt): static
-    {
-        $this->adjustedMetricsLastUpdatedAt = $adjustedMetricsLastUpdatedAt;
 
         return $this;
     }

@@ -12,7 +12,7 @@ use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
 use App\Service\ExchangeRate\ExchangeRateInterface;
 use App\Service\Referer;
-use App\Service\WeightedAverage;
+use App\Service\Position\WeightedAverage;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

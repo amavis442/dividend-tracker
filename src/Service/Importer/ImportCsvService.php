@@ -16,8 +16,7 @@ use App\Repository\PositionRepository;
 use App\Repository\TaxRepository;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
-use App\Service\WeightedAverage;
-use App\Service\CsvReader;
+use App\Service\Cvs\CsvReader;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
@@ -25,6 +24,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\SecurityBundle\Security;
 use DOMNode;
 use Symfony\Component\Uid\Uuid;
+use App\Service\Position\WeightedAverage;
 
 class ImportCsvService extends AbstractImporter implements CsvInterface
 {

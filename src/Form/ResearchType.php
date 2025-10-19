@@ -57,7 +57,7 @@ class ResearchType extends AbstractType
                 function (int $tickerId) {
                     return $tickerId;
                 },
-                function (int $tickerId = null) {
+                function (?int $tickerId = null) {
                     return $this->tickerRepository->find($tickerId);
                 }
             )
