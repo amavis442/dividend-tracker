@@ -10,7 +10,7 @@ use App\Repository\Trading212PieMetaDataRepository;
 
 #[
     AsEntityListener(
-        event: Events::postPersist,
+        event: Events::postUpdate,
         method: 'postUpdate',
         entity: Pie::class
     )
@@ -25,7 +25,8 @@ final class PieListener
 
 
     public function postUpdate(
-        Pie $pie
+        Pie $pie,
+        PostUpdateEventArgs $event
     ): void {
         $this->trading212PieMetaDataRepository->updatePie($pie);
     }
