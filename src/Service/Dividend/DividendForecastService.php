@@ -118,7 +118,8 @@ class DividendForecastService
 						'pieLabel' => $snapshot
 							->getTrading212PieMetaData()
 							->getPie()
-							->getLabel(),
+							?->getLabel() ?? 'Pie Unknown #'. $snapshot
+							->getTrading212PieMetaData()->getTrading212PieId(),
 						'payout' => $payout,
 						'paymentDate' => $calendarEntry->getPaymentDate(),
 						'exDate' => $calendarEntry->getExDividendDate(),
