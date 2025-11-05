@@ -15,6 +15,13 @@ use App\Repository\Trading212PieMetaDataRepository;
         entity: Pie::class
     )
 ]
+#[
+	AsEntityListener(
+		event: Events::postPersist,
+		method: 'postUpdate',
+		entity: Pie::class
+	)
+]
 final class PieListener
 {
 

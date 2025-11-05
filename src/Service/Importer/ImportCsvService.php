@@ -9,7 +9,7 @@ use App\Entity\Position;
 use App\Entity\Transaction;
 use App\Entity\Tax;
 use App\Repository\BranchRepository;
-use App\Repository\CalendarRepository;
+use App\Repository\DividendCalendarRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
@@ -25,6 +25,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use DOMNode;
 use Symfony\Component\Uid\Uuid;
 use App\Service\Position\WeightedAverage;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ImportCsvService extends AbstractImporter implements CsvInterface
 {
@@ -38,11 +39,12 @@ class ImportCsvService extends AbstractImporter implements CsvInterface
         protected BranchRepository $branchRepository,
         protected TransactionRepository $transactionRepository,
         protected PaymentRepository $paymentRepository,
-        protected CalendarRepository $calendarRepository,
+        protected DividendCalendarRepository $calendarRepository,
         protected EntityManagerInterface $entityManager,
         protected WeightedAverage $weightedAverage,
         protected TaxRepository $taxRepository,
-        protected Security $security
+        protected Security $security,
+        protected ValidatorInterface $validator,
     ) {}
 
     protected function formatImportData(array|DOMNode $data): array
@@ -190,23 +192,6 @@ class ImportCsvService extends AbstractImporter implements CsvInterface
                          * @see https://www.isin.org/isin-format/
                          */
                         $row['isin'] = $val;
-                        $isin = $val;
-                        if (
-                            !preg_match(
-                                '/^([A-Z]{2})(\d{1})(\w+)/i',
-                                $isin,
-                                $matches
-                            ) &&
-                            !preg_match(
-                                '/^([A-Z]{4})(\d{1})(\w+)/i',
-                                $isin,
-                                $matches
-                            )
-                        ) {
-                            throw new RuntimeException(
-                                'ISIN Number not correct: ' . $isin. ' '. print_r($csvRow, true)
-                            );
-                        }
                         break;
                     case 'ticker':
                         $row['ticker'] = $val;
@@ -215,11 +200,9 @@ class ImportCsvService extends AbstractImporter implements CsvInterface
                         $row['name'] = $val;
                         break;
                     case 'no. of shares': // Changed the headers to quantity
-                        $rawAmount = $val;
                         $row['amount'] = $val;
                         break;
                     case 'quantity':
-                        $rawAmount = $val;
                         $row['amount'] = $val;
                         break;
                     case 'price / share':
@@ -327,13 +310,16 @@ class ImportCsvService extends AbstractImporter implements CsvInterface
 
         if (count($rows) > 0) {
             foreach ($rows as $row) {
+
                 $ticker = $this->preImportCheckTicker(
                     $this->entityManager,
                     $defaultBranch,
                     $this->tickerRepository,
                     $defaultTax,
+                    $this->validator,
                     $row
                 );
+
                 $transaction = $this->transactionRepository->findOneBy([
                     'jobid' => $row['opdrachtid'],
                 ]);
