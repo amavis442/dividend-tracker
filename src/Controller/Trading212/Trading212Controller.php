@@ -3,6 +3,7 @@
 namespace App\Controller\Trading212;
 
 use App\Entity\Pie;
+use App\Entity\Position;
 use App\Entity\Trading212PieMetaData;
 use App\Helper\Colors;
 use App\Repository\DividendCalendarRepository;
@@ -22,7 +23,6 @@ use Doctrine\Common\Collections\Collection;
 use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
 use App\DataProvider\CorporateActionDataProvider;
 use App\DataProvider\DividendDataProvider;
-
 
 #[
 	Route(
@@ -115,16 +115,20 @@ final class Trading212Controller extends AbstractController
 		);
 		$lastYear = (new \Datetime('-1 years -1 months'))->format('Ym');
 
-
 		foreach ($tickerCalendars as $calId => $tickerCalendar) {
 			$tickerId = $tickerCalendar->getTicker()->getId();
 			$frequency = $tickerCalendar->getTicker()->getPayoutFrequency();
 			$cId = (int) $tickerCalendar->getPaymentDate()->format('Ym');
 
-
 			//$cashAmount = $tickerCalendar
-			$adjustedCalendar = $tickers[$tickerId]['adjustedDividend'][$calId] ?? ['adjusted' => $tickerCalendar->getCashAmount()];
-			if ($tickerId == 291 && $tickerCalendar->getPaymentDate()->format('Y-m-d') > '2025-10-01') {
+			$adjustedCalendar = $tickers[$tickerId]['adjustedDividend'][
+				$calId
+			] ?? ['adjusted' => $tickerCalendar->getCashAmount()];
+			if (
+				$tickerId == 291 &&
+				$tickerCalendar->getPaymentDate()->format('Y-m-d') >
+					'2025-10-01'
+			) {
 				dd($tickers[291]['adjustedDividend'], $calId, $tickerCalendar);
 			}
 			$cashAmount = $adjustedCalendar['adjusted'];
@@ -138,7 +142,9 @@ final class Trading212Controller extends AbstractController
 				$tickers[$tickerId]['dividend']['records'] = 0;
 				$tickers[$tickerId]['dividend']['avg'] = 0.0;
 				$tickers[$tickerId]['dividend']['predicted_payment'] = [];
-				$tickers[$tickerId]['dividend']['predicted_payment_monthly'] = [];
+				$tickers[$tickerId]['dividend'][
+					'predicted_payment_monthly'
+				] = [];
 
 				$tickers[$tickerId]['dividend']['frequency'] = $frequency;
 			}
@@ -149,13 +155,9 @@ final class Trading212Controller extends AbstractController
 					$cId
 				] = $tickerCalendar->getCashAmount();
 				*/
-				$tickers[$tickerId]['dividend'][
-					$cId
-				] = $cashAmount;
+				$tickers[$tickerId]['dividend'][$cId] = $cashAmount;
 
-				$tickers[$tickerId]['dividend'][
-					'sumDividend'
-				] += $cashAmount;
+				$tickers[$tickerId]['dividend']['sumDividend'] += $cashAmount;
 				$tickers[$tickerId]['dividend']['records'] += 1;
 
 				$owned = $tickers[$tickerId]['instrument']->getOwnedQuantity();
@@ -164,15 +166,13 @@ final class Trading212Controller extends AbstractController
 				$normalizeToMonthlyPaymentMultiplier = $frequency / 12;
 
 				$predictedPayment =
-					$owned *
-					$cashAmount *
-					$rateDollarEuro *
-					(1 - $tax);
+					$owned * $cashAmount * $rateDollarEuro * (1 - $tax);
 				$tickers[$tickerId]['dividend']['predicted_payment'][
 					$cId
 				] = $predictedPayment;
-				$tickers[$tickerId]['dividend']['predicted_payment_monthly'][$cId] =
-					$predictedPayment * $normalizeToMonthlyPaymentMultiplier;
+				$tickers[$tickerId]['dividend']['predicted_payment_monthly'][
+					$cId
+				] = $predictedPayment * $normalizeToMonthlyPaymentMultiplier;
 			}
 		}
 	}
@@ -566,7 +566,7 @@ final class Trading212Controller extends AbstractController
 		ChartBuilderInterface $chartBuilder,
 		CorporateActionDataProvider $corporateActionDataProvider,
 		DividendDataProvider $dividendDataProvider,
-		AdjustedDividendDecoratorFactory $adjustedDividendDecoratorFactory,
+		AdjustedDividendDecoratorFactory $adjustedDividendDecoratorFactory
 	): Response {
 		/**
 		 * @var \App\Entity\Trading212PieMetaData $metaData
@@ -584,10 +584,15 @@ final class Trading212Controller extends AbstractController
 		/**
 		 * \App\Entity\Trading212PieInstrument $instrument
 		 */
-		$positions = array_map(function($instrument) {
+		$positions = array_map(function ($instrument) {
 			return $instrument->getPosition();
 		}, $instruments->toArray());
-		$tickerList = array_map(function($position) {
+		$positions = array_filter(
+			$positions,
+			fn($position) => $position ? true : false
+		);
+
+		$tickerList = array_map(function (?Position $position) {
 			return $position->getTicker();
 		}, $positions);
 
@@ -618,12 +623,16 @@ final class Trading212Controller extends AbstractController
 				'adjustedDividend' => [],
 			];
 
-
 			$position = $instrument->getPosition();
 			$pid = $position->getId();
 
-			$adjustedDividendDecoratorFactory->load($dividends, $corporateActions);
-			$adjustedDividendDecorator = $adjustedDividendDecoratorFactory->decorate($position->getTicker());
+			$adjustedDividendDecoratorFactory->load(
+				$dividends,
+				$corporateActions
+			);
+			$adjustedDividendDecorator = $adjustedDividendDecoratorFactory->decorate(
+				$position->getTicker()
+			);
 
 			$adjustedDividends = $adjustedDividendDecorator->getAdjustedDividend();
 			$tickers[$ticker->getId()]['adjustedDividend'] = $adjustedDividends;
@@ -647,8 +656,11 @@ final class Trading212Controller extends AbstractController
 		$totalMonthlyDividend = 0.0;
 		foreach ($tickers as $id => $item) {
 			if (isset($item['dividend'])) {
-			$lastDividend = 0.0;
-				foreach ($item['dividend']['predicted_payment_monthly'] as $month => $predictedMonthlyDividend) {
+				$lastDividend = 0.0;
+				foreach (
+					$item['dividend']['predicted_payment_monthly']
+					as $month => $predictedMonthlyDividend
+				) {
 					if ($month > $currentMonth) {
 						continue;
 					}
@@ -657,11 +669,14 @@ final class Trading212Controller extends AbstractController
 				$totalMonthlyDividend += $lastDividend;
 			}
 		}
-		$yearlyDividendPercentage = $metaData->getPriceAvgInvestedValue() > 0 ? ($totalMonthlyDividend * 12) / $metaData->getPriceAvgInvestedValue() : 0;
+		$yearlyDividendPercentage =
+			$metaData->getPriceAvgInvestedValue() > 0
+				? ($totalMonthlyDividend * 12) /
+					$metaData->getPriceAvgInvestedValue()
+				: 0;
 		$stats['yearlyDividendPercentage'] = $yearlyDividendPercentage * 100;
 		$stats['monthlyDividend'] = $totalMonthlyDividend;
 		$stats['yearlyDividend'] = $totalMonthlyDividend * 12;
-
 
 		$pieInstruments = [];
 		$pieDividend = 0.0; // What is actually paid will be a computed on latest paydat so can be inaccurate. Trading212 does not split up payments by pie instruments :(

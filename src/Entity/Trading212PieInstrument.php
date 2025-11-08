@@ -253,7 +253,10 @@ class Trading212PieInstrument
 		return $this;
 	}
 
-	public function getPosition(): Position {
+	public function getPosition(): ?Position {
+		if (!$this->ticker) {
+			return null;
+		}
 		return $this->ticker->getPositions()->first();
 	}
 

@@ -43,9 +43,14 @@ class DividendForecastService
 		);
 		$payouts = [];
 
-		$tickers = array_map(function ($snapshot) {
+		$snapshots = array_filter($snapshots, fn($snapshot)=> $snapshot->getTicker() ? true: false );
+		//dd($snapshots);
+
+
+		$tickers = array_map(function ($snapshot) use ($snapshots) {
 			return $snapshot->getTicker();
 		}, $snapshots);
+
 
 		$dividends = $this->dividendDataProvider->load(
 			tickers: $tickers,
