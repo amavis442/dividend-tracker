@@ -120,7 +120,7 @@ services:
                       '\App\Service\DividendDate\NullService',
                       ['QYLD', 'XY7D', 'EQQQ'],
                   ]
-             - addService:
+            - addService:
                   [
                       '\App\Service\DividendDate\MassiveService',
                       [],
