@@ -12,6 +12,7 @@ parameters:
     app.max_per_page: 10
     app.supported_locales: 'en|nl'
     dividend.financial_modeling_prep_api_key: '%env(FINANCIALMODELINGPREP_API_KEY)%'
+    dividend.massive_api_key: '%env(MASSIVE_API_KEY)%'
     app.incomesshares: '%env(INCOMESSHARES)%'
 
 services:
@@ -118,6 +119,13 @@ services:
                   [
                       '\App\Service\DividendDate\NullService',
                       ['QYLD', 'XY7D', 'EQQQ'],
+                  ]
+             - addService:
+                  [
+                      '\App\Service\DividendDate\MassiveService',
+                      [],
+                      '%dividend.massive_api_key%',
+                      true
                   ]
             #- setDefault: ['App\Service\DividendDate\SeekingAlphaService']
             - setDefault:
