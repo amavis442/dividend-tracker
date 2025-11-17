@@ -7,7 +7,7 @@ use App\Entity\Calendar;
 
 class FinancialModelingPrepService extends AbstractDividendDate implements DividendDatePluginInterface
 {
-	public const URL = 'https://financialmodelingprep.com/api/v3/historical-price-full/stock_dividend/[SYMBOL]?apikey=[API_KEY]'; // source https://github.com/AlmaWeb3/dividend-web
+	public const URL = 'https://financialmodelingprep.com/stable/dividends?symbol=[SYMBOL]&apikey=[API_KEY]';
 
 	private array $ignore = ['QQQY'];
 
@@ -36,7 +36,7 @@ class FinancialModelingPrepService extends AbstractDividendDate implements Divid
 
         $currentYear = (int)date('Y');
 		$items = [];
-		foreach ($data->historical as $divDate) {
+		foreach ($data as $divDate) {
             $payDate = new \DateTime($divDate->paymentDate);
             if ($divDate->date == '' || $divDate->paymentDate == '' || $divDate->dividend == '' || $currentYear < (int)$payDate->format('Y')) {
                 continue;
