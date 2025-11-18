@@ -72,7 +72,7 @@ class Calendar
 
     #[Groups(['calendar:read', 'calendar:write', 'ticker:read:item', 'position:read:item', 'transaction:read'])]
     #[ORM\Column(type: 'string', length: 255, nullable: false,options: ["default" => 'Regular'],)]
-    private $dividendType;
+    private $dividendType = 'Regular';
 
     /**
      * Was this added manual or script?

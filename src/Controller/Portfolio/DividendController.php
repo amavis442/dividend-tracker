@@ -104,6 +104,7 @@ class DividendController extends AbstractController
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
 			$calendar->setSource(Calendar::SOURCE_MANUEL);
+			$calendar->setDividendType(Calendar::REGULAR);
 			$entityManager->persist($calendar);
 			$entityManager->flush();
 
