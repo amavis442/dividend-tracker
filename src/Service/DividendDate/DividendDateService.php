@@ -192,9 +192,13 @@ class DividendDateService
 				return $result;
 			}
 		}
+
 		foreach ($this->fallbackServices as $service) {
 			// These should have cached data, so they play nice with free api's
-			return $service->getData($symbol, $isin);
+			$result = $service->getData($symbol, $isin);
+			if ($result && count($result) > 0) {
+				return $result;
+			}
 		}
 
 		return [];
