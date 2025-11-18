@@ -47,7 +47,7 @@ class DividendForecastService
 		//dd($snapshots);
 
 
-		$tickers = array_map(function ($snapshot) use ($snapshots) {
+		$tickers = array_map(function ($snapshot) {
 			return $snapshot->getTicker();
 		}, $snapshots);
 

@@ -26,10 +26,9 @@ class DividendDataProvider
 	{
 		$logger = $this->logger;
 		try{
-		$ids = array_map(function(?Ticker $t) use ($logger, $tickers) {
+		$ids = array_map(function(?Ticker $t) use ($logger) {
 			if (!isset($t) || $t == null) {
 				$logger->error('DividendDataProvider::load()#'.__LINE__.' Ticker() is null');
-				dd($tickers);
 			}
 
 			return  $t->getId();
@@ -37,7 +36,6 @@ class DividendDataProvider
 		} catch(\Exception $e) {
 			$logger->error($e->getMessage());
 			$logger->error(print_r($tickers, true));
-			dd($e->getMessage());
 			throw $e;
 		}
 
