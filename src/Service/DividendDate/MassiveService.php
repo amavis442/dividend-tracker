@@ -7,7 +7,7 @@ use App\Entity\Calendar;
 
 class MassiveService extends AbstractDividendDate implements DividendDatePluginInterface
 {
-	public const URL = 'https://api.massive.com/v3/reference/dividends?ticker=[SYMBOL]&order=desc&limit=10&sort=ex_dividend_date&apiKey=[API_KEY]';
+	public const URL = 'https://api.massive.com/v3/reference/dividends?ticker=[SYMBOL]&order=desc&limit=5&sort=ex_dividend_date&apiKey=[API_KEY]';
 
 	private array $ignore = ['QQQY'];
 
