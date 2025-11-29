@@ -171,7 +171,7 @@
         "csfix": "phpcbf --ignore=migrations/**,src/Kernel.php,bin/**",
         "cscheck": "phpcs --ignore=migrations/**,src/Kernel.php,bin/**",
         "phpstan": "phpstan analyse src/ -c phpstan.neon --level=5 --no-progress -vvv --memory-limit=1024M",
-        "phpunit": "SYMFONY_DEPRECATIONS_HELPER=disabled vendor/bin/phpunit  --do-not-fail-on-warning --do-not-fail-on-risky --coverage-html var/coverage"
+        "phpunit": "SYMFONY_DEPRECATIONS_HELPER=disabled xdebug_enabled=true XDEBUG_MODE=coverage vendor/bin/phpunit  --do-not-fail-on-warning --do-not-fail-on-risky --coverage-html var/coverage"
     },
     "conflict": {
         "symfony/symfony": "*"

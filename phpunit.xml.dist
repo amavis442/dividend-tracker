@@ -7,11 +7,11 @@
          colors="true"
          bootstrap="tests/bootstrap.php"
          testdox="false"
-         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnTestsThatTriggerDeprecations="false"
          displayDetailsOnTestsThatTriggerErrors="true"
          displayDetailsOnTestsThatTriggerNotices="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
-         displayDetailsOnPhpunitDeprecations="true"
+         displayDetailsOnPhpunitDeprecations="false"
 >
     <php>
         <ini name="display_errors" value="1" />
@@ -19,15 +19,15 @@
         <server name="APP_ENV" value="test" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
         <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
-        <server name="SYMFONY_PHPUNIT_VERSION" value="9.6" />
+        <server name="SYMFONY_PHPUNIT_VERSION" value="12.0" />
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="logFile=var/log/deprecations.log"/>
     </php>
 
     <testsuites>
-        <testsuite name="Unit Test Suite">
-            <directory>tests/Unit</directory>
+        <testsuite name="Features">
+            <directory>tests/Features</directory>
         </testsuite>
-        <testsuite name="Functional Test Suite">
+        <testsuite name="Functional">
             <directory>tests/Functional</directory>
         </testsuite>
     </testsuites>
