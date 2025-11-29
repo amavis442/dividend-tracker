@@ -26,8 +26,8 @@ set('bin/cachetool', function () {
 add('shared_files', ['.env.local', 'public/uploads']);
 
 // Hosts
-host('prod')
-    ->set('hostname', '127.0.0.1')
+host('production')
+    ->set('hostname', '192.168.2.49')
     ->set('branch' ,'main')
     ->setRemoteUser('deployer')
     ->setDeployPath('/var/www/prod/{{application}}')
@@ -35,52 +35,6 @@ host('prod')
         'type' => 'local',
         'env' => 'prod',
         'stage' => 'prod',
-    ])
-    ->set('cachetool', '/run/php/php8.3-fpm-dividend.sock');
-
-host('acc')
-    ->set('hostname', '127.0.0.1')
-    ->set('branch' ,'main')
-    ->setRemoteUser('deployer')
-    ->setDeployPath('/var/www/acc/{{application}}')
-    ->setLabels([
-        'type' => 'local',
-        'env' => 'prod',
-        'stage' => 'acc',
-    ])
-    ->set('cachetool', '/run/php/php8.3-fpm-prod-sites.sock');
-
-host('acerdeploy')
-    ->set('hostname', 'acerdeploy')
-    ->set('branch' ,'main')
-    ->setRemoteUser('deployer')
-    ->setDeployPath('/var/www/prod/{{application}}')
-    ->setLabels([
-        'type' => 'local',
-        'env' => 'prod',
-        'stage' => 'prod',
-    ]);
-
-host('proxmox')
-    ->set('hostname', 'proxmox')
-    ->set('branch' ,'main')
-    ->setRemoteUser('deployer')
-    ->setDeployPath('/var/www/prod/{{application}}')
-    ->setLabels([
-        'type' => 'local',
-        'env' => 'prod',
-        'stage' => 'prod',
-    ]);
-
-host('test')
-    ->set('hostname', '127.0.0.1')
-    ->set('branch' ,'main')
-    ->setRemoteUser('deployer')
-    ->setDeployPath('/var/www/test/{{application}}')
-    ->setLabels([
-        'type' => 'local',
-        'env' => 'test',
-        'stage' => 'test',
     ]);
 
 // Tasks
