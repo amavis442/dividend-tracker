@@ -57,6 +57,7 @@
         }
     ],
     "[php]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
+        "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
     },
+    "intelephense.environment.phpVersion": "8.4",
 }
