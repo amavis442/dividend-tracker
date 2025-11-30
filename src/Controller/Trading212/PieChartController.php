@@ -2,22 +2,14 @@
 
 namespace App\Controller\Trading212;
 
-use App\Entity\Pie;
-use App\Helper\Colors;
-use App\Repository\CalendarRepository;
-use App\Repository\PaymentRepository;
-use App\Repository\Trading212PieInstrumentRepository;
 use App\Repository\Trading212PieMetaDataRepository;
-use App\Service\ExchangeRate\ExchangeRateInterface;
-use Pagerfanta\Doctrine\ORM\QueryAdapter;
-use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
+
 
 #[
 	Route(

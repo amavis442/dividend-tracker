@@ -104,7 +104,7 @@
                     <twig:Table:Td>
                         {% if item.pie %}
                             <twig:Button tag="a"
-                                         href="{{ path("app_report_trading212_graph", {'pie': item.pie.id}) }}">
+                                         href="{{ path("app_report_trading212_pie_instruments", {'pie': item.pie.id}) }}">
                                 <i class="fa fa-line-chart"></i>
                             </twig:Button>
                         {% endif %}
