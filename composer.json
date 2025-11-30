@@ -94,6 +94,7 @@
         "doctrine/doctrine-fixtures-bundle": "^4.1",
         "fakerphp/faker": "^1.23",
         "friends-of-behat/symfony-extension": "^2.6",
+        "friendsofphp/php-cs-fixer": "*",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpdocumentor/shim": "^3.8",
         "phpspec/phpspec": "^8.0",
