@@ -23,21 +23,35 @@ set('bin/cachetool', function () {
 
 
 // Shared files/dirs between deploys
-add('shared_files', ['.env.local', 'public/uploads']);
+set('shared_files', ['.env.local']);
+set('shared_dirs', ['public/uploads','var/log','var/cache']);
 
 // Hosts
+host('acceptance')
+    ->set('hostname', '192.168.2.49')
+    ->set('branch' ,'main')
+    ->setRemoteUser('deployer')
+    ->setDeployPath('/var/www/acc/{{application}}')
+    ->setLabels([
+        'type' => 'live',
+        'env' => 'acc',
+        'stage' => 'acc',
+    ]);
+
 host('production')
     ->set('hostname', '192.168.2.49')
     ->set('branch' ,'main')
     ->setRemoteUser('deployer')
     ->setDeployPath('/var/www/prod/{{application}}')
     ->setLabels([
-        'type' => 'local',
+        'type' => 'live',
         'env' => 'prod',
         'stage' => 'prod',
     ]);
 
-// Tasks
+
+
+    // Tasks
 desc('Install npm packages');
 task('npm:install', function () {
     if (has('previous_release')) {
