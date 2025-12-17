@@ -3,27 +3,25 @@
 namespace App\Controller\Trading212;
 
 use App\Entity\Pie;
-use App\Entity\Position;
-use App\Entity\Trading212PieMetaData;
-use App\Helper\Colors;
 use App\Repository\DividendCalendarRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\TickerRepository;
-use App\Repository\Trading212PieMetaDataRepository;
 use App\Service\ExchangeRate\ExchangeRateInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
-use Symfony\UX\Chartjs\Model\Chart;
 use Doctrine\Common\Collections\Collection;
 use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
-use App\DataProvider\CorporateActionDataProvider;
-use App\DataProvider\DividendDataProvider;
+
 use App\Service\Trading212\CalcStatsService;
+use App\DataProvider\PieDataProvider;
+use App\Service\Trading212\Factory\ChartBuilderFactory;
+use App\Decorator\DividendDecorator;
+use App\Decorator\TickerTaxDecorator;
+use App\Decorator\InstrumentDecorator;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[
 	Route(
@@ -32,61 +30,47 @@ use App\Service\Trading212\CalcStatsService;
 ]
 class PieInstrumentsController extends AbstractController
 {
-	public function __construct(protected CalcStatsService $calcStatsService) {
+	private const MONTHS_IN_YEAR = 12;
 
-	}
+	public function __construct(
+		private CalcStatsService $calcStatsService,
+		private readonly ChartBuilderFactory $chartBuilderFactory,
+		private readonly PieDataProvider $pieDataProvider,
+		private readonly TickerTaxDecorator $taxDecorator,
+		private readonly DividendDecorator $dividendDecorator,
+		private readonly InstrumentDecorator $instrumentDecorator,
+		private readonly TickerRepository $tickerRepository,
+		private readonly PaymentRepository $paymentRepository,
+	) {}
 
-    	//Todo Refactor. Controller has become to fat and should be split
+	//Todo Refactor. Controller has become to fat and should be split
 	// up into several parts.
 	#[Route('/pie-instruments/{pie}', name: 'app_report_trading212_pie_instruments')]
 	public function index(
 		Pie $pie,
-		Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
-		DividendCalendarRepository $calendarRepository,
-		PaymentRepository $paymentRepository,
-		TickerRepository $tickerRepository,
-		TranslatorInterface $translator,
-		ExchangeRateInterface $exchangeRate,
 		EntityManagerInterface $entityManager,
-		ChartBuilderInterface $chartBuilder,
-		CorporateActionDataProvider $corporateActionDataProvider,
-		DividendDataProvider $dividendDataProvider,
-		AdjustedDividendDecoratorFactory $adjustedDividendDecoratorFactory,
 	): Response {
-		/**
-		 * @var \App\Entity\Trading212PieMetaData $metaData
-		 */
-		$metaData = $trading212PieMetaDataRepository->findOneBy(
-			['pie' => $pie],
-			['createdAt' => 'DESC']
-		);
+
+		// 1️⃣ Load all data for the pie
+		$pieDataDto = $this->pieDataProvider->load($pie);
+
+		// 2️⃣ Stats & basic values
+		$metaData = $pieDataDto->metaData->first();
 		$stats = $this->calcStatsService->calc($metaData);
-		$instruments = $metaData->getTrading212PieInstruments();
+		$instruments = $pieDataDto->instruments;
+		$corporateActions = $pieDataDto->corporateActions;
+		$dividends = $pieDataDto->dividends;
 		$pieAvgInvested = $metaData->getPriceAvgInvestedValue();
-		$rates = $exchangeRate->getRates();
-		$rateDollarEuro = 1 / $rates['USD'];
 
-		/**
-		 * \App\Entity\Trading212PieInstrument $instrument
-		 */
-		$positions = array_map(function ($instrument) {
-			return $instrument->getPosition();
-		}, $instruments->toArray());
-		$positions = array_filter(
-			$positions,
-			fn($position) => $position ? true : false
-		);
 
-		$tickerList = array_map(function (?Position $position) {
-			return $position->getTicker();
-		}, $positions);
-
-		$corporateActions = $corporateActionDataProvider->load($tickerList);
-		$dividends = $dividendDataProvider->load($tickerList);
-
+		// 3️⃣ Prepare tickers map
 		$tickers = [];
 		$priceProfitLoss = 0.0;
-		// Get the tickers needed foor the rest
+
+		/**
+		 * Get the tickers needed for the rest
+		 * If a instrument has no ticker attached yet, notify user
+		 */
 		foreach ($instruments as $instrument) {
 			if (!$instrument->getTicker()) {
 				$this->addFlash(
@@ -97,45 +81,32 @@ class PieInstrumentsController extends AbstractController
 				continue;
 			}
 			/**
+			 * Profit/loss based on price action
+			 *
 			 * @var \App\Entity\Ticker $ticker
 			 */
 			$ticker = $instrument->getTicker();
 			$priceProfitLoss +=
 				$instrument->getPrice() - $instrument->getAvgPrice();
+
 			$tickers[$ticker->getId()] = [
 				'ticker' => $instrument->getTicker(),
 				'instrument' => $instrument,
 				'adjustedDividend' => [],
 			];
-
-			$position = $instrument->getPosition();
-			$pid = $position->getId();
-
-			$adjustedDividendDecoratorFactory->load(
-				$dividends,
-				$corporateActions
-			);
-			$adjustedDividendDecorator = $adjustedDividendDecoratorFactory->decorate(
-				$position->getTicker()
-			);
-
-			$adjustedDividends = $adjustedDividendDecorator->getAdjustedDividend();
-			$tickers[$ticker->getId()]['adjustedDividend'] = $adjustedDividends;
 		}
 
-		// Get the taxrate for each ticker
-		$tickerTaxes = $tickerRepository->getTaxForTickers(
-			array_keys($tickers)
-		);
-		foreach ($tickerTaxes as $id => $tickerTax) {
-			$tickers[$id]['tax'] = $tickerTax->getTax();
-		}
+		// 4️⃣ Decorate dividends (adjust dividend where needed.)
+		$this->dividendDecorator->decorate($tickers, $dividends, $corporateActions);
 
-		$this->decorateWithDividend(
-			$calendarRepository,
-			$tickers,
-			$rateDollarEuro
-		);
+		// 5️⃣ Taxes (hated taxes) for each ticker some have 15% others 0% and some 30% tax rate
+		$tickerIds = array_keys($tickers);
+		$taxes = $this->tickerRepository->getTaxForTickers($tickerIds);
+		$this->taxDecorator->decorate($tickers, $taxes);
+
+		// 6️⃣ Further decorations (break‑even, current dividend …)
+		$rateDollarEuro = 1 / $this->pieDataProvider->getExchangeRates()['USD'];
+		$this->instrumentDecorator->dividend($dividends, $tickers, $rateDollarEuro);
 
 		$currentMonth = date('Ym');
 		$totalMonthlyDividend = 0.0;
@@ -156,18 +127,19 @@ class PieInstrumentsController extends AbstractController
 		}
 		$yearlyDividendPercentage =
 			$metaData->getPriceAvgInvestedValue() > 0
-				? ($totalMonthlyDividend * 12) /
-					$metaData->getPriceAvgInvestedValue()
-				: 0;
+			? ($totalMonthlyDividend * static::MONTHS_IN_YEAR) /
+			$metaData->getPriceAvgInvestedValue()
+			: 0;
 		$stats['yearlyDividendPercentage'] = $yearlyDividendPercentage * 100;
 		$stats['monthlyDividend'] = $totalMonthlyDividend;
-		$stats['yearlyDividend'] = $totalMonthlyDividend * 12;
+		$stats['yearlyDividend'] = $totalMonthlyDividend * static::MONTHS_IN_YEAR;
 
 		$pieInstruments = [];
 		$pieDividend = 0.0; // What is actually paid will be a computed on latest paydat so can be inaccurate. Trading212 does not split up payments by pie instruments :(
 		$pieCurrentDividend = 0.0;
 		$pieAvgDividend = 0.0;
 
+		/*
 		$dataInstruments = $this->decorateInstruments(
 			$paymentRepository,
 			$instruments,
@@ -176,31 +148,48 @@ class PieInstrumentsController extends AbstractController
 			$pieAvgInvested,
 			$rateDollarEuro
 		);
+		*/
+
+		// @todo: need to get Collection $payments
+		//$payments = new ArrayCollection([]);
+		$payments = new ArrayCollection($this->paymentRepository->getLastDividends($tickers));
+dd($payments);
+		$dataInstruments = $this->instrumentDecorator->instruments(
+			$pieAvgInvested,
+			$instruments,
+			$payments,
+			$tickers,
+			$rateDollarEuro
+		);
+
 
 		if (!$pieInstruments) {
 			return $this->render('trading212/report/no_graph.html.twig');
 		}
 
-		$chartInstruments = $this->createPieChart(
-			$chartBuilder,
-			$pieInstruments
-		);
+		$chartInstruments = $this->chartBuilderFactory->buildInstrumentsChart($pieInstruments);
 
-		$data = $this->getChartData($trading212PieMetaDataRepository, $pie);
+		$data = $this->getChartData($pieDataDto->metaData);
 
-		$chart = $this->createChart($data, $pie, $chartBuilder, $translator);
+		$chart = $this->chartBuilderFactory->buildMainChart($data, $pie);
 
-		$breakEvenChart = $this->breakEvenChart(
+		$breakEvenChart = $this->chartBuilderFactory->buildBreakEvenChart(
 			$data,
-			$chartBuilder,
-			$translator
 		);
 
-		$chartYield = $this->createYieldChart(
-			$chartBuilder,
-			$entityManager,
-			$pie,
-			$translator
+		$sql = sprintf(
+			'SELECT * FROM trading212_yield WHERE trading212_pie_id = %d',
+			$pie->getTrading212PieId()
+		);
+		$data = $entityManager
+			->getConnection()
+			->prepare($sql)
+			->executeQuery()
+			->fetchAllAssociative();
+
+		$chartYield = $this->chartBuilderFactory->buildYieldChart(
+			$data,
+			$pie
 		);
 
 		$date = new \DateTime('now');
@@ -213,20 +202,20 @@ class PieInstrumentsController extends AbstractController
 
 		$monthsEstimatedBreakEven =
 			$pieDividend > 0
-				? ceil(
-					($metaData->getPriceAvgInvestedValue() -
-						$metaData->getGained()) /
-						$pieDividend
-				)
-				: 0.0;
+			? ceil(
+				($metaData->getPriceAvgInvestedValue() -
+					$metaData->getGained()) /
+					$pieDividend
+			)
+			: 0.0;
 		$yearsEstimatedBreakEven = floor($monthsEstimatedBreakEven / 12);
 		$periodEstimatedBreakEven['years'] = $yearsEstimatedBreakEven;
 		$periodEstimatedBreakEven['months'] =
 			$monthsEstimatedBreakEven - $yearsEstimatedBreakEven * 12;
 		$pieYield =
-			((12 * $pieDividend) / $metaData->getPriceAvgInvestedValue()) * 100;
+			((static::MONTHS_IN_YEAR * $pieDividend) / $metaData->getPriceAvgInvestedValue()) * 100;
 		$pieYieldAvg =
-			((12 * $pieAvgDividend) / $metaData->getPriceAvgInvestedValue()) *
+			((static::MONTHS_IN_YEAR * $pieAvgDividend) / $metaData->getPriceAvgInvestedValue()) *
 			100;
 
 		return $this->render(
@@ -257,78 +246,46 @@ class PieInstrumentsController extends AbstractController
 		);
 	}
 
-	protected function decorateWithDividend(
-		DividendCalendarRepository $calendarRepository,
-		array &$tickers,
-		float $rateDollarEuro
-	): void {
-		$lastYear = sprintf(
-			'%04d-%02d-%02d',
-			date('Y') - 1,
-			date('m'),
-			date('d')
-		);
+	private function getChartData(
+		Collection $metaData
+	) {
+		$labels = [];
+		$allocationData = [];
+		$valueData = [];
+		$gained = [];
+		$totalReturn = [];
+		$breakEvenData = [];
 
-		// Get Calendars for at least 1 year
-		$tickerCalendars = $calendarRepository->getCalendarsForTickers(
-			$tickers,
-			$lastYear
-		);
-		$lastYear = (new \Datetime('-1 years -1 months'))->format('Ym');
+		/**
+		 * @var array<int, \App\Entity\Trading212PieMetaData> $data
+		 */
+		$data = $metaData->toArray();
 
-		foreach ($tickerCalendars as $calId => $tickerCalendar) {
-			$tickerId = $tickerCalendar->getTicker()->getId();
-			$frequency = $tickerCalendar->getTicker()->getPayoutFrequency();
-			$cId = (int) $tickerCalendar->getPaymentDate()->format('Ym');
+		/**
+		 * @var \App\Entity\Trading212PieMetaData $item
+		 */
+		foreach ($data as $item) {
+			$allocationData[] = round($item->getPriceAvgInvestedValue(), 2);
+			$valueData[] = round($item->getPriceAvgValue(), 2);
+			$gained[] = round($item->getGained(), 2);
+			$labels[] = $item->getCreatedAt()->format('d-m-Y');
+			$totalReturn[] = $item->getGained() + $item->getPriceAvgValue();
 
-			//$cashAmount = $tickerCalendar
-			$adjustedCalendar = $tickers[$tickerId]['adjustedDividend'][$calId] ?? ['adjusted' => $tickerCalendar->getCashAmount()];
-			if (
-				$tickerId == 291 &&
-				$tickerCalendar->getPaymentDate()->format('Y-m-d') >
-				'2025-10-01'
-			) {
-				dd($tickers[291]['adjustedDividend'], $calId, $tickerCalendar);
-			}
-			$cashAmount = $adjustedCalendar['adjusted'];
-
-			$tickerCalendar->setAdjustedCashAmount($cashAmount);
-
-			$tickers[$tickerId]['calendars'][$cId] = $tickerCalendar;
-
-			if (!isset($tickers[$tickerId]['dividend'])) {
-				$tickers[$tickerId]['dividend']['sumDividend'] = 0.0;
-				$tickers[$tickerId]['dividend']['records'] = 0;
-				$tickers[$tickerId]['dividend']['avg'] = 0.0;
-				$tickers[$tickerId]['dividend']['predicted_payment'] = [];
-				$tickers[$tickerId]['dividend']['predicted_payment_monthly'] = [];
-
-				$tickers[$tickerId]['dividend']['frequency'] = $frequency;
-			}
-
-			if ($cId > $lastYear) {
-				/*
-				$tickers[$id]['dividend'][
-					$cId
-				] = $tickerCalendar->getCashAmount();
-				*/
-				$tickers[$tickerId]['dividend'][$cId] = $cashAmount;
-
-				$tickers[$tickerId]['dividend']['sumDividend'] += $cashAmount;
-				$tickers[$tickerId]['dividend']['records'] += 1;
-
-				$owned = $tickers[$tickerId]['instrument']->getOwnedQuantity();
-				$tax = $tickers[$tickerId]['tax']->getTaxRate();
-
-				$normalizeToMonthlyPaymentMultiplier = $frequency / 12;
-
-				$predictedPayment =
-					$owned * $cashAmount * $rateDollarEuro * (1 - $tax);
-				$tickers[$tickerId]['dividend']['predicted_payment'][$cId] = $predictedPayment;
-				$tickers[$tickerId]['dividend']['predicted_payment_monthly'][$cId] = $predictedPayment * $normalizeToMonthlyPaymentMultiplier;
-			}
+			$breakEvenData[] =
+				$item->getPriceAvgInvestedValue() -
+				($item->getGained() + $item->getPriceAvgValue());
 		}
+
+		return [
+			'allocationData' => $allocationData,
+			'valueData' => $valueData,
+			'gained' => $gained,
+			'labels' => $labels,
+			'totalReturn' => $totalReturn,
+			'breakEvenData' => $breakEvenData,
+		];
 	}
+
 
 	protected function decorateInstruments(
 		PaymentRepository $paymentRepository,
@@ -376,7 +333,7 @@ class PieInstrumentsController extends AbstractController
 				$instrument->setCalendars($cals); // Last 6 months if data is available
 				$instrument->setDividend($instrumentTicker['dividend']);
 			}
-			$tax = $instrumentTicker['tax']->getTaxRate();
+			$tax = $instrumentTicker['tax']->getTax()->getTaxRate();
 			$instrument->setTaxRate($tax);
 			$instrument->setExchangeRate($rateDollarEuro);
 
@@ -454,251 +411,5 @@ class PieInstrumentsController extends AbstractController
 			'pieCurrentDividend' => $pieCurrentDividend,
 			'pieAvgDividend' => $pieAvgDividend,
 		];
-	}
-
-	protected function createPieChart(
-		ChartBuilderInterface $chartBuilder,
-		array $pieInstruments
-	): \Symfony\UX\Chartjs\Model\Chart {
-		$chartInstruments = $chartBuilder->createChart(Chart::TYPE_DOUGHNUT);
-		$chartInstruments->setData([
-			'labels' => $pieInstruments['labels'],
-			'datasets' => [
-				[
-					'label' => 'Percentage',
-					'data' => $pieInstruments['data'],
-				],
-			],
-		]);
-		return $chartInstruments;
-	}
-
-	protected function getChartData(
-		Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
-		Pie $pie
-	) {
-		$labels = [];
-		$allocationData = [];
-		$valueData = [];
-		$gained = [];
-		$totalReturn = [];
-		$breakEvenData = [];
-
-		/**
-		 * @var array<int, \App\Entity\Trading212PieMetaData> $data
-		 */
-		$data = $trading212PieMetaDataRepository->findBy(
-			['pie' => $pie],
-			['createdAt' => 'ASC']
-		);
-
-		/**
-		 * @var \App\Entity\Trading212PieMetaData $item
-		 */
-		foreach ($data as $item) {
-			$allocationData[] = round($item->getPriceAvgInvestedValue(), 2);
-			$valueData[] = round($item->getPriceAvgValue(), 2);
-			$gained[] = round($item->getGained(), 2);
-			$labels[] = $item->getCreatedAt()->format('d-m-Y');
-			$totalReturn[] = $item->getGained() + $item->getPriceAvgValue();
-
-			$breakEvenData[] =
-				$item->getPriceAvgInvestedValue() -
-				($item->getGained() + $item->getPriceAvgValue());
-		}
-
-		return [
-			'allocationData' => $allocationData,
-			'valueData' => $valueData,
-			'gained' => $gained,
-			'labels' => $labels,
-			'totalReturn' => $totalReturn,
-			'breakEvenData' => $breakEvenData,
-		];
-	}
-
-	protected function createChart(
-		array $data,
-		Pie $pie,
-		ChartBuilderInterface $chartBuilder,
-		TranslatorInterface $translator
-	): \Symfony\UX\Chartjs\Model\Chart {
-		$colors = Colors::COLORS;
-
-		$labels = $data['labels'];
-		$allocationData = $data['allocationData'];
-		$gained = $data['gained'];
-		$totalReturn = $data['totalReturn'];
-		$valueData = ['valueData'];
-
-		$colors = Colors::COLORS;
-
-		$chartData = [
-			[
-				'label' => $translator->trans('Invested'),
-				'data' => $allocationData,
-			],
-			[
-				'label' => $translator->trans('Current value'),
-				'data' => $valueData,
-			],
-			[
-				'label' => $translator->trans('Dividend'),
-				'data' => $gained,
-			],
-			[
-				'label' => $translator->trans('Total return'),
-				'data' => $totalReturn,
-			],
-		];
-
-		$chart = $chartBuilder->createChart(Chart::TYPE_LINE);
-		$chart->setData([
-			'labels' => $labels,
-			'datasets' => [
-				[
-					'label' => $chartData[0]['label'],
-					'backgroundColor' => $colors[0],
-					'borderColor' => $colors,
-					'data' => $chartData[0]['data'],
-				],
-				[
-					'label' => $chartData[1]['label'],
-					'backgroundColor' => $colors[1],
-					'borderColor' => $colors,
-					'data' => $chartData[1]['data'],
-				],
-				[
-					'label' => $chartData[2]['label'],
-					'backgroundColor' => $colors[2],
-					'borderColor' => $colors,
-					'data' => $chartData[2]['data'],
-				],
-				[
-					'label' => $chartData[3]['label'],
-					'backgroundColor' => $colors[3],
-					'borderColor' => $colors,
-					'data' => $chartData[3]['data'],
-				],
-			],
-		]);
-
-		$chart->setOptions([
-			'maintainAspectRatio' => false,
-			'responsive' => true,
-			'plugins' => [
-				'title' => [
-					'display' => true,
-					'text' => $translator->trans($pie->getLabel()),
-					'font' => [
-						'size' => 24,
-					],
-				],
-				'legend' => [
-					'position' => 'top',
-				],
-			],
-		]);
-
-		return $chart;
-	}
-
-	protected function breakEvenChart(
-		array $data,
-		ChartBuilderInterface $chartBuilder,
-		TranslatorInterface $translator
-	) {
-		$chart = $chartBuilder->createChart(Chart::TYPE_LINE);
-		$chart->setData([
-			'labels' => $data['labels'],
-			'datasets' => [
-				[
-					'label' => $translator->trans('Break even'),
-					'data' => $data['breakEvenData'],
-				],
-			],
-		]);
-
-		$chart->setOptions([
-			'maintainAspectRatio' => false,
-			'responsive' => true,
-			'plugins' => [
-				'title' => [
-					'display' => true,
-					'text' => $translator->trans(
-						'Break even (under zero is good)'
-					),
-					'font' => [
-						'size' => 24,
-					],
-				],
-				'legend' => [
-					'position' => 'top',
-				],
-			],
-		]);
-
-		return $chart;
-	}
-
-	protected function createYieldChart(
-		ChartBuilderInterface $chartBuilder,
-		EntityManagerInterface $entityManager,
-		Pie $pie,
-		TranslatorInterface $translator
-	): \Symfony\UX\Chartjs\Model\Chart {
-		$yieldData = [];
-		$sql = sprintf(
-			'SELECT * FROM trading212_yield WHERE trading212_pie_id = %d',
-			$pie->getTrading212PieId()
-		);
-		$data = $entityManager
-			->getConnection()
-			->prepare($sql)
-			->executeQuery()
-			->fetchAllAssociative();
-		foreach ($data as $itemData) {
-			$yieldData['labels'][] =
-				$itemData['month'] . '-' . $itemData['year'];
-			$yield = 0.0;
-			if ($itemData['start_invested'] > 0) {
-				$deltaGained =
-					$itemData['end_gained'] - $itemData['start_gained'];
-				$yield = round(
-					($deltaGained / $itemData['start_invested']) * 100,
-					2
-				);
-			}
-			$yieldData['data'][] = $yield;
-		}
-
-		$chartYield = $chartBuilder->createChart(Chart::TYPE_BAR);
-		$chartYield->setData([
-			'labels' => $yieldData['labels'],
-			'datasets' => [
-				[
-					'label' => 'Yield',
-					'data' => $yieldData['data'],
-				],
-			],
-		]);
-
-		$chartYield->setOptions([
-			'maintainAspectRatio' => false,
-			'responsive' => true,
-			'plugins' => [
-				'title' => [
-					'display' => true,
-					'text' => $translator->trans($pie->getLabel()),
-					'font' => [
-						'size' => 24,
-					],
-				],
-				'legend' => [
-					'position' => 'top',
-				],
-			],
-		]);
-		return $chartYield;
 	}
 }

@@ -197,13 +197,16 @@
                                                                             </li>
                                                                             <li class="font-bold mb-2">
                                                                                 {{'estimated payout'|trans}} &euro;
-                                                                                {{ instrument.dividend.predicted_payment[ckey]|number_format(2) }}
-                                                                                <span class="font-semibold">
-                                                                                    {% set monthlyPayment = instrument.dividend.predicted_payment[ckey] *(instrument.dividend.frequency/12) %}
-                                                                                    {% set monthlyYield = (monthlyPayment / instrument.priceAvgInvestedValue) *100 %}
-                                                                                    {% set yearlyYield = monthlyYield * 12 %}
-                                                                                    <small>({{ monthlyYield|number_format(3) }}% - {{ yearlyYield|number_format(3) }}%)</small>
-                                                                                </span>
+                                                                                {% if instrument.dividend.predicted_payment.ckey is defined %}
+                                                                                    {{ instrument.dividend.predicted_payment[ckey]|number_format(2) }}
+
+                                                                                    <span class="font-semibold">
+                                                                                        {% set monthlyPayment = instrument.dividend.predicted_payment[ckey] *(instrument.dividend.frequency/12) %}
+                                                                                        {% set monthlyYield = (monthlyPayment / instrument.priceAvgInvestedValue) *100 %}
+                                                                                        {% set yearlyYield = monthlyYield * 12 %}
+                                                                                        <small>({{ monthlyYield|number_format(3) }}% - {{ yearlyYield|number_format(3) }}%)</small>
+                                                                                    </span>
+                                                                                {% endif %}
                                                                             </li>
                                                                         </ul>
                                                                     </li>

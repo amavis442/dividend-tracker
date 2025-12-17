@@ -160,6 +160,9 @@ class Position
     private ?float $adjustedAmount = null;
     private ?float $adjustedAveragePrice = null;
 
+    #[ORM\ManyToOne]
+    private ?Instrument $instrument = null;
+
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
     {
@@ -878,6 +881,18 @@ class Position
     public function setAdjustedAveragePrice(?float $adjustedAveragePrice): static
     {
         $this->adjustedAveragePrice = $adjustedAveragePrice;
+
+        return $this;
+    }
+
+    public function getInstrument(): ?Instrument
+    {
+        return $this->instrument;
+    }
+
+    public function setInstrument(?Instrument $instrument): static
+    {
+        $this->instrument = $instrument;
 
         return $this;
     }
