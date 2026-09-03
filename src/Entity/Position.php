@@ -231,7 +231,7 @@ class Position
 
     public function getAmount(): float
     {
-        return $this->amount ?? 0.0;
+        return $this->amount;
     }
 
     public function setAmount(float $amount): self
@@ -284,7 +284,7 @@ class Position
 
     public function getAllocation(): float
     {
-        return $this->allocation ?? 0.0;
+        return $this->allocation;
     }
 
     public function setAllocation(float $allocation): self
@@ -650,7 +650,7 @@ class Position
      */
     public function getForwardNetDividendYieldPerShare(): float
     {
-        return $this->forwardNetDividendYieldPerShare ?? 0;
+        return $this->forwardNetDividendYieldPerShare;
     }
 
     /**
@@ -675,7 +675,7 @@ class Position
      */
     public function getNetDividendPerShare(): float
     {
-        return $this->netDividendPerShare ?? 0.0;
+        return $this->netDividendPerShare;
     }
 
     /**
