@@ -3,21 +3,15 @@
 namespace App\Service\Trading212\Factory;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\PaymentRepository;
 use Symfony\UX\Chartjs\Model\Chart;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use App\Helper\Colors;
 use App\Entity\Pie;
-use App\Service\Trading212\CalcStatsService;
-use Doctrine\Common\Collections\Collection;
-
 
 final class ChartBuilderFactory
 {
     public function __construct(
         private readonly ChartBuilderInterface $chartBuilder,
-        private readonly CalcStatsService $calcStatsService,
         private readonly TranslatorInterface $translator,
     ) {}
 

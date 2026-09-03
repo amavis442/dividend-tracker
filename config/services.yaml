@@ -141,13 +141,7 @@ services:
             $entityManager: '@doctrine.orm.entity_manager'
 
     Doctrine\Migrations\Version\DbalMigrationFactory: ~
-    App\Migrations\Factory\MigrationFactoryDecorator:
-        decorates: Doctrine\Migrations\Version\DbalMigrationFactory
-        arguments:
-            [
-                '@App\Migrations\Factory\MigrationFactoryDecorator.inner',
-                '@service_container',
-            ]
+
 
     App\ViewModel\PortfolioViewModel:
         bind:
