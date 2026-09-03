@@ -4,7 +4,7 @@ stages:
   - deployment
 
 default:
-  image: phpdockerio/php:8.3-fpm
+  image: phpdockerio/php:8.4-fpm
   services:
     - name: postgres:16-alpine
       alias: postgresql
