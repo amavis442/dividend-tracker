@@ -72,29 +72,34 @@ class PieDataProvider
         }
 
         /**
-         * From those positions we only need the ticker Id
+         * From those positions we only need the ticker
          *
-         * @var Collection<int, int> $tickerIds
+         * @var Collection<int, \App\Entity\Ticker> $tickers
          */
-        $tickerIds = $positions->map(fn($p) => $p->getTicker());
+        $tickers = $positions->map(fn($p) => $p->getTicker());
 
-        if ($tickerIds->isEmpty()) {
+        if ($tickers->isEmpty()) {
             throw new NotFoundHttpException('No tickers found for this pie.');
         }
+
+        /**
+         * @var Collection<int,int> $tickerIds
+         */
+        $tickerIds = $tickers->map(fn($t) => $t->getId());
 
         /**
          * Get the corporate actions per ticker
          *
          * @var Collection<int, CorporateAction> $corporateActions
          */
-        $corporateActions = new ArrayCollection($this->corporateActionDataProvider->load($tickerIds->toArray()));
+        $corporateActions = new ArrayCollection($this->corporateActionDataProvider->load($tickers->toArray()));
 
         /**
          * Get the dividend Calendars per ticker
          *
          * @var Collection<int, array<int, Calendar>> $dividends
          */
-        $dividends = new ArrayCollection($this->dividendDataProvider->load($tickerIds->toArray()));
+        $dividends = new ArrayCollection($this->dividendDataProvider->load($tickers->toArray()));
 
         return new PieDataDto(
             metaData: $metaDatas,
