@@ -4,7 +4,6 @@ namespace App\Form;
 
 use App\Entity\ApiKey;
 use App\Entity\ApiKeyName;
-use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
