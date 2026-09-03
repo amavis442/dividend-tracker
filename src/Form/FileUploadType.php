@@ -25,7 +25,7 @@ class FileUploadType extends AbstractType
                 // every time you edit the Product details
                 'required' => false,
 
-                // unmapped fields can't define their validation using annotations
+                // unmapped fields can't define their validation using Attributes
                 // in the associated entity, so you can use the PHP constraint classes
                 /*'constraints' => [
                 new File([
