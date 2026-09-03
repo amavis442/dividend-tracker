@@ -7,6 +7,7 @@ use App\Entity\Position;
 use App\Form\PaymentType;
 use App\Repository\PaymentRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,7 +31,7 @@ class PaymentController extends AbstractController
 	public function createPayment(
 		Request $request,
 		EntityManagerInterface $entityManager,
-		Position $position
+		#[MapEntity] Position $position
 	) {
 		$payment = new Payment();
 		$payment->setPosition($position);
@@ -70,7 +71,7 @@ class PaymentController extends AbstractController
 		Request $request,
 		EntityManagerInterface $entityManager,
 		PaymentRepository $paymentRepository,
-		Payment $payment,
+		#[MapEntity] Payment $payment,
 		int $page = 1
 	) {
 		$form = $this->createForm(PaymentType::class, $payment);
@@ -124,8 +125,8 @@ class PaymentController extends AbstractController
 	public function deletePayment(
 		Request $request,
 		EntityManagerInterface $entityManager,
-		Payment $payment,
-		Position $position
+		#[MapEntity] Payment $payment,
+		#[MapEntity] Position $position
 	): Response {
 		if (
 			$this->isCsrfTokenValid(
@@ -152,7 +153,7 @@ class PaymentController extends AbstractController
 		)
 	]
 	public function showPayments(
-		Position $position,
+		#[MapEntity] Position $position,
 		PaymentRepository $paymentRepository,
 		int $page = 1
 	): Response {

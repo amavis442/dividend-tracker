@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/pie')]
 class PieController extends AbstractController
@@ -45,7 +46,7 @@ class PieController extends AbstractController
     }
 
     #[Route(path: '/{id}', name: 'pie_show', methods: ['GET'])]
-    public function show(Pie $pie): Response
+    public function show(#[MapEntity] Pie $pie): Response
     {
         return $this->render('pie/show.html.twig', [
             'pie' => $pie,
@@ -53,7 +54,7 @@ class PieController extends AbstractController
     }
 
     #[Route(path: '/{id}/edit', name: 'pie_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, EntityManagerInterface $entityManager, Pie $pie): Response
+    public function edit(Request $request, EntityManagerInterface $entityManager, #[MapEntity] Pie $pie): Response
     {
         $form = $this->createForm(PieType::class, $pie);
         $form->handleRequest($request);
@@ -73,7 +74,7 @@ class PieController extends AbstractController
     #[Route(path: '/delete/{id}', name: 'pie_delete', methods: ['POST', 'DELETE'])]
     public function delete(Request $request,
         EntityManagerInterface $entityManager,
-        Pie $pie,
+        #[MapEntity] Pie $pie,
         TransactionRepository $transactionRepository,
         ): Response
     {

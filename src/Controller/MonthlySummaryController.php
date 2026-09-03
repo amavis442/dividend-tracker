@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/monthly/summary')]
 final class MonthlySummaryController extends AbstractController
@@ -47,7 +48,7 @@ final class MonthlySummaryController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_monthly_summary_show', methods: ['GET'])]
-    public function show(MonthlySummary $monthlySummary): Response
+    public function show(#[MapEntity] MonthlySummary $monthlySummary): Response
     {
         return $this->render('monthly_summary/show.html.twig', [
             'monthly_summary' => $monthlySummary,
@@ -55,7 +56,7 @@ final class MonthlySummaryController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_monthly_summary_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, MonthlySummary $monthlySummary, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, #[MapEntity] MonthlySummary $monthlySummary, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(MonthlySummaryType::class, $monthlySummary);
         $form->handleRequest($request);
@@ -73,7 +74,7 @@ final class MonthlySummaryController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_monthly_summary_delete', methods: ['POST'])]
-    public function delete(Request $request, MonthlySummary $monthlySummary, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, #[MapEntity] MonthlySummary $monthlySummary, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$monthlySummary->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($monthlySummary);

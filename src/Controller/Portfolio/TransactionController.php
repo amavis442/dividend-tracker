@@ -14,6 +14,7 @@ use App\Service\ExchangeRate\ExchangeAndTaxResolverInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,7 +34,7 @@ class TransactionController extends AbstractController
 		)
 	]
 	public function showOrders(
-		Position $position,
+		#[MapEntity] Position $position,
 		TransactionRepository $transactionRepository,
 		DividendServiceInterface $dividendService,
 		ExchangeAndTaxResolverInterface $exchangeAndTaxResolver,
@@ -90,7 +91,7 @@ class TransactionController extends AbstractController
 	]
 	public function updatePie(
 		Request $request,
-		Transaction $transaction,
+		#[MapEntity] Transaction $transaction,
 		EntityManagerInterface $entityManager,
 		TransactionRepository $transactionRepository
 	): Response {
@@ -127,7 +128,7 @@ class TransactionController extends AbstractController
 	]
 	public function updatePieBulk(
 		Request $request,
-		Position $position,
+		#[MapEntity] Position $position,
 		EntityManagerInterface $entityManager,
 		TransactionRepository $transactionRepository,
 		PositionRepository $positionRepository,

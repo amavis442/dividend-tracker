@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/taxonomy')]
 class TaxonomyController extends AbstractController
@@ -48,7 +49,7 @@ class TaxonomyController extends AbstractController
 	}
 
 	#[Route(path: '/{id}', name: 'app_taxonomy_show', methods: ['GET'])]
-	public function show(Taxonomy $taxonomy): Response
+	public function show(#[MapEntity] Taxonomy $taxonomy): Response
 	{
 		return $this->render('taxonomy/show.html.twig', [
 			'taxonomy' => $taxonomy,
@@ -64,7 +65,7 @@ class TaxonomyController extends AbstractController
 	]
 	public function edit(
 		Request $request,
-		Taxonomy $taxonomy,
+		#[MapEntity] Taxonomy $taxonomy,
 		TaxonomyRepository $taxonomyRepository
 	): Response {
 		$form = $this->createForm(TaxonomyType::class, $taxonomy);
@@ -96,7 +97,7 @@ class TaxonomyController extends AbstractController
 	public function delete(
 		Request $request,
 		EntityManagerInterface $entityManager,
-		Taxonomy $taxonomy
+		#[MapEntity] Taxonomy $taxonomy
 	): Response {
 		if (
 			$this->isCsrfTokenValid(

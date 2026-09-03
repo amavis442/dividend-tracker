@@ -23,6 +23,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/transaction')]
 class TransactionController extends AbstractController
@@ -106,7 +107,7 @@ class TransactionController extends AbstractController
         ]);
     }
 
-    private function presetMetrics(Transaction $transaction)
+    private function presetMetrics(#[MapEntity] Transaction $transaction)
     {
         $transaction->calcAllocation();
         $transaction->calcPrice();
@@ -131,7 +132,7 @@ class TransactionController extends AbstractController
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
-        Position $position,
+        #[MapEntity] ?Position $position,
         WeightedAverage $weightedAverage,
         Referer $referer,
         ExchangeRateInterface $euExchangeRateService
@@ -204,7 +205,7 @@ class TransactionController extends AbstractController
     }
 
     #[Route(path: '/{id}', name: 'transaction_show', methods: ['GET'])]
-    public function show(Transaction $transaction): Response
+    public function show(#[MapEntity] Transaction $transaction): Response
     {
         return $this->render('transaction/show.html.twig', [
             'transaction' => $transaction,
@@ -221,7 +222,7 @@ class TransactionController extends AbstractController
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
-        Transaction $transaction,
+        #[MapEntity] Transaction $transaction,
         WeightedAverage $weightedAverage,
         Referer $referer
     ): Response {
@@ -267,7 +268,7 @@ class TransactionController extends AbstractController
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,
-        Transaction $transaction,
+        #[MapEntity] Transaction $transaction,
         WeightedAverage $weightedAverage,
         Referer $referer
     ): Response {

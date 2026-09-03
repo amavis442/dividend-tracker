@@ -2,6 +2,7 @@
 
 namespace App\Controller\Trading212;
 
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -25,8 +26,8 @@ final class Trading212InstrumentController extends AbstractController
 
 	#[Route('/{pie}/{ticker}', name: 'app_report_trading212_instrument_index')]
 	public function index(
-		Pie $pie,
-		Ticker $ticker,
+		#[MapEntity] Pie $pie,
+		#[MapEntity] Ticker $ticker,
 		Trading212PieInstrumentRepository $instrumentRepository,
 		ChartBuilderInterface $chartBuilder,
 		TranslatorInterface $translator

@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route('/{_locale<%app.supported_locales%>}/dashboard/admin/apikeys')]
 final class ApiKeyNameController extends AbstractController
@@ -62,7 +63,7 @@ final class ApiKeyNameController extends AbstractController
 	}
 
 	#[Route('/{id}', name: 'app_api_key_name_show', methods: ['GET'])]
-	public function show(ApiKeyName $apiKeyName): Response
+	public function show(#[MapEntity] ApiKeyName $apiKeyName): Response
 	{
 		return $this->render('api_key_name/show.html.twig', [
 			'api_key_name' => $apiKeyName,
@@ -78,7 +79,7 @@ final class ApiKeyNameController extends AbstractController
 	]
 	public function edit(
 		Request $request,
-		ApiKeyName $apiKeyName,
+		#[MapEntity] ApiKeyName $apiKeyName,
 		EntityManagerInterface $entityManager
 	): Response {
 		$form = $this->createForm(ApiKeyNameType::class, $apiKeyName);
@@ -103,7 +104,7 @@ final class ApiKeyNameController extends AbstractController
 	#[Route('/{id}', name: 'app_api_key_name_delete', methods: ['POST'])]
 	public function delete(
 		Request $request,
-		ApiKeyName $apiKeyName,
+		#[MapEntity] ApiKeyName $apiKeyName,
 		EntityManagerInterface $entityManager
 	): Response {
 		if (

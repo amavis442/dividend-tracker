@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route('/{_locale<%app.supported_locales%>}/dashboard/corporate/action')]
 final class CorporateActionController extends AbstractController
@@ -43,7 +44,7 @@ final class CorporateActionController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_corporate_action_show', methods: ['GET'])]
-    public function show(CorporateAction $corporateAction): Response
+    public function show(#[MapEntity] CorporateAction $corporateAction): Response
     {
         return $this->render('corporate_action/show.html.twig', [
             'corporate_action' => $corporateAction,
@@ -51,7 +52,7 @@ final class CorporateActionController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_corporate_action_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, CorporateAction $corporateAction, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, #[MapEntity] CorporateAction $corporateAction, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(CorporateActionType::class, $corporateAction);
         $form->handleRequest($request);
@@ -69,7 +70,7 @@ final class CorporateActionController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_corporate_action_delete', methods: ['POST'])]
-    public function delete(Request $request, CorporateAction $corporateAction, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, #[MapEntity] CorporateAction $corporateAction, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$corporateAction->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($corporateAction);

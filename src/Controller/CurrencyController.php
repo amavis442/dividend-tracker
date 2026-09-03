@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/currency')]
 class CurrencyController extends AbstractController
@@ -53,7 +54,7 @@ class CurrencyController extends AbstractController
 	}
 
 	#[Route(path: '/{id}', name: 'currency_show', methods: ['GET'])]
-	public function show(Currency $currency): Response
+	public function show(#[MapEntity] Currency $currency): Response
 	{
 		return $this->render('currency/show.html.twig', [
 			'currency' => $currency,
@@ -70,7 +71,7 @@ class CurrencyController extends AbstractController
 	public function edit(
 		Request $request,
 		EntityManagerInterface $entityManager,
-		Currency $currency
+		#[MapEntity] Currency $currency
 	): Response {
 		$form = $this->createForm(CurrencyType::class, $currency);
 		$form->handleRequest($request);
@@ -97,7 +98,7 @@ class CurrencyController extends AbstractController
 	public function delete(
 		Request $request,
 		EntityManagerInterface $entityManager,
-		Currency $currency,
+		#[MapEntity] Currency $currency,
 		TickerRepository $tickerRepository,
 		PositionRepository $positionRepository,
 		PaymentRepository $paymentRepository,

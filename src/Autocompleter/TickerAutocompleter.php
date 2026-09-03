@@ -26,6 +26,7 @@ class TickerAutocompleter implements OptionsAwareEntityAutocompleterInterface
 		return Ticker::class;
 	}
 
+	
 	/**
 	 * @param array<string, mixed> $options
 	 */

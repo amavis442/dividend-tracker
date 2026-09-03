@@ -41,6 +41,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 /** @psalm-suppress PropertyNotSetInConstructor */
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/portfolio')]
@@ -104,7 +105,7 @@ class PortfolioController extends AbstractController
 		}
 
 		/**
-		 * @var \App\Entity\User $user
+		 * @var \#[MapEntity] App\Entity\User $user
 		 */
 		$user = $this->getUser();
 		$portfolio = $portfolioRepository->findOneBy([
@@ -250,7 +251,7 @@ class PortfolioController extends AbstractController
 		$growth = $dividendGrowth->getData($ticker);
 
 		/**
-		 * @var \App\Entity\User $user
+		 * @var \#[MapEntity] App\Entity\User $user
 		 */
 		$user = $this->getUser();
 		$portfolio = $portfolioRepository->findOneBy([
@@ -487,7 +488,7 @@ class PortfolioController extends AbstractController
 		}
 
 		/**
-		 * @var \App\Entity\User $user
+		 * @var \#[MapEntity] App\Entity\User $user
 		 */
 		$user = $this->getUser();
 		$portfolio = $portfolioRepository->findOneBy([
@@ -546,7 +547,7 @@ class PortfolioController extends AbstractController
 		)
 	]
 	public function showPosition(
-		Position $position,
+		#[MapEntity] Position $position,
 		PositionRepository $positionRepository,
 		TransactionDataProvider $transactionDataProvider,
 		CorporateActionDataProvider $corporateActionDataProvider,

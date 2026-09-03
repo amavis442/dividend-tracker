@@ -75,7 +75,7 @@ class ImportCsvServiceTest extends KernelTestCase
 
 		self::bootKernel();
 		$entityManager = self::getContainer()->get('doctrine')->getManager();
-		$entityManager->clear(); // Optional: $entityManager->close();
+		$entityManager->clear();
 	}
 
 	public function testImportsDividendWithAuthenticatedUser(): void

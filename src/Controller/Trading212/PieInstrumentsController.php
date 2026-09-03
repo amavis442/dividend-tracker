@@ -8,6 +8,7 @@ use App\Repository\PaymentRepository;
 use App\Repository\TickerRepository;
 use App\Service\ExchangeRate\ExchangeRateInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -47,7 +48,7 @@ class PieInstrumentsController extends AbstractController
 	// up into several parts.
 	#[Route('/pie-instruments/{pie}', name: 'app_report_trading212_pie_instruments')]
 	public function index(
-		Pie $pie,
+		#[MapEntity] Pie $pie,
 		EntityManagerInterface $entityManager,
 	): Response {
 

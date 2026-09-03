@@ -8,6 +8,7 @@ use App\Repository\TickerAlternativeSymbolRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -83,7 +84,7 @@ final class TickerAlternativeSymbolController extends AbstractController
 		)
 	]
 	public function show(
-		TickerAlternativeSymbol $tickerAlternativeSymbol
+		#[MapEntity] TickerAlternativeSymbol $tickerAlternativeSymbol
 	): Response {
 		return $this->render('ticker_alternative_symbol/show.html.twig', [
 			'ticker_alternative_symbol' => $tickerAlternativeSymbol,
@@ -108,7 +109,7 @@ final class TickerAlternativeSymbolController extends AbstractController
 	]
 	public function edit(
 		Request $request,
-		TickerAlternativeSymbol $tickerAlternativeSymbol,
+		#[MapEntity] TickerAlternativeSymbol $tickerAlternativeSymbol,
 		EntityManagerInterface $entityManager
 	): Response {
 		$form = $this->createForm(
@@ -148,7 +149,7 @@ final class TickerAlternativeSymbolController extends AbstractController
 	]
 	public function delete(
 		Request $request,
-		TickerAlternativeSymbol $tickerAlternativeSymbol,
+		#[MapEntity] TickerAlternativeSymbol $tickerAlternativeSymbol,
 		EntityManagerInterface $entityManager
 	): Response {
 		if (

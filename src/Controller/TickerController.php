@@ -16,6 +16,7 @@ use App\Service\Referer;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/admin/ticker')]
 class TickerController extends AbstractController
@@ -120,7 +121,7 @@ class TickerController extends AbstractController
 	}
 
 	#[Route(path: '/{id}', name: 'ticker_show', methods: ['GET'])]
-	public function show(Ticker $ticker): Response
+	public function show(#[MapEntity] Ticker $ticker): Response
 	{
 		return $this->render('ticker/show.html.twig', [
 			'ticker' => $ticker,
@@ -132,7 +133,7 @@ class TickerController extends AbstractController
 		Request $request,
 		Referer $referer,
 		EntityManagerInterface $entityManager,
-		Ticker $ticker
+		#[MapEntity] Ticker $ticker
 	): Response {
 		$form = $this->createForm(TickerType::class, $ticker);
 		$form->handleRequest($request);
@@ -164,7 +165,7 @@ class TickerController extends AbstractController
 	public function delete(
 		Request $request,
 		EntityManagerInterface $entityManager,
-		Ticker $ticker
+		#[MapEntity] Ticker $ticker
 	): Response {
 		if (
 			$this->isCsrfTokenValid(

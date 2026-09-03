@@ -23,6 +23,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/payment')]
 class PaymentController extends AbstractController
@@ -229,7 +230,7 @@ class PaymentController extends AbstractController
 	}
 
 	#[Route(path: '/{id}', name: 'payment_show', methods: ['GET'])]
-	public function show(Payment $payment): Response
+	public function show(#[MapEntity] Payment $payment): Response
 	{
 		return $this->render('payment/show.html.twig', [
 			'payment' => $payment,
@@ -240,7 +241,7 @@ class PaymentController extends AbstractController
 	public function edit(
 		Request $request,
 		EntityManagerInterface $entityManager,
-		Payment $payment,
+		#[MapEntity] Payment $payment,
 		Referer $referer
 	): Response {
 		$form = $this->createForm(PaymentType::class, $payment);

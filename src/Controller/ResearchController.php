@@ -21,6 +21,7 @@ use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/research')]
 class ResearchController extends AbstractController
@@ -117,7 +118,7 @@ class ResearchController extends AbstractController
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
-        ?Ticker $ticker,
+        #[MapEntity] ?Ticker $ticker,
         FileUploader $fileUploader,
         Referer $referer
     ): Response {
@@ -158,7 +159,7 @@ class ResearchController extends AbstractController
     }
 
     #[Route(path: '/show/{id}', name: 'research_show', methods: ['GET'])]
-    public function show(Research $research): Response
+    public function show(#[MapEntity] Research $research): Response
     {
         return $this->render('research/show.html.twig', [
             'research' => $research,
@@ -175,7 +176,7 @@ class ResearchController extends AbstractController
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
-        Research $research,
+        #[MapEntity] Research $research,
         FileUploader $fileUploader,
         Referer $referer
     ): Response {
@@ -220,7 +221,7 @@ class ResearchController extends AbstractController
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,
-        Research $research,
+        #[MapEntity] Research $research,
         Referer $referer
     ): Response {
         if (
@@ -256,7 +257,7 @@ class ResearchController extends AbstractController
         )
     ]
     public function deleteAttachment(
-        Attachment $attachment,
+        #[MapEntity] Attachment $attachment,
         Request $request,
         EntityManagerInterface $entityManager
     ): Response {

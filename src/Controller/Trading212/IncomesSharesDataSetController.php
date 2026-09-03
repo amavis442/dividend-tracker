@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
@@ -386,7 +387,7 @@ final class IncomesSharesDataSetController extends AbstractController
 		)
 	]
 	public function show(
-		IncomesSharesDataSet $incomesSharesDataSet,
+		#[MapEntity] IncomesSharesDataSet $incomesSharesDataSet,
 		IncomesSharesDataRepository $incomesSharesDataRepository,
 		ExchangeRateInterface $exchangeRateService
 	): Response {
@@ -611,7 +612,7 @@ final class IncomesSharesDataSetController extends AbstractController
 	]
 	public function edit(
 		Request $request,
-		IncomesSharesDataSet $incomesSharesDataSet,
+		#[MapEntity] IncomesSharesDataSet $incomesSharesDataSet,
 		EntityManagerInterface $entityManager
 	): Response {
 		$form = $this->createForm(
@@ -723,7 +724,7 @@ final class IncomesSharesDataSetController extends AbstractController
 	]
 	public function delete(
 		Request $request,
-		IncomesSharesDataSet $incomesSharesDataSet,
+		#[MapEntity] IncomesSharesDataSet $incomesSharesDataSet,
 		EntityManagerInterface $entityManager
 	): Response {
 		if (
