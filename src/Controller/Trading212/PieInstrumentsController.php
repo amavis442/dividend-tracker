@@ -128,12 +128,12 @@ class PieInstrumentsController extends AbstractController
 		}
 		$yearlyDividendPercentage =
 			$metaData->getPriceAvgInvestedValue() > 0
-			? ($totalMonthlyDividend * static::MONTHS_IN_YEAR) /
+			? ($totalMonthlyDividend * self::MONTHS_IN_YEAR) /
 			$metaData->getPriceAvgInvestedValue()
 			: 0;
 		$stats['yearlyDividendPercentage'] = $yearlyDividendPercentage * 100;
 		$stats['monthlyDividend'] = $totalMonthlyDividend;
-		$stats['yearlyDividend'] = $totalMonthlyDividend * static::MONTHS_IN_YEAR;
+		$stats['yearlyDividend'] = $totalMonthlyDividend * self::MONTHS_IN_YEAR;
 
 		$payments = new ArrayCollection($this->paymentRepository->getLastDividends($tickers));
 		$dataInstruments = $this->instrumentDecorator->instruments(
@@ -196,9 +196,9 @@ class PieInstrumentsController extends AbstractController
 		$periodEstimatedBreakEven['months'] =
 			$monthsEstimatedBreakEven - $yearsEstimatedBreakEven * 12;
 		$pieYield =
-			((static::MONTHS_IN_YEAR * $pieDividend) / $metaData->getPriceAvgInvestedValue()) * 100;
+			((self::MONTHS_IN_YEAR * $pieDividend) / $metaData->getPriceAvgInvestedValue()) * 100;
 		$pieYieldAvg =
-			((static::MONTHS_IN_YEAR * $pieAvgDividend) / $metaData->getPriceAvgInvestedValue()) *
+			((self::MONTHS_IN_YEAR * $pieAvgDividend) / $metaData->getPriceAvgInvestedValue()) *
 			100;
 
 		return $this->render(
