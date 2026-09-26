@@ -42,14 +42,24 @@ rm /tmp/issue-description.md
 
 Note the issue number from the output (e.g. `#42`).
 
-## 2. Pull latest main
+## 2. Set issue to Doing
+
+Before writing any code, set the issue status to **Doing**:
+
+```bash
+glab issue update <id> --label "Doing" --unlabel "To Do"
+```
+
+Skip this step? The issue stays on the board as "to do" and another dev may pick it up. **Always do this before starting implementation.**
+
+## 3. Pull latest main
 
 ```bash
 git switch main
 git pull origin main
 ```
 
-## 3. Create a feature branch
+## 4. Create a feature branch
 
 Naming: `{issue-number}-short-description` — use the same slug as the issue.
 
