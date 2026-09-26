@@ -1,0 +1,279 @@
+# Dividend — Symfony upgrade 6.4 → 8.1
+
+## Project context
+
+Trading/dividend tracking app. Symfony PHP framework 8.1, PHP 8.4+, Doctrine ORM, API Platform, Twig templates, Tailwind, UX bundles (ChartJS, Autocomplete, Turbo).
+
+Namespace: `App\` → PSR-4 `src/`  
+Test namespace: `App\Tests\` → `tests/`
+
+Composer require: `"symfony": {"require": "8.1.*"}`  
+PHP: `>=8.4`  
+Config: `config/services.yaml`, YAML parameters via `%param.name%`
+
+### GitLab / glab
+
+`glab` is the CLI tool for GitLab. Use it for all GitLab interactions:
+
+```bash
+glab issue create     # create issue
+glab issue list       # list open issues
+glab issue view #N    # view issue details
+glab mr create        # open merge request
+glab mr view          # check MR status
+glab mr approve       # approve an MR
+glab ci list          # list CI pipelines
+glab ci view          # view CI job details
+```
+
+See `.ai/skills/feature-workflow.md` for the full feature creation workflow.
+
+---
+
+## PHP 8.x strict mode
+
+1. **`declare(strict_types=1)`** — always present in every entry-point file. Never use `declare(strict_types=0)` or omit it.
+
+2. **Typed properties** — all class properties MUST declare their type:
+   ```php
+   private ?int $id = null;
+   private string $label;
+   private float $goal = 0.0;
+   private Collection $positions;
+   ```
+
+3. **Return type syntax** — use PHP 8.x `: type` syntax for all methods & functions:
+   ```php
+   public function getName(): string
+   public function findById(int $id): ?Entity
+   public function buildForm(FormBuilderInterface $builder, array $options): void
+   ```
+   Return `: self` for fluent setters, `: static` when returning `$this` from a non-final class.
+
+4. **Parameter types** — every parameter must have a declared type:
+   ```php
+   public function setLabel(string $label): self
+   public function setGoal(float $goal): static
+   ```
+
+5. **Nullable** — prefix `?` on nullable types: `?int`, `?string`, `?User`
+
+6. **`use` imports** — always import global classes explicitly:
+   ```php
+   use DateTime;
+   use DateTimeInterface;
+   use RuntimeException;
+   ```
+
+7. **No PHPDoc for types** — type information goes in native syntax, not PHPDoc `@param`/`@return`. PHPDoc is only for descriptions/documentation.
+
+8. **Attributes over annotations** — all Doctrine, Symfony, and API Platform metadata MUST use `#[...]` attribute syntax. Never `@Annotation` syntax (6.4 style).
+
+9. **Named arguments in attributes** — use named argument syntax:
+   ```php
+   #[Route(path: '/...', name: 'route_name')]
+   #[ORM\Column(type: 'string', length: 255)]
+   ```
+
+---
+
+## Symfony 8.1 framework conventions
+
+### Controllers
+
+- Extend `Symfony\Bundle\FrameworkBundle\Controller\AbstractController`
+- Service tag: `tags: ['controller.service_arguments']` in `config/services.yaml`
+- Inject repositories/translators/services as action method arguments (autowired)
+- Route attribute on class for prefix, on method for specific paths
+- Return `Response` or render via `$this->render('template.html.twig', [...])`
+- Redirect via `$this->redirectToRoute('route_name', ['_locale' => 'nl'])`
+
+```php
+#[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/tracker')]
+class DividendTrackerController extends AbstractController
+{
+    #[Route(path: '/dividend/{year}', name: 'dividend_tracker', requirements: ['year' => '\d+'])]
+    public function index(
+        PaymentRepository $paymentRepository,
+        TranslatorInterface $translator,
+        int $year = 1
+    ): Response {
+        return $this->render('dividend_tracker/index.html.twig', [...]);
+    }
+}
+```
+
+### Entities (Doctrine ORM)
+
+- Use `Doctrine\ORM\Mapping as ORM` import, then `#[ORM\Table]`, `#[ORM\Column]`, etc.
+- API Platform: `#[ApiResource(...)]` for REST exposure
+- Serialization groups: `#[Groups(['group:read', 'group:write'])]`
+- Fluent setters: return `: self` or `: static`
+- Always `#[ORM\HasLifecycleCallbacks]` when using prePersist/postPersist etc.
+- Use typed Collection: `Doctrine\Common\Collections\Collection` + `ArrayCollection`
+- Specify `targetEntity:` in relation attributes when the target is a string name
+- Always specify `inversedBy` / `mappedBy` on bidirectional relations
+
+```php
+#[ApiResource(
+    normalizationContext: ['groups' => ['pie:read']],
+    denormalizationContext: ['groups' => ['pie:write']],
+    security: 'is_granted("ROLE_USER")',
+    operations: [new Get(), new GetCollection(), new Post()]
+)]
+#[ORM\Table(name: 'pie')]
+#[ORM\Entity(repositoryClass: 'App\Repository\PieRepository')]
+class Pie
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
+
+    #[Groups(['pie:read', 'pie:write'])]
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $label;
+}
+```
+
+### Forms
+
+- Extend `Symfony\Component\Form\AbstractType`
+- Implement `buildForm(FormBuilderInterface $builder, array $options): void`
+- Implement `configureOptions(OptionsResolver $resolver): void`
+- Use builder chaining: `$builder->add('field')->add('field2', null, ['required' => false])`
+- Options resolver for defaults: `$resolver->setDefaults(['data_class' => Entity::class])`
+
+### Services & DI
+
+- Config in `config/services.yaml` with `autowire: true` (default)
+- Fully-qualified class name as service ID: e.g. `App\Helper\DateHelper`
+- Controller action arguments are autowired — no manual DI in controllers
+- Event listeners: tag with `kernel.event_listener`, event name in `event:` and `method:`
+
+### Security
+
+- API Platform: `security: 'is_granted("ROLE_USER")'` in `#[ApiResource]`
+- Route security goes in `config/packages/security.yaml` (if present)
+
+### Twig templates
+
+- Template path format: `controller_action.html.twig` in subdirectory per controller
+- Translation: `$translator->trans('key')` in PHP, `{{ 'key'|trans }}` in Twig
+- importmap for JS assets: use `{{ importmap('app') }}` in templates
+
+### API Platform
+
+- Operations: `new Get()`, `new GetCollection()`, `new Post()`, `new Put()`, `new Patch()`, `new Delete()`
+- Normalization/denormalization context via groups
+- Groups format: `entity:action` — e.g. `pie:read`, `transaction:write`
+
+---
+
+## Migration patterns (6.4 → 8.1)
+
+These patterns fix code still on 6.4 conventions:
+
+| 6.4 (oud) | 8.1 (nieuw) |
+|---|---|
+| `@Route(...)` annotation | `#[Route(...)]` attribute |
+| `@ORM\Table(...)` annotation | `#[ORM\Table(...)]` attribute |
+| `@Groups({...})` | `#[Groups([...])]` |
+| `/** @var Type */` doc for props | `private Type $prop;` typed property |
+| `function foo(): ReturnType` return after params | same — no change, but check colon spacing |
+| `$this->container->get(id)` | constructor/argument injection |
+| `@param`/`@return` for types | native type syntax; PHPDoc only for descriptions |
+| `DateTime('Y-m-d')` | `new DateTime('Y-m-d')` |
+
+Rector is configured in `rector.php` with sets:
+- `DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES`
+- `SymfonySetList::ANNOTATIONS_TO_ATTRIBUTES`
+- `SensiolabsSetList::FRAMEWORK_EXTRA_61`
+
+Run: `vendor/bin/rector process` (works on `src/`).
+
+PHPStan analysis: `composer phpstan` (level 5, memory 1024M).  
+CS check: `composer cscheck` (phpcs).  
+CS fix: `composer csfix` (phpcbf).  
+Tests: `composer phpunit` (with coverage).
+
+---
+
+## Architecture & design principles
+
+### SOLID
+
+- **Single Responsibility**: each class has one reason to change. Controllers handle routing+rendering only, Forms handle form building only, Entities are data+behavior only.
+- **Open/Closed**: extend via dependency injection and interface implementation, not class modification.
+- **Liskov**: interfaces (`Contracts/`) define contracts; implementations are swappable.
+- **Interface Segregation**: small focused interfaces (`StockPricePluginInterface`, `DividendDatePluginInterface`).
+- **Dependency Inversion**: high-level code depends on interfaces (in `Contracts/`), not concrete classes.
+
+### DRY
+
+- Extract repeated query logic into Repository methods
+- Shared validation in Form types with `configureOptions()`
+- Common view partials in `templates/_shared/` or via Twig `include`/`embed`
+
+### KISS
+
+- Controllers: thin — delegate business logic to services/repositories
+- Forms: one class per form, no inheritance chains deeper than AbstractType → YourType
+- Entities: plain objects with getters, fluent setters, and collection management
+
+### Clean Architecture layers
+
+```
+src/
+  Controller/       ← Framework layer (routing, HTTP)
+  Form/             ← Input validation & construction
+  Entity/           ← Domain models (Doctrine ORM)
+  Repository/       ← Data access
+  Contracts/        ← Interfaces / ports
+    Service/        ←   Domain service interfaces
+  Helper/           ← Pure utility functions (no DI)
+  Serializer/       ← API Platform context builders
+  State/            ← Post-processors
+  Autocompleter/    ← UX autocomplete providers
+  EventListener/    ← Kernel event listeners
+  Doctrine/         ← Custom Doctrine types/functions
+```
+
+Dependencies point INWARD: Controller → Form/Service(interface) → Entity.  
+No Entity depends on Controller. No Form depends on Repository directly.
+
+### Language
+
+- **Documentation**: English — all code comments, README, CONTRIBUTING, and project documentation must be in English
+- **Git commits**: English — commit messages, PR titles, and CHANGELOG in English. Use conventional commits: `type(scope): description`
+- **User-facing translations**: Dutch — via Symfony Translation system (`translations/*.yaml`), keys in PHP/Twig remain English
+
+## Coding conventions
+
+- **Attributes** before properties, properties before constructor, constructor before methods
+- **Methods**: private helpers below public API
+- **Fluent API**: setters return `: self` or `: static` for chaining
+- **No magic numbers/strings**: define as `public const CONST_NAME = value` on the relevant class
+- **Collections**: initialize in `__construct()` with `new ArrayCollection()`
+- **Imports order**: 1) built-in (`DateTime`), 2) first-party (`App\*`), 3) Symfony, 4) Doctrine, 5) vendor
+- **No `@var` type hints** in PHPDoc — use typed properties instead
+- **No `@Annotation` syntax** — must use `#[Attribute]` syntax
+- **Nullable entities**: `?` prefix, not `@param Type|null` in PHPDoc
+
+---
+
+## Upgrade pitfall checklist
+
+- [ ] All `@Annotation` → `#[Attribute(...)]` converted (check with Rector, then verify edge cases)
+- [ ] All `/** @var Type */` → typed property syntax
+- [ ] All `@param`/`@return` type hints → native type syntax (PHPDoc only for descriptions)
+- [ ] Service DI: `$this->container->get()` → constructor/method injection
+- [ ] Route names match: `name: 'route_name'` in `#[Route]`, no stringly-typed names
+- [ ] `#[ORM\GeneratedValue(strategy: 'SEQUENCE')]` not `'AUTO'` (Symfony standard)
+- [ ] Entity relations use `targetEntity:` not class literal when referencing by string name
+- [ ] Form `buildForm` → `configureOptions` split from legacy `setDefaultOptions`
+- [ ] Remove any `use Symfony\Component\Something\Annotation\*` leftover imports
+- [ ] Verify `config/services.yaml` autowiring covers all new service classes
+- [ ] Run `composer phpstan` after each batch of changes — level 5 is strict
+- [ ] Run `composer cscheck` — project follows PSR coding standard
+- [ ] Rector can do bulk conversions; always review diff for edge cases afterwards
