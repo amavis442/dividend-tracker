@@ -2,6 +2,10 @@
 
 Use when creating a new feature: always start with a GitLab issue and a dedicated branch via `glab`.
 
+## 0. Golden rule — no direct pushes to main
+
+`git push origin main` is FORBIDDEN. Every change, including one-line fixes, must go through: work item → branch → MR → review → merge. The ONLY exception is an explicit user override.
+
 ## 1. Create a GitLab issue
 
 ⚠️ **WSL pitfall**: `"$(cat <<EOF\n...\nEOF)"` inline heredocs BREAK in WSL (nested quote parsing fails). Always use `--description-file` with a temp file instead.
@@ -69,7 +73,7 @@ git switch -c 42-short-description
 
 Branch is based on latest `main`.
 
-## 4. Implement the feature
+## 5. Implement the feature
 
 Follow the principles in `.ai/rules`:
 
@@ -88,7 +92,18 @@ git push origin 42-short-description
 
 Commit style: `type(scope): description` — types: feat, fix, refactor, chore, docs, test.
 
-## 5. Open a Merge Request via glab
+## 6. Verify the pipeline before pushing
+
+Before pushing the branch or opening an MR, run ALL checks locally. If any fails, do NOT push — fix it first. "Pre-existing" failures are not an excuse; fix them too.
+
+```bash
+php vendor/bin/phpstan.phar analyse src/ -c phpstan.neon --level=5 --no-progress --memory-limit=1024M
+php bin/console tailwind:build
+php bin/console asset-map:compile --no-debug
+php vendor/bin/phpunit --configuration phpunit.xml.dist
+```
+
+## 7. Open a Merge Request via glab
 
 ```bash
 glab mr create \
@@ -96,7 +111,7 @@ glab mr create \
   --description "Closes #42"
 ```
 
-## 6. Use glab for follow-up
+## 8. Use glab for follow-up
 
 ```bash
 glab mr view      # check MR status
@@ -108,6 +123,6 @@ glab ci list      # check CI pipeline status
 glab ci view      # view CI job logs
 ```
 
-## 7. Wait for CI / review
+## 9. Wait for CI / review
 
 After creating the MR, the task is ready. Do not wait in Hermes — the user picks it up later.
