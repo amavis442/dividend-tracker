@@ -4,10 +4,12 @@ Use when creating a new feature: always start with a GitLab issue and a dedicate
 
 ## 1. Create a GitLab issue
 
+⚠️ **WSL pitfall**: `"$(cat <<EOF\n...\nEOF)"` inline heredocs BREAK in WSL (nested quote parsing fails). Always use `--description-file` with a temp file instead.
+
+Write the description to a scratch file first:
+
 ```bash
-glab issue create \
-  --title "feat: short feature description" \
-  --description "$(cat <<EOF
+cat > /tmp/issue-description.md << 'EOF'
 ## What
 
 Technical summary of what needs to be done.
@@ -21,8 +23,21 @@ Why is this needed? Link to ticket/conversation.
 - [ ] criterion 1
 - [ ] criterion 2
 EOF
-)" \
+```
+
+Then create the issue referencing that file:
+
+```bash
+glab issue create \
+  --title "feat: short feature description" \
+  --description-file /tmp/issue-description.md \
   --label "feature"
+```
+
+Clean up after:
+
+```bash
+rm /tmp/issue-description.md
 ```
 
 Note the issue number from the output (e.g. `#42`).
@@ -68,8 +83,7 @@ Commit style: `type(scope): description` — types: feat, fix, refactor, chore, 
 ```bash
 glab mr create \
   --title "feat: short description" \
-  --description "Closes #42" \
-  --fill
+  --description "Closes #42"
 ```
 
 ## 6. Use glab for follow-up

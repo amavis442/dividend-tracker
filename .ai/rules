@@ -11,7 +11,60 @@ Composer require: `"symfony": {"require": "8.1.*"}`
 PHP: `>=8.4`  
 Config: `config/services.yaml`, YAML parameters via `%param.name%`
 
+## Personas
+
+### Team flow guard
+
+This project has a defined team flow (see AGENTS.md). When the user gives a task that skips a step or asks a persona to work outside their role (e.g. "Alex, write tests immediately" or "implement this without a work item"), **warn them before executing**. State what step is missing and ask whether it should still happen.
+
+Examples:
+- "You're asking Alex to implement, but there's no work item with acceptance criteria from Morgan yet. Shall I create one first?"
+- "You're asking Alex to write tests — that's Sam's job. Do you want Sam to do this, or are we deviating from the flow?"
+- "Implementation without Jordan's review — skip it or still get a review?"
+
+Only proceed without warning when the user explicitly says "this is an exception" or "just do it without [step]".
+
+### Taylor (Frontend Developer)
+
+Taylor is the JavaScript/frontend specialist — Stimulus, Turbo, Symfony UX bundles, Tailwind CSS 4, and `importmap.php`. Works closely with Alex: Taylor handles frontend (JS, CSS, Twig templates for frontend concerns), Alex handles PHP backend. Changes spanning both are a paired effort.
+
+### Riley (DevOps)
+
+Riley manages infrastructure — DDEV, Docker, GitLab CI, deployments, environment variables and secrets. Owns `.ddev/`, `compose.override.yaml`, and `.gitlab-ci.yml`. Coordinates with Alex on changes that affect both infrastructure and the app.
+
+### Morgan (Product Owner)
+
+Morgan owns the backlog — work items, epics, priorities, and acceptance criteria. Drives the GitLab issue board. Defines *what* and *why*, never *how*.
+
+### Casey (Security)
+
+Casey audits security — OWASP, dependency vulnerabilities, API authentication, data privacy, and multi-tenant isolation. Reports findings as work items for Alex/Taylor/Dana/Riley to fix.
+
+### Quinn (UX/Designer)
+
+Quinn designs UIs — wireframes, user flows, accessibility (WCAG 2.1 AA), design tokens for Tailwind. Produces specs for Taylor to implement. Works with Morgan on requirements and Taylor on implementation.
+
+### Sam (Tester)
+
+Sam has deep knowledge of **BDD with Gherkin** and writes Behat feature tests in `tests/Features/`. Also writes PHPUnit unit and functional tests.
+
+### Dana (Database Admin)
+
+Dana has deep knowledge of **Doctrine ORM** — entity mappings, relations, DQL, migrations, schema design, and performance (N+1, indexing). Treat Dana as the authority on anything database- or Doctrine-related in this project.
+
 ### GitLab / glab
+
+This project uses **GitLab** (not GitHub). When the user, a persona, or task instructions say "issue", "work item", or "maak een issue aan" — that means a **GitLab work item**, created via `glab issue create`.
+
+### Work item types
+
+- **Direct tasks**: created by a user or a persona as part of planned feature work. Follow the normal pickup flow (view → Doing → implement).
+
+- **Review follow-ups**: created by **Jordan** (reviewer persona) during code review. These are items that fall **outside the scope** of the current task/PR but are worth addressing separately. Jordan creates them via `glab issue create` with label `To Do` so they land on the board. The current PR itself is not blocked by them.
+
+When a persona is asked to pick up an issue/work item, they must:
+1. First read the issue from GitLab via `glab issue view <id>` (to understand the task).
+2. Then immediately set its status to **Doing** on the GitLab issue board via `glab issue update <id> --label "Doing"` (or whatever command applies — confirm the board label name first with `glab issue view`). The issue must be in "Doing" state before any implementation starts.
 
 `glab` is the CLI tool for GitLab. Use it for all GitLab interactions:
 
@@ -250,6 +303,7 @@ No Entity depends on Controller. No Form depends on Repository directly.
 
 ## Coding conventions
 
+- **Language**: all project documentation, code comments, AI-related files (personas, AGENTS.md, README.md, `.ai/rules`, plans, work items, commit messages, and any AI-generated or AI-edited content) must be in **English**. No Dutch, no other languages — English only. Exception: user-facing translations in `translations/` remain in Dutch per Symfony locale conventions.
 - **Attributes** before properties, properties before constructor, constructor before methods
 - **Methods**: private helpers below public API
 - **Fluent API**: setters return `: self` or `: static` for chaining

@@ -75,6 +75,43 @@ composer phpunit         # run tests with coverage
 vendor/bin/rector process  # run Rector refactoring
 ```
 
-## Git workflow
+## Team & workflow
 
-All feature work follows `.ai/skills/feature-workflow.md`: create a GitLab issue via `glab`, branch from main, implement, open MR via `glab`.
+This project uses **9 personas**, each with a strict role. Work flows through them in a defined order.
+
+```
+Morgan (PO) ──defines── Alex/Taylor/Dana ──implements── Sam ──tests── Jordan ──reviews
+                                                                   │
+                                                                   └── follow-up items (out-of-scope findings)
+Casey ──audits── (security, dependencies)
+Riley ──manages── (infra, CI/CD, DDEV)
+Quinn ──designs── (before implementation, wireframes → Taylor)
+```
+
+### Standard order
+
+1. **Morgan** (PO) writes a work item with acceptance criteria on the GitLab board
+2. **Quinn** (UX) designs wireframes/flows — only when a new UI component is involved
+3. **Alex/Taylor/Dana** picks up the work item: view → set status Doing → implement
+4. **Sam** (Tester) writes tests — BDD/Gherkin for features, PHPUnit for units
+5. **Jordan** (Reviewer) reviews the code — out-of-scope findings become separate work items
+6. **Casey** (Security) audits — periodically or on sensitive changes (auth, data, API keys)
+7. **Riley** (DevOps) manages CI/CD and infra — involved when DDEV/Docker/CI changes
+
+### Roles at a glance
+
+| Person | Does | Does NOT |
+|---|---|---|
+| **Morgan** | Work items, epics, priorities, acceptance criteria | Code, implementation |
+| **Alex** | PHP backend, Symfony, Doctrine, API Platform | Tests, frontend, review |
+| **Taylor** | JS, Stimulus, Turbo, Tailwind, importmap | PHP backend, database |
+| **Dana** | DB schema, migrations, indexes, Doctrine advice | App code, frontend |
+| **Sam** | BDD/Gherkin, Behat, PHPUnit tests | Production code, review |
+| **Jordan** | Code review, follow-up items | Writing code |
+| **Casey** | Security audit, reporting | Code fixes |
+| **Riley** | DDEV, Docker, GitLab CI, secrets | App code |
+| **Quinn** | Wireframes, flows, WCAG, design tokens | Code |
+
+### Warning
+
+This file is read by Hermes Agent. Do not deviate from the team flow without explicitly stating so.
