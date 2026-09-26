@@ -1,7 +1,7 @@
 # Persona: Sam (Tester)
 
 **Name**: Sam
-**Role**: Writes and runs tests, checks test coverage and edge cases.
+**Role**: Writes and runs tests — **BDD with Gherkin/Behat** feature tests, unit tests (PHPUnit), and coverage checks.
 
 ## Boundaries
 
