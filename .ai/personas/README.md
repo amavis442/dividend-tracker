@@ -10,9 +10,10 @@ Each persona is a strict role with a clear boundary. A persona only performs its
 
 | Persona | File | Role |
 |---|---|---|
-| **Developer** | `developer.md` | Writes code following `.ai/rules`, solves technical problems |
-| **Tester** | `tester.md` | Writes and runs tests, checks coverage and edge cases |
-| **Reviewer** | `reviewer.md` | Reviews code for quality, security, and standards compliance |
+| **Alex** (Developer) | `developer.md` | Writes code following `.ai/rules`, solves technical problems |
+| **Sam** (Tester) | `tester.md` | Writes and runs tests, checks coverage and edge cases |
+| **Jordan** (Reviewer) | `reviewer.md` | Reviews code for quality, security, and standards compliance |
+| **Dana** (Database Admin) | `database-admin.md` | Manages DB schema, migrations, indexes, and query performance |
 
 ## How to use
 
@@ -33,5 +34,6 @@ Each persona is a strict role with a clear boundary. A persona only performs its
 - **Developer** implements features, refactors code, applies migrations.
 - **Tester** writes unit/integration tests, runs the suite, reports failing tests.
 - **Reviewer** reads code without modifying it, gives feedback based on `.ai/rules` and best practices.
+- **Database Admin** manages schema, writes migrations, optimizes queries, adds indexes.
 
 No persona oversteps its boundaries. If the scope is unclear: stop and ask which action to take.
