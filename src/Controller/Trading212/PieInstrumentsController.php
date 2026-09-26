@@ -135,26 +135,8 @@ class PieInstrumentsController extends AbstractController
 		$stats['monthlyDividend'] = $totalMonthlyDividend;
 		$stats['yearlyDividend'] = $totalMonthlyDividend * static::MONTHS_IN_YEAR;
 
-		$pieInstruments = [];
-		$pieDividend = 0.0; // What is actually paid will be a computed on latest paydat so can be inaccurate. Trading212 does not split up payments by pie instruments :(
-		$pieCurrentDividend = 0.0;
-		$pieAvgDividend = 0.0;
-
-		/*
-		$dataInstruments = $this->decorateInstruments(
-			$paymentRepository,
-			$instruments,
-			$pieInstruments,
-			$tickers,
-			$pieAvgInvested,
-			$rateDollarEuro
-		);
-		*/
-
 		// @todo: need to get Collection $payments
-		//$payments = new ArrayCollection([]);
 		$payments = new ArrayCollection($this->paymentRepository->getLastDividends($tickers));
-dd($payments);
 		$dataInstruments = $this->instrumentDecorator->instruments(
 			$pieAvgInvested,
 			$instruments,
@@ -162,6 +144,11 @@ dd($payments);
 			$tickers,
 			$rateDollarEuro
 		);
+
+		$pieInstruments = $dataInstruments['pieInstruments'] ?? [];
+		$pieDividend = $dataInstruments['pieDividend'] ?? 0.0;
+		$pieCurrentDividend = $dataInstruments['pieCurrentDividend'] ?? 0.0;
+		$pieAvgDividend = $dataInstruments['pieAvgDividend'] ?? 0.0;
 
 
 		if (!$pieInstruments) {
@@ -196,10 +183,6 @@ dd($payments);
 		$date = new \DateTime('now');
 		$date->modify('last day of this month');
 		$paymentLimit = $date->format('Y-m-d');
-
-		$pieDividend = $dataInstruments['pieDividend'];
-		$pieCurrentDividend = $dataInstruments['pieCurrentDividend'];
-		$pieAvgDividend = $dataInstruments['pieAvgDividend'];
 
 		$monthsEstimatedBreakEven =
 			$pieDividend > 0
@@ -284,133 +267,6 @@ dd($payments);
 			'labels' => $labels,
 			'totalReturn' => $totalReturn,
 			'breakEvenData' => $breakEvenData,
-		];
-	}
-
-
-	protected function decorateInstruments(
-		PaymentRepository $paymentRepository,
-		Collection &$instruments,
-		array &$pieInstruments,
-		array &$tickers,
-		float $pieAvgInvested,
-		float $rateDollarEuro
-	): array {
-		$pieDividend = 0.0; // What is actually paid will be a computed on latest paydat so can be inaccurate. Trading212 does not split up payments by pie instruments :(
-		$pieCurrentDividend = 0.0;
-		$pieAvgDividend = 0.0;
-
-		/**
-		 * @var \App\Entity\Trading212PieInstrument $instrument
-		 */
-		foreach ($instruments as $instrument) {
-			$ticker = $instrument->getTicker();
-			if (!$ticker) {
-				continue;
-			}
-			$tickerId = $instrument->getTicker()->getId();
-
-			if ($instrument->getPriceAvgInvestedValue() == 0) {
-				continue;
-			}
-			$instrumentTicker = $tickers[$tickerId];
-			if (isset($instrumentTicker['dividend']['avg'])) {
-				$instrumentTicker['dividend']['avg'] =
-					$instrumentTicker['dividend']['sumDividend'] /
-					$instrumentTicker['dividend']['records'];
-			} else {
-				$instrumentTicker['dividend']['avg'] = 0.0;
-			}
-			if (isset($instrumentTicker['calendars'])) {
-				//dd(array_slice($instrumentTicker['dividend'], -6, null, true) );
-				//array_slice($instrumentTicker['calendars'], -6);
-				$cals = array_slice(
-					$instrumentTicker['calendars'],
-					-6,
-					null,
-					true
-				);
-				ksort($cals);
-				$instrument->setCalendars($cals); // Last 6 months if data is available
-				$instrument->setDividend($instrumentTicker['dividend']);
-			}
-			$tax = $instrumentTicker['tax']->getTax()->getTaxRate();
-			$instrument->setTaxRate($tax);
-			$instrument->setExchangeRate($rateDollarEuro);
-
-			$owned = $instrument->getOwnedQuantity();
-			// Current
-			$yearMonth = (int) date('Ym');
-			$currentDividend = 0.0;
-			if (isset($instrumentTicker['calendars'][$yearMonth])) {
-				$currentDividend = $instrumentTicker['calendars'][$yearMonth]->getAdjustedCashAmount();
-			}
-			$instrument->setCurrentDividendPerShare($currentDividend);
-
-			$totalCurrentDividend =
-				$currentDividend * $owned * (1 - $tax) * $rateDollarEuro;
-			$instrument->setCurrentDividend($totalCurrentDividend);
-
-			$instrument->setMonthlyYield(0.0);
-			if ($instrument->getPriceAvgInvestedValue() > 0) {
-				$monthlyYield =
-					($totalCurrentDividend /
-						$instrument->getPriceAvgInvestedValue()) *
-					100;
-				$instrument->setMonthlyYield($monthlyYield);
-			}
-
-			$currentYearlYield =
-				(($ticker->getPayoutFrequency() * $totalCurrentDividend) /
-					$instrument->getPriceAvgInvestedValue()) *
-				100;
-			$instrument->setCurrentYearlyYield($currentYearlYield);
-			$pieCurrentDividend += $totalCurrentDividend;
-
-			// Avg
-			//$avgDividend = $calendarRepository->getAvgDividend($ticker);
-			$avgDividend = $instrumentTicker['dividend']['avg'];
-			$instrument->setAvgDividendPerShare($avgDividend);
-
-			$avgExpectedDividend =
-				$avgDividend * $owned * (1 - $tax) * $rateDollarEuro;
-			$instrument->setAvgExpectedDividend($avgExpectedDividend);
-
-			$avgYearlYield =
-				(($ticker->getPayoutFrequency() * $avgExpectedDividend) /
-					$instrument->getPriceAvgInvestedValue()) *
-				100;
-			$instrument->setAvgYearlyYield($avgYearlYield);
-			$pieAvgDividend += $avgExpectedDividend;
-
-			$pieShare = round(
-				($instrument->getPriceAvgInvestedValue() / $pieAvgInvested) *
-					100,
-				2
-			);
-			$pieInstruments['labels'][] = $ticker->getFullname();
-			$pieInstruments['data'][] = $pieShare;
-
-			/**
-			 * @var \App\Entity\Payment $payment
-			 */
-			$payment = $paymentRepository->getLastDividend(
-				$ticker,
-				$instrument->getCreatedAt()
-			);
-			if ($payment) {
-				$amount = $payment->getAmount();
-				$dividend = $payment->getDividend();
-				$instrumentDividendPaid = ($dividend / $amount) * $owned;
-				$instrument->setDividendPaid($instrumentDividendPaid);
-				$pieDividend += $instrumentDividendPaid;
-			}
-		}
-
-		return [
-			'pieDividend' => $pieDividend,
-			'pieCurrentDividend' => $pieCurrentDividend,
-			'pieAvgDividend' => $pieAvgDividend,
 		];
 	}
 }

@@ -3,15 +3,14 @@
 namespace App\Decorator;
 
 use App\Entity\Calendar;
-use App\Repository\PaymentRepository; // Has to go and data should be inserted as parameter
 use Doctrine\Common\Collections\Collection;
 
 
 final class InstrumentDecorator
 {
-    public function __construct(
-        private readonly PaymentRepository $paymentRepo,
-    ) {}
+    public function __construct()
+    {
+    }
 
     /**
      * Adds dividend, currentDividend and avgDividend to each ticker entry.
@@ -116,6 +115,15 @@ final class InstrumentDecorator
         array &$tickers,
         float $rateDollarEuro
     ): array {
+        // Pre-index payments by ticker id — already sorted DESC from DB
+        $paymentsByTicker = [];
+        foreach ($payments as $payment) {
+            $tid = $payment->getTicker()->getId();
+            $paymentsByTicker[$tid][] = $payment;
+        }
+
+        $pieInstruments = [];
+
         // The original `$this->decorateInstruments(...)` logic.
         $pieDividend = 0.0; // What is actually paid will be a computed on latest paydat so can be inaccurate. Trading212 does not split up payments by pie instruments :(
         $pieCurrentDividend = 0.0;
@@ -145,8 +153,6 @@ final class InstrumentDecorator
             }
 
             if (isset($instrumentTicker['calendars'])) {
-                //dd(array_slice($instrumentTicker['dividend'], -6, null, true) );
-                //array_slice($instrumentTicker['calendars'], -6);
                 $cals = array_slice(
                     $instrumentTicker['calendars'],
                     -6,
@@ -191,7 +197,6 @@ final class InstrumentDecorator
             $pieCurrentDividend += $totalCurrentDividend;
 
             // Avg
-            //$avgDividend = $calendarRepository->getAvgDividend($ticker);
             $avgDividend = $instrumentTicker['dividend']['avg'];
             $instrument->setAvgDividendPerShare($avgDividend);
 
@@ -214,26 +219,28 @@ final class InstrumentDecorator
             $pieInstruments['labels'][] = $ticker->getFullname();
             $pieInstruments['data'][] = $pieShare;
 
-
-            /**
-             * @var \App\Entity\Payment $payment
-             */
-            $payment = $this->paymentRepo->getLastDividend(
-                $ticker,
-                $instrument->getCreatedAt()
-            );
-            // @todo: Must come from $payments Collection <$tickerId, array<
-
-            if ($payment) {
-                $amount = $payment->getAmount();
-                $dividend = $payment->getDividend();
-                $instrumentDividendPaid = ($dividend / $amount) * $owned;
+            // Look up last dividend from pre-loaded $paymentsByTicker instead of N+1 query
+            $instrumentDividendPaid = 0.0;
+            $instrumentCreatedAt = $instrument->getCreatedAt();
+            if (isset($paymentsByTicker[$tickerId])) {
+                foreach ($paymentsByTicker[$tickerId] as $payment) {
+                    $payDate = $payment->getPayDate();
+                    if ($payDate !== null && $payDate < $instrumentCreatedAt) {
+                        $amount = $payment->getAmount();
+                        $dividend = $payment->getDividend();
+                        $instrumentDividendPaid = ($dividend / $amount) * $owned;
+                        break;
+                    }
+                }
+            }
+            if ($instrumentDividendPaid > 0) {
                 $instrument->setDividendPaid($instrumentDividendPaid);
                 $pieDividend += $instrumentDividendPaid;
             }
         }
 
         return [
+            'pieInstruments' => $pieInstruments,
             'pieDividend' => $pieDividend,
             'pieCurrentDividend' => $pieCurrentDividend,
             'pieAvgDividend' => $pieAvgDividend,

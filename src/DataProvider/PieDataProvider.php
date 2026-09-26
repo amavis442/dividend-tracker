@@ -95,11 +95,13 @@ class PieDataProvider
         $corporateActions = new ArrayCollection($this->corporateActionDataProvider->load($tickers->toArray()));
 
         /**
-         * Get the dividend Calendars per ticker
-         *
-         * @var Collection<int, array<int, Calendar>> $dividends
+         * Get the dividend Calendars per ticker — limit to last 14 months
          */
-        $dividends = new ArrayCollection($this->dividendDataProvider->load($tickers->toArray()));
+        $afterDate = new \DateTime('-14 months');
+        $dividends = new ArrayCollection($this->dividendDataProvider->load(
+            $tickers->toArray(),
+            $afterDate
+        ));
 
         return new PieDataDto(
             metaData: $metaDatas,
