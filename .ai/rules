@@ -17,6 +17,17 @@ Config: `config/services.yaml`, YAML parameters via `%param.name%`
 
 This project has a defined team flow (see AGENTS.md). When the user gives a task that skips a step or asks a persona to work outside their role (e.g. "Alex, write tests immediately" or "implement this without a work item"), **warn them before executing**. State what step is missing and ask whether it should still happen.
 
+### Pipeline must be green before MR
+
+Before opening or updating a merge request, **all pipeline stages must pass locally first**:
+
+1. **PHPStan**: `php vendor/bin/phpstan.phar analyse src/ -c phpstan.neon --level=5 --no-progress --memory-limit=1024M` — must exit with 0 errors
+2. **Tailwind build**: `php bin/console tailwind:build` — must succeed
+3. **Asset compile**: `php bin/console asset-map:compile --no-debug` — must succeed
+4. **PHPUnit**: `php vendor/bin/phpunit --configuration phpunit.xml.dist` — must not produce unexpected failures
+
+If any stage fails locally (even pre-existing issues), **do not push or open an MR** until the pipeline is fixed. Push only when the full pipeline is green. No exceptions — code that breaks the pipeline is worse than code that isn't pushed yet.
+
 Examples:
 - "You're asking Alex to implement, but there's no work item with acceptance criteria from Morgan yet. Shall I create one first?"
 - "You're asking Alex to write tests — that's Sam's job. Do you want Sam to do this, or are we deviating from the flow?"
