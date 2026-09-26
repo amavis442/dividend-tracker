@@ -89,7 +89,7 @@
 													</a>
 													{% endif %}
 													{% if not position.calendar %}
-													<a class="btn btn-secondary" href="{{ path('calendar_new', {'ticker': ticker.id }) }}" data-toggle="tooltip" data-placement="top" title="add dividend date">
+													<a class="btn btn-secondary" href="{{ path('calendar_create', {'ticker': ticker.id }) }}" data-toggle="tooltip" data-placement="top" title="add dividend date">
 														<i class="far fa-calendar-alt"></i>
 													</a>
 													{% else %}
