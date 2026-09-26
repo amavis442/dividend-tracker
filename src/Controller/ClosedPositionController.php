@@ -14,9 +14,10 @@ use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/closed/position')]
 class ClosedPositionController extends AbstractController
@@ -97,7 +98,7 @@ class ClosedPositionController extends AbstractController
     }
 
     #[Route(path: '/{id}', name: 'closed_position_show', methods: ['GET'])]
-    public function show(Position $position): Response
+    public function show(#[MapEntity] Position $position): Response
     {
         return $this->render('closed_position/show.html.twig', [
             'position' => $position,
@@ -114,9 +115,9 @@ class ClosedPositionController extends AbstractController
         )
     ]
     public function edit(
-        Request $request,
-        Position $position,
-        PositionService $positionService,
+    		Request $request,
+    		#[MapEntity] Position $position,
+    		PositionService $positionService,
         ?int $closed,
         Referer $referer
     ): Response {

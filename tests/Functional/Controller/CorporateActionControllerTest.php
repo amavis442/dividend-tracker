@@ -41,27 +41,17 @@ final class CorporateActionControllerTest extends WebTestCase
 			CorporateAction::class
 		);
 
-		$user = UserFactory::createOne(['email' => 'test@test.nl']);
-        $this->assertSame('test@test.nl', $user->getEmail());
+		$userFactoryResult = UserFactory::createOne(['email' => '[EMAIL]']);
+		$this->manager->flush();  // flush so repository lookup works
 
-        $this->manager->persist($user->_real());
-		$this->manager->flush();
-
+		$user = $userFactoryResult->_real();
+		$this->assertSame('[EMAIL]', $user->getEmail());
 
 		$userRepository = static::getContainer()->get(UserRepository::class);
-		$this->testUser = $userRepository->findOneByEmail('test@test.nl');
-		//dump('test user data:', $testUser);
+		$this->testUser = $userRepository->findOneByEmail('[EMAIL]');
 
         // simulate $testUser being logged in
         $this->client->loginUser($this->testUser);
-
-		/* using ResetDatabase already
-		foreach ($this->corporateActionRepository->findAll() as $object) {
-			$this->manager->remove($object);
-		}
-
-		$this->manager->flush();
-		*/
 	}
 
 	public function testIndex(): void
@@ -71,38 +61,18 @@ final class CorporateActionControllerTest extends WebTestCase
 
 		self::assertResponseStatusCodeSame(200);
 		self::assertPageTitleContains('CorporateAction index');
-
-		//dump($crawler);
-
-		// Use the $crawler to perform additional assertions e.g.
-		// self::assertSame('Some text on the page', $crawler->filter('.p')->first()->text());
 	}
 
 	private function setUpTicker(): \App\Entity\Ticker
 	{
-		//$start = microtime(true);
 		$currency = CurrencyFactory::createOne(['symbol'=> 'USD']);
-		//$end = microtime(true);
-		//dump('CurrencyFactory took ' . ($end - $start) . ' seconds');
-
-        //$start = microtime(true);
 		$branch = BranchFactory::createOne(['label' => 'finance']);
-		//$end = microtime(true);
-		//dump('BranchFactory took ' . ($end - $start) . ' seconds');
 
-        //$start = microtime(true);
 		$tickerProxy = TickerFactory::createOne([
             'branch' => $branch,
             'fullname' => 'Apple',
             'symbol' => 'AAPL',
         ]);
-		//$end = microtime(true);
-		//dump('TickerFactory took ' . ($end - $start) . ' seconds');
-
-        //$start = microtime(true);
-		//$user = UserFactory::new();
-		//$end = microtime(true);
-		//dump('CurrencyFactory took ' . ($end - $start) . ' seconds');
 
 		$positionProxy = PositionFactory::createOne([
 			'allocation' => 1000.0,
@@ -130,14 +100,8 @@ final class CorporateActionControllerTest extends WebTestCase
 	{
 		$ticker = $this->setUpTicker();
 
-		//$positionRepository = static::getContainer()->get(PositionRepository::class);
-		//$positions = $positionRepository->findAll();
-		//dd('Current positions:', $positions);
-
 		$crawler = $this->client->request('GET', sprintf('%snew', $this->path));
 		self::assertResponseStatusCodeSame(200);
-
-		//dump($crawler);
 
 		$this->client->submitForm('Save', [
 			'corporate_action[type]' => 'reverse_split',
@@ -170,11 +134,8 @@ final class CorporateActionControllerTest extends WebTestCase
 			sprintf('%s%s', $this->path, $fixture->getId())
 		);
 
-		//dump($crawler);
 		self::assertResponseStatusCodeSame(200);
 		self::assertPageTitleContains('CorporateAction');
-		//self::assertContains('My Test Type',$crawler->filter('.table')->filter('td'), 'Missing My Test Type');
-		// Use assertions to check that the properties are properly displayed.
 	}
 
 	public function testEdit(): void

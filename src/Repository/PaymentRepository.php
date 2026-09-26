@@ -12,6 +12,7 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -163,6 +164,32 @@ class PaymentRepository extends ServiceEntityRepository
 			->getQuery()
 			->getOneOrNullResult();
 	}
+
+	public function getLastDividends(
+		array $tickers,
+	): array {
+		$tickerIds = array_keys($tickers);
+
+		/*
+		$subQuery = $this->createQueryBuilder('pa')
+			->select('MAX(pa.id)')
+			->innerJoin('pa.ticker', 'ti')
+			->where('ti = :ticker AND pa.payDate < :payDate')
+			->getDQL();
+		*/
+
+		return $this->createQueryBuilder('p','p.ticker')
+			->select('p')
+			->join('p.ticker','t')
+			->where('p.ticker IN (:tickerIds)')
+			->setParameter(
+				'tickerIds', $tickerIds
+			)
+			->orderBy('p.ticker, p.payDate, p.id','DESC')
+			->getQuery()
+			->getResult();
+	}
+
 
 	public function getForPositionQueryBuilder(Position $position): QueryBuilder
 	{

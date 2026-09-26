@@ -36,11 +36,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 /** @psalm-suppress PropertyNotSetInConstructor */
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/portfolio')]
@@ -546,7 +547,7 @@ class PortfolioController extends AbstractController
 		)
 	]
 	public function showPosition(
-		Position $position,
+		#[MapEntity] Position $position,
 		PositionRepository $positionRepository,
 		TransactionDataProvider $transactionDataProvider,
 		CorporateActionDataProvider $corporateActionDataProvider,

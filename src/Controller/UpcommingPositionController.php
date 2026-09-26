@@ -7,9 +7,10 @@ use App\Repository\PositionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\PaymentRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/upcomming')]
 class UpcommingPositionController extends AbstractController
@@ -41,7 +42,7 @@ class UpcommingPositionController extends AbstractController
     }
 
     #[Route(path: '/{id}', name: 'upcomming_position_show', methods: ['GET'])]
-    public function show(Position $position): Response
+    public function show(#[MapEntity] Position $position): Response
     {
         return $this->render('upcomming_position/show.html.twig', [
             'position' => $position,
@@ -49,7 +50,7 @@ class UpcommingPositionController extends AbstractController
     }
 
     #[Route(path: '/delete/{id}', name: 'upcomming_position_delete', methods: ['POST', 'DELETE'])]
-    public function delete(Request $request, EntityManagerInterface $entityManager, Position $position): Response
+    public function delete(Request $request, EntityManagerInterface $entityManager, #[MapEntity] Position $position): Response
     {
         if ($this->isCsrfTokenValid('delete' . $position->getId(), $request->request->get('_token'))) {
             $entityManager->remove($position);

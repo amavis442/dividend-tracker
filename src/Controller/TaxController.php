@@ -8,8 +8,9 @@ use App\Repository\TaxRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/tax')]
 class TaxController extends AbstractController
@@ -43,7 +44,7 @@ class TaxController extends AbstractController
     }
 
     #[Route(path: '/{id}', name: 'tax_show', methods: ['GET'])]
-    public function show(Tax $tax): Response
+    public function show(#[MapEntity] Tax $tax): Response
     {
         return $this->render('tax/show.html.twig', [
             'tax' => $tax,
@@ -51,7 +52,7 @@ class TaxController extends AbstractController
     }
 
     #[Route(path: '/{id}/edit', name: 'tax_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, EntityManagerInterface $entityManager, Tax $tax): Response
+    public function edit(Request $request, EntityManagerInterface $entityManager, #[MapEntity] Tax $tax): Response
     {
         $form = $this->createForm(TaxType::class, $tax);
         $form->handleRequest($request);
@@ -68,7 +69,7 @@ class TaxController extends AbstractController
     }
 
     #[Route(path: '/delete/{id}', name: 'tax_delete', methods: ['POST', 'DELETE'])]
-    public function delete(Request $request, EntityManagerInterface $entityManager, Tax $tax): Response
+    public function delete(Request $request, EntityManagerInterface $entityManager, #[MapEntity] Tax $tax): Response
     {
         if ($this->isCsrfTokenValid('delete' . $tax->getId(), $request->request->get('_token'))) {
             $entityManager->remove($tax);

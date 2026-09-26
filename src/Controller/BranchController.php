@@ -10,10 +10,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route('/{_locale<%app.supported_locales%>}/dashboard/branch')]
 class BranchController extends AbstractController
@@ -74,7 +75,7 @@ class BranchController extends AbstractController
 	}
 
 	#[Route('/{id}', name: 'branch_show', methods: ['GET'])]
-	public function show(Branch $branch): Response
+	public function show(#[MapEntity] Branch $branch): Response
 	{
 		return $this->render('branch/show.html.twig', [
 			'branch' => $branch,
@@ -85,7 +86,7 @@ class BranchController extends AbstractController
 	public function edit(
 		Request $request,
 		EntityManagerInterface $entityManager,
-		Branch $branch,
+		#[MapEntity] Branch $branch,
 		BranchRepository $branchRepository
 	): Response {
 		$assignedAllocation =
@@ -113,7 +114,7 @@ class BranchController extends AbstractController
 	public function delete(
 		Request $request,
 		EntityManagerInterface $entityManager,
-		Branch $branch
+		#[MapEntity] Branch $branch
 	): Response {
 		if (
 			$this->isCsrfTokenValid(

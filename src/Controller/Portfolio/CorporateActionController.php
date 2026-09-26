@@ -9,11 +9,12 @@ use App\Repository\CorporateActionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /** @psalm-suppress PropertyNotSetInConstructor */
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/portfolio')]
@@ -27,7 +28,7 @@ class CorporateActionController extends AbstractController
 		)
 	]
 	public function index(
-		Position $position,
+		#[MapEntity] Position $position,
 		CorporateActionRepository $corporateActionRepository,
 		#[MapQueryParameter] int $page = 1,
 		#[MapQueryParameter] string $orderBy = 'eventDate',
@@ -60,7 +61,7 @@ class CorporateActionController extends AbstractController
 		)
 	]
 	public function show(
-		CorporateAction $corporateAction,
+		#[MapEntity] CorporateAction $corporateAction,
 		CorporateActionRepository $corporateActionRepository,
 		int $page = 1
 	): Response {
@@ -80,7 +81,7 @@ class CorporateActionController extends AbstractController
 	public function create(
 		Request $request,
 		EntityManagerInterface $entityManager,
-		?Position $position
+		#[MapEntity] ?Position $position
 	): Response {
 		$corporateAction = new CorporateAction();
 		if ($position) {
@@ -116,8 +117,8 @@ class CorporateActionController extends AbstractController
 	public function delete(
 		Request $request,
 		EntityManagerInterface $entityManager,
-		CorporateAction $corporateAction,
-		Position $position
+		#[MapEntity] CorporateAction $corporateAction,
+		#[MapEntity] Position $position
 	): Response {
 		if (
 			$this->isCsrfTokenValid(

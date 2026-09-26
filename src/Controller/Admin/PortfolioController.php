@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route(path: '/dashboard/portfolio/admin')]
 final class PortfolioController extends AbstractController
@@ -43,7 +44,7 @@ final class PortfolioController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_admin_portfolio_controller_show', methods: ['GET'])]
-    public function show(Portfolio $portfolio): Response
+    public function show(#[MapEntity] Portfolio $portfolio): Response
     {
         return $this->render('portfolio/admin/show.html.twig', [
             'portfolio' => $portfolio,
@@ -51,7 +52,7 @@ final class PortfolioController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_admin_portfolio_controller_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Portfolio $portfolio, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, #[MapEntity] Portfolio $portfolio, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(PortfolioType::class, $portfolio);
         $form->handleRequest($request);
@@ -69,7 +70,7 @@ final class PortfolioController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_admin_portfolio_controller_delete', methods: ['POST'])]
-    public function delete(Request $request, Portfolio $portfolio, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, #[MapEntity] Portfolio $portfolio, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$portfolio->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($portfolio);

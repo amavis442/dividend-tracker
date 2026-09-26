@@ -1,9 +1,4 @@
-@import "ckeditor5.css";
-@import "tooltip.css";
-@import "tom-select.css";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /*
 [data-turbo-preview] body {

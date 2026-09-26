@@ -11,10 +11,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/journal')]
 class JournalController extends AbstractController
@@ -91,7 +92,7 @@ class JournalController extends AbstractController
     }
 
     #[Route(path: '/{id}', name: 'journal_show', methods: ['GET'])]
-    public function show(Journal $journal): Response
+    public function show(#[MapEntity] Journal $journal): Response
     {
         return $this->render('journal/show.html.twig', [
             'journal' => $journal,
@@ -100,9 +101,9 @@ class JournalController extends AbstractController
 
     #[Route(path: '/{id}/edit', name: 'journal_edit', methods: ['GET', 'POST'])]
     public function edit(
-        Request $request,
-        EntityManagerInterface $entityManager,
-        Journal $journal,
+   		Request $request,
+   		EntityManagerInterface $entityManager,
+   		#[MapEntity] Journal $journal,
         Referer $referer,
     ): Response {
         $form = $this->createForm(JournalType::class, $journal);
@@ -131,9 +132,9 @@ class JournalController extends AbstractController
         )
     ]
     public function delete(
-        Request $request,
-        EntityManagerInterface $entityManager,
-        Journal $journal
+    		Request $request,
+    		EntityManagerInterface $entityManager,
+    		#[MapEntity] Journal $journal
     ): Response {
         if (
             $this->isCsrfTokenValid(

@@ -19,10 +19,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/payment')]
 class PaymentController extends AbstractController
@@ -169,7 +170,7 @@ class PaymentController extends AbstractController
 	public function create(
 		Request $request,
 		EntityManagerInterface $entityManager,
-		position $position,
+		Position $position,
 		string $timestamp,
 		CalendarRepository $calendarRepository,
 		Referer $referer
@@ -229,7 +230,7 @@ class PaymentController extends AbstractController
 	}
 
 	#[Route(path: '/{id}', name: 'payment_show', methods: ['GET'])]
-	public function show(Payment $payment): Response
+	public function show(#[MapEntity] Payment $payment): Response
 	{
 		return $this->render('payment/show.html.twig', [
 			'payment' => $payment,
@@ -240,7 +241,7 @@ class PaymentController extends AbstractController
 	public function edit(
 		Request $request,
 		EntityManagerInterface $entityManager,
-		Payment $payment,
+		#[MapEntity] Payment $payment,
 		Referer $referer
 	): Response {
 		$form = $this->createForm(PaymentType::class, $payment);

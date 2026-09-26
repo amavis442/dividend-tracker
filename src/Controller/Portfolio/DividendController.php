@@ -8,10 +8,11 @@ use App\Entity\Ticker;
 use App\Form\CalendarType;
 use App\Repository\PaymentRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Pagerfanta\Adapter\ArrayAdapter;
 use Pagerfanta\Pagerfanta;
@@ -30,7 +31,7 @@ class DividendController extends AbstractController
 		)
 	]
 	public function showDividend(
-		Position $position,
+		#[MapEntity] Position $position,
 		PaymentRepository $paymentRepository,
 		int $page = 1
 	): Response {
@@ -94,7 +95,7 @@ class DividendController extends AbstractController
 		Request $request,
 		EntityManagerInterface $entityManager,
 		?Ticker $ticker,
-		?Position $position
+		#[MapEntity] ?Position $position
 	) {
 		$calendar = new Calendar();
 		if ($ticker != null) {
@@ -135,8 +136,8 @@ class DividendController extends AbstractController
 	public function deleteDividend(
 		Request $request,
 		EntityManagerInterface $entityManager,
-		Calendar $calendar,
-		Position $position
+		#[MapEntity] Calendar $calendar,
+		#[MapEntity] Position $position
 	): Response {
 		if (
 			$this->isCsrfTokenValid(

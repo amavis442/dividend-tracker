@@ -16,10 +16,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/position')]
 class PositionController extends AbstractController
@@ -121,7 +122,7 @@ class PositionController extends AbstractController
 
 	#[Route(path: '/show/{id}/{page}', name: 'position_show', methods: ['GET'])]
 	public function show(
-		Position $position,
+		#[MapEntity] Position $position,
 		TransactionRepository $transactionRepository,
 		int $page = 1
 	): Response {
@@ -150,7 +151,7 @@ class PositionController extends AbstractController
 	]
 	public function edit(
 		Request $request,
-		Position $position,
+		#[MapEntity] Position $position,
 		Referer $referer,
 		TransactionRepository $transactionRepository,
 		EntityManagerInterface $entityManager
@@ -195,7 +196,7 @@ class PositionController extends AbstractController
 	public function delete(
 		Request $request,
 		EntityManagerInterface $entityManager,
-		Position $position
+		#[MapEntity] Position $position
 	): Response {
 		if ($position->getId() == null) {
 			throw new \RuntimeException('No position to remove');

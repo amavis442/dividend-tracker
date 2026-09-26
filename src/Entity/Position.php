@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[
     ApiResource(
@@ -160,6 +160,9 @@ class Position
     private ?float $adjustedAmount = null;
     private ?float $adjustedAveragePrice = null;
 
+    #[ORM\ManyToOne]
+    private ?Instrument $instrument = null;
+
     #[ORM\PrePersist]
     public function setCreatedAtValue(): void
     {
@@ -228,7 +231,7 @@ class Position
 
     public function getAmount(): float
     {
-        return $this->amount ?? 0.0;
+        return $this->amount;
     }
 
     public function setAmount(float $amount): self
@@ -281,7 +284,7 @@ class Position
 
     public function getAllocation(): float
     {
-        return $this->allocation ?? 0.0;
+        return $this->allocation;
     }
 
     public function setAllocation(float $allocation): self
@@ -647,7 +650,7 @@ class Position
      */
     public function getForwardNetDividendYieldPerShare(): float
     {
-        return $this->forwardNetDividendYieldPerShare ?? 0;
+        return $this->forwardNetDividendYieldPerShare;
     }
 
     /**
@@ -672,7 +675,7 @@ class Position
      */
     public function getNetDividendPerShare(): float
     {
-        return $this->netDividendPerShare ?? 0.0;
+        return $this->netDividendPerShare;
     }
 
     /**
@@ -878,6 +881,18 @@ class Position
     public function setAdjustedAveragePrice(?float $adjustedAveragePrice): static
     {
         $this->adjustedAveragePrice = $adjustedAveragePrice;
+
+        return $this;
+    }
+
+    public function getInstrument(): ?Instrument
+    {
+        return $this->instrument;
+    }
+
+    public function setInstrument(?Instrument $instrument): static
+    {
+        $this->instrument = $instrument;
 
         return $this;
     }
