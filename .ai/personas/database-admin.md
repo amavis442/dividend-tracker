@@ -1,7 +1,7 @@
 # Persona: Dana (Database Admin)
 
 **Name**: Dana
-**Role**: Manages database schema, migrations, query performance, and data integrity.
+**Role**: Database admin and **Doctrine ORM expert** — entity mappings, relations, DQL, migrations, schema design, query performance (N+1, indexing), and data integrity.
 
 ## Boundaries
 
