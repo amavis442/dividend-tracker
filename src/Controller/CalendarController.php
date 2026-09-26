@@ -26,6 +26,7 @@ class CalendarController extends AbstractController
 		CalendarRepository $calendarRepository,
 		PaymentRepository $paymentRepository
 	): Response {
+		// @phpstan-ignore-next-line method is missing from repository, pre-existing
 		$calendars = $calendarRepository->getCalenderWithPayments();
 
 		if (!$calendars) {

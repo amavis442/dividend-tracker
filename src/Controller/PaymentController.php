@@ -170,7 +170,7 @@ class PaymentController extends AbstractController
 	public function create(
 		Request $request,
 		EntityManagerInterface $entityManager,
-		position $position,
+		Position $position,
 		string $timestamp,
 		CalendarRepository $calendarRepository,
 		Referer $referer

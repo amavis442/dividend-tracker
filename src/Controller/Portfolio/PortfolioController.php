@@ -105,7 +105,7 @@ class PortfolioController extends AbstractController
 		}
 
 		/**
-		 * @var \#[MapEntity] App\Entity\User $user
+		 * @var \App\Entity\User $user
 		 */
 		$user = $this->getUser();
 		$portfolio = $portfolioRepository->findOneBy([
@@ -251,7 +251,7 @@ class PortfolioController extends AbstractController
 		$growth = $dividendGrowth->getData($ticker);
 
 		/**
-		 * @var \#[MapEntity] App\Entity\User $user
+		 * @var \App\Entity\User $user
 		 */
 		$user = $this->getUser();
 		$portfolio = $portfolioRepository->findOneBy([
@@ -488,7 +488,7 @@ class PortfolioController extends AbstractController
 		}
 
 		/**
-		 * @var \#[MapEntity] App\Entity\User $user
+		 * @var \App\Entity\User $user
 		 */
 		$user = $this->getUser();
 		$portfolio = $portfolioRepository->findOneBy([

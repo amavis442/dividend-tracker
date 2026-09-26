@@ -88,7 +88,7 @@ class PositionController extends AbstractController
 		$referer->set('position_index', ['status' => $status]);
 
 		/**
-		 * @var \#[MapEntity] App\Entity\User $user
+		 * @var \App\Entity\User $user
 		 */
 		$user = $this->getUser();
 		$portfolio = $portfolioRepository->findOneBy([
