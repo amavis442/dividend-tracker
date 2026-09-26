@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /*
 [data-turbo-preview] body {
@@ -9,10 +7,10 @@
 */
 .ck-editor__editable_inline {
     min-height: 400px;
-    margin-bottom: 1rem;
+    @apply mb-4;
 }
 
 .ck-rounded-corners {
-    border-radius: 0.5rem;
+    @apply rounded-lg;
 }
 
