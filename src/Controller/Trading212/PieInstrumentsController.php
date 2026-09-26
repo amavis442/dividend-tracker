@@ -135,7 +135,6 @@ class PieInstrumentsController extends AbstractController
 		$stats['monthlyDividend'] = $totalMonthlyDividend;
 		$stats['yearlyDividend'] = $totalMonthlyDividend * static::MONTHS_IN_YEAR;
 
-		// @todo: need to get Collection $payments
 		$payments = new ArrayCollection($this->paymentRepository->getLastDividends($tickers));
 		$dataInstruments = $this->instrumentDecorator->instruments(
 			$pieAvgInvested,
