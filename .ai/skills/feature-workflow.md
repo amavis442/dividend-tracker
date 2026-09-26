@@ -83,8 +83,7 @@ Commit style: `type(scope): description` — types: feat, fix, refactor, chore, 
 ```bash
 glab mr create \
   --title "feat: short description" \
-  --description "Closes #42" \
-  --fill
+  --description "Closes #42"
 ```
 
 ## 6. Use glab for follow-up
