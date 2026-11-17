@@ -444,10 +444,6 @@ class Position
 
     public function addPie(Pie $pie): self
     {
-        if ($this->pies == null) {
-            $this->pies = new ArrayCollection();
-        }
-
         if (!$this->pies->contains($pie)) {
             $this->pies[] = $pie;
             $pie->addPosition($this);
