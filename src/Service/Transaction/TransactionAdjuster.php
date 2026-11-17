@@ -2,6 +2,7 @@
 
 namespace App\Service\Transaction;
 
+use App\Contracts\Transaction\TransactionAdjusterInterface;
 use App\Entity\Transaction;
 use App\Entity\CorporateAction;
 

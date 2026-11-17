@@ -15,7 +15,7 @@ use App\Repository\Trading212PieMetaDataRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use App\Service\ExchangeRate\ExchangeRateInterface;
+use App\Contracts\ExchangeRate\ExchangeRateInterface;
 
 class PieDataProvider
 {

@@ -11,7 +11,7 @@ use App\Form\TickerAutocompleteType;
 use App\Form\TransactionType;
 use App\Repository\TickerRepository;
 use App\Repository\TransactionRepository;
-use App\Service\ExchangeRate\ExchangeRateInterface;
+use App\Contracts\ExchangeRate\ExchangeRateInterface;
 use App\Service\Referer;
 use App\Service\Position\WeightedAverage;
 use DateTime;

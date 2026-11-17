@@ -8,7 +8,7 @@ use App\Entity\Pie;
 use App\Repository\DividendCalendarRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\TickerRepository;
-use App\Service\ExchangeRate\ExchangeRateInterface;
+use App\Contracts\ExchangeRate\ExchangeRateInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

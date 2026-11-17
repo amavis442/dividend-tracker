@@ -5,7 +5,7 @@ namespace App\Command;
 use App\Entity\DividendTracker;
 use App\Repository\PositionRepository;
 use App\Repository\UserRepository;
-use App\Service\Dividend\DividendServiceInterface;
+use App\Contracts\Dividend\DividendServiceInterface;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;

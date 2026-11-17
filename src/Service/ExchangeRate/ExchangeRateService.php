@@ -2,6 +2,7 @@
 
 namespace App\Service\ExchangeRate;
 
+use App\Contracts\ExchangeRate\ExchangeRateInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;

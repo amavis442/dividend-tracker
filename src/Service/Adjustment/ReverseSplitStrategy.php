@@ -2,6 +2,7 @@
 
 namespace App\Service\Adjustment;
 
+use App\Contracts\Adjustment\AdjustmentStrategyInterface;
 use App\Entity\CorporateAction;
 use App\Entity\Transaction;
 

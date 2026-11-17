@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\Adjustment;
 
+use App\Contracts\Adjustment\DividendAdjustmentStrategyInterface;
 use App\Entity\CorporateAction;
 use DateTime;
 

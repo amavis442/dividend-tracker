@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Decorator;
+namespace App\Contracts\Decorator;
 
 interface AdjustedPositionDecoratorInterface extends AdjustedDecoratorInterface
 {

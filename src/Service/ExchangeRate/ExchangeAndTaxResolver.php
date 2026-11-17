@@ -2,6 +2,7 @@
 
 namespace App\Service\ExchangeRate;
 
+use App\Contracts\ExchangeRate\ExchangeAndTaxResolverInterface;
 use App\Entity\Calendar;
 use App\Entity\Ticker;
 use App\Util\Constants;

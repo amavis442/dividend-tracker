@@ -14,7 +14,7 @@ use App\DataProvider\TransactionDataProvider;
 use App\DataProvider\CorporateActionDataProvider;
 use App\DataProvider\DividendDataProvider;
 use Doctrine\Common\Collections\ArrayCollection;
-use App\Service\ExchangeRate\DividendExchangeRateResolverInterface;
+use App\Contracts\ExchangeRate\DividendExchangeRateResolverInterface;
 
 class YieldsService
 {

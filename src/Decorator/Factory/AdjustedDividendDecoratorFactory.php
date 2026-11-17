@@ -6,7 +6,7 @@ use App\Entity\Calendar;
 use App\Entity\CorporateAction;
 use App\Entity\Ticker;
 use App\Decorator\AdjustedDividendDecorator;
-use App\Decorator\AdjustedDividendDecoratorInterface;
+use App\Contracts\Decorator\AdjustedDividendDecoratorInterface;
 use App\Service\Dividend\DividendAdjuster;
 
 class AdjustedDividendDecoratorFactory

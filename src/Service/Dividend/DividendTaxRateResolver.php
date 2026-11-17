@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\Dividend;
 
+use App\Contracts\Dividend\DividendTaxRateResolverInterface;
 use App\Entity\Calendar;
 use App\Util\Constants;
 

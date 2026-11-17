@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Dividend;
+namespace App\Contracts\Dividend;
 
 use App\Entity\Transaction;
 use App\Entity\CorporateAction;

@@ -6,7 +6,7 @@ use App\Entity\Transaction;
 use App\Entity\Calendar;
 use App\Entity\Ticker;
 use App\Entity\Position;
-use App\Service\Transaction\ShareEligibilityCalculatorInterface;
+use App\Contracts\Transaction\ShareEligibilityCalculatorInterface;
 
 final class DividendCalendarService
 {

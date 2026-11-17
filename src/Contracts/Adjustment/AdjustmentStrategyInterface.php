@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Adjustment;
+namespace App\Contracts\Adjustment;
 
 use App\Entity\Transaction;
 use App\Entity\CorporateAction;

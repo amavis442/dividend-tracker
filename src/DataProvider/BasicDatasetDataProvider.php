@@ -9,7 +9,7 @@ use App\Entity\Calendar;
 use App\Repository\PositionRepository;
 use App\Repository\TransactionRepository;
 use App\Service\Dividend\DividendAdjuster;
-use App\Service\ExchangeRate\DividendExchangeRateResolverInterface;
+use App\Contracts\ExchangeRate\DividendExchangeRateResolverInterface;
 use App\Service\Transaction\TransactionAdjuster;
 use App\Dto\BasicDataSetDto;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
