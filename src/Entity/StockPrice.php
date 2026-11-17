@@ -1,68 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-use ApiPlatform\Core\Attribute\ApiProperty;
-use ApiPlatform\Core\Attribute\ApiResource;
-
 /**
- * @ApiResource(
- *  collectionOperations={"get"},
- *  itemOperations={"get"}
- * )
+ * Plain value object for a market price, served by ApiController.
+ * Not a Doctrine entity; candidate to move to App\Dto.
  */
 class StockPrice
 {
-    /**
-     * @ApiProperty(identifier=true)
-     */
-    private $symbol;
+    private string $symbol = '';
 
     /**
      * Market price
-     *
-     * @var float|null
      */
-    private $price;
+    private ?float $price = null;
 
-    /**
-     * Get the value of symbol
-     */
-    public function getSymbol()
+    public function getSymbol(): string
     {
         return $this->symbol;
     }
 
-
-    /**
-     * Set the value of symbol
-     *
-     * @return  self
-     */
-    public function setSymbol($symbol): self
+    public function setSymbol(string $symbol): self
     {
         $this->symbol = $symbol;
 
         return $this;
     }
 
-    /**
-     * Get market price
-     *
-     * @return  float|null
-     */
     public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    /**
-     * Set market price
-     *
-     * @param  float  $price  Market price
-     *
-     * @return  self
-     */
     public function setPrice(?float $price): self
     {
         $this->price = $price;

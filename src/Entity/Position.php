@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\PositionStatus;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -51,8 +52,12 @@ class Position
 
     #[Groups(['position:read', 'position:write'])]
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Ticker', inversedBy: 'positions')]
-    #[ORM\JoinColumn(nullable: false)]
-    private Ticker $ticker;
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Ticker $ticker = null;
+
+    #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
+    #[ORM\Column(type: 'string', length: 16, enumType: PositionStatus::class, options: ['default' => 'open'])]
+    private PositionStatus $status = PositionStatus::OPEN;
 
     #[Groups(['position:read', 'position:write', 'ticker:read:item'])]
     #[
@@ -241,12 +246,12 @@ class Position
         return $this;
     }
 
-    public function getTicker(): Ticker
+    public function getTicker(): ?Ticker
     {
         return $this->ticker;
     }
 
-    public function setTicker(Ticker $ticker): self
+    public function setTicker(?Ticker $ticker): self
     {
         $this->ticker = $ticker;
 
@@ -258,9 +263,37 @@ class Position
         return $this->closed;
     }
 
+    /**
+     * Keeps the status in sync: closing sets status CLOSED, reopening a
+     * closed position sets status OPEN (PENDING is left untouched).
+     */
     public function setClosed(bool $closed): self
     {
         $this->closed = $closed;
+
+        if ($closed) {
+            $this->status = PositionStatus::CLOSED;
+        }
+
+        if (!$closed && $this->status === PositionStatus::CLOSED) {
+            $this->status = PositionStatus::OPEN;
+        }
+
+        return $this;
+    }
+
+    public function getStatus(): PositionStatus
+    {
+        return $this->status;
+    }
+
+    /**
+     * Keeps the closed flag in sync with the status.
+     */
+    public function setStatus(PositionStatus $status): self
+    {
+        $this->status = $status;
+        $this->closed = $status === PositionStatus::CLOSED;
 
         return $this;
     }
@@ -413,10 +446,6 @@ class Position
 
     public function addPie(Pie $pie): self
     {
-        if ($this->pies == null) {
-            $this->pies = new ArrayCollection();
-        }
-
         if (!$this->pies->contains($pie)) {
             $this->pies[] = $pie;
             $pie->addPosition($this);

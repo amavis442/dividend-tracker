@@ -3,12 +3,12 @@
 namespace App\Factory;
 
 use App\Entity\Currency;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<Currency>
+ * @extends PersistentObjectFactory<Currency>
  */
-final class CurrencyFactory extends PersistentProxyObjectFactory
+final class CurrencyFactory extends PersistentObjectFactory
 {
     const CURRENCY_SYMBOL = ['USD','EUR','GBX'];
     /**

@@ -3,12 +3,12 @@
 namespace App\Factory;
 
 use App\Entity\Ticker;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<Ticker>
+ * @extends PersistentObjectFactory<Ticker>
  */
-final class TickerFactory extends PersistentProxyObjectFactory
+final class TickerFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

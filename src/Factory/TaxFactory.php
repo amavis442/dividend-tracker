@@ -3,12 +3,12 @@
 namespace App\Factory;
 
 use App\Entity\Tax;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<Tax>
+ * @extends PersistentObjectFactory<Tax>
  */
-final class TaxFactory extends PersistentProxyObjectFactory
+final class TaxFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

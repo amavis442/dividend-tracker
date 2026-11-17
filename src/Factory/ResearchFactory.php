@@ -3,12 +3,12 @@
 namespace App\Factory;
 
 use App\Entity\Research;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<Research>
+ * @extends PersistentObjectFactory<Research>
  */
-final class ResearchFactory extends PersistentProxyObjectFactory
+final class ResearchFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

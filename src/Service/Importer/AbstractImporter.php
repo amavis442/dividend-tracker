@@ -61,14 +61,10 @@ abstract class AbstractImporter
 				->setUser($user)
 				->setCurrency($currency)
 				->setAllocationCurrency($currency);
-			$entityManager->persist($position);
-			$entityManager->flush();
 		}
 
-		if ($position != null) {
-			$entityManager->persist($position);
-			$entityManager->flush();
-		}
+		$entityManager->persist($position);
+		$entityManager->flush();
 
 		return $position;
 	}

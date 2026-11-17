@@ -44,7 +44,7 @@ final class CorporateActionControllerTest extends WebTestCase
 		$userFactoryResult = UserFactory::createOne(['email' => '[EMAIL]']);
 		$this->manager->flush();  // flush so repository lookup works
 
-		$user = $userFactoryResult->_real();
+		$user = $userFactoryResult;
 		$this->assertSame('[EMAIL]', $user->getEmail());
 
 		$userRepository = static::getContainer()->get(UserRepository::class);
@@ -85,8 +85,8 @@ final class CorporateActionControllerTest extends WebTestCase
 			'ticker' => $tickerProxy,
 			'user' => $this->testUser,
 		]);
-		$position = $positionProxy->_real();
-		$ticker = $tickerProxy->_real();
+		$position = $positionProxy;
+		$ticker = $tickerProxy;
 
 		$this->manager->persist($ticker);
 		$this->manager->persist($position);

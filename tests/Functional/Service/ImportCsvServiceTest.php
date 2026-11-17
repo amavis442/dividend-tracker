@@ -49,7 +49,7 @@ class ImportCsvServiceTest extends KernelTestCase
 		$container = static::getContainer();
 
 		$userFactory = UserFactory::createOne();
-		$user = $userFactory->_real();
+		$user = $userFactory;
 		$currency = CurrencyFactory::createOne(['symbol' => 'EUR']);
 		$tax = TaxFactory::createOne(['taxRate' => 15]);
 		$branch = BranchFactory::createOne([

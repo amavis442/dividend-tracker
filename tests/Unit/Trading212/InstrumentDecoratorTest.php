@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Features\Trading212;
+namespace App\Tests\Unit\Trading212;
 
 use App\Decorator\InstrumentDecorator;
 use App\Entity\Payment;

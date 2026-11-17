@@ -3,12 +3,12 @@
 namespace App\Factory;
 
 use App\Entity\Journal;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<Journal>
+ * @extends PersistentObjectFactory<Journal>
  */
-final class JournalFactory extends PersistentProxyObjectFactory
+final class JournalFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

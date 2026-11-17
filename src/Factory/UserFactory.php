@@ -3,13 +3,13 @@
 namespace App\Factory;
 
 use App\Entity\User;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
- * @extends PersistentProxyObjectFactory<User>
+ * @extends PersistentObjectFactory<User>
  */
-final class UserFactory extends PersistentProxyObjectFactory
+final class UserFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

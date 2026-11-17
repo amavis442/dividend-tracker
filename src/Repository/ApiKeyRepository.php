@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\ApiKey;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,16 +22,24 @@ class ApiKeyRepository extends ServiceEntityRepository
 		return $this->createQueryBuilder('a')->orderBy('a.id', 'ASC');
 	}
 
-	public function findByApiKeyName(string $value): ?ApiKey
+	public function findByApiKeyName(string $value, ?User $user = null): ?ApiKey
 	{
-	        return $this->createQueryBuilder('a')
+		$queryBuilder = $this->createQueryBuilder('a')
 			->join('a.apiKeyName', 'ak')
-	            ->where('ak.keyName = :val')
-	            ->setParameter('val', $value)
-	            ->getQuery()
-	            ->getOneOrNullResult()
-	        ;
-	    }
+			->where('ak.keyName = :val')
+			->setParameter('val', $value);
+
+		if ($user !== null) {
+			$queryBuilder
+				->andWhere('a.user = :user')
+				->setParameter('user', $user);
+		}
+
+		return $queryBuilder
+			->setMaxResults(1)
+			->getQuery()
+			->getOneOrNullResult();
+	}
 
 	//    /**
 	//     * @return ApiKey[] Returns an array of ApiKey objects
