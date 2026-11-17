@@ -29,8 +29,9 @@ class ExportTransactionsController extends AbstractController
         $writer->setFieldDelimiter(';');
 
         /*
-        Datum;Type;Waarde;Transactievaluta;Brutobedrag;Valuta brutobedrag;Wisselkoers;Kosten;Belastingen;Aandelen;ISIN;WKN;Tickersymbool;Naam effect;Opmerking
-         */
+        Datum;Type;Waarde;Transactievaluta;Brutobedrag;Valuta brutobedrag;Wisselkoers;
+        Kosten;Belastingen;Aandelen;ISIN;WKN;Tickersymbool;Naam effect;Opmerking
+        */
         $headers = [];
         $headers[] = 'Datum';
         $headers[] = 'Tijd';
@@ -109,7 +110,8 @@ class ExportTransactionsController extends AbstractController
 
         $writer->setFieldDelimiter(';');
         /*
-        Datum;Type;Waarde;Transactievaluta;Brutobedrag;Valuta brutobedrag;Wisselkoers;Kosten;Belastingen;Aandelen;ISIN;WKN;Tickersymbool;Naam effect;Opmerking
+        Datum;Type;Waarde;Transactievaluta;Brutobedrag;Valuta brutobedrag;
+        Wisselkoers;Kosten;Belastingen;Aandelen;ISIN;WKN;Tickersymbool;Naam effect;Opmerking
          */
         $headers = [];
         $headers[] = 'Datum';

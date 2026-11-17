@@ -27,6 +27,9 @@ class YieldController extends AbstractController
     ): Response {
         $result = $yields->yield($sort, $sortDirection);
 
-        return $this->render('report/yield/index.html.twig', array_merge($result, ['controller_name' => 'ReportController']));
+        return $this->render(
+            'report/yield/index.html.twig',
+            array_merge($result, ['controller_name' => 'ReportController'])
+        );
     }
 }
