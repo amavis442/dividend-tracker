@@ -4,7 +4,7 @@ namespace App\Command;
 
 use App\Entity\Ticker;
 use App\Entity\Calendar;
-use App\Repository\CalendarRepository;
+use App\Repository\DividendCalendarRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\TickerRepository;
 use App\Service\DividendDate\DividendDateService;
@@ -37,7 +37,7 @@ class DividendDateCommand extends Command
     /**
      * Dividend calendar
      *
-     * @var CalendarRepository
+     * @var DividendCalendarRepository
      */
     protected $calendarRepository;
     /**
@@ -62,7 +62,7 @@ class DividendDateCommand extends Command
     public function __construct(
         EntityManagerInterface $entityManager,
         TickerRepository $tickerRepository,
-        CalendarRepository $calendarRepository,
+        DividendCalendarRepository $calendarRepository,
         CurrencyRepository $currencyRepository,
         DividendDateService $dividendDateService,
         LoggerInterface $logger

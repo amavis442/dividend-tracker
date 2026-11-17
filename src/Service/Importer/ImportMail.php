@@ -7,7 +7,7 @@ use App\Entity\Currency;
 use App\Entity\Tax;
 use App\Entity\Transaction;
 use App\Repository\BranchRepository;
-use App\Repository\CalendarRepository;
+use App\Repository\DividendCalendarRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
@@ -35,7 +35,7 @@ class ImportMail extends AbstractImporter
         protected BranchRepository $branchRepository,
         protected TransactionRepository $transactionRepository,
         protected PaymentRepository $paymentRepository,
-        protected CalendarRepository $calendarRepository,
+        protected DividendCalendarRepository $calendarRepository,
         protected EntityManager $entityManager,
         protected WeightedAverage $weightedAverage,
         protected TaxRepository $taxRepository,

@@ -8,7 +8,7 @@ use App\Entity\GlobalXImport;
 use App\Entity\ImportFiles;
 use App\Form\FileUploadType;
 use App\Form\GlobalXImportType;
-use App\Repository\CalendarRepository;
+use App\Repository\DividendCalendarRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\ImportFilesRepository;
 use App\Repository\TickerRepository;
@@ -31,7 +31,7 @@ class GlobalXImportController extends AbstractController
     #[Route(path: '/', name: 'globalx_import')]
     public function index(
         Request $request,
-        CalendarRepository $calendarRepository,
+        DividendCalendarRepository $calendarRepository,
         CurrencyRepository $currencyRepository,
         TickerRepository $tickerRepository,
         GlobalXImportService $globalXImportService,

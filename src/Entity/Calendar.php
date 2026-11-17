@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new GetCollection()
     ]
 )]
-#[ORM\Entity(repositoryClass: 'App\Repository\CalendarRepository')]
+#[ORM\Entity(repositoryClass: 'App\Repository\DividendCalendarRepository')]
 #[ORM\HasLifecycleCallbacks]
 class Calendar
 {
