@@ -5,7 +5,7 @@ namespace App\Controller\Report;
 use App\Helper\Colors;
 use App\Repository\PaymentRepository;
 use App\Repository\DividendTrackerRepository;
-use App\Repository\CalendarRepository;
+use App\Repository\DividendCalendarRepository;
 use App\Service\Payouts;
 use App\Service\Dividend\DividendService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -75,7 +75,7 @@ class PayoutController extends AbstractController
     public function payments(
         PaymentRepository $paymentRepository,
         DividendTrackerRepository $dividendTrackerRepository,
-        CalendarRepository $calendarRepository,
+        DividendCalendarRepository $calendarRepository,
         Payouts $payout,
         DividendService $dividendService,
         ChartBuilderInterface $chartBuilder

@@ -8,9 +8,6 @@ use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Entity\Transaction;
-use App\Service\ExchangeRate\DividendExchangeRateResolverInterface;
-use App\Service\Dividend\DividendServiceInterface;
-use App\Service\Dividend\DividendTaxRateResolverInterface;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -404,14 +401,15 @@ class DividendCalendarRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get the calendars between startDate and endDate
+     * Calendars paid out between startDate and endDate for open positions
+     * (or positions closed in the last two months), with ticker, positions,
+     * transactions, pies, currency and tax fetched for the forecast.
+     *
+     * @return Calendar[]
      */
-    public function foreCast(
-        DividendServiceInterface $dividendService,
-        string $startDate,
-        string $endDate
-    ): ?array {
-        $qb = $this->createQueryBuilder('c')
+    public function findForForecast(string $startDate, string $endDate): array
+    {
+        return $this->createQueryBuilder('c')
             ->select('c, t, p, tr, pies, cur, tax')
             ->innerJoin('c.ticker', 't')
             ->innerJoin(
@@ -425,43 +423,11 @@ class DividendCalendarRepository extends ServiceEntityRepository
             ->leftJoin('p.pies', 'pies')
             ->leftJoin('c.currency', 'cur')
             ->where('c.paymentDate >= :start and c.paymentDate <= :end')
-
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
-            ->setParameter(
-                'closedAt',
-                (new DateTime('-2 month'))->format('Y-m-d')
-            );
-
-        $result = $qb->getQuery()->getResult();
-
-        if (!$result) {
-            return null;
-        }
-
-        $dividendService->setAccumulateDividendAmount(false);
-
-        $totalDividend = [];
-        foreach ($result as $item) {
-            $positionAmount = $dividendService->getPositionAmount($item);
-            if ($positionAmount < 0.001) {
-                // filter out ones that have no amount of stocks for dividend payout
-                continue;
-            }
-            $positionDividend = $dividendService->getTotalNetDividend($item);
-            if ($positionDividend < 0.01) {
-                // filter out ones that have no payout of dividend or to small to matter
-                continue;
-            }
-            if (!isset($totalDividend[$item->getPaymentDate()->format('Ym')])) {
-                $totalDividend[$item->getPaymentDate()->format('Ym')] = 0.0;
-            }
-            $totalDividend[
-                $item->getPaymentDate()->format('Ym')
-            ] += $positionDividend;
-        }
-
-        return $totalDividend;
+            ->setParameter('closedAt', (new DateTime('-2 month'))->format('Y-m-d'))
+            ->getQuery()
+            ->getResult();
     }
 
     public function getCalendarsForTickers(

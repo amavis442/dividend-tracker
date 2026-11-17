@@ -2,13 +2,17 @@
 
 namespace App\Service;
 
+use App\Entity\Calendar;
 use App\Repository\PaymentRepository;
 use App\Repository\DividendTrackerRepository;
-use App\Repository\CalendarRepository;
-use App\Service\Dividend\DividendService;
+use App\Repository\DividendCalendarRepository;
+use App\Service\Dividend\DividendServiceInterface;
 
 class Payouts
 {
+    private const MIN_POSITION_AMOUNT = 0.001;
+    private const MIN_DIVIDEND = 0.01;
+
     public function payout(PaymentRepository $paymentRepository): array
     {
         $data = $paymentRepository->getDividendsPerInterval();
@@ -36,8 +40,8 @@ class Payouts
     public function payments(
         PaymentRepository $paymentRepository,
         DividendTrackerRepository $dividendTrackerRepository,
-        DividendService $dividendService,
-        CalendarRepository $calendarRepository
+        DividendServiceInterface $dividendService,
+        DividendCalendarRepository $calendarRepository
     ): array {
         $paydate = (new \DateTime('first day of this month -1 years'))->format(
             'Y-m-d'
@@ -56,7 +60,10 @@ class Payouts
 
         //$startDate = (new \DateTime('first day of this month'))->format('Y-m-d');
         $endDate = (new \DateTime('last day of this month'))->format('Y-m-d');
-        $foreCastDividend = $calendarRepository->foreCast($dividendService, $paydate, $endDate);
+        $foreCastDividend = $this->forecastPerMonth(
+            $dividendService,
+            $calendarRepository->findForForecast($paydate, $endDate)
+        );
         ksort($foreCastDividend);
 
         $labels = [];
@@ -163,5 +170,35 @@ class Payouts
             'slope' => $slope,
             'intercept' => $intercept,
         ];
+    }
+
+    /**
+     * Net forecast dividend per payment month (key: Ym), skipping calendars
+     * without shares or with a negligible payout.
+     *
+     * @param Calendar[] $calendars
+     *
+     * @return array<string, float>
+     */
+    private function forecastPerMonth(DividendServiceInterface $dividendService, array $calendars): array
+    {
+        $dividendService->setAccumulateDividendAmount(false);
+
+        $totalDividend = [];
+        foreach ($calendars as $calendar) {
+            if ($dividendService->getPositionAmount($calendar) < self::MIN_POSITION_AMOUNT) {
+                continue;
+            }
+
+            $positionDividend = $dividendService->getTotalNetDividend($calendar);
+            if ($positionDividend < self::MIN_DIVIDEND) {
+                continue;
+            }
+
+            $month = $calendar->getPaymentDate()->format('Ym');
+            $totalDividend[$month] = ($totalDividend[$month] ?? 0.0) + $positionDividend;
+        }
+
+        return $totalDividend;
     }
 }
