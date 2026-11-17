@@ -4,7 +4,7 @@ namespace App\Service\Trading212;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class PositionService
+class PositionApiClient
 {
     public const API_URL = 'https://live.trading212.com/api/v0/equity/positions';
     protected string $apiKey;
