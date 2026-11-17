@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Calendar;
-use App\Entity\FileUpload;
-use App\Entity\GlobalXImport;
+use App\Form\Model\FileUpload;
+use App\Form\Model\GlobalXImport;
 use App\Entity\ImportFiles;
 use App\Form\FileUploadType;
 use App\Form\GlobalXImportType;

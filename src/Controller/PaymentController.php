@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Util\Constants;
-use App\Entity\DateIntervalSelect;
+use App\Form\Model\DateIntervalSelect;
 use App\Entity\Payment;
 use App\Entity\Position;
 use App\Form\DateIntervalFormType;

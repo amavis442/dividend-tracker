@@ -6,7 +6,7 @@ use Symfony\Component\Form\FormInterface;
 use App\Entity\Research;
 use App\Entity\Ticker;
 use App\Entity\Attachment;
-use App\Entity\TickerAutocomplete;
+use App\Form\Model\TickerAutocomplete;
 use App\Form\ResearchType;
 use App\Form\TickerAutocompleteType;
 use App\Repository\ResearchRepository;

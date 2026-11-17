@@ -6,7 +6,7 @@ use Symfony\Component\Form\FormInterface;
 use App\Entity\User;
 use App\Entity\Portfolio;
 use App\Entity\Position;
-use App\Entity\TickerAutocomplete;
+use App\Form\Model\TickerAutocomplete;
 use App\Form\PositionType;
 use App\Form\TickerAutocompleteType;
 use App\Repository\PortfolioRepository;

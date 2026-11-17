@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Contracts\Service;
 
-use App\Entity\Summary;
+use App\Dto\Summary;
 
 interface SummaryInterface
 {

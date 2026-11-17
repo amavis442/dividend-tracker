@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Entity\CalcCompound;
-use App\Entity\Compound;
-use App\Entity\Drip;
+use App\Form\Model\Compound;
+use App\Form\Model\Drip;
 
 class CompoundCalculator
 {
