@@ -19,120 +19,120 @@ use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 #[Route('/{_locale<%app.supported_locales%>}/dashboard/branch')]
 class BranchController extends AbstractController
 {
-	#[Route('/', name: 'branch_index', methods: ['GET'])]
-	public function index(
-		BranchRepository $branchRepository,
-		Referer $referer,
-		#[MapQueryParameter] int $page = 1
-	): Response {
-		$referer->clear();
-		$referer->set('branch_index', [
-			'page' => $page,
-		]);
+    #[Route('/', name: 'branch_index', methods: ['GET'])]
+    public function index(
+        BranchRepository $branchRepository,
+        Referer $referer,
+        #[MapQueryParameter] int $page = 1
+    ): Response {
+        $referer->clear();
+        $referer->set('branch_index', [
+            'page' => $page,
+        ]);
 
-		$queryBuilder = $branchRepository->getAllQuery();
-		$adapter = new QueryAdapter($queryBuilder);
-		$pager = new Pagerfanta($adapter);
-		$pager->setMaxPerPage(10);
-		$pager->setCurrentPage($page);
+        $queryBuilder = $branchRepository->getAllQuery();
+        $adapter = new QueryAdapter($queryBuilder);
+        $pager = new Pagerfanta($adapter);
+        $pager->setMaxPerPage(10);
+        $pager->setCurrentPage($page);
 
-		$sumAssetAllocation = $branchRepository->getSumAssetAllocation();
+        $sumAssetAllocation = $branchRepository->getSumAssetAllocation();
 
-		return $this->render('branch/index.html.twig', [
-			'pager' => $pager,
-			'sumAssetAllocation' => $sumAssetAllocation,
-			'routeName' => 'branch_index',
-		]);
-	}
+        return $this->render('branch/index.html.twig', [
+            'pager' => $pager,
+            'sumAssetAllocation' => $sumAssetAllocation,
+            'routeName' => 'branch_index',
+        ]);
+    }
 
-	#[Route('/create', name: 'branch_new', methods: ['GET', 'POST'])]
-	public function create(
-		Request $request,
-		BranchRepository $branchRepository,
-		EntityManagerInterface $entityManager
-	): Response {
-		$branch = new Branch();
-		$assignedAllocation =
-			$branchRepository->getSumAssetAllocation() -
-			$branch->getAssetAllocation();
-		$maxAssetAllocation = 100 - (int) ($assignedAllocation / 100);
-		$form = $this->createForm(BranchType::class, $branch, [
-			'maxAssetAllocation' => $maxAssetAllocation,
-		]);
-		$form->handleRequest($request);
+    #[Route('/create', name: 'branch_new', methods: ['GET', 'POST'])]
+    public function create(
+        Request $request,
+        BranchRepository $branchRepository,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $branch = new Branch();
+        $assignedAllocation =
+            $branchRepository->getSumAssetAllocation() -
+            $branch->getAssetAllocation();
+        $maxAssetAllocation = 100 - (int) ($assignedAllocation / 100);
+        $form = $this->createForm(BranchType::class, $branch, [
+            'maxAssetAllocation' => $maxAssetAllocation,
+        ]);
+        $form->handleRequest($request);
 
-		if ($form->isSubmitted() && $form->isValid()) {
-			$entityManager->persist($branch);
-			$entityManager->flush();
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($branch);
+            $entityManager->flush();
 
-			return $this->redirectToRoute('branch_index');
-		}
+            return $this->redirectToRoute('branch_index');
+        }
 
-		return $this->render('branch/new.html.twig', [
-			'branch' => $branch,
-			'form' => $form->createView(),
-		]);
-	}
+        return $this->render('branch/new.html.twig', [
+            'branch' => $branch,
+            'form' => $form->createView(),
+        ]);
+    }
 
-	#[Route('/{id}', name: 'branch_show', methods: ['GET'])]
-	public function show(#[MapEntity] Branch $branch): Response
-	{
-		return $this->render('branch/show.html.twig', [
-			'branch' => $branch,
-		]);
-	}
+    #[Route('/{id}', name: 'branch_show', methods: ['GET'])]
+    public function show(#[MapEntity] Branch $branch): Response
+    {
+        return $this->render('branch/show.html.twig', [
+            'branch' => $branch,
+        ]);
+    }
 
-	#[Route('/{id}/edit', name: 'branch_edit', methods: ['GET', 'POST'])]
-	public function edit(
-		Request $request,
-		EntityManagerInterface $entityManager,
-		#[MapEntity] Branch $branch,
-		BranchRepository $branchRepository
-	): Response {
-		$assignedAllocation =
-			$branchRepository->getSumAssetAllocation() -
-			$branch->getAssetAllocation();
-		$maxAssetAllocation = 100 - (int) ($assignedAllocation / 100);
-		$form = $this->createForm(BranchType::class, $branch, [
-			'maxAssetAllocation' => $maxAssetAllocation,
-		]);
-		$form->handleRequest($request);
+    #[Route('/{id}/edit', name: 'branch_edit', methods: ['GET', 'POST'])]
+    public function edit(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        #[MapEntity] Branch $branch,
+        BranchRepository $branchRepository
+    ): Response {
+        $assignedAllocation =
+            $branchRepository->getSumAssetAllocation() -
+            $branch->getAssetAllocation();
+        $maxAssetAllocation = 100 - (int) ($assignedAllocation / 100);
+        $form = $this->createForm(BranchType::class, $branch, [
+            'maxAssetAllocation' => $maxAssetAllocation,
+        ]);
+        $form->handleRequest($request);
 
-		if ($form->isSubmitted() && $form->isValid()) {
-			$entityManager->flush();
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
 
-			return $this->redirectToRoute('branch_index');
-		}
+            return $this->redirectToRoute('branch_index');
+        }
 
-		return $this->render('branch/edit.html.twig', [
-			'branch' => $branch,
-			'form' => $form->createView(),
-		]);
-	}
+        return $this->render('branch/edit.html.twig', [
+            'branch' => $branch,
+            'form' => $form->createView(),
+        ]);
+    }
 
-	#[Route('/delete/{id}', name: 'branch_delete', methods: ['POST', 'DELETE'])]
-	public function delete(
-		Request $request,
-		EntityManagerInterface $entityManager,
-		#[MapEntity] Branch $branch
-	): Response {
-		if (
-			$this->isCsrfTokenValid(
-				'delete' . $branch->getId(),
-				$request->request->get('_token')
-			)
-		) {
-			if ($branch->getTickers()->isEmpty()) {
-				$entityManager->remove($branch);
-				$entityManager->flush();
-				return $this->redirectToRoute('branch_index');
-			}
+    #[Route('/delete/{id}', name: 'branch_delete', methods: ['POST', 'DELETE'])]
+    public function delete(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        #[MapEntity] Branch $branch
+    ): Response {
+        if (
+            $this->isCsrfTokenValid(
+                'delete' . $branch->getId(),
+                $request->request->get('_token')
+            )
+        ) {
+            if ($branch->getTickers()->isEmpty()) {
+                $entityManager->remove($branch);
+                $entityManager->flush();
+                return $this->redirectToRoute('branch_index');
+            }
 
-			$this->addFlash(
-				'notice',
-				'Can not delete. Branch is connected to tickers.'
-			);
-		}
-		return $this->redirectToRoute('branch_index');
-	}
+            $this->addFlash(
+                'notice',
+                'Can not delete. Branch is connected to tickers.'
+            );
+        }
+        return $this->redirectToRoute('branch_index');
+    }
 }

@@ -19,27 +19,27 @@ class GlobalXImport
         return $this;
     }
 
-	/**
-	 * Get the value of ticker
-	 *
-	 * @return  Ticker
-	 */
-	public function getTicker(): Ticker
-	{
-		return $this->ticker;
-	}
+    /**
+     * Get the value of ticker
+     *
+     * @return  Ticker
+     */
+    public function getTicker(): Ticker
+    {
+        return $this->ticker;
+    }
 
-	/**
-	 * Set the value of ticker
-	 *
-	 * @param   Ticker  $ticker
-	 *
-	 * @return  self
-	 */
-	public function setTicker(Ticker $ticker): self
-	{
-		$this->ticker = $ticker;
+    /**
+     * Set the value of ticker
+     *
+     * @param   Ticker  $ticker
+     *
+     * @return  self
+     */
+    public function setTicker(Ticker $ticker): self
+    {
+        $this->ticker = $ticker;
 
-		return $this;
-	}
+        return $this;
+    }
 }

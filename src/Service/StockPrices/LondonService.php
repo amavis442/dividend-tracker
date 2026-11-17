@@ -8,7 +8,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class LondonService implements StockPricePluginInterface
 {
-
     /**
      * Used for calling the api
      *

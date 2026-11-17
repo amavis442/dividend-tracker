@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service\Adjustment;
 
 use App\Entity\CorporateAction;

@@ -30,5 +30,6 @@ final class PieDataDto
         public readonly Collection $tickerIds,
         public readonly Collection $corporateActions,
         public readonly Collection $dividends,
-    ) {}
+    ) {
+    }
 }

@@ -71,7 +71,7 @@ class Calendar
     private $currency;
 
     #[Groups(['calendar:read', 'calendar:write', 'ticker:read:item', 'position:read:item', 'transaction:read'])]
-    #[ORM\Column(type: 'string', length: 255, nullable: false,options: ["default" => 'Regular'],)]
+    #[ORM\Column(type: 'string', length: 255, nullable: false, options: ["default" => 'Regular'],)]
     private $dividendType = 'Regular';
 
     /**
@@ -289,30 +289,30 @@ class Calendar
         return $this->updatedAt;
     }
 
-	/**
-	 * Get the value of adjustedCashAmount
-	 *
-	 * @return  float
-	 */
-	public function getAdjustedCashAmount(): float
-	{
+    /**
+     * Get the value of adjustedCashAmount
+     *
+     * @return  float
+     */
+    public function getAdjustedCashAmount(): float
+    {
         if (!isset($this->adjustedCashAmount)) {
             $this->adjustedCashAmount = $this->cashAmount;
         }
-		return $this->adjustedCashAmount;
-	}
+        return $this->adjustedCashAmount;
+    }
 
-	/**
-	 * Set the value of adjustedCashAmount
-	 *
-	 * @param   float  $adjustedCashAmount
-	 *
-	 * @return  self
-	 */
-	public function setAdjustedCashAmount(float $adjustedCashAmount): self
-	{
-		$this->adjustedCashAmount = $adjustedCashAmount;
+    /**
+     * Set the value of adjustedCashAmount
+     *
+     * @param   float  $adjustedCashAmount
+     *
+     * @return  self
+     */
+    public function setAdjustedCashAmount(float $adjustedCashAmount): self
+    {
+        $this->adjustedCashAmount = $adjustedCashAmount;
 
-		return $this;
-	}
+        return $this;
+    }
 }

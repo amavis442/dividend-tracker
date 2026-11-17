@@ -9,26 +9,26 @@ use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 
 #[
-	AsEntityListener(
-		event: Events::prePersist,
-		method: 'prePersist',
-		entity: CorporateAction::class
-	)
+    AsEntityListener(
+        event: Events::prePersist,
+        method: 'prePersist',
+        entity: CorporateAction::class
+    )
 ]
 final class CorporateActionListener
 {
-	public function __construct(private MetricsUpdateService $metricsUpdate)
-	{
-	}
+    public function __construct(private MetricsUpdateService $metricsUpdate)
+    {
+    }
 
-	public function prePersist(
-		CorporateAction $action,
-		PrePersistEventArgs $event
-	): void {
-		$ticker = $action->getTicker();
-		$position = $ticker->getPositions()->first();
-		if ($position) {
-			$this->metricsUpdate->update($position);
-		}
-	}
+    public function prePersist(
+        CorporateAction $action,
+        PrePersistEventArgs $event
+    ): void {
+        $ticker = $action->getTicker();
+        $position = $ticker->getPositions()->first();
+        if ($position) {
+            $this->metricsUpdate->update($position);
+        }
+    }
 }

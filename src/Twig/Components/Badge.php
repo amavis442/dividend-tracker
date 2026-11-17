@@ -25,8 +25,7 @@ final class Badge
 
     public function getTypeClasses(): string
     {
-        return match($this->type)
-        {
+        return match ($this->type) {
             'default' => 'rounded-md',
             'pill' => 'p-2 h-4 inline-flex items-center justify-center rounded-full',
             default => throw new \LogicException(sprintf('Unknown badge type "%s"', $this->type)),

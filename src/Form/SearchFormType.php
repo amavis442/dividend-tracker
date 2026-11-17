@@ -33,5 +33,4 @@ class SearchFormType extends AbstractType
             "extra_options" => [],
         ]);
     }
-
 }

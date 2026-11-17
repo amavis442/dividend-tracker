@@ -4,7 +4,6 @@ namespace App\Entity;
 
 class SearchForm
 {
-
     private ?Ticker $ticker = null;
 
     /**

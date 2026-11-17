@@ -9,5 +9,4 @@ use Traversable;
 final class ListGroup
 {
     public Traversable $list_items;
-    
 }

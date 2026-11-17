@@ -10,7 +10,9 @@ class AdjustmentStrategyResolver
     /**
      * @param AdjustmentStrategyInterface[] $strategies
      */
-    public function __construct(private iterable $strategies) {}
+    public function __construct(private iterable $strategies)
+    {
+    }
 
     public function resolve(Transaction $transaction, CorporateAction $action): float
     {

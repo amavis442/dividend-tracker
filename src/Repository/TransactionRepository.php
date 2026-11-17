@@ -19,111 +19,111 @@ use App\Entity\Ticker;
  */
 class TransactionRepository extends ServiceEntityRepository
 {
-	use PagerTrait;
+    use PagerTrait;
 
-	public function __construct(ManagerRegistry $registry)
-	{
-		parent::__construct($registry, Transaction::class);
-	}
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Transaction::class);
+    }
 
-	private function getQueryBuilder(
-		string $orderBy = 'transactionDate',
-		string $sort = 'ASC',
-		?Ticker $ticker = null
-	): QueryBuilder {
-		$order = 'tr.' . $orderBy;
-		if ($orderBy === 'symbol') {
-			$order = 't.symbol';
-		}
+    private function getQueryBuilder(
+        string $orderBy = 'transactionDate',
+        string $sort = 'ASC',
+        ?Ticker $ticker = null
+    ): QueryBuilder {
+        $order = 'tr.' . $orderBy;
+        if ($orderBy === 'symbol') {
+            $order = 't.symbol';
+        }
 
-		// Create our query
-		$queryBuilder = $this->createQueryBuilder('tr')
-			->select('tr')
-			->innerJoin('tr.position', 'p')
-			->innerJoin('p.ticker', 't')
-			->innerJoin('t.branch', 'i')
-			->orderBy($order, $sort);
+        // Create our query
+        $queryBuilder = $this->createQueryBuilder('tr')
+            ->select('tr')
+            ->innerJoin('tr.position', 'p')
+            ->innerJoin('p.ticker', 't')
+            ->innerJoin('t.branch', 'i')
+            ->orderBy($order, $sort);
 
-		if ($ticker) {
-			$queryBuilder
-				->andWhere('t = :ticker')
-				->setParameter('ticker', $ticker->getId());
-		}
-		return $queryBuilder;
-	}
+        if ($ticker) {
+            $queryBuilder
+                ->andWhere('t = :ticker')
+                ->setParameter('ticker', $ticker->getId());
+        }
+        return $queryBuilder;
+    }
 
-	public function getAll(
-		int $page = 1,
-		int $limit = 10,
-		string $orderBy = 'transactionDate',
-		string $sort = 'ASC',
-		?Ticker $ticker = null
-	): Paginator {
-		$queryBuilder = $this->getQueryBuilder($orderBy, $sort, $ticker);
-		$queryBuilder->leftJoin('t.calendars', 'c');
-		$query = $queryBuilder->getQuery();
-		$paginator = $this->paginate($query, $page, $limit);
+    public function getAll(
+        int $page = 1,
+        int $limit = 10,
+        string $orderBy = 'transactionDate',
+        string $sort = 'ASC',
+        ?Ticker $ticker = null
+    ): Paginator {
+        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $ticker);
+        $queryBuilder->leftJoin('t.calendars', 'c');
+        $query = $queryBuilder->getQuery();
+        $paginator = $this->paginate($query, $page, $limit);
 
-		return $paginator;
-	}
+        return $paginator;
+    }
 
-	public function getAllQuery(
-		string $orderBy = 'transactionDate',
-		string $sort = 'ASC',
-		?Ticker $ticker = null
-	): QueryBuilder {
-		$queryBuilder = $this->getQueryBuilder($orderBy, $sort, $ticker);
-		$queryBuilder->leftJoin('t.calendars', 'c');
-		return $queryBuilder;
-	}
+    public function getAllQuery(
+        string $orderBy = 'transactionDate',
+        string $sort = 'ASC',
+        ?Ticker $ticker = null
+    ): QueryBuilder {
+        $queryBuilder = $this->getQueryBuilder($orderBy, $sort, $ticker);
+        $queryBuilder->leftJoin('t.calendars', 'c');
+        return $queryBuilder;
+    }
 
-	public function getAllByPositionQuery(Position $position): QueryBuilder
-	{
-		return $this->createQueryBuilder('t')
-			->innerJoin('t.position', 'p')
-			->where('t.position = :position')
-			->orderBy('t.transactionDate, t.id', 'asc')
-			->andWhere('p.closed = false')
-			->setParameter('position', $position);
-	}
+    public function getAllByPositionQuery(Position $position): QueryBuilder
+    {
+        return $this->createQueryBuilder('t')
+            ->innerJoin('t.position', 'p')
+            ->where('t.position = :position')
+            ->orderBy('t.transactionDate, t.id', 'asc')
+            ->andWhere('p.closed = false')
+            ->setParameter('position', $position);
+    }
 
-	public function getByTicker(Ticker $ticker)
-	{
-		return $this->createQueryBuilder('t')
-			->innerJoin('t.position', 'p')
-			->where('t.ticker = :ticker')
-			->orderBy('t.transactionDate, t.id', 'asc')
-			->andWhere('p.closed = false')
-			->setParameter('ticker', $ticker)
-			->getQuery()
-			->getResult();
-	}
+    public function getByTicker(Ticker $ticker)
+    {
+        return $this->createQueryBuilder('t')
+            ->innerJoin('t.position', 'p')
+            ->where('t.ticker = :ticker')
+            ->orderBy('t.transactionDate, t.id', 'asc')
+            ->andWhere('p.closed = false')
+            ->setParameter('ticker', $ticker)
+            ->getQuery()
+            ->getResult();
+    }
 
-	public function getHighLow(Position $position): array
-	{
-		$result = $this->createQueryBuilder('t')
-			->select('MAX(t.price) as high, MIN(t.price) as low')
-			->innerJoin('t.position', 'p')
-			->where('p = :position')
-			->andWhere('p.closed = false')
-			->setParameter('position', $position)
-			->getQuery()
-			->getResult();
+    public function getHighLow(Position $position): array
+    {
+        $result = $this->createQueryBuilder('t')
+            ->select('MAX(t.price) as high, MIN(t.price) as low')
+            ->innerJoin('t.position', 'p')
+            ->where('p = :position')
+            ->andWhere('p.closed = false')
+            ->setParameter('position', $position)
+            ->getQuery()
+            ->getResult();
 
-		if (count($result) > 0) {
-			return [
-				'low' => $result['0']['low'],
-				'high' => $result['0']['high'],
-			];
-		}
-		return ['low' => 0, 'high' => 0];
-	}
+        if (count($result) > 0) {
+            return [
+                'low' => $result['0']['low'],
+                'high' => $result['0']['high'],
+            ];
+        }
+        return ['low' => 0, 'high' => 0];
+    }
 
-	public function getSummaryByPie(Pie $pie)
-	{
-		return $this->createQueryBuilder('t')
-			->select(
-				'p.id position_id, SUM(CASE WHEN t.side = 1 THEN t.amount ELSE -t.amount END) AS amount,
+    public function getSummaryByPie(Pie $pie)
+    {
+        return $this->createQueryBuilder('t')
+            ->select(
+                'p.id position_id, SUM(CASE WHEN t.side = 1 THEN t.amount ELSE -t.amount END) AS amount,
 				SUM(
 					CASE WHEN t.side = 1 THEN t.allocation ELSE 0 END
 
@@ -133,67 +133,67 @@ class TransactionRepository extends ServiceEntityRepository
 					CASE WHEN t.side = 1 THEN t.allocation ELSE 0 END
 
 				)/SUM(CASE WHEN t.side = 1 THEN t.amount ELSE 0 END)) * SUM(CASE WHEN t.side = 1 THEN t.amount ELSE -t.amount END) AS allocation'
-			)
-			->innerJoin('t.position', 'p', null, null, 'p.id')
-			->where('p.closed = false')
-			->andWhere('t.pie = :pie')
-			->setParameter('pie', $pie)
-			->groupBy('p.id')
-			->getQuery()
-			->getResult();
-	}
+            )
+            ->innerJoin('t.position', 'p', null, null, 'p.id')
+            ->where('p.closed = false')
+            ->andWhere('t.pie = :pie')
+            ->setParameter('pie', $pie)
+            ->groupBy('p.id')
+            ->getQuery()
+            ->getResult();
+    }
 
-	public function getByPositionQueryBuilder(Position $position)
-	{
-		return $this->createQueryBuilder('t')
-			->innerJoin('t.position', 'p')
-			->orderBy('t.transactionDate, t.id', 'asc')
-			->where('t.position = :position')
-			->andWhere('p.closed = false')
-			->orderBy('t.id', 'DESC')
-			->setParameter('position', $position);
-	}
+    public function getByPositionQueryBuilder(Position $position)
+    {
+        return $this->createQueryBuilder('t')
+            ->innerJoin('t.position', 'p')
+            ->orderBy('t.transactionDate, t.id', 'asc')
+            ->where('t.position = :position')
+            ->andWhere('p.closed = false')
+            ->orderBy('t.id', 'DESC')
+            ->setParameter('position', $position);
+    }
 
-	public function getLastImportFile(): array
-	{
-		return $this->createQueryBuilder('t')
-			->select('t.importfile')
-			->where('t.importfile is not null')
-			->orderBy('t.id', 'desc')
-			->setMaxResults(1)
-			->getQuery()
-			->getOneOrNullResult();
-	}
+    public function getLastImportFile(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->select('t.importfile')
+            ->where('t.importfile is not null')
+            ->orderBy('t.id', 'desc')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 
-	public function updatePieNull(Position $position, Pie $pie): void
-	{
-		$this->createQueryBuilder('t')
-			->update(Transaction::class, 't')
-			->set('t.pie', ':pie')
-			->where('t.pie is null')
-			->andWhere('t.position = :position')
-			->setParameter('pie', $pie)
-			->setParameter('position', $position)
-			->getQuery()
-			->execute();
-	}
+    public function updatePieNull(Position $position, Pie $pie): void
+    {
+        $this->createQueryBuilder('t')
+            ->update(Transaction::class, 't')
+            ->set('t.pie', ':pie')
+            ->where('t.pie is null')
+            ->andWhere('t.position = :position')
+            ->setParameter('pie', $pie)
+            ->setParameter('position', $position)
+            ->getQuery()
+            ->execute();
+    }
 
-	public function updatePie(Position $position, Pie $pie): void
-	{
-		$this->createQueryBuilder('t')
-			->update(Transaction::class, 't')
-			->set('t.pie', ':pie')
-			->andWhere('t.position = :position')
-			->setParameter('pie', $pie)
-			->setParameter('position', $position)
-			->getQuery()
-			->execute();
-	}
+    public function updatePie(Position $position, Pie $pie): void
+    {
+        $this->createQueryBuilder('t')
+            ->update(Transaction::class, 't')
+            ->set('t.pie', ':pie')
+            ->andWhere('t.position = :position')
+            ->setParameter('pie', $pie)
+            ->setParameter('position', $position)
+            ->getQuery()
+            ->execute();
+    }
 
-	// /**
-	//  * @return Transaction[] Returns an array of Transaction objects
-	//  */
-	/*
+    // /**
+    //  * @return Transaction[] Returns an array of Transaction objects
+    //  */
+    /*
     public function findByExampleField($value)
     {
         return $this->createQueryBuilder('o')
@@ -207,7 +207,7 @@ class TransactionRepository extends ServiceEntityRepository
     }
     */
 
-	/*
+    /*
     public function findOneBySomeField($value): ?Transaction
     {
         return $this->createQueryBuilder('o')
@@ -219,29 +219,31 @@ class TransactionRepository extends ServiceEntityRepository
     }
     */
 
-	public function removePie(Pie $pie): void
-	{
-		$this->createQueryBuilder('t')
-			->update(Transaction::class, 't')
-			->set('t.pie', 'null')
-			->where('t.pie = :pie')
-			->setParameter('pie', $pie)
-			->getQuery()
-			->execute();
-	}
+    public function removePie(Pie $pie): void
+    {
+        $this->createQueryBuilder('t')
+            ->update(Transaction::class, 't')
+            ->set('t.pie', 'null')
+            ->where('t.pie = :pie')
+            ->setParameter('pie', $pie)
+            ->getQuery()
+            ->execute();
+    }
 
-	public function findByPositionIds(array $positionIds): array {
-		return $this->createQueryBuilder('t')
-		->select('t, p, ti')
-		->join('t.position', 'p')
-		->join('p.ticker','ti')
-		->andWhere('t.position in (:positions)')
-		->setParameter('positions', $positionIds)
-		->getQuery()
-		->getResult();
-	}
+    public function findByPositionIds(array $positionIds): array
+    {
+        return $this->createQueryBuilder('t')
+        ->select('t, p, ti')
+        ->join('t.position', 'p')
+        ->join('p.ticker', 'ti')
+        ->andWhere('t.position in (:positions)')
+        ->setParameter('positions', $positionIds)
+        ->getQuery()
+        ->getResult();
+    }
 
-	public function getForCalendarView(array $positionIds): mixed {
-		return $this->findByPositionIds($positionIds);
-	}
+    public function getForCalendarView(array $positionIds): mixed
+    {
+        return $this->findByPositionIds($positionIds);
+    }
 }

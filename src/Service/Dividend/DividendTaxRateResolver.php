@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Service\Dividend;
 
 use App\Entity\Calendar;
 use App\Entity\Constants;
 
-class DividendTaxRateResolver implements DividendTaxRateResolverInterface {
+class DividendTaxRateResolver implements DividendTaxRateResolverInterface
+{
     /**
      * Needs Calendar, Ticker, Tax Entity data
      * $calendar->getTicker()->getTax()

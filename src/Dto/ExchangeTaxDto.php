@@ -9,5 +9,6 @@ final class ExchangeTaxDto
         public readonly float $taxAmount,
         public readonly string $currency,
         // Add any other contextual fields you need
-    ) {}
+    ) {
+    }
 }

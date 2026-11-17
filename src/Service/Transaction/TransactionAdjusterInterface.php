@@ -6,8 +6,8 @@ use App\Entity\Transaction;
 
 interface TransactionAdjusterInterface
 {
-	public function getAdjustedAmount(
-		Transaction $transaction,
-		array $actions
-	): float;
+    public function getAdjustedAmount(
+        Transaction $transaction,
+        array $actions
+    ): float;
 }

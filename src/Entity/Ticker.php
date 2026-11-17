@@ -55,7 +55,7 @@ class Ticker
 
     //#[Groups(['ticker:read', 'ticker:write'])]
     #[ORM\OneToMany(targetEntity: 'App\Entity\Research', mappedBy: 'ticker')]
-    #[ORM\OrderBy(['createdAt'=>'DESC'])]
+    #[ORM\OrderBy(['createdAt' => 'DESC'])]
     private $researches;
 
     //#[Groups(['ticker:read', 'ticker:write'])]
@@ -557,5 +557,4 @@ class Ticker
 
         return $this;
     }
-
 }

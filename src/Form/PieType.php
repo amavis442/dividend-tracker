@@ -15,7 +15,7 @@ class PieType extends AbstractType
     {
         $builder
             ->add('label')
-            ->add('trading212PieId', null,[
+            ->add('trading212PieId', null, [
                 'required' => false
             ]);
     }

@@ -16,7 +16,6 @@ class MonthNumberToNameExtension extends AbstractExtension
 {
     public function __construct(private TranslatorInterface $translator)
     {
-
     }
 
     /**

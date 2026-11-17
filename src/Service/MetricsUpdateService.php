@@ -11,7 +11,8 @@ class MetricsUpdateService
     public function __construct(
         private WeightedAverage $weightedAverage,
         private EntityManagerInterface $entityManager
-    ) {}
+    ) {
+    }
 
     public function update(Position $position): void
     {

@@ -18,13 +18,13 @@ use App\Service\ExchangeRate\ExchangeRateInterface;
 
 class PieDataProvider
 {
-
     public function __construct(
         private readonly Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
         private readonly CorporateActionDataProvider $corporateActionDataProvider,
         private readonly ExchangeRateInterface $exchangeRate,
         private readonly DividendDataProvider $dividendDataProvider,
-    ) {}
+    ) {
+    }
 
     /**
      * Returns an object that contains:
@@ -119,7 +119,8 @@ class PieDataProvider
      *
      * @return array
      */
-    public function getExchangeRates():array {
+    public function getExchangeRates(): array
+    {
         return $this->exchangeRate->getRates();
     }
 }

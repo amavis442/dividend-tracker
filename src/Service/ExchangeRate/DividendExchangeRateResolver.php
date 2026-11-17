@@ -12,7 +12,8 @@ class DividendExchangeRateResolver implements DividendExchangeRateResolverInterf
     public function __construct(
         private ExchangeRateInterface $exchangeRateService,
         private TranslatorInterface $translator
-    ) {}
+    ) {
+    }
 
     public function getRateForCalendar(Calendar $calendar): float
     {
@@ -56,4 +57,3 @@ class DividendExchangeRateResolver implements DividendExchangeRateResolverInterf
         };
     }
 }
-

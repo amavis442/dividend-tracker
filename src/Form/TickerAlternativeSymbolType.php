@@ -19,7 +19,7 @@ class TickerAlternativeSymbolType extends AbstractType
             ->add('ticker', EntityType::class, [
                 'class' => Ticker::class,
                 'choice_label' => function (Ticker $ticker): string {
-                    return $ticker->getFullname() . ' ('. $ticker->getSymbol(). ')';
+                    return $ticker->getFullname() . ' (' . $ticker->getSymbol() . ')';
                 },
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('ticker')

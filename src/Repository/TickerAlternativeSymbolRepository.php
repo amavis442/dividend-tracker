@@ -12,38 +12,38 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class TickerAlternativeSymbolRepository extends ServiceEntityRepository
 {
-	public function __construct(ManagerRegistry $registry)
-	{
-		parent::__construct($registry, TickerAlternativeSymbol::class);
-	}
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, TickerAlternativeSymbol::class);
+    }
 
-	public function getQueryBuilderFindByAll(): QueryBuilder
-	{
-		return $this->createQueryBuilder('t')->orderBy('t.symbol', 'ASC');
-	}
+    public function getQueryBuilderFindByAll(): QueryBuilder
+    {
+        return $this->createQueryBuilder('t')->orderBy('t.symbol', 'ASC');
+    }
 
-	//    /**
-	//     * @return TickerAlternativeSymbol[] Returns an array of TickerAlternativeSymbol objects
-	//     */
-	//    public function findByExampleField($value): array
-	//    {
-	//        return $this->createQueryBuilder('t')
-	//            ->andWhere('t.exampleField = :val')
-	//            ->setParameter('val', $value)
-	//            ->orderBy('t.id', 'ASC')
-	//            ->setMaxResults(10)
-	//            ->getQuery()
-	//            ->getResult()
-	//        ;
-	//    }
+    //    /**
+    //     * @return TickerAlternativeSymbol[] Returns an array of TickerAlternativeSymbol objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('t')
+    //            ->andWhere('t.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('t.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
 
-	//    public function findOneBySomeField($value): ?TickerAlternativeSymbol
-	//    {
-	//        return $this->createQueryBuilder('t')
-	//            ->andWhere('t.exampleField = :val')
-	//            ->setParameter('val', $value)
-	//            ->getQuery()
-	//            ->getOneOrNullResult()
-	//        ;
-	//    }
+    //    public function findOneBySomeField($value): ?TickerAlternativeSymbol
+    //    {
+    //        return $this->createQueryBuilder('t')
+    //            ->andWhere('t.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
 }

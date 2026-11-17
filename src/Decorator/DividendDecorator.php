@@ -7,7 +7,9 @@ use Doctrine\Common\Collections\Collection;
 
 final class DividendDecorator
 {
-    public function __construct(private readonly AdjustedDividendDecoratorFactory $factory) {}
+    public function __construct(private readonly AdjustedDividendDecoratorFactory $factory)
+    {
+    }
 
     /**
      */

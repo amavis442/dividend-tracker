@@ -6,10 +6,11 @@ use App\Entity\Calendar;
 use App\Entity\Transaction;
 use App\Service\Transaction\TransactionAdjuster;
 
-
 class PositionSizeResolver
 {
-    public function __construct(protected TransactionAdjuster $transactionAdjuster){}
+    public function __construct(protected TransactionAdjuster $transactionAdjuster)
+    {
+    }
 
     /**
      * Calculates the effective position size on ex-dividend date,

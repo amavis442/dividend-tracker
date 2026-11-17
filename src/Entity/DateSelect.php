@@ -6,7 +6,6 @@ use DateTimeInterface;
 
 class DateSelect
 {
-
     /**
      * Date
      *

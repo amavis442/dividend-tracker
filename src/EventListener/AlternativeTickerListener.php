@@ -17,11 +17,10 @@ use App\Repository\Trading212PieInstrumentRepository;
 ]
 final class AlternativeTickerListener
 {
-
     public function __construct(
         private Trading212PieInstrumentRepository $trading212PieInstrumentRepository,
-    )
-    { }
+    ) {
+    }
 
 
     public function postUpdate(

@@ -13,4 +13,3 @@ final class CustomGenerator
         return $faker;
     }
 }
-

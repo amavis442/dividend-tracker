@@ -4,7 +4,6 @@ namespace App\Contracts\Service;
 
 interface StockPricePluginInterface
 {
-
     /**
      * Get the marketprice of the symbols
      *

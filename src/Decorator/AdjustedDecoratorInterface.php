@@ -4,5 +4,5 @@ namespace App\Decorator;
 
 interface AdjustedDecoratorInterface
 {
-	public function getAdjustmentNote(): ?string;
+    public function getAdjustmentNote(): ?string;
 }

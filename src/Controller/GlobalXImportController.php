@@ -26,62 +26,62 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/admin/globalx')]
 class GlobalXImportController extends AbstractController
 {
-	private const SESSION_GLOBALX_IMPORT_RESULT_KEY = 'import_globalx_csv_result';
+    private const SESSION_GLOBALX_IMPORT_RESULT_KEY = 'import_globalx_csv_result';
 
-	#[Route(path: '/', name: 'globalx_import')]
-	public function index(
-		Request $request,
-		CalendarRepository $calendarRepository,
-		CurrencyRepository $currencyRepository,
-		TickerRepository $tickerRepository,
-		GlobalXImportService $globalXImportService,
-		EntityManagerInterface $entityManager
-	): Response {
-		$tickerChoices = $tickerRepository->findBy([
-			'isin' => ['IE0002L5QB31', 'IE00BM8R0J59'],
-		]); //TODO: Need this in config
+    #[Route(path: '/', name: 'globalx_import')]
+    public function index(
+        Request $request,
+        CalendarRepository $calendarRepository,
+        CurrencyRepository $currencyRepository,
+        TickerRepository $tickerRepository,
+        GlobalXImportService $globalXImportService,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $tickerChoices = $tickerRepository->findBy([
+            'isin' => ['IE0002L5QB31', 'IE00BM8R0J59'],
+        ]); //TODO: Need this in config
 
-		$globalXImport = new GlobalXImport();
-		$form = $this->createForm(GlobalXImportType::class, $globalXImport, [
-			'tickers' => $tickerChoices,
-		]);
-		$form->handleRequest($request);
+        $globalXImport = new GlobalXImport();
+        $form = $this->createForm(GlobalXImportType::class, $globalXImport, [
+            'tickers' => $tickerChoices,
+        ]);
+        $form->handleRequest($request);
 
-		if ($form->isSubmitted() && $form->isValid()) {
-			$transactionFile = $form->get('importfile')->getData();
-			if ($transactionFile instanceof UploadedFile) {
-				$ticker = $globalXImport->getTicker();
-				$records = $globalXImportService->process(
-					$transactionFile->getRealPath(),
-					$ticker
-				);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $transactionFile = $form->get('importfile')->getData();
+            if ($transactionFile instanceof UploadedFile) {
+                $ticker = $globalXImport->getTicker();
+                $records = $globalXImportService->process(
+                    $transactionFile->getRealPath(),
+                    $ticker
+                );
 
-				$this->addFlash(
-					'notice',
-					'Added ' .
-						$records .
-						' for ticker ' .
-						$ticker->getFullname()
-				);
+                $this->addFlash(
+                    'notice',
+                    'Added ' .
+                        $records .
+                        ' for ticker ' .
+                        $ticker->getFullname()
+                );
 
-				return $this->redirectToRoute('globalx_import_result');
-			}
-		}
+                return $this->redirectToRoute('globalx_import_result');
+            }
+        }
 
-		return $this->render('globalx/import.html.twig', [
-			'form' => $form->createView(),
-		]);
-	}
+        return $this->render('globalx/import.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
 
-	#[Route(path: '/result-import', name: 'globalx_import_result')]
-	public function report(Request $request): Response
-	{
-		$result = $request
-			->getSession()
-			->get(self::SESSION_GLOBALX_IMPORT_RESULT_KEY);
+    #[Route(path: '/result-import', name: 'globalx_import_result')]
+    public function report(Request $request): Response
+    {
+        $result = $request
+            ->getSession()
+            ->get(self::SESSION_GLOBALX_IMPORT_RESULT_KEY);
 
-		return $this->render('globalx/report.html.twig', [
-			'data' => $result,
-		]);
-	}
+        return $this->render('globalx/report.html.twig', [
+            'data' => $result,
+        ]);
+    }
 }

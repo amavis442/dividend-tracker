@@ -7,8 +7,6 @@ use App\Entity\Tax;
 
 final class TickerTaxDecorator
 {
-
-
     /**
      * Decorates array $tickers with \App\Entity\Tax
      * @param array &$tickers

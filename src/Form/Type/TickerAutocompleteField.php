@@ -40,7 +40,6 @@ class TickerAutocompleteField extends AbstractType
                         ->setParameter('ignore', 'nvt%');
 
                     if ($includeAllTickers === false) {
-
                         $qb->join(
                             't.positions',
                             'p',

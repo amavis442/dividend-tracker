@@ -166,8 +166,9 @@ class TickerRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getTaxForTickers(array $tickers):array {
-        return $this->createQueryBuilder('t','t.id')
+    public function getTaxForTickers(array $tickers): array
+    {
+        return $this->createQueryBuilder('t', 't.id')
         ->select('t, ta')
         ->join('t.tax', 'ta')
         ->where('t in (:tickers)')

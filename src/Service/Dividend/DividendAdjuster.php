@@ -6,7 +6,6 @@ use App\Entity\Calendar;
 
 class DividendAdjuster
 {
-
     public function getAdjustedDividend(Calendar $calendar, array $actions): float
     {
         $cashAmount = $calendar->getCashAmount();

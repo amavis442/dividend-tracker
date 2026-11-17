@@ -2,7 +2,6 @@
 
 namespace App\Util;
 
-
 class Constants
 {
     public const AMOUNT_PRECISION = 10000000;

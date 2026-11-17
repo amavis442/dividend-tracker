@@ -2,6 +2,7 @@
 
 namespace App\Service\Importer;
 
-interface CsvInterface {
+interface CsvInterface
+{
     public function processRows(array $rows, string $filename): array;
 }

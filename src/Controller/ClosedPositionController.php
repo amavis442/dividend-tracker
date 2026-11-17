@@ -115,9 +115,9 @@ class ClosedPositionController extends AbstractController
         )
     ]
     public function edit(
-    		Request $request,
-    		#[MapEntity] Position $position,
-    		PositionService $positionService,
+        Request $request,
+        #[MapEntity] Position $position,
+        PositionService $positionService,
         ?int $closed,
         Referer $referer
     ): Response {
