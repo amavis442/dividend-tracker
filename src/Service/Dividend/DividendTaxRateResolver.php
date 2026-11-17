@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service\Dividend;
 
 use App\Entity\Calendar;
@@ -18,24 +20,9 @@ class DividendTaxRateResolver implements DividendTaxRateResolverInterface
             return $tax->getTaxRate();
         }
 
-        switch ($calendar->getCurrency()->getSymbol()) {
-            case 'EUR':
-                $dividendTax = Constants::DEFAULT_TAX_RATE;
-                break;
-            case 'USD':
-                $dividendTax = Constants::DEFAULT_TAX_RATE;
-                break;
-            case 'GB':
-                $dividendTax = Constants::TAX_GB / 100;
-                break;
-            case 'CAD':
-                $dividendTax = Constants::DEFAULT_TAX_RATE;
-                break;
-            default:
-                $dividendTax = Constants::DEFAULT_TAX_RATE;
-                break;
-        }
-
-        return $dividendTax;
+        return match ($calendar->getCurrency()->getSymbol()) {
+            'GBX', 'GBP' => Constants::TAX_GB_RATE,
+            default => Constants::DEFAULT_TAX_RATE,
+        };
     }
 }

@@ -11,6 +11,7 @@ class Constants
     public const TAX = 15; // 15%
     public const DEFAULT_TAX_RATE = self::TAX / 100; // 0.15
     public const TAX_GB = 35; // 35%
+    public const TAX_GB_RATE = self::TAX_GB / 100; // 0.35
     public const EXCHANGE = 1.19;
     public const EXCHANGE_USDEUR = 0.84; // 1 USD = 0.84 EUR
     public const EXCHANGE_GBXEUR = 0.011082; // 1 GBX (Penny) = 0.011082 EUR 0.539 GBX = 53.9 x 0.011082 = 0.5973198 EUR
