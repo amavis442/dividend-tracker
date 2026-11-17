@@ -3,12 +3,9 @@
 namespace App\Controller\Portfolio;
 
 use App\DataProvider\CorporateActionDataProvider;
-use App\DataProvider\DividendDataProvider;
 use App\DataProvider\TransactionDataProvider;
 use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
-use App\Entity\Calendar;
-use App\Entity\Portfolio;
 use App\Form\Model\PortfolioGoal;
 use App\Entity\Position;
 use App\Form\Model\SearchForm;
@@ -16,14 +13,13 @@ use App\Entity\User;
 use App\Form\PortfolioGoalType;
 use App\Form\SearchFormType;
 use App\Helper\Colors;
-use App\Repository\PaymentRepository;
 use App\Repository\PortfolioRepository;
 use App\Repository\PositionRepository;
 use App\Repository\ResearchRepository;
 use App\Repository\TickerRepository;
+use App\Service\Chart\BarChartFactory;
 use App\Service\Dividend\DividendGrowthService;
-use App\Contracts\Dividend\DividendServiceInterface;
-use App\Contracts\ExchangeRate\ExchangeAndTaxResolverInterface;
+use App\Service\Position\PositionDetailService;
 use App\Service\Referer;
 use App\ViewModel\PortfolioViewModel;
 use DateTime;
@@ -38,8 +34,6 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
-use Symfony\UX\Chartjs\Model\Chart;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 /** @psalm-suppress PropertyNotSetInConstructor */
@@ -47,6 +41,8 @@ use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 class PortfolioController extends AbstractController
 {
     public const SESSION_KEY = 'portfoliocontroller_session';
+    private const HISTORY_BACKGROUND_COLOR = '#0055ff';
+    private const HISTORY_BORDER_COLOR = '#000dff';
 
     public function __construct(private Stopwatch $stopwatch)
     {
@@ -103,16 +99,9 @@ class PortfolioController extends AbstractController
             $request->getSession()->set(self::SESSION_KEY, $searchForm);
         }
 
-        /**
-         * @var User $user
-         */
+        /** @var User $user */
         $user = $this->getUser();
-        $portfolio = $portfolioRepository->findOneBy([
-            'user' => $user->getId(),
-        ]);
-        if (!$portfolio) {
-            $portfolio = new Portfolio(); // do not want to throw an exception, but just use an empty entity
-        }
+        $portfolio = $portfolioRepository->findForUserOrEmpty($user);
 
         $this->stopwatch->start('portfoliomodel-getpage');
 
@@ -142,243 +131,81 @@ class PortfolioController extends AbstractController
         ]);
     }
 
-    //TODO: REFACTOR!!! This method is to fat
     #[Route(path: '/show/{id}', name: 'portfolio_show', methods: ['GET'])]
     public function show(
         Request $request,
         Position $position,
-        PaymentRepository $paymentRepository,
         PortfolioRepository $portfolioRepository,
+        PositionDetailService $positionDetail,
         DividendGrowthService $dividendGrowth,
-        DividendServiceInterface $dividendService,
-        ExchangeAndTaxResolverInterface $exchangeAndTaxResolver,
-        TransactionDataProvider $transactionDataProvider,
-        CorporateActionDataProvider $corporateActionDataProvider,
-        DividendDataProvider $dividendDataProvider,
+        BarChartFactory $barChartFactory,
         Referer $referer,
-        ChartBuilderInterface $chartBuilder
     ): Response {
         $ticker = $position->getTicker();
-        $calendarRecentDividendDate = $ticker->getRecentDividendDate();
+        $recentCalendar = $ticker->getRecentDividendDate();
+
+        $positionDetail->loadDividendData($position);
+
         $netCashAmount = 0.0;
         $amountPerDate = 0.0;
-
-        $calenders = $ticker->getCalendars();
-
         $nextDividendExDiv = null;
         $nextDividendPayout = null;
-
-        $transactions = $transactionDataProvider->load(
-            [$position]
-        );
-        $actions = $corporateActionDataProvider->load(
-            [$ticker]
-        );
-
-        $dividends = $dividendDataProvider->load([$ticker]);
-
-        $dividendService->load(
-            transactions: $transactions,
-            corporateActions: $actions,
-            dividends: $dividends
-        );
-
-
-        if ($calendarRecentDividendDate) {
-            $exchangeTaxDto = $exchangeAndTaxResolver->resolve($position->getTicker(), $calendarRecentDividendDate);
-            $exchangeRate = $exchangeTaxDto->exchangeRate;
-            $dividendTax = $exchangeTaxDto->taxAmount;
-
-            $netCashAmount =
-                $calendarRecentDividendDate->getCashAmount() *
-                $exchangeRate *
-                (1 - $dividendTax);
-            $amountPerDate = $position->getAmountPerDate(
-                $calendarRecentDividendDate->getExDividendDate()
+        if ($recentCalendar) {
+            $netCashAmount = $positionDetail->getNetCashAmount(
+                $ticker,
+                $recentCalendar,
+                $recentCalendar->getCashAmount()
             );
-
-            $nextDividendExDiv = $calendarRecentDividendDate->getExDividendDate();
-            $nextDividendPayout = $calendarRecentDividendDate->getPaymentDate();
+            $amountPerDate = $position->getAmountPerDate($recentCalendar->getExDividendDate());
+            $nextDividendExDiv = $recentCalendar->getExDividendDate();
+            $nextDividendPayout = $recentCalendar->getPaymentDate();
         }
 
-        //$position = $positionRepository->getForPosition($position);
-        $netYearlyDividend = 0.0;
-
-        if (count($calenders) > 0) {
-            $cal = $dividendService->getRegularCalendar($ticker);
-
-            $exchangeTaxDto = $exchangeAndTaxResolver->resolve($ticker, $cal);
-            $exchangeRate = $exchangeTaxDto->exchangeRate;
-            $dividendTax = $exchangeTaxDto->taxAmount;
-
-            $dividendFrequentie = $ticker->getPayoutFrequency();
-            $netYearlyDividend =
-                $dividendFrequentie *
-                $cal->getCashAmount() *
-                $exchangeRate *
-                (1 - $dividendTax);
-        }
-        $dividendRaises = [];
-
-        $reverseCalendars = array_reverse($calenders->toArray(), true);
-        // Cals start with latest and descent
-        /**
-         * @var Calendar $calendar
-         */
-        foreach ($reverseCalendars as $index => $calendar) {
-            $dividendRaises[$index] = 0;
-            if (
-                $calendar->getDividendType() === Calendar::REGULAR &&
-                stripos($calendar->getDescription() ?? '', 'Extra') === false
-            ) {
-                if (isset($oldCal) && $oldCal->getCashAmount() > 0) {
-                    $oldCash = $oldCal->getCashAmount(); // previous
-                    $dividendRaises[$index] =
-                        (($calendar->getCashAmount() - $oldCash) / $oldCash) *
-                        100;
-                }
-                $oldCal = $calendar;
-            }
-        }
-
-        $payments = $position->getPayments();
-        $dividends = $paymentRepository->getSumDividends([$ticker->getId()]);
-        $dividend = 0;
-        if (!empty($dividends) && $ticker->getId() != null) {
-            $dividend = $dividends[$ticker->getId()];
-        }
+        /** @var User $user */
+        $user = $this->getUser();
+        $portfolio = $portfolioRepository->findForUserOrEmpty($user);
+        $forwardDividend = $positionDetail->getForwardDividend($position);
         $growth = $dividendGrowth->getData($ticker);
 
-        /**
-         * @var User $user
-         */
-        $user = $this->getUser();
-        $portfolio = $portfolioRepository->findOneBy([
-            'user' => $user->getId(),
-        ]);
-        if (!$portfolio) {
-            $portfolio = new Portfolio(); // do not want to throw an exception, but just use an empty entity
-        }
-
-        $allocated = $portfolio->getInvested();
-        $percentageAllocation = 0;
-
-        if ($allocated > 0) {
-            $percentageAllocation =
-                ($position->getAllocation() / $allocated) * 100;
-        }
-
-        $calendars = $ticker->getCalendars()->slice(0, 30);
-        $calendarsCount = $ticker->getCalendars()->count();
-
-        $yearlyForwardDividendPayout =
-            $position->getTicker()->getPayoutFrequency() *
-            $dividendService->getForwardNetDividend(
-                $position->getTicker(),
-                $position->getAmount()
-            );
-        $singleTimeForwarddividendPayout = $dividendService->getForwardNetDividend(
-            $position->getTicker(),
-            $position->getAmount()
-        );
-        $dividendYield = $dividendService->getForwardNetDividendYield(
-            $position,
-            $position->getTicker(),
-            $position->getAmount(),
-            $position->getAllocation()
-        );
-
         $referer->set('portfolio_show', ['id' => $position->getId()]);
-
-        $indexUrl = $request->getSession()->get(get_class($this));
-
-        $colors = Colors::COLORS;
-
-        $chartPayout = $chartBuilder->createChart(Chart::TYPE_BAR);
-
-        $chartPayout->setData([
-            'labels' => $growth['labels'],
-            'datasets' => [
-                [
-                    'label' => 'Dividend payout',
-                    'backgroundColor' => $colors,
-                    'borderColor' => $colors,
-                    'data' => $growth['payout'],
-                ],
-            ],
-        ]);
-
-        $chartPayout->setOptions([
-            'maintainAspectRatio' => false,
-            'responsive' => true,
-            'plugins' => [
-                'title' => [
-                    'display' => true,
-                    'text' => 'Dividend forward',
-                    'font' => [
-                        'size' => 24,
-                    ],
-                ],
-                'legend' => [
-                    'position' => 'top',
-                ],
-            ],
-        ]);
-
-        $chartYield = $chartBuilder->createChart(Chart::TYPE_BAR);
-
-        $chartYield->setData([
-            'labels' => $growth['labels'],
-            'datasets' => [
-                [
-                    'label' => 'Dividend yield',
-                    'backgroundColor' => $colors,
-                    'borderColor' => $colors,
-                    'data' => $growth['data'],
-                ],
-            ],
-        ]);
-
-        $chartYield->setOptions([
-            'maintainAspectRatio' => false,
-            'responsive' => true,
-            'plugins' => [
-                'title' => [
-                    'display' => true,
-                    'text' => 'Yield',
-                    'font' => [
-                        'size' => 24,
-                    ],
-                ],
-                'legend' => [
-                    'position' => 'top',
-                ],
-            ],
-        ]);
 
         return $this->render('portfolio/show.html.twig', [
             'ticker' => $ticker,
             'growth' => $growth,
             'position' => $position,
-            'payments' => $payments,
-            'dividend' => $dividend,
-            'calendars' => $calendars,
-            'calendarsCount' => $calendarsCount,
-            'dividendRaises' => $dividendRaises,
-            'totalInvested' => $allocated,
-            'netYearlyDividend' => $netYearlyDividend,
-            'percentageAllocated' => $percentageAllocation,
+            'payments' => $position->getPayments(),
+            'dividend' => $positionDetail->getDividendsReceived($ticker),
+            'calendars' => $ticker->getCalendars()->slice(0, 30),
+            'calendarsCount' => $ticker->getCalendars()->count(),
+            'dividendRaises' => $positionDetail->getDividendRaises($ticker),
+            'totalInvested' => $portfolio->getInvested(),
+            'netYearlyDividend' => $positionDetail->getNetYearlyDividend($ticker),
+            'percentageAllocated' => $positionDetail->getPercentageAllocated($position, $portfolio),
             'netCashAmount' => $netCashAmount,
             'amountPerDate' => $amountPerDate,
             'expectedPayout' => $netCashAmount * $amountPerDate,
-            'yearlyForwardDividendPayout' => $yearlyForwardDividendPayout,
-            'singleTimeForwarddividendPayout' => $singleTimeForwarddividendPayout,
-            'dividendYield' => $dividendYield,
+            'yearlyForwardDividendPayout' => $forwardDividend['yearly'],
+            'singleTimeForwarddividendPayout' => $forwardDividend['single'],
+            'dividendYield' => $forwardDividend['yield'],
             'nextDividendExDiv' => $nextDividendExDiv,
             'nextDividendPayout' => $nextDividendPayout,
-            'indexUrl' => $indexUrl,
-            'chartYield' => $chartYield,
-            'chartPayout' => $chartPayout,
+            'indexUrl' => $request->getSession()->get(get_class($this)),
+            'chartYield' => $barChartFactory->create(
+                $growth['labels'],
+                $growth['data'],
+                'Dividend yield',
+                'Yield',
+                Colors::COLORS,
+                Colors::COLORS
+            ),
+            'chartPayout' => $barChartFactory->create(
+                $growth['labels'],
+                $growth['payout'],
+                'Dividend payout',
+                'Dividend forward',
+                Colors::COLORS,
+                Colors::COLORS
+            ),
         ]);
     }
 
@@ -391,148 +218,55 @@ class PortfolioController extends AbstractController
     ]
     public function showInfo(
         Position $position,
-        PaymentRepository $paymentRepository,
         PortfolioRepository $portfolioRepository,
-        DividendServiceInterface $dividendService,
-        ExchangeAndTaxResolverInterface $exchangeAndTaxResolver,
+        PositionDetailService $positionDetail,
         AdjustedDividendDecoratorFactory $adjustedDividendDecorator,
-        TransactionDataProvider $transactionDataProvider,
-        CorporateActionDataProvider $corporateActionDataProvider,
-        DividendDataProvider $dividendDataProvider,
         AdjustedPositionDecoratorFactory $adjustedPositionDecorator,
     ): Response {
         $ticker = $position->getTicker();
-        $calendarRecentDividendDate = $ticker->getRecentDividendDate();
-        $netCashAmount = 0.0;
-        $amountPerDate = 0.0;
+        $recentCalendar = $ticker->getRecentDividendDate();
 
-        $calenders = $ticker->getCalendars();
+        $data = $positionDetail->loadDividendData($position);
 
-        $nextDividendExDiv = null;
-        $nextDividendPayout = null;
-
-        $transactions = $transactionDataProvider->load([$position]);
-        $actions = $corporateActionDataProvider->load([$ticker]);
-        $dividends = $dividendDataProvider->load([$ticker]);
-
-        $dividendService->load(transactions: $transactions, corporateActions: $actions, dividends: $dividends);
-
-        $adjustedPositionDecorator->load($transactions, $actions);
+        $adjustedPositionDecorator->load($data['transactions'], $data['corporateActions']);
         $positionDecorator = $adjustedPositionDecorator->decorate($position);
 
-        $adjustedDividendDecorator->load($dividends, $actions);
+        $adjustedDividendDecorator->load($data['dividends'], $data['corporateActions']);
+        $adjustedDividends = $adjustedDividendDecorator->decorate($ticker)->getAdjustedDividend();
 
-        $dividendDecorator = $adjustedDividendDecorator->decorate($position->getTicker());
-        $adjustedDividends = $dividendDecorator->getAdjustedDividend();
+        $netCashAmount = 0.0;
+        $amountPerDate = 0.0;
+        $nextDividendExDiv = null;
+        $nextDividendPayout = null;
+        if ($recentCalendar) {
+            $adjustedCash = $adjustedDividends[$recentCalendar->getId()]['adjusted'];
+            $netCashAmount = $positionDetail->getNetCashAmount($ticker, $recentCalendar, $adjustedCash);
 
-        if ($calendarRecentDividendDate) {
-            $exchangeTaxDto = $exchangeAndTaxResolver->resolve($ticker, $calendarRecentDividendDate);
-            $exchangeRate = $exchangeTaxDto->exchangeRate;
-            $dividendTax = $exchangeTaxDto->taxAmount;
-
-            $adjustedDividend = $adjustedDividends[$calendarRecentDividendDate->getId()];
-
-            $netCashAmount =
-                $adjustedDividend['adjusted'] *
-                $exchangeRate *
-                (1 - $dividendTax);
-            /* $amountPerDate = $position->getAmountPerDate(
-                $calendarRecentDividendDate->getExDividendDate()
-            ); */
-            $cutoffDate = $calendarRecentDividendDate->getExDividendDate();
-            $amountPerDate =  $positionDecorator->getAdjustedAmountPerDate($cutoffDate);
+            $cutoffDate = $recentCalendar->getExDividendDate();
+            $amountPerDate = $positionDecorator->getAdjustedAmountPerDate($cutoffDate);
             $position->setAdjustedAmount($amountPerDate);
-            $adjustedAvgPrice = $positionDecorator->getAdjustedAveragePricePerDate($cutoffDate);
-            $position->setAdjustedAveragePrice($adjustedAvgPrice);
+            $position->setAdjustedAveragePrice($positionDecorator->getAdjustedAveragePricePerDate($cutoffDate));
 
-            $nextDividendExDiv = $calendarRecentDividendDate->getExDividendDate();
-            $nextDividendPayout = $calendarRecentDividendDate->getPaymentDate();
+            $nextDividendExDiv = $recentCalendar->getExDividendDate();
+            $nextDividendPayout = $recentCalendar->getPaymentDate();
         }
 
-        if (count($calenders) > 0) {
-            $cal = $dividendService->getRegularCalendar($ticker);
-            $exchangeTaxDto = $exchangeAndTaxResolver->resolve($ticker, $cal);
-            $exchangeRate = $exchangeTaxDto->exchangeRate;
-            $dividendTax = $exchangeTaxDto->taxAmount;
-        }
-        $dividendRaises = [];
-
-        $reverseCalendars = array_reverse($calenders->toArray(), true);
-
-        /**
-         * Calculates the dividend percentage increases from start with latest and descent
-         *
-         * @var Calendar $calendar
-         */
-        foreach ($reverseCalendars as $index => $calendar) {
-            $dividendRaises[$index] = 0;
-            if (
-                $calendar->getDividendType() === Calendar::REGULAR &&
-                stripos($calendar->getDescription() ?? '', 'Extra') === false
-            ) {
-                if (isset($oldCal) && $oldCal->getCashAmount() > 0) {
-                    $oldCash = $oldCal->getCashAmount(); // previous
-                    $dividendRaises[$index] =
-                        (($calendar->getCashAmount() - $oldCash) / $oldCash) *
-                        100;
-                }
-                $oldCal = $calendar;
-            }
-        }
-
-        $dividendsReceivedPerTicker = $paymentRepository->getSumDividends([$ticker->getId()]);
-        $dividendsReceived = 0.0;
-        if (!empty($dividendsReceivedPerTicker) && $ticker->getId() != null) {
-            $dividendsReceived = $dividendsReceivedPerTicker[$ticker->getId()];
-        }
-
-        /**
-         * @var User $user
-         */
+        /** @var User $user */
         $user = $this->getUser();
-        $portfolio = $portfolioRepository->findOneBy([
-            'user' => $user->getId(),
-        ]);
-        if (!$portfolio) {
-            $portfolio = new Portfolio(); // do not want to trhow an exception but just use an empty entity
-        }
-
-        $allocated = $portfolio->getInvested();
-        $percentageAllocation = 0;
-
-        if ($allocated > 0) {
-            $percentageAllocation =
-                ($position->getAllocation() / $allocated) * 100;
-        }
-
-        $yearlyForwardDividendPayout =
-            $position->getTicker()->getPayoutFrequency() *
-            $dividendService->getForwardNetDividend(
-                $position->getTicker(),
-                $position->getAmount()
-            );
-        $singleTimeForwarddividendPayout = $dividendService->getForwardNetDividend(
-            $position->getTicker(),
-            $position->getAmount()
-        );
-        $dividendYield = $dividendService->getForwardNetDividendYield(
-            $position,
-            $position->getTicker(),
-            $position->getAmount(),
-            $position->getAllocation()
-        );
+        $portfolio = $portfolioRepository->findForUserOrEmpty($user);
+        $forwardDividend = $positionDetail->getForwardDividend($position);
 
         return $this->render('portfolio/show/_info.html.twig', [
             'ticker' => $ticker,
             'position' => $position,
-            'dividend' => $dividendsReceived,
-            'percentageAllocated' => $percentageAllocation,
+            'dividend' => $positionDetail->getDividendsReceived($ticker),
+            'percentageAllocated' => $positionDetail->getPercentageAllocated($position, $portfolio),
             'netCashAmount' => $netCashAmount,
             'amountPerDate' => $amountPerDate,
             'expectedPayout' => $netCashAmount * $position->getAdjustedAmount(),
-            'yearlyForwardDividendPayout' => $yearlyForwardDividendPayout,
-            'singleTimeForwarddividendPayout' => $singleTimeForwarddividendPayout,
-            'dividendYield' => $dividendYield,
+            'yearlyForwardDividendPayout' => $forwardDividend['yearly'],
+            'singleTimeForwarddividendPayout' => $forwardDividend['single'],
+            'dividendYield' => $forwardDividend['yield'],
             'nextDividendExDiv' => $nextDividendExDiv,
             'nextDividendPayout' => $nextDividendPayout,
         ]);
@@ -579,113 +313,38 @@ class PortfolioController extends AbstractController
     public function showDividendProgression(
         Position $position,
         DividendGrowthService $dividendGrowth,
-        ChartBuilderInterface $chartBuilder,
+        BarChartFactory $barChartFactory,
         TranslatorInterface $translator,
     ): Response {
-        $ticker = $position->getTicker();
-        $growth = $dividendGrowth->getData($ticker);
+        $growth = $dividendGrowth->getData($position->getTicker());
         $dividendHistory = $growth['cashPayout'];
-
-        $colors = Colors::COLORS;
-
-        $chartPayout = $chartBuilder->createChart(Chart::TYPE_BAR);
-
-        $chartPayout->setData([
-            'labels' => $growth['labels'],
-            'datasets' => [
-                [
-                    'label' => $translator->trans('Dividend payout'),
-                    'backgroundColor' => $colors,
-                    'borderColor' => $colors,
-                    'data' => $growth['payout'],
-                ],
-            ],
-        ]);
-
-        $chartPayout->setOptions([
-            'maintainAspectRatio' => false,
-            'responsive' => true,
-            'plugins' => [
-                'title' => [
-                    'display' => true,
-                    'text' => $translator->trans('Dividend history'),
-                    'font' => [
-                        'size' => 24,
-                    ],
-                ],
-                'legend' => [
-                    'position' => 'top',
-                ],
-            ],
-        ]);
-
-        $chartYield = $chartBuilder->createChart(Chart::TYPE_BAR);
-
-        $chartYield->setData([
-            'labels' => $growth['labels'],
-            'datasets' => [
-                [
-                    'label' => $translator->trans('Dividend yield'),
-                    'backgroundColor' => $colors,
-                    'borderColor' => $colors,
-                    'data' => $growth['data'],
-                ],
-            ],
-        ]);
-
-        $chartYield->setOptions([
-            'maintainAspectRatio' => false,
-            'responsive' => true,
-            'plugins' => [
-                'title' => [
-                    'display' => true,
-                    'text' => $translator->trans('Yield'),
-                    'font' => [
-                        'size' => 24,
-                    ],
-                ],
-                'legend' => [
-                    'position' => 'top',
-                ],
-            ],
-        ]);
-
-        $chartYieldHistory = $chartBuilder->createChart(Chart::TYPE_BAR);
-
         ksort($dividendHistory);
-        $chartYieldHistory->setData([
-            'labels' => array_keys($dividendHistory),
-            'datasets' => [
-                [
-                    'label' => $translator->trans('Dividend history'),
-                    'backgroundColor' => '#0055ff',
-                    'borderColor' => '#000dff',
-                    'data' => array_values($dividendHistory),
-                ],
-            ],
-        ]);
-
-        $chartYieldHistory->setOptions([
-            'maintainAspectRatio' => false,
-            'responsive' => true,
-            'plugins' => [
-                'title' => [
-                    'display' => true,
-                    'text' => $translator->trans('Yield'),
-                    'font' => [
-                        'size' => 24,
-                    ],
-                ],
-                'legend' => [
-                    'position' => 'top',
-                ],
-            ],
-        ]);
 
         return $this->render('portfolio/show/_growth.html.twig', [
-            'chartYield' => $chartYield,
-            'chartPayout' => $chartPayout,
-            'chartYieldHistory' => $chartYieldHistory,
+            'chartYield' => $barChartFactory->create(
+                $growth['labels'],
+                $growth['data'],
+                $translator->trans('Dividend yield'),
+                $translator->trans('Yield'),
+                Colors::COLORS,
+                Colors::COLORS
+            ),
+            'chartPayout' => $barChartFactory->create(
+                $growth['labels'],
+                $growth['payout'],
+                $translator->trans('Dividend payout'),
+                $translator->trans('Dividend history'),
+                Colors::COLORS,
+                Colors::COLORS
+            ),
+            'chartYieldHistory' => $barChartFactory->create(
+                array_keys($dividendHistory),
+                array_values($dividendHistory),
+                $translator->trans('Dividend history'),
+                $translator->trans('Yield'),
+                self::HISTORY_BACKGROUND_COLOR,
+                self::HISTORY_BORDER_COLOR
+            ),
         ]);
     }
 
@@ -762,16 +421,9 @@ class PortfolioController extends AbstractController
         PortfolioRepository $portfolioRepository,
         EntityManagerInterface $entityManager
     ): Response {
-        /**
-         * @var User $user
-         */
+        /** @var User $user */
         $user = $this->getUser();
-        $portfolio = $portfolioRepository->findOneBy([
-            'user' => $user->getId(),
-        ]);
-        if (!$portfolio) {
-            $portfolio = new Portfolio(); // do not want to trhow an exception but just use an empty entity
-        }
+        $portfolio = $portfolioRepository->findForUserOrEmpty($user);
 
         $portfolioGoal = new PortfolioGoal();
         $portfolioGoal->setGoal($portfolio->getGoal() ?? 0);
