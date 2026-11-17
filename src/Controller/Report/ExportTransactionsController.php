@@ -2,6 +2,7 @@
 
 namespace App\Controller\Report;
 
+use App\Util\Constants;
 use App\Entity\Payment;
 use App\Entity\Calendar;
 use App\Entity\Transaction;
@@ -17,8 +18,6 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/report')]
 class ExportTransactionsController extends AbstractController
 {
-    public const TAX_DIVIDEND = 0.15; // %
-    public const EXCHANGE_RATE = 1.19; // dollar to euro
     public const YIELD_PIE_KEY = 'yeildpie_searchPie';
 
     #[Route(path: '/exporttransactions', name: 'report_export_transactions')]
@@ -154,7 +153,7 @@ class ExportTransactionsController extends AbstractController
             $calendar = $payment->getCalendar();
             $grossValuePerShare = $calendar->getCashAmount();
             $totalGrossValue = $grossValuePerShare * $payment->getAmount();
-            $taxRate = ($ticker->getTax() != null ? $ticker->getTax()->getTaxRate() : 0.15);
+            $taxRate = ($ticker->getTax() != null ? $ticker->getTax()->getTaxRate() : Constants::DEFAULT_TAX_RATE);
             $taxPerShare = $grossValuePerShare * $taxRate;
             $tax = $taxPerShare * $payment->getAmount();
             $netPayment = $totalGrossValue - $tax;

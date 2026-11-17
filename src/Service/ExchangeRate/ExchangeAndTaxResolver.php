@@ -26,7 +26,7 @@ class ExchangeAndTaxResolver implements ExchangeAndTaxResolverInterface
     {
         $dividendTax = $ticker->getTax()
             ? $ticker->getTax()->getTaxRate()
-            : Constants::TAX / 100;
+            : Constants::DEFAULT_TAX_RATE;
 
         $exchangeRate = $this->dividendExchangeRateResolver->getRateForCalendar(
             $calendar

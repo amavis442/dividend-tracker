@@ -2,6 +2,7 @@
 
 namespace App\Service\Importer;
 
+use App\Util\Constants;
 use App\Entity\Branch;
 use App\Entity\Calendar;
 use App\Entity\Payment;
@@ -289,7 +290,7 @@ class ImportCsvService extends AbstractImporter implements CsvInterface
         $rows = $this->formatImportData($rows);
         $defaultCurrency = $this->currencyRepository->findOneBy(['symbol' => 'EUR']);
 
-        $defaultTax = $this->taxRepository->findOneBy(['taxRate' => 15]); //Current dividend tax rate in the Netherlands
+        $defaultTax = $this->taxRepository->findOneBy(['taxRate' => Constants::TAX]);
         if (!$defaultTax) {
             $defaultTax = new Tax();
             $defaultTax->setTaxRate(15);
