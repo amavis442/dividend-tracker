@@ -5,7 +5,7 @@ namespace App\Service\Dividend;
 use App\Entity\Position;
 use App\Util\Constants;
 use App\Entity\Pie;
-use App\Entity\PositionYield;
+use App\Dto\PositionYield;
 use App\Repository\PositionRepository;
 use App\Repository\TransactionRepository;
 use Symfony\Component\Stopwatch\Stopwatch;

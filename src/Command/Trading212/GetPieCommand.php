@@ -3,7 +3,7 @@
 namespace App\Command\Trading212;
 
 use App\Entity\TickerAlternativeSymbol;
-use App\Entity\PieSelect;
+use App\Form\Model\PieSelect;
 use App\Entity\Trading212PieInstrument;
 use App\Repository\ApiKeyRepository;
 use App\Repository\TickerAlternativeSymbolRepository;

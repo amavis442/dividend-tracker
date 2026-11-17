@@ -4,7 +4,7 @@
 
 namespace App\DataProvider;
 
-use App\Entity\StockPrice;
+use App\Dto\StockPrice;
 use App\Repository\TickerRepository;
 use App\Service\StockPriceService;
 

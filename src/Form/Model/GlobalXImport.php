@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Entity;
+namespace App\Form\Model;
+
+use App\Entity\Ticker;
 
 class GlobalXImport
 {

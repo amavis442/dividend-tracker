@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\FileUpload;
+use App\Form\Model\FileUpload;
 use App\Entity\ImportFiles;
 use App\Form\FileUploadType;
 use App\Repository\ImportFilesRepository;

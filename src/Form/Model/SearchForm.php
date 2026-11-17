@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Form\Model;
 
-class TickerAutocomplete
+use App\Entity\Ticker;
+
+class SearchForm
 {
     private ?Ticker $ticker = null;
 

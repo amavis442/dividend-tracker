@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Position;
-use App\Entity\Summary;
+use App\Dto\Summary;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
 use App\Contracts\Service\SummaryInterface;

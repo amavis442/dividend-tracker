@@ -1,6 +1,9 @@
 <?php
 
-namespace App\Entity;
+namespace App\Form\Model;
+
+use App\Entity\Pie;
+use App\Entity\Ticker;
 
 class DateIntervalSelect
 {

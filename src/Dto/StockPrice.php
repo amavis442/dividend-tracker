@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Dto;
 
 /**
  * Plain value object for a market price, served by ApiController.

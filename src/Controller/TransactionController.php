@@ -5,7 +5,7 @@ namespace App\Controller;
 use Symfony\Component\Form\FormInterface;
 use App\Controller\Portfolio\PortfolioController;
 use App\Entity\Position;
-use App\Entity\TickerAutocomplete;
+use App\Form\Model\TickerAutocomplete;
 use App\Entity\Transaction;
 use App\Form\TickerAutocompleteType;
 use App\Form\TransactionType;

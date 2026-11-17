@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Form;
 
 use Doctrine\ORM\QueryBuilder;
-use App\Entity\DateIntervalSelect;
+use App\Form\Model\DateIntervalSelect;
 use App\Entity\Pie;
 use App\Form\Type\TickerAutocompleteField;
 use Doctrine\ORM\EntityRepository;

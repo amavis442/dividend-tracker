@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use Symfony\Component\Form\FormInterface;
 use App\Entity\Ticker;
-use App\Entity\TickerAutocomplete;
+use App\Form\Model\TickerAutocomplete;
 use App\Form\TickerAutocompleteType;
 use App\Form\TickerType;
 use App\Repository\TickerRepository;
