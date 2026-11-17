@@ -130,12 +130,11 @@ class DividendService implements DividendServiceInterface
         Calendar $calendar
     ): array {
         $exchangeRate = 1;
-        $dividendTax = 0.15;
         $ticker = $position->getTicker();
 
         $dividendTax = $ticker->getTax()
             ? $ticker->getTax()->getTaxRate()
-            : Constants::TAX / 100;
+            : Constants::DEFAULT_TAX_RATE;
         $exchangeRate = $this->dividendExchangeRateResolver->getRateForCalendar(
             $calendar
         );
@@ -257,7 +256,7 @@ class DividendService implements DividendServiceInterface
         $ticker = $position->getTicker();
         $dividendTax = $ticker->getTax()
             ? $ticker->getTax()->getTaxRate()
-            : Constants::TAX / 100;
+            : Constants::DEFAULT_TAX_RATE;
 
         $cashAmount = $calendar->getCashAmount();
         if (!isset($this->cachedDividendCalendars[$position->getId()])) {
@@ -375,7 +374,7 @@ class DividendService implements DividendServiceInterface
                 $cashAmount = $this->resolveCashAmount($ticker);
                 $dividendTax = $ticker->getTax()
                     ? $ticker->getTax()->getTaxRate()
-                    : Constants::TAX / 100;
+                    : Constants::DEFAULT_TAX_RATE;
                 $exchangeRate = $this->dividendExchangeRateResolver->getRateForCalendar(
                     $calendar
                 );

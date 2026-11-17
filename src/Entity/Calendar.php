@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Util\Constants;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -175,7 +176,7 @@ class Calendar
 
     public function getNetCashAmount(): ?float
     {
-        return ($this->cashAmount * (1 - (Constants::TAX / 100)) / Constants::EXCHANGE);
+        return ($this->cashAmount * (1 - Constants::DEFAULT_TAX_RATE) / Constants::EXCHANGE);
     }
 
     public function setCashAmount(float $cashAmount): self

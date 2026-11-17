@@ -17,9 +17,6 @@ use App\Enum\SortField;
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/report')]
 class YieldByPieController extends AbstractController
 {
-    public const TAX_DIVIDEND = 0.15; // %
-    public const EXCHANGE_RATE = 1.19; // dollar to euro
-
     #[Route(path: '/pieyield', name: 'report_dividend_yield_by_pie')]
     public function index(
         ChartBuilderInterface $chartBuilder,

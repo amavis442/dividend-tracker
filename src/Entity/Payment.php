@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Util\Constants;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;

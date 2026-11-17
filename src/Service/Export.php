@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Util\Constants;
 use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
@@ -137,7 +138,7 @@ class Export
                 $row['frequency'] = $ticker->getDividendFrequency();
                 $row['tax'] = $ticker->getTax()
                     ? $ticker->getTax()->getTaxRate()
-                    : 0.15;
+                    : Constants::DEFAULT_TAX_RATE;
                 $row['exchangerate'] = $this->dividendExchangeRateResolver->getRateForCalendar(
                     $calendar
                 );

@@ -3,7 +3,7 @@
 namespace App\Service\Dividend;
 
 use App\Entity\Position;
-use App\Entity\Constants;
+use App\Util\Constants;
 use App\Entity\Pie;
 use App\Entity\PositionYield;
 use App\Repository\PositionRepository;

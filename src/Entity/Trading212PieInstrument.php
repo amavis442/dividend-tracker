@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Util\Constants;
 use App\Repository\Trading212PieInstrumentRepository;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
@@ -92,7 +93,7 @@ class Trading212PieInstrument
     private float $avgYearlyYield = 0.0;
     private float $dividendPaid = 0.0;
 
-    private float $taxRate = 0.15;
+    private float $taxRate = Constants::DEFAULT_TAX_RATE;
     private float $exchangeRate = 0.0;
     private array $calendars = [];
     private array $dividend = [];

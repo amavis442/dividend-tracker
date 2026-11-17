@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Constants;
+use App\Util\Constants;
 use App\Entity\DateIntervalSelect;
 use App\Entity\Payment;
 use App\Entity\Position;

@@ -3,7 +3,7 @@
 namespace App\Service\Dividend;
 
 use App\Entity\Calendar;
-use App\Entity\Constants;
+use App\Util\Constants;
 
 class DividendTaxRateResolver implements DividendTaxRateResolverInterface
 {
@@ -13,31 +13,26 @@ class DividendTaxRateResolver implements DividendTaxRateResolverInterface
      */
     public function getTaxRateForCalendar(Calendar $calendar): float
     {
-        $dividendTax = 0.15;
-        $taxRate = 0;
-
-        $ticker = $calendar->getTicker();
-        $tax = $ticker->getTax();
+        $tax = $calendar->getTicker()->getTax();
         if ($tax) {
-            $taxRate = $tax->getTaxRate();
-            return $taxRate;
+            return $tax->getTaxRate();
         }
 
         switch ($calendar->getCurrency()->getSymbol()) {
             case 'EUR':
-                $dividendTax = Constants::TAX / 100;
+                $dividendTax = Constants::DEFAULT_TAX_RATE;
                 break;
             case 'USD':
-                $dividendTax = Constants::TAX / 100;
+                $dividendTax = Constants::DEFAULT_TAX_RATE;
                 break;
             case 'GB':
                 $dividendTax = Constants::TAX_GB / 100;
                 break;
             case 'CAD':
-                $dividendTax = Constants::TAX / 100;
+                $dividendTax = Constants::DEFAULT_TAX_RATE;
                 break;
             default:
-                $dividendTax = Constants::TAX / 100;
+                $dividendTax = Constants::DEFAULT_TAX_RATE;
                 break;
         }
 

@@ -9,6 +9,7 @@ class Constants
     public const AMOUNT_PRECISION = 10000000;
     public const VALUTA_PRECISION = 1000;
     public const TAX = 15; // 15%
+    public const DEFAULT_TAX_RATE = self::TAX / 100; // 0.15
     public const TAX_GB = 35; // 35%
     public const EXCHANGE = 1.19;
     public const EXCHANGE_USDEUR = 0.84; // 1 USD = 0.84 EUR
