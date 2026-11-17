@@ -2,10 +2,12 @@
 
 namespace App\Decorator;
 
+use App\Contracts\Decorator\AdjustedDecoratorInterface;
+use App\Contracts\Decorator\AdjustedPositionDecoratorInterface;
 use App\Entity\CorporateAction;
 use App\Entity\Position;
 use App\Entity\Transaction;
-use App\Service\Transaction\TransactionAdjusterInterface;
+use App\Contracts\Transaction\TransactionAdjusterInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class AdjustedPositionDecorator implements AdjustedDecoratorInterface, AdjustedPositionDecoratorInterface

@@ -7,7 +7,7 @@ use RuntimeException;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use App\Service\ExchangeRate\ExchangeRateInterface;
+use App\Contracts\ExchangeRate\ExchangeRateInterface;
 
 class StockPriceService
 {

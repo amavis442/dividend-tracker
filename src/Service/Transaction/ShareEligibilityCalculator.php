@@ -2,6 +2,7 @@
 
 namespace App\Service\Transaction;
 
+use App\Contracts\Transaction\ShareEligibilityCalculatorInterface;
 use App\Entity\Transaction;
 use App\Entity\Calendar;
 

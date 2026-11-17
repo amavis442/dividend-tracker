@@ -6,8 +6,8 @@ use App\Entity\Transaction;
 use App\Entity\CorporateAction;
 use App\Entity\Position;
 use App\Decorator\AdjustedPositionDecorator;
-use App\Decorator\AdjustedPositionDecoratorInterface;
-use App\Service\Transaction\TransactionAdjusterInterface;
+use App\Contracts\Decorator\AdjustedPositionDecoratorInterface;
+use App\Contracts\Transaction\TransactionAdjusterInterface;
 
 class AdjustedPositionDecoratorFactory
 {

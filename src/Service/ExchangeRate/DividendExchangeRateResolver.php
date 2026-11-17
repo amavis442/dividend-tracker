@@ -2,9 +2,10 @@
 
 namespace App\Service\ExchangeRate;
 
+use App\Contracts\ExchangeRate\DividendExchangeRateResolverInterface;
 use App\Entity\Calendar;
 use App\Entity\Ticker;
-use App\Service\ExchangeRate\ExchangeRateInterface;
+use App\Contracts\ExchangeRate\ExchangeRateInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DividendExchangeRateResolver implements DividendExchangeRateResolverInterface

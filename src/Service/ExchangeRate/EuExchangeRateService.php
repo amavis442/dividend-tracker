@@ -2,6 +2,7 @@
 
 namespace App\Service\ExchangeRate;
 
+use App\Contracts\ExchangeRate\ExchangeRateInterface;
 use DOMDocument;
 use DOMXPath;
 use Psr\Cache\CacheItemPoolInterface;

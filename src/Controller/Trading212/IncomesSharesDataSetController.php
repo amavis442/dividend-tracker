@@ -17,7 +17,7 @@ use App\Repository\TickerRepository;
 use App\Form\IncomesSharesDataSetType;
 use App\Helper\Colors;
 use App\Repository\IncomesSharesDataSetRepository;
-use App\Service\ExchangeRate\ExchangeRateInterface;
+use App\Contracts\ExchangeRate\ExchangeRateInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;

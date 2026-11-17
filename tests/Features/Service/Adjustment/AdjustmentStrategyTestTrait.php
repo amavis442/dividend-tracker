@@ -4,7 +4,7 @@ namespace App\Tests\Features\Service\Adjustment;
 
 use App\Entity\Transaction;
 use App\Entity\CorporateAction;
-use App\Service\Adjustment\AdjustmentStrategyInterface;
+use App\Contracts\Adjustment\AdjustmentStrategyInterface;
 
 trait AdjustmentStrategyTestTrait
 {

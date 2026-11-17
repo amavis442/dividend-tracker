@@ -2,6 +2,8 @@
 
 namespace App\Service\Dividend;
 
+use App\Contracts\Dividend\DividendServiceInterface;
+use App\Contracts\Dividend\DividendTaxRateResolverInterface;
 use App\Entity\CorporateAction;
 use App\Entity\Calendar;
 use App\Util\Constants;
@@ -14,9 +16,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Decorator\Factory\AdjustedDividendDecoratorFactory;
 use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
-use App\Service\ExchangeRate\DividendExchangeRateResolverInterface;
-use App\Service\Transaction\ShareEligibilityCalculatorInterface;
-use App\Service\ExchangeRate\ExchangeAndTaxResolverInterface;
+use App\Contracts\ExchangeRate\DividendExchangeRateResolverInterface;
+use App\Contracts\Transaction\ShareEligibilityCalculatorInterface;
+use App\Contracts\ExchangeRate\ExchangeAndTaxResolverInterface;
 
 class DividendService implements DividendServiceInterface
 {

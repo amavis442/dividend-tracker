@@ -2,6 +2,8 @@
 
 namespace App\Decorator;
 
+use App\Contracts\Decorator\AdjustedDecoratorInterface;
+use App\Contracts\Decorator\AdjustedDividendDecoratorInterface;
 use App\Entity\Ticker;
 use App\Service\Dividend\DividendAdjuster;
 use Doctrine\Common\Collections\ArrayCollection;

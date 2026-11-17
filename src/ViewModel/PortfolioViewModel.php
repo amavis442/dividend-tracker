@@ -12,7 +12,7 @@ use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Repository\PositionRepository;
 use App\Repository\DividendCalendarRepository;
-use App\Service\Dividend\DividendServiceInterface;
+use App\Contracts\Dividend\DividendServiceInterface;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;

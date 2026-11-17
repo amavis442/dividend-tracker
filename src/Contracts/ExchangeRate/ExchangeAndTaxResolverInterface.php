@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\ExchangeRate;
+namespace App\Contracts\ExchangeRate;
 
 use App\Dto\ExchangeTaxDto;
 use App\Entity\Ticker;

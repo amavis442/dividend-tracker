@@ -6,7 +6,7 @@ use App\Entity\Calendar;
 use App\Repository\PaymentRepository;
 use App\Repository\DividendTrackerRepository;
 use App\Repository\DividendCalendarRepository;
-use App\Service\Dividend\DividendServiceInterface;
+use App\Contracts\Dividend\DividendServiceInterface;
 
 class Payouts
 {

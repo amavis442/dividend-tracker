@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Importer;
+namespace App\Contracts\Importer;
 
 interface CsvInterface
 {
