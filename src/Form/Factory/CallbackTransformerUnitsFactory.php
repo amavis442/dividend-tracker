@@ -11,10 +11,10 @@ class CallbackTransformerUnitsFactory
     public static function create(): CallbackTransformer
     {
         return new CallbackTransformer(
-            function ($inputAsInt) {
+            function ($inputAsInt): int|float {
                 return $inputAsInt / 10000000;
             },
-            function ($outputAsInt) {
+            function ($outputAsInt): int {
                 $a = $outputAsInt * 10000000;
                 return (int)floor($a);
             }

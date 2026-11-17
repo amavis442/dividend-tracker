@@ -6,7 +6,7 @@ use App\Entity\Ticker;
 
 class DividendGrowthService
 {
-    public function getData(Ticker $ticker)
+    public function getData(Ticker $ticker): array
     {
         $calendars = $ticker->getCalendars();
         $data = [];

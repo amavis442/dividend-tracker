@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\Form\FormInterface;
 use App\Controller\Portfolio\PortfolioController;
 use App\Entity\Position;
 use App\Entity\TickerAutocomplete;
@@ -74,7 +75,7 @@ class TransactionController extends AbstractController
         }
 
         /**
-         * @var \Symfony\Component\Form\FormInterface $form
+         * @var FormInterface $form
          */
         $form = $this->createForm(
             TickerAutocompleteType::class,
@@ -107,7 +108,7 @@ class TransactionController extends AbstractController
         ]);
     }
 
-    private function presetMetrics(#[MapEntity] Transaction $transaction)
+    private function presetMetrics(#[MapEntity] Transaction $transaction): void
     {
         $transaction->calcAllocation();
         $transaction->calcPrice();

@@ -52,7 +52,7 @@ class PortfolioViewModel
             iterator_to_array($positions)
         );
 
-        $tickers = array_map(function ($position) {
+        $tickers = array_map(function (Position $position): ?Ticker {
             return $position->getTicker();
         }, iterator_to_array($positions));
 

@@ -20,13 +20,13 @@ class DividendDataProvider
      *
      * @param Ticker[] $tickers
      *
-     * @return array<int, array<int, \App\Entity\Calendar>>
+     * @return array<int, array<int, Calendar>>
      */
     public function load(array $tickers, ?\DateTime $afterDate = null, ?\DateTime $beforeDate = null, array $types = [Calendar::REGULAR]): array
     {
         $logger = $this->logger;
         try {
-            $ids = array_map(function (?Ticker $t) use ($logger) {
+            $ids = array_map(function (?Ticker $t) use ($logger): ?int {
                 if (!isset($t) || $t == null) {
                     $logger->error('DividendDataProvider::load()#' . __LINE__ . ' Ticker() is null');
                 }

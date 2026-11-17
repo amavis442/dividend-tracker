@@ -10,17 +10,13 @@ class DateSelect
 {
     /**
      * Date
-     *
-     * @var DateTimeInterface
      */
-    private $startdate;
+    private ?\DateTimeInterface $startdate = null;
 
     /**
      * Date
-     *
-     * @var DateTimeInterface
      */
-    private $enddate;
+    private ?\DateTimeInterface $enddate = null;
 
 
     /**
@@ -35,12 +31,8 @@ class DateSelect
 
     /**
      * Set date
-     *
-     * @param  DateTimeInterface  $startdate  Date
-     *
-     * @return  self
      */
-    public function setStartdate(DateTimeInterface $startdate)
+    public function setStartdate(DateTimeInterface $startdate): static
     {
         $this->startdate = $startdate;
 
@@ -59,12 +51,8 @@ class DateSelect
 
     /**
      * Set date
-     *
-     * @param  DateTimeInterface  $enddate  Date
-     *
-     * @return  self
      */
-    public function setEnddate(DateTimeInterface $enddate)
+    public function setEnddate(DateTimeInterface $enddate): static
     {
         $this->enddate = $enddate;
 

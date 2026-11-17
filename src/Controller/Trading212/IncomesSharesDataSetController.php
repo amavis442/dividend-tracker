@@ -2,6 +2,9 @@
 
 namespace App\Controller\Trading212;
 
+use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
+use App\Entity\Ticker;
+use App\Entity\Calendar;
 use App\Entity\IncomesSharesData;
 use App\Entity\IncomesSharesDataSet;
 use App\Entity\IncomesSharesFile;
@@ -66,7 +69,7 @@ final class IncomesSharesDataSetController extends AbstractController
 
         try {
             $parameter = $this->getParameter('app.incomesshares');
-        } catch (\Symfony\Component\DependencyInjection\Exception\EnvNotFoundException $e) {
+        } catch (EnvNotFoundException $e) {
             $this->addFlash(
                 'notice',
                 'Missing INCOMESSHARES parameter in .env(.local)'
@@ -248,7 +251,7 @@ final class IncomesSharesDataSetController extends AbstractController
         IncomesSharesDataSetRepository $incomesSharesDataSetRepository,
         TranslatorInterface $translator,
         ChartBuilderInterface $chartBuilder
-    ) {
+    ): Response {
         $data = $incomesSharesDataSetRepository->findAll();
         $labels = [];
         $allocationData = [];
@@ -405,7 +408,7 @@ final class IncomesSharesDataSetController extends AbstractController
 
         foreach ($dataIshares as $ishare) {
             /**
-             * @var \App\Entity\Ticker
+             * @var Ticker
              */
             $ticker = $ishare->getTicker();
             $isin = $ticker->getIsin();
@@ -416,7 +419,7 @@ final class IncomesSharesDataSetController extends AbstractController
             $price = $ishare->getPrice();
             $amount = $position->getAmount();
             /**
-             * @var \App\Entity\Calendar
+             * @var Calendar
              */
             $calendar = $ticker->getCalendars()->first();
             $distributionCash = $calendar->getCashAmount();

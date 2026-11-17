@@ -2,6 +2,8 @@
 
 namespace App\Controller\Trading212;
 
+use App\Entity\Ticker;
+use App\Entity\Trading212PieMetaData;
 use App\Entity\Pie;
 use App\Repository\DividendCalendarRepository;
 use App\Repository\PaymentRepository;
@@ -83,7 +85,7 @@ class PieInstrumentsController extends AbstractController
             /**
              * Profit/loss based on price action
              *
-             * @var \App\Entity\Ticker $ticker
+             * @var Ticker $ticker
              */
             $ticker = $instrument->getTicker();
             $priceProfitLoss +=
@@ -228,7 +230,7 @@ class PieInstrumentsController extends AbstractController
 
     private function getChartData(
         Collection $metaData
-    ) {
+    ): array {
         $labels = [];
         $allocationData = [];
         $valueData = [];
@@ -237,12 +239,12 @@ class PieInstrumentsController extends AbstractController
         $breakEvenData = [];
 
         /**
-         * @var array<int, \App\Entity\Trading212PieMetaData> $data
+         * @var array<int, Trading212PieMetaData> $data
          */
         $data = $metaData->toArray();
 
         /**
-         * @var \App\Entity\Trading212PieMetaData $item
+         * @var Trading212PieMetaData $item
          */
         foreach ($data as $item) {
             $allocationData[] = round($item->getPriceAvgInvestedValue(), 2);

@@ -2,6 +2,7 @@
 
 namespace App\Command\Trading212;
 
+use App\Entity\TickerAlternativeSymbol;
 use App\Entity\Trading212PieMetaData;
 use App\Entity\Trading212PieInstrument;
 use App\Repository\ApiKeyRepository;
@@ -156,7 +157,7 @@ class PieCommand extends Command
                     $trading212PieMetaData
                 );
                 /**
-                 * @var \App\Entity\TickerAlternativeSymbol
+                 * @var TickerAlternativeSymbol
                  */
                 $tickerAlternativeSymbol = $this->tickerAlternativeSymbolRepository->findOneBy(
                     ['symbol' => $instrument['ticker']]

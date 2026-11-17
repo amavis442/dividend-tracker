@@ -2,6 +2,7 @@
 
 namespace App\DataProvider;
 
+use App\Entity\Transaction;
 use App\Repository\TransactionRepository;
 use App\Entity\Position;
 
@@ -17,11 +18,11 @@ class TransactionDataProvider
      *
      * @param Position[] $positions
      *
-     * @return array<int, array<int ,\App\Entity\Transaction>>
+     * @return array<int, array<int ,Transaction>>
      */
     public function load(array $positions): array
     {
-        $ids = array_map(fn(Position $p) => $p->getId(), $positions);
+        $ids = array_map(fn(Position $p): ?int => $p->getId(), $positions);
 
         return
             $this->mapByPosition(

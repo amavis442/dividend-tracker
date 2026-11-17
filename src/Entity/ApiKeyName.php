@@ -53,7 +53,7 @@ class ApiKeyName
     }
 
     #[Assert\Callback]
-    public function validate(ExecutionContextInterface $context, $payload)
+    public function validate(ExecutionContextInterface $context, $payload): void
     {
         if (empty($this->getKeyName())) {
             $context

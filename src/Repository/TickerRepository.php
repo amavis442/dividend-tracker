@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use Doctrine\ORM\QueryBuilder;
 use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -56,7 +57,7 @@ class TickerRepository extends ServiceEntityRepository
         string $sort = "symbol",
         string $orderBy = "ASC",
         ?Ticker $ticker = null
-    ): \Doctrine\ORM\QueryBuilder {
+    ): QueryBuilder {
         $sort = "t." . $sort;
         // Create our query
         $queryBuilder = $this->createQueryBuilder("t")
@@ -139,7 +140,7 @@ class TickerRepository extends ServiceEntityRepository
         return $result[0]["units"] ?? 0;
     }
 
-    public function getActive()
+    public function getActive(): mixed
     {
         $qb = $this->createQueryBuilder("t", "t.symbol")
             ->select("t")
@@ -153,7 +154,7 @@ class TickerRepository extends ServiceEntityRepository
         return $qb->getResult();
     }
 
-    public function getActiveForDividendYield()
+    public function getActiveForDividendYield(): mixed
     {
         return $this->createQueryBuilder("t")
             ->select("t, p, c, dm")

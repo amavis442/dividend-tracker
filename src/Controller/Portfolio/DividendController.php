@@ -2,6 +2,7 @@
 
 namespace App\Controller\Portfolio;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Entity\Calendar;
 use App\Entity\Position;
 use App\Entity\Ticker;
@@ -96,7 +97,7 @@ class DividendController extends AbstractController
         EntityManagerInterface $entityManager,
         ?Ticker $ticker,
         #[MapEntity] ?Position $position
-    ) {
+    ): RedirectResponse|Response {
         $calendar = new Calendar();
         if ($ticker != null) {
             $calendar->setTicker($ticker);

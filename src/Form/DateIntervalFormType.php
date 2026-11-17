@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Form;
 
+use Doctrine\ORM\QueryBuilder;
 use App\Entity\DateIntervalSelect;
 use App\Entity\Pie;
 use App\Form\Type\TickerAutocompleteField;
@@ -69,7 +70,7 @@ class DateIntervalFormType extends AbstractType
                 'placeholder' => 'Please choose a Pie',
                 'empty_data' => null,
                 'multiple' => false,
-                'query_builder' => function (EntityRepository $er) {
+                'query_builder' => function (EntityRepository $er): QueryBuilder {
                     return $er->createQueryBuilder('pie')
                         ->join("pie.positions", "pos")
                         ->where("pos.closed = false")

@@ -2,6 +2,7 @@
 
 namespace App\Service\Dividend;
 
+use App\Entity\CorporateAction;
 use App\Entity\Calendar;
 use App\Util\Constants;
 use App\Entity\Pie;
@@ -53,17 +54,17 @@ class DividendService implements DividendServiceInterface
     protected ?array $cachedPositionData;
 
     /**
-     * @var array<int, array<int, \App\Entity\Transaction>>|null
+     * @var array<int, array<int, Transaction>>|null
      */
     protected ?array $cachedTransactions;
 
     /**
-     * @var array<int, array<int, \App\Entity\CorporateAction>>|null
+     * @var array<int, array<int, CorporateAction>>|null
      */
     protected ?array $cachedCorporateActions;
 
     /**
-     * @var array<int, array<int, \App\Entity\Calendar>>|null
+     * @var array<int, array<int, Calendar>>|null
      */
     protected ?array $cachedDividendCalendars;
 
@@ -94,9 +95,9 @@ class DividendService implements DividendServiceInterface
      * @param Position $position
      *
      * @return array{
-     *     transactions: array<int, array<int, \App\Entity\Transaction>>,
-     *     actions: array<int, array<int, \App\Entity\CorporateAction>>,
-     *     dividends: array<int, array<int, \App\Entity\Calendar>>,
+     *     transactions: array<int, array<int, Transaction>>,
+     *     actions: array<int, array<int, CorporateAction>>,
+     *     dividends: array<int, array<int, Calendar>>,
      * }
      */
     protected function getChachedDataForPosition(Position $position): array
@@ -191,7 +192,7 @@ class DividendService implements DividendServiceInterface
         }
 
         $calendars = $ticker->getCalendars()->slice(0, 8);
-        $calendars = array_filter($calendars, function ($element) {
+        $calendars = array_filter($calendars, function ($element): bool {
             return $element->getDividendType() === Calendar::REGULAR ||
                 $element->getDividendType() === null;
         });
@@ -367,7 +368,7 @@ class DividendService implements DividendServiceInterface
         $calendars = $ticker->getCalendars();
         if (count($calendars) > 0) {
             /**
-             * @var \App\Entity\Calendar $calendar
+             * @var Calendar $calendar
              */
             $calendar = $this->getRegularCalendar($ticker);
             if ($calendar) {

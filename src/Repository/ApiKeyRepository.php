@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use Doctrine\ORM\QueryBuilder;
 use App\Entity\ApiKey;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -17,7 +18,7 @@ class ApiKeyRepository extends ServiceEntityRepository
         parent::__construct($registry, ApiKey::class);
     }
 
-    public function getQueryBuilderFindByAll()
+    public function getQueryBuilderFindByAll(): QueryBuilder
     {
         return $this->createQueryBuilder('a')->orderBy('a.id', 'ASC');
     }

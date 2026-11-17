@@ -2,6 +2,7 @@
 
 namespace App\Decorator;
 
+use App\Entity\CorporateAction;
 use App\Entity\Position;
 use App\Entity\Transaction;
 use App\Service\Transaction\TransactionAdjusterInterface;
@@ -15,11 +16,11 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface, AdjustedP
     /**
      * @param Position $position
      *
-     * @param array<int, \App\Entity\Transaction> $transactions
+     * @param array<int, Transaction> $transactions
      *
-     * @param array<int, \App\Entity\CorporateAction> $actions
+     * @param array<int, CorporateAction> $actions
      *
-     * @param \App\Service\Transaction\TransactionAdjusterInterface $transactionAdjuster
+     * @param TransactionAdjusterInterface $transactionAdjuster
      */
     public function __construct(
         private Position $position,
@@ -218,7 +219,7 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface, AdjustedP
             return null;
         }
 
-        $notes = array_map(function ($action) {
+        $notes = array_map(function ($action): string {
             return sprintf(
                 'Adjusted due to reverse split on %s (ratio: %s)',
                 $action->getEventDate()->format('Y-m-d'),

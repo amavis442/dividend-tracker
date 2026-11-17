@@ -86,7 +86,7 @@ class Tax
      * Gets triggered only on insert
      */
     #[ORM\PrePersist]
-    public function onPrePersist()
+    public function onPrePersist(): void
     {
         $this->createdAt = new \DateTime("now");
     }

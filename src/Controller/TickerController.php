@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\Form\FormInterface;
 use App\Entity\Ticker;
 use App\Entity\TickerAutocomplete;
 use App\Form\TickerAutocompleteType;
@@ -61,7 +62,7 @@ class TickerController extends AbstractController
         }
 
         /**
-         * @var \Symfony\Component\Form\FormInterface $form
+         * @var FormInterface $form
          */
         $form = $this->createForm(
             TickerAutocompleteType::class,

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\Form\FormInterface;
 use App\Entity\Position;
 use App\Entity\TickerAutocomplete;
 use App\Form\PositionType;
@@ -68,7 +69,7 @@ class ClosedPositionController extends AbstractController
         }
 
         /**
-         * @var \Symfony\Component\Form\FormInterface $form
+         * @var FormInterface $form
          */
         $form = $this->createForm(
             TickerAutocompleteType::class,

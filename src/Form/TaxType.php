@@ -24,11 +24,11 @@ class TaxType extends AbstractType
             ]);
 
         $builder->get('taxRate')->addModelTransformer(new CallbackTransformer(
-            function ($taxRate) {
+            function ($taxRate): int|float {
                 // transform the array to a string
                 return $taxRate * 100;
             },
-            function ($taxRate) {
+            function ($taxRate): int {
                 // transform the string back to an array
                 return (int)$taxRate;
             }

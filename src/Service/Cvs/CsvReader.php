@@ -32,7 +32,7 @@ class CsvReader
         return $this;
     }
 
-    public function setFieldDelimiter($delimiter): self
+    public function setFieldDelimiter(string $delimiter): self
     {
         $this->delimiter = $delimiter;
 

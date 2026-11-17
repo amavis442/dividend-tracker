@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Decorator;
 
+use App\Entity\Calendar;
 use App\Entity\Ticker;
 
 interface AdjustedDividendDecoratorInterface
@@ -18,7 +19,7 @@ interface AdjustedDividendDecoratorInterface
      *  paymentDate: \DateTime,
      *  ticker: Ticker,
      *  symbol: string,
-     *  calendar: \App\Entity\Calendar
+     *  calendar: Calendar
      * }>
      */
     public function getAdjustedDividend(): array;
@@ -33,7 +34,7 @@ interface AdjustedDividendDecoratorInterface
      *  paymentDate: \DateTime,
      *  ticker: Ticker,
      *  symbol: string,
-     *  calendar: \App\Entity\Calendar
+     *  calendar: Calendar
      * }>
      */
     public function getAdjustedDividendSortByPaymentDate(): array;

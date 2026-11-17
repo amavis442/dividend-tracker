@@ -2,6 +2,7 @@
 
 namespace App\Controller\Report;
 
+use Symfony\Component\HttpFoundation\Response;
 use App\Entity\Portfolio;
 use App\Helper\Colors;
 use App\Model\AllocationModel;
@@ -26,14 +27,14 @@ class AllocationPerPositionController extends AbstractController
         PositionRepository $positionRepository,
         ChartBuilderInterface $chartBuilder,
         CacheInterface $pool
-    ) {
+    ): Response {
         $colors = Colors::COLORS;
         $result = $pool->get('allocation_per_position_report', function (
             ItemInterface $item
         ) use (
             $positionRepository,
             $colors
-        ) {
+        ): array {
             $item->expiresAfter(3600);
 
             $positions = $positionRepository->getOpenPositions();

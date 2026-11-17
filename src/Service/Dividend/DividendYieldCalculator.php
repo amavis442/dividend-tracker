@@ -2,22 +2,25 @@
 
 namespace App\Service\Dividend;
 
+use App\Entity\Ticker;
+use App\Entity\Calendar;
+use App\Entity\Position;
+
 class DividendYieldCalculator
 {
     /**
-     * @var array<int, \App\Entity\Ticker>
+     * @var array<int, Ticker>
      */
     private array $tickers;
 
     /**
-     * @var array<int,array<int, \App\Entity\Calendar>>
+     * @var array<int,array<int, Calendar>>
      */
     private array $calendars;
 
     /**
-     * @var array<int, \App\Entity\Position>
+     * @var array<int, Position>
      */
-
     private array $positions;
     /**
      * @var array<int, float>
@@ -40,9 +43,9 @@ class DividendYieldCalculator
      * Returns an array keyed by tickerId.
      *
      * @return array<int|string, array{
-     *     position: \App\Entity\Position,
-     *     ticker: \App\Entity\Ticker,
-     *     calendar_used: \App\Entity\Calendar|null,
+     *     position: Position,
+     *     ticker: Ticker,
+     *     calendar_used: Calendar|null,
      *     total_shares: float,
      *     exchange_rate: float,
      *     tax_rate: float,

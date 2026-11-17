@@ -2,6 +2,8 @@
 
 namespace App\Decorator\Factory;
 
+use App\Entity\Calendar;
+use App\Entity\CorporateAction;
 use App\Entity\Ticker;
 use App\Decorator\AdjustedDividendDecorator;
 use App\Decorator\AdjustedDividendDecoratorInterface;
@@ -10,11 +12,11 @@ use App\Service\Dividend\DividendAdjuster;
 class AdjustedDividendDecoratorFactory
 {
     /**
-     * @var array<int, array<int, \App\Entity\Calendar>> $dividends
+     * @var array<int, array<int, Calendar>> $dividends
      */
     private ?array $dividends = null;
     /**
-     * @var array<int , array<int, \App\Entity\CorporateAction>> $actions
+     * @var array<int , array<int, CorporateAction>> $actions
      */
     private ?array $actions = null;
 
@@ -40,9 +42,9 @@ class AdjustedDividendDecoratorFactory
     /**
      * Mass load needed data for decorator(s)
      *
-     * @param array<int, array<int, \App\Entity\Calendar>> $dividends
+     * @param array<int, array<int, Calendar>> $dividends
      *
-     * @param array<int , array<int, \App\Entity\CorporateAction>> $actions
+     * @param array<int , array<int, CorporateAction>> $actions
      *
      * @return self
      *
@@ -73,7 +75,7 @@ class AdjustedDividendDecoratorFactory
     public function decorateBatch(array $tickers): array
     {
         return array_map(
-            fn($ticker) => $this->decorate($ticker),
+            fn($ticker): AdjustedDividendDecoratorInterface => $this->decorate($ticker),
             $tickers
         );
     }

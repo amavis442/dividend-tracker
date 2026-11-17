@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use Doctrine\ORM\QueryBuilder;
 use App\Entity\Ticker;
 use App\Entity\Branch;
 use App\Entity\DividendMonth;
@@ -32,7 +33,7 @@ class TickerType extends AbstractType
                 'required' => true,
                 'placeholder' => 'Please choose a branch',
                 'empty_data' => null,
-                'query_builder' => function (EntityRepository $er) {
+                'query_builder' => function (EntityRepository $er): QueryBuilder {
                     return $er->createQueryBuilder('b')
                         ->orderBy('b.label', 'ASC');
                 },
@@ -61,10 +62,10 @@ class TickerType extends AbstractType
                 'placeholder' => 'Please choose a tax',
                 'empty_data' => null,
                 'multiple' => false,
-                'choice_label' => function ($tax) {
+                'choice_label' => function ($tax): string {
                     return ($tax->getTaxRate() * 100) . '%';
                 },
-                'query_builder' => function (EntityRepository $er) {
+                'query_builder' => function (EntityRepository $er): QueryBuilder {
                     return $er->createQueryBuilder('t')
                         ->where('t.validFrom <= :validFrom')
                         ->orderBy('t.taxRate, t.validFrom', 'ASC')

@@ -2,6 +2,8 @@
 
 namespace App\Decorator\Factory;
 
+use App\Entity\Transaction;
+use App\Entity\CorporateAction;
 use App\Entity\Position;
 use App\Decorator\AdjustedPositionDecorator;
 use App\Decorator\AdjustedPositionDecoratorInterface;
@@ -10,11 +12,11 @@ use App\Service\Transaction\TransactionAdjusterInterface;
 class AdjustedPositionDecoratorFactory
 {
     /**
-     * @var array<int, array<int, \App\Entity\Transaction>> $transactions
+     * @var array<int, array<int, Transaction>> $transactions
      */
     private ?array $transactions = null;
     /**
-     * @var array<int , array<int, \App\Entity\CorporateAction>> $actions
+     * @var array<int , array<int, CorporateAction>> $actions
      */
     private ?array $actions = null;
 
@@ -40,9 +42,9 @@ class AdjustedPositionDecoratorFactory
     /**
      * Mass load needed data for decorator(s)
      *
-     * @param array<int, array<int, \App\Entity\Transaction>> $transactions key is positionId
+     * @param array<int, array<int, Transaction>> $transactions key is positionId
      *
-     * @param array<int , array<int, \App\Entity\CorporateAction>> $actions key is tickerId
+     * @param array<int , array<int, CorporateAction>> $actions key is tickerId
      *
      * @return self
      *
@@ -85,7 +87,7 @@ class AdjustedPositionDecoratorFactory
     public function decorateBatch(array $positions): array
     {
         return array_map(
-            fn($position) => $this->decorate($position),
+            fn($position): AdjustedPositionDecoratorInterface => $this->decorate($position),
             $positions
         );
     }

@@ -7,7 +7,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 
 class AddUser
 {
-    private $security;
+    private Security $security;
 
     public function __construct(Security $security)
     {

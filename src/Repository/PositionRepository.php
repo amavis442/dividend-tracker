@@ -238,7 +238,7 @@ class PositionRepository extends ServiceEntityRepository
     public function getAllClosedQuery(
         string $sort = 'DESC',
         ?Ticker $ticker = null
-    ): \Doctrine\ORM\QueryBuilder {
+    ): QueryBuilder {
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('p, t, i')
             ->innerJoin('p.ticker', 't')
@@ -502,7 +502,7 @@ class PositionRepository extends ServiceEntityRepository
         return 0;
     }
 
-    public function getUpcommingDividend()
+    public function getUpcommingDividend(): mixed
     {
         return $this->createQueryBuilder('p')
             ->join('p.ticker', 't')

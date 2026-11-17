@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Entity\Ticker;
 use App\Entity\Calendar;
 use App\Repository\CalendarRepository;
 use App\Repository\CurrencyRepository;
@@ -104,7 +105,7 @@ class DividendDateCommand extends Command
         $addedForTicker = [];
 
         /**
-         * @var \App\Entity\Ticker $ticker
+         * @var Ticker $ticker
          */
         foreach ($tickers as $ticker) {
             $data = $this->dividendDateService->getData(

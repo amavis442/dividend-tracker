@@ -13,7 +13,7 @@ final class DividendDecorator
 
     /**
      */
-    public function decorate(array &$tickers, Collection $dividends, Collection $corporateActions)
+    public function decorate(array &$tickers, Collection $dividends, Collection $corporateActions): void
     {
         // The original logic that called the factory
         $this->factory->load($dividends->toArray(), $corporateActions->toArray());

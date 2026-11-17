@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Form;
 
+use Doctrine\ORM\QueryBuilder;
 use App\Entity\Journal;
 use App\Entity\Taxonomy;
 use Symfony\Component\Form\AbstractType;
@@ -36,7 +37,7 @@ class JournalType extends AbstractType
                 //'empty_data' => null, Geeft een foutmelding als je deze erin laat staan en je wilt hem leeg hebben.
                 'multiple' => true,
                 'expanded' => true,
-                'query_builder' => function (EntityRepository $er) {
+                'query_builder' => function (EntityRepository $er): QueryBuilder {
                     return $er
                         ->createQueryBuilder('taxonomy')
                         ->orderBy('taxonomy.title', 'ASC');

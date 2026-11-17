@@ -3,6 +3,7 @@
 // src/Form/Type/PieSelectType.php
 namespace App\Form\Type;
 
+use Doctrine\ORM\QueryBuilder;
 use App\Entity\Pie;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -20,7 +21,7 @@ class PieSelectType extends AbstractType
             },
             "choice_value" => "id",
             "placeholder" => "Please choose a Pie",
-            "query_builder" => function (EntityRepository $er) {
+            "query_builder" => function (EntityRepository $er): QueryBuilder {
                 $resultTransactions = $er
                     ->createQueryBuilder("pie")
                     ->select("pie.id")

@@ -2,6 +2,7 @@
 
 namespace App\Controller\Portfolio;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Entity\Payment;
 use App\Entity\Position;
 use App\Form\PaymentType;
@@ -32,7 +33,7 @@ class PaymentController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         #[MapEntity] Position $position
-    ) {
+    ): RedirectResponse|Response {
         $payment = new Payment();
         $payment->setPosition($position);
         $payment->setTicker($position->getTicker());
@@ -73,7 +74,7 @@ class PaymentController extends AbstractController
         PaymentRepository $paymentRepository,
         #[MapEntity] Payment $payment,
         int $page = 1
-    ) {
+    ): RedirectResponse|Response {
             $form = $this->createForm(PaymentType::class, $payment);
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {

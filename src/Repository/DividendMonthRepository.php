@@ -36,7 +36,7 @@ class DividendMonthRepository extends ServiceEntityRepository
         return $result;
     }
 
-    public function getFreq(array $ticker_ids)
+    public function getFreq(array $ticker_ids): mixed
     {
         $em = $this->getEntityManager();
         $expr = $this->getEntityManager()->getExpressionBuilder();

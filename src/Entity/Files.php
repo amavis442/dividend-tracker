@@ -19,10 +19,8 @@ class Files
 
     /**
      * Holder for raw file data. Not to be persisted.
-     *
-     * @var File
      */
-    private $file;
+    private ?File $file = null;
 
 
     public function getId(): ?int

@@ -165,7 +165,7 @@ class Transaction
     private ?float $adjustedPrice = null;
 
     #[Assert\Callback]
-    public function validate(ExecutionContextInterface $context, $payload)
+    public function validate(ExecutionContextInterface $context, $payload): void
     {
         if (empty($this->getOriginalPrice()) && empty($this->getTotal())) {
             $context

@@ -2,6 +2,7 @@
 
 namespace App\Service\Dividend;
 
+use App\Entity\Position;
 use App\Entity\Constants;
 use App\Entity\Pie;
 use App\Entity\PositionYield;
@@ -76,7 +77,7 @@ class YieldsService
         $this->adjustedPositionDecoratorFactory->load($transactions, $actions);
 
         /**
-         * @var \App\Entity\Position $position
+         * @var Position $position
          */
         foreach ($positions as $position) {
             $avgPrice =

@@ -2,6 +2,9 @@
 
 namespace App\Service;
 
+use App\Entity\Pie;
+use App\Entity\Position;
+use App\Entity\Ticker;
 use App\Repository\PieRepository;
 use App\Repository\PositionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -48,7 +51,7 @@ class Export
         $pies = $this->pieRepository->findAll();
         if ($pies) {
             /**
-             * @var \App\Entity\Pie $pie
+             * @var Pie $pie
              */
             foreach ($pies as $pie) {
                 $positions = $pie->getPositions();
@@ -93,7 +96,7 @@ class Export
     {
         $data = [];
         /**
-         * @var \App\Entity\Position $position
+         * @var Position $position
          */
         foreach ($positions as $position) {
             if ($position->getClosed()) {
@@ -101,7 +104,7 @@ class Export
             }
             $row = [];
             /**
-             * @var \App\Entity\Ticker $ticker
+             * @var Ticker $ticker
              */
             $ticker = $position->getTicker();
             $row['Ticker'] = $ticker->getSymbol();
@@ -140,7 +143,7 @@ class Export
                 );
 
                 /**
-                 * @var \Doctrine\Common\Collections\Collection $dividendMonths
+                 * @var Collection $dividendMonths
                  */
                 $dividendMonths = $ticker->getDividendMonths();
                 $netDividend = $this->dividendService->getNetDividend(

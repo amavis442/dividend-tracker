@@ -148,7 +148,7 @@ class DividendTrackerController extends AbstractController
         ChartBuilderInterface $chartBuilder,
         array $labels,
         array $yieldReceivedDividends
-    ): \Symfony\UX\Chartjs\Model\Chart {
+    ): Chart {
         ksort($yieldReceivedDividends);
 
         $chartYield = $chartBuilder->createChart(Chart::TYPE_BAR);
@@ -188,7 +188,7 @@ class DividendTrackerController extends AbstractController
         ChartBuilderInterface $chartBuilder,
         array $labels,
         array $receivedDividends
-    ): \Symfony\UX\Chartjs\Model\Chart {
+    ): Chart {
         ksort($receivedDividends);
 
         $chartRealized = $chartBuilder->createChart(Chart::TYPE_BAR);

@@ -66,7 +66,7 @@ class AdjustedDividendDecorator implements AdjustedDecoratorInterface, AdjustedD
             return null;
         }
 
-        $notes = array_map(function ($action) {
+        $notes = array_map(function ($action): string {
             return sprintf(
                 'Adjusted due to reverse split on %s (ratio: %s)',
                 $action->getEventDate()->format('Y-m-d'),

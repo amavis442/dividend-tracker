@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Form;
 
+use Doctrine\ORM\QueryBuilder;
 use App\Entity\Pie;
 use App\Entity\Transaction;
 use Doctrine\ORM\EntityRepository;
@@ -24,7 +25,7 @@ class TransactionPieType extends AbstractType
                 'placeholder' => 'Please choose a Pie',
                 'empty_data' => null,
                 //'multiple' => false,
-                'query_builder' => function (EntityRepository $er) {
+                'query_builder' => function (EntityRepository $er): QueryBuilder {
                     return $er->createQueryBuilder('pie')
                         ->orderBy('pie.label', 'ASC');
                 },

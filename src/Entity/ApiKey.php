@@ -46,7 +46,7 @@ class ApiKey
     }
 
     #[Assert\Callback]
-    public function validate(ExecutionContextInterface $context, $payload)
+    public function validate(ExecutionContextInterface $context, $payload): void
     {
         if (empty($this->getApiKey())) {
             $context

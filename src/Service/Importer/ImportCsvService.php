@@ -142,7 +142,7 @@ class ImportCsvService extends AbstractImporter implements CsvInterface
     {
         $rows = [];
         $rowNum = 0;
-        $csvRows = array_map(function ($row) {
+        $csvRows = array_map(function ($row): array {
             $newRow = [];
             foreach ($row as $header => $value) {
                 $newRow[strtolower($header)] = $value;

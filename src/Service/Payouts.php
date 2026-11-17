@@ -138,7 +138,7 @@ class Payouts
         ];
     }
 
-    private function trendline($x, $y)
+    private function trendline(array $x, array $y): array
     {
         $n = count($x); // number of items in the array
         $x_sum = array_sum($x); // sum of all X values

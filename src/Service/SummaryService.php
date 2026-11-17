@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Position;
 use App\Entity\Summary;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
@@ -28,7 +29,7 @@ class SummaryService implements SummaryInterface
         $profit = 0.0;
         $allocated = 0.0;
         /**
-         * @var  \App\Entity\Position  $position
+         * @var  Position  $position
          */
         foreach ($positions as $position) {
             $profit += $position->getProfit();

@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use Doctrine\ORM\QueryBuilder;
 use App\Entity\Calendar;
 use App\Entity\Currency;
 use App\Entity\Ticker;
@@ -22,13 +23,13 @@ class CalendarType extends AbstractType
         $builder
             ->add('ticker', EntityType::class, [
                 'class' => Ticker::class,
-                'choice_label' => function ($ticker) {
+                'choice_label' => function ($ticker): string {
                     return $ticker->getSymbol() . ' - ' . substr($ticker->getFullname(), 0, 80);
                 },
                 'required' => true,
                 'placeholder' => 'Please choose a ticker',
                 'empty_data' => null,
-                'query_builder' => function (EntityRepository $er) {
+                'query_builder' => function (EntityRepository $er): QueryBuilder {
                     return $er->createQueryBuilder('t')
                         ->orderBy('t.symbol', 'ASC');
                 },

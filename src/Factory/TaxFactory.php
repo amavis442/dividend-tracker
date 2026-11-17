@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Factory;
 
+use Faker\Factory;
 use App\Entity\Tax;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
@@ -30,7 +31,7 @@ final class TaxFactory extends PersistentObjectFactory
      */
     protected function defaults(): array
     {
-        $faker = \Faker\Factory::create();
+        $faker = Factory::create();
 
         return [
             'taxRate' => $faker->numberBetween(10, 30),

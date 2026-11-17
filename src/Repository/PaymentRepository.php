@@ -37,7 +37,7 @@ class PaymentRepository extends ServiceEntityRepository
         QueryBuilder $queryBuilder,
         string $startDate,
         string $endDate
-    ) {
+    ): void {
         $queryBuilder
             ->andWhere('p.payDate >= :startDate and p.payDate <= :endDate')
             ->setParameters(
@@ -96,7 +96,7 @@ class PaymentRepository extends ServiceEntityRepository
         ?Pie $pie = null,
         ?string $startDate = null,
         ?string $endDate = null
-    ): \Doctrine\ORM\QueryBuilder {
+    ): QueryBuilder {
         $sort = match ($sort) {
             'symbol' => 't.symbol',
             'exDividendDate' => 'c.exDividendDate',
@@ -302,7 +302,10 @@ class PaymentRepository extends ServiceEntityRepository
         return $result ? $result['total'] : 0.0;
     }
 
-    public function getSumDividends(array $tickerIds)
+    /**
+     * @return mixed[]
+     */
+    public function getSumDividends(array $tickerIds): array
     {
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('SUM(p.dividend) total')

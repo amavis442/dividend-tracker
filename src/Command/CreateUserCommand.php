@@ -34,11 +34,11 @@ class CreateUserCommand extends Command
             throw new \RuntimeException('Helper is not of type QuestionHelper');
         }
         $questionEmail = new Question('Please enter the email: ', null);
-        $questionEmail->setNormalizer(function ($value) {
+        $questionEmail->setNormalizer(function ($value): string {
             // $value can be null here
             return $value ? trim($value) : '';
         });
-        $questionEmail->setValidator(function ($answer) use ($userManager) {
+        $questionEmail->setValidator(function ($answer) use ($userManager): string {
             $answer = trim($answer);
             if ((int) strlen($answer) < 3 || $answer == '') {
                 throw new \RuntimeException('Email to short or not present.');
@@ -55,14 +55,14 @@ class CreateUserCommand extends Command
         $questionPassword = new Question('Password: ');
         $questionPassword->setHidden(true);
         $questionPassword->setHiddenFallback(false);
-        $questionPassword->setNormalizer(function ($value) {
+        $questionPassword->setNormalizer(function ($value): string {
             // $value can be null here
             return $value ? trim($value) : '';
         });
         $password = $helper->ask($input, $output, $questionPassword);
 
         $questionPasswordRepeat = new Question('Password repeat: ');
-        $questionPasswordRepeat->setNormalizer(function ($value) {
+        $questionPasswordRepeat->setNormalizer(function ($value): string {
             // $value can be null here
             return $value ? trim($value) : '';
         });
@@ -88,11 +88,11 @@ class CreateUserCommand extends Command
             'Please enter roles (comma separated): ',
             'user'
         );
-        $questionRoles->setNormalizer(function ($value) {
+        $questionRoles->setNormalizer(function ($value): string {
             // $value can be null here
             return $value ? strtolower(trim($value)) : '';
         });
-        $questionRoles->setValidator(function ($answer) {
+        $questionRoles->setValidator(function ($answer): array {
             $roles = explode(',', trim($answer));
             foreach ($roles as &$role) {
                 if (!in_array($role, User::ROLES)) {

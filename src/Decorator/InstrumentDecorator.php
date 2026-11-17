@@ -2,6 +2,7 @@
 
 namespace App\Decorator;
 
+use App\Entity\Trading212PieInstrument;
 use App\Entity\Calendar;
 use Doctrine\Common\Collections\Collection;
 
@@ -129,7 +130,7 @@ final class InstrumentDecorator
         $pieAvgDividend = 0.0;
 
         /**
-         * @var \App\Entity\Trading212PieInstrument $instrument
+         * @var Trading212PieInstrument $instrument
          */
         foreach ($instruments as $instrument) {
             $ticker = $instrument->getTicker();

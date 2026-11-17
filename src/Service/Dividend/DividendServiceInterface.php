@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Service\Dividend;
 
+use App\Entity\Transaction;
+use App\Entity\CorporateAction;
 use App\Entity\Calendar;
 use App\Entity\Position;
 use App\Entity\Pie;
@@ -23,11 +25,11 @@ interface DividendServiceInterface
     /**
      * Load arrays with data to be processed
      *
-     * @param array<int, array<int, \App\Entity\Transaction>> $transactions
+     * @param array<int, array<int, Transaction>> $transactions
      *
-     * @param array<int, array<int, \App\Entity\CorporateAction>> $corporateActions
+     * @param array<int, array<int, CorporateAction>> $corporateActions
      *
-     * @param array<int, array<int, \App\Entity\Calendar>> $dividends
+     * @param array<int, array<int, Calendar>> $dividends
      */
     public function load(
         array $transactions,
@@ -143,10 +145,10 @@ interface DividendServiceInterface
     ): DividendServiceInterface;
 
     /**
-     * @param array<int, \App\Entity\Calendar> $calendars
+     * @param array<int, Calendar> $calendars
      * @param null|string $startDate
      * @param null|string $endDate
-     * @param \App\Entity\Pie|null $pie
+     * @param Pie|null $pie
      *
      * @return array
      */

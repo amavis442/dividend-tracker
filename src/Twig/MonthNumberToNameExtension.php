@@ -25,7 +25,7 @@ class MonthNumberToNameExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('monthToName', function ($value) {
+            new TwigFilter('monthToName', function ($value): string {
                 $rawDate = date('Y') . '-' . $value . '-01';
                 $formatDate = new DateTime($rawDate);
 

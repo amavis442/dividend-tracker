@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use Symfony\Component\Form\FormInterface;
+use App\Entity\User;
 use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Entity\TickerAutocomplete;
@@ -72,7 +74,7 @@ class PositionController extends AbstractController
         }
 
         /**
-         * @var \Symfony\Component\Form\FormInterface $form
+         * @var FormInterface $form
          */
         $form = $this->createForm(
             TickerAutocompleteType::class,
@@ -88,7 +90,7 @@ class PositionController extends AbstractController
         $referer->set('position_index', ['status' => $status]);
 
         /**
-         * @var \App\Entity\User $user
+         * @var User $user
          */
         $user = $this->getUser();
         $portfolio = $portfolioRepository->findOneBy([

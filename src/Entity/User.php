@@ -330,17 +330,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Get the value of apiToken
      */
-    public function getApiToken()
+    public function getApiToken(): ?string
     {
         return $this->apiToken;
     }
 
     /**
      * Set the value of apiToken
-     *
-     * @return  self
      */
-    public function setApiToken($apiToken)
+    public function setApiToken(?string $apiToken): static
     {
         $this->apiToken = $apiToken;
 

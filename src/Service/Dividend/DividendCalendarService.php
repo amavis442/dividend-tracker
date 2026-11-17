@@ -2,24 +2,28 @@
 
 namespace App\Service\Dividend;
 
+use App\Entity\Transaction;
+use App\Entity\Calendar;
+use App\Entity\Ticker;
+use App\Entity\Position;
 use App\Service\Transaction\ShareEligibilityCalculatorInterface;
 
 final class DividendCalendarService
 {
     /**
-     * @var array<int, array<int, \App\Entity\Transaction>> $transactions
+     * @var array<int, array<int, Transaction>> $transactions
      */
     private array $transactions;
     /**
-     * @var array<int, array<int, \App\Entity\Calendar>> $calendars
+     * @var array<int, array<int, Calendar>> $calendars
      */
     private array $calendars;
     /**
-     * @var array<int, \App\Entity\Ticker> $tickers
+     * @var array<int, Ticker> $tickers
      */
     private array $tickers;
     /**
-     * @var array<int, \App\Entity\Position> $position
+     * @var array<int, Position> $position
      */
     private array $positions;
 

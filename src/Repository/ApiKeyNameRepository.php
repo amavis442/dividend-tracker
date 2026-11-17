@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use Doctrine\ORM\QueryBuilder;
 use App\Entity\ApiKeyName;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -18,7 +19,7 @@ class ApiKeyNameRepository extends ServiceEntityRepository
         parent::__construct($registry, ApiKeyName::class);
     }
 
-    public function getQueryBuilderFindByAll()
+    public function getQueryBuilderFindByAll(): QueryBuilder
     {
         return $this->createQueryBuilder('a')->orderBy('a.keyName', 'ASC');
     }

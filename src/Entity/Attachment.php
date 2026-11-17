@@ -41,7 +41,7 @@ class Attachment
     #[ORM\Column(type: 'bigint', nullable: true)]
     private ?int $attachmentSize = null;
 
-    #[ORM\ManyToOne(targetEntity: \App\Entity\Research::class, inversedBy: 'attachments')]
+    #[ORM\ManyToOne(targetEntity: Research::class, inversedBy: 'attachments')]
     private ?Research $research = null;
 
     #[Groups(['attachment:read', 'attachment:write', 'research:read:item'])]
@@ -84,7 +84,7 @@ class Attachment
      * must be able to accept an instance of 'File' as the bundle will inject one here
      * during Doctrine hydration.
      *
-     * @param \Symfony\Component\HttpFoundation\File\UploadedFile|null $attachmentFile
+     * @param UploadedFile|null $attachmentFile
      */
     public function setAttachmentFile(?UploadedFile $attachmentFile = null): void
     {

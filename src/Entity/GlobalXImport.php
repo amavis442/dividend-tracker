@@ -4,7 +4,7 @@ namespace App\Entity;
 
 class GlobalXImport
 {
-    private $uploadfile;
+    private ?string $uploadfile = null;
     private Ticker $ticker;
 
     public function getUploadFile(): ?string

@@ -2,6 +2,7 @@
 
 namespace App\DataProvider;
 
+use App\Entity\CorporateAction;
 use App\Repository\CorporateActionRepository;
 use App\Entity\Ticker;
 
@@ -17,11 +18,11 @@ class CorporateActionDataProvider
      *
      * @param Ticker[] $tickers
      *
-     * @return array<int, array<int, \App\Entity\CorporateAction>>
+     * @return array<int, array<int, CorporateAction>>
      */
     public function load(array $tickers): array
     {
-        $ids = array_map(fn(Ticker $t) => $t->getId(), $tickers);
+        $ids = array_map(fn(Ticker $t): ?int => $t->getId(), $tickers);
 
         return  $this->mapByPosition(
             $this->actionRepo->findByTickerIds($ids)

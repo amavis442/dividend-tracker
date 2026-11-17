@@ -17,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ResearchType extends AbstractType
 {
-    private $tickerRepository;
+    private TickerRepository $tickerRepository;
 
     public function __construct(TickerRepository $tickerRepository)
     {
@@ -54,7 +54,7 @@ class ResearchType extends AbstractType
 
         $builder->get('ticker')->addModelTransformer(
             new CallbackTransformer(
-                function (int $tickerId) {
+                function (int $tickerId): int {
                     return $tickerId;
                 },
                 function (?int $tickerId = null) {

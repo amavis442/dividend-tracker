@@ -2,6 +2,7 @@
 
 namespace App\Controller\Trading212;
 
+use App\Entity\Trading212PieMetaData;
 use App\Repository\Trading212PieMetaDataRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,12 +49,12 @@ final class PieChartController extends AbstractController
         Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
         ChartBuilderInterface $chartBuilder,
         TranslatorInterface $translator
-    ): \Symfony\UX\Chartjs\Model\Chart {
+    ): Chart {
         $data = $trading212PieMetaDataRepository->latest();
 
         $totalInvested = 0.0;
         /**
-         * @var \App\Entity\Trading212PieMetaData $pie
+         * @var Trading212PieMetaData $pie
          */
         foreach ($data as $pie) {
             $totalInvested += $pie->getPriceAvgInvestedValue();
@@ -191,7 +192,7 @@ final class PieChartController extends AbstractController
         array $pieDates,
         ChartBuilderInterface $chartBuilder,
         TranslatorInterface $translator
-    ): \Symfony\UX\Chartjs\Model\Chart {
+    ): Chart {
         $chart = $chartBuilder->createChart(Chart::TYPE_LINE);
         $chart->setData([
             'labels' => $pieDates,

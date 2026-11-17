@@ -23,7 +23,7 @@ class WeightedAverage
     ) {
     }
 
-    public function addTransaction(Transaction $transaction, int $index)
+    public function addTransaction(Transaction $transaction, int $index): void
     {
         $timeStamp = (int) $transaction->getTransactionDate()->format('YmdHis');
         if (isset($this->transactions[$timeStamp])) {
@@ -59,7 +59,7 @@ class WeightedAverage
         // Sort on transaction date
         usort(
             $transactions,
-            fn($a, $b) => $a->getTransactionDate() <=> $b->getTransactionDate()
+            fn($a, $b): int => $a->getTransactionDate() <=> $b->getTransactionDate()
         );
 
 

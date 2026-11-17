@@ -7,7 +7,7 @@ use Doctrine\ORM\Event\PrePersistEventArgs;
 
 class CreatedAtTimestamp
 {
-    public function prePersist(PrePersistEventArgs $args)
+    public function prePersist(PrePersistEventArgs $args): void
     {
         $entity = $args->getObject();
 

@@ -12,8 +12,8 @@ use App\Entity\Ticker;
 final class AdminGroupsContextBuilder implements
     SerializerContextBuilderInterface
 {
-    private $decorated;
-    private $authorizationChecker;
+    private SerializerContextBuilderInterface $decorated;
+    private AuthorizationCheckerInterface $authorizationChecker;
 
     public function __construct(
         SerializerContextBuilderInterface $decorated,

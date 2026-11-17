@@ -2,6 +2,8 @@
 
 namespace App\Service\DividendDate;
 
+use OpenSpout\Reader\XLSX\Reader;
+use OpenSpout\Common\Entity\Cell;
 use App\Contracts\Service\DividendDatePluginInterface;
 use OpenSpout\Reader\Common\Creator\ReaderEntityFactory;
 use DateTime;
@@ -57,13 +59,13 @@ class PimcoService extends AbstractDividendDate implements DividendDatePluginInt
         $content = $response->getContent(true);
         $items = [];
         if (file_put_contents($filename, $content)) {
-            $reader = new \OpenSpout\Reader\XLSX\Reader();
+            $reader = new Reader();
             $reader->open($filename);
 
             foreach ($reader->getSheetIterator() as $sheet) {
                 foreach ($sheet->getRowIterator() as $rowid => $row) {
                     /**
-                     * @var \OpenSpout\Common\Entity\Cell[] $cells
+                     * @var Cell[] $cells
                      */
                     $cells = $row->getCells();
                     if ($rowid == 3) {

@@ -103,7 +103,7 @@ class Position
     private Collection $transactions;
 
     #[Groups(['position:read', 'position:write'])]
-    #[ORM\OneToMany(targetEntity: \App\Entity\Payment::class, mappedBy: 'position')]
+    #[ORM\OneToMany(targetEntity: Payment::class, mappedBy: 'position')]
     #[ORM\OrderBy(['payDate' => 'DESC'])]
     private Collection $payments;
 
@@ -189,7 +189,7 @@ class Position
     }
 
     #[Assert\Callback]
-    public function validate(ExecutionContextInterface $context, $payload)
+    public function validate(ExecutionContextInterface $context, $payload): void
     {
         if (empty($this->getPrice()) && empty($this->getAllocation())) {
             $context
@@ -561,7 +561,7 @@ class Position
     /**
      * Frequency of dividends paid 3,6,12 etc
      */
-    public function setDividendPayoutFrequency($payoutFrequency): self
+    public function setDividendPayoutFrequency(int $payoutFrequency): self
     {
         $this->payoutFrequency = $payoutFrequency;
 

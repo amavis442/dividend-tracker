@@ -10,8 +10,8 @@ class ExchangeRateService implements ExchangeRateInterface
 {
     public const ECB_EXCHANGERATE = 'https://api.exchangerate.host/latest?base=EUR';
 
-    private $exchangerateCache;
-    private $client;
+    private CacheInterface $exchangerateCache;
+    private HttpClientInterface $client;
 
     public function __construct(HttpClientInterface $client, CacheInterface $exchangerateCache)
     {

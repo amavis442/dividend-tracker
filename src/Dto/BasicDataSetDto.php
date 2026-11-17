@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace App\Dto;
 
+use App\Entity\Ticker;
+use App\Entity\Calendar;
+use App\Entity\Transaction;
+use App\Entity\Position;
+
 final class BasicDataSetDto
 {
     /**
-     * @param array<int, \App\Entity\Ticker> $tickers
-     * @param array<int, array <int, \App\Entity\Calendar>> $calendars
-     * @param array<int, array <int, \App\Entity\Transaction>> $transactions
-     * @param array<int, \App\Entity\Position> $positions
+     * @param array<int, Ticker> $tickers
+     * @param array<int, array <int, Calendar>> $calendars
+     * @param array<int, array <int, Transaction>> $transactions
+     * @param array<int, Position> $positions
      * @param array<int, float> $exchangeRates
      *
      */

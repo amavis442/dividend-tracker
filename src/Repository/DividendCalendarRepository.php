@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use Doctrine\ORM\QueryBuilder;
 use App\Entity\Calendar;
 use App\Entity\Pie;
 use App\Entity\Position;
@@ -98,7 +99,7 @@ class DividendCalendarRepository extends ServiceEntityRepository
         string $sort = 'exDividendDate',
         string $orderBy = 'DESC',
         ?Ticker $ticker = null
-    ): \Doctrine\ORM\QueryBuilder {
+    ): QueryBuilder {
         $sort = match ($sort) {
             'symbol' => ($sort = 't.symbol'),
             default => 'c.' . $sort,
@@ -130,7 +131,7 @@ class DividendCalendarRepository extends ServiceEntityRepository
         return $queryBuilder;
     }
 
-    public function getLastDividend(Ticker $ticker)
+    public function getLastDividend(Ticker $ticker): mixed
     {
         $queryBuilder = $this->createQueryBuilder('c')
             ->select('c')
@@ -273,7 +274,7 @@ class DividendCalendarRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    private function getPositionSize(Collection $transactions, Calendar $item)
+    private function getPositionSize(Collection $transactions, Calendar $item): int|float
     {
         $units = 0;
 

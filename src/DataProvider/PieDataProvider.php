@@ -2,6 +2,7 @@
 
 namespace App\DataProvider;
 
+use App\Entity\Ticker;
 use App\DataProvider\CorporateActionDataProvider;
 use App\DataProvider\DividendDataProvider;
 use App\Dto\PieDataDto;
@@ -65,7 +66,7 @@ class PieDataProvider
          * @var Collection<int, Position> $positions
          */
         $positions = $instruments->map(fn($i) => $i->getPosition())
-            ->filter(fn(?Position $p) => null !== $p);
+            ->filter(fn(?Position $p): bool => null !== $p);
 
         if ($positions->isEmpty()) {
             throw new NotFoundHttpException('No positions found for this pie.');
@@ -74,7 +75,7 @@ class PieDataProvider
         /**
          * From those positions we only need the ticker
          *
-         * @var Collection<int, \App\Entity\Ticker> $tickers
+         * @var Collection<int, Ticker> $tickers
          */
         $tickers = $positions->map(fn($p) => $p->getTicker());
 

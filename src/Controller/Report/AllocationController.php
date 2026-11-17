@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Report;
 
+use Symfony\Component\HttpFoundation\Response;
 use App\Helper\Colors;
 use App\Repository\PositionRepository;
 use App\Model\AllocationModel;
@@ -25,14 +26,14 @@ class AllocationController extends AbstractController
         TranslatorInterface $translator,
         ChartBuilderInterface $chartBuilder,
         CacheInterface $pool
-    ) {
+    ): Response {
         $result = $pool->get('allocation_report', function (
             ItemInterface $item
         ) use (
             $allocation,
             $positionRepository,
             $translator
-) {
+): array {
             $item->expiresAfter(3600);
             return $allocation->allocation($positionRepository, $translator);
         });

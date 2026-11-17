@@ -2,6 +2,8 @@
 
 namespace App\Controller\Report;
 
+use App\Entity\Payment;
+use App\Entity\Calendar;
 use App\Entity\Transaction;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
@@ -138,7 +140,7 @@ class ExportTransactionsController extends AbstractController
         }
 
         /**
-         * @var \App\Entity\Payment $payment
+         * @var Payment $payment
          */
         foreach ($payments as $payment) {
             $ticker = $payment->getTicker();
@@ -147,7 +149,7 @@ class ExportTransactionsController extends AbstractController
             $tickerName = $ticker->getFullname();
             $tickerIsin = $ticker->getIsin();
             /**
-             * @var \App\Entity\Calendar $calendar
+             * @var Calendar $calendar
              */
             $calendar = $payment->getCalendar();
             $grossValuePerShare = $calendar->getCashAmount();

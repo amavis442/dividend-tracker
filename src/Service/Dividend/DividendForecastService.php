@@ -2,6 +2,8 @@
 
 namespace App\Service\Dividend;
 
+use App\Entity\Trading212PieInstrument;
+use App\Entity\Ticker;
 use App\Entity\Calendar;
 use App\Repository\Trading212PieInstrumentRepository;
 use App\Repository\DividendCalendarRepository;
@@ -43,7 +45,7 @@ class DividendForecastService
         );
         $payouts = [];
 
-        $snapshots = array_filter($snapshots, fn($snapshot)=> $snapshot->getTicker() ? true : false);
+        $snapshots = array_filter($snapshots, fn($snapshot): bool=> $snapshot->getTicker() ? true : false);
         //dd($snapshots);
 
 
@@ -65,11 +67,11 @@ class DividendForecastService
         );
 
         /**
-         * @var \App\Entity\Trading212PieInstrument $snapshot
+         * @var Trading212PieInstrument $snapshot
          */
         foreach ($snapshots as $snapshot) {
             /**
-             * @var \App\Entity\Ticker $ticker
+             * @var Ticker $ticker
              */
             $ticker = $snapshot->getTicker();
             if (!$ticker) {
@@ -144,7 +146,10 @@ class DividendForecastService
         return $payouts;
     }
 
-    public function getForecastGraphData($startDate, $endDate)
+    /**
+     * @return mixed[][]
+     */
+    public function getForecastGraphData($startDate, $endDate): array
     {
         $monthlyPayouts = [];
 

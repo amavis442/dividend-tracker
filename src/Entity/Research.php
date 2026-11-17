@@ -42,7 +42,7 @@ class Research
     private ?string $info = null;
 
     #[Groups(['research:read', 'research:write'])]
-    #[ORM\OneToMany(targetEntity: \App\Entity\Attachment::class, mappedBy: 'research', cascade: ['persist'])]
+    #[ORM\OneToMany(targetEntity: Attachment::class, mappedBy: 'research', cascade: ['persist'])]
     private Collection $attachments;
 
     #[ORM\Column]

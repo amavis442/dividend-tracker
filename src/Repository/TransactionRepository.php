@@ -87,7 +87,7 @@ class TransactionRepository extends ServiceEntityRepository
             ->setParameter('position', $position);
     }
 
-    public function getByTicker(Ticker $ticker)
+    public function getByTicker(Ticker $ticker): mixed
     {
         return $this->createQueryBuilder('t')
             ->innerJoin('t.position', 'p')
@@ -119,7 +119,7 @@ class TransactionRepository extends ServiceEntityRepository
         return ['low' => 0, 'high' => 0];
     }
 
-    public function getSummaryByPie(Pie $pie)
+    public function getSummaryByPie(Pie $pie): mixed
     {
         return $this->createQueryBuilder('t')
             ->select(
@@ -143,7 +143,7 @@ class TransactionRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getByPositionQueryBuilder(Position $position)
+    public function getByPositionQueryBuilder(Position $position): QueryBuilder
     {
         return $this->createQueryBuilder('t')
             ->innerJoin('t.position', 'p')
