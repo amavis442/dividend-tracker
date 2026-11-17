@@ -24,19 +24,13 @@ class DividendDataProvider
      */
     public function load(array $tickers, ?\DateTime $afterDate = null, ?\DateTime $beforeDate = null, array $types = [Calendar::REGULAR]): array
     {
-        $logger = $this->logger;
-        try {
-            $ids = array_map(function (?Ticker $t) use ($logger): ?int {
-                if (!isset($t) || $t == null) {
-                    $logger->error('DividendDataProvider::load()#' . __LINE__ . ' Ticker() is null');
-                }
-
-                return  $t->getId();
-            }, $tickers);
-        } catch (\Exception $e) {
-            $logger->error($e->getMessage());
-            $logger->error(print_r($tickers, true));
-            throw $e;
+        $ids = [];
+        foreach ($tickers as $ticker) {
+            if (!$ticker instanceof Ticker) {
+                $this->logger->error('DividendDataProvider::load() skipped a null Ticker');
+                continue;
+            }
+            $ids[] = $ticker->getId();
         }
 
         return $this->mapByTicker(
