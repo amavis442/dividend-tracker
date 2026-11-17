@@ -123,20 +123,21 @@ class PositionsCommand extends Command
             $apiInstrument = $item['instrument'] ?? [];
             $walletImpact = $item['walletImpact'] ?? [];
             $symbol = (string) ($apiInstrument['ticker'] ?? '');
+            $isin = (string) ($apiInstrument['isin'] ?? '');
 
             if ($symbol === '') {
                 $skipped++;
                 continue;
             }
 
-            $instrument = $this->instrumentRepository->findOneBy(['symbol' => $symbol]);
+            $instrument = $this->findInstrument($isin, $symbol);
 
             if (!$instrument instanceof Instrument) {
                 $instrument = (new Instrument())
                     ->setUuid(Uuid::v4())
                     ->setSymbol($symbol)
                     ->setName((string) ($apiInstrument['name'] ?? $symbol))
-                    ->setIsin((string) ($apiInstrument['isin'] ?? ''))
+                    ->setIsin($isin)
                     ->setCurrency($this->resolveCurrency($apiInstrument['currency'] ?? null, $defaultCurrency))
                     ->setBranch($defaultBranch)
                     ->setTax($defaultTax)
@@ -196,6 +197,19 @@ class PositionsCommand extends Command
         ));
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * ISIN is unique across exchanges, so it is preferred; the Trading212
+     * ticker is only used when the API returns no ISIN.
+     */
+    private function findInstrument(string $isin, string $symbol): ?Instrument
+    {
+        if ($isin !== '') {
+            return $this->instrumentRepository->findOneBy(['isin' => $isin]);
+        }
+
+        return $this->instrumentRepository->findOneBy(['symbol' => $symbol]);
     }
 
     private function resolveCurrency(mixed $currencyCode, Currency $defaultCurrency): Currency
