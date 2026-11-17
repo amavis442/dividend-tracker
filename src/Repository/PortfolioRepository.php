@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Portfolio;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,6 +17,15 @@ class PortfolioRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Portfolio::class);
+    }
+
+    /**
+     * The portfolio of the user, or a new unsaved one so views can render
+     * without a portfolio.
+     */
+    public function findForUserOrEmpty(User $user): Portfolio
+    {
+        return $this->findOneBy(['user' => $user->getId()]) ?? new Portfolio();
     }
 
     //    /**
