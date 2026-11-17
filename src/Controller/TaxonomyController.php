@@ -15,108 +15,108 @@ use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/taxonomy')]
 class TaxonomyController extends AbstractController
 {
-	#[Route(path: '/', name: 'app_taxonomy_index', methods: ['GET'])]
-	public function index(TaxonomyRepository $taxonomyRepository): Response
-	{
-		return $this->render('taxonomy/index.html.twig', [
-			'taxonomies' => $taxonomyRepository->findAll(),
-		]);
-	}
+    #[Route(path: '/', name: 'app_taxonomy_index', methods: ['GET'])]
+    public function index(TaxonomyRepository $taxonomyRepository): Response
+    {
+        return $this->render('taxonomy/index.html.twig', [
+            'taxonomies' => $taxonomyRepository->findAll(),
+        ]);
+    }
 
-	#[Route(path: '/new', name: 'app_taxonomy_new', methods: ['GET', 'POST'])]
-	public function new(
-		Request $request,
-		TaxonomyRepository $taxonomyRepository
-	): Response {
-		$taxonomy = new Taxonomy();
-		$form = $this->createForm(TaxonomyType::class, $taxonomy);
-		$form->handleRequest($request);
+    #[Route(path: '/new', name: 'app_taxonomy_new', methods: ['GET', 'POST'])]
+    public function new(
+        Request $request,
+        TaxonomyRepository $taxonomyRepository
+    ): Response {
+        $taxonomy = new Taxonomy();
+        $form = $this->createForm(TaxonomyType::class, $taxonomy);
+        $form->handleRequest($request);
 
-		if ($form->isSubmitted() && $form->isValid()) {
-			$taxonomyRepository->add($taxonomy, true);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $taxonomyRepository->add($taxonomy, true);
 
-			return $this->redirectToRoute(
-				'app_taxonomy_index',
-				[],
-				Response::HTTP_SEE_OTHER
-			);
-		}
+            return $this->redirectToRoute(
+                'app_taxonomy_index',
+                [],
+                Response::HTTP_SEE_OTHER
+            );
+        }
 
-		return $this->render('taxonomy/new.html.twig', [
-			'taxonomy' => $taxonomy,
-			'form' => $form->createView(),
-		]);
-	}
+        return $this->render('taxonomy/new.html.twig', [
+            'taxonomy' => $taxonomy,
+            'form' => $form->createView(),
+        ]);
+    }
 
-	#[Route(path: '/{id}', name: 'app_taxonomy_show', methods: ['GET'])]
-	public function show(#[MapEntity] Taxonomy $taxonomy): Response
-	{
-		return $this->render('taxonomy/show.html.twig', [
-			'taxonomy' => $taxonomy,
-		]);
-	}
+    #[Route(path: '/{id}', name: 'app_taxonomy_show', methods: ['GET'])]
+    public function show(#[MapEntity] Taxonomy $taxonomy): Response
+    {
+        return $this->render('taxonomy/show.html.twig', [
+            'taxonomy' => $taxonomy,
+        ]);
+    }
 
-	#[
-		Route(
-			path: '/{id}/edit',
-			name: 'app_taxonomy_edit',
-			methods: ['GET', 'POST']
-		)
-	]
-	public function edit(
-		Request $request,
-		#[MapEntity] Taxonomy $taxonomy,
-		TaxonomyRepository $taxonomyRepository
-	): Response {
-		$form = $this->createForm(TaxonomyType::class, $taxonomy);
-		$form->handleRequest($request);
+    #[
+        Route(
+            path: '/{id}/edit',
+            name: 'app_taxonomy_edit',
+            methods: ['GET', 'POST']
+        )
+    ]
+    public function edit(
+        Request $request,
+        #[MapEntity] Taxonomy $taxonomy,
+        TaxonomyRepository $taxonomyRepository
+    ): Response {
+        $form = $this->createForm(TaxonomyType::class, $taxonomy);
+        $form->handleRequest($request);
 
-		if ($form->isSubmitted() && $form->isValid()) {
-			$taxonomyRepository->add($taxonomy, true);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $taxonomyRepository->add($taxonomy, true);
 
-			return $this->redirectToRoute(
-				'app_taxonomy_index',
-				[],
-				Response::HTTP_SEE_OTHER
-			);
-		}
+            return $this->redirectToRoute(
+                'app_taxonomy_index',
+                [],
+                Response::HTTP_SEE_OTHER
+            );
+        }
 
-		return $this->render('taxonomy/edit.html.twig', [
-			'taxonomy' => $taxonomy,
-			'form' => $form->createView(),
-		]);
-	}
+        return $this->render('taxonomy/edit.html.twig', [
+            'taxonomy' => $taxonomy,
+            'form' => $form->createView(),
+        ]);
+    }
 
-	#[
-		Route(
-			path: '/delete/{id}',
-			name: 'app_taxonomy_delete',
-			methods: ['POST']
-		)
-	]
-	public function delete(
-		Request $request,
-		EntityManagerInterface $entityManager,
-		#[MapEntity] Taxonomy $taxonomy
-	): Response {
-		if (
-			$this->isCsrfTokenValid(
-				'delete' . $taxonomy->getId(),
-				$request->request->get('_token')
-			)
-		) {
-			if ($taxonomy->getJournals()->isEmpty()) {
-				$entityManager->remove($taxonomy);
-				$entityManager->flush();
-				return $this->redirectToRoute('app_taxonomy_index');
-			}
+    #[
+        Route(
+            path: '/delete/{id}',
+            name: 'app_taxonomy_delete',
+            methods: ['POST']
+        )
+    ]
+    public function delete(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        #[MapEntity] Taxonomy $taxonomy
+    ): Response {
+        if (
+            $this->isCsrfTokenValid(
+                'delete' . $taxonomy->getId(),
+                $request->request->get('_token')
+            )
+        ) {
+            if ($taxonomy->getJournals()->isEmpty()) {
+                $entityManager->remove($taxonomy);
+                $entityManager->flush();
+                return $this->redirectToRoute('app_taxonomy_index');
+            }
 
-			$this->addFlash(
-				'notice',
-				'Can not delete. Taxonomy is connected to one or more journal(s).'
-			);
-		}
+            $this->addFlash(
+                'notice',
+                'Can not delete. Taxonomy is connected to one or more journal(s).'
+            );
+        }
 
-		return $this->redirectToRoute('app_taxonomy_index');
-	}
+        return $this->redirectToRoute('app_taxonomy_index');
+    }
 }

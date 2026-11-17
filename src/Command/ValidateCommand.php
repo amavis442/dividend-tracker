@@ -66,7 +66,7 @@ class ValidateCommand extends Command
     protected function importData(array $csvRows, OutputInterface $output): void
     {
         $rowNum = 0;
-        $csvRows = array_map(function ($row) {
+        $csvRows = array_map(function (array $row): array {
             $newRow = [];
             foreach ($row as $header => $value) {
                 $newRow[strtolower($header)] = $value;

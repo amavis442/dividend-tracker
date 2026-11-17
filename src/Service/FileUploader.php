@@ -63,7 +63,7 @@ class FileUploader
         return $this->fileName;
     }
 
-    public function getTargetDirectory()
+    public function getTargetDirectory(): string
     {
         return $this->targetDirectory;
     }

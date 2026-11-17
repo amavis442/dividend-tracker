@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Factory;
 
+use Faker\Factory;
 use App\Entity\Tax;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
@@ -13,7 +16,9 @@ final class TaxFactory extends PersistentObjectFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
      */
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     public static function class(): string
     {
@@ -26,7 +31,7 @@ final class TaxFactory extends PersistentObjectFactory
      */
     protected function defaults(): array
     {
-        $faker = \Faker\Factory::create();
+        $faker = Factory::create();
 
         return [
             'taxRate' => $faker->numberBetween(10, 30),

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
+use Doctrine\ORM\QueryBuilder;
 use App\Entity\Ticker;
 use App\Entity\TickerAlternativeSymbol;
 use Doctrine\ORM\EntityRepository;
@@ -19,9 +22,9 @@ class TickerAlternativeSymbolType extends AbstractType
             ->add('ticker', EntityType::class, [
                 'class' => Ticker::class,
                 'choice_label' => function (Ticker $ticker): string {
-                    return $ticker->getFullname() . ' ('. $ticker->getSymbol(). ')';
+                    return $ticker->getFullname() . ' (' . $ticker->getSymbol() . ')';
                 },
-                'query_builder' => function (EntityRepository $er) {
+                'query_builder' => function (EntityRepository $er): QueryBuilder {
                     return $er->createQueryBuilder('ticker')
                         ->join('ticker.positions', 'pos')
                         ->where('pos.closed = false')

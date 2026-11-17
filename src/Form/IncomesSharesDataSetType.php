@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
 use App\Entity\IncomesSharesDataSet;
@@ -17,8 +19,8 @@ class IncomesSharesDataSetType extends AbstractType
             'entry_type' => IncomesShareDataType::class,
             'entry_options' => ['label' => false],
         ])
-        ->add('submit', SubmitType::class, ['attr'=> ['class' => 'rounded-lg text-white bg-blue-500 hover:bg-blue-700 p-2']])
-        ->add('save', SubmitType::class, ['attr'=> ['class' => 'rounded-lg text-white bg-blue-500 hover:bg-blue-700 p-2']]);
+        ->add('submit', SubmitType::class, ['attr' => ['class' => 'rounded-lg text-white bg-blue-500 hover:bg-blue-700 p-2']])
+        ->add('save', SubmitType::class, ['attr' => ['class' => 'rounded-lg text-white bg-blue-500 hover:bg-blue-700 p-2']]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

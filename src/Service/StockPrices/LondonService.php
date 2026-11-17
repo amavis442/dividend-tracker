@@ -8,15 +8,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class LondonService implements StockPricePluginInterface
 {
-
     /**
      * Used for calling the api
-     *
-     * @var HttpClientInterface
      */
-    private $client;
+    private HttpClientInterface $client;
 
-    private $retrieveableSymbols = [
+    private array $retrieveableSymbols = [
         'PNN' => 'https://www.londonstockexchange.com/stock/PNN/pennon-group-plc/company-page',
         'SEMB' => 'https://www.londonstockexchange.com/stock/SEMB/ishares/company-page',
         'RB' => 'https://www.londonstockexchange.com/stock/RKT/reckitt-benckiser-group-plc/company-page',

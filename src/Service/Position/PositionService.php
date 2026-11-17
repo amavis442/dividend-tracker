@@ -9,7 +9,8 @@ class PositionService
 {
     public function __construct(
         private EntityManagerInterface $entityManager
-    ) {}
+    ) {
+    }
 
     private function presetMetrics(Position $position): void
     {

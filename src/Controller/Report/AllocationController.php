@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Report;
 
+use Symfony\Component\HttpFoundation\Response;
 use App\Helper\Colors;
 use App\Repository\PositionRepository;
 use App\Model\AllocationModel;
@@ -16,53 +19,57 @@ use Symfony\UX\Chartjs\Model\Chart;
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/report')]
 class AllocationController extends AbstractController
 {
-	#[Route(path: '/allocation/sector', name: 'report_allocation_sector')]
-	public function index(
-		PositionRepository $positionRepository,
-		AllocationModel $allocation,
-		TranslatorInterface $translator,
-		ChartBuilderInterface $chartBuilder,
-		CacheInterface $pool
-	) {
-		$result = $pool->get('allocation_report', function (
-			ItemInterface $item
-		) use ($allocation, $positionRepository, $translator) {
+    #[Route(path: '/allocation/sector', name: 'report_allocation_sector')]
+    public function index(
+        PositionRepository $positionRepository,
+        AllocationModel $allocation,
+        TranslatorInterface $translator,
+        ChartBuilderInterface $chartBuilder,
+        CacheInterface $pool
+    ): Response {
+        $result = $pool->get('allocation_report', function (
+            ItemInterface $item
+        ) use (
+            $allocation,
+            $positionRepository,
+            $translator
+): array {
             $item->expiresAfter(3600);
-			return $allocation->allocation($positionRepository, $translator);
-		});
+            return $allocation->allocation($positionRepository, $translator);
+        });
 
-		$chart = $chartBuilder->createChart(Chart::TYPE_DOUGHNUT);
+        $chart = $chartBuilder->createChart(Chart::TYPE_DOUGHNUT);
 
-		$chart->setData([
-			'labels' => $result['labels'],
-			'datasets' => [
-				[
-					'label' => 'Percentage',
-					'data' => $result['data'],
-				],
-			],
-		]);
+        $chart->setData([
+            'labels' => $result['labels'],
+            'datasets' => [
+                [
+                    'label' => 'Percentage',
+                    'data' => $result['data'],
+                ],
+            ],
+        ]);
 
-		$chart->setOptions([
-			'maintainAspectRatio' => false,
-			'responsive' => true,
-			'plugins' => [
-				'title' => [
-					'display' => true,
-					'text' => 'Allocation per sector',
-					'font' => [
-						'size' => 24,
-					],
-				],
-				'legend' => [
-					'position' => 'top',
-				],
-			],
-		]);
+        $chart->setOptions([
+            'maintainAspectRatio' => false,
+            'responsive' => true,
+            'plugins' => [
+                'title' => [
+                    'display' => true,
+                    'text' => 'Allocation per sector',
+                    'font' => [
+                        'size' => 24,
+                    ],
+                ],
+                'legend' => [
+                    'position' => 'top',
+                ],
+            ],
+        ]);
 
-		return $this->render('report/allocation/index.html.twig', [
-			'controller_name' => 'ReportController',
-			'chart' => $chart,
-		]);
-	}
+        return $this->render('report/allocation/index.html.twig', [
+            'controller_name' => 'ReportController',
+            'chart' => $chart,
+        ]);
+    }
 }

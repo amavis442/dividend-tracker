@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
 use App\Entity\IncomesSharesFile;
@@ -10,20 +12,20 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IncomesSharesFileType extends AbstractType
 {
-	public function buildForm(
-		FormBuilderInterface $builder,
-		array $options
-	): void {
-		$builder->add('uploadfile', FileType::class, [
-			'label' => 'Brochure (PDF file)',
-			'mapped' => false,
-		]);
-	}
+    public function buildForm(
+        FormBuilderInterface $builder,
+        array $options
+    ): void {
+        $builder->add('uploadfile', FileType::class, [
+            'label' => 'Brochure (PDF file)',
+            'mapped' => false,
+        ]);
+    }
 
-	public function configureOptions(OptionsResolver $resolver): void
-	{
-		$resolver->setDefaults([
-			'data_class' => IncomesSharesFile::class,
-		]);
-	}
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => IncomesSharesFile::class,
+        ]);
+    }
 }

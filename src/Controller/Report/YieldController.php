@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Report;
 
 use App\Repository\PositionRepository;
@@ -27,6 +29,9 @@ class YieldController extends AbstractController
     ): Response {
         $result = $yields->yield($sort, $sortDirection);
 
-        return $this->render('report/yield/index.html.twig', array_merge($result, ['controller_name' => 'ReportController']));
+        return $this->render(
+            'report/yield/index.html.twig',
+            array_merge($result, ['controller_name' => 'ReportController'])
+        );
     }
 }

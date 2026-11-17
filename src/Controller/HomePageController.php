@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,7 +17,7 @@ class HomePageController extends AbstractController
     }
 
     #[Route(path: '/{_locale<%app.supported_locales%>}/', name: 'app_homepage')]
-    public function index()
+    public function index(): Response
     {
         return $this->render('home_page/index.html.twig', [
             'controller_name' => 'HomePageController',

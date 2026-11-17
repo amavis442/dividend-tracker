@@ -37,7 +37,7 @@ class Payment
     #[ORM\Column(type: 'float', nullable: false, options: ['default' => 0])]
     private float $dividend = 0.0;
 
-    private $taxes;
+    private ?float $taxes = null;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Ticker', inversedBy: 'payments')]
     #[ORM\JoinColumn(nullable: false)]
@@ -63,7 +63,7 @@ class Payment
 
     #[
         ORM\ManyToOne(
-            targetEntity: \App\Entity\Position::class,
+            targetEntity: Position::class,
             inversedBy: 'payments'
         )
     ]

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form\Type;
 
+use Doctrine\ORM\QueryBuilder;
 use App\Entity\Ticker;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -28,8 +31,8 @@ class TickerAutocompleteField extends AbstractType
             'security' => function (Security $security): bool {
                 return $security->isGranted('ROLE_USER');
             },
-            'query_builder' => function (Options $options) {
-                return function (EntityRepository $er) use ($options) {
+            'query_builder' => function (Options $options): \Closure {
+                return function (EntityRepository $er) use ($options): QueryBuilder {
                     $qb = $er->createQueryBuilder('t');
 
                     $includeAllTickers =
@@ -40,7 +43,6 @@ class TickerAutocompleteField extends AbstractType
                         ->setParameter('ignore', 'nvt%');
 
                     if ($includeAllTickers === false) {
-
                         $qb->join(
                             't.positions',
                             'p',

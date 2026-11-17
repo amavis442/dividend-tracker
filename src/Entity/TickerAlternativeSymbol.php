@@ -28,17 +28,17 @@ class TickerAlternativeSymbol
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\PrePersist]
-	public function setCreatedAtValue(): void
-	{
-		$this->createdAt = new \DateTimeImmutable();
-		$this->setUpdatedAtValue();
-	}
+    public function setCreatedAtValue(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->setUpdatedAtValue();
+    }
 
-	#[ORM\PreUpdate]
-	public function setUpdatedAtValue(): void
-	{
-		$this->updatedAt = new \DateTimeImmutable();
-	}
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
@@ -69,7 +69,7 @@ class TickerAlternativeSymbol
         return $this;
     }
 
-       public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Service\Importer;
+declare(strict_types=1);
 
+namespace App\Service\Importer;
 
 enum ImporterEnum
 {

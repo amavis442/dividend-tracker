@@ -45,7 +45,8 @@ class ImportCsvService extends AbstractImporter implements CsvInterface
         protected TaxRepository $taxRepository,
         protected Security $security,
         protected ValidatorInterface $validator,
-    ) {}
+    ) {
+    }
 
     protected function formatImportData(array|DOMNode $data): array
     {
@@ -141,7 +142,7 @@ class ImportCsvService extends AbstractImporter implements CsvInterface
     {
         $rows = [];
         $rowNum = 0;
-        $csvRows = array_map(function ($row) {
+        $csvRows = array_map(function ($row): array {
             $newRow = [];
             foreach ($row as $header => $value) {
                 $newRow[strtolower($header)] = $value;
@@ -310,7 +311,6 @@ class ImportCsvService extends AbstractImporter implements CsvInterface
 
         if (count($rows) > 0) {
             foreach ($rows as $row) {
-
                 $ticker = $this->preImportCheckTicker(
                     $this->entityManager,
                     $defaultBranch,

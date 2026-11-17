@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Position;
@@ -11,7 +13,8 @@ class MetricsUpdateService
     public function __construct(
         private WeightedAverage $weightedAverage,
         private EntityManagerInterface $entityManager
-    ) {}
+    ) {
+    }
 
     public function update(Position $position): void
     {

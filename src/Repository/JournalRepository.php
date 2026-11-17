@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
+use Doctrine\ORM\QueryBuilder;
 use App\Entity\Journal;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -38,7 +41,7 @@ class JournalRepository extends ServiceEntityRepository
         return $this->paginate($query, $page, $limit);
     }
 
-    public function findItemsQuery(?array $taxonomy = null): \Doctrine\ORM\QueryBuilder
+    public function findItemsQuery(?array $taxonomy = null): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('j')
             ->orderBy('j.id', 'DESC');

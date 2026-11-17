@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Research;
@@ -57,9 +59,9 @@ class ResearchRepository extends ServiceEntityRepository
         ?Ticker $ticker = null
     ): QueryBuilder {
 
-        $sort = match($sort) {
+        $sort = match ($sort) {
             'symbol' => 't.symbol',
-            default => 'r.'.$sort,
+            default => 'r.' . $sort,
         };
 
         // Create our query

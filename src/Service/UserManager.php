@@ -8,16 +8,16 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserManager
 {
-    private $userRepository;
-    private $passwordHasher;
+    private UserRepository $userRepository;
+    private UserPasswordHasherInterface $passwordHasher;
 
-    public function __construct(UserRepository $userRepository, UserPasswordHasherInterface  $passwordHasher)
+    public function __construct(UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher)
     {
         $this->userRepository = $userRepository;
         $this->passwordHasher = $passwordHasher;
     }
 
-    public function isUserDuplicate(string $email)
+    public function isUserDuplicate(string $email): bool
     {
         $result = $this->userRepository->findOneBy(['email' => $email]);
 

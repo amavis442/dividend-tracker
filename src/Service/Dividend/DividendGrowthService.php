@@ -6,7 +6,7 @@ use App\Entity\Ticker;
 
 class DividendGrowthService
 {
-    public function getData(Ticker $ticker)
+    public function getData(Ticker $ticker): array
     {
         $calendars = $ticker->getCalendars();
         $data = [];
@@ -33,7 +33,7 @@ class DividendGrowthService
                     $data[$year]['payoutfreq'] = $payoutFreq;
                     $data[$year]['payouts'] = 0;
                 }
-                $cashPayouts[$year.$month] = $cashPayout;
+                $cashPayouts[$year . $month] = $cashPayout;
                 $data[$year]['dividend'] += $cashPayout;
                 $data[$year]['payouts'] += 1;
             }
@@ -60,7 +60,7 @@ class DividendGrowthService
             'data' => $values,
             'payout' => $payout,
             'labels' => $labels,
-            'cashPayout'=> $cashPayouts,
+            'cashPayout' => $cashPayouts,
         ];
     }
 }

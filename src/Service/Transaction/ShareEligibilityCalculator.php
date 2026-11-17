@@ -7,47 +7,47 @@ use App\Entity\Calendar;
 
 class ShareEligibilityCalculator implements ShareEligibilityCalculatorInterface
 {
-	public function calculate(
-		array $transactions,
-		Calendar $calendar,
-		bool $adjusted = true
-	): float {
-		$shares = 0.0;
-		$exDate = $calendar->getExdividendDate();
+    public function calculate(
+        array $transactions,
+        Calendar $calendar,
+        bool $adjusted = true
+    ): float {
+        $shares = 0.0;
+        $exDate = $calendar->getExdividendDate();
 
-		foreach ($transactions as $transaction) {
-			if ($transaction->getTransactionDate() >= $exDate) {
-				continue;
-			}
+        foreach ($transactions as $transaction) {
+            if ($transaction->getTransactionDate() >= $exDate) {
+                continue;
+            }
 
-			$amount = $adjusted
-				? $transaction->getAdjustedAmount()
-				: $transaction->getAmount();
+            $amount = $adjusted
+                ? $transaction->getAdjustedAmount()
+                : $transaction->getAmount();
 
-			$shares += match ($transaction->getSide()) {
-				Transaction::BUY => $amount,
-				Transaction::SELL => -$amount,
-				default => 0.0,
-			};
-		}
+            $shares += match ($transaction->getSide()) {
+                Transaction::BUY => $amount,
+                Transaction::SELL => -$amount,
+                default => 0.0,
+            };
+        }
 
-		return $shares;
-	}
+        return $shares;
+    }
 
-	public function filterEligibleTransactions(
-		array $transactions,
-		Calendar $calendar
-	): array {
-		$exDate = $calendar->getExdividendDate();
-		$eligibleTransactions = [];
+    public function filterEligibleTransactions(
+        array $transactions,
+        Calendar $calendar
+    ): array {
+        $exDate = $calendar->getExdividendDate();
+        $eligibleTransactions = [];
 
-		foreach ($transactions as $transaction) {
-			if ($transaction->getTransactionDate() >= $exDate) {
-				continue;
-			}
-			$eligibleTransactions[] = $transaction;
-		}
+        foreach ($transactions as $transaction) {
+            if ($transaction->getTransactionDate() >= $exDate) {
+                continue;
+            }
+            $eligibleTransactions[] = $transaction;
+        }
 
-		return $eligibleTransactions;
-	}
+        return $eligibleTransactions;
+    }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Decorator;
 
+use App\Entity\Trading212PieInstrument;
 use App\Entity\Calendar;
 use Doctrine\Common\Collections\Collection;
-
 
 final class InstrumentDecorator
 {
@@ -56,12 +56,12 @@ final class InstrumentDecorator
             //$cashAmount = $tickerCalendar
             $adjustedCalendar = $tickers[$tickerId]['adjustedDividend'][$calId] ?? ['adjusted' => $tickerCalendar->getCashAmount()];
             /*if (
-				$tickerId == 291 &&
-				$tickerCalendar->getPaymentDate()->format('Y-m-d') >
-				'2025-10-01'
-			) {
-				dd($tickers[291]['adjustedDividend'], $calId, $tickerCalendar);
-			}*/
+                $tickerId == 291 &&
+                $tickerCalendar->getPaymentDate()->format('Y-m-d') >
+                '2025-10-01'
+            ) {
+                dd($tickers[291]['adjustedDividend'], $calId, $tickerCalendar);
+            }*/
             $cashAmount = $adjustedCalendar['adjusted'];
 
             $tickerCalendar->setAdjustedCashAmount($cashAmount);
@@ -80,10 +80,10 @@ final class InstrumentDecorator
 
             if ($cId > $lastYear) {
                 /*
-				$tickers[$id]['dividend'][
-					$cId
-				] = $tickerCalendar->getCashAmount();
-				*/
+                $tickers[$id]['dividend'][
+                    $cId
+                ] = $tickerCalendar->getCashAmount();
+                */
                 $tickers[$tickerId]['dividend'][$cId] = $cashAmount;
 
                 $tickers[$tickerId]['dividend']['sumDividend'] += $cashAmount;
@@ -130,7 +130,7 @@ final class InstrumentDecorator
         $pieAvgDividend = 0.0;
 
         /**
-         * @var \App\Entity\Trading212PieInstrument $instrument
+         * @var Trading212PieInstrument $instrument
          */
         foreach ($instruments as $instrument) {
             $ticker = $instrument->getTicker();

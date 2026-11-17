@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
 use App\Entity\Drip;
@@ -12,38 +14,38 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DripType extends AbstractType
 {
-	public function buildForm(
-		FormBuilderInterface $builder,
-		array $options
-	): void {
-		$builder
-			->add('dividendPercentage')
-			->add('invested')
-			->add('investPerMonth')
-			->add('dividendPercentageWithDrawn', NumberType::class,[
-				'label' => 'Takout percentage',
-				'required' => false
-			])
-			->add('inflation')
-			->add('frequency', ChoiceType::class, [
-				'choices' => [
-					'4' => 4,
-					'12' => 12,
-				],
+    public function buildForm(
+        FormBuilderInterface $builder,
+        array $options
+    ): void {
+        $builder
+            ->add('dividendPercentage')
+            ->add('invested')
+            ->add('investPerMonth')
+            ->add('dividendPercentageWithDrawn', NumberType::class, [
+                'label' => 'Takout percentage',
+                'required' => false
+            ])
+            ->add('inflation')
+            ->add('frequency', ChoiceType::class, [
+                'choices' => [
+                    '4' => 4,
+                    '12' => 12,
+                ],
                 'required' => true,
-			])
-			->add('years')
-			->add('taxRate')
-			->add('dividendReinvested', CheckboxType::class, [
-				'label' => 'Dividend re-invest?',
-				'required' => false,
-			]);
-	}
+            ])
+            ->add('years')
+            ->add('taxRate')
+            ->add('dividendReinvested', CheckboxType::class, [
+                'label' => 'Dividend re-invest?',
+                'required' => false,
+            ]);
+    }
 
-	public function configureOptions(OptionsResolver $resolver): void
-	{
-		$resolver->setDefaults([
-			'data_class' => Drip::class,
-		]);
-	}
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => Drip::class,
+        ]);
+    }
 }

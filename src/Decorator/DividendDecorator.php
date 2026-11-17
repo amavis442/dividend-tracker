@@ -7,11 +7,13 @@ use Doctrine\Common\Collections\Collection;
 
 final class DividendDecorator
 {
-    public function __construct(private readonly AdjustedDividendDecoratorFactory $factory) {}
+    public function __construct(private readonly AdjustedDividendDecoratorFactory $factory)
+    {
+    }
 
     /**
      */
-    public function decorate(array &$tickers, Collection $dividends, Collection $corporateActions)
+    public function decorate(array &$tickers, Collection $dividends, Collection $corporateActions): void
     {
         // The original logic that called the factory
         $this->factory->load($dividends->toArray(), $corporateActions->toArray());

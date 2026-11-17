@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\EventListener;
 
 use Doctrine\ORM\Event\PostUpdateEventArgs;
@@ -16,19 +18,18 @@ use App\Repository\Trading212PieMetaDataRepository;
     )
 ]
 #[
-	AsEntityListener(
-		event: Events::postPersist,
-		method: 'postUpdate',
-		entity: Pie::class
-	)
+    AsEntityListener(
+        event: Events::postPersist,
+        method: 'postUpdate',
+        entity: Pie::class
+    )
 ]
 final class PieListener
 {
-
     public function __construct(
         private Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
-    )
-    { }
+    ) {
+    }
 
 
     public function postUpdate(

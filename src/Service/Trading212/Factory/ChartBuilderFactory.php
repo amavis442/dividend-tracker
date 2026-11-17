@@ -1,4 +1,5 @@
 <?php
+
 // src/Service/Tradin212/Factory/ChartBuilderFactory.php
 namespace App\Service\Trading212\Factory;
 
@@ -13,11 +14,11 @@ final class ChartBuilderFactory
     public function __construct(
         private readonly ChartBuilderInterface $chartBuilder,
         private readonly TranslatorInterface $translator,
-    ) {}
+    ) {
+    }
 
     /* ---------- 1. Pie‑instruments chart ----------------------------------- */
     public function buildInstrumentsChart(
-
         array $pieInstruments
     ): Chart {
         return $this->createPieChart($pieInstruments);
@@ -42,7 +43,7 @@ final class ChartBuilderFactory
     /* ---------- 4. Yield chart --------------------------------------------- */
     public function buildYieldChart(
         array $data,
-        Pie                     $pie
+        Pie $pie
     ): Chart {
         return $this->createYieldChart($data, $pie);
     }

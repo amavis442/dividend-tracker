@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Factory;
 
 use App\Entity\Currency;
@@ -10,7 +12,7 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  */
 final class CurrencyFactory extends PersistentObjectFactory
 {
-    const CURRENCY_SYMBOL = ['USD','EUR','GBX'];
+    public const CURRENCY_SYMBOL = ['USD','EUR','GBX'];
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
      *

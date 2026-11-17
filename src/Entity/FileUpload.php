@@ -4,7 +4,7 @@ namespace App\Entity;
 
 class FileUpload
 {
-    private $uploadfile;
+    private ?string $uploadfile = null;
 
     public function getUploadFile(): ?string
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
 use App\Entity\Pie;
@@ -15,7 +17,7 @@ class PieType extends AbstractType
     {
         $builder
             ->add('label')
-            ->add('trading212PieId', null,[
+            ->add('trading212PieId', null, [
                 'required' => false
             ]);
     }

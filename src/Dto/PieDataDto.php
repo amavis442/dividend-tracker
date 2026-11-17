@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Dto;
 
 use App\Entity\Calendar;
@@ -30,5 +32,6 @@ final class PieDataDto
         public readonly Collection $tickerIds,
         public readonly Collection $corporateActions,
         public readonly Collection $dividends,
-    ) {}
+    ) {
+    }
 }

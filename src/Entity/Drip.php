@@ -6,273 +6,273 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class Drip
 {
-	/**
-	 * Dividend percentage per year.
-	 *
-	 * @var float
-	 */
-	#[Assert\GreaterThan(0)]
-	private float $dividendPercentage = 4.0;
+    /**
+     * Dividend percentage per year.
+     *
+     * @var float
+     */
+    #[Assert\GreaterThan(0)]
+    private float $dividendPercentage = 4.0;
 
-	/**
-	 * Staring investment
-	 *
-	 * @var float
-	 */
-	private ?float $invested = 0.0;
+    /**
+     * Staring investment
+     *
+     * @var float
+     */
+    private ?float $invested = 0.0;
 
-	/**
-	 * Investment per month
-	 *
-	 * @var float
-	 */
-	private float $investPerMonth = 100.0;
+    /**
+     * Investment per month
+     *
+     * @var float
+     */
+    private float $investPerMonth = 100.0;
 
-	/**
-	 * Inflation
-	 *
-	 * @var float
-	 */
-	private ?float $inflation = 0.0;
+    /**
+     * Inflation
+     *
+     * @var float
+     */
+    private ?float $inflation = 0.0;
 
-	/**
-	 * How many times does a company pay dividends per year. Default will be 4
-	 *
-	 * @var int
-	 */
-	#[Assert\GreaterThan(0)]
-	private int $frequency = 12;
+    /**
+     * How many times does a company pay dividends per year. Default will be 4
+     *
+     * @var int
+     */
+    #[Assert\GreaterThan(0)]
+    private int $frequency = 12;
 
-	/**
-	 *
-	 * @var int
-	 */
-	#[Assert\GreaterThan(0)]
-	private int $years = 10;
+    /**
+     *
+     * @var int
+     */
+    #[Assert\GreaterThan(0)]
+    private int $years = 10;
 
-	/**
-	 *
-	 * @var float
-	 */
-	private ?float $taxRate = 0;
+    /**
+     *
+     * @var float
+     */
+    private ?float $taxRate = 0;
 
-	private bool $dividendReinvested = true;
+    private bool $dividendReinvested = true;
 
-	private int $dividendPercentageWithDrawn = 0;
+    private int $dividendPercentageWithDrawn = 0;
 
-	/**
-	 * Get the value of dividendPercentage
-	 *
-	 * @return  float
-	 */
-	public function getDividendPercentage(): float
-	{
-		return $this->dividendPercentage;
-	}
+    /**
+     * Get the value of dividendPercentage
+     *
+     * @return  float
+     */
+    public function getDividendPercentage(): float
+    {
+        return $this->dividendPercentage;
+    }
 
-	/**
-	 * Set the value of dividendPercentage
-	 *
-	 * @param   float  $dividendPercentage
-	 *
-	 * @return  self
-	 */
-	public function setDividendPercentage(?float $dividendPercentage): self
-	{
-		$this->dividendPercentage = $dividendPercentage ?? 0.0;
+    /**
+     * Set the value of dividendPercentage
+     *
+     * @param   float  $dividendPercentage
+     *
+     * @return  self
+     */
+    public function setDividendPercentage(?float $dividendPercentage): self
+    {
+        $this->dividendPercentage = $dividendPercentage ?? 0.0;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Get the value of invested
-	 *
-	 * @return  float
-	 */
-	public function getInvested(): ?float
-	{
-		return $this->invested;
-	}
+    /**
+     * Get the value of invested
+     *
+     * @return  float
+     */
+    public function getInvested(): ?float
+    {
+        return $this->invested;
+    }
 
-	/**
-	 * Set the value of invested
-	 *
-	 * @param   float  $invested
-	 *
-	 * @return  self
-	 */
-	public function setInvested(?float $invested): self
-	{
-		$this->invested = $invested;
+    /**
+     * Set the value of invested
+     *
+     * @param   float  $invested
+     *
+     * @return  self
+     */
+    public function setInvested(?float $invested): self
+    {
+        $this->invested = $invested;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Get the value of investPerMonth
-	 *
-	 * @return  float
-	 */
-	public function getInvestPerMonth(): float
-	{
-		return $this->investPerMonth;
-	}
+    /**
+     * Get the value of investPerMonth
+     *
+     * @return  float
+     */
+    public function getInvestPerMonth(): float
+    {
+        return $this->investPerMonth;
+    }
 
-	/**
-	 * Set the value of investPerMonth
-	 *
-	 * @param   float  $investPerMonth
-	 *
-	 * @return  self
-	 */
-	public function setInvestPerMonth(?float $investPerMonth): self
-	{
-		$this->investPerMonth = $investPerMonth ?? 0;
+    /**
+     * Set the value of investPerMonth
+     *
+     * @param   float  $investPerMonth
+     *
+     * @return  self
+     */
+    public function setInvestPerMonth(?float $investPerMonth): self
+    {
+        $this->investPerMonth = $investPerMonth ?? 0;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Get the value of frequency
-	 *
-	 * @return  int
-	 */
-	public function getFrequency(): int
-	{
-		return $this->frequency;
-	}
+    /**
+     * Get the value of frequency
+     *
+     * @return  int
+     */
+    public function getFrequency(): int
+    {
+        return $this->frequency;
+    }
 
-	/**
-	 * Set the value of frequency
-	 *
-	 * @param   int  $frequency
-	 *
-	 * @return  self
-	 */
-	public function setFrequency(int $frequency): self
-	{
-		$this->frequency = $frequency;
+    /**
+     * Set the value of frequency
+     *
+     * @param   int  $frequency
+     *
+     * @return  self
+     */
+    public function setFrequency(int $frequency): self
+    {
+        $this->frequency = $frequency;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Get the value of years
-	 *
-	 * @return  int
-	 */
-	public function getYears(): int
-	{
-		return $this->years;
-	}
+    /**
+     * Get the value of years
+     *
+     * @return  int
+     */
+    public function getYears(): int
+    {
+        return $this->years;
+    }
 
-	/**
-	 * Set the value of years
-	 *
-	 * @param   int  $years
-	 *
-	 * @return  self
-	 */
-	public function setYears(int $years): self
-	{
-		$this->years = $years;
+    /**
+     * Set the value of years
+     *
+     * @param   int  $years
+     *
+     * @return  self
+     */
+    public function setYears(int $years): self
+    {
+        $this->years = $years;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Get the value of taxRate
-	 *
-	 * @return  float
-	 */
-	public function getTaxRate(): ?float
-	{
-		return $this->taxRate;
-	}
+    /**
+     * Get the value of taxRate
+     *
+     * @return  float
+     */
+    public function getTaxRate(): ?float
+    {
+        return $this->taxRate;
+    }
 
-	/**
-	 * Set the value of taxRate
-	 *
-	 * @param   float  $taxRate
-	 *
-	 * @return  self
-	 */
-	public function setTaxRate(?float $taxRate): self
-	{
-		$this->taxRate = $taxRate;
+    /**
+     * Set the value of taxRate
+     *
+     * @param   float  $taxRate
+     *
+     * @return  self
+     */
+    public function setTaxRate(?float $taxRate): self
+    {
+        $this->taxRate = $taxRate;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Get the value of inflation
-	 *
-	 * @return  float
-	 */
-	public function getInflation(): ?float
-	{
-		return $this->inflation;
-	}
+    /**
+     * Get the value of inflation
+     *
+     * @return  float
+     */
+    public function getInflation(): ?float
+    {
+        return $this->inflation;
+    }
 
-	/**
-	 * Set the value of inflation
-	 *
-	 * @param   float  $inflation
-	 *
-	 * @return  self
-	 */
-	public function setInflation(?float $inflation): self
-	{
-		$this->inflation = $inflation;
+    /**
+     * Set the value of inflation
+     *
+     * @param   float  $inflation
+     *
+     * @return  self
+     */
+    public function setInflation(?float $inflation): self
+    {
+        $this->inflation = $inflation;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Get the value of dividendReinvested
-	 *
-	 * @return  bool
-	 */
-	public function isDividendReinvested(): bool
-	{
-		return $this->dividendReinvested;
-	}
+    /**
+     * Get the value of dividendReinvested
+     *
+     * @return  bool
+     */
+    public function isDividendReinvested(): bool
+    {
+        return $this->dividendReinvested;
+    }
 
-	/**
-	 * Set the value of dividendReinvested
-	 *
-	 * @param   bool  $dividendReinvested
-	 *
-	 * @return  self
-	 */
-	public function setDividendReinvested(bool $dividendReinvested): self
-	{
-		$this->dividendReinvested = $dividendReinvested;
+    /**
+     * Set the value of dividendReinvested
+     *
+     * @param   bool  $dividendReinvested
+     *
+     * @return  self
+     */
+    public function setDividendReinvested(bool $dividendReinvested): self
+    {
+        $this->dividendReinvested = $dividendReinvested;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Get the value of dividendPercentageWithDrawn
-	 *
-	 * @return  int
-	 */
-	public function getDividendPercentageWithDrawn(): int
-	{
-		return $this->dividendPercentageWithDrawn;
-	}
+    /**
+     * Get the value of dividendPercentageWithDrawn
+     *
+     * @return  int
+     */
+    public function getDividendPercentageWithDrawn(): int
+    {
+        return $this->dividendPercentageWithDrawn;
+    }
 
-	/**
-	 * Set the value of dividendPercentageWithDrawn
-	 *
-	 * @param   int  $dividendPercentageWithDrawn
-	 *
-	 * @return  static
-	 */
-	public function setDividendPercentageWithDrawn(int $dividendPercentageWithDrawn): static
-	{
-		$this->dividendPercentageWithDrawn = $dividendPercentageWithDrawn;
+    /**
+     * Set the value of dividendPercentageWithDrawn
+     *
+     * @param   int  $dividendPercentageWithDrawn
+     *
+     * @return  static
+     */
+    public function setDividendPercentageWithDrawn(int $dividendPercentageWithDrawn): static
+    {
+        $this->dividendPercentageWithDrawn = $dividendPercentageWithDrawn;
 
-		return $this;
-	}
+        return $this;
+    }
 }

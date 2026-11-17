@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\EventListener;
 
 use Doctrine\ORM\EntityManager;
@@ -9,8 +11,8 @@ use App\Entity\User;
 
 class OnRequestListener
 {
-    private $tokenStorage;
-    private $manager;
+    private UsageTrackingTokenStorage $tokenStorage;
+    private EntityManager $manager;
 
     public function __construct(EntityManager $manager, UsageTrackingTokenStorage $tokenStorage)
     {

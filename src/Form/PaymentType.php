@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use Doctrine\ORM\QueryBuilder;
 use App\Entity\Calendar;
 use App\Entity\Currency;
 use App\Entity\Payment;
@@ -27,10 +28,10 @@ class PaymentType extends AbstractType
         $builder
             ->add('Calendar', EntityType::class, [
                 'class' => Calendar::class,
-                'choice_label' => function ($calendar) {
+                'choice_label' => function ($calendar): string {
                     return $calendar->getTicker()->getSymbol() . ',(p):: ' . $calendar->getPaymentDate()->format('Y-m-d') . ' (ex):: ' . $calendar->getExDividendDate()->format('Y-m-d') . ' ' . ($calendar->getDividendType() ?? 'Regular');
                 },
-                'query_builder' => function (EntityRepository $er) use ($tickerId) {
+                'query_builder' => function (EntityRepository $er) use ($tickerId): QueryBuilder {
                     $query = $er->createQueryBuilder('c')
                         ->where('c.paymentDate <= :currentDate')
                         ->orderBy('c.paymentDate', 'DESC')

@@ -18,7 +18,7 @@ class SeekingAlphaService extends AbstractDividendDate implements DividendDatePl
         'NESN' => 'NSRGY',
     ];
 
-    private function getToken()
+    private function getToken(): array
     {
         $response = $this->client->request('GET', self::TOKEN_URL);
         if ($response->getStatusCode() !== 200) {

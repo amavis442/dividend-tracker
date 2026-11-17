@@ -18,16 +18,16 @@ class IncomesSharesDataRepository extends ServiceEntityRepository
     }
 
     public function findByDataset(Uuid $uuid): array
-        {
+    {
             return $this->createQueryBuilder('i')
-                ->join('i.ticker','t')
+                ->join('i.ticker', 't')
                 ->andWhere('i.dataset = :dataset')
                 ->setParameter('dataset', $uuid)
                 ->orderBy('t.fullname', 'ASC')
                 ->getQuery()
                 ->getResult()
             ;
-        }
+    }
 
     //    /**
     //     * @return IncomesSharesData[] Returns an array of IncomesSharesData objects

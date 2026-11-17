@@ -10,7 +10,9 @@ class DividendAdjustmentStrategyResolver
     /**
      * @param DividendAdjustmentStrategyInterface[] $strategies
      */
-    public function __construct(private iterable $strategies) {}
+    public function __construct(private iterable $strategies)
+    {
+    }
 
     public function resolve(float $declaredAmount, DateTime $declarationDate, CorporateAction $action): float
     {

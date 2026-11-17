@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Decorator;
 
 use App\Entity\Ticker;
@@ -7,74 +8,72 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 class AdjustedDividendDecorator implements AdjustedDecoratorInterface, AdjustedDividendDecoratorInterface
 {
-	const SORT_BY_CALENDAR_ID = 1;
-	const SORT_BY_PAYMENT_DATE = 2;
+    public const SORT_BY_CALENDAR_ID = 1;
+    public const SORT_BY_PAYMENT_DATE = 2;
 
     public function __construct(
-		private array $dividends,
-		private array $actions,
-		private DividendAdjuster $dividendAdjuster
-	) {
-	}
+        private array $dividends,
+        private array $actions,
+        private DividendAdjuster $dividendAdjuster
+    ) {
+    }
 
 
-	private function getAdjustedDividendByKey(int $key): array
-	{
-		$adjusted = [];
+    private function getAdjustedDividendByKey(int $key): array
+    {
+        $adjusted = [];
 
-		foreach ($this->dividends as $dividend) {
-			$indexBy = $key == self::SORT_BY_CALENDAR_ID ? $dividend->getId() : $dividend->getPaymentDate()->format('Ymd');
+        foreach ($this->dividends as $dividend) {
+            $indexBy = $key == self::SORT_BY_CALENDAR_ID ? $dividend->getId() : $dividend->getPaymentDate()->format('Ymd');
 
-			$adjustedCashAmount = $this->dividendAdjuster->getAdjustedDividend(
-					calendar: $dividend,
-					actions: $this->actions
-			);
+            $adjustedCashAmount = $this->dividendAdjuster->getAdjustedDividend(
+                calendar: $dividend,
+                actions: $this->actions
+            );
 
-			$dividend->setAdjustedCashAmount($adjustedCashAmount);
+            $dividend->setAdjustedCashAmount($adjustedCashAmount);
 
-			$adjusted[$indexBy] = [
-				'original' => $dividend->getCashAmount(),
-				'adjusted' => $adjustedCashAmount,
-				'declareDate' => $dividend->getCreatedAt(),
-				'paymentDate' => $dividend->getPaymentDate(),
-				'ticker' => $dividend->getTicker(),
-				'symbol' => $dividend->getTicker()->getSymbol(),
-				'calendar' => $dividend,
-			];
-		}
+            $adjusted[$indexBy] = [
+                'original' => $dividend->getCashAmount(),
+                'adjusted' => $adjustedCashAmount,
+                'declareDate' => $dividend->getCreatedAt(),
+                'paymentDate' => $dividend->getPaymentDate(),
+                'ticker' => $dividend->getTicker(),
+                'symbol' => $dividend->getTicker()->getSymbol(),
+                'calendar' => $dividend,
+            ];
+        }
 
-		return $adjusted;
+        return $adjusted;
+    }
+    public function getAdjustedDividend(): array
+    {
+        return $this->getAdjustedDividendByKey(self::SORT_BY_CALENDAR_ID);
+    }
 
+    public function getAdjustedDividendSortByPaymentDate(): array
+    {
+        $adjusted = $this->getAdjustedDividendByKey(self::SORT_BY_PAYMENT_DATE);
+        ksort($adjusted);
+        return $adjusted;
+    }
 
-	}
-	public function getAdjustedDividend(): array
-	{
-		return $this->getAdjustedDividendByKey(self::SORT_BY_CALENDAR_ID);
-	}
+    public function getAdjustmentNote(): ?string
+    {
+        $actions = $this->actions;
 
-	public function getAdjustedDividendSortByPaymentDate(): array
-	{
-		$adjusted = $this->getAdjustedDividendByKey(self::SORT_BY_PAYMENT_DATE);
-		ksort($adjusted);
-		return $adjusted;
-	}
+        if (empty($actions)) {
+            return null;
+        }
 
-	public function getAdjustmentNote(): ?string
-	{
-		$actions = $this->actions;
+        $notes = array_map(function ($action): string {
+            return sprintf(
+                'Adjusted due to reverse split on %s (ratio: %s)',
+                $action->getEventDate()->format('Y-m-d'),
+                $action->getRatio()
+            );
+        }, $actions);
 
-		if (empty($actions)) {
-			return null;
-		}
-
-		$notes = array_map(function ($action) {
-			return sprintf(
-				'Adjusted due to reverse split on %s (ratio: %s)',
-				$action->getEventDate()->format('Y-m-d'),
-				$action->getRatio()
-			);
-		}, $actions);
-
-		return implode('; ', $notes);
-	}
+        return implode('; ', $notes);
+    }
 }

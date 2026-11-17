@@ -19,22 +19,22 @@ class TypeCastingExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('int', function ($value) {
+            new TwigFilter('int', function ($value): int {
                 return (int) $value;
             }),
-            new TwigFilter('float', function ($value) {
+            new TwigFilter('float', function ($value): float {
                 return (float) $value;
             }),
-            new TwigFilter('string', function ($value) {
+            new TwigFilter('string', function ($value): string {
                 return (string) $value;
             }),
-            new TwigFilter('bool', function ($value) {
+            new TwigFilter('bool', function ($value): bool {
                 return (bool) $value;
             }),
-            new TwigFilter('array', function (object $value) {
+            new TwigFilter('array', function (object $value): array {
                 return (array) $value;
             }),
-            new TwigFilter('object', function (array $value) {
+            new TwigFilter('object', function (array $value): \stdClass {
                 return (object) $value;
             }),
         ];

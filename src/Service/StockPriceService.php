@@ -233,7 +233,7 @@ class StockPriceService
      *
      * @return  integer
      */
-    public function getCacheTimeStamp()
+    public function getCacheTimeStamp(): int
     {
         return $this->cacheTimeStamp;
     }

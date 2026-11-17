@@ -56,7 +56,7 @@ class IncomesSharesData
         return $this->id;
     }
 
-        public function getTicker(): ?Ticker
+    public function getTicker(): ?Ticker
     {
         return $this->ticker;
     }
@@ -187,5 +187,4 @@ class IncomesSharesData
 
         return $this;
     }
-
 }

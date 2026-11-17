@@ -2,6 +2,8 @@
 
 namespace App\Controller\Report;
 
+use App\Entity\Payment;
+use App\Entity\Calendar;
 use App\Entity\Transaction;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
@@ -29,8 +31,9 @@ class ExportTransactionsController extends AbstractController
         $writer->setFieldDelimiter(';');
 
         /*
-        Datum;Type;Waarde;Transactievaluta;Brutobedrag;Valuta brutobedrag;Wisselkoers;Kosten;Belastingen;Aandelen;ISIN;WKN;Tickersymbool;Naam effect;Opmerking
-         */
+        Datum;Type;Waarde;Transactievaluta;Brutobedrag;Valuta brutobedrag;Wisselkoers;
+        Kosten;Belastingen;Aandelen;ISIN;WKN;Tickersymbool;Naam effect;Opmerking
+        */
         $headers = [];
         $headers[] = 'Datum';
         $headers[] = 'Tijd';
@@ -109,7 +112,8 @@ class ExportTransactionsController extends AbstractController
 
         $writer->setFieldDelimiter(';');
         /*
-        Datum;Type;Waarde;Transactievaluta;Brutobedrag;Valuta brutobedrag;Wisselkoers;Kosten;Belastingen;Aandelen;ISIN;WKN;Tickersymbool;Naam effect;Opmerking
+        Datum;Type;Waarde;Transactievaluta;Brutobedrag;Valuta brutobedrag;
+        Wisselkoers;Kosten;Belastingen;Aandelen;ISIN;WKN;Tickersymbool;Naam effect;Opmerking
          */
         $headers = [];
         $headers[] = 'Datum';
@@ -136,7 +140,7 @@ class ExportTransactionsController extends AbstractController
         }
 
         /**
-         * @var \App\Entity\Payment $payment
+         * @var Payment $payment
          */
         foreach ($payments as $payment) {
             $ticker = $payment->getTicker();
@@ -145,7 +149,7 @@ class ExportTransactionsController extends AbstractController
             $tickerName = $ticker->getFullname();
             $tickerIsin = $ticker->getIsin();
             /**
-             * @var \App\Entity\Calendar $calendar
+             * @var Calendar $calendar
              */
             $calendar = $payment->getCalendar();
             $grossValuePerShare = $calendar->getCashAmount();

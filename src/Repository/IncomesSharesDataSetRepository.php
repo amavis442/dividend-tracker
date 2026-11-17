@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\IncomesSharesDataSet;
@@ -19,7 +21,7 @@ class IncomesSharesDataSetRepository extends ServiceEntityRepository
 
     public function all(): QueryBuilder
     {
-        return $this->createQueryBuilder('i')->orderBy('i.createdAt','DESC');
+        return $this->createQueryBuilder('i')->orderBy('i.createdAt', 'DESC');
     //            ->andWhere('i.exampleField = :val')
     //            ->setParameter('val', $value)
     //            ->getQuery()

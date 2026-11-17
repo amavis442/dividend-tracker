@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Symfony\Component\Form\FormInterface;
 use App\Entity\Research;
 use App\Entity\Ticker;
 use App\Entity\Attachment;
@@ -50,7 +51,7 @@ class ResearchController extends AbstractController
             'orderBy' => $orderBy,
             'sort' => $sort,
         ]);
-        $sort = in_array($sort, ['id', 'symbol'])? $sort: 'id';
+        $sort = in_array($sort, ['id', 'symbol']) ? $sort : 'id';
         $orderBy = in_array($orderBy, ['asc', 'desc', 'ASC', 'DESC']) ? $orderBy : 'asc';
 
         $tickerAutoComplete = new TickerAutocomplete();
@@ -75,7 +76,7 @@ class ResearchController extends AbstractController
         }
 
         /**
-         * @var \Symfony\Component\Form\FormInterface $form
+         * @var FormInterface $form
          */
         $form = $this->createForm(
             TickerAutocompleteType::class,

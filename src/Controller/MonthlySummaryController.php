@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\MonthlySummary;
@@ -76,7 +78,7 @@ final class MonthlySummaryController extends AbstractController
     #[Route('/{id}', name: 'app_monthly_summary_delete', methods: ['POST'])]
     public function delete(Request $request, #[MapEntity] MonthlySummary $monthlySummary, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$monthlySummary->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $monthlySummary->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($monthlySummary);
             $entityManager->flush();
         }

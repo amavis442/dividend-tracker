@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Dto;
 
 final class ExchangeTaxDto
@@ -9,5 +11,6 @@ final class ExchangeTaxDto
         public readonly float $taxAmount,
         public readonly string $currency,
         // Add any other contextual fields you need
-    ) {}
+    ) {
+    }
 }

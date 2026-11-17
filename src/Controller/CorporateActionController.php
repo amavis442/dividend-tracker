@@ -72,7 +72,7 @@ final class CorporateActionController extends AbstractController
     #[Route('/{id}', name: 'app_corporate_action_delete', methods: ['POST'])]
     public function delete(Request $request, #[MapEntity] CorporateAction $corporateAction, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$corporateAction->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $corporateAction->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($corporateAction);
             $entityManager->flush();
         }

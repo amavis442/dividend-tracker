@@ -49,10 +49,8 @@ class YahooFinanceService implements StockPricePluginInterface
 
     /**
      * Used for calling the api
-     *
-     * @var HttpClientInterface
      */
-    private $client;
+    private HttpClientInterface $client;
 
     public function __construct(
         HttpClientInterface $client
@@ -67,7 +65,7 @@ class YahooFinanceService implements StockPricePluginInterface
 
         $response = $client->request(
             'GET',
-            $apiCallUrl . implode(',', array_map(function ($symbol) {
+            $apiCallUrl . implode(',', array_map(function ($symbol): string {
                 if (isset($this->translate[$symbol])) {
                     $symbol = $this->translate[$symbol];
                 }

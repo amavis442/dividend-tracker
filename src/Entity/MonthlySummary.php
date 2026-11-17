@@ -22,70 +22,80 @@ class MonthlySummary
     #[ORM\Column(type: Types::DATE_MUTABLE, name: 'ac_date')]
     private ?\DateTimeInterface $acDate = null;
 
-    #[ORM\Column(type: 'float',
+    #[ORM\Column(
+        type: 'float',
         nullable: false,
         options: ["default" => 0],
         name: 'deposit_withdrawal'
     )]
     private float $depositWithdrawal = 0.0;
 
-    #[ORM\Column(type: 'float',
+    #[ORM\Column(
+        type: 'float',
         nullable: false,
         options: ["default" => 0],
         name: 'closed_position_result'
     )]
     private float $closedPositionResult = 0.0;
 
-    #[ORM\Column(type: 'float',
+    #[ORM\Column(
+        type: 'float',
         nullable: false,
         options: ["default" => 0],
         name: 'dividends'
     )]
     private float $dividends = 0.0;
 
-    #[ORM\Column(type: 'float',
+    #[ORM\Column(
+        type: 'float',
         nullable: false,
         options: ["default" => 0],
         name: 'interest_on_uninvested_cash'
     )]
     private float $interestOnUninvestedCash = 0.0;
 
-    #[ORM\Column(type: 'float',
+    #[ORM\Column(
+        type: 'float',
         nullable: false,
         options: ["default" => 0],
         name: 'commissions_and_fees'
     )]
     private float $commissionsAndFees = 0.0;
 
-    #[ORM\Column(type: 'float',
+    #[ORM\Column(
+        type: 'float',
         nullable: false,
         options: ["default" => 0],
         name: 'equity_charges_and_fees'
     )]
     private float $equityChargesAndFees = 0.0;
 
-    #[ORM\Column(type: 'float',
+    #[ORM\Column(
+        type: 'float',
         nullable: false,
         options: ["default" => 0],
         name: 'account_adjustments'
     )]
     private float $accountAdjustments = 0.0;
 
-    #[ORM\Column(type: 'float',
+    #[ORM\Column(
+        type: 'float',
         nullable: false,
         options: ["default" => 0],
         name: 'account_value'
     )]
     private float $accountValue = 0.0;
 
-    #[ORM\Column(type: 'float',
+    #[ORM\Column(
+        type: 'float',
         nullable: false,
         options: ["default" => 0],
         name: 'cash'
     )]
     private float $cash = 0.0;
 
-    #[ORM\Column(type: 'float',
+    #[ORM\Column(
+        type: 'float',
         nullable: false,
         options: ["default" => 0],
         name: 'bonus_non_withdrawable'

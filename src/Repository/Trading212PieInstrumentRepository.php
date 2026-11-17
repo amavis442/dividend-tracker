@@ -40,11 +40,10 @@ class Trading212PieInstrumentRepository extends ServiceEntityRepository
         ->where('t.ticker = :ticker')
         ->andWhere('tm.pie = :pie')
         ->groupBy('t.createdAt')
-        ->orderBy('t.createdAt','ASC')
+        ->orderBy('t.createdAt', 'ASC')
         ->setParameter('ticker', $ticker->getId())
         ->setParameter('pie', $pie->getId())
         ->getQuery()->getResult();
-
     }
 
     public function getSnapshotsByDate(\DateTime $snapshotDate): array

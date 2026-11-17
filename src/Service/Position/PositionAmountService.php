@@ -11,33 +11,35 @@ use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
  */
 class PositionAmountService
 {
-	private Position $position;
-	private array $transactions;
-	private array $actions;
+    private Position $position;
+    private array $transactions;
+    private array $actions;
 
-	public function __construct(
-		private AdjustedPositionDecoratorFactory $adjustedPositionDecoratorFactory,
-		) {	}
+    public function __construct(
+        private AdjustedPositionDecoratorFactory $adjustedPositionDecoratorFactory,
+    ) {
+    }
 
-	public function setPosition(Position $position): self
-	{
-		$this->position = $position;
+    public function setPosition(Position $position): self
+    {
+        $this->position = $position;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function load(array $transactions, array $actions): self {
-		$this->transactions = $transactions;
-		$this->actions = $actions;
+    public function load(array $transactions, array $actions): self
+    {
+        $this->transactions = $transactions;
+        $this->actions = $actions;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function getAmount(): float
-	{
-		$this->adjustedPositionDecoratorFactory->load($this->transactions, $this->actions);
-		$decorator = $this->adjustedPositionDecoratorFactory->decorate($this->position);
+    public function getAmount(): float
+    {
+        $this->adjustedPositionDecoratorFactory->load($this->transactions, $this->actions);
+        $decorator = $this->adjustedPositionDecoratorFactory->decorate($this->position);
 
-		return $decorator->getAdjustedAmount();
-	}
+        return $decorator->getAdjustedAmount();
+    }
 }

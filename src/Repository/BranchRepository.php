@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use Doctrine\ORM\QueryBuilder;
 use App\Entity\Branch;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -34,7 +35,7 @@ class BranchRepository extends ServiceEntityRepository
         return $paginator;
     }
 
-    public function getAllQuery(): \Doctrine\ORM\QueryBuilder
+    public function getAllQuery(): QueryBuilder
     {
         // Create our query
         $queryBuilder = $this->createQueryBuilder('i')
@@ -51,7 +52,7 @@ class BranchRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function getAllocationPerSector()
+    public function getAllocationPerSector(): array
     {
         $result = $this->createQueryBuilder('s')
             ->select('s, t, p')
@@ -105,7 +106,7 @@ class BranchRepository extends ServiceEntityRepository
         }
 
 
-        uasort($output, function ($a, $b) {
+        uasort($output, function (array $a, array $b): int {
             $a1 = $a['sectorTargetAllocation'];
             $b1 = $b['sectorTargetAllocation'];
 

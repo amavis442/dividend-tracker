@@ -1,15 +1,19 @@
 <?php
 
-namespace  App\Doctrine\Functions;
+namespace App\Doctrine\Functions;
 
+use Doctrine\ORM\Query\Parser;
+use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\AST\Functions\FunctionNode;
 use Doctrine\ORM\Query\TokenType;
 
-class CastFunction extends FunctionNode {
+class CastFunction extends FunctionNode
+{
     public $type = null;
     public $expression = null;
 
-    public function parse(\Doctrine\ORM\Query\Parser $parser):void {
+    public function parse(Parser $parser): void
+    {
         $parser->match(TokenType::T_IDENTIFIER); // CAST
         $parser->match(TokenType::T_OPEN_PARENTHESIS);
         $this->expression = $parser->ArithmeticPrimary();
@@ -25,7 +29,7 @@ class CastFunction extends FunctionNode {
     }
     */
 
-    public function getSql(\Doctrine\ORM\Query\SqlWalker $sqlWalker):string
+    public function getSql(SqlWalker $sqlWalker): string
     {
         return sprintf(
             'CAST(%s AS %s)',

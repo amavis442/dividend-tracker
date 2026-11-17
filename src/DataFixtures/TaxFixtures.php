@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataFixtures;
 
 use App\Entity\Tax;
@@ -7,7 +9,6 @@ use App\Factory\TaxFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use App\Factory\UserFactory;
-
 
 class TaxFixtures extends Fixture
 {

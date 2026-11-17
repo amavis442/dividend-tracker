@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Set\ValueObject\SetList;
+use Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\NarrowObjectReturnTypeRector;
 use Rector\Doctrine\Set\DoctrineSetList;
-use Rector\Symfony\Set\SensiolabsSetList;
 use Rector\Symfony\Set\SymfonySetList;
 
 return static function (RectorConfig $rectorConfig): void {
@@ -17,11 +19,17 @@ return static function (RectorConfig $rectorConfig): void {
         //__DIR__ . '/tests',
     ]);
 
-    $rectorConfig->import('vendor/fakerphp/faker/rector-migrate.php');
-
     $rectorConfig->sets([
         DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
         SymfonySetList::ANNOTATIONS_TO_ATTRIBUTES,
-        SensiolabsSetList::FRAMEWORK_EXTRA_61,
+        SetList::TYPE_DECLARATION,
     ]);
+
+    $rectorConfig->rule(SafeDeclareStrictTypesRector::class);
+
+    // Controllers keep returning Response per project conventions
+    $rectorConfig->skip([NarrowObjectReturnTypeRector::class]);
+
+    $rectorConfig->importNames();
+    $rectorConfig->importShortClasses(false);
 };

@@ -101,9 +101,9 @@ class JournalController extends AbstractController
 
     #[Route(path: '/{id}/edit', name: 'journal_edit', methods: ['GET', 'POST'])]
     public function edit(
-   		Request $request,
-   		EntityManagerInterface $entityManager,
-   		#[MapEntity] Journal $journal,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        #[MapEntity] Journal $journal,
         Referer $referer,
     ): Response {
         $form = $this->createForm(JournalType::class, $journal);
@@ -132,9 +132,9 @@ class JournalController extends AbstractController
         )
     ]
     public function delete(
-    		Request $request,
-    		EntityManagerInterface $entityManager,
-    		#[MapEntity] Journal $journal
+        Request $request,
+        EntityManagerInterface $entityManager,
+        #[MapEntity] Journal $journal
     ): Response {
         if (
             $this->isCsrfTokenValid(
