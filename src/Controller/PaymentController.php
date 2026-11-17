@@ -9,7 +9,7 @@ use App\Entity\Position;
 use App\Form\DateIntervalFormType;
 use App\Form\PaymentType;
 use App\Helper\DateHelper;
-use App\Repository\CalendarRepository;
+use App\Repository\DividendCalendarRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\PieRepository;
 use App\Repository\TickerRepository;
@@ -172,7 +172,7 @@ class PaymentController extends AbstractController
         EntityManagerInterface $entityManager,
         Position $position,
         string $timestamp,
-        CalendarRepository $calendarRepository,
+        DividendCalendarRepository $calendarRepository,
         Referer $referer
     ): Response {
         $ticker = $position->getTicker();

@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\Repository\TickerRepository;
-use App\Repository\CalendarRepository;
+use App\Repository\DividendCalendarRepository;
 use App\Repository\CurrencyRepository;
 use App\Entity\Calendar;
 use Psr\Log\LoggerInterface;
@@ -26,7 +26,7 @@ class IncomeSharesDividendDateCommand extends Command
     public function __construct(
         protected IncomeSharesService $incomeSharesImportService,
         protected TickerRepository $tickerRepository,
-        protected CalendarRepository $calendarRepository,
+        protected DividendCalendarRepository $calendarRepository,
         protected CurrencyRepository $currencyRepository,
         protected LoggerInterface $logger
     ) {

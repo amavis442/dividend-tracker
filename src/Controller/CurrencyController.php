@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Currency;
 use App\Form\CurrencyType;
-use App\Repository\CalendarRepository;
+use App\Repository\DividendCalendarRepository;
 use App\Repository\CurrencyRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
@@ -102,7 +102,7 @@ class CurrencyController extends AbstractController
         TickerRepository $tickerRepository,
         PositionRepository $positionRepository,
         PaymentRepository $paymentRepository,
-        CalendarRepository $calendarRepository
+        DividendCalendarRepository $calendarRepository
     ): Response {
         if (
             $this->isCsrfTokenValid(
