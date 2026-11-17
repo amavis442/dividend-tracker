@@ -37,17 +37,6 @@ services:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
 
-    # Listeners
-    on_request_listener:
-        class: App\EventListener\OnRequestListener
-        arguments: ['@doctrine.orm.entity_manager', '@security.token_storage']
-        tags:
-            - {
-                  name: kernel.event_listener,
-                  event: kernel.request,
-                  method: onKernelRequest,
-              }
-
     # Setup alias for the ExchangeRateInterface so autowire understand it
     App\Service\ExchangeRate\EuExchangeRateService: ~
     App\Contracts\ExchangeRate\ExchangeRateInterface: '@App\Service\ExchangeRate\WisselkoersNlExchangeRateService'
