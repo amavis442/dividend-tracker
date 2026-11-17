@@ -273,7 +273,9 @@ class Position
 
         if ($closed) {
             $this->status = PositionStatus::CLOSED;
-        } elseif ($this->status === PositionStatus::CLOSED) {
+        }
+
+        if (!$closed && $this->status === PositionStatus::CLOSED) {
             $this->status = PositionStatus::OPEN;
         }
 
