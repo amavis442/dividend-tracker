@@ -1,7 +1,8 @@
 <?php
 
-// src/State/UserPostProcesser.php
+declare(strict_types=1);
 
+// src/State/UserPostProcesser.php
 namespace App\State;
 
 use App\Entity\User;
