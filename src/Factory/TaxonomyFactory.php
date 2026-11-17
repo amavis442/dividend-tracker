@@ -3,12 +3,12 @@
 namespace App\Factory;
 
 use App\Entity\Taxonomy;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<Taxonomy>
+ * @extends PersistentObjectFactory<Taxonomy>
  */
-final class TaxonomyFactory extends PersistentProxyObjectFactory
+final class TaxonomyFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

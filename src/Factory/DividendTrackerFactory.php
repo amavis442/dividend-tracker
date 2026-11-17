@@ -3,12 +3,12 @@
 namespace App\Factory;
 
 use App\Entity\DividendTracker;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<DividendTracker>
+ * @extends PersistentObjectFactory<DividendTracker>
  */
-final class DividendTrackerFactory extends PersistentProxyObjectFactory
+final class DividendTrackerFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

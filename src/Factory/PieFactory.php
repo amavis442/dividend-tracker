@@ -3,12 +3,12 @@
 namespace App\Factory;
 
 use App\Entity\Pie;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<Pie>
+ * @extends PersistentObjectFactory<Pie>
  */
-final class PieFactory extends PersistentProxyObjectFactory
+final class PieFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

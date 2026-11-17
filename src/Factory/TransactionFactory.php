@@ -3,12 +3,12 @@
 namespace App\Factory;
 
 use App\Entity\Transaction;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<Transaction>
+ * @extends PersistentObjectFactory<Transaction>
  */
-final class TransactionFactory extends PersistentProxyObjectFactory
+final class TransactionFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

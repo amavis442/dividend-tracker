@@ -3,12 +3,12 @@
 namespace App\Factory;
 
 use App\Entity\DividendMonth;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentProxyObjectFactory<DividendMonth>
+ * @extends PersistentObjectFactory<DividendMonth>
  */
-final class DividendMonthFactory extends PersistentProxyObjectFactory
+final class DividendMonthFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
