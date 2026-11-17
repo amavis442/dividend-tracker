@@ -2,16 +2,17 @@
 
 namespace App\Service\ExchangeRate;
 
+use App\Contracts\Dividend\DividendTaxRateResolverInterface;
 use App\Contracts\ExchangeRate\ExchangeAndTaxResolverInterface;
 use App\Entity\Calendar;
 use App\Entity\Ticker;
-use App\Util\Constants;
 use App\Dto\ExchangeTaxDto;
 
 class ExchangeAndTaxResolver implements ExchangeAndTaxResolverInterface
 {
     public function __construct(
-        private DividendExchangeRateResolver $dividendExchangeRateResolver
+        private DividendExchangeRateResolver $dividendExchangeRateResolver,
+        private DividendTaxRateResolverInterface $dividendTaxRateResolver,
     ) {
     }
 
@@ -25,9 +26,7 @@ class ExchangeAndTaxResolver implements ExchangeAndTaxResolverInterface
      */
     public function resolve(Ticker $ticker, Calendar $calendar): ExchangeTaxDto
     {
-        $dividendTax = $ticker->getTax()
-            ? $ticker->getTax()->getTaxRate()
-            : Constants::DEFAULT_TAX_RATE;
+        $dividendTax = $this->dividendTaxRateResolver->getTaxRateForCalendar($calendar);
 
         $exchangeRate = $this->dividendExchangeRateResolver->getRateForCalendar(
             $calendar
