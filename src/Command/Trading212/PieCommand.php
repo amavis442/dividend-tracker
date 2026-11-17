@@ -15,7 +15,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[
 	AsCommand(
@@ -25,10 +24,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 ]
 class PieCommand extends Command
 {
-	protected PieService $pieService;
-
 	public function __construct(
-		protected HttpClientInterface $client,
+		private readonly PieService $pieService,
 		protected ApiKeyRepository $apiKeyRepository,
 		protected Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
 		protected PieRepository $pieRepository,
@@ -44,7 +41,6 @@ class PieCommand extends Command
 		 * $var \App\Entity\ApiKey
 		 */
 		$apiKey = $this->apiKeyRepository->findByApiKeyName('Trading212');
-		$this->pieService = new PieService($this->client);
 		$this->pieService->setApiKey($apiKey->getApiKey());
 	}
 

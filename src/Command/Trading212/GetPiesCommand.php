@@ -14,7 +14,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[
 	AsCommand(
@@ -25,7 +24,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class GetPiesCommand extends Command
 {
 	public function __construct(
-		protected HttpClientInterface $client,
+		private readonly PieService $pieService,
 		protected ApiKeyRepository $apiKeyRepository,
 		protected Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
 		protected PieRepository $pieRepository,
@@ -46,11 +45,10 @@ class GetPiesCommand extends Command
 		 * $var \App\Entity\ApiKey
 		 */
 		$apiKey = $this->apiKeyRepository->findByApiKeyName('Trading212');
-		$pieService = new PieService($this->client);
-		$pieService->setApiKey($apiKey->getApiKey());
+		$this->pieService->setApiKey($apiKey->getApiKey());
 
 		$io = new SymfonyStyle($input, $output);
-		$data = $pieService->getPies();
+		$data = $this->pieService->getPies();
 
 		foreach ($data as $metaData) {
 			$trading212PieMetaData = new Trading212PieMetaData();

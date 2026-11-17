@@ -16,7 +16,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[
 	AsCommand(
@@ -27,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class GetPieCommand extends Command
 {
 	public function __construct(
-		protected HttpClientInterface $client,
+		private readonly PieService $pieService,
 		protected ApiKeyRepository $apiKeyRepository,
 		protected Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
 		protected TickerAlternativeSymbolRepository $tickerAlternativeSymbolRepository,
@@ -53,14 +52,13 @@ class GetPieCommand extends Command
 		 * $var \App\Entity\ApiKey
 		 */
 		$apiKey = $this->apiKeyRepository->findByApiKeyName('Trading212');
-		$pieService = new PieService($this->client);
-		$pieService->setApiKey($apiKey->getApiKey());
+		$this->pieService->setApiKey($apiKey->getApiKey());
 
 		$io = new SymfonyStyle($input, $output);
 		$pieID = $input->getArgument('pie-id');
 
 		$io->note(sprintf('You passed an argument: %s', $pieID));
-		$data = $pieService->getPie($pieID);
+		$data = $this->pieService->getPie($pieID);
 		$settings = $data['settings'];
 		$trading212_pie_id = $settings['id'];
 		$trading212_pie_name = $settings['name'];
