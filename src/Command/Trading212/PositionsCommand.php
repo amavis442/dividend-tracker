@@ -21,7 +21,7 @@ use App\Repository\PositionRepository;
 use App\Repository\TaxRepository;
 use App\Repository\TickerRepository;
 use App\Repository\UserRepository;
-use App\Service\Trading212\PositionService;
+use App\Service\Trading212\PositionApiClient;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -41,7 +41,7 @@ class PositionsCommand extends Command
     public const ARGUMENT_USER_ID = 'user-id';
 
     public function __construct(
-        private readonly PositionService $positionService,
+        private readonly PositionApiClient $positionApiClient,
         private readonly ApiKeyRepository $apiKeyRepository,
         private readonly UserRepository $userRepository,
         private readonly InstrumentRepository $instrumentRepository,
@@ -103,8 +103,8 @@ class PositionsCommand extends Command
 
         $io->note('Fetching positions from Trading212...');
 
-        $this->positionService->setApiKey($apiKey->getApiKey());
-        $data = $this->positionService->getPositions();
+        $this->positionApiClient->setApiKey($apiKey->getApiKey());
+        $data = $this->positionApiClient->getPositions();
         if (empty($data)) {
             $io->warning('No positions returned from Trading212 API.');
 

@@ -6,7 +6,6 @@ use App\Contracts\Dividend\DividendServiceInterface;
 use App\Contracts\Dividend\DividendTaxRateResolverInterface;
 use App\Entity\CorporateAction;
 use App\Entity\Calendar;
-use App\Util\Constants;
 use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
@@ -134,9 +133,7 @@ class DividendService implements DividendServiceInterface
         $exchangeRate = 1;
         $ticker = $position->getTicker();
 
-        $dividendTax = $ticker->getTax()
-            ? $ticker->getTax()->getTaxRate()
-            : Constants::DEFAULT_TAX_RATE;
+        $dividendTax = $this->dividendTaxRateResolver->getTaxRateForCalendar($calendar);
         $exchangeRate = $this->dividendExchangeRateResolver->getRateForCalendar(
             $calendar
         );
@@ -256,9 +253,7 @@ class DividendService implements DividendServiceInterface
         Calendar $calendar
     ): ?float {
         $ticker = $position->getTicker();
-        $dividendTax = $ticker->getTax()
-            ? $ticker->getTax()->getTaxRate()
-            : Constants::DEFAULT_TAX_RATE;
+        $dividendTax = $this->dividendTaxRateResolver->getTaxRateForCalendar($calendar);
 
         $cashAmount = $calendar->getCashAmount();
         if (!isset($this->cachedDividendCalendars[$position->getId()])) {
@@ -374,9 +369,7 @@ class DividendService implements DividendServiceInterface
             $calendar = $this->getRegularCalendar($ticker);
             if ($calendar) {
                 $cashAmount = $this->resolveCashAmount($ticker);
-                $dividendTax = $ticker->getTax()
-                    ? $ticker->getTax()->getTaxRate()
-                    : Constants::DEFAULT_TAX_RATE;
+                $dividendTax = $this->dividendTaxRateResolver->getTaxRateForCalendar($calendar);
                 $exchangeRate = $this->dividendExchangeRateResolver->getRateForCalendar(
                     $calendar
                 );

@@ -4,9 +4,8 @@ namespace App\Form;
 
 use App\Entity\Research;
 use App\Form\AttachmentType;
-use App\Repository\TickerRepository;
+use App\Form\DataTransformer\TickerToIdTransformer;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -17,11 +16,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ResearchType extends AbstractType
 {
-    private TickerRepository $tickerRepository;
-
-    public function __construct(TickerRepository $tickerRepository)
+    public function __construct(private readonly TickerToIdTransformer $tickerToIdTransformer)
     {
-        $this->tickerRepository = $tickerRepository;
     }
 
     public function buildForm(
@@ -52,16 +48,7 @@ class ResearchType extends AbstractType
                 //'attr' => ['style' => 'display:none'],
             ]);
 
-        $builder->get('ticker')->addModelTransformer(
-            new CallbackTransformer(
-                function (int $tickerId): int {
-                    return $tickerId;
-                },
-                function (?int $tickerId = null) {
-                    return $this->tickerRepository->find($tickerId);
-                }
-            )
-        );
+        $builder->get('ticker')->addModelTransformer($this->tickerToIdTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

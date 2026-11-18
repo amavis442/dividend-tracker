@@ -2,7 +2,7 @@
 
 namespace App\Controller\Report;
 
-use App\Util\Constants;
+use App\Contracts\Dividend\DividendTaxRateResolverInterface;
 use App\Entity\Payment;
 use App\Entity\Calendar;
 use App\Entity\Transaction;
@@ -101,8 +101,10 @@ class ExportTransactionsController extends AbstractController
 
 
     #[Route(path: '/exportdividend', name: 'report_export_dividend')]
-    public function dividend(PaymentRepository $paymentRepository): Response
-    {
+    public function dividend(
+        PaymentRepository $paymentRepository,
+        DividendTaxRateResolverInterface $taxRateResolver,
+    ): Response {
         $fname = 'export-dividend-' . date('Ymd') . '.csv';
         $filename = '/tmp/' . $fname;
 
@@ -153,7 +155,7 @@ class ExportTransactionsController extends AbstractController
             $calendar = $payment->getCalendar();
             $grossValuePerShare = $calendar->getCashAmount();
             $totalGrossValue = $grossValuePerShare * $payment->getAmount();
-            $taxRate = ($ticker->getTax() != null ? $ticker->getTax()->getTaxRate() : Constants::DEFAULT_TAX_RATE);
+            $taxRate = $taxRateResolver->getTaxRateForCalendar($calendar);
             $taxPerShare = $grossValuePerShare * $taxRate;
             $tax = $taxPerShare * $payment->getAmount();
             $netPayment = $totalGrossValue - $tax;

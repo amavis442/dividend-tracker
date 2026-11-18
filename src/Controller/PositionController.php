@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use Symfony\Component\Form\FormInterface;
 use App\Entity\User;
-use App\Entity\Portfolio;
 use App\Entity\Position;
 use App\Form\Model\TickerAutocomplete;
 use App\Form\PositionType;
@@ -89,16 +88,9 @@ class PositionController extends AbstractController
 
         $referer->set('position_index', ['status' => $status]);
 
-        /**
-         * @var User $user
-         */
+        /** @var User $user */
         $user = $this->getUser();
-        $portfolio = $portfolioRepository->findOneBy([
-            'user' => $user->getId(),
-        ]);
-        if (!$portfolio) {
-            $portfolio = new Portfolio(); // do not want to throw an exception, but just use an empty entity
-        }
+        $portfolio = $portfolioRepository->findForUserOrEmpty($user);
 
         $queryBuilder = $positionRepository->getAllQuery(
             $orderBy,

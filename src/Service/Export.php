@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Util\Constants;
 use App\Entity\Pie;
 use App\Entity\Position;
 use App\Entity\Ticker;
@@ -16,6 +15,7 @@ use OpenSpout\Common\Entity\Style\Color;
 use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Writer\XLSX\Writer;
 use App\Contracts\Dividend\DividendServiceInterface;
+use App\Contracts\Dividend\DividendTaxRateResolverInterface;
 use App\Contracts\ExchangeRate\DividendExchangeRateResolverInterface;
 
 class Export
@@ -24,7 +24,8 @@ class Export
         protected PositionRepository $positionRepository,
         protected DividendServiceInterface $dividendService,
         protected DividendExchangeRateResolverInterface $dividendExchangeRateResolver,
-        protected PieRepository $pieRepository
+        protected PieRepository $pieRepository,
+        protected DividendTaxRateResolverInterface $dividendTaxRateResolver,
     ) {
     }
 
@@ -136,9 +137,7 @@ class Export
                 $cash = $calendar->getCashAmount();
                 $row['dividend'] = $cash;
                 $row['frequency'] = $ticker->getDividendFrequency();
-                $row['tax'] = $ticker->getTax()
-                    ? $ticker->getTax()->getTaxRate()
-                    : Constants::DEFAULT_TAX_RATE;
+                $row['tax'] = $this->dividendTaxRateResolver->getTaxRateForCalendar($calendar);
                 $row['exchangerate'] = $this->dividendExchangeRateResolver->getRateForCalendar(
                     $calendar
                 );

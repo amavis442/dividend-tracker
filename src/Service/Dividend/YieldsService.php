@@ -2,6 +2,7 @@
 
 namespace App\Service\Dividend;
 
+use App\Contracts\Dividend\DividendTaxRateResolverInterface;
 use App\Entity\Position;
 use App\Util\Constants;
 use App\Entity\Pie;
@@ -25,6 +26,7 @@ class YieldsService
         private TransactionRepository $transactionRepository,
         private DividendService $dividendService,
         private DividendExchangeRateResolverInterface $dividendExchangeRateResolver,
+        private DividendTaxRateResolverInterface $dividendTaxRateResolver,
         private TransactionDataProvider $transactionDataProvider,
         private CorporateActionDataProvider $corporateActionDataProvider,
         private DividendDataProvider $dividendDataProvider,
@@ -117,9 +119,10 @@ class YieldsService
             $netTotalPayoutPerPaydate = 0;
             $lastCash = 0;
             $lastCashCurrency = '$';
-            $taxRate = $ticker->getTax()
-                ? $ticker->getTax()->getTaxRate() * 100
-                : Constants::TAX;
+            // Tax rate in percent; currency rules (e.g. UK) need a calendar entry
+            $taxRate = $firstCalendarEntry
+                ? $this->dividendTaxRateResolver->getTaxRateForCalendar($firstCalendarEntry) * 100
+                : ($ticker->getTax() ? $ticker->getTax()->getTaxRate() * 100 : Constants::TAX);
             $exchangeRate = $firstCalendarEntry
                 ? $this->dividendExchangeRateResolver->getRateForCalendar($firstCalendarEntry)
                 : 0;
