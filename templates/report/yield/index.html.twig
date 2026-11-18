@@ -65,7 +65,7 @@
 							{% endif %}
 						</td>
 						<td>
-							{% if item.payout > 0 %}{{ item.lastDividendCurrency }}{{ (item.payout)|format_number({fraction_digit: 2}) }}{% else %}-
+							{% if item.payout > 0 %}{{ item.payoutCurrency }}{{ (item.payout)|format_number({fraction_digit: 2}) }}{% else %}-
 							{% endif %}
 						</td>
 						<td>

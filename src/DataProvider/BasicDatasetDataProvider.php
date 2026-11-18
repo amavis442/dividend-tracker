@@ -113,16 +113,22 @@ class BasicDatasetDataProvider
             types: $calendarTypes
         );
 
+        // The last payment can be older than the window used for expected dividends.
+        $paidCalendars = $dataType === self::YIELD_DATA_TYPE
+            ? $this->dividendDataProvider->load(
+                tickers: $tickers,
+                beforeDate: new \DateTime(),
+                types: $calendarTypes
+            )
+            : [];
+
         $exchangeRates = [];
         foreach ($tickers as $ticker) {
             $tickerId = $ticker->getId();
             $exchangeRates[$tickerId] = $this->dividendRate($ticker, $calendars[$tickerId] ?? []);
 
-            if (
-                isset($calendars[$tickerId]) &&
-                isset($corporateActions[$tickerId])
-            ) {
-                foreach ($calendars[$tickerId] as $calendar) {
+            if (isset($corporateActions[$tickerId])) {
+                foreach ([...($calendars[$tickerId] ?? []), ...($paidCalendars[$tickerId] ?? [])] as $calendar) {
                     $this->dividendAdjuster->getAdjustedDividend(
                         $calendar,
                         $corporateActions[$tickerId] ?? []
@@ -136,7 +142,8 @@ class BasicDatasetDataProvider
             $calendars,
             $transactions,
             $positions,
-            $exchangeRates
+            $exchangeRates,
+            $paidCalendars
         );
     }
 

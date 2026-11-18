@@ -17,6 +17,7 @@ final class BasicDataSetDto
      * @param array<int, array <int, Transaction>> $transactions
      * @param array<int, Position> $positions
      * @param array<int, float> $exchangeRates
+     * @param array<int, array <int, Calendar>> $paidCalendars full payment history, for the yield data
      *
      */
     public function __construct(
@@ -24,7 +25,8 @@ final class BasicDataSetDto
         public readonly array $calendars,
         public readonly array $transactions,
         public readonly array $positions,
-        public readonly array $exchangeRates
+        public readonly array $exchangeRates,
+        public readonly array $paidCalendars = []
     ) {
     }
 }

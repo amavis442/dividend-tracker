@@ -190,16 +190,17 @@
                                             <twig:ListGroup>
                                                 <twig:ListGroupItem>
                                                     {{ 'Last dividend'|trans }}:
-                                                    {% if item.calendar_used %}
-                                                        {{ item.calendar_used.currency.sign|raw }}{{ (item.calendar_used.adjustedCashAmount)|format_number({"fraction_digit": 2}) }}
+                                                    {% if item.last_paid_calendar %}
+                                                        {% set paidCurrency = item.last_paid_calendar.currency ?? item.ticker.currency %}
+                                                        {{ (paidCurrency ? (paidCurrency.sign ?: paidCurrency.symbol) : '$')|raw }}{{ (item.last_paid_calendar.adjustedCashAmount)|format_number({"fraction_digit": 2}) }}
                                                     {% else %}
                                                         -
                                                     {% endif %}
                                                 </twig:ListGroupItem>
                                                 <twig:ListGroupItem>
                                                     {{ 'Last payout date'|trans }}:
-                                                    {% if item.calendar_used is not null %}
-                                                        {{ item.calendar_used.paymentDate|date("d-m-Y") }}
+                                                    {% if item.last_paid_calendar is not null %}
+                                                        {{ item.last_paid_calendar.paymentDate|date("d-m-Y") }}
                                                     {% else %}
                                                         -
                                                     {% endif %}
