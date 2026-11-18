@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\CorporateActionRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -24,6 +25,7 @@ class CorporateAction
     private ?\DateTime $eventDate = null;
 
     #[ORM\Column]
+    #[Assert\Positive]
     private ?float $ratio = null;
 
     #[ORM\Column]

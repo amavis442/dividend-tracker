@@ -101,8 +101,7 @@ class YieldsService
             $adjustedAveragePrice = $positionDecorator->getAdjustedAveragePrice();
 
             $position->setAdjustedAmount($adjustedAmount);
-            // Positions synchronised from the broker have no transactions to derive an amount from.
-            $currentAmount = (float) (isset($transactions[$position->getId()]) ? $adjustedAmount : $amount);
+            $currentAmount = $adjustedAmount;
             $position->setAdjustedAveragePrice($adjustedAveragePrice);
 
             $allocation =

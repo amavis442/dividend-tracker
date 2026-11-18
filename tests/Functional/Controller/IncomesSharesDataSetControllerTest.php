@@ -101,6 +101,35 @@ final class IncomesSharesDataSetControllerTest extends WebTestCase
         self::assertAnySelectorTextContains(self::RESULT_CELL, 'Test Income');
     }
 
+    public function testTheFormIsSubmittedWithoutTurbo(): void
+    {
+        $this->client->request('GET', self::BASE . '/create');
+
+        self::assertSelectorExists('form[data-turbo="false"]');
+    }
+
+    public function testChangedPositionsStoreNothingAndExplainWhy(): void
+    {
+        $held = $this->positionFor('Still Held', 'IE00TEST0002', closed: false);
+        self::assertFalse($held->getClosed());
+
+        $crawler = $this->client->request('GET', self::BASE . '/create');
+        $form = $crawler->filter('button[name$="[save]"]')->form();
+        $priceField = sprintf('incomes_shares_data_set[shares][%d][price]', $held->getTicker()->getId());
+        $form[$priceField] = '12,5';
+
+        $this->position->setClosed(true);
+        $manager = static::getContainer()->get(EntityManagerInterface::class);
+        $manager->flush();
+
+        $crawler = $this->client->submit($form);
+
+        self::assertResponseStatusCodeSame(422);
+        self::assertSame(0, $manager->getRepository(IncomesSharesDataSet::class)->count([]));
+        self::assertAnySelectorTextContains('body', 'open posities zijn gewijzigd');
+        self::assertSame('12,5', $crawler->filter(sprintf('input[name="%s"]', $priceField))->attr('value'));
+    }
+
     public function testANewDataSetSkipsTickersWithoutAnOpenPosition(): void
     {
         $this->positionFor('Sold Income', self::CLOSED_ISIN, closed: true);

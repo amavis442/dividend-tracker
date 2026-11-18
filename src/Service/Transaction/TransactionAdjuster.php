@@ -2,6 +2,7 @@
 
 namespace App\Service\Transaction;
 
+use App\Helper\CorporateActionRatio;
 use App\Contracts\Transaction\TransactionAdjusterInterface;
 use App\Entity\Transaction;
 use App\Entity\CorporateAction;
@@ -21,8 +22,8 @@ class TransactionAdjuster implements TransactionAdjusterInterface
         $txDate = $transaction->getTransactionDate();
 
         foreach ($actions as $action) {
-            if ($txDate < $action->getEventDate()) {
-                $amount *= $action->getRatio(); // Applies reverse split
+            if (CorporateActionRatio::appliesTo($action, $txDate)) {
+                $amount *= CorporateActionRatio::of($action); // Applies reverse split
             }
         }
 

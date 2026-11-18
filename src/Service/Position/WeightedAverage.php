@@ -120,11 +120,15 @@ class WeightedAverage
 
         $averagePrice = $adjustedShares > 0 ? round($totalCost / $adjustedShares, 4) : 0;
 
-        $position
-            ->setAllocation(round($costBase, 3))
-            ->setAmount((float) $numShares)
-            ->setPrice($aPrice)
-            ->setProfit(round($totalProfit, 3));
+        // The broker's values lead for a synchronised position.
+        if ($position->getInstrument() === null) {
+            $position
+                ->setAllocation(round($costBase, 3))
+                ->setAmount((float) $numShares)
+                ->setPrice($aPrice);
+        }
+
+        $position->setProfit(round($totalProfit, 3));
 
         return count($transactions);
     }

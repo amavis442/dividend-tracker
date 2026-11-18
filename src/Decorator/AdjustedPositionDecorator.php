@@ -3,6 +3,7 @@
 namespace App\Decorator;
 
 use App\Contracts\Decorator\AdjustedDecoratorInterface;
+use App\Helper\CorporateActionRatio;
 use App\Contracts\Decorator\AdjustedPositionDecoratorInterface;
 use App\Entity\CorporateAction;
 use App\Entity\Position;
@@ -57,8 +58,10 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface, AdjustedP
     }
 
     /**
-     * Calculates the adjusted number of shares held for a given position,
-     * taking into account reverse split corporate actions.
+     * Calculates the number of shares currently held. A position synchronised
+     * from the broker uses the broker's amount; other positions use their
+     * transactions, adjusted for reverse split corporate actions, and fall back
+     * to the stored amount when they have no transactions.
      *
      * This method retrieves all transactions associated with the current position
      * and applies reverse split adjustments using the TransactionAdjuster service.
@@ -70,6 +73,10 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface, AdjustedP
     public function getAdjustedAmount(): float
     {
         $transactions = $this->getTransactions();
+        if ($this->position->getInstrument() !== null || $transactions === []) {
+            return (float) $this->position->getAmount();
+        }
+
         $actions = $this->getActions();
 
         $total = 0.0;
@@ -100,6 +107,11 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface, AdjustedP
     public function getAdjustedAmountPerDate(\DateTimeInterface $datetime): float
     {
         $transactions = $this->getTransactions();
+        if ($transactions === []) {
+            // Without transactions the amount is only known from the moment the position exists.
+            return $datetime >= $this->position->getCreatedAt() ? (float) $this->position->getAmount() : 0.0;
+        }
+
         $actions = $this->getActions();
 
         $total = 0.0;
@@ -139,6 +151,10 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface, AdjustedP
     public function getAdjustedAveragePrice(): float
     {
         $transactions = $this->getTransactions();
+        if ($transactions === []) {
+            return round((float) $this->position->getPrice(), 4);
+        }
+
         $actions = $this->getActions();
 
         $totalShares = 0.0;
@@ -150,9 +166,10 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface, AdjustedP
             $txDate = $tx->getTransactionDate();
 
             foreach ($actions as $action) {
-                if ($txDate < $action->getEventDate()) {
-                    $amount *= $action->getRatio();
-                    $price /= $action->getRatio();
+                if (CorporateActionRatio::appliesTo($action, $txDate)) {
+                    $ratio = CorporateActionRatio::of($action);
+                    $amount *= $ratio;
+                    $price /= $ratio;
                 }
             }
 
@@ -189,9 +206,10 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface, AdjustedP
             $txDate = $tx->getTransactionDate();
 
             foreach ($actions as $action) {
-                if ($txDate < $action->getEventDate()) {
-                    $amount *= $action->getRatio();
-                    $price /= $action->getRatio();
+                if (CorporateActionRatio::appliesTo($action, $txDate)) {
+                    $ratio = CorporateActionRatio::of($action);
+                    $amount *= $ratio;
+                    $price /= $ratio;
                 }
             }
 
@@ -215,7 +233,7 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface, AdjustedP
             ['position' => $this->position->getId(), 'type' => [CorporateAction::REVERSE_SPLIT, CorporateAction::SPLIT]],
             ['eventDate' => 'ASC']
         ); */
-        $actions = $this->actions;
+        $actions = array_filter($this->actions, CorporateActionRatio::hasTakenPlace(...));
 
         if (empty($actions)) {
             return null;

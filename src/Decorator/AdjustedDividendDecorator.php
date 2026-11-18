@@ -5,6 +5,7 @@ namespace App\Decorator;
 use App\Contracts\Decorator\AdjustedDecoratorInterface;
 use App\Contracts\Decorator\AdjustedDividendDecoratorInterface;
 use App\Entity\Ticker;
+use App\Helper\CorporateActionRatio;
 use App\Service\Dividend\DividendAdjuster;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -62,7 +63,7 @@ class AdjustedDividendDecorator implements AdjustedDecoratorInterface, AdjustedD
 
     public function getAdjustmentNote(): ?string
     {
-        $actions = $this->actions;
+        $actions = array_filter($this->actions, CorporateActionRatio::hasTakenPlace(...));
 
         if (empty($actions)) {
             return null;
