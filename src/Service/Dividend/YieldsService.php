@@ -19,6 +19,9 @@ use App\Contracts\ExchangeRate\DividendExchangeRateResolverInterface;
 
 class YieldsService
 {
+    private const SORT_FIELDS = ['symbol', 'dividend', 'yield'];
+    private const DEFAULT_SORT = 'symbol';
+
     public function __construct(
         //private CacheInterface $pool,
         private Stopwatch $stopwatch,
@@ -246,18 +249,21 @@ class YieldsService
         ksort($yieldData->labels);
         ksort($yieldData->data);
 
-        match (strtolower($sortDirection)) {
-            'desc' => krsort($yieldData->dataSource[$sort]),
-            'asc' => ksort($yieldData->dataSource[$sort]),
-            default => ksort($yieldData->dataSource[$sort]),
-        };
+        $sort = in_array($sort, self::SORT_FIELDS, true) ? $sort : self::DEFAULT_SORT;
+        $dataSource = $yieldData->dataSource[$sort] ?? [];
+
+        if (strtolower($sortDirection) === 'desc') {
+            krsort($dataSource);
+        } else {
+            ksort($dataSource);
+        }
 
         //$this->pool->delete($poolKey);
 
         return [
             'data' => array_values($yieldData->data),
             'labels' => array_values($yieldData->labels),
-            'datasource' => $yieldData->dataSource[$sort],
+            'datasource' => $dataSource,
             'totalAvgYield' => $totalAvgYield,
             'dividendYieldOnCost' => $dividendYieldOnCost,
             'allocated' => $allocated,
