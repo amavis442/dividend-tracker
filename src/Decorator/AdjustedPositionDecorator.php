@@ -108,7 +108,8 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface, AdjustedP
     {
         $transactions = $this->getTransactions();
         if ($transactions === []) {
-            return (float) $this->position->getAmount();
+            // Without transactions the amount is only known from the moment the position exists.
+            return $datetime >= $this->position->getCreatedAt() ? (float) $this->position->getAmount() : 0.0;
         }
 
         $actions = $this->getActions();
@@ -150,6 +151,10 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface, AdjustedP
     public function getAdjustedAveragePrice(): float
     {
         $transactions = $this->getTransactions();
+        if ($transactions === []) {
+            return round((float) $this->position->getPrice(), 4);
+        }
+
         $actions = $this->getActions();
 
         $totalShares = 0.0;

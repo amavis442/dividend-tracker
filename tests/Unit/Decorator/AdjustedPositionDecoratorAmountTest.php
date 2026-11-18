@@ -50,12 +50,21 @@ final class AdjustedPositionDecoratorAmountTest extends TestCase
 
     public function testThePositionAmountIsUsedPerDateWithoutTransactions(): void
     {
-        $position = $this->createConfiguredStub(Position::class, ['getAmount' => 25.0]);
+        $position = $this->createConfiguredStub(Position::class, [
+            'getAmount' => 25.0,
+            'getCreatedAt' => new \DateTimeImmutable('2026-03-01'),
+        ]);
+        $decorator = $this->decorator($position, []);
 
-        self::assertSame(
-            25.0,
-            $this->decorator($position, [])->getAdjustedAmountPerDate(new \DateTime('2026-05-01'))
-        );
+        self::assertSame(25.0, $decorator->getAdjustedAmountPerDate(new \DateTime('2026-05-01')));
+        self::assertSame(0.0, $decorator->getAdjustedAmountPerDate(new \DateTime('2026-01-01')));
+    }
+
+    public function testThePositionPriceIsUsedWithoutTransactions(): void
+    {
+        $position = $this->createConfiguredStub(Position::class, ['getPrice' => 40.0]);
+
+        self::assertSame(40.0, $this->decorator($position, [])->getAdjustedAveragePrice());
     }
 
     public function testAFutureSplitIsNotMentionedInTheNote(): void

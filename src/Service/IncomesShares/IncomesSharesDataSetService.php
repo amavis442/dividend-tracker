@@ -319,13 +319,10 @@ final class IncomesSharesDataSetService
             $tickers[$ticker->getId()] = $ticker;
         }
 
-        $now = new \DateTimeImmutable();
-
         return array_map(
-            static fn(array $actions): array => array_values(array_filter(
-                $actions,
-                static fn(CorporateAction $action): bool => $action->getEventDate() <= $now
-            )),
+            static fn(array $actions): array => array_values(
+                array_filter($actions, CorporateActionRatio::hasTakenPlace(...))
+            ),
             $this->corporateActionDataProvider->load(array_values($tickers))
         );
     }
