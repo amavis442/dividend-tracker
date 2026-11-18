@@ -36,6 +36,7 @@ class YieldsService
         private CorporateActionDataProvider $corporateActionDataProvider,
         private DividendDataProvider $dividendDataProvider,
         private AdjustedPositionDecoratorFactory $adjustedPositionDecoratorFactory,
+        private DividendAdjuster $dividendAdjuster,
     ) {
     }
     public function yield(
@@ -140,12 +141,14 @@ class YieldsService
                 : 0;
 
             if ($latestCalendar) {
-                // Also adjusts the cash amounts of the loaded calendars.
                 $latestCash = $dividendService->getCashAmount($ticker);
                 $payoutCurrency = $this->currencySign($latestCalendar, $ticker);
 
                 if ($lastPaidCalendar !== null) {
-                    $lastPaidCash = $lastPaidCalendar->getAdjustedCashAmount();
+                    $lastPaidCash = $this->dividendAdjuster->getAdjustedDividend(
+                        $lastPaidCalendar,
+                        $actions[$ticker->getId()] ?? []
+                    );
                     $lastPaidCurrency = $this->currencySign($lastPaidCalendar, $ticker);
                     $lastPaidDate = $lastPaidCalendar->getPaymentDate();
                 }

@@ -38,7 +38,8 @@ class YieldByPieController extends AbstractController
             tickers: $tickers,
             calendars: $calendars,
             positions: $positions,
-            exchangeRates: $exchangeRates
+            exchangeRates: $exchangeRates,
+            paidCalendars: $dataSet->paidCalendars
         );
 
         $dataCalc = $dividendYieldCalculator->process();

@@ -258,6 +258,37 @@ final class YieldControllerTest extends WebTestCase
         self::assertStringNotContainsString($declared->format('d-m-Y'), $content);
     }
 
+    public function testThePieReportFindsAnOlderPayment(): void
+    {
+        $paid = new \DateTimeImmutable('-6 months');
+        $ticker = $this->createPosition('KEEP', withCalendar: false, forPieReport: true);
+        $this->createCalendar($ticker, 0.5, $paid->format('Y-m-d'));
+        $this->createCalendar($ticker, 0.8, (new \DateTimeImmutable('+1 month'))->format('Y-m-d'));
+
+        $this->client->request('GET', self::PIE_PATH);
+
+        self::assertResponseIsSuccessful();
+        self::assertStringContainsString(
+            $paid->format('d-m-Y'),
+            (string) $this->client->getResponse()->getContent()
+        );
+    }
+
+    public function testThePieReportHandlesAPaymentWithoutCurrency(): void
+    {
+        $ticker = $this->createPosition('KEEP', withCalendar: false, forPieReport: true);
+        $this->createCalendar(
+            $ticker,
+            0.5,
+            (new \DateTimeImmutable('-1 month'))->format('Y-m-d'),
+            withCurrency: false
+        );
+
+        $this->client->request('GET', self::PIE_PATH);
+
+        self::assertResponseIsSuccessful();
+    }
+
     public function testThePieReportSkipsIgnoredPositions(): void
     {
         $this->createPosition('KEEP', forPieReport: true);

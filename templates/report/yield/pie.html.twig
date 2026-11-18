@@ -148,7 +148,7 @@
                                     </twig:Table:Td>
                                     <twig:Table:Td>
                                         {% if item.payout > 0 %}
-                                            {{ item.lastDividendCurrency|raw }}{{ (item.payout)|format_number({"fraction_digit": 2}) }}
+                                            {{ item.payoutCurrency }}{{ (item.payout)|format_number({"fraction_digit": 2}) }}
                                         {% else %}
                                             -
                                         {% endif %}

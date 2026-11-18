@@ -28,16 +28,26 @@ class DividendYieldCalculator
      */
     private array $exchangeRates;
 
+    /**
+     * @var array<int,array<int, Calendar>>
+     */
+    private array $paidCalendars = [];
+
+    /**
+     * @param array<int, array<int, Calendar>> $paidCalendars payment history; defaults to $calendars
+     */
     public function load(
         array $tickers,
         array $calendars,
         array $positions,
-        array $exchangeRates
+        array $exchangeRates,
+        array $paidCalendars = []
     ): void {
         $this->tickers = $tickers;
         $this->calendars = $calendars;
         $this->positions = $positions;
         $this->exchangeRates = $exchangeRates;
+        $this->paidCalendars = $paidCalendars;
     }
 
     /**
@@ -46,7 +56,6 @@ class DividendYieldCalculator
      * @return array<int|string, array{
      *     position: Position,
      *     ticker: Ticker,
-     *     calendar_used: Calendar|null,
      *     last_paid_calendar: Calendar|null,
      *     total_shares: float,
      *     exchange_rate: float,
@@ -138,8 +147,9 @@ class DividendYieldCalculator
             $data[$ticker->getId()] = [
                 'position' => $position,
                 'ticker' => $ticker,
-                'calendar_used' => $calendar, // Use the lastest
-                'last_paid_calendar' => DividendCalendars::lastPaid($this->calendars[$tickerId] ?? []),
+                'last_paid_calendar' => DividendCalendars::lastPaid(
+                    $this->paidCalendars[$tickerId] ?? $this->calendars[$tickerId] ?? []
+                ),
                 'total_shares' => $position->getAdjustedAmount(),
                 'exchange_rate' => $exchangeRate,
                 'tax_rate' => $ticker->getTax()->getTaxRate(),
