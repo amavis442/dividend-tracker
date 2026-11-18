@@ -20,6 +20,7 @@ use App\Service\Dividend\DividendAdjuster;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Contracts\HttpClient\Exception\ExceptionInterface as HttpClientException;
 
 /**
  * Calculates IncomesShares datasets (returns per share and totals) and stores them.
@@ -38,6 +39,8 @@ use Symfony\Component\Uid\Uuid;
  */
 final class IncomesSharesDataSetService
 {
+    private bool $rateProviderUnavailable = false;
+
     public function __construct(
         private readonly PositionRepository $positionRepository,
         private readonly PaymentRepository $paymentRepository,
@@ -62,8 +65,13 @@ final class IncomesSharesDataSetService
     {
         $tickers = $this->tickerRepository->findBy(['isin' => $isins], ['fullname' => 'ASC']);
 
+        $heldTickerIds = [];
+        foreach ($this->positionRepository->findBy(['ticker' => $tickers, 'closed' => false]) as $position) {
+            $heldTickerIds[$position->getTicker()->getId()] = true;
+        }
+
         foreach ($tickers as $ticker) {
-            if ($this->positionRepository->findOneBy(['ticker' => $ticker->getId(), 'closed' => false]) === null) {
+            if (!isset($heldTickerIds[$ticker->getId()])) {
                 continue;
             }
 
@@ -71,7 +79,8 @@ final class IncomesSharesDataSetService
             $share->setTicker($ticker);
             $share->setPrice(0);
             $share->setProfitLoss(0);
-            $dataSet->getShares()->add($share);
+            // Keyed by ticker, so submitted values stay with their ticker if the list changes.
+            $dataSet->getShares()->set($ticker->getId(), $share);
         }
     }
 
@@ -150,7 +159,8 @@ final class IncomesSharesDataSetService
                 $share->getPrice(),
                 $share->getDistributions(),
                 $share->getProfitLoss(),
-                $actions
+                $actions,
+                $share->getCreatedAt()
             );
 
             if ($persist) {
@@ -191,7 +201,14 @@ final class IncomesSharesDataSetService
                 $share->getPrice(),
                 $share->getDistributions(),
                 $share->getProfitLoss()
-            ) + ['expectedDistribution' => $this->expectedDistribution($ticker, $amount, $actions)];
+            ) + [
+                'expectedDistribution' => $this->expectedDistribution(
+                    $ticker,
+                    $amount,
+                    $actions,
+                    $share->getCreatedAt()
+                ),
+            ];
         }
 
         return ['rows' => $rows, 'totalExpectedDistribution' => $this->totalExpectedDistribution($rows)];
@@ -262,17 +279,27 @@ final class IncomesSharesDataSetService
     /**
      * @param IncomesSharesData[] $shares
      *
-     * @return array<int, array<int, CorporateAction>> keyed by ticker id
+     * @return array<int, array<int, CorporateAction>> actions that took place, keyed by ticker id
      */
     private function corporateActionsFor(array $shares): array
     {
+        $this->rateProviderUnavailable = false;
+
         $tickers = [];
         foreach ($shares as $share) {
             $ticker = $share->getTicker();
             $tickers[$ticker->getId()] = $ticker;
         }
 
-        return $this->corporateActionDataProvider->load(array_values($tickers));
+        $now = new \DateTimeImmutable();
+
+        return array_map(
+            static fn(array $actions): array => array_values(array_filter(
+                $actions,
+                static fn(CorporateAction $action): bool => $action->getEventDate() <= $now
+            )),
+            $this->corporateActionDataProvider->load(array_values($tickers))
+        );
     }
 
     /**
@@ -289,23 +316,34 @@ final class IncomesSharesDataSetService
 
     /**
      * Net latest regular dividend for the shares in euro: 0 without a regular
-     * dividend, null when the exchange or tax rate cannot be determined.
+     * dividend, null when it cannot be determined. A stored amount is brought
+     * in line with the dividend by applying the actions since $amountDate.
      *
      * @param array<int, array<int, CorporateAction>> $actions keyed by ticker id
      */
-    private function expectedDistribution(Ticker $ticker, ?float $amount, array $actions): ?float
-    {
+    private function expectedDistribution(
+        Ticker $ticker,
+        ?float $amount,
+        array $actions,
+        ?\DateTimeImmutable $amountDate = null
+    ): ?float {
         $calendar = $this->dividendService->getRegularCalendar($ticker);
         if ($calendar === null) {
             return 0.0;
         }
 
-        $cashAmount = $this->dividendAdjuster->getAdjustedDividend($calendar, $actions[$ticker->getId()] ?? []);
+        if ($this->rateProviderUnavailable) {
+            return null;
+        }
+
+        $tickerActions = $actions[$ticker->getId()] ?? [];
 
         try {
+            $cashAmount = $this->dividendAdjuster->getAdjustedDividend($calendar, $tickerActions);
             $exchangeRate = $this->exchangeRateResolver->getRateForCalendar($calendar);
             $taxRate = $this->taxRateResolver->getTaxRateForCalendar($calendar);
         } catch (\Throwable $exception) {
+            $this->rateProviderUnavailable = $exception instanceof HttpClientException;
             $this->logger->warning('Expected distribution unavailable for {ticker}: {message}', [
                 'ticker' => $ticker->getSymbol(),
                 'message' => $exception->getMessage(),
@@ -314,7 +352,28 @@ final class IncomesSharesDataSetService
             return null;
         }
 
-        return $cashAmount * $amount * $exchangeRate * (1 - $taxRate);
+        return $cashAmount
+            * $this->amountAfterActions($amount, $tickerActions, $amountDate)
+            * $exchangeRate
+            * (1 - $taxRate);
+    }
+
+    /**
+     * @param CorporateAction[] $actions
+     */
+    private function amountAfterActions(?float $amount, array $actions, ?\DateTimeImmutable $amountDate): ?float
+    {
+        if ($amountDate === null) {
+            return $amount;
+        }
+
+        foreach ($actions as $action) {
+            if ($action->getEventDate() > $amountDate) {
+                $amount *= $action->getRatio();
+            }
+        }
+
+        return $amount;
     }
 
     /**
@@ -348,6 +407,7 @@ final class IncomesSharesDataSetService
     /**
      * @param array<int, array<int, CorporateAction>>|null $actions null when the
      *        expected distribution is not needed
+     * @param \DateTimeImmutable|null $amountDate when a stored amount was recorded
      */
     private function addToResult(
         array &$result,
@@ -358,10 +418,11 @@ final class IncomesSharesDataSetService
         ?float $distributions,
         ?float $profitLoss,
         ?array $actions,
+        ?\DateTimeImmutable $amountDate = null,
     ): void {
         $row = $this->row($ticker, $allocation, $amount, $price, $distributions, $profitLoss);
         if ($actions !== null) {
-            $row['expectedDistribution'] = $this->expectedDistribution($ticker, $amount, $actions);
+            $row['expectedDistribution'] = $this->expectedDistribution($ticker, $amount, $actions, $amountDate);
         }
 
         $result['rows'][$ticker->getIsin()] = $row;

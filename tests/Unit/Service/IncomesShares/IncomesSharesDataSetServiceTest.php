@@ -23,6 +23,7 @@ use App\Service\IncomesShares\IncomesSharesDataSetService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\Uid\Uuid;
 
 final class IncomesSharesDataSetServiceTest extends TestCase
@@ -52,18 +53,66 @@ final class IncomesSharesDataSetServiceTest extends TestCase
 
     public function testTheCashAmountIsAdjustedForCorporateActions(): void
     {
-        $action = $this->createConfiguredStub(CorporateAction::class, [
-            'getEventDate' => new \DateTime('+1 day'),
-            'getRatio' => 2.0,
-        ]);
-
-        $result = $this->service(actions: [self::TICKER_ID => [$action]])->recalculate($this->dataSet(), false);
+        $result = $this->service(actions: [self::TICKER_ID => [$this->split('-1 day')]])
+            ->recalculate($this->dataSet(), false);
 
         self::assertEqualsWithDelta(
             self::NET_EXPECTED / 2,
             $result['rows'][self::ISIN]['expectedDistribution'],
             0.0001
         );
+    }
+
+    public function testAFutureCorporateActionIsIgnored(): void
+    {
+        $result = $this->service(actions: [self::TICKER_ID => [$this->split('+1 day')]])
+            ->recalculate($this->dataSet(), false);
+
+        self::assertEqualsWithDelta(
+            self::NET_EXPECTED,
+            $result['rows'][self::ISIN]['expectedDistribution'],
+            0.0001
+        );
+    }
+
+    public function testAStoredAmountFollowsALaterCorporateAction(): void
+    {
+        $share = $this->share();
+        $share->setCreatedAt(new \DateTimeImmutable('-3 days'));
+        $dataSet = new IncomesSharesDataSet();
+        $dataSet->getShares()->add($share);
+
+        $result = $this->service(actions: [self::TICKER_ID => [$this->split('-1 day')]])
+            ->recalculate($dataSet, false);
+
+        self::assertEqualsWithDelta(
+            self::NET_EXPECTED,
+            $result['rows'][self::ISIN]['expectedDistribution'],
+            0.0001
+        );
+        self::assertSame(self::SHARES, $result['rows'][self::ISIN]['amount']);
+    }
+
+    public function testAnInvalidCorporateActionLeavesTheExpectedDistributionUnknown(): void
+    {
+        $result = $this->service(actions: [self::TICKER_ID => [$this->split('-1 day', 0.0)]])
+            ->recalculate($this->dataSet(), false);
+
+        self::assertNull($result['rows'][self::ISIN]['expectedDistribution']);
+    }
+
+    public function testAnUnreachableRateProviderIsTriedOnce(): void
+    {
+        $rates = $this->createMock(DividendExchangeRateResolverInterface::class);
+        $rates->expects(self::once())->method('getRateForCalendar')
+            ->willThrowException(new TransportException('Timeout'));
+        $dataSet = new IncomesSharesDataSet();
+        $dataSet->getShares()->add($this->share());
+        $dataSet->getShares()->add($this->share(ticker: $this->ticker(10, 'IE00TEST0002')));
+
+        $result = $this->service(rates: $rates)->recalculate($dataSet, false);
+
+        self::assertNull($result['totalExpectedDistribution']);
     }
 
     public function testATickerWithoutRegularDividendExpectsNothing(): void
@@ -175,15 +224,17 @@ final class IncomesSharesDataSetServiceTest extends TestCase
         $position = $this->createConfiguredStub(Position::class, [
             'getAllocation' => 100.0,
             'getAmount' => self::SHARES,
+            'getTicker' => $this->ticker(),
         ]);
         $calendar = $this->createConfiguredStub(Calendar::class, [
             'getCashAmount' => self::CASH_AMOUNT,
-            'getCreatedAt' => new \DateTimeImmutable('-1 day'),
+            'getCreatedAt' => new \DateTimeImmutable('-2 days'),
         ]);
 
         return new IncomesSharesDataSetService(
             $this->createConfiguredStub(PositionRepository::class, [
                 'findOneBy' => $hasOpenPosition ? $position : null,
+                'findBy' => $hasOpenPosition ? [$position] : [],
             ]),
             $this->createConfiguredStub(PaymentRepository::class, ['getSumDividendsByPosition' => 3.0]),
             $tickers ?? $this->createStub(TickerRepository::class),
@@ -204,11 +255,19 @@ final class IncomesSharesDataSetServiceTest extends TestCase
         );
     }
 
-    private function ticker(): Ticker
+    private function split(string $eventDate, float $ratio = 2.0): CorporateAction
+    {
+        return $this->createConfiguredStub(CorporateAction::class, [
+            'getEventDate' => new \DateTime($eventDate),
+            'getRatio' => $ratio,
+        ]);
+    }
+
+    private function ticker(int $id = self::TICKER_ID, string $isin = self::ISIN): Ticker
     {
         return $this->createConfiguredStub(Ticker::class, [
-            'getId' => self::TICKER_ID,
-            'getIsin' => self::ISIN,
+            'getId' => $id,
+            'getIsin' => $isin,
             'getFullname' => 'Test Income',
         ]);
     }
@@ -221,10 +280,10 @@ final class IncomesSharesDataSetServiceTest extends TestCase
         return $dataSet;
     }
 
-    private function share(float $allocation = 100.0): IncomesSharesData
+    private function share(float $allocation = 100.0, ?Ticker $ticker = null): IncomesSharesData
     {
         $share = new IncomesSharesData();
-        $share->setTicker($this->ticker());
+        $share->setTicker($ticker ?? $this->ticker());
         $share->setPrice(11.0);
         $share->setProfitLoss(10.0);
         $share->setAllocation($allocation);
