@@ -74,6 +74,7 @@ class YieldsService
 
         $totalDividend = 0.0;
         $totalNetYearlyDividend = 0.0;
+        $netYearlyDividendOnAllocation = 0.0;
         $totalNetYearlyDividendPerStock = 0.0;
         $totalNetMonthlyDividend = 0.0;
         $dividendYieldOnCost = 0.0;
@@ -225,6 +226,9 @@ class YieldsService
                 'exchangeRate' => $exchangeRate,
             ];
             $totalNetYearlyDividend += $netTotalForwardYearlyPayout;
+            if ($allocation > 0) {
+                $netYearlyDividendOnAllocation += $netTotalForwardYearlyPayout;
+            }
             $positionYield->sumAvgPrice += $avgPrice;
             $positionYield->sumDividends += $dividendPerYear;
             $totalDividend += $dividendPerYear * $amount;
@@ -239,7 +243,7 @@ class YieldsService
                 100;
         }
         if ($allocated) {
-            $dividendYieldOnCost = ($totalNetYearlyDividend / $allocated) * 100;
+            $dividendYieldOnCost = ($netYearlyDividendOnAllocation / $allocated) * 100;
         }
         $yieldData = $positionYield;
 
@@ -249,6 +253,7 @@ class YieldsService
         ksort($yieldData->labels);
         ksort($yieldData->data);
 
+        $sort = strtolower($sort);
         $sort = in_array($sort, self::SORT_FIELDS, true) ? $sort : self::DEFAULT_SORT;
         $dataSource = $yieldData->dataSource[$sort] ?? [];
 
