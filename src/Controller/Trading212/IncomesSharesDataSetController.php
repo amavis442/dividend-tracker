@@ -36,6 +36,7 @@ final class IncomesSharesDataSetController extends AbstractController
         'totalAllocation' => 0.0,
         'totalDistribution' => 0.0,
         'totalProfitLoss' => 0.0,
+        'totalExpectedDistribution' => 0.0,
         'yield' => 0.0,
     ];
 
@@ -283,6 +284,7 @@ final class IncomesSharesDataSetController extends AbstractController
             'totalProfitLoss' => $result['totalProfitLoss'],
             'totalDistribution' => $result['totalDistribution'],
             'totalAllocation' => $result['totalAllocation'],
+            'totalExpectedDistribution' => $result['totalExpectedDistribution'],
             'yield' => $result['yield'],
         ];
     }

@@ -26,6 +26,7 @@ use Symfony\Component\Uid\Uuid;
  *     totalAllocation: float,
  *     totalDistribution: float,
  *     totalProfitLoss: float,
+ *     totalExpectedDistribution: float,
  *     yield: float
  * }
  */
@@ -61,7 +62,8 @@ final class IncomesSharesDataSetService
 
     /**
      * Calculates a new dataset from the entered prices/profit-loss and the
-     * current open positions; with $persist the shares and dataset are stored.
+     * current open positions. With $persist the shares and dataset are stored;
+     * without it the result also holds the expected distributions for display.
      *
      * @return CalculationResult
      */
@@ -70,6 +72,7 @@ final class IncomesSharesDataSetService
         $uuid = Uuid::v7();
         $dataSet->setUuid($uuid);
 
+        $usdToEuro = $persist ? null : $this->usdToEuro();
         $result = $this->emptyResult();
         foreach ($dataSet->getShares() as $share) {
             $ticker = $share->getTicker();
@@ -88,7 +91,8 @@ final class IncomesSharesDataSetService
                 $amount,
                 $share->getPrice(),
                 $distributions,
-                $share->getProfitLoss()
+                $share->getProfitLoss(),
+                $usdToEuro
             );
 
             if ($persist) {
@@ -112,13 +116,15 @@ final class IncomesSharesDataSetService
     }
 
     /**
-     * Recalculates an existing dataset from its stored shares; with $persist
-     * the changes are stored.
+     * Recalculates an existing dataset from its stored shares. With $persist
+     * the changes are stored; without it the result also holds the expected
+     * distributions for display.
      *
      * @return CalculationResult
      */
     public function recalculate(IncomesSharesDataSet $dataSet, bool $persist): array
     {
+        $usdToEuro = $persist ? null : $this->usdToEuro();
         $result = $this->emptyResult();
         foreach ($dataSet->getShares() as $share) {
             $this->addToResult(
@@ -128,7 +134,8 @@ final class IncomesSharesDataSetService
                 $share->getAmount(),
                 $share->getPrice(),
                 $share->getDistributions(),
-                $share->getProfitLoss()
+                $share->getProfitLoss(),
+                $usdToEuro
             );
 
             if ($persist) {
@@ -153,17 +160,13 @@ final class IncomesSharesDataSetService
      */
     public function rowsForDisplay(IncomesSharesDataSet $dataSet): array
     {
-        $rates = $this->exchangeRateService->getRates();
-        $usdRate = $rates['USD'] ?: 1;
-        $usdToEuro = 1 / $usdRate;
+        $usdToEuro = $this->usdToEuro();
 
         $rows = [];
-        $totalExpectedDistribution = 0.0;
         foreach ($this->incomesSharesDataRepository->findByDataset($dataSet->getUuid()) as $share) {
             $ticker = $share->getTicker();
             $amount = $share->getPosition()->getAmount();
-            $nextCashAmount = $ticker->getCalendars()->first()->getCashAmount();
-            $expectedDistribution = $nextCashAmount * $amount * $usdToEuro;
+            $expectedDistribution = $this->expectedDistribution($ticker, $amount, $usdToEuro);
 
             $rows[$ticker->getIsin()] = $this->row(
                 $ticker,
@@ -173,11 +176,9 @@ final class IncomesSharesDataSetService
                 $share->getDistributions(),
                 $share->getProfitLoss()
             ) + ['expectedDistribution' => $expectedDistribution];
-
-            $totalExpectedDistribution += $expectedDistribution;
         }
 
-        return ['rows' => $rows, 'totalExpectedDistribution' => $totalExpectedDistribution];
+        return ['rows' => $rows, 'totalExpectedDistribution' => $this->totalExpectedDistribution($rows)];
     }
 
     /**
@@ -228,6 +229,34 @@ final class IncomesSharesDataSetService
     }
 
     /**
+     * @param array<string, array<string, mixed>> $rows
+     */
+    private function totalExpectedDistribution(array $rows): float
+    {
+        return (float) array_sum(array_column($rows, 'expectedDistribution'));
+    }
+
+    private function usdToEuro(): float
+    {
+        $rates = $this->exchangeRateService->getRates();
+
+        return 1 / ($rates['USD'] ?: 1);
+    }
+
+    /**
+     * Latest declared cash amount times the shares, in euro; 0 without a declared dividend.
+     */
+    private function expectedDistribution(Ticker $ticker, ?float $amount, float $usdToEuro): float
+    {
+        $calendar = $ticker->getCalendars()->first();
+        if (!$calendar) {
+            return 0.0;
+        }
+
+        return $calendar->getCashAmount() * $amount * $usdToEuro;
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function row(
@@ -263,15 +292,14 @@ final class IncomesSharesDataSetService
         ?float $price,
         ?float $distributions,
         ?float $profitLoss,
+        ?float $usdToEuro,
     ): void {
-        $result['rows'][$ticker->getIsin()] = $this->row(
-            $ticker,
-            $allocation,
-            $amount,
-            $price,
-            $distributions,
-            $profitLoss
-        );
+        $row = $this->row($ticker, $allocation, $amount, $price, $distributions, $profitLoss);
+        if ($usdToEuro !== null) {
+            $row['expectedDistribution'] = $this->expectedDistribution($ticker, $amount, $usdToEuro);
+        }
+
+        $result['rows'][$ticker->getIsin()] = $row;
         $result['totalDistribution'] += $distributions;
         $result['totalAllocation'] += $allocation;
         $result['totalProfitLoss'] += $profitLoss;
@@ -286,6 +314,8 @@ final class IncomesSharesDataSetService
         if ($result['totalAllocation'] > 0) {
             $result['yield'] = ($result['totalDistribution'] / $result['totalAllocation']) * 100;
         }
+
+        $result['totalExpectedDistribution'] = $this->totalExpectedDistribution($result['rows']);
 
         $dataSet->setTotalAllocation($result['totalAllocation']);
         $dataSet->setTotalDistribution($result['totalDistribution']);
@@ -312,6 +342,7 @@ final class IncomesSharesDataSetService
             'totalAllocation' => 0.0,
             'totalDistribution' => 0.0,
             'totalProfitLoss' => 0.0,
+            'totalExpectedDistribution' => 0.0,
             'yield' => 0.0,
         ];
     }
