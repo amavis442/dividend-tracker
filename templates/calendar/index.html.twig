@@ -3,9 +3,10 @@
 {% block body %}
     <div class="w-full flex flex-col">
         <div class="flex flex-col w-full md:container mx-auto px-4">
-            {% if app.flashes('notice') %}
+            {% set notices = app.flashes('notice') %}
+            {% if notices %}
                 <div class="w-1/2">
-                    {% for notice in app.flashes('notice') %}
+                    {% for notice in notices %}
                         <twig:Alert class="mt-2">
                             {{ notice|trans }}
                         </twig:Alert>
@@ -19,19 +20,17 @@
             </section>
             <div class="flex items-center gap-2 mb-6 bg-gray-200 shadow-md rounded-lg p-6">
                 {{ form_start(form, {
-                                    'action': path('calendar_index') ,
+                    'action': path('calendar_index', { sort: sort, orderBy: orderBy }),
                     'attr': {
                     'autocomplete' : 'off',
                     'class': 'flex w-full justify-center',
-                    'data-turbo-frame' : 'calendar-results'
+                    'data-turbo-frame' : '_top'
                     }})
                     }}
                     {{ form_errors(form) }}
                     <div class="w-1/2 me-2">
-                        <select placeholder="{{ 'Select a ticker'|trans }}" name="{{ field_name(form.ticker) }}" {{ stimulus_controller('symfony/ux-autocomplete/autocomplete',{
-                             url: path('ux_entity_autocomplete', { alias: 'ticker'})
-                            }) }}>
-                        </select>
+                        {{ form_widget(form.ticker, { attr: { placeholder: 'Select a ticker'|trans } }) }}
+                        {{ form_errors(form.ticker) }}
                     </div>
                     <div>
                         <twig:Button type="submit" title="{{ 'Search ticker'|trans }}">
@@ -49,14 +48,14 @@
                         <i class="fas fa-plus"></i>
                     </twig:Button>
                 </div>
-                <turbo-frame id="calendar-results">
+                <turbo-frame id="calendar-results" target="_top">
                 <twig:Table:Table class="max-w-min min-w-full mb-4">
                     <twig:Table:THead>
                         <tr>
                             <twig:Table:ThCol>
                                 <div class="flex items-center">
                                     {{ 'Fullname'|trans }}
-                                    <a href="{{ path('calendar_index', { page: thisPage ? thisPage : 1, sort: 'ticker', orderBy: orderBy == 'asc' ? 'desc' : 'asc' }) }}">
+                                    <a href="{{ path('calendar_index', { page: thisPage ? thisPage : 1, sort: 'fullname', orderBy: orderBy == 'asc' ? 'desc' : 'asc' }) }}">
                                         <svg class="w-3 h-3 ms-1.5"
                                              aria-hidden="true"
                                              xmlns="http://www.w3.org/2000/svg"
@@ -130,9 +129,10 @@
                         {% for calendar in pager %}
                             <twig:Table:Tr>
                                 <twig:Table:Td>
-                                    {% if calendar.ticker.positions[0] %}
+                                    {% set position = calendar.ticker.positions|first %}
+                                    {% if position %}
                                         <div class="inline-block" data-controller="tooltip">
-                                            <a href="{{ path('portfolio_show', { id: calendar.ticker.positions[0].id }) }}"
+                                            <a href="{{ path('portfolio_show', { id: position.id }) }}"
                                                data-turbo-frame="_top"
                                                data-tooltip-target="element"
                                                data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
@@ -165,7 +165,7 @@
                                     {{ (calendar.source ?? 'manual')|trans }}
                                 </twig:Table:Td>
                                 <twig:Table:Td>
-                                    {{ calendar.description ?? '&mdash;' }}
+                                    {{ calendar.description ?? '—' }}
                                 </twig:Table:Td>
                                 <twig:Table:Td>
                                     {{ calendar.createdAt|format_date('medium', locale=app.request.locale) }}
