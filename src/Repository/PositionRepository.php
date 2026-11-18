@@ -601,6 +601,7 @@ class PositionRepository extends ServiceEntityRepository
             ->where(
                 '(p.closed = false and p.closedAt is null)'
             )
+            ->andWhere('p.ignore_for_dividend = false')
             ->getQuery()
             ->getResult();
     }

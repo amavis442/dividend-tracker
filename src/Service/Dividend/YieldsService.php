@@ -4,6 +4,8 @@ namespace App\Service\Dividend;
 
 use App\Contracts\Dividend\DividendTaxRateResolverInterface;
 use App\Entity\Position;
+use App\Enum\SortDirection;
+use App\Enum\SortField;
 use App\Util\Constants;
 use App\Entity\Pie;
 use App\Dto\PositionYield;
@@ -19,9 +21,6 @@ use App\Contracts\ExchangeRate\DividendExchangeRateResolverInterface;
 
 class YieldsService
 {
-    private const SORT_FIELDS = ['symbol', 'dividend', 'yield'];
-    private const DEFAULT_SORT = 'symbol';
-
     public function __construct(
         //private CacheInterface $pool,
         private Stopwatch $stopwatch,
@@ -53,10 +52,6 @@ class YieldsService
         }
 
         $this->stopwatch->stop('getting-positions-from-database');
-
-        if ($pie && count($report) < 1) {
-            return [];
-        }
 
         $allocated = 0.0;
 
@@ -115,8 +110,8 @@ class YieldsService
             $numPayoutsPerYear = $ticker->getDividendMonths()->count();
             $calendarList = new ArrayCollection($dividends[$position->getTicker()->getId()] ?? []);
 
-            //$firstCalendarEntry = $ticker->getCalendars()->first();
-            $firstCalendarEntry = $calendarList->first();
+            // Calendars are loaded by ascending payment date.
+            $latestCalendar = $calendarList->last();
 
             $netTotalForwardYearlyPayout = 0;
             $netForwardYearlyPayout = 0;
@@ -125,21 +120,19 @@ class YieldsService
             $lastCash = 0;
             $lastCashCurrency = '$';
             // Tax rate in percent; currency rules (e.g. UK) need a calendar entry
-            $taxRate = $firstCalendarEntry
-                ? $this->dividendTaxRateResolver->getTaxRateForCalendar($firstCalendarEntry) * 100
+            $taxRate = $latestCalendar
+                ? $this->dividendTaxRateResolver->getTaxRateForCalendar($latestCalendar) * 100
                 : ($ticker->getTax() ? $ticker->getTax()->getTaxRate() * 100 : Constants::TAX);
-            $exchangeRate = $firstCalendarEntry
-                ? $this->dividendExchangeRateResolver->getRateForCalendar($firstCalendarEntry)
+            $exchangeRate = $latestCalendar
+                ? $this->dividendExchangeRateResolver->getRateForCalendar($latestCalendar)
                 : 0;
 
-            if ($firstCalendarEntry) {
+            if ($latestCalendar) {
 //              $lastCash = $dividendService->getCashAmount($ticker);
                 $lastCash = $dividendService->getCashAmount($ticker);
 
-                $lastCashCurrency = $firstCalendarEntry
-                    ->getCurrency()
-                    ->getSign();
-                $lastDividendDate = $firstCalendarEntry->getPaymentDate();
+                $lastCashCurrency = $latestCalendar->getCurrency()?->getSign() ?? '$';
+                $lastDividendDate = $latestCalendar->getPaymentDate();
 
                 $netTotalForwardYearlyPayout =
                     $numPayoutsPerYear *
@@ -151,12 +144,12 @@ class YieldsService
                     $numPayoutsPerYear *
                     $dividendService->getNetDividend(
                         $position,
-                        $firstCalendarEntry
+                        $latestCalendar
                     );
                 $dividendYield = $dividendService->getForwardNetDividendYield(
                     $position,
                     $position->getTicker(),
-                    $amount,
+                    (float) $adjustedAmount,
                     $allocation
                 );
                 $netTotalPayoutPerPaydate = 0;
@@ -186,27 +179,7 @@ class YieldsService
             );
             $positionYield->data[$tickerLabel] = $dividendYield;
 
-            $orderKey['yield'] =
-                str_pad(
-                    (string) ($dividendYield * 100),
-                    10,
-                    '0',
-                    STR_PAD_LEFT
-                ) . $ticker->getSymbol();
-            $orderKey['dividend'] =
-                str_pad(
-                    (string) ($dividendPerYear * 100),
-                    10,
-                    '0',
-                    STR_PAD_LEFT
-                ) . $ticker->getSymbol();
-            $orderKey['symbol'] = $ticker->getSymbol();
-
-            $positionYield->dataSource['symbol'][
-                $orderKey['symbol']
-            ] = $positionYield->dataSource['dividend'][
-                $orderKey['dividend']
-            ] = $positionYield->dataSource['yield'][$orderKey['yield']] = [
+            $positionYield->dataSource[] = [
                 'ticker' => $ticker->getSymbol(),
                 'tickerId' => $ticker->getId(),
                 'position' => $position,
@@ -253,15 +226,9 @@ class YieldsService
         ksort($yieldData->labels);
         ksort($yieldData->data);
 
-        $sort = strtolower($sort);
-        $sort = in_array($sort, self::SORT_FIELDS, true) ? $sort : self::DEFAULT_SORT;
-        $dataSource = $yieldData->dataSource[$sort] ?? [];
-
-        if (strtolower($sortDirection) === 'desc') {
-            krsort($dataSource);
-        } else {
-            ksort($dataSource);
-        }
+        $sortField = SortField::fromString($sort);
+        $direction = SortDirection::fromString($sortDirection);
+        $dataSource = $this->sortRows($yieldData->dataSource, $sortField, $direction);
 
         //$this->pool->delete($poolKey);
 
@@ -269,6 +236,8 @@ class YieldsService
             'data' => array_values($yieldData->data),
             'labels' => array_values($yieldData->labels),
             'datasource' => $dataSource,
+            'sort' => $sortField->toString(),
+            'sortDirection' => $direction->toString(),
             'totalAvgYield' => $totalAvgYield,
             'dividendYieldOnCost' => $dividendYieldOnCost,
             'allocated' => $allocated,
@@ -277,5 +246,29 @@ class YieldsService
             'totalNetMonthlyDividend' => $totalNetMonthlyDividend,
             'totalNetYearlyDividendPerStock' => $totalNetYearlyDividendPerStock,
         ];
+    }
+
+    /**
+     * Sorts on the numeric value; rows with the same value stay ordered by symbol.
+     *
+     * @param list<array<string, mixed>> $rows
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function sortRows(array $rows, SortField $sortField, SortDirection $direction): array
+    {
+        $key = match ($sortField) {
+            SortField::SYMBOL => 'ticker',
+            SortField::DIVIDEND => 'payout',
+            SortField::YIELD => 'yield',
+        };
+
+        usort($rows, static function (array $a, array $b) use ($key, $direction): int {
+            $order = $direction === SortDirection::DESC ? $b[$key] <=> $a[$key] : $a[$key] <=> $b[$key];
+
+            return $order ?: $a['ticker'] <=> $b['ticker'];
+        });
+
+        return $rows;
     }
 }

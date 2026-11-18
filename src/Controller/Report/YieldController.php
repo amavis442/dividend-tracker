@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller\Report;
 
-use App\Repository\PositionRepository;
-use App\Service\Dividend\DividendService;
+use App\Helper\Colors;
+use App\Service\Chart\BarChartFactory;
 use App\Service\Dividend\YieldsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,9 +19,8 @@ class YieldController extends AbstractController
 
     #[Route(path: '/yield', name: 'report_dividend_yield')]
     public function index(
-        PositionRepository $positionRepository,
         YieldsService $yields,
-        DividendService $dividendService,
+        BarChartFactory $barChartFactory,
         #[MapQueryParameter]string $sort = 'symbol',
         #[MapQueryParameter]string $sortDirection = 'ASC'
     ): Response {
@@ -29,7 +28,17 @@ class YieldController extends AbstractController
 
         return $this->render(
             'report/yield/index.html.twig',
-            array_merge($result, ['controller_name' => 'ReportController'])
+            array_merge($result, [
+                'controller_name' => 'ReportController',
+                'chart' => $barChartFactory->create(
+                    $result['labels'],
+                    $result['data'],
+                    'Dividend yield',
+                    'Yield',
+                    Colors::COLORS,
+                    Colors::COLORS
+                ),
+            ])
         );
     }
 }

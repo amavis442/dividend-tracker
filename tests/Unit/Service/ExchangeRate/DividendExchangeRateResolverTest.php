@@ -49,6 +49,26 @@ final class DividendExchangeRateResolverTest extends TestCase
         self::assertEqualsWithDelta($expected, $resolver->getRateForTicker($this->ticker($symbol)), 0.00001);
     }
 
+    public function testADividendWithoutCurrencyUsesTheTickerCurrency(): void
+    {
+        $calendar = $this->createConfiguredStub(Calendar::class, [
+            'getCurrency' => null,
+            'getTicker' => $this->ticker('GBP'),
+        ]);
+
+        self::assertEqualsWithDelta(1.25, $this->resolver(self::RATES)->getRateForCalendar($calendar), 0.00001);
+    }
+
+    public function testADividendWithoutAnyCurrencyCountsAsDollars(): void
+    {
+        $calendar = $this->createConfiguredStub(Calendar::class, [
+            'getCurrency' => null,
+            'getTicker' => $this->createConfiguredStub(Ticker::class, ['getCurrency' => null]),
+        ]);
+
+        self::assertEqualsWithDelta(0.8, $this->resolver(self::RATES)->getRateForCalendar($calendar), 0.00001);
+    }
+
     public function testEuroNeedsNoRates(): void
     {
         $rates = $this->createMock(ExchangeRateInterface::class);

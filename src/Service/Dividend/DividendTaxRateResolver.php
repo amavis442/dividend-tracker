@@ -21,7 +21,7 @@ class DividendTaxRateResolver implements DividendTaxRateResolverInterface
             return $tax->getTaxRate();
         }
 
-        return match ($calendar->getCurrency()->getSymbol()) {
+        return match ($calendar->getCurrency()?->getSymbol()) {
             'GB', 'GBX', 'GBP' => Constants::TAX_GB_RATE,
             default => Constants::DEFAULT_TAX_RATE,
         };
