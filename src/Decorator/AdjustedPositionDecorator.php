@@ -3,6 +3,7 @@
 namespace App\Decorator;
 
 use App\Contracts\Decorator\AdjustedDecoratorInterface;
+use App\Helper\CorporateActionRatio;
 use App\Contracts\Decorator\AdjustedPositionDecoratorInterface;
 use App\Entity\CorporateAction;
 use App\Entity\Position;
@@ -156,9 +157,10 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface, AdjustedP
             $txDate = $tx->getTransactionDate();
 
             foreach ($actions as $action) {
-                if ($txDate < $action->getEventDate()) {
-                    $amount *= $action->getRatio();
-                    $price /= $action->getRatio();
+                if (CorporateActionRatio::appliesTo($action, $txDate)) {
+                    $ratio = CorporateActionRatio::of($action);
+                    $amount *= $ratio;
+                    $price /= $ratio;
                 }
             }
 
@@ -195,9 +197,10 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface, AdjustedP
             $txDate = $tx->getTransactionDate();
 
             foreach ($actions as $action) {
-                if ($txDate < $action->getEventDate()) {
-                    $amount *= $action->getRatio();
-                    $price /= $action->getRatio();
+                if (CorporateActionRatio::appliesTo($action, $txDate)) {
+                    $ratio = CorporateActionRatio::of($action);
+                    $amount *= $ratio;
+                    $price /= $ratio;
                 }
             }
 

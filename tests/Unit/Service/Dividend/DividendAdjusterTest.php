@@ -30,6 +30,19 @@ final class DividendAdjusterTest extends TestCase
         self::assertSame($expected, (new DividendAdjuster())->getAdjustedDividend($calendar, [$this->split(0.5)]));
     }
 
+    public function testAFutureSplitIsIgnored(): void
+    {
+        $split = $this->createConfiguredStub(CorporateAction::class, [
+            'getEventDate' => new \DateTime('+1 month'),
+            'getRatio' => 0.5,
+        ]);
+
+        self::assertSame(
+            1.0,
+            (new DividendAdjuster())->getAdjustedDividend($this->calendar('2026-03-01', '2026-03-01'), [$split])
+        );
+    }
+
     public function testAnInvalidRatioIsRejected(): void
     {
         $this->expectException(\InvalidArgumentException::class);

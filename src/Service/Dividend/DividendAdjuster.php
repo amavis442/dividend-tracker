@@ -18,8 +18,10 @@ class DividendAdjuster
         $exDividendDate = $calendar->getExDividendDate();
 
         foreach ($actions as $action) {
-            $eventDate = $action->getEventDate();
-            if ($createdAt < $eventDate || ($exDividendDate !== null && $exDividendDate < $eventDate)) {
+            if (
+                CorporateActionRatio::appliesTo($action, $createdAt)
+                || ($exDividendDate !== null && CorporateActionRatio::appliesTo($action, $exDividendDate))
+            ) {
                 $cashAmount /= CorporateActionRatio::of($action); // Applies reverse split
             }
         }

@@ -22,7 +22,7 @@ class TransactionAdjuster implements TransactionAdjusterInterface
         $txDate = $transaction->getTransactionDate();
 
         foreach ($actions as $action) {
-            if ($txDate < $action->getEventDate()) {
+            if (CorporateActionRatio::appliesTo($action, $txDate)) {
                 $amount *= CorporateActionRatio::of($action); // Applies reverse split
             }
         }

@@ -103,19 +103,24 @@ final class IncomesSharesDataSetControllerTest extends WebTestCase
 
     public function testChangedPositionsStoreNothingAndExplainWhy(): void
     {
+        $held = $this->positionFor('Still Held', 'IE00TEST0002', closed: false);
+        self::assertFalse($held->getClosed());
+
         $crawler = $this->client->request('GET', self::BASE . '/create');
         $form = $crawler->filter('button[name$="[save]"]')->form();
+        $priceField = sprintf('incomes_shares_data_set[shares][%d][price]', $held->getTicker()->getId());
+        $form[$priceField] = '12,5';
 
         $this->position->setClosed(true);
         $manager = static::getContainer()->get(EntityManagerInterface::class);
         $manager->flush();
 
-        $this->client->submit($form);
+        $crawler = $this->client->submit($form);
 
-        self::assertResponseRedirects(self::BASE . '/create', 303);
+        self::assertResponseStatusCodeSame(422);
         self::assertSame(0, $manager->getRepository(IncomesSharesDataSet::class)->count([]));
-        $this->client->followRedirect();
         self::assertAnySelectorTextContains('body', 'open positions have changed');
+        self::assertSame('12,5', $crawler->filter(sprintf('input[name="%s"]', $priceField))->attr('value'));
     }
 
     public function testANewDataSetSkipsTickersWithoutAnOpenPosition(): void

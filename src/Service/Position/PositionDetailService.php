@@ -142,7 +142,8 @@ final class PositionDetailService
     public function getForwardDividend(Position $position): array
     {
         $ticker = $position->getTicker();
-        $single = $this->dividendService->getForwardNetDividend($ticker, $position->getAmount());
+        $amount = (float) $this->dividendService->getSharesPerPositionAmount($position);
+        $single = $this->dividendService->getForwardNetDividend($ticker, $amount);
 
         return [
             'single' => $single,
@@ -150,7 +151,7 @@ final class PositionDetailService
             'yield' => $this->dividendService->getForwardNetDividendYield(
                 $position,
                 $ticker,
-                $position->getAmount(),
+                $amount,
                 $position->getAllocation()
             ),
         ];

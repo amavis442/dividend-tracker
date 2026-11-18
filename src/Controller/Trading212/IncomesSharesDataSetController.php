@@ -65,8 +65,14 @@ final class IncomesSharesDataSetController extends AbstractController
 
         if ($request->isMethod('POST') && $this->submittedSharesChanged($request, $form, $incomesSharesDataSet)) {
             $this->addFlash('notice', 'Your open positions have changed. Check the values and submit again.');
+            $this->keepSubmittedValues($request, $form, $incomesSharesDataSet);
 
-            return $this->redirectToRoute('app_incomes_shares_data_set_create', [], Response::HTTP_SEE_OTHER);
+            return $this->render('incomes_shares_data_set/create.html.twig', [
+                'controller_name' => 'IncomesSharesController',
+                'form' => $form,
+            ] + $this->resultView($dataSetService->emptyResult()), new Response(
+                status: Response::HTTP_UNPROCESSABLE_ENTITY
+            ));
         }
 
         $form->handleRequest($request);
@@ -283,6 +289,24 @@ final class IncomesSharesDataSetController extends AbstractController
         sort($current);
 
         return $submitted !== $current;
+    }
+
+    /**
+     * Shows what was entered for the rows that still exist, without calculating or saving.
+     */
+    private function keepSubmittedValues(
+        Request $request,
+        FormInterface $form,
+        IncomesSharesDataSet $dataSet
+    ): void {
+        $submitted = $request->request->all($form->getName());
+        unset($submitted['submit'], $submitted['save']);
+        $submitted['shares'] = array_intersect_key(
+            $submitted['shares'] ?? [],
+            array_flip($dataSet->getShares()->getKeys())
+        );
+
+        $form->submit($submitted);
     }
 
     private function isSaveClicked(FormInterface $form): bool

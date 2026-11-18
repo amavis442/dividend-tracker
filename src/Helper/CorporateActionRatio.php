@@ -12,6 +12,16 @@ use App\Entity\CorporateAction;
 final class CorporateActionRatio
 {
     /**
+     * Whether something dated $date comes before a split that has taken place.
+     */
+    public static function appliesTo(CorporateAction $action, \DateTimeInterface $date): bool
+    {
+        $eventDate = $action->getEventDate();
+
+        return $date < $eventDate && $eventDate <= new \DateTimeImmutable();
+    }
+
+    /**
      * @throws \InvalidArgumentException when the ratio is not positive
      */
     public static function of(CorporateAction $action): float
