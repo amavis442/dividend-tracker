@@ -99,7 +99,7 @@ class YieldsService
 
             $position->setAdjustedAmount($adjustedAmount);
             // Positions synchronised from the broker have no transactions to derive an amount from.
-            $currentAmount = (float) ($adjustedAmount ?: $amount);
+            $currentAmount = (float) (isset($transactions[$position->getId()]) ? $adjustedAmount : $amount);
             $position->setAdjustedAveragePrice($adjustedAveragePrice);
 
             $allocation =
@@ -196,7 +196,7 @@ class YieldsService
                 'lastDividendCurrency' => $lastCashCurrency,
                 'lastDividendDate' => $lastDividendDate,
                 'numPayoutsPerYear' => $numPayoutsPerYear,
-                'amount' => $amount,
+                'amount' => $currentAmount,
                 'taxRate' => $taxRate,
                 'exchangeRate' => $exchangeRate,
             ];
@@ -205,7 +205,7 @@ class YieldsService
             }
             $positionYield->sumAvgPrice += $avgPrice;
             $positionYield->sumDividends += $dividendPerYear;
-            $totalDividend += $dividendPerYear * $amount;
+            $totalDividend += $dividendPerYear * $currentAmount;
             $totalNetYearlyDividendPerStock += $netForwardYearlyPayout;
             $this->stopwatch->lap('processing-file');
         }
