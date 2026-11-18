@@ -3,9 +3,10 @@
 {% block body %}
     <div class="w-full flex flex-col">
         <div class="flex flex-col w-full md:container mx-auto px-4">
-            {% if app.flashes('notice') %}
+            {% set notices = app.flashes('notice') %}
+            {% if notices %}
                 <div class="w-1/2">
-                    {% for notice in app.flashes('notice') %}
+                    {% for notice in notices %}
                         <twig:Alert class="mt-2">
                             {{ notice|trans }}
                         </twig:Alert>
@@ -23,12 +24,13 @@
                     'attr': {
                     'autocomplete' : 'off',
                     'class': 'flex w-full justify-center',
-                    'data-turbo-frame' : 'calendar-results'
+                    'data-turbo-frame' : '_top'
                     }})
                     }}
                     {{ form_errors(form) }}
                     <div class="w-1/2 me-2">
                         {{ form_widget(form.ticker, { attr: { placeholder: 'Select a ticker'|trans } }) }}
+                        {{ form_errors(form.ticker) }}
                     </div>
                     <div>
                         <twig:Button type="submit" title="{{ 'Search ticker'|trans }}">
@@ -46,14 +48,14 @@
                         <i class="fas fa-plus"></i>
                     </twig:Button>
                 </div>
-                <turbo-frame id="calendar-results">
+                <turbo-frame id="calendar-results" target="_top">
                 <twig:Table:Table class="max-w-min min-w-full mb-4">
                     <twig:Table:THead>
                         <tr>
                             <twig:Table:ThCol>
                                 <div class="flex items-center">
                                     {{ 'Fullname'|trans }}
-                                    <a href="{{ path('calendar_index', { page: thisPage ? thisPage : 1, sort: 'symbol', orderBy: orderBy == 'asc' ? 'desc' : 'asc' }) }}">
+                                    <a href="{{ path('calendar_index', { page: thisPage ? thisPage : 1, sort: 'fullname', orderBy: orderBy == 'asc' ? 'desc' : 'asc' }) }}">
                                         <svg class="w-3 h-3 ms-1.5"
                                              aria-hidden="true"
                                              xmlns="http://www.w3.org/2000/svg"

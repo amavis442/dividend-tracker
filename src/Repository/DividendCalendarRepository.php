@@ -98,7 +98,8 @@ class DividendCalendarRepository extends ServiceEntityRepository
         ?Ticker $ticker = null
     ): QueryBuilder {
         $sort = match ($sort) {
-            'symbol' => ($sort = 't.symbol'),
+            'symbol' => 't.symbol',
+            'fullname' => 't.fullname',
             default => 'c.' . $sort,
         };
 

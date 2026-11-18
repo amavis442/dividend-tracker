@@ -71,13 +71,21 @@ final class CalendarControllerTest extends WebTestCase
         self::assertAnySelectorTextContains('turbo-frame#calendar-results td', 'Alpha Income');
     }
 
-    public function testTheSymbolSortLinkWorks(): void
+    public function testNavigationUpdatesTheWholePage(): void
+    {
+        $this->client->request('GET', self::PATH);
+
+        self::assertSelectorExists('turbo-frame#calendar-results[target="_top"]');
+        self::assertSelectorExists('form[data-turbo-frame="_top"]');
+    }
+
+    public function testTheNameSortLinkWorks(): void
     {
         $this->heldTicker('Alpha Income');
 
         $crawler = $this->client->request('GET', self::PATH);
         $link = $crawler->filter('turbo-frame#calendar-results th a')->first()->link();
-        self::assertStringContainsString('sort=symbol', $link->getUri());
+        self::assertStringContainsString('sort=fullname', $link->getUri());
 
         $this->client->click($link);
 
@@ -164,7 +172,7 @@ final class CalendarControllerTest extends WebTestCase
     private function search(string $tickerId, string $query = ''): void
     {
         $crawler = $this->client->request('GET', self::PATH . $query);
-        $form = $crawler->filter('form[data-turbo-frame="calendar-results"]')->form();
+        $form = $crawler->filter('form[data-turbo-frame="_top"]')->form();
         $form->disableValidation();
         $form[self::FIELD] = $tickerId;
 

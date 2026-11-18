@@ -27,7 +27,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class CalendarController extends AbstractController
 {
     private const SESSION_TICKER_KEY = 'calendar_searchTicker';
-    private const SORT_FIELDS = ['paymentDate', 'symbol', 'exDividendDate', 'createdAt'];
+    private const SORT_FIELDS = ['paymentDate', 'fullname', 'exDividendDate', 'createdAt'];
     private const DEFAULT_SORT = 'createdAt';
     private const ITEMS_PER_PAGE = 10;
 
@@ -43,9 +43,6 @@ class CalendarController extends AbstractController
     ): Response {
         $sort = in_array($sort, self::SORT_FIELDS, true) ? $sort : self::DEFAULT_SORT;
         $orderBy = strtolower($orderBy) === 'asc' ? 'asc' : 'desc';
-
-        $referer->clear();
-        $referer->set('calendar_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
 
         $session = $request->getSession();
         $tickerId = $session->get(self::SESSION_TICKER_KEY);
@@ -80,6 +77,12 @@ class CalendarController extends AbstractController
         $pager->setMaxPerPage(self::ITEMS_PER_PAGE);
         $pager->setNormalizeOutOfRangePages(true);
         $pager->setCurrentPage(max(1, $page));
+
+        $referer->set('calendar_index', [
+            'page' => $pager->getCurrentPage(),
+            'orderBy' => $orderBy,
+            'sort' => $sort,
+        ]);
 
         return $this->render('calendar/index.html.twig', [
             'form' => $form,
