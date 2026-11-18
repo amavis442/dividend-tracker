@@ -84,7 +84,7 @@
                         {{ item.amount|format_number({"fraction_digit": 5}) }}
                     </twig:Table:Td>
                     <twig:Table:Td>
-                        {{ item.expectedDistribution|format_number({"fraction_digit": 2}) }}
+                        {{ item.expectedDistribution is null ? '—' : item.expectedDistribution|format_number({"fraction_digit": 2}) }}
                     </twig:Table:Td>
                     <twig:Table:Td>
                         {{ item.distributions|format_number({"fraction_digit": 2}) }}
@@ -194,7 +194,7 @@
                 <div class="flex items-center space-x-4 rtl:space-x-reverse">
                     <div class="flex-1 min-w-0">{{ 'Expected Distributions'|trans }}:</div>
                     <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                        {{ totalExpectedDistribution|format_number({"fraction_digit": 4}) }}&euro;
+                        {% if totalExpectedDistribution is null %}—{% else %}{{ totalExpectedDistribution|format_number({"fraction_digit": 4}) }}&euro;{% endif %}
                     </div>
                 </div>
             </li>
@@ -202,7 +202,7 @@
                 <div class="flex items-center space-x-4 rtl:space-x-reverse">
                     <div class="flex-1 min-w-0">{{ 'Return'|trans }}:</div>
                     <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                        {{ ((totalDistribution / totalAllocation) * 100)|format_number({"fraction_digit": 4}) }}%
+                        {{ yield|format_number({"fraction_digit": 4}) }}%
                     </div>
                 </div>
             </li>

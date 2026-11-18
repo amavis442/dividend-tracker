@@ -41,6 +41,7 @@ class IncomesSharesDataSet
      * @var Collection<int, IncomesSharesData>
      */
     #[ORM\OneToMany(targetEntity: IncomesSharesData::class, mappedBy: 'incomesSharesDataSet', orphanRemoval: true)]
+    #[ORM\OrderBy(['id' => 'ASC'])]
     private Collection $shares;
 
     public function __construct()
