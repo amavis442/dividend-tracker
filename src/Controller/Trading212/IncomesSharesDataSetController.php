@@ -31,15 +31,6 @@ use Symfony\Component\Routing\Attribute\Route;
 ]
 final class IncomesSharesDataSetController extends AbstractController
 {
-    private const EMPTY_RESULT = [
-        'rows' => [],
-        'totalAllocation' => 0.0,
-        'totalDistribution' => 0.0,
-        'totalProfitLoss' => 0.0,
-        'totalExpectedDistribution' => 0.0,
-        'yield' => 0.0,
-    ];
-
     #[Route(name: 'app_incomes_shares_data_set_index', methods: ['GET'])]
     public function index(
         IncomesSharesDataSetRepository $incomesSharesDataSetRepository,
@@ -73,7 +64,7 @@ final class IncomesSharesDataSetController extends AbstractController
         $form = $this->createForm(IncomesSharesDataSetType::class, $incomesSharesDataSet);
         $form->handleRequest($request);
 
-        $result = self::EMPTY_RESULT;
+        $result = $dataSetService->emptyResult();
         if ($form->isSubmitted() && $form->isValid()) {
             $save = $this->isSaveClicked($form);
             $result = $dataSetService->calculateFromPositions($incomesSharesDataSet, $save);
@@ -216,7 +207,7 @@ final class IncomesSharesDataSetController extends AbstractController
         $form = $this->createForm(IncomesSharesDataSetType::class, $incomesSharesDataSet);
         $form->handleRequest($request);
 
-        $result = self::EMPTY_RESULT;
+        $result = $dataSetService->emptyResult();
         if ($form->isSubmitted() && $form->isValid()) {
             $save = $this->isSaveClicked($form);
             $result = $dataSetService->recalculate($incomesSharesDataSet, $save);
