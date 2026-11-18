@@ -203,6 +203,61 @@ final class YieldControllerTest extends WebTestCase
         self::assertAnySelectorTextNotContains('td', '15-03-2023');
     }
 
+    public function testTheLastDividendIsTheLastPaidOne(): void
+    {
+        $paid = new \DateTimeImmutable('-1 month');
+        $declared = new \DateTimeImmutable('+1 month');
+        $ticker = $this->createPosition('YLD', withCalendar: false);
+        $this->createCalendar($ticker, 0.5, $paid->format('Y-m-d'));
+        $this->createCalendar($ticker, 0.8, $declared->format('Y-m-d'));
+
+        $crawler = $this->client->request('GET', self::PATH);
+        $cells = $crawler->filter('tbody tr')->first()->filter('td');
+
+        self::assertStringContainsString('0,50', $cells->eq(2)->text());
+        self::assertSame($paid->format('d-m-Y'), trim($cells->eq(3)->text()));
+        self::assertStringContainsString('0,80', $cells->eq(4)->text());
+    }
+
+    public function testNoLastDividendIsShownBeforeTheFirstPayment(): void
+    {
+        $ticker = $this->createPosition('YLD', withCalendar: false);
+        $this->createCalendar($ticker, 0.8, (new \DateTimeImmutable('+1 month'))->format('Y-m-d'));
+
+        $crawler = $this->client->request('GET', self::PATH);
+        $cells = $crawler->filter('tbody tr')->first()->filter('td');
+
+        self::assertSame('-', trim($cells->eq(2)->text()));
+        self::assertSame('-', trim($cells->eq(3)->text()));
+    }
+
+    public function testTheChartFollowsTheSelectedSort(): void
+    {
+        $this->createPosition('AAA', cashAmount: 0.25);
+        $this->createPosition('ZZZ', cashAmount: 1.0);
+
+        $crawler = $this->client->request('GET', self::PATH . '?sort=dividend&sortDirection=desc');
+        $view = (string) $crawler->filter('canvas')->attr('data-symfony--ux-chartjs--chart-view-value');
+
+        self::assertLessThan(strpos($view, '(AAA)'), strpos($view, '(ZZZ)'));
+    }
+
+    public function testThePieReportShowsTheLastPaidDividend(): void
+    {
+        $paid = new \DateTimeImmutable('-1 month');
+        $declared = new \DateTimeImmutable('+1 month');
+        $ticker = $this->createPosition('KEEP', withCalendar: false, forPieReport: true);
+        $this->createCalendar($ticker, 0.5, $paid->format('Y-m-d'));
+        $this->createCalendar($ticker, 0.8, $declared->format('Y-m-d'));
+
+        $this->client->request('GET', self::PIE_PATH);
+        $content = (string) $this->client->getResponse()->getContent();
+
+        self::assertResponseIsSuccessful();
+        self::assertStringContainsString($paid->format('d-m-Y'), $content);
+        self::assertStringNotContainsString($declared->format('d-m-Y'), $content);
+    }
+
     public function testThePieReportSkipsIgnoredPositions(): void
     {
         $this->createPosition('KEEP', forPieReport: true);

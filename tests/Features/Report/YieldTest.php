@@ -193,6 +193,7 @@ class YieldTest extends TestCase
 				'position' => $position,
 				'ticker' => $ticker,
 				'calendar_used' => $calendar, // Use the lastest
+				'last_paid_calendar' => $calendar,
 				'total_shares' => $transaction->getAdjustedAmount(),
 				'exchange_rate' => $exchangeRates[$ticker->getId()],
 				'tax_rate' => $ticker->getTax()->getTaxRate(),
@@ -380,6 +381,7 @@ class YieldTest extends TestCase
 				'position' => $position,
 				'ticker' => $ticker,
 				'calendar_used' => $calendar, // Use the lastest
+				'last_paid_calendar' => $calendar,
 				'total_shares' => $transaction->getAdjustedAmount(),
 				'exchange_rate' => $exchangeRates[$ticker->getId()],
 				'tax_rate' => $ticker->getTax()->getTaxRate(),
@@ -635,6 +637,7 @@ class YieldTest extends TestCase
 			'position' => $position,
 			'ticker' => $ticker,
 			'calendar_used' => $calendar, // Use the lastest
+			'last_paid_calendar' => $calendar,
 			'total_shares' => $position->getAdjustedAmount(),
 			'exchange_rate' => $exchangeRates[$ticker->getId()],
 			'tax_rate' => $ticker->getTax()->getTaxRate(),
@@ -720,6 +723,7 @@ class YieldTest extends TestCase
 			'position' => $position2,
 			'ticker' => $ticker2,
 			'calendar_used' => $calendar, // Use the lastest
+			'last_paid_calendar' => $calendar,
 			'total_shares' => $position2->getAdjustedAmount(),
 			'exchange_rate' => $exchangeRates[$ticker2->getId()],
 			'tax_rate' => $ticker2->getTax()->getTaxRate(),
@@ -970,6 +974,7 @@ class YieldTest extends TestCase
 			'position' => $position,
 			'ticker' => $ticker,
 			'calendar_used' => $calendar, // Use the lastest
+			'last_paid_calendar' => $calendar,
 			'total_shares' => $position->getAdjustedAmount(),
 			'exchange_rate' => $exchangeRates[$ticker->getId()],
 			'tax_rate' => $ticker->getTax()->getTaxRate(),
@@ -1053,6 +1058,7 @@ class YieldTest extends TestCase
 			'position' => $position2,
 			'ticker' => $ticker2,
 			'calendar_used' => null, // Use the lastest
+			'last_paid_calendar' => null,
 			'total_shares' => $position2->getAdjustedAmount(),
 			'exchange_rate' => $exchangeRates[$ticker2->getId()],
 			'tax_rate' => $ticker2->getTax()->getTaxRate(),

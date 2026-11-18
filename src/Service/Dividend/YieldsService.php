@@ -4,6 +4,9 @@ namespace App\Service\Dividend;
 
 use App\Contracts\Dividend\DividendTaxRateResolverInterface;
 use App\Entity\Position;
+use App\Entity\Calendar;
+use App\Entity\Ticker;
+use App\Helper\DividendCalendars;
 use App\Enum\SortDirection;
 use App\Enum\SortField;
 use App\Util\Constants;
@@ -112,21 +115,22 @@ class YieldsService
                 $allocated += $allocation;
             }
 
-            $lastCash = 0;
-            $lastDividendDate = null;
-
             $numPayoutsPerYear = $ticker->getDividendMonths()->count();
             $calendarList = new ArrayCollection($dividends[$position->getTicker()->getId()] ?? []);
 
             // Calendars are loaded by ascending payment date.
             $latestCalendar = $calendarList->last();
+            $lastPaidCalendar = DividendCalendars::lastPaid($calendarList);
 
             $netTotalForwardYearlyPayout = 0;
             $netForwardYearlyPayout = 0;
             $dividendYield = 0;
             $netTotalPayoutPerPaydate = 0;
-            $lastCash = 0;
-            $lastCashCurrency = '$';
+            $latestCash = 0;
+            $payoutCurrency = '$';
+            $lastPaidCash = 0;
+            $lastPaidCurrency = '$';
+            $lastPaidDate = null;
             // Tax rate in percent; currency rules (e.g. UK) need a calendar entry
             $taxRate = $latestCalendar
                 ? $this->dividendTaxRateResolver->getTaxRateForCalendar($latestCalendar) * 100
@@ -136,12 +140,15 @@ class YieldsService
                 : 0;
 
             if ($latestCalendar) {
-//              $lastCash = $dividendService->getCashAmount($ticker);
-                $lastCash = $dividendService->getCashAmount($ticker);
+                // Also adjusts the cash amounts of the loaded calendars.
+                $latestCash = $dividendService->getCashAmount($ticker);
+                $payoutCurrency = $this->currencySign($latestCalendar, $ticker);
 
-                $currency = $latestCalendar->getCurrency() ?? $ticker->getCurrency();
-                $lastCashCurrency = html_entity_decode($currency?->getSign() ?? '$', ENT_QUOTES | ENT_HTML5);
-                $lastDividendDate = $latestCalendar->getPaymentDate();
+                if ($lastPaidCalendar !== null) {
+                    $lastPaidCash = $lastPaidCalendar->getAdjustedCashAmount();
+                    $lastPaidCurrency = $this->currencySign($lastPaidCalendar, $ticker);
+                    $lastPaidDate = $lastPaidCalendar->getPaymentDate();
+                }
 
                 $netTotalForwardYearlyPayout =
                     $numPayoutsPerYear *
@@ -168,33 +175,30 @@ class YieldsService
                     $totalNetMonthlyDividend += $netTotalPayoutPerPaydate;
                 }
             }
-            $dividendPerYear = $numPayoutsPerYear * $lastCash;
-
-            // A ticker can have several open positions; each gets its own bar.
-            $tickerLabel = $ticker->getSymbol() . '#' . $position->getId();
-            $positionYield->labels[$tickerLabel] = sprintf(
-                '%s (%s)',
-                mb_substr(str_replace(["'", '"'], '', (string) $ticker->getFullname()), 0, 8),
-                $ticker->getSymbol()
-            );
-            $positionYield->data[$tickerLabel] = $dividendYield;
+            $dividendPerYear = $numPayoutsPerYear * $latestCash;
 
             $positionYield->dataSource[] = [
                 'ticker' => $ticker->getSymbol(),
                 'tickerId' => $ticker->getId(),
                 'position' => $position,
                 'label' => $ticker->getFullname(),
+                'chartLabel' => sprintf(
+                    '%s (%s)',
+                    mb_substr((string) $ticker->getFullname(), 0, 8),
+                    $ticker->getSymbol()
+                ),
                 'yield' => $dividendYield,
                 'payout' => $dividendPerYear,
                 'payoutInEuro' => $dividendPerYear * $exchangeRate,
+                'payoutCurrency' => $payoutCurrency,
                 'allocation' => $allocation,
                 'netTotalPayoutPerPaydate' => $netTotalPayoutPerPaydate,
                 'netForwardYearlyPayout' => $netForwardYearlyPayout,
                 'netTotalForwardYearlyPayout' => $netTotalForwardYearlyPayout,
                 'avgPrice' => $avgPrice,
-                'lastDividend' => $lastCash,
-                'lastDividendCurrency' => $lastCashCurrency,
-                'lastDividendDate' => $lastDividendDate,
+                'lastDividend' => $lastPaidCash,
+                'lastDividendCurrency' => $lastPaidCurrency,
+                'lastDividendDate' => $lastPaidDate,
                 'numPayoutsPerYear' => $numPayoutsPerYear,
                 'amount' => $currentAmount,
                 'taxRate' => $taxRate,
@@ -224,9 +228,6 @@ class YieldsService
         //return $positionYield;
         //});
 
-        ksort($yieldData->labels);
-        ksort($yieldData->data);
-
         $sortField = SortField::fromString($sort);
         $direction = SortDirection::fromString($sortDirection);
         $dataSource = $this->sortRows($yieldData->dataSource, $sortField, $direction);
@@ -234,8 +235,8 @@ class YieldsService
         //$this->pool->delete($poolKey);
 
         return [
-            'data' => array_values($yieldData->data),
-            'labels' => array_values($yieldData->labels),
+            'data' => array_column($dataSource, 'yield'),
+            'labels' => array_column($dataSource, 'chartLabel'),
             'datasource' => $dataSource,
             'sort' => $sortField->toString(),
             'sortDirection' => $direction->toString(),
@@ -247,6 +248,14 @@ class YieldsService
             'totalNetMonthlyDividend' => $totalNetMonthlyDividend,
             'totalNetYearlyDividendPerStock' => $totalNetYearlyDividendPerStock,
         ];
+    }
+
+    private function currencySign(Calendar $calendar, Ticker $ticker): string
+    {
+        $currency = $calendar->getCurrency() ?? $ticker->getCurrency();
+        $sign = $currency?->getSign() ?: $currency?->getSymbol() ?: '$';
+
+        return html_entity_decode($sign, ENT_QUOTES | ENT_HTML5);
     }
 
     /**
