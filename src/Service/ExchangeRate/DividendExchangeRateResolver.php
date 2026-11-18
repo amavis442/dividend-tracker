@@ -9,6 +9,7 @@ use App\Contracts\ExchangeRate\ExchangeRateInterface;
 use App\Entity\Calendar;
 use App\Entity\Ticker;
 use App\Exception\ExchangeRateUnavailableException;
+use App\Helper\DividendCalendars;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface as HttpClientException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -18,7 +19,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DividendExchangeRateResolver implements DividendExchangeRateResolverInterface
 {
     private const BASE_CURRENCY = 'EUR';
-    private const DEFAULT_DIVIDEND_CURRENCY = 'USD';
 
     /** Currency symbols in the database that are quoted under another symbol. */
     private const RATE_SYMBOLS = ['GB' => 'GBP'];
@@ -31,15 +31,17 @@ class DividendExchangeRateResolver implements DividendExchangeRateResolverInterf
 
     public function getRateForCalendar(Calendar $calendar): float
     {
-        $ticker = $calendar->getTicker();
-        $currency = $calendar->getCurrency() ?? $ticker->getCurrency();
-
-        return $this->rateToEuro($currency?->getSymbol() ?? self::DEFAULT_DIVIDEND_CURRENCY, $ticker->getSymbol());
+        return $this->rateToEuro(DividendCalendars::currencySymbol($calendar), $calendar->getTicker()->getSymbol());
     }
 
     public function getRateForTicker(Ticker $ticker): float
     {
         return $this->rateToEuro($ticker->getCurrency()->getSymbol(), $ticker->getSymbol());
+    }
+
+    public function getRateForCurrency(string $symbol): float
+    {
+        return $this->rateToEuro($symbol, null);
     }
 
     private function rateToEuro(string $symbol, ?string $tickerSymbol): float

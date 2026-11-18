@@ -81,7 +81,11 @@ final class BasicDatasetDataProviderTest extends TestCase
             'getId' => self::TICKER_ID,
             'getCurrency' => $this->createStub(Currency::class),
         ]);
-        $position = $this->createConfiguredStub(Position::class, ['getId' => 5, 'getTicker' => $ticker]);
+        $position = $this->createConfiguredStub(Position::class, [
+            'getId' => 5,
+            'getTicker' => $ticker,
+            'getAllocation' => 100.0,
+        ]);
 
         return new BasicDatasetDataProvider(
             $this->createConfiguredStub(PositionRepository::class, ['getForYieldView' => [$position]]),

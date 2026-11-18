@@ -11,4 +11,5 @@ interface DividendExchangeRateResolverInterface
 {
     public function getRateForCalendar(Calendar $calendar): float;
     public function getRateForTicker(Ticker $ticker): float;
+    public function getRateForCurrency(string $symbol): float;
 }

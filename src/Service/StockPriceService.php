@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Contracts\Service\StockPricePluginInterface;
+use App\Exception\ExchangeRateUnavailableException;
 use RuntimeException;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -209,7 +210,14 @@ class StockPriceService
             $price = $data['regularMarketPrice'];
             $currency = strtoupper($data['currency']);
             if ($currency !== 'EUR') {
-                return $price / ($rates[$currency]);
+                $rate = (float) ($rates[$currency] ?? 0.0);
+                if ($rate <= 0.0) {
+                    throw new ExchangeRateUnavailableException(
+                        sprintf('Exchange rate for %s is currently unavailable.', $currency)
+                    );
+                }
+
+                return $price / $rate;
             }
             return $price;
         }

@@ -107,8 +107,7 @@ class PieInstrumentsController extends AbstractController
         $this->taxDecorator->decorate($tickers, $taxes);
 
         // 6️⃣ Further decorations (break‑even, current dividend …)
-        $rateDollarEuro = 1 / $this->pieDataProvider->getExchangeRates()['USD'];
-        $this->instrumentDecorator->dividend($dividends, $tickers, $rateDollarEuro);
+        $this->instrumentDecorator->dividend($dividends, $tickers);
 
         $currentMonth = date('Ym');
         $totalMonthlyDividend = 0.0;
@@ -139,8 +138,7 @@ class PieInstrumentsController extends AbstractController
             $pieAvgInvested,
             $instruments,
             $payments,
-            $tickers,
-            $rateDollarEuro
+            $tickers
         );
 
         $pieInstruments = $dataInstruments['pieInstruments'] ?? [];

@@ -15,14 +15,12 @@ use App\Repository\Trading212PieMetaDataRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use App\Contracts\ExchangeRate\ExchangeRateInterface;
 
 class PieDataProvider
 {
     public function __construct(
         private readonly Trading212PieMetaDataRepository $trading212PieMetaDataRepository,
         private readonly CorporateActionDataProvider $corporateActionDataProvider,
-        private readonly ExchangeRateInterface $exchangeRate,
         private readonly DividendDataProvider $dividendDataProvider,
     ) {
     }
@@ -112,16 +110,5 @@ class PieDataProvider
             corporateActions: $corporateActions,
             dividends: $dividends
         );
-    }
-
-
-    /**
-     * Return an array of exchange rates.
-     *
-     * @return array
-     */
-    public function getExchangeRates(): array
-    {
-        return $this->exchangeRate->getRates();
     }
 }

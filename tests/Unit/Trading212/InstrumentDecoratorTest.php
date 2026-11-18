@@ -2,7 +2,10 @@
 
 namespace App\Tests\Unit\Trading212;
 
+use App\Contracts\ExchangeRate\DividendExchangeRateResolverInterface;
 use App\Decorator\InstrumentDecorator;
+use App\Entity\Calendar;
+use App\Exception\ExchangeRateUnavailableException;
 use App\Entity\Payment;
 use App\Entity\Ticker;
 use App\Entity\Trading212PieInstrument;
@@ -31,13 +34,12 @@ final class InstrumentDecoratorTest extends TestCase
 		$payments = new ArrayCollection([]);
 		$tickers = $this->buildTickersMap($ticker, $instrument);
 
-		$decorator = new InstrumentDecorator();
+		$decorator = $this->decorator();
 		$result = $decorator->instruments(
 			pieAvgInvested: 1000.0,
 			instruments: $instruments,
 			payments: $payments,
 			tickers: $tickers,
-			rateDollarEuro: 0.92,
 		);
 
 		$this->assertNotEquals([], $result['pieInstruments']);
@@ -63,13 +65,12 @@ final class InstrumentDecoratorTest extends TestCase
 		$payments = new ArrayCollection([$latePayment, $earlyPayment]);
 		$tickers = $this->buildTickersMap($ticker, $instrument);
 
-		$decorator = new InstrumentDecorator();
+		$decorator = $this->decorator();
 		$result = $decorator->instruments(
 			pieAvgInvested: 1000.0,
 			instruments: $instruments,
 			payments: $payments,
 			tickers: $tickers,
-			rateDollarEuro: 0.92,
 		);
 
 		// (3.0 / 10) * 10 = 3.0
@@ -92,13 +93,12 @@ final class InstrumentDecoratorTest extends TestCase
 		$payments = new ArrayCollection([$laterPayment]);
 		$tickers = $this->buildTickersMap($ticker, $instrument);
 
-		$decorator = new InstrumentDecorator();
+		$decorator = $this->decorator();
 		$result = $decorator->instruments(
 			pieAvgInvested: 1000.0,
 			instruments: $instruments,
 			payments: $payments,
 			tickers: $tickers,
-			rateDollarEuro: 0.92,
 		);
 
 		// Payment after createdAt should be skipped, resulting in 0 dividend paid
@@ -120,13 +120,12 @@ final class InstrumentDecoratorTest extends TestCase
 		$payments = new ArrayCollection([$futurePayment]);
 		$tickers = $this->buildTickersMap($ticker, $instrument);
 
-		$decorator = new InstrumentDecorator();
+		$decorator = $this->decorator();
 		$result = $decorator->instruments(
 			pieAvgInvested: 1000.0,
 			instruments: $instruments,
 			payments: $payments,
 			tickers: $tickers,
-			rateDollarEuro: 0.92,
 		);
 
 		$this->assertEquals(0.0, $result['pieDividend'], 0.001);
@@ -144,13 +143,12 @@ final class InstrumentDecoratorTest extends TestCase
 		$payments = new ArrayCollection([]);
 		$emptyTickers = [];
 
-		$decorator = new InstrumentDecorator();
+		$decorator = $this->decorator();
 		$result = $decorator->instruments(
 			pieAvgInvested: 1000.0,
 			instruments: $instruments,
 			payments: $payments,
 			tickers: $emptyTickers,
-			rateDollarEuro: 0.92,
 		);
 
 		$this->assertEquals(0.0, $result['pieDividend'], 0.001);
@@ -171,13 +169,12 @@ final class InstrumentDecoratorTest extends TestCase
 		$payments = new ArrayCollection([]);
 		$tickers = $this->buildTickersMap($ticker, $instrument);
 
-		$decorator = new InstrumentDecorator();
+		$decorator = $this->decorator();
 		$result = $decorator->instruments(
 			pieAvgInvested: 1000.0,
 			instruments: $instruments,
 			payments: $payments,
 			tickers: $tickers,
-			rateDollarEuro: 0.92,
 		);
 
 		$this->assertEquals(0.0, $result['pieDividend'], 0.001);
@@ -205,20 +202,93 @@ final class InstrumentDecoratorTest extends TestCase
 			[$tickerB, $instrumentB],
 		]);
 
-		$decorator = new InstrumentDecorator();
+		$decorator = $this->decorator();
 		$result = $decorator->instruments(
 			pieAvgInvested: 1000.0,
 			instruments: $instruments,
 			payments: $payments,
 			tickers: $tickers,
-			rateDollarEuro: 0.92,
 		);
 
 		// A: (2.0 / 5) * 5 = 2.0, B: (4.0 / 10) * 20 = 8.0
 		$this->assertEquals(10.0, $result['pieDividend'], 0.001);
 	}
 
+	public function testDividendsUseTheRateOfTheirOwnCurrency(): void
+	{
+		$ticker = $this->createTickerWithId(1, 'VOD', 'Vodafone', 4);
+		$instrument = $this->createInstrument($ticker, 10, 500.0, new DateTimeImmutable('2025-06-15'));
+		$tickers = $this->buildTickersMap($ticker, $instrument);
+		$month = new DateTimeImmutable('first day of last month');
+		$calendar = $this->createCalendar(7, $ticker, $month, 0.5);
+		$rates = $this->createMock(DividendExchangeRateResolverInterface::class);
+		$rates->expects($this->once())->method('getRateForCalendar')->with($calendar)->willReturn(1.25);
+
+		(new InstrumentDecorator($rates))->dividend(new ArrayCollection([1 => [7 => $calendar]]), $tickers);
+
+		// 10 shares * 0.5 * 1.25; the tax stub rounds its rate to 0
+		$this->assertEqualsWithDelta(
+			6.25,
+			$tickers[1]['dividend']['predicted_payment'][(int) $month->format('Ym')],
+			0.0001
+		);
+		$this->assertSame(1.25, $tickers[1]['exchangeRate']);
+	}
+
+	public function testInstrumentsUseTheRateOfTheLatestDividend(): void
+	{
+		$ticker = $this->createTickerWithId(1, 'VOD', 'Vodafone', 4);
+		$instrument = $this->createInstrument($ticker, 10, 500.0, new DateTimeImmutable('2025-06-15'));
+		$tickers = $this->buildTickersMap($ticker, $instrument);
+		$tickers[1]['exchangeRate'] = 1.25;
+		$tickers[1]['dividend']['sumDividend'] = 1.0;
+		$tickers[1]['dividend']['records'] = 2;
+
+		$result = $this->decorator()->instruments(
+			pieAvgInvested: 1000.0,
+			instruments: new ArrayCollection([$instrument]),
+			payments: new ArrayCollection([]),
+			tickers: $tickers,
+		);
+
+		$this->assertSame(1.25, $instrument->getExchangeRate());
+		// avg 0.5 * 10 shares * 1.25; the tax stub rounds its rate to 0
+		$this->assertEqualsWithDelta(6.25, $result['pieAvgDividend'], 0.0001);
+	}
+
+	public function testAMissingRateIsReported(): void
+	{
+		$ticker = $this->createTickerWithId(1, 'VOD', 'Vodafone', 4);
+		$instrument = $this->createInstrument($ticker, 10, 500.0, new DateTimeImmutable('2025-06-15'));
+		$tickers = $this->buildTickersMap($ticker, $instrument);
+		$calendar = $this->createCalendar(7, $ticker, new DateTimeImmutable('first day of last month'), 0.5);
+		$rates = $this->createStub(DividendExchangeRateResolverInterface::class);
+		$rates->method('getRateForCalendar')->willThrowException(new ExchangeRateUnavailableException('No rate'));
+
+		$this->expectException(ExchangeRateUnavailableException::class);
+
+		(new InstrumentDecorator($rates))->dividend(new ArrayCollection([1 => [7 => $calendar]]), $tickers);
+	}
+
 	// -- Helper methods -------------------------------------------------------
+
+	private function decorator(): InstrumentDecorator
+	{
+		return new InstrumentDecorator($this->createConfiguredStub(DividendExchangeRateResolverInterface::class, [
+			'getRateForCalendar' => 0.92,
+			'getRateForCurrency' => 0.92,
+		]));
+	}
+
+	private function createCalendar(int $id, Ticker $ticker, DateTimeImmutable $paymentDate, float $cash): Calendar
+	{
+		return $this->createConfiguredStub(Calendar::class, [
+			'getId' => $id,
+			'getTicker' => $ticker,
+			'getPaymentDate' => new \DateTime($paymentDate->format('Y-m-d')),
+			'getCashAmount' => $cash,
+		]);
+	}
 
 	private function createTickerWithId(int $id, string $symbol, string $fullname, int $frequency): Ticker
 	{

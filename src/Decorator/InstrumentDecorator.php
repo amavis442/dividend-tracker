@@ -2,14 +2,18 @@
 
 namespace App\Decorator;
 
+use App\Contracts\ExchangeRate\DividendExchangeRateResolverInterface;
+use App\Entity\Ticker;
 use App\Entity\Trading212PieInstrument;
 use App\Entity\Calendar;
+use App\Helper\DividendCalendars;
 use Doctrine\Common\Collections\Collection;
 
 final class InstrumentDecorator
 {
-    public function __construct()
-    {
+    public function __construct(
+        private readonly DividendExchangeRateResolverInterface $exchangeRateResolver
+    ) {
     }
 
     /**
@@ -17,8 +21,7 @@ final class InstrumentDecorator
      */
     public function dividend(
         Collection $dividends,
-        array &$tickers,
-        float $rateDollarEuro
+        array &$tickers
     ): void {
         // Copy the original foreach that filled `$tickers[$id]['dividend']`
         // Use $corporateActions as needed. All the logic stays here.
@@ -68,6 +71,12 @@ final class InstrumentDecorator
 
             $tickers[$tickerId]['calendars'][$cId] = $tickerCalendar;
 
+            $exchangeRate = $this->exchangeRateResolver->getRateForCalendar($tickerCalendar);
+            if ($cId >= ($tickers[$tickerId]['exchangeRateMonth'] ?? 0)) {
+                $tickers[$tickerId]['exchangeRate'] = $exchangeRate;
+                $tickers[$tickerId]['exchangeRateMonth'] = $cId;
+            }
+
             if (!isset($tickers[$tickerId]['dividend'])) {
                 $tickers[$tickerId]['dividend']['sumDividend'] = 0.0;
                 $tickers[$tickerId]['dividend']['records'] = 0;
@@ -95,7 +104,7 @@ final class InstrumentDecorator
                 $normalizeToMonthlyPaymentMultiplier = $frequency / 12;
 
                 $predictedPayment =
-                    $owned * $cashAmount * $rateDollarEuro * (1 - $tax);
+                    $owned * $cashAmount * $exchangeRate * (1 - $tax);
                 $tickers[$tickerId]['dividend']['predicted_payment'][$cId] = $predictedPayment;
                 $tickers[$tickerId]['dividend']['predicted_payment_monthly'][$cId] = $predictedPayment * $normalizeToMonthlyPaymentMultiplier;
             }
@@ -112,8 +121,7 @@ final class InstrumentDecorator
         float $pieAvgInvested,
         Collection $instruments,
         Collection $payments,
-        array &$tickers,
-        float $rateDollarEuro
+        array &$tickers
     ): array {
         // Pre-index payments by ticker id — already sorted DESC from DB
         $paymentsByTicker = [];
@@ -165,19 +173,25 @@ final class InstrumentDecorator
             }
             $tax = $instrumentTicker['tax']->getTax()->getTaxRate();
             $instrument->setTaxRate($tax);
-            $instrument->setExchangeRate($rateDollarEuro);
+            // The rate of the latest dividend; it is the basis of the expected amounts.
+            $exchangeRate = $instrumentTicker['exchangeRate'] ?? $this->tickerRate($ticker);
+            $instrument->setExchangeRate($exchangeRate);
 
             $owned = $instrument->getOwnedQuantity();
             // Current
             $yearMonth = (int) date('Ym');
             $currentDividend = 0.0;
+            $currentExchangeRate = $exchangeRate;
             if (isset($instrumentTicker['calendars'][$yearMonth])) {
+                $currentExchangeRate = $this->exchangeRateResolver->getRateForCalendar(
+                    $instrumentTicker['calendars'][$yearMonth]
+                );
                 $currentDividend = $instrumentTicker['calendars'][$yearMonth]->getAdjustedCashAmount();
             }
             $instrument->setCurrentDividendPerShare($currentDividend);
 
             $totalCurrentDividend =
-                $currentDividend * $owned * (1 - $tax) * $rateDollarEuro;
+                $currentDividend * $owned * (1 - $tax) * $currentExchangeRate;
             $instrument->setCurrentDividend($totalCurrentDividend);
 
             $instrument->setMonthlyYield(0.0);
@@ -201,7 +215,7 @@ final class InstrumentDecorator
             $instrument->setAvgDividendPerShare($avgDividend);
 
             $avgExpectedDividend =
-                $avgDividend * $owned * (1 - $tax) * $rateDollarEuro;
+                $avgDividend * $owned * (1 - $tax) * $exchangeRate;
             $instrument->setAvgExpectedDividend($avgExpectedDividend);
 
             $avgYearlYield =
@@ -245,5 +259,12 @@ final class InstrumentDecorator
             'pieCurrentDividend' => $pieCurrentDividend,
             'pieAvgDividend' => $pieAvgDividend,
         ];
+    }
+
+    private function tickerRate(Ticker $ticker): float
+    {
+        return $this->exchangeRateResolver->getRateForCurrency(
+            $ticker->getCurrency()?->getSymbol() ?? DividendCalendars::DEFAULT_CURRENCY
+        );
     }
 }
