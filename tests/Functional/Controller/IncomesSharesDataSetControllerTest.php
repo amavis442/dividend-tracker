@@ -96,6 +96,19 @@ final class IncomesSharesDataSetControllerTest extends WebTestCase
         self::assertAnySelectorTextContains(self::RESULT_CELL, '3,40');
     }
 
+    public function testABlankPriceCountsAsZero(): void
+    {
+        $crawler = $this->client->request('GET', self::BASE . '/create');
+        $form = $crawler->filter('button[name$="[submit]"]')->form();
+        $field = $crawler->filter('input[name$="[price]"]')->attr('name');
+        $form[(string) $field] = '';
+
+        $this->client->submit($form);
+
+        self::assertResponseIsSuccessful();
+        self::assertAnySelectorTextContains(self::RESULT_CELL, 'Test Income');
+    }
+
     public function testANewDataSetSkipsTickersWithoutAnOpenPosition(): void
     {
         $this->positionFor('Sold Income', self::CLOSED_ISIN, closed: true);

@@ -79,7 +79,7 @@ final class IncomesSharesDataSetService
             $share->setTicker($ticker);
             $share->setPrice(0);
             $share->setProfitLoss(0);
-            // Keyed by ticker, so submitted values stay with their ticker if the list changes.
+            // Keyed by ticker, so submitted values can never end up on another ticker.
             $dataSet->getShares()->set($ticker->getId(), $share);
         }
     }

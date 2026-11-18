@@ -20,8 +20,8 @@ class IncomesShareDataType extends AbstractType
         array $options
     ): void {
         $builder
-            ->add('price')
-            ->add('profitLoss')
+            ->add('price', null, ['empty_data' => '0'])
+            ->add('profitLoss', null, ['empty_data' => '0'])
             ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
                 // The share is fixed: its ticker may no longer have an open position.
                 $ticker = $event->getData()?->getTicker();
