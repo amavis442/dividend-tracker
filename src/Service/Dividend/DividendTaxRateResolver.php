@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\Dividend;
 
+use App\Helper\DividendCalendars;
 use App\Contracts\Dividend\DividendTaxRateResolverInterface;
 use App\Entity\Calendar;
 use App\Util\Constants;
@@ -16,13 +17,12 @@ class DividendTaxRateResolver implements DividendTaxRateResolverInterface
      */
     public function getTaxRateForCalendar(Calendar $calendar): float
     {
-        $ticker = $calendar->getTicker();
-        $tax = $ticker->getTax();
+        $tax = $calendar->getTicker()->getTax();
         if ($tax) {
             return $tax->getTaxRate();
         }
 
-        return match (($calendar->getCurrency() ?? $ticker->getCurrency())?->getSymbol()) {
+        return match (DividendCalendars::currency($calendar)?->getSymbol()) {
             'GB', 'GBX', 'GBP' => Constants::TAX_GB_RATE,
             default => Constants::DEFAULT_TAX_RATE,
         };

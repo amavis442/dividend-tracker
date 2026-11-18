@@ -69,6 +69,11 @@ final class DividendExchangeRateResolverTest extends TestCase
         self::assertEqualsWithDelta(0.8, $this->resolver(self::RATES)->getRateForCalendar($calendar), 0.00001);
     }
 
+    public function testARateCanBeRequestedByCurrency(): void
+    {
+        self::assertEqualsWithDelta(1.25, $this->resolver(self::RATES)->getRateForCurrency('GB'), 0.00001);
+    }
+
     public function testEuroNeedsNoRates(): void
     {
         $rates = $this->createMock(ExchangeRateInterface::class);

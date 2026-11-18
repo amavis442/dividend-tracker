@@ -168,7 +168,9 @@
                                 {% endif %}
                             </twig:Table:Td>
                             <twig:Table:Td>
-                                {{ sign|raw }}{{ instrument.currentDividendPerShare|number_format(4) }}
+                                {% set currentCalendar = instrument.calendars[('now'|date('Ym'))] ?? null %}
+                                {% set currentCurrency = currentCalendar ? (currentCalendar.currency ?? instrument.ticker.currency) : null %}
+                                {{ (currentCurrency ? (currentCurrency.sign ?: currentCurrency.symbol) : sign)|raw }}{{ instrument.currentDividendPerShare|number_format(4) }}
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 <div class="flex" {{ stimulus_controller("tooltip") }} data-tooltip-placement-value="right">
@@ -193,11 +195,11 @@
                                                                         <ul>
                                                                             <li>#{{ ckey }}</li>
                                                                             <li>
-                                                                                <span class="font-semibold">{{ calendar.paymentDate|format_datetime('long', 'none', locale: 'nl') }}:</span> ${{ calendar.adjustedCashAmount }}
+                                                                                <span class="font-semibold">{{ calendar.paymentDate|format_datetime('long', 'none', locale: 'nl') }}:</span> {% set calendarCurrency = calendar.currency ?? instrument.ticker.currency %}{{ (calendarCurrency ? (calendarCurrency.sign ?: calendarCurrency.symbol) : '$')|raw }}{{ calendar.adjustedCashAmount }}
                                                                             </li>
                                                                             <li class="font-bold mb-2">
                                                                                 {{'estimated payout'|trans}} &euro;
-                                                                                {% if instrument.dividend.predicted_payment.ckey is defined %}
+                                                                                {% if instrument.dividend.predicted_payment[ckey] is defined %}
                                                                                     {{ instrument.dividend.predicted_payment[ckey]|number_format(2) }}
 
                                                                                     <span class="font-semibold">

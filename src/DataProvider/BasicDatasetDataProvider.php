@@ -125,7 +125,11 @@ class BasicDatasetDataProvider
         $exchangeRates = [];
         foreach ($tickers as $ticker) {
             $tickerId = $ticker->getId();
-            $exchangeRates[$tickerId] = $this->dividendRate($ticker, $calendars[$tickerId] ?? []);
+            // The yield report leaves out positions without an allocation, so they need no rate.
+            $isReported = $dataType !== self::YIELD_DATA_TYPE || $positions[$tickerId]->getAllocation() > 0;
+            $exchangeRates[$tickerId] = $isReported
+                ? $this->dividendRate($ticker, $calendars[$tickerId] ?? [])
+                : 0.0;
 
             if (isset($corporateActions[$tickerId])) {
                 foreach ([...($calendars[$tickerId] ?? []), ...($paidCalendars[$tickerId] ?? [])] as $calendar) {

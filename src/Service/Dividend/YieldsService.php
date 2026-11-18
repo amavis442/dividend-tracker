@@ -5,7 +5,6 @@ namespace App\Service\Dividend;
 use App\Contracts\Dividend\DividendTaxRateResolverInterface;
 use App\Entity\Position;
 use App\Entity\Calendar;
-use App\Entity\Ticker;
 use App\Helper\DividendCalendars;
 use App\Enum\SortDirection;
 use App\Enum\SortField;
@@ -142,14 +141,14 @@ class YieldsService
 
             if ($latestCalendar) {
                 $latestCash = $dividendService->getCashAmount($ticker);
-                $payoutCurrency = $this->currencySign($latestCalendar, $ticker);
+                $payoutCurrency = $this->currencySign($latestCalendar);
 
                 if ($lastPaidCalendar !== null) {
                     $lastPaidCash = $this->dividendAdjuster->getAdjustedDividend(
                         $lastPaidCalendar,
                         $actions[$ticker->getId()] ?? []
                     );
-                    $lastPaidCurrency = $this->currencySign($lastPaidCalendar, $ticker);
+                    $lastPaidCurrency = $this->currencySign($lastPaidCalendar);
                     $lastPaidDate = $lastPaidCalendar->getPaymentDate();
                 }
 
@@ -253,9 +252,9 @@ class YieldsService
         ];
     }
 
-    private function currencySign(Calendar $calendar, Ticker $ticker): string
+    private function currencySign(Calendar $calendar): string
     {
-        $currency = $calendar->getCurrency() ?? $ticker->getCurrency();
+        $currency = DividendCalendars::currency($calendar);
         $sign = $currency?->getSign() ?: $currency?->getSymbol() ?: '$';
 
         return html_entity_decode($sign, ENT_QUOTES | ENT_HTML5);

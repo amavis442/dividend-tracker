@@ -7,6 +7,7 @@ use App\Contracts\ExchangeRate\ExchangeAndTaxResolverInterface;
 use App\Entity\Calendar;
 use App\Entity\Ticker;
 use App\Dto\ExchangeTaxDto;
+use App\Helper\DividendCalendars;
 
 class ExchangeAndTaxResolver implements ExchangeAndTaxResolverInterface
 {
@@ -32,7 +33,7 @@ class ExchangeAndTaxResolver implements ExchangeAndTaxResolverInterface
             $calendar
         );
 
-        $currency = ($calendar->getCurrency() ?? $ticker->getCurrency())?->getSymbol() ?? 'USD';
+        $currency = DividendCalendars::currencySymbol($calendar);
 
         return new ExchangeTaxDto(
             exchangeRate: $exchangeRate,
