@@ -328,6 +328,44 @@ final class InstrumentDecoratorTest extends TestCase
 		$rates->expects($this->never())->method('getRateForCalendar');
 
 		(new InstrumentDecorator($rates))->dividend(new ArrayCollection([1 => [7 => $calendar]]), $tickers);
+
+		$this->assertSame(1, $tickers[1]['dividend']['records']);
+		$this->assertSame(0.5, $tickers[1]['dividend']['sumDividend']);
+	}
+
+	public function testAProviderFailureIsNotHiddenForAnInstrumentWithoutDividends(): void
+	{
+		$ticker = $this->createTickerWithId(1, 'VOD', 'Vodafone', 4);
+		$instrument = $this->createInstrument($ticker, 10, 500.0, new DateTimeImmutable('2025-06-15'));
+		$tickers = $this->buildTickersMap($ticker, $instrument);
+		$rates = $this->createStub(DividendExchangeRateResolverInterface::class);
+		$rates->method('getRateForCurrency')->willThrowException(new ExchangeRateUnavailableException('Down', true));
+
+		$this->expectException(ExchangeRateUnavailableException::class);
+
+		(new InstrumentDecorator($rates))->instruments(
+			pieAvgInvested: 1000.0,
+			instruments: new ArrayCollection([$instrument]),
+			payments: new ArrayCollection([]),
+			tickers: $tickers,
+		);
+	}
+
+	public function testAPaymentWithoutSharesIsSkipped(): void
+	{
+		$ticker = $this->createTickerWithId(1, 'VOD', 'Vodafone', 4);
+		$instrument = $this->createInstrument($ticker, 10, 500.0, new DateTimeImmutable('2025-06-15'));
+		$tickers = $this->buildTickersMap($ticker, $instrument);
+		$payment = $this->createPayment($ticker, new DateTimeImmutable('2025-06-01'), 0, 3.0);
+
+		$result = $this->decorator()->instruments(
+			pieAvgInvested: 1000.0,
+			instruments: new ArrayCollection([$instrument]),
+			payments: new ArrayCollection([$payment]),
+			tickers: $tickers,
+		);
+
+		$this->assertEquals(0.0, $result['pieDividend'], 0.001);
 	}
 
 	public function testAMissingRateIsReported(): void

@@ -82,12 +82,15 @@ final class InstrumentDecorator
                 $tickers[$tickerId]['dividend']['frequency'] = $frequency;
             }
 
-            // Without shares there is nothing to convert, so no rate is needed.
-            if ($cId > $lastYear && $tickers[$tickerId]['instrument']->getOwnedQuantity() > 0) {
-                $exchangeRate = $this->exchangeRateResolver->getRateForCalendar($tickerCalendar);
-                if ($cId >= ($tickers[$tickerId]['exchangeRateMonth'] ?? 0)) {
-                    $tickers[$tickerId]['exchangeRate'] = $exchangeRate;
-                    $tickers[$tickerId]['exchangeRateMonth'] = $cId;
+            if ($cId > $lastYear) {
+                // Without shares there is nothing to convert, so no rate is needed.
+                $exchangeRate = 0.0;
+                if ($tickers[$tickerId]['instrument']->getOwnedQuantity() > 0) {
+                    $exchangeRate = $this->exchangeRateResolver->getRateForCalendar($tickerCalendar);
+                    if ($cId >= ($tickers[$tickerId]['exchangeRateMonth'] ?? 0)) {
+                        $tickers[$tickerId]['exchangeRate'] = $exchangeRate;
+                        $tickers[$tickerId]['exchangeRateMonth'] = $cId;
+                    }
                 }
 
                 /*
@@ -177,7 +180,7 @@ final class InstrumentDecorator
             }
             $tax = $instrumentTicker['tax']->getTax()->getTaxRate();
             $instrument->setTaxRate($tax);
-            // The rate of the latest dividend; it is the basis of the expected amounts.
+            // The rate of the latest dividend.
             $exchangeRate = $instrumentTicker['exchangeRate'] ?? $this->tickerRate($ticker);
             $instrument->setExchangeRate($exchangeRate);
 
@@ -187,9 +190,11 @@ final class InstrumentDecorator
             $currentDividend = 0.0;
             $currentExchangeRate = $exchangeRate;
             if (isset($instrumentTicker['calendars'][$yearMonth])) {
-                $currentExchangeRate = $this->exchangeRateResolver->getRateForCalendar(
-                    $instrumentTicker['calendars'][$yearMonth]
-                );
+                if ($owned > 0) {
+                    $currentExchangeRate = $this->exchangeRateResolver->getRateForCalendar(
+                        $instrumentTicker['calendars'][$yearMonth]
+                    );
+                }
                 $currentDividend = $instrumentTicker['calendars'][$yearMonth]->getAdjustedCashAmount();
             }
             $instrument->setCurrentDividendPerShare($currentDividend);
@@ -247,7 +252,7 @@ final class InstrumentDecorator
             if (isset($paymentsByTicker[$tickerId])) {
                 foreach ($paymentsByTicker[$tickerId] as $payment) {
                     $payDate = $payment->getPayDate();
-                    if ($payDate !== null && $payDate < $instrumentCreatedAt) {
+                    if ($payDate !== null && $payDate < $instrumentCreatedAt && $payment->getAmount() > 0) {
                         $amount = $payment->getAmount();
                         $dividend = $payment->getDividend();
                         $instrumentDividendPaid = ($dividend / $amount) * $owned;
@@ -278,7 +283,11 @@ final class InstrumentDecorator
             return $this->exchangeRateResolver->getRateForCurrency(
                 $ticker->getCurrency()?->getSymbol() ?? DividendCalendars::DEFAULT_CURRENCY
             );
-        } catch (ExchangeRateUnavailableException) {
+        } catch (ExchangeRateUnavailableException $exception) {
+            if ($exception->providerFailed) {
+                throw $exception;
+            }
+
             return 0.0;
         }
     }
