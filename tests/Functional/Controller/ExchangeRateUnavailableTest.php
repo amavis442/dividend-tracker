@@ -45,6 +45,7 @@ final class ExchangeRateUnavailableTest extends WebTestCase
             'user' => $user,
             'currency' => $currency,
             'closed' => false,
+            'ignore_for_dividend' => false,
             'allocation' => 100.0,
             'amount' => 10.0,
         ]);
