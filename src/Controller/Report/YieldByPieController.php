@@ -55,7 +55,7 @@ class YieldByPieController extends AbstractController
             $ticker = $item['ticker'];
             $dividendPerMonth = $item['cash']['all_shares']['month']['net'];
             $invested = $item['invested'];
-            $yieldPerYear = $invested > 0 ? ((12 * $dividendPerMonth) / $invested) * 100 : 0.0;
+            $yieldPerYear = ((12 * $dividendPerMonth) / $invested) * 100;
 
             $totalDividendPerMonth += $dividendPerMonth;
             $totalInvested += $invested;

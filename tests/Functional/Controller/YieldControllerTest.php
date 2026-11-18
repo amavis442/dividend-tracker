@@ -68,6 +68,16 @@ final class YieldControllerTest extends WebTestCase
         self::assertAnySelectorTextContains('td', 'YLD');
     }
 
+    public function testAPositionWithoutAllocationDoesNotCrash(): void
+    {
+        $this->createPosition(allocation: 0.0);
+
+        $this->client->request('GET', self::PATH);
+
+        self::assertResponseIsSuccessful();
+        self::assertAnySelectorTextContains('td', 'YLD');
+    }
+
     public function testAnUnknownSortFallsBackToTheSymbol(): void
     {
         $this->createPosition();
@@ -78,20 +88,25 @@ final class YieldControllerTest extends WebTestCase
         self::assertAnySelectorTextContains('td', 'YLD');
     }
 
-    private function createPosition(): void
+    private function createPosition(float $allocation = 100.0): void
     {
         $currency = CurrencyFactory::createOne(['symbol' => 'USD']);
         $ticker = TickerFactory::createOne(['symbol' => 'YLD', 'fullname' => 'Yield Income']);
         CalendarFactory::new()
             ->instantiateWith(Instantiator::withConstructor()->alwaysForce())
-            ->create(['ticker' => $ticker, 'currency' => $currency, 'createdAt' => new \DateTimeImmutable()]);
+            ->create([
+                'ticker' => $ticker,
+                'currency' => $currency,
+                'cashAmount' => 0.5,
+                'createdAt' => new \DateTimeImmutable(),
+            ]);
         PositionFactory::createOne([
             'ticker' => $ticker,
             'user' => $this->user,
             'currency' => $currency,
             'closed' => false,
             'ignore_for_dividend' => false,
-            'allocation' => 100.0,
+            'allocation' => $allocation,
             'amount' => 10.0,
             'price' => 10.0,
         ]);

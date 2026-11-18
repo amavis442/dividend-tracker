@@ -471,7 +471,7 @@ class DividendService implements DividendServiceInterface
 
 
 
-        if ($forwardNetDividend) {
+        if ($forwardNetDividend && $allocation > 0) {
             $dividendFrequency = 4;
             if ($position->getTicker()->getDividendMonths()) {
                 $dividendFrequency = $position
