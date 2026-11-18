@@ -18,6 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DividendExchangeRateResolver implements DividendExchangeRateResolverInterface
 {
     private const BASE_CURRENCY = 'EUR';
+    private const DEFAULT_DIVIDEND_CURRENCY = 'USD';
 
     /** Currency symbols in the database that are quoted under another symbol. */
     private const RATE_SYMBOLS = ['GB' => 'GBP'];
@@ -30,7 +31,10 @@ class DividendExchangeRateResolver implements DividendExchangeRateResolverInterf
 
     public function getRateForCalendar(Calendar $calendar): float
     {
-        return $this->rateToEuro($calendar->getCurrency()->getSymbol(), $calendar->getTicker()->getSymbol());
+        $ticker = $calendar->getTicker();
+        $currency = $calendar->getCurrency() ?? $ticker->getCurrency();
+
+        return $this->rateToEuro($currency?->getSymbol() ?? self::DEFAULT_DIVIDEND_CURRENCY, $ticker->getSymbol());
     }
 
     public function getRateForTicker(Ticker $ticker): float

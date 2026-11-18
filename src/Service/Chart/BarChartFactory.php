@@ -8,7 +8,7 @@ use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
 /**
- * Builds the single-dataset bar charts used on the position detail pages.
+ * Builds single-dataset bar charts.
  */
 final class BarChartFactory
 {

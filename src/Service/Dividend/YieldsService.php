@@ -4,6 +4,8 @@ namespace App\Service\Dividend;
 
 use App\Contracts\Dividend\DividendTaxRateResolverInterface;
 use App\Entity\Position;
+use App\Enum\SortDirection;
+use App\Enum\SortField;
 use App\Util\Constants;
 use App\Entity\Pie;
 use App\Dto\PositionYield;
@@ -19,9 +21,6 @@ use App\Contracts\ExchangeRate\DividendExchangeRateResolverInterface;
 
 class YieldsService
 {
-    private const SORT_FIELDS = ['symbol', 'dividend', 'yield'];
-    private const DEFAULT_SORT = 'symbol';
-
     public function __construct(
         //private CacheInterface $pool,
         private Stopwatch $stopwatch,
@@ -52,11 +51,13 @@ class YieldsService
             $positions = $positionRepository->getAllOpen($pie, null);
         }
 
-        $this->stopwatch->stop('getting-positions-from-database');
+        // A synchronised position can still be waiting for its ticker to be matched.
+        $positions = array_values(array_filter(
+            $positions,
+            static fn(Position $position): bool => $position->getTicker() !== null
+        ));
 
-        if ($pie && count($report) < 1) {
-            return [];
-        }
+        $this->stopwatch->stop('getting-positions-from-database');
 
         $allocated = 0.0;
 
@@ -97,6 +98,8 @@ class YieldsService
             $adjustedAveragePrice = $positionDecorator->getAdjustedAveragePrice();
 
             $position->setAdjustedAmount($adjustedAmount);
+            // Positions synchronised from the broker have no transactions to derive an amount from.
+            $currentAmount = (float) (isset($transactions[$position->getId()]) ? $adjustedAmount : $amount);
             $position->setAdjustedAveragePrice($adjustedAveragePrice);
 
             $allocation =
@@ -115,8 +118,8 @@ class YieldsService
             $numPayoutsPerYear = $ticker->getDividendMonths()->count();
             $calendarList = new ArrayCollection($dividends[$position->getTicker()->getId()] ?? []);
 
-            //$firstCalendarEntry = $ticker->getCalendars()->first();
-            $firstCalendarEntry = $calendarList->first();
+            // Calendars are loaded by ascending payment date.
+            $latestCalendar = $calendarList->last();
 
             $netTotalForwardYearlyPayout = 0;
             $netForwardYearlyPayout = 0;
@@ -125,38 +128,37 @@ class YieldsService
             $lastCash = 0;
             $lastCashCurrency = '$';
             // Tax rate in percent; currency rules (e.g. UK) need a calendar entry
-            $taxRate = $firstCalendarEntry
-                ? $this->dividendTaxRateResolver->getTaxRateForCalendar($firstCalendarEntry) * 100
+            $taxRate = $latestCalendar
+                ? $this->dividendTaxRateResolver->getTaxRateForCalendar($latestCalendar) * 100
                 : ($ticker->getTax() ? $ticker->getTax()->getTaxRate() * 100 : Constants::TAX);
-            $exchangeRate = $firstCalendarEntry
-                ? $this->dividendExchangeRateResolver->getRateForCalendar($firstCalendarEntry)
+            $exchangeRate = $latestCalendar
+                ? $this->dividendExchangeRateResolver->getRateForCalendar($latestCalendar)
                 : 0;
 
-            if ($firstCalendarEntry) {
+            if ($latestCalendar) {
 //              $lastCash = $dividendService->getCashAmount($ticker);
                 $lastCash = $dividendService->getCashAmount($ticker);
 
-                $lastCashCurrency = $firstCalendarEntry
-                    ->getCurrency()
-                    ->getSign();
-                $lastDividendDate = $firstCalendarEntry->getPaymentDate();
+                $currency = $latestCalendar->getCurrency() ?? $ticker->getCurrency();
+                $lastCashCurrency = html_entity_decode($currency?->getSign() ?? '$', ENT_QUOTES | ENT_HTML5);
+                $lastDividendDate = $latestCalendar->getPaymentDate();
 
                 $netTotalForwardYearlyPayout =
                     $numPayoutsPerYear *
                     $dividendService->getForwardNetDividend(
                         $position->getTicker(),
-                        $position->getAdjustedAmount()
+                        $currentAmount
                     );
                 $netForwardYearlyPayout =
                     $numPayoutsPerYear *
                     $dividendService->getNetDividend(
                         $position,
-                        $firstCalendarEntry
+                        $latestCalendar
                     );
                 $dividendYield = $dividendService->getForwardNetDividendYield(
                     $position,
                     $position->getTicker(),
-                    $amount,
+                    $currentAmount,
                     $allocation
                 );
                 $netTotalPayoutPerPaydate = 0;
@@ -168,51 +170,23 @@ class YieldsService
             }
             $dividendPerYear = $numPayoutsPerYear * $lastCash;
 
-            $tickerLabel = $ticker->getSymbol();
+            // A ticker can have several open positions; each gets its own bar.
+            $tickerLabel = $ticker->getSymbol() . '#' . $position->getId();
             $positionYield->labels[$tickerLabel] = sprintf(
                 '%s (%s)',
-                substr(
-                    addslashes(
-                        str_replace(
-                            ["'", '"'],
-                            ['', ''],
-                            $ticker->getFullname()
-                        )
-                    ),
-                    0,
-                    8
-                ),
+                mb_substr(str_replace(["'", '"'], '', (string) $ticker->getFullname()), 0, 8),
                 $ticker->getSymbol()
             );
             $positionYield->data[$tickerLabel] = $dividendYield;
 
-            $orderKey['yield'] =
-                str_pad(
-                    (string) ($dividendYield * 100),
-                    10,
-                    '0',
-                    STR_PAD_LEFT
-                ) . $ticker->getSymbol();
-            $orderKey['dividend'] =
-                str_pad(
-                    (string) ($dividendPerYear * 100),
-                    10,
-                    '0',
-                    STR_PAD_LEFT
-                ) . $ticker->getSymbol();
-            $orderKey['symbol'] = $ticker->getSymbol();
-
-            $positionYield->dataSource['symbol'][
-                $orderKey['symbol']
-            ] = $positionYield->dataSource['dividend'][
-                $orderKey['dividend']
-            ] = $positionYield->dataSource['yield'][$orderKey['yield']] = [
+            $positionYield->dataSource[] = [
                 'ticker' => $ticker->getSymbol(),
                 'tickerId' => $ticker->getId(),
                 'position' => $position,
                 'label' => $ticker->getFullname(),
                 'yield' => $dividendYield,
                 'payout' => $dividendPerYear,
+                'payoutInEuro' => $dividendPerYear * $exchangeRate,
                 'allocation' => $allocation,
                 'netTotalPayoutPerPaydate' => $netTotalPayoutPerPaydate,
                 'netForwardYearlyPayout' => $netForwardYearlyPayout,
@@ -222,7 +196,7 @@ class YieldsService
                 'lastDividendCurrency' => $lastCashCurrency,
                 'lastDividendDate' => $lastDividendDate,
                 'numPayoutsPerYear' => $numPayoutsPerYear,
-                'amount' => $amount,
+                'amount' => $currentAmount,
                 'taxRate' => $taxRate,
                 'exchangeRate' => $exchangeRate,
             ];
@@ -231,7 +205,7 @@ class YieldsService
             }
             $positionYield->sumAvgPrice += $avgPrice;
             $positionYield->sumDividends += $dividendPerYear;
-            $totalDividend += $dividendPerYear * $amount;
+            $totalDividend += $dividendPerYear * $currentAmount;
             $totalNetYearlyDividendPerStock += $netForwardYearlyPayout;
             $this->stopwatch->lap('processing-file');
         }
@@ -253,15 +227,9 @@ class YieldsService
         ksort($yieldData->labels);
         ksort($yieldData->data);
 
-        $sort = strtolower($sort);
-        $sort = in_array($sort, self::SORT_FIELDS, true) ? $sort : self::DEFAULT_SORT;
-        $dataSource = $yieldData->dataSource[$sort] ?? [];
-
-        if (strtolower($sortDirection) === 'desc') {
-            krsort($dataSource);
-        } else {
-            ksort($dataSource);
-        }
+        $sortField = SortField::fromString($sort);
+        $direction = SortDirection::fromString($sortDirection);
+        $dataSource = $this->sortRows($yieldData->dataSource, $sortField, $direction);
 
         //$this->pool->delete($poolKey);
 
@@ -269,6 +237,8 @@ class YieldsService
             'data' => array_values($yieldData->data),
             'labels' => array_values($yieldData->labels),
             'datasource' => $dataSource,
+            'sort' => $sortField->toString(),
+            'sortDirection' => $direction->toString(),
             'totalAvgYield' => $totalAvgYield,
             'dividendYieldOnCost' => $dividendYieldOnCost,
             'allocated' => $allocated,
@@ -277,5 +247,29 @@ class YieldsService
             'totalNetMonthlyDividend' => $totalNetMonthlyDividend,
             'totalNetYearlyDividendPerStock' => $totalNetYearlyDividendPerStock,
         ];
+    }
+
+    /**
+     * Sorts on the numeric value; rows with the same value stay ordered by symbol.
+     *
+     * @param list<array<string, mixed>> $rows
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function sortRows(array $rows, SortField $sortField, SortDirection $direction): array
+    {
+        $key = match ($sortField) {
+            SortField::SYMBOL => 'ticker',
+            SortField::DIVIDEND => 'payoutInEuro',
+            SortField::YIELD => 'yield',
+        };
+
+        usort($rows, static function (array $a, array $b) use ($key, $direction): int {
+            $order = $direction === SortDirection::DESC ? $b[$key] <=> $a[$key] : $a[$key] <=> $b[$key];
+
+            return $order ?: $a['ticker'] <=> $b['ticker'];
+        });
+
+        return $rows;
     }
 }

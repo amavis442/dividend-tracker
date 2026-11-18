@@ -467,7 +467,9 @@ class DividendCalendarRepository extends ServiceEntityRepository
         ->andWhere('c.dividendType IN (:dividendType)')
         ->setParameter('tickers', $tickerIds)
         ->setParameter('dividendType', $types)
-        ->groupBy('t.id, c.id');
+        ->groupBy('t.id, c.id')
+        ->orderBy('c.paymentDate', 'ASC')
+        ->addOrderBy('c.id', 'ASC');
 
         if ($afterDate) {
             $qb->andWhere('c.paymentDate >= :afterDate')

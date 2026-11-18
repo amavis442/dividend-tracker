@@ -32,7 +32,7 @@ class ExchangeAndTaxResolver implements ExchangeAndTaxResolverInterface
             $calendar
         );
 
-        $currency = $calendar->getCurrency()->getSymbol();
+        $currency = ($calendar->getCurrency() ?? $ticker->getCurrency())?->getSymbol() ?? 'USD';
 
         return new ExchangeTaxDto(
             exchangeRate: $exchangeRate,
