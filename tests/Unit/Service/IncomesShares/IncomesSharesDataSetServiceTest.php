@@ -18,6 +18,7 @@ use App\Service\IncomesShares\IncomesSharesDataSetService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\Uuid;
 
 final class IncomesSharesDataSetServiceTest extends TestCase
 {
@@ -65,6 +66,23 @@ final class IncomesSharesDataSetServiceTest extends TestCase
         self::assertEqualsWithDelta(2.5, $result['totalExpectedDistribution'], 0.0001);
     }
 
+    public function testTheDisplayedTotalMatchesTheTableWhenATickerIsStoredTwice(): void
+    {
+        $position = $this->createConfiguredStub(Position::class, ['getAmount' => 10.0]);
+        $ticker = $this->ticker(cashAmount: 0.5);
+        $shares = [$this->share($ticker), $this->share($ticker)];
+        foreach ($shares as $share) {
+            $share->setPosition($position);
+        }
+        $dataSet = new IncomesSharesDataSet();
+        $dataSet->setUuid(Uuid::v7());
+
+        $display = $this->service(storedShares: $shares)->rowsForDisplay($dataSet);
+
+        self::assertCount(1, $display['rows']);
+        self::assertEqualsWithDelta(2.5, $display['totalExpectedDistribution'], 0.0001);
+    }
+
     public function testSavingDoesNotNeedExchangeRates(): void
     {
         $dataSet = $this->dataSet($this->ticker(cashAmount: 0.5));
@@ -74,8 +92,13 @@ final class IncomesSharesDataSetServiceTest extends TestCase
         $this->service($exchangeRates)->recalculate($dataSet, true);
     }
 
-    private function service(?ExchangeRateInterface $exchangeRates = null): IncomesSharesDataSetService
-    {
+    /**
+     * @param IncomesSharesData[] $storedShares
+     */
+    private function service(
+        ?ExchangeRateInterface $exchangeRates = null,
+        array $storedShares = []
+    ): IncomesSharesDataSetService {
         $position = $this->createConfiguredStub(Position::class, [
             'getAllocation' => 100.0,
             'getAmount' => 10.0,
@@ -85,7 +108,7 @@ final class IncomesSharesDataSetServiceTest extends TestCase
             $this->createConfiguredStub(PositionRepository::class, ['findOneBy' => $position]),
             $this->createConfiguredStub(PaymentRepository::class, ['getSumDividendsByPosition' => 3.0]),
             $this->createStub(TickerRepository::class),
-            $this->createStub(IncomesSharesDataRepository::class),
+            $this->createConfiguredStub(IncomesSharesDataRepository::class, ['findByDataset' => $storedShares]),
             $exchangeRates ?? $this->createConfiguredStub(ExchangeRateInterface::class, [
                 'getRates' => ['USD' => 2.0],
             ]),

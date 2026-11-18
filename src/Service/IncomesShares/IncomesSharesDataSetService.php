@@ -163,7 +163,6 @@ final class IncomesSharesDataSetService
         $usdToEuro = $this->usdToEuro();
 
         $rows = [];
-        $totalExpectedDistribution = 0.0;
         foreach ($this->incomesSharesDataRepository->findByDataset($dataSet->getUuid()) as $share) {
             $ticker = $share->getTicker();
             $amount = $share->getPosition()->getAmount();
@@ -177,11 +176,9 @@ final class IncomesSharesDataSetService
                 $share->getDistributions(),
                 $share->getProfitLoss()
             ) + ['expectedDistribution' => $expectedDistribution];
-
-            $totalExpectedDistribution += $expectedDistribution;
         }
 
-        return ['rows' => $rows, 'totalExpectedDistribution' => $totalExpectedDistribution];
+        return ['rows' => $rows, 'totalExpectedDistribution' => $this->totalExpectedDistribution($rows)];
     }
 
     /**
@@ -229,6 +226,14 @@ final class IncomesSharesDataSetService
         $this->entityManager->flush();
 
         return $dataSet;
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $rows
+     */
+    private function totalExpectedDistribution(array $rows): float
+    {
+        return (float) array_sum(array_column($rows, 'expectedDistribution'));
     }
 
     private function usdToEuro(): float
@@ -310,9 +315,7 @@ final class IncomesSharesDataSetService
             $result['yield'] = ($result['totalDistribution'] / $result['totalAllocation']) * 100;
         }
 
-        $result['totalExpectedDistribution'] = (float) array_sum(
-            array_column($result['rows'], 'expectedDistribution')
-        );
+        $result['totalExpectedDistribution'] = $this->totalExpectedDistribution($result['rows']);
 
         $dataSet->setTotalAllocation($result['totalAllocation']);
         $dataSet->setTotalDistribution($result['totalDistribution']);
