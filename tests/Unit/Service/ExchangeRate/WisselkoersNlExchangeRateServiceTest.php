@@ -44,6 +44,18 @@ final class WisselkoersNlExchangeRateServiceTest extends TestCase
         self::assertFalse($cache->hasItem(ExchangeRateInterface::CACHE_KEY));
     }
 
+    public function testAFailedRequestIsRetried(): void
+    {
+        $client = new MockHttpClient([
+            new MockResponse('', ['http_code' => 500]),
+            new MockResponse(self::BODY),
+        ]);
+        $service = $this->service($client, new BrokenCachePool());
+
+        self::assertSame([], $service->getRates());
+        self::assertSame(1.25, $service->getRates()['USD']);
+    }
+
     private function service(
         MockHttpClient $client,
         ?\Psr\Cache\CacheItemPoolInterface $cache = null

@@ -21,7 +21,6 @@ use App\Service\Dividend\DividendAdjuster;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Uid\Uuid;
-use Symfony\Contracts\HttpClient\Exception\ExceptionInterface as HttpClientException;
 
 /**
  * Calculates IncomesShares datasets (returns per share and totals) and stores them.
@@ -231,8 +230,10 @@ final class IncomesSharesDataSetService
             ['fullname' => 'ASC']
         );
 
+        // Ordered, so the newest position of a ticker is used.
         $positions = [];
-        foreach ($this->positionRepository->findBy(['ticker' => $tickers, 'closed' => false]) as $position) {
+        $openPositions = $this->positionRepository->findBy(['ticker' => $tickers, 'closed' => false], ['id' => 'ASC']);
+        foreach ($openPositions as $position) {
             $positions[$position->getTicker()->getId()] = $position;
         }
 
@@ -364,9 +365,8 @@ final class IncomesSharesDataSetService
             $exchangeRate = $this->exchangeRateResolver->getRateForCalendar($calendar);
             $taxRate = $this->taxRateResolver->getTaxRateForCalendar($calendar);
         } catch (\Throwable $exception) {
-            $this->rateProviderUnavailable = $exception instanceof HttpClientException
-                || ($exception instanceof \RuntimeException
-                    && !$exception instanceof ExchangeRateUnavailableException);
+            $this->rateProviderUnavailable = $exception instanceof ExchangeRateUnavailableException
+                && $exception->providerFailed;
             $this->logger->warning('Expected distribution unavailable for {ticker}: {message}', [
                 'ticker' => $ticker->getSymbol(),
                 'message' => $exception->getMessage(),

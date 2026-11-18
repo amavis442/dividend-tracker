@@ -114,9 +114,12 @@ class BasicDatasetDataProvider
         $exchangeRates = [];
         foreach ($tickers as $ticker) {
             $tickerId = $ticker->getId();
-            $exchangeRates[
-                $tickerId
-            ] = $this->dividendExchangeRateResolver->getRateForTicker($ticker);
+            // Dividends are paid in the currency of their calendar, not the listing currency.
+            $tickerCalendars = $calendars[$tickerId] ?? [];
+            $calendar = reset($tickerCalendars) ?: null;
+            $exchangeRates[$tickerId] = $calendar !== null
+                ? $this->dividendExchangeRateResolver->getRateForCalendar($calendar)
+                : $this->dividendExchangeRateResolver->getRateForTicker($ticker);
 
             if (
                 isset($calendars[$tickerId]) &&

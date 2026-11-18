@@ -9,8 +9,11 @@ use Symfony\Contracts\Service\ResetInterface;
 
 class WisselkoersNlExchangeRateService implements ExchangeRateInterface, ResetInterface
 {
-    /** @var array<string, float>|null rates of the current request */
+    private const RATES_LIFETIME = 60 * 15;
+
+    /** @var array<string, float>|null last complete rates */
     private ?array $rates = null;
+    private int $ratesFetchedAt = 0;
 
     public const URL_EXCHANGERATE = 'https://www.wisselkoers.nl/calcvalutas.ashx';
 
@@ -27,7 +30,17 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface, ResetIn
 
     public function getRates(): array
     {
-        return $this->rates ??= $this->loadRates();
+        if ($this->rates !== null && time() - $this->ratesFetchedAt < self::RATES_LIFETIME) {
+            return $this->rates;
+        }
+
+        $rates = $this->loadRates();
+        if (isset($rates['GBP'])) {
+            $this->rates = $rates;
+            $this->ratesFetchedAt = time();
+        }
+
+        return $rates;
     }
 
     private function loadRates(): array
@@ -80,8 +93,7 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface, ResetIn
         $item = $this->exchangerateCache->getItem(
             ExchangeRateInterface::CACHE_KEY
         );
-        $Minutes15 = 60 * 15;
-        $item->expiresAfter($Minutes15);
+        $item->expiresAfter(self::RATES_LIFETIME);
         $item->set($rates);
 
         $this->exchangerateCache->save($item);

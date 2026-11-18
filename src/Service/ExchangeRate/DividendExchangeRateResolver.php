@@ -9,6 +9,7 @@ use App\Contracts\ExchangeRate\ExchangeRateInterface;
 use App\Entity\Calendar;
 use App\Entity\Ticker;
 use App\Exception\ExchangeRateUnavailableException;
+use Symfony\Contracts\HttpClient\Exception\ExceptionInterface as HttpClientException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -34,9 +35,7 @@ class DividendExchangeRateResolver implements DividendExchangeRateResolverInterf
 
     public function getRateForTicker(Ticker $ticker): float
     {
-        $symbol = $ticker->getCurrency()->getSymbol();
-
-        return $this->rateToEuro($symbol, $symbol);
+        return $this->rateToEuro($ticker->getCurrency()->getSymbol(), $ticker->getSymbol());
     }
 
     private function rateToEuro(string $symbol, ?string $tickerSymbol): float
@@ -45,20 +44,40 @@ class DividendExchangeRateResolver implements DividendExchangeRateResolverInterf
             return 1.0;
         }
 
-        $rates = $this->exchangeRateService->getRates();
+        try {
+            $rates = $this->exchangeRateService->getRates();
+        } catch (HttpClientException | \RuntimeException $exception) {
+            throw new ExchangeRateUnavailableException(
+                $this->unavailableMessage($symbol, $tickerSymbol, []),
+                true,
+                $exception
+            );
+        }
+
         $rate = (float) ($rates[self::RATE_SYMBOLS[$symbol] ?? $symbol] ?? 0.0);
 
         if ($rate <= 0.0) {
-            throw new ExchangeRateUnavailableException($this->translator->trans(
-                'tickerSymbol:: Exchange rate for [Symbol] is currently unavailable. Available are: jsonSymbol',
-                [
-                    'tickerSymbol' => $tickerSymbol,
-                    'Symbol' => $symbol,
-                    'jsonSymbol' => json_encode(array_keys($rates)),
-                ]
-            ));
+            throw new ExchangeRateUnavailableException(
+                $this->unavailableMessage($symbol, $tickerSymbol, $rates),
+                $rates === []
+            );
         }
 
         return 1 / $rate;
+    }
+
+    /**
+     * @param array<string, float> $rates
+     */
+    private function unavailableMessage(string $symbol, ?string $tickerSymbol, array $rates): string
+    {
+        return $this->translator->trans(
+            'tickerSymbol:: Exchange rate for [Symbol] is currently unavailable. Available are: jsonSymbol',
+            [
+                'tickerSymbol' => $tickerSymbol,
+                'Symbol' => $symbol,
+                'jsonSymbol' => json_encode(array_keys($rates)),
+            ]
+        );
     }
 }

@@ -65,6 +65,31 @@ final class DividendExchangeRateResolverTest extends TestCase
         $this->resolver(['USD' => 1.25])->getRateForCalendar($this->calendar('SEK'));
     }
 
+    public function testAProviderFailureIsReported(): void
+    {
+        $rates = $this->createStub(ExchangeRateInterface::class);
+        $rates->method('getRates')->willThrowException(new \RuntimeException('Unreadable'));
+        $resolver = new DividendExchangeRateResolver($rates, $this->createStub(TranslatorInterface::class));
+
+        try {
+            $resolver->getRateForCalendar($this->calendar('USD'));
+            self::fail('Expected the rate to be unavailable.');
+        } catch (ExchangeRateUnavailableException $exception) {
+            self::assertTrue($exception->providerFailed);
+            self::assertNotNull($exception->getPrevious());
+        }
+    }
+
+    public function testNoRatesAtAllCountsAsAProviderFailure(): void
+    {
+        try {
+            $this->resolver([])->getRateForCalendar($this->calendar('USD'));
+            self::fail('Expected the rate to be unavailable.');
+        } catch (ExchangeRateUnavailableException $exception) {
+            self::assertTrue($exception->providerFailed);
+        }
+    }
+
     public function testAZeroRateIsReported(): void
     {
         $this->expectException(ExchangeRateUnavailableException::class);

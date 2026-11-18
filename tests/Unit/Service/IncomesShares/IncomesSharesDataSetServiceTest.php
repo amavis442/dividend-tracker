@@ -24,7 +24,6 @@ use App\Service\IncomesShares\IncomesSharesDataSetService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\Uid\Uuid;
 
 final class IncomesSharesDataSetServiceTest extends TestCase
@@ -106,7 +105,7 @@ final class IncomesSharesDataSetServiceTest extends TestCase
     {
         $rates = $this->createMock(DividendExchangeRateResolverInterface::class);
         $rates->expects(self::once())->method('getRateForCalendar')
-            ->willThrowException(new TransportException('Timeout'));
+            ->willThrowException(new ExchangeRateUnavailableException('Timeout', true));
         $dataSet = new IncomesSharesDataSet();
         $dataSet->getShares()->add($this->share());
         $dataSet->getShares()->add($this->share(ticker: $this->ticker(10, 'IE00TEST0002')));
