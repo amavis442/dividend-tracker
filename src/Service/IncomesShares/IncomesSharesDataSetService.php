@@ -354,7 +354,7 @@ final class IncomesSharesDataSetService
             return 0.0;
         }
 
-        if ($this->rateProviderUnavailable) {
+        if ($this->rateProviderUnavailable && $calendar->getCurrency()?->getSymbol() !== 'EUR') {
             return null;
         }
 

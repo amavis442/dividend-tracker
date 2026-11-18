@@ -10,10 +10,11 @@ use Symfony\Contracts\Service\ResetInterface;
 class WisselkoersNlExchangeRateService implements ExchangeRateInterface, ResetInterface
 {
     private const RATES_LIFETIME = 60 * 15;
+    private const INCOMPLETE_RATES_LIFETIME = 60;
 
-    /** @var array<string, float>|null last complete rates */
+    /** @var array<string, float>|null last fetched rates */
     private ?array $rates = null;
-    private int $ratesFetchedAt = 0;
+    private int $ratesExpireAt = 0;
 
     public const URL_EXCHANGERATE = 'https://www.wisselkoers.nl/calcvalutas.ashx';
 
@@ -30,17 +31,23 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface, ResetIn
 
     public function getRates(): array
     {
-        if ($this->rates !== null && time() - $this->ratesFetchedAt < self::RATES_LIFETIME) {
+        if ($this->rates !== null && time() < $this->ratesExpireAt) {
             return $this->rates;
         }
 
-        $rates = $this->loadRates();
-        if (isset($rates['GBP'])) {
-            $this->rates = $rates;
-            $this->ratesFetchedAt = time();
-        }
+        $this->rates = $this->loadRates();
+        $lifetime = $this->isComplete($this->rates) ? self::RATES_LIFETIME : self::INCOMPLETE_RATES_LIFETIME;
+        $this->ratesExpireAt = time() + $lifetime;
 
-        return $rates;
+        return $this->rates;
+    }
+
+    /**
+     * @param array<string, float> $rates
+     */
+    private function isComplete(array $rates): bool
+    {
+        return ($rates['GBP'] ?? 0.0) > 0.0;
     }
 
     private function loadRates(): array
@@ -73,7 +80,13 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface, ResetIn
                     'Data for exchangerate is empty or can not be read'
                 );
             }
+            if (!is_array($response)) {
+                throw new \RuntimeException('Data for exchangerate has an unexpected format');
+            }
             foreach ($response as $data) {
+                if (!is_array($data) || !isset($data['Shortname'], $data['Last'])) {
+                    throw new \RuntimeException('Data for exchangerate has an unexpected format');
+                }
                 if ($data['Shortname'] != '') {
                     $rates[
                         strtoupper($data['Shortname'])
@@ -82,8 +95,8 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface, ResetIn
             }
         }
 
-        if (!isset($rates['GBP'])) {
-            // Incomplete rates are not worth keeping: try again on the next request.
+        if (!$this->isComplete($rates)) {
+            // Incomplete rates are not worth keeping: try again soon.
             return $rates;
         }
 

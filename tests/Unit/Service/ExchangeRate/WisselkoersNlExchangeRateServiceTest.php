@@ -44,7 +44,7 @@ final class WisselkoersNlExchangeRateServiceTest extends TestCase
         self::assertFalse($cache->hasItem(ExchangeRateInterface::CACHE_KEY));
     }
 
-    public function testAFailedRequestIsRetried(): void
+    public function testAFailedRequestIsRememberedBrieflyAndRetriedAfterAReset(): void
     {
         $client = new MockHttpClient([
             new MockResponse('', ['http_code' => 500]),
@@ -53,7 +53,31 @@ final class WisselkoersNlExchangeRateServiceTest extends TestCase
         $service = $this->service($client, new BrokenCachePool());
 
         self::assertSame([], $service->getRates());
+        self::assertSame([], $service->getRates());
+        self::assertSame(1, $client->getRequestsCount());
+
+        $service->reset();
+
         self::assertSame(1.25, $service->getRates()['USD']);
+    }
+
+    public function testAZeroPoundRateIsNotCached(): void
+    {
+        $cache = new ArrayAdapter();
+        $client = new MockHttpClient([new MockResponse('[{"Shortname":"gbp","Last":"0"}]')]);
+
+        $this->service($client, $cache)->getRates();
+
+        self::assertFalse($cache->hasItem(ExchangeRateInterface::CACHE_KEY));
+    }
+
+    public function testAnUnexpectedResponseIsReported(): void
+    {
+        $client = new MockHttpClient([new MockResponse('{"error":"busy"}')]);
+
+        $this->expectException(\RuntimeException::class);
+
+        $this->service($client)->getRates();
     }
 
     private function service(
