@@ -301,7 +301,24 @@ final class InstrumentDecoratorTest extends TestCase
 		$this->assertSame(0.0, $instrument->getExchangeRate());
 	}
 
-	public function testAnInstrumentWithoutInvestedValueNeedsNoRate(): void
+	public function testAnInstrumentWithoutInvestedValueStillCountsItsDividend(): void
+	{
+		$ticker = $this->createTickerWithId(1, 'VOD', 'Vodafone', 4);
+		$instrument = $this->createInstrument($ticker, 10, 0.0, new DateTimeImmutable('2025-06-15'));
+		$tickers = $this->buildTickersMap($ticker, $instrument);
+		$month = new DateTimeImmutable('first day of last month');
+		$calendar = $this->createCalendar(7, $ticker, $month, 0.5);
+
+		$this->decorator()->dividend(new ArrayCollection([1 => [7 => $calendar]]), $tickers);
+
+		$this->assertEqualsWithDelta(
+			4.6,
+			$tickers[1]['dividend']['predicted_payment'][(int) $month->format('Ym')],
+			0.0001
+		);
+	}
+
+	public function testAnInstrumentWithoutSharesNeedsNoRate(): void
 	{
 		$ticker = $this->createTickerWithId(1, 'VOD', 'Vodafone', 4);
 		$instrument = $this->createInstrument($ticker, 0, 0.0, new DateTimeImmutable('2025-06-15'));

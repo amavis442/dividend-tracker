@@ -37,7 +37,11 @@ final class StockPriceCollectionDataProvider
         foreach ($symbols as $symbol) {
             try {
                 $marketPrice = $this->stockPriceService->getMarketPrice($symbol);
-            } catch (ExchangeRateUnavailableException) {
+            } catch (ExchangeRateUnavailableException $exception) {
+                if ($exception->providerFailed) {
+                    throw $exception;
+                }
+
                 // One price without a rate should not hide the others.
                 $marketPrice = null;
             }

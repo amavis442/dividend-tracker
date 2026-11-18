@@ -82,8 +82,8 @@ final class InstrumentDecorator
                 $tickers[$tickerId]['dividend']['frequency'] = $frequency;
             }
 
-            // Instruments without invested value are not reported, so they need no rate.
-            if ($cId > $lastYear && $tickers[$tickerId]['instrument']->getPriceAvgInvestedValue() != 0) {
+            // Without shares there is nothing to convert, so no rate is needed.
+            if ($cId > $lastYear && $tickers[$tickerId]['instrument']->getOwnedQuantity() > 0) {
                 $exchangeRate = $this->exchangeRateResolver->getRateForCalendar($tickerCalendar);
                 if ($cId >= ($tickers[$tickerId]['exchangeRateMonth'] ?? 0)) {
                     $tickers[$tickerId]['exchangeRate'] = $exchangeRate;
