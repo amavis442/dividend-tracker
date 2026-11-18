@@ -392,7 +392,16 @@ final class IncomesSharesDataSetService
             $this->corporateActionDataProvider->load([$position->getTicker()])
         );
 
-        return $this->adjustedPositionDecoratorFactory->decorate($position)->getAdjustedAmount();
+        try {
+            return $this->adjustedPositionDecoratorFactory->decorate($position)->getAdjustedAmount();
+        } catch (\InvalidArgumentException $exception) {
+            $this->logger->warning('Stored amount used for position {id}: {message}', [
+                'id' => $position->getId(),
+                'message' => $exception->getMessage(),
+            ]);
+
+            return (float) $position->getAmount();
+        }
     }
 
     /**

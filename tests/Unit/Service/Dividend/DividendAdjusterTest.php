@@ -18,7 +18,7 @@ final class DividendAdjusterTest extends TestCase
     public static function dividends(): iterable
     {
         yield 'recorded before the split' => ['2026-03-01', '2026-05-01', 2.0];
-        yield 'imported later but ex-dividend before the split' => ['2026-05-01', '2026-03-01', 2.0];
+        yield 'imported after the split with an earlier ex-dividend date' => ['2026-05-01', '2026-03-01', 1.0];
         yield 'recorded and ex-dividend after the split' => ['2026-05-01', '2026-05-15', 1.0];
     }
 

@@ -283,7 +283,7 @@ final class IncomesSharesDataSetController extends AbstractController
         FormInterface $form,
         IncomesSharesDataSet $dataSet
     ): bool {
-        $submitted = array_map('intval', array_keys($request->request->all($form->getName())['shares'] ?? []));
+        $submitted = array_map('intval', array_keys($this->submittedShares($request, $form)));
         $current = array_map('intval', $dataSet->getShares()->getKeys());
         sort($submitted);
         sort($current);
@@ -302,11 +302,21 @@ final class IncomesSharesDataSetController extends AbstractController
         $submitted = $request->request->all($form->getName());
         unset($submitted['submit'], $submitted['save']);
         $submitted['shares'] = array_intersect_key(
-            $submitted['shares'] ?? [],
+            $this->submittedShares($request, $form),
             array_flip($dataSet->getShares()->getKeys())
         );
 
         $form->submit($submitted);
+    }
+
+    /**
+     * @return array<int|string, mixed>
+     */
+    private function submittedShares(Request $request, FormInterface $form): array
+    {
+        $shares = $request->request->all($form->getName())['shares'] ?? [];
+
+        return is_array($shares) ? $shares : [];
     }
 
     private function isSaveClicked(FormInterface $form): bool

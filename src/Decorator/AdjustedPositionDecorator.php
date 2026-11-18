@@ -107,6 +107,10 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface, AdjustedP
     public function getAdjustedAmountPerDate(\DateTimeInterface $datetime): float
     {
         $transactions = $this->getTransactions();
+        if ($transactions === []) {
+            return (float) $this->position->getAmount();
+        }
+
         $actions = $this->getActions();
 
         $total = 0.0;
@@ -224,7 +228,7 @@ class AdjustedPositionDecorator implements AdjustedDecoratorInterface, AdjustedP
             ['position' => $this->position->getId(), 'type' => [CorporateAction::REVERSE_SPLIT, CorporateAction::SPLIT]],
             ['eventDate' => 'ASC']
         ); */
-        $actions = $this->actions;
+        $actions = array_filter($this->actions, CorporateActionRatio::hasTakenPlace(...));
 
         if (empty($actions)) {
             return null;

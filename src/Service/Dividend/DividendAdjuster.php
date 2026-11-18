@@ -8,20 +8,17 @@ use App\Helper\CorporateActionRatio;
 class DividendAdjuster
 {
     /**
-     * Expresses a dividend per share after later reverse splits. A dividend
-     * needs adjusting when it was recorded or went ex-dividend before the split.
+     * Expresses a dividend per share after later reverse splits. The moment of
+     * recording decides: dividends imported after a split, also for earlier
+     * dates, already arrive split-adjusted from the data providers.
      */
     public function getAdjustedDividend(Calendar $calendar, array $actions): float
     {
         $cashAmount = $calendar->getCashAmount();
         $createdAt = $calendar->getCreatedAt();
-        $exDividendDate = $calendar->getExDividendDate();
 
         foreach ($actions as $action) {
-            if (
-                CorporateActionRatio::appliesTo($action, $createdAt)
-                || ($exDividendDate !== null && CorporateActionRatio::appliesTo($action, $exDividendDate))
-            ) {
+            if (CorporateActionRatio::appliesTo($action, $createdAt)) {
                 $cashAmount /= CorporateActionRatio::of($action); // Applies reverse split
             }
         }

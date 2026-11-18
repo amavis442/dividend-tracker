@@ -16,9 +16,12 @@ final class CorporateActionRatio
      */
     public static function appliesTo(CorporateAction $action, \DateTimeInterface $date): bool
     {
-        $eventDate = $action->getEventDate();
+        return $date < $action->getEventDate() && self::hasTakenPlace($action);
+    }
 
-        return $date < $eventDate && $eventDate <= new \DateTimeImmutable();
+    public static function hasTakenPlace(CorporateAction $action): bool
+    {
+        return $action->getEventDate() <= new \DateTimeImmutable();
     }
 
     /**

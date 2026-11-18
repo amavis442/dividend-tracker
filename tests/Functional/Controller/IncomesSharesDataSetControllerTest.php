@@ -101,6 +101,13 @@ final class IncomesSharesDataSetControllerTest extends WebTestCase
         self::assertAnySelectorTextContains(self::RESULT_CELL, 'Test Income');
     }
 
+    public function testTheFormIsSubmittedWithoutTurbo(): void
+    {
+        $this->client->request('GET', self::BASE . '/create');
+
+        self::assertSelectorExists('form[data-turbo="false"]');
+    }
+
     public function testChangedPositionsStoreNothingAndExplainWhy(): void
     {
         $held = $this->positionFor('Still Held', 'IE00TEST0002', closed: false);
@@ -119,7 +126,7 @@ final class IncomesSharesDataSetControllerTest extends WebTestCase
 
         self::assertResponseStatusCodeSame(422);
         self::assertSame(0, $manager->getRepository(IncomesSharesDataSet::class)->count([]));
-        self::assertAnySelectorTextContains('body', 'open positions have changed');
+        self::assertAnySelectorTextContains('body', 'open posities zijn gewijzigd');
         self::assertSame('12,5', $crawler->filter(sprintf('input[name="%s"]', $priceField))->attr('value'));
     }
 
