@@ -74,7 +74,6 @@ class YieldsService
 
         $totalDividend = 0.0;
         $totalNetYearlyDividend = 0.0;
-        $netYearlyDividendOnAllocation = 0.0;
         $totalNetYearlyDividendPerStock = 0.0;
         $totalNetMonthlyDividend = 0.0;
         $dividendYieldOnCost = 0.0;
@@ -106,7 +105,9 @@ class YieldsService
                     : $position->getAllocation();
             $ticker = $position->getTicker();
 
-            $allocated += $allocation;
+            if ($allocation > 0) {
+                $allocated += $allocation;
+            }
 
             $lastCash = 0;
             $lastDividendDate = null;
@@ -225,9 +226,8 @@ class YieldsService
                 'taxRate' => $taxRate,
                 'exchangeRate' => $exchangeRate,
             ];
-            $totalNetYearlyDividend += $netTotalForwardYearlyPayout;
             if ($allocation > 0) {
-                $netYearlyDividendOnAllocation += $netTotalForwardYearlyPayout;
+                $totalNetYearlyDividend += $netTotalForwardYearlyPayout;
             }
             $positionYield->sumAvgPrice += $avgPrice;
             $positionYield->sumDividends += $dividendPerYear;
@@ -243,7 +243,7 @@ class YieldsService
                 100;
         }
         if ($allocated) {
-            $dividendYieldOnCost = ($netYearlyDividendOnAllocation / $allocated) * 100;
+            $dividendYieldOnCost = ($totalNetYearlyDividend / $allocated) * 100;
         }
         $yieldData = $positionYield;
 
