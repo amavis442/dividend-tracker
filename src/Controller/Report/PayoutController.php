@@ -96,7 +96,7 @@ class PayoutController extends AbstractController
                 ],
                 [
                     'label' => 'forecast payout',
-                    'data' => array_values($result['forecast'])
+                    'data' => $result['forecast'],
                 ],
                 [
                     'label' => 'Trendline',

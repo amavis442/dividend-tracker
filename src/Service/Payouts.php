@@ -2,6 +2,9 @@
 
 namespace App\Service;
 
+use App\DataProvider\CorporateActionDataProvider;
+use App\DataProvider\DividendDataProvider;
+use App\DataProvider\TransactionDataProvider;
 use App\Entity\Calendar;
 use App\Repository\PaymentRepository;
 use App\Repository\DividendTrackerRepository;
@@ -12,6 +15,13 @@ class Payouts
 {
     private const MIN_POSITION_AMOUNT = 0.001;
     private const MIN_DIVIDEND = 0.01;
+
+    public function __construct(
+        private readonly TransactionDataProvider $transactionDataProvider,
+        private readonly CorporateActionDataProvider $corporateActionDataProvider,
+        private readonly DividendDataProvider $dividendDataProvider
+    ) {
+    }
 
     public function payout(PaymentRepository $paymentRepository): array
     {
@@ -64,7 +74,6 @@ class Payouts
             $dividendService,
             $calendarRepository->findForForecast($paydate, $endDate)
         );
-        ksort($foreCastDividend);
 
         $labels = [];
         $dates = [];
@@ -86,7 +95,7 @@ class Payouts
             $dates[] = $date;
             $dividends[] = $item['dividend'];
 
-            if (isset($allocations[$date])) {
+            if (!empty($allocations[$date])) {
                 $yields[$date] = (($item['dividend'] * 12) / $allocations[$date]) * 100;
 
                 if (isset($foreCastDividend[$date])) {
@@ -97,52 +106,52 @@ class Payouts
 
         $labelMonths = array_fill_keys($labels, 'filler');
 
-        $date = date('Y-m');
-        if (!isset($labelMonths[$date])) {
-            $labels[] = $date;
+        $date = date('Ym');
+        if (!isset($labelMonths[date('Y-m')])) {
+            $labels[] = date('Y-m');
             $yields[$date] = 0.0;
         }
-        $date = date('Ym');
-        if (isset($allocations[$date]) && isset($foreCastDividend[$date])) {
+        if (!empty($allocations[$date]) && isset($foreCastDividend[$date])) {
             $yields[$date] = (($foreCastDividend[$date] * 12) / $allocations[$date]) * 100;
         }
 
-        $trendarray = $this->trendline(array_keys($dividends), $dividends);
-        $trendline = [];
-        foreach (array_keys($dividends) as $item) {
-            $number = ( $trendarray['slope'] * $item ) + $trendarray['intercept'];
-            $number = ( $number <= 0 ) ? 0 : $number;
-            $trendline[] = $number;
-        }
-
-        $range = range(0, count($yields) - 1);
-        $trendarrayYield = $this->trendline($range, array_values($yields));
-        $trendlineYield = [];
-        foreach ($range as $item) {
-            $number = ( $trendarrayYield['slope'] * $item ) + $trendarrayYield['intercept'];
-            $number = ( $number <= 0 ) ? 0 : $number;
-            $trendlineYield[] = $number;
-        }
-
-        $range = range(0, count($foreCastYields) - 1);
-        $trendarrayYield = $this->trendline($range, array_values($foreCastYields));
-        $trendlineForeCastYield = [];
-        foreach ($range as $item) {
-            $number = ( $trendarrayYield['slope'] * $item ) + $trendarrayYield['intercept'];
-            $number = ( $number <= 0 ) ? 0 : $number;
-            $trendlineForeCastYield[] = $number;
-        }
-
+        $forecastPerLabel = array_map(
+            static fn(string $label): ?float => $foreCastDividend[str_replace('-', '', $label)] ?? null,
+            $labels
+        );
 
         return [
             'labels' => $labels,
             'dividends' => $dividends,
-            'trendline' => $trendline,
+            'trendline' => $this->trendValues($dividends),
             'yields' => $yields,
-            'trendlineYield' => $trendlineYield,
-            'forecast' => $foreCastDividend,
-            'trendlineForeCastYield' => $trendlineForeCastYield,
+            'trendlineYield' => $this->trendValues($yields),
+            'forecast' => $forecastPerLabel,
+            'trendlineForeCastYield' => $this->trendValues($foreCastYields),
         ];
+    }
+
+    /**
+     * Value of the linear trend at every data point, never below zero.
+     *
+     * @param array<int|string, float|int|string> $values
+     *
+     * @return list<float>
+     */
+    private function trendValues(array $values): array
+    {
+        if ($values === []) {
+            return [];
+        }
+
+        $values = array_values($values);
+        $positions = array_keys($values);
+        $trend = $this->trendline($positions, $values);
+
+        return array_map(
+            static fn(int $position): float => max(0.0, $trend['slope'] * $position + $trend['intercept']),
+            $positions
+        );
     }
 
     private function trendline(array $x, array $y): array
@@ -159,9 +168,9 @@ class Payouts
             $xx_sum += $x[$i] * $x[$i];
         }
 
-        // Slope
-        $slope =
-            ($n * $xy_sum - $x_sum * $y_sum) / ($n * $xx_sum - $x_sum * $x_sum);
+        // A single data point has no slope
+        $denominator = $n * $xx_sum - $x_sum * $x_sum;
+        $slope = $denominator == 0 ? 0.0 : ($n * $xy_sum - $x_sum * $y_sum) / $denominator;
 
         // calculate intercept
         $intercept = ($y_sum - $slope * $x_sum) / $n;
@@ -182,6 +191,7 @@ class Payouts
      */
     private function forecastPerMonth(DividendServiceInterface $dividendService, array $calendars): array
     {
+        $this->loadForecastData($dividendService, $calendars);
         $dividendService->setAccumulateDividendAmount(false);
 
         $totalDividend = [];
@@ -200,5 +210,36 @@ class Payouts
         }
 
         return $totalDividend;
+    }
+
+    /**
+     * @param Calendar[] $calendars
+     */
+    private function loadForecastData(DividendServiceInterface $dividendService, array $calendars): void
+    {
+        $positions = [];
+        $tickers = [];
+        foreach ($calendars as $calendar) {
+            $ticker = $calendar->getTicker();
+            $position = $ticker->getPositions()->first();
+            if (!$position) {
+                continue;
+            }
+
+            $positions[$position->getId()] = $position;
+            $tickers[$ticker->getId()] = $ticker;
+        }
+
+        $positions = array_values($positions);
+        $tickers = array_values($tickers);
+
+        $dividendService->load(
+            transactions: $this->transactionDataProvider->load($positions),
+            corporateActions: $this->corporateActionDataProvider->load($tickers),
+            dividends: $this->dividendDataProvider->load(
+                tickers: $tickers,
+                types: [Calendar::REGULAR, Calendar::SUPPLEMENT, Calendar::SPECIAL]
+            )
+        );
     }
 }
