@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Service;
 
-use App\Contracts\ExchangeRate\ExchangeRateInterface;
+use App\Contracts\ExchangeRate\DividendExchangeRateResolverInterface;
 use App\Exception\ExchangeRateUnavailableException;
 use App\Service\StockPriceService;
 use PHPUnit\Framework\TestCase;
@@ -15,30 +15,26 @@ final class StockPriceServiceTest extends TestCase
 {
     public function testAQuoteIsConvertedWithItsCurrencyRate(): void
     {
-        self::assertEqualsWithDelta(8.0, $this->service(['USD' => 1.25])->getQuote('ABC'), 0.0001);
+        $rates = $this->createMock(DividendExchangeRateResolverInterface::class);
+        $rates->expects(self::once())->method('getRateForCurrency')->with('USD')->willReturn(0.8);
+
+        self::assertEqualsWithDelta(8.0, $this->service($rates)->getQuote('ABC'), 0.0001);
     }
 
     public function testAMissingRateIsReported(): void
     {
+        $rates = $this->createStub(DividendExchangeRateResolverInterface::class);
+        $rates->method('getRateForCurrency')->willThrowException(new ExchangeRateUnavailableException('No rate'));
+
         $this->expectException(ExchangeRateUnavailableException::class);
 
-        $this->service([])->getQuote('ABC');
+        $this->service($rates)->getQuote('ABC');
     }
 
-    public function testAZeroRateIsReported(): void
-    {
-        $this->expectException(ExchangeRateUnavailableException::class);
-
-        $this->service(['USD' => 0.0])->getQuote('ABC');
-    }
-
-    /**
-     * @param array<string, float> $rates
-     */
-    private function service(array $rates): StockPriceService
+    private function service(DividendExchangeRateResolverInterface $rates): StockPriceService
     {
         $service = new StockPriceService(
-            $this->createConfiguredStub(ExchangeRateInterface::class, ['getRates' => $rates]),
+            $rates,
             $this->createStub(CacheInterface::class),
             $this->createStub(HttpClientInterface::class)
         );

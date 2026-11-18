@@ -256,6 +256,63 @@ final class InstrumentDecoratorTest extends TestCase
 		$this->assertEqualsWithDelta(6.25, $result['pieAvgDividend'], 0.0001);
 	}
 
+	public function testTheAverageConvertsEachDividendWithItsOwnRate(): void
+	{
+		$ticker = $this->createTickerWithId(1, 'VOD', 'Vodafone', 4);
+		$instrument = $this->createInstrument($ticker, 10, 500.0, new DateTimeImmutable('2025-06-15'));
+		$tickers = $this->buildTickersMap($ticker, $instrument);
+		unset($tickers[1]['dividend']);
+		$older = $this->createCalendar(7, $ticker, new DateTimeImmutable('first day of -2 months'), 1.0);
+		$newer = $this->createCalendar(8, $ticker, new DateTimeImmutable('first day of -1 month'), 1.0);
+		$rates = $this->createStub(DividendExchangeRateResolverInterface::class);
+		$rates->method('getRateForCalendar')->willReturnCallback(
+			static fn(Calendar $calendar): float => $calendar === $older ? 2.0 : 1.0
+		);
+		$decorator = new InstrumentDecorator($rates);
+
+		$decorator->dividend(new ArrayCollection([1 => [7 => $older, 8 => $newer]]), $tickers);
+		$result = $decorator->instruments(
+			pieAvgInvested: 1000.0,
+			instruments: new ArrayCollection([$instrument]),
+			payments: new ArrayCollection([]),
+			tickers: $tickers,
+		);
+
+		// ((1.0 * 2.0) + (1.0 * 1.0)) / 2 * 10 shares; the tax stub rounds its rate to 0
+		$this->assertEqualsWithDelta(15.0, $result['pieAvgDividend'], 0.0001);
+		$this->assertSame(1.0, $instrument->getExchangeRate());
+	}
+
+	public function testAnInstrumentWithoutDividendsToleratesAMissingRate(): void
+	{
+		$ticker = $this->createTickerWithId(1, 'VOD', 'Vodafone', 4);
+		$instrument = $this->createInstrument($ticker, 10, 500.0, new DateTimeImmutable('2025-06-15'));
+		$tickers = $this->buildTickersMap($ticker, $instrument);
+		$rates = $this->createStub(DividendExchangeRateResolverInterface::class);
+		$rates->method('getRateForCurrency')->willThrowException(new ExchangeRateUnavailableException('No rate'));
+
+		(new InstrumentDecorator($rates))->instruments(
+			pieAvgInvested: 1000.0,
+			instruments: new ArrayCollection([$instrument]),
+			payments: new ArrayCollection([]),
+			tickers: $tickers,
+		);
+
+		$this->assertSame(0.0, $instrument->getExchangeRate());
+	}
+
+	public function testAnInstrumentWithoutInvestedValueNeedsNoRate(): void
+	{
+		$ticker = $this->createTickerWithId(1, 'VOD', 'Vodafone', 4);
+		$instrument = $this->createInstrument($ticker, 0, 0.0, new DateTimeImmutable('2025-06-15'));
+		$tickers = $this->buildTickersMap($ticker, $instrument);
+		$calendar = $this->createCalendar(7, $ticker, new DateTimeImmutable('first day of last month'), 0.5);
+		$rates = $this->createMock(DividendExchangeRateResolverInterface::class);
+		$rates->expects($this->never())->method('getRateForCalendar');
+
+		(new InstrumentDecorator($rates))->dividend(new ArrayCollection([1 => [7 => $calendar]]), $tickers);
+	}
+
 	public function testAMissingRateIsReported(): void
 	{
 		$ticker = $this->createTickerWithId(1, 'VOD', 'Vodafone', 4);

@@ -6,6 +6,7 @@ use App\Contracts\ExchangeRate\DividendExchangeRateResolverInterface;
 use App\Entity\Ticker;
 use App\Entity\Trading212PieInstrument;
 use App\Entity\Calendar;
+use App\Exception\ExchangeRateUnavailableException;
 use App\Helper\DividendCalendars;
 use Doctrine\Common\Collections\Collection;
 
@@ -71,12 +72,6 @@ final class InstrumentDecorator
 
             $tickers[$tickerId]['calendars'][$cId] = $tickerCalendar;
 
-            $exchangeRate = $this->exchangeRateResolver->getRateForCalendar($tickerCalendar);
-            if ($cId >= ($tickers[$tickerId]['exchangeRateMonth'] ?? 0)) {
-                $tickers[$tickerId]['exchangeRate'] = $exchangeRate;
-                $tickers[$tickerId]['exchangeRateMonth'] = $cId;
-            }
-
             if (!isset($tickers[$tickerId]['dividend'])) {
                 $tickers[$tickerId]['dividend']['sumDividend'] = 0.0;
                 $tickers[$tickerId]['dividend']['records'] = 0;
@@ -87,7 +82,14 @@ final class InstrumentDecorator
                 $tickers[$tickerId]['dividend']['frequency'] = $frequency;
             }
 
-            if ($cId > $lastYear) {
+            // Instruments without invested value are not reported, so they need no rate.
+            if ($cId > $lastYear && $tickers[$tickerId]['instrument']->getPriceAvgInvestedValue() != 0) {
+                $exchangeRate = $this->exchangeRateResolver->getRateForCalendar($tickerCalendar);
+                if ($cId >= ($tickers[$tickerId]['exchangeRateMonth'] ?? 0)) {
+                    $tickers[$tickerId]['exchangeRate'] = $exchangeRate;
+                    $tickers[$tickerId]['exchangeRateMonth'] = $cId;
+                }
+
                 /*
                 $tickers[$id]['dividend'][
                     $cId
@@ -96,6 +98,8 @@ final class InstrumentDecorator
                 $tickers[$tickerId]['dividend'][$cId] = $cashAmount;
 
                 $tickers[$tickerId]['dividend']['sumDividend'] += $cashAmount;
+                $tickers[$tickerId]['dividend']['sumDividendInEuro'] =
+                    ($tickers[$tickerId]['dividend']['sumDividendInEuro'] ?? 0.0) + $cashAmount * $exchangeRate;
                 $tickers[$tickerId]['dividend']['records'] += 1;
 
                 $owned = $tickers[$tickerId]['instrument']->getOwnedQuantity();
@@ -214,8 +218,12 @@ final class InstrumentDecorator
             $avgDividend = $instrumentTicker['dividend']['avg'];
             $instrument->setAvgDividendPerShare($avgDividend);
 
-            $avgExpectedDividend =
-                $avgDividend * $owned * (1 - $tax) * $exchangeRate;
+            // Dividends can differ in currency, so they are averaged after conversion.
+            $records = $instrumentTicker['dividend']['records'] ?? 0;
+            $avgDividendInEuro = isset($instrumentTicker['dividend']['sumDividendInEuro']) && $records > 0
+                ? $instrumentTicker['dividend']['sumDividendInEuro'] / $records
+                : $avgDividend * $exchangeRate;
+            $avgExpectedDividend = $avgDividendInEuro * $owned * (1 - $tax);
             $instrument->setAvgExpectedDividend($avgExpectedDividend);
 
             $avgYearlYield =
@@ -261,10 +269,17 @@ final class InstrumentDecorator
         ];
     }
 
+    /**
+     * Only informative: without dividends nothing is converted, so a missing rate gives 0.
+     */
     private function tickerRate(Ticker $ticker): float
     {
-        return $this->exchangeRateResolver->getRateForCurrency(
-            $ticker->getCurrency()?->getSymbol() ?? DividendCalendars::DEFAULT_CURRENCY
-        );
+        try {
+            return $this->exchangeRateResolver->getRateForCurrency(
+                $ticker->getCurrency()?->getSymbol() ?? DividendCalendars::DEFAULT_CURRENCY
+            );
+        } catch (ExchangeRateUnavailableException) {
+            return 0.0;
+        }
     }
 }

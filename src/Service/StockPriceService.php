@@ -3,12 +3,11 @@
 namespace App\Service;
 
 use App\Contracts\Service\StockPricePluginInterface;
-use App\Exception\ExchangeRateUnavailableException;
 use RuntimeException;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use App\Contracts\ExchangeRate\ExchangeRateInterface;
+use App\Contracts\ExchangeRate\DividendExchangeRateResolverInterface;
 
 class StockPriceService
 {
@@ -25,11 +24,11 @@ class StockPriceService
      */
     protected array $linkTickerToService;
     /**
-     * Get the current exchange rates
+     * Converts prices to euro
      *
-     * @var ExchangeRateInterface
+     * @var DividendExchangeRateResolverInterface
      */
-    protected ExchangeRateInterface $exchangeRateService;
+    protected DividendExchangeRateResolverInterface $exchangeRateResolver;
     /**
      * Get data from external sources
      *
@@ -57,12 +56,12 @@ class StockPriceService
 
     /**
      *
-     * @param ExchangeRateInterface $exchangeRateService
+     * @param DividendExchangeRateResolverInterface $exchangeRateResolver
      * @param CacheInterface $stockCache
      * @param HttpClientInterface $client
      */
     public function __construct(
-        ExchangeRateInterface $exchangeRateService,
+        DividendExchangeRateResolverInterface $exchangeRateResolver,
         CacheInterface $stockCache,
         HttpClientInterface $client
     ) {
@@ -70,7 +69,7 @@ class StockPriceService
         $this->linkTickerToService = [];
 
         $this->client = $client;
-        $this->exchangeRateService = $exchangeRateService;
+        $this->exchangeRateResolver = $exchangeRateResolver;
         $this->stockCache = $stockCache;
         $this->data = [];
     }
@@ -202,24 +201,13 @@ class StockPriceService
     public function getQuote(string $symbol): ?float
     {
         if (isset($this->data[$symbol])) {
-            $rates = $this->exchangeRateService->getRates();
             $data = $this->data[$symbol];
             if (!isset($data['regularMarketPrice'])) {
                 return null;
             }
             $price = $data['regularMarketPrice'];
-            $currency = strtoupper($data['currency']);
-            if ($currency !== 'EUR') {
-                $rate = (float) ($rates[$currency] ?? 0.0);
-                if ($rate <= 0.0) {
-                    throw new ExchangeRateUnavailableException(
-                        sprintf('Exchange rate for %s is currently unavailable.', $currency)
-                    );
-                }
 
-                return $price / $rate;
-            }
-            return $price;
+            return $price * $this->exchangeRateResolver->getRateForCurrency(strtoupper($data['currency']));
         }
 
         return null;

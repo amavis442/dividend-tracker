@@ -5,6 +5,7 @@
 namespace App\DataProvider;
 
 use App\Dto\StockPrice;
+use App\Exception\ExchangeRateUnavailableException;
 use App\Repository\TickerRepository;
 use App\Service\StockPriceService;
 
@@ -34,7 +35,12 @@ final class StockPriceCollectionDataProvider
 
         $data = [];
         foreach ($symbols as $symbol) {
-            $marketPrice = $this->stockPriceService->getMarketPrice($symbol);
+            try {
+                $marketPrice = $this->stockPriceService->getMarketPrice($symbol);
+            } catch (ExchangeRateUnavailableException) {
+                // One price without a rate should not hide the others.
+                $marketPrice = null;
+            }
             $stockprice = new StockPrice();
             $stockprice->setSymbol($symbol);
             $stockprice->setPrice(null);
