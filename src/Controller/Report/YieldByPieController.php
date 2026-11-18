@@ -45,7 +45,7 @@ class YieldByPieController extends AbstractController
 
         $totalDividendPerMonth = 0.0;
         $totalInvested = 0.0;
-        $result = [];
+        $result = ['labels' => [], 'data' => []];
 
         BasicDatasetDataProvider::sort($dataCalc, $sortBy, $sortDirection);
 
@@ -65,8 +65,9 @@ class YieldByPieController extends AbstractController
             $result['data'][] = $yieldPerYear;
         }
         $yearlyEstimatedDividend = $totalDividendPerMonth * 12;
-        $yearlyEstimatedYield =
-            ($yearlyEstimatedDividend / $totalInvested) * 100;
+        $yearlyEstimatedYield = $totalInvested > 0
+            ? ($yearlyEstimatedDividend / $totalInvested) * 100
+            : 0.0;
 
         $result['totalNetYearlyDividend'] = $yearlyEstimatedDividend;
         $result['dividendYieldOnCost'] = $yearlyEstimatedYield;
