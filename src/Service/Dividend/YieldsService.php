@@ -51,6 +51,12 @@ class YieldsService
             $positions = $positionRepository->getAllOpen($pie, null);
         }
 
+        // A synchronised position can still be waiting for its ticker to be matched.
+        $positions = array_values(array_filter(
+            $positions,
+            static fn(Position $position): bool => $position->getTicker() !== null
+        ));
+
         $this->stopwatch->stop('getting-positions-from-database');
 
         $allocated = 0.0;
@@ -92,6 +98,8 @@ class YieldsService
             $adjustedAveragePrice = $positionDecorator->getAdjustedAveragePrice();
 
             $position->setAdjustedAmount($adjustedAmount);
+            // Positions synchronised from the broker have no transactions to derive an amount from.
+            $currentAmount = (float) ($adjustedAmount ?: $amount);
             $position->setAdjustedAveragePrice($adjustedAveragePrice);
 
             $allocation =
@@ -131,14 +139,15 @@ class YieldsService
 //              $lastCash = $dividendService->getCashAmount($ticker);
                 $lastCash = $dividendService->getCashAmount($ticker);
 
-                $lastCashCurrency = $latestCalendar->getCurrency()?->getSign() ?? '$';
+                $currency = $latestCalendar->getCurrency() ?? $ticker->getCurrency();
+                $lastCashCurrency = html_entity_decode($currency?->getSign() ?? '$', ENT_QUOTES | ENT_HTML5);
                 $lastDividendDate = $latestCalendar->getPaymentDate();
 
                 $netTotalForwardYearlyPayout =
                     $numPayoutsPerYear *
                     $dividendService->getForwardNetDividend(
                         $position->getTicker(),
-                        $position->getAdjustedAmount()
+                        $currentAmount
                     );
                 $netForwardYearlyPayout =
                     $numPayoutsPerYear *
@@ -149,7 +158,7 @@ class YieldsService
                 $dividendYield = $dividendService->getForwardNetDividendYield(
                     $position,
                     $position->getTicker(),
-                    (float) $adjustedAmount,
+                    $currentAmount,
                     $allocation
                 );
                 $netTotalPayoutPerPaydate = 0;
@@ -161,20 +170,11 @@ class YieldsService
             }
             $dividendPerYear = $numPayoutsPerYear * $lastCash;
 
-            $tickerLabel = $ticker->getSymbol();
+            // A ticker can have several open positions; each gets its own bar.
+            $tickerLabel = $ticker->getSymbol() . '#' . $position->getId();
             $positionYield->labels[$tickerLabel] = sprintf(
                 '%s (%s)',
-                substr(
-                    addslashes(
-                        str_replace(
-                            ["'", '"'],
-                            ['', ''],
-                            $ticker->getFullname()
-                        )
-                    ),
-                    0,
-                    8
-                ),
+                mb_substr(str_replace(["'", '"'], '', (string) $ticker->getFullname()), 0, 8),
                 $ticker->getSymbol()
             );
             $positionYield->data[$tickerLabel] = $dividendYield;
@@ -186,6 +186,7 @@ class YieldsService
                 'label' => $ticker->getFullname(),
                 'yield' => $dividendYield,
                 'payout' => $dividendPerYear,
+                'payoutInEuro' => $dividendPerYear * $exchangeRate,
                 'allocation' => $allocation,
                 'netTotalPayoutPerPaydate' => $netTotalPayoutPerPaydate,
                 'netForwardYearlyPayout' => $netForwardYearlyPayout,
@@ -259,7 +260,7 @@ class YieldsService
     {
         $key = match ($sortField) {
             SortField::SYMBOL => 'ticker',
-            SortField::DIVIDEND => 'payout',
+            SortField::DIVIDEND => 'payoutInEuro',
             SortField::YIELD => 'yield',
         };
 

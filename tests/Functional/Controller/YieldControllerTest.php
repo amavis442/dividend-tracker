@@ -17,6 +17,7 @@ use App\Factory\UserFactory;
 use App\Repository\UserRepository;
 use App\Service\ExchangeRate\WisselkoersNlExchangeRateService;
 use App\Tests\Support\StubExchangeRates;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -83,6 +84,51 @@ final class YieldControllerTest extends WebTestCase
         $this->client->request('GET', self::PATH);
 
         self::assertSelectorExists('canvas[data-controller~="chartjs-add-percentage"]');
+    }
+
+    public function testAPositionWithoutTransactionsStillHasAYield(): void
+    {
+        $this->createPosition('YLD');
+
+        $crawler = $this->client->request('GET', self::PATH);
+
+        self::assertStringContainsString('%', $crawler->filter('tbody tr')->first()->filter('td')->last()->text());
+    }
+
+    public function testAPositionWithoutTickerIsSkipped(): void
+    {
+        PositionFactory::createOne([
+            'ticker' => null,
+            'user' => $this->user,
+            'currency' => $this->currency,
+            'closed' => false,
+            'ignore_for_dividend' => false,
+        ]);
+
+        $this->client->request('GET', self::PATH);
+
+        self::assertResponseIsSuccessful();
+    }
+
+    public function testAnAccentedNameKeepsTheChartValid(): void
+    {
+        $this->createPosition('SOC', fullname: 'Société Générale');
+
+        $crawler = $this->client->request('GET', self::PATH);
+        $view = (string) $crawler->filter('canvas')->attr('data-symfony--ux-chartjs--chart-view-value');
+
+        self::assertStringContainsString('SOC', $view);
+    }
+
+    public function testTheCurrencySignIsShownEscaped(): void
+    {
+        $this->currency->setSign('&pound;');
+        static::getContainer()->get(EntityManagerInterface::class)->flush();
+        $this->createPosition('YLD');
+
+        $this->client->request('GET', self::PATH);
+
+        self::assertAnySelectorTextContains('td', '£0,50');
     }
 
     public function testAPositionWithoutAllocationDoesNotCrash(): void
@@ -186,10 +232,11 @@ final class YieldControllerTest extends WebTestCase
         bool $withCalendar = true,
         bool $ignored = false,
         bool $forPieReport = false,
+        ?string $fullname = null,
     ): Ticker {
         $attributes = [
             'symbol' => $symbol,
-            'fullname' => $symbol . ' Income',
+            'fullname' => $fullname ?? $symbol . ' Income',
             'dividendMonths' => [DividendMonthFactory::createOne(['dividendMonth' => 3])],
         ];
         if ($forPieReport) {

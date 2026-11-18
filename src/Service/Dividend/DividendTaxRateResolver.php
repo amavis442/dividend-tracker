@@ -16,12 +16,13 @@ class DividendTaxRateResolver implements DividendTaxRateResolverInterface
      */
     public function getTaxRateForCalendar(Calendar $calendar): float
     {
-        $tax = $calendar->getTicker()->getTax();
+        $ticker = $calendar->getTicker();
+        $tax = $ticker->getTax();
         if ($tax) {
             return $tax->getTaxRate();
         }
 
-        return match ($calendar->getCurrency()?->getSymbol()) {
+        return match (($calendar->getCurrency() ?? $ticker->getCurrency())?->getSymbol()) {
             'GB', 'GBX', 'GBP' => Constants::TAX_GB_RATE,
             default => Constants::DEFAULT_TAX_RATE,
         };
