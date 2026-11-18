@@ -179,9 +179,19 @@ final class IncomesSharesDataSetController extends AbstractController
                 $contents[] = $fileData->get('uploadfile')->getData()->getContent();
             }
 
-            $dataSet = $dataSetService->importExport($csvParser->parse($contents));
+            $import = $dataSetService->importExport($csvParser->parse($contents));
 
-            $this->addFlash('success', 'Saved dataset: ' . $dataSet->getUuid()->__toString());
+            if ($import['skippedSymbols'] !== []) {
+                $this->addFlash(
+                    'notice',
+                    'Skipped without an open position: ' . implode(', ', $import['skippedSymbols'])
+                );
+            }
+            if ($import['dataSet'] !== null) {
+                $this->addFlash('success', 'Saved dataset: ' . $import['dataSet']->getUuid()->__toString());
+            } elseif ($import['skippedSymbols'] === []) {
+                $this->addFlash('notice', 'The uploaded files contain no instruments.');
+            }
 
             return $this->redirectToRoute('app_incomes_shares_data_set_index', [], Response::HTTP_SEE_OTHER);
         }

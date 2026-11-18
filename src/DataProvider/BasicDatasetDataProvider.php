@@ -6,6 +6,8 @@ namespace App\DataProvider;
 
 use App\DataProvider\DividendDataProvider;
 use App\Entity\Calendar;
+use App\Entity\Ticker;
+use App\Exception\ExchangeRateUnavailableException;
 use App\Repository\PositionRepository;
 use App\Repository\TransactionRepository;
 use App\Service\Dividend\DividendAdjuster;
@@ -114,9 +116,7 @@ class BasicDatasetDataProvider
         $exchangeRates = [];
         foreach ($tickers as $ticker) {
             $tickerId = $ticker->getId();
-            $exchangeRates[
-                $tickerId
-            ] = $this->dividendExchangeRateResolver->getRateForTicker($ticker);
+            $exchangeRates[$tickerId] = $this->dividendRate($ticker, $calendars[$tickerId] ?? []);
 
             if (
                 isset($calendars[$tickerId]) &&
@@ -138,6 +138,35 @@ class BasicDatasetDataProvider
             $positions,
             $exchangeRates
         );
+    }
+
+    /**
+     * Rate for the ticker's dividends: those are paid in the currency of their
+     * calendar, not the listing currency. Without a dividend the rate is only
+     * informative, so a missing rate gives 0 instead of failing the page.
+     *
+     * @param array<int, Calendar> $calendars
+     */
+    private function dividendRate(Ticker $ticker, array $calendars): float
+    {
+        $calendar = end($calendars) ?: null;
+        if ($calendar?->getCurrency() !== null) {
+            return $this->dividendExchangeRateResolver->getRateForCalendar($calendar);
+        }
+
+        if ($ticker->getCurrency() === null) {
+            return 0.0;
+        }
+
+        try {
+            return $this->dividendExchangeRateResolver->getRateForTicker($ticker);
+        } catch (ExchangeRateUnavailableException $exception) {
+            if ($calendar !== null) {
+                throw $exception;
+            }
+
+            return 0.0;
+        }
     }
 
     /**

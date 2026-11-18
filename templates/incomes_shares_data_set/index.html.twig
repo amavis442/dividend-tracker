@@ -9,6 +9,11 @@
                         {{ notice|trans }}
                     </twig:Alert>
                 {% endfor %}
+                {% for notice in app.flashes('success') %}
+                    <twig:Alert variant="success">
+                        {{ notice|trans }}
+                    </twig:Alert>
+                {% endfor %}
             </div>
             <div id="header" class="px-3 py-2 w-full">
                 <twig:Head>

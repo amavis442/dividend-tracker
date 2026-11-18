@@ -12,6 +12,7 @@ use App\Entity\CorporateAction;
 use App\Entity\IncomesSharesData;
 use App\Entity\IncomesSharesDataSet;
 use App\Entity\Ticker;
+use App\Exception\ExchangeRateUnavailableException;
 use App\Repository\IncomesSharesDataRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
@@ -20,7 +21,6 @@ use App\Service\Dividend\DividendAdjuster;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Uid\Uuid;
-use Symfony\Contracts\HttpClient\Exception\ExceptionInterface as HttpClientException;
 
 /**
  * Calculates IncomesShares datasets (returns per share and totals) and stores them.
@@ -216,20 +216,38 @@ final class IncomesSharesDataSetService
 
     /**
      * Stores a new dataset from parsed export data (see IncomesSharesCsvParser).
+     * Symbols without a ticker or an open position are skipped and reported;
+     * nothing is stored when no symbol can be used.
      *
      * @param array<string, array{price: float, result: float}> $exportData
+     *
+     * @return array{dataSet: ?IncomesSharesDataSet, skippedSymbols: list<string>}
      */
-    public function importExport(array $exportData): IncomesSharesDataSet
+    public function importExport(array $exportData): array
     {
         $tickers = $this->tickerRepository->findBy(
             ['symbol' => array_keys($exportData)],
             ['fullname' => 'ASC']
         );
 
+        // Ordered, so the newest position of a ticker is used.
+        $positions = [];
+        $openPositions = $this->positionRepository->findBy(['ticker' => $tickers, 'closed' => false], ['id' => 'ASC']);
+        foreach ($openPositions as $position) {
+            $positions[$position->getTicker()->getId()] = $position;
+        }
+
         $uuid = Uuid::v7();
         $dataSet = new IncomesSharesDataSet();
         $result = $this->emptyResult();
+        $importedSymbols = [];
         foreach ($tickers as $ticker) {
+            $position = $positions[$ticker->getId()] ?? null;
+            if ($position === null) {
+                continue;
+            }
+
+            $importedSymbols[] = $ticker->getSymbol();
             $item = $exportData[$ticker->getSymbol()];
             $share = new IncomesSharesData();
             $share->setTicker($ticker);
@@ -237,7 +255,6 @@ final class IncomesSharesDataSetService
             $share->setProfitLoss($item['result']);
             $dataSet->getShares()->add($share);
 
-            $position = $ticker->getPositions()[0];
             $distributions = $this->paymentRepository->getSumDividendsByPosition($position);
 
             $result['totalDistribution'] += $distributions;
@@ -252,13 +269,18 @@ final class IncomesSharesDataSetService
             $this->entityManager->persist($share);
         }
 
+        $skippedSymbols = array_values(array_diff(array_map('strval', array_keys($exportData)), $importedSymbols));
+        if ($importedSymbols === []) {
+            return ['dataSet' => null, 'skippedSymbols' => $skippedSymbols];
+        }
+
         $dataSet->setUuid($uuid);
         $this->applyTotals($dataSet, $result);
 
         $this->entityManager->persist($dataSet);
         $this->entityManager->flush();
 
-        return $dataSet;
+        return ['dataSet' => $dataSet, 'skippedSymbols' => $skippedSymbols];
     }
 
     /**
@@ -332,7 +354,7 @@ final class IncomesSharesDataSetService
             return 0.0;
         }
 
-        if ($this->rateProviderUnavailable) {
+        if ($this->rateProviderUnavailable && $calendar->getCurrency()?->getSymbol() !== 'EUR') {
             return null;
         }
 
@@ -343,7 +365,8 @@ final class IncomesSharesDataSetService
             $exchangeRate = $this->exchangeRateResolver->getRateForCalendar($calendar);
             $taxRate = $this->taxRateResolver->getTaxRateForCalendar($calendar);
         } catch (\Throwable $exception) {
-            $this->rateProviderUnavailable = $exception instanceof HttpClientException;
+            $this->rateProviderUnavailable = $this->rateProviderUnavailable
+                || ($exception instanceof ExchangeRateUnavailableException && $exception->providerFailed);
             $this->logger->warning('Expected distribution unavailable for {ticker}: {message}', [
                 'ticker' => $ticker->getSymbol(),
                 'message' => $exception->getMessage(),
