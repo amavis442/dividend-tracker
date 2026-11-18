@@ -142,8 +142,8 @@ class BasicDatasetDataProvider
 
     /**
      * Rate for the ticker's dividends: those are paid in the currency of their
-     * calendar, not the listing currency. Without a dividend to convert, a
-     * missing rate is harmless and gives 0.
+     * calendar, not the listing currency. Without a dividend the rate is only
+     * informative, so a missing rate gives 0 instead of failing the page.
      *
      * @param array<int, Calendar> $calendars
      */

@@ -50,6 +50,16 @@ final class BasicDatasetDataProviderTest extends TestCase
         self::assertSame([self::TICKER_ID => 0.5], $data->exchangeRates);
     }
 
+    public function testAMissingRateWithoutDividendsDoesNotBreakTheDataset(): void
+    {
+        $rates = $this->createStub(DividendExchangeRateResolverInterface::class);
+        $rates->method('getRateForTicker')->willThrowException(new ExchangeRateUnavailableException('No rate'));
+
+        $data = $this->provider($rates, [])->getDataForYield();
+
+        self::assertSame([self::TICKER_ID => 0.0], $data->exchangeRates);
+    }
+
     public function testADividendWithoutCurrencyUsesTheTickerCurrency(): void
     {
         $calendar = $this->createConfiguredStub(Calendar::class, ['getCurrency' => null]);
@@ -60,16 +70,6 @@ final class BasicDatasetDataProviderTest extends TestCase
         $data = $this->provider($rates, [self::TICKER_ID => [1 => $calendar]])->getDataForYield();
 
         self::assertSame([self::TICKER_ID => 0.5], $data->exchangeRates);
-    }
-
-    public function testAMissingRateWithoutDividendsDoesNotBreakTheDataset(): void
-    {
-        $rates = $this->createStub(DividendExchangeRateResolverInterface::class);
-        $rates->method('getRateForTicker')->willThrowException(new ExchangeRateUnavailableException('No rate'));
-
-        $data = $this->provider($rates, [])->getDataForYield();
-
-        self::assertSame([self::TICKER_ID => 0.0], $data->exchangeRates);
     }
 
     /**

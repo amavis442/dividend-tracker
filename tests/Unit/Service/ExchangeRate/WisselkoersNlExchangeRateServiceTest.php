@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 final class WisselkoersNlExchangeRateServiceTest extends TestCase
 {
@@ -71,13 +72,47 @@ final class WisselkoersNlExchangeRateServiceTest extends TestCase
         self::assertFalse($cache->hasItem(ExchangeRateInterface::CACHE_KEY));
     }
 
-    public function testAnUnexpectedResponseIsReported(): void
+    public function testAProviderFailureIsRememberedBriefly(): void
+    {
+        $client = new MockHttpClient([new MockResponse('', ['error' => 'Timeout'])]);
+        $service = $this->service($client, new BrokenCachePool());
+
+        foreach ([1, 2] as $attempt) {
+            try {
+                $service->getRates();
+                self::fail('Expected the provider to fail.');
+            } catch (TransportExceptionInterface) {
+                self::assertSame(1, $client->getRequestsCount(), 'Attempt ' . $attempt);
+            }
+        }
+    }
+
+    public function testAnUnexpectedResponseGivesNoRates(): void
     {
         $client = new MockHttpClient([new MockResponse('{"error":"busy"}')]);
 
-        $this->expectException(\RuntimeException::class);
+        self::assertSame([], $this->service($client)->getRates());
+    }
 
-        $this->service($client)->getRates();
+    public function testAnUnusableRowIsSkipped(): void
+    {
+        $body = '[{"Shortname":null,"Last":"1"},{"Shortname":"sek"},{"Shortname":"usd","Last":"1,25"},'
+            . '{"Shortname":"gbp","Last":"0,8"}]';
+
+        $rates = $this->service(new MockHttpClient([new MockResponse($body)]))->getRates();
+
+        self::assertSame(1.25, $rates['USD']);
+        self::assertArrayNotHasKey('SEK', $rates);
+    }
+
+    public function testRatesWithoutADollarRateAreNotCached(): void
+    {
+        $cache = new ArrayAdapter();
+        $client = new MockHttpClient([new MockResponse('[{"Shortname":"gbp","Last":"0,8"}]')]);
+
+        $this->service($client, $cache)->getRates();
+
+        self::assertFalse($cache->hasItem(ExchangeRateInterface::CACHE_KEY));
     }
 
     private function service(

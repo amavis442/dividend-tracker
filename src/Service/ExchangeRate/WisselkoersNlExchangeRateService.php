@@ -4,6 +4,7 @@ namespace App\Service\ExchangeRate;
 
 use App\Contracts\ExchangeRate\ExchangeRateInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Contracts\HttpClient\Exception\ExceptionInterface as HttpClientException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -14,6 +15,7 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface, ResetIn
 
     /** @var array<string, float>|null last fetched rates */
     private ?array $rates = null;
+    private ?\Throwable $failure = null;
     private int $ratesExpireAt = 0;
 
     public const URL_EXCHANGERATE = 'https://www.wisselkoers.nl/calcvalutas.ashx';
@@ -27,15 +29,32 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface, ResetIn
     public function reset(): void
     {
         $this->rates = null;
+        $this->failure = null;
+        $this->ratesExpireAt = 0;
     }
 
     public function getRates(): array
     {
-        if ($this->rates !== null && time() < $this->ratesExpireAt) {
-            return $this->rates;
+        if (time() < $this->ratesExpireAt) {
+            if ($this->failure !== null) {
+                throw $this->failure;
+            }
+            if ($this->rates !== null) {
+                return $this->rates;
+            }
         }
 
-        $this->rates = $this->loadRates();
+        $this->failure = null;
+        try {
+            $this->rates = $this->loadRates();
+        } catch (HttpClientException | \RuntimeException $exception) {
+            $this->rates = null;
+            $this->failure = $exception;
+            $this->ratesExpireAt = time() + self::INCOMPLETE_RATES_LIFETIME;
+
+            throw $exception;
+        }
+
         $lifetime = $this->isComplete($this->rates) ? self::RATES_LIFETIME : self::INCOMPLETE_RATES_LIFETIME;
         $this->ratesExpireAt = time() + $lifetime;
 
@@ -47,7 +66,7 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface, ResetIn
      */
     private function isComplete(array $rates): bool
     {
-        return ($rates['GBP'] ?? 0.0) > 0.0;
+        return ($rates['GBP'] ?? 0.0) > 0.0 && ($rates['USD'] ?? 0.0) > 0.0;
     }
 
     private function loadRates(): array
@@ -84,14 +103,11 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface, ResetIn
                 throw new \RuntimeException('Data for exchangerate has an unexpected format');
             }
             foreach ($response as $data) {
-                if (!is_array($data) || !isset($data['Shortname'], $data['Last'])) {
-                    throw new \RuntimeException('Data for exchangerate has an unexpected format');
+                if (!is_array($data) || empty($data['Shortname']) || !isset($data['Last'])) {
+                    continue;
                 }
-                if ($data['Shortname'] != '') {
-                    $rates[
-                        strtoupper($data['Shortname'])
-                    ] = (float) str_replace(',', '.', $data['Last']);
-                }
+
+                $rates[strtoupper($data['Shortname'])] = (float) str_replace(',', '.', $data['Last']);
             }
         }
 

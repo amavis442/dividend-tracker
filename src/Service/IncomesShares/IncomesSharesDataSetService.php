@@ -365,8 +365,8 @@ final class IncomesSharesDataSetService
             $exchangeRate = $this->exchangeRateResolver->getRateForCalendar($calendar);
             $taxRate = $this->taxRateResolver->getTaxRateForCalendar($calendar);
         } catch (\Throwable $exception) {
-            $this->rateProviderUnavailable = $exception instanceof ExchangeRateUnavailableException
-                && $exception->providerFailed;
+            $this->rateProviderUnavailable = $this->rateProviderUnavailable
+                || ($exception instanceof ExchangeRateUnavailableException && $exception->providerFailed);
             $this->logger->warning('Expected distribution unavailable for {ticker}: {message}', [
                 'ticker' => $ticker->getSymbol(),
                 'message' => $exception->getMessage(),
