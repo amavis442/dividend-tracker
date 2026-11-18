@@ -28,7 +28,7 @@ class CalendarController extends AbstractController
 {
     private const SESSION_TICKER_KEY = 'calendar_searchTicker';
     private const SORT_FIELDS = ['paymentDate', 'symbol', 'exDividendDate', 'createdAt'];
-    private const SORT_ORDERS = ['asc', 'desc', 'ASC', 'DESC'];
+    private const DEFAULT_SORT = 'createdAt';
     private const ITEMS_PER_PAGE = 10;
 
     #[Route(path: '/', name: 'calendar_index', methods: ['GET', 'POST'])]
@@ -38,11 +38,11 @@ class CalendarController extends AbstractController
         TickerRepository $tickerRepository,
         Referer $referer,
         #[MapQueryParameter] int $page = 1,
-        #[MapQueryParameter] string $sort = 'createdAt',
-        #[MapQueryParameter] string $orderBy = 'DESC'
+        #[MapQueryParameter] string $sort = self::DEFAULT_SORT,
+        #[MapQueryParameter] string $orderBy = 'desc'
     ): Response {
-        $sort = in_array($sort, self::SORT_FIELDS, true) ? $sort : 'paymentDate';
-        $orderBy = in_array($orderBy, self::SORT_ORDERS, true) ? $orderBy : 'DESC';
+        $sort = in_array($sort, self::SORT_FIELDS, true) ? $sort : self::DEFAULT_SORT;
+        $orderBy = strtolower($orderBy) === 'asc' ? 'asc' : 'desc';
 
         $referer->clear();
         $referer->set('calendar_index', ['page' => $page, 'orderBy' => $orderBy, 'sort' => $sort]);
@@ -78,12 +78,13 @@ class CalendarController extends AbstractController
 
         $pager = new Pagerfanta(new QueryAdapter($calendarRepository->getAllQuery($sort, $orderBy, $ticker)));
         $pager->setMaxPerPage(self::ITEMS_PER_PAGE);
-        $pager->setCurrentPage($page);
+        $pager->setNormalizeOutOfRangePages(true);
+        $pager->setCurrentPage(max(1, $page));
 
         return $this->render('calendar/index.html.twig', [
             'form' => $form,
             'pager' => $pager,
-            'thisPage' => $page,
+            'thisPage' => $pager->getCurrentPage(),
             'orderBy' => $orderBy,
             'sort' => $sort,
         ]);

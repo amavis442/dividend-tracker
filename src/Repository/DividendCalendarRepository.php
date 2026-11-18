@@ -113,7 +113,8 @@ class DividendCalendarRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('c')
             ->select('c')
             ->innerJoin('c.ticker', 't')
-            ->orderBy($sort, $orderBy);
+            ->orderBy($sort, $orderBy)
+            ->addOrderBy('c.id', 'DESC');
 
         $queryBuilder->where(
             $queryBuilder->expr()->in('t.id', $queryBuilder2->getDQL())

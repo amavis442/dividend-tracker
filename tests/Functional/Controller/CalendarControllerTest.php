@@ -84,6 +84,55 @@ final class CalendarControllerTest extends WebTestCase
         self::assertResponseIsSuccessful();
     }
 
+    public function testTheSortOrderToggleIgnoresCase(): void
+    {
+        $this->heldTicker('Alpha Income');
+
+        $crawler = $this->client->request('GET', self::PATH . '?orderBy=ASC');
+
+        $link = $crawler->filter('turbo-frame#calendar-results th a')->first()->link();
+        self::assertStringContainsString('orderBy=desc', $link->getUri());
+    }
+
+    public function testAPageBeyondTheResultsShowsTheLastPage(): void
+    {
+        $this->heldTicker('Alpha Income');
+
+        $this->client->request('GET', self::PATH . '?page=5');
+
+        self::assertResponseIsSuccessful();
+        self::assertAnySelectorTextContains('turbo-frame#calendar-results td', 'Alpha Income');
+    }
+
+    public function testAMissingDescriptionShowsADash(): void
+    {
+        $this->heldTicker('Alpha Income');
+
+        $this->client->request('GET', self::PATH);
+
+        self::assertStringNotContainsString('&amp;mdash;', (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testSearchKeepsTheSortOrder(): void
+    {
+        $alpha = $this->heldTicker('Alpha Income');
+
+        $this->search((string) $alpha->getId(), '?sort=paymentDate&orderBy=asc');
+
+        $location = (string) $this->client->getRequest()->getUri();
+        self::assertStringContainsString('sort=paymentDate', $location);
+        self::assertStringContainsString('orderBy=asc', $location);
+    }
+
+    public function testTheActiveTickerIsShownInTheSearchField(): void
+    {
+        $alpha = $this->heldTicker('Alpha Income');
+
+        $this->search((string) $alpha->getId());
+
+        self::assertSelectorTextContains('select[name="' . self::FIELD . '"] option[selected]', 'Alpha Income');
+    }
+
     public function testSearchFiltersOnTickerUntilItIsCleared(): void
     {
         $alpha = $this->heldTicker('Alpha Income');
@@ -112,9 +161,9 @@ final class CalendarControllerTest extends WebTestCase
         self::assertAnySelectorTextContains('turbo-frame#calendar-results td', 'Not Held');
     }
 
-    private function search(string $tickerId): void
+    private function search(string $tickerId, string $query = ''): void
     {
-        $crawler = $this->client->request('GET', self::PATH);
+        $crawler = $this->client->request('GET', self::PATH . $query);
         $form = $crawler->filter('form[data-turbo-frame="calendar-results"]')->form();
         $form->disableValidation();
         $form[self::FIELD] = $tickerId;
