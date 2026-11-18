@@ -256,18 +256,16 @@ class DividendService implements DividendServiceInterface
         $dividendTax = $this->dividendTaxRateResolver->getTaxRateForCalendar($calendar);
 
         $cashAmount = $calendar->getCashAmount();
-        if (!isset($this->cachedDividendCalendars[$position->getId()])) {
+        if (!isset($this->cachedDividendCalendars[$ticker->getId()])) {
             return 0.0;
         }
         $this->adjustedDividendDecoratorFactory->load($this->cachedDividendCalendars, $this->cachedCorporateActions);
         $dividendDecorator = $this->adjustedDividendDecoratorFactory->decorate($position->getTicker());
         $adjustedDividends = $dividendDecorator->getAdjustedDividend();
 
-        try {
-            $adjustedCashAmount = $adjustedDividends[$calendar->getId()]['adjusted'];
-        } catch (\Exception $e) {
-            //dd($this, $position->getId(), $position->getTicker(), $adjustedDividends, $calendar->getId());
-            throw $e;
+        $adjustedCashAmount = $adjustedDividends[$calendar->getId()]['adjusted'] ?? null;
+        if ($adjustedCashAmount === null) {
+            return 0.0;
         }
         if ($this->accumulateDividendAmount) {
             $cashAmount = $this->getCashAmount($ticker);
