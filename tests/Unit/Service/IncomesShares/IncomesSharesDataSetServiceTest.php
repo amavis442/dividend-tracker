@@ -7,7 +7,10 @@ namespace App\Tests\Unit\Service\IncomesShares;
 use App\Contracts\Dividend\DividendServiceInterface;
 use App\Contracts\Dividend\DividendTaxRateResolverInterface;
 use App\Contracts\ExchangeRate\DividendExchangeRateResolverInterface;
+use App\Contracts\Decorator\AdjustedPositionDecoratorInterface;
 use App\DataProvider\CorporateActionDataProvider;
+use App\DataProvider\TransactionDataProvider;
+use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 use App\Entity\Calendar;
 use App\Entity\CorporateAction;
 use App\Entity\IncomesSharesData;
@@ -161,6 +164,22 @@ final class IncomesSharesDataSetServiceTest extends TestCase
         self::assertSame(0.0, $result['totalExpectedDistribution']);
     }
 
+    public function testAnInvalidRatioOnAStoredAmountLeavesTheDistributionUnknown(): void
+    {
+        $share = $this->share();
+        $share->setCreatedAt(new \DateTimeImmutable('-3 days'));
+        $dataSet = new IncomesSharesDataSet();
+        $dataSet->getShares()->add($share);
+        $action = $this->createConfiguredStub(CorporateAction::class, [
+            'getEventDate' => new \DateTime('-1 day'),
+            'getRatio' => 0.0,
+        ]);
+
+        $result = $this->service(actions: [self::TICKER_ID => [$action]])->recalculate($dataSet, false);
+
+        self::assertNull($result['rows'][self::ISIN]['expectedDistribution']);
+    }
+
     public function testAnUnavailableExchangeRateLeavesTheExpectedDistributionUnknown(): void
     {
         $rates = $this->createStub(DividendExchangeRateResolverInterface::class);
@@ -287,6 +306,12 @@ final class IncomesSharesDataSetServiceTest extends TestCase
                 'getTaxRateForCalendar' => self::TAX_RATE,
             ]),
             $this->createConfiguredStub(CorporateActionDataProvider::class, ['load' => $actions]),
+            $this->createConfiguredStub(TransactionDataProvider::class, ['load' => []]),
+            $this->createConfiguredStub(AdjustedPositionDecoratorFactory::class, [
+                'decorate' => $this->createConfiguredStub(AdjustedPositionDecoratorInterface::class, [
+                    'getAdjustedAmount' => self::SHARES,
+                ]),
+            ]),
             new DividendAdjuster(),
             $this->createStub(EntityManagerInterface::class),
             $this->createStub(LoggerInterface::class)

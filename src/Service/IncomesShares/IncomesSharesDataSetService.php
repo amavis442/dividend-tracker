@@ -8,11 +8,15 @@ use App\Contracts\Dividend\DividendServiceInterface;
 use App\Contracts\Dividend\DividendTaxRateResolverInterface;
 use App\Contracts\ExchangeRate\DividendExchangeRateResolverInterface;
 use App\DataProvider\CorporateActionDataProvider;
+use App\DataProvider\TransactionDataProvider;
+use App\Decorator\Factory\AdjustedPositionDecoratorFactory;
 use App\Entity\CorporateAction;
 use App\Entity\IncomesSharesData;
 use App\Entity\IncomesSharesDataSet;
+use App\Entity\Position;
 use App\Entity\Ticker;
 use App\Exception\ExchangeRateUnavailableException;
+use App\Helper\CorporateActionRatio;
 use App\Repository\IncomesSharesDataRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
@@ -50,6 +54,8 @@ final class IncomesSharesDataSetService
         private readonly DividendExchangeRateResolverInterface $exchangeRateResolver,
         private readonly DividendTaxRateResolverInterface $taxRateResolver,
         private readonly CorporateActionDataProvider $corporateActionDataProvider,
+        private readonly TransactionDataProvider $transactionDataProvider,
+        private readonly AdjustedPositionDecoratorFactory $adjustedPositionDecoratorFactory,
         private readonly DividendAdjuster $dividendAdjuster,
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
@@ -106,7 +112,7 @@ final class IncomesSharesDataSetService
             ]);
             $allocation = $position->getAllocation();
             $distributions = $this->paymentRepository->getSumDividendsByPosition($position);
-            $amount = $position->getAmount();
+            $amount = $this->currentAmount($position);
 
             $this->addToResult(
                 $result,
@@ -264,7 +270,7 @@ final class IncomesSharesDataSetService
             $share->setPosition($position);
             $share->setDistributions($distributions);
             $share->setAllocation($position->getAllocation());
-            $share->setAmount($position->getAmount());
+            $share->setAmount($this->currentAmount($position));
             $this->stampShare($share, $dataSet, $uuid);
             $this->entityManager->persist($share);
         }
@@ -364,6 +370,7 @@ final class IncomesSharesDataSetService
             $cashAmount = $this->dividendAdjuster->getAdjustedDividend($calendar, $tickerActions);
             $exchangeRate = $this->exchangeRateResolver->getRateForCalendar($calendar);
             $taxRate = $this->taxRateResolver->getTaxRateForCalendar($calendar);
+            $currentAmount = $this->amountAfterActions($amount, $tickerActions, $amountDate);
         } catch (\Throwable $exception) {
             $this->rateProviderUnavailable = $this->rateProviderUnavailable
                 || ($exception instanceof ExchangeRateUnavailableException && $exception->providerFailed);
@@ -375,10 +382,17 @@ final class IncomesSharesDataSetService
             return null;
         }
 
-        return $cashAmount
-            * $this->amountAfterActions($amount, $tickerActions, $amountDate)
-            * $exchangeRate
-            * (1 - $taxRate);
+        return $cashAmount * $currentAmount * $exchangeRate * (1 - $taxRate);
+    }
+
+    private function currentAmount(Position $position): float
+    {
+        $this->adjustedPositionDecoratorFactory->load(
+            $this->transactionDataProvider->load([$position]),
+            $this->corporateActionDataProvider->load([$position->getTicker()])
+        );
+
+        return $this->adjustedPositionDecoratorFactory->decorate($position)->getAdjustedAmount();
     }
 
     /**
@@ -392,7 +406,7 @@ final class IncomesSharesDataSetService
 
         foreach ($actions as $action) {
             if ($action->getEventDate() > $amountDate) {
-                $amount *= $action->getRatio();
+                $amount *= CorporateActionRatio::of($action);
             }
         }
 

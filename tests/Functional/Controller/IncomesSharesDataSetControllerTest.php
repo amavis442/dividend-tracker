@@ -101,6 +101,23 @@ final class IncomesSharesDataSetControllerTest extends WebTestCase
         self::assertAnySelectorTextContains(self::RESULT_CELL, 'Test Income');
     }
 
+    public function testChangedPositionsStoreNothingAndExplainWhy(): void
+    {
+        $crawler = $this->client->request('GET', self::BASE . '/create');
+        $form = $crawler->filter('button[name$="[save]"]')->form();
+
+        $this->position->setClosed(true);
+        $manager = static::getContainer()->get(EntityManagerInterface::class);
+        $manager->flush();
+
+        $this->client->submit($form);
+
+        self::assertResponseRedirects(self::BASE . '/create', 303);
+        self::assertSame(0, $manager->getRepository(IncomesSharesDataSet::class)->count([]));
+        $this->client->followRedirect();
+        self::assertAnySelectorTextContains('body', 'open positions have changed');
+    }
+
     public function testANewDataSetSkipsTickersWithoutAnOpenPosition(): void
     {
         $this->positionFor('Sold Income', self::CLOSED_ISIN, closed: true);

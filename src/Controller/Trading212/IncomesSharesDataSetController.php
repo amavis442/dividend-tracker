@@ -62,6 +62,13 @@ final class IncomesSharesDataSetController extends AbstractController
         $dataSetService->addSharesForIsins($incomesSharesDataSet, explode(',', $isins));
 
         $form = $this->createForm(IncomesSharesDataSetType::class, $incomesSharesDataSet);
+
+        if ($request->isMethod('POST') && $this->submittedSharesChanged($request, $form, $incomesSharesDataSet)) {
+            $this->addFlash('notice', 'Your open positions have changed. Check the values and submit again.');
+
+            return $this->redirectToRoute('app_incomes_shares_data_set_create', [], Response::HTTP_SEE_OTHER);
+        }
+
         $form->handleRequest($request);
 
         $result = $dataSetService->emptyResult();
@@ -259,6 +266,23 @@ final class IncomesSharesDataSetController extends AbstractController
             [],
             Response::HTTP_SEE_OTHER
         );
+    }
+
+    /**
+     * The rows of a new dataset follow the open positions, which can change
+     * between opening and submitting the form.
+     */
+    private function submittedSharesChanged(
+        Request $request,
+        FormInterface $form,
+        IncomesSharesDataSet $dataSet
+    ): bool {
+        $submitted = array_map('intval', array_keys($request->request->all($form->getName())['shares'] ?? []));
+        $current = array_map('intval', $dataSet->getShares()->getKeys());
+        sort($submitted);
+        sort($current);
+
+        return $submitted !== $current;
     }
 
     private function isSaveClicked(FormInterface $form): bool
