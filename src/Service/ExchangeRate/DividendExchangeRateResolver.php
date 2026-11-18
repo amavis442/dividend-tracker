@@ -1,15 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service\ExchangeRate;
 
 use App\Contracts\ExchangeRate\DividendExchangeRateResolverInterface;
+use App\Contracts\ExchangeRate\ExchangeRateInterface;
 use App\Entity\Calendar;
 use App\Entity\Ticker;
-use App\Contracts\ExchangeRate\ExchangeRateInterface;
+use App\Exception\ExchangeRateUnavailableException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Resolves the factor that converts an amount in a given currency to euro.
+ */
 class DividendExchangeRateResolver implements DividendExchangeRateResolverInterface
 {
+    private const BASE_CURRENCY = 'EUR';
+
+    /** Currency symbols in the database that are quoted under another symbol. */
+    private const RATE_SYMBOLS = ['GB' => 'GBP'];
+
     public function __construct(
         private ExchangeRateInterface $exchangeRateService,
         private TranslatorInterface $translator
@@ -18,43 +29,36 @@ class DividendExchangeRateResolver implements DividendExchangeRateResolverInterf
 
     public function getRateForCalendar(Calendar $calendar): float
     {
-        $rates = $this->exchangeRateService->getRates();
-        $symbol = $calendar->getCurrency()->getSymbol();
-
-        if (count($rates) < 1 && $symbol !== 'EUR' || !isset($rates[$symbol])) {
-            $msg = $this->translator->trans('tickerSymbol:: Exchange rate for [Symbol] is currently unavailable. Available are: jsonSymbol', [
-                'tickerSymbol' => $calendar->getTicker()->getSymbol(),
-                'Symbol' => $symbol,
-                'jsonSymbol' => json_encode($rates)
-            ]);
-            throw new \RuntimeException($msg);
-        }
-
-        return match ($symbol) {
-            'EUR' => 1,
-            'USD', 'GBP', 'CAD', 'CHF' => 1 / $rates[$symbol],
-            default => 1 / $rates['USD']
-        };
+        return $this->rateToEuro($calendar->getCurrency()->getSymbol(), $calendar->getTicker()->getSymbol());
     }
 
     public function getRateForTicker(Ticker $ticker): float
     {
-        $rates = $this->exchangeRateService->getRates();
         $symbol = $ticker->getCurrency()->getSymbol();
 
-        if (count($rates) < 1 && $symbol !== 'EUR' || !isset($rates[$symbol])) {
-            $msg = $this->translator->trans('tickerSymbol:: Exchange rate for [Symbol] is currently unavailable. Available are: jsonSymbol', [
-                'tickerSymbol' => $symbol,
-                'Symbol' => $symbol,
-                'jsonSymbol' => json_encode($rates)
-            ]);
-            throw new \RuntimeException($msg);
+        return $this->rateToEuro($symbol, $symbol);
+    }
+
+    private function rateToEuro(string $symbol, ?string $tickerSymbol): float
+    {
+        if ($symbol === self::BASE_CURRENCY) {
+            return 1.0;
         }
 
-        return match ($symbol) {
-            'EUR' => 1,
-            'USD', 'GBP', 'CAD', 'CHF' => 1 / $rates[$symbol],
-            default => 1 / $rates['USD']
-        };
+        $rates = $this->exchangeRateService->getRates();
+        $rate = (float) ($rates[self::RATE_SYMBOLS[$symbol] ?? $symbol] ?? 0.0);
+
+        if ($rate <= 0.0) {
+            throw new ExchangeRateUnavailableException($this->translator->trans(
+                'tickerSymbol:: Exchange rate for [Symbol] is currently unavailable. Available are: jsonSymbol',
+                [
+                    'tickerSymbol' => $tickerSymbol,
+                    'Symbol' => $symbol,
+                    'jsonSymbol' => json_encode(array_keys($rates)),
+                ]
+            ));
+        }
+
+        return 1 / $rate;
     }
 }

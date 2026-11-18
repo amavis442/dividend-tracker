@@ -5,9 +5,13 @@ namespace App\Service\ExchangeRate;
 use App\Contracts\ExchangeRate\ExchangeRateInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-class WisselkoersNlExchangeRateService implements ExchangeRateInterface
+class WisselkoersNlExchangeRateService implements ExchangeRateInterface, ResetInterface
 {
+    /** @var array<string, float>|null rates of the current request */
+    private ?array $rates = null;
+
     public const URL_EXCHANGERATE = 'https://www.wisselkoers.nl/calcvalutas.ashx';
 
     public function __construct(
@@ -16,7 +20,17 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface
     ) {
     }
 
+    public function reset(): void
+    {
+        $this->rates = null;
+    }
+
     public function getRates(): array
+    {
+        return $this->rates ??= $this->loadRates();
+    }
+
+    private function loadRates(): array
     {
         if (
             $this->exchangerateCache->hasItem(ExchangeRateInterface::CACHE_KEY)
@@ -55,10 +69,13 @@ class WisselkoersNlExchangeRateService implements ExchangeRateInterface
             }
         }
 
-        $rates['GBX'] = $rates['GBP'] * 100;
-        if (!isset($rates['GB']) && isset($rates['GBP'])) {
-            $rates['GB'] = $rates['GBP'];
+        if (!isset($rates['GBP'])) {
+            // Incomplete rates are not worth keeping: try again on the next request.
+            return $rates;
         }
+
+        $rates['GBX'] = $rates['GBP'] * 100;
+        $rates['GB'] ??= $rates['GBP'];
 
         $item = $this->exchangerateCache->getItem(
             ExchangeRateInterface::CACHE_KEY

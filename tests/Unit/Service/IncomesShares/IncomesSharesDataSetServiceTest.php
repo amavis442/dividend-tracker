@@ -14,6 +14,7 @@ use App\Entity\IncomesSharesData;
 use App\Entity\IncomesSharesDataSet;
 use App\Entity\Position;
 use App\Entity\Ticker;
+use App\Exception\ExchangeRateUnavailableException;
 use App\Repository\IncomesSharesDataRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\PositionRepository;
@@ -113,6 +114,44 @@ final class IncomesSharesDataSetServiceTest extends TestCase
         $result = $this->service(rates: $rates)->recalculate($dataSet, false);
 
         self::assertNull($result['totalExpectedDistribution']);
+    }
+
+    public function testAMissingCurrencyRateDoesNotStopOtherTickers(): void
+    {
+        $rates = $this->createMock(DividendExchangeRateResolverInterface::class);
+        $rates->expects(self::exactly(2))->method('getRateForCalendar')
+            ->willThrowException(new ExchangeRateUnavailableException('No rate'));
+        $dataSet = new IncomesSharesDataSet();
+        $dataSet->getShares()->add($this->share());
+        $dataSet->getShares()->add($this->share(ticker: $this->ticker(10, 'IE00TEST0002')));
+
+        $this->service(rates: $rates)->recalculate($dataSet, false);
+    }
+
+    public function testImportUsesOpenPositionsAndReportsTheRest(): void
+    {
+        $tickers = $this->createConfiguredStub(TickerRepository::class, ['findBy' => [$this->ticker()]]);
+
+        $import = $this->service(tickers: $tickers)->importExport([
+            'TEST' => ['price' => 11.0, 'result' => 10.0],
+            'UNKNOWN' => ['price' => 1.0, 'result' => 1.0],
+        ]);
+
+        self::assertNotNull($import['dataSet']);
+        self::assertCount(1, $import['dataSet']->getShares());
+        self::assertSame(['UNKNOWN'], $import['skippedSymbols']);
+        self::assertSame(self::SHARES, $import['dataSet']->getShares()->first()->getAmount());
+    }
+
+    public function testImportStoresNothingWithoutOpenPositions(): void
+    {
+        $tickers = $this->createConfiguredStub(TickerRepository::class, ['findBy' => [$this->ticker()]]);
+
+        $import = $this->service(tickers: $tickers, hasOpenPosition: false)
+            ->importExport(['TEST' => ['price' => 11.0, 'result' => 10.0]]);
+
+        self::assertNull($import['dataSet']);
+        self::assertSame(['TEST'], $import['skippedSymbols']);
     }
 
     public function testATickerWithoutRegularDividendExpectsNothing(): void
@@ -268,6 +307,7 @@ final class IncomesSharesDataSetServiceTest extends TestCase
         return $this->createConfiguredStub(Ticker::class, [
             'getId' => $id,
             'getIsin' => $isin,
+            'getSymbol' => 'TEST',
             'getFullname' => 'Test Income',
         ]);
     }

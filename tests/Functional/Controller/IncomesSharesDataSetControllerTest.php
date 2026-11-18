@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
-use App\Contracts\ExchangeRate\ExchangeRateInterface;
 use App\Entity\Currency;
 use App\Entity\IncomesSharesData;
 use App\Entity\IncomesSharesDataSet;
@@ -18,6 +17,7 @@ use App\Factory\TickerFactory;
 use App\Factory\UserFactory;
 use App\Repository\UserRepository;
 use App\Service\ExchangeRate\WisselkoersNlExchangeRateService;
+use App\Tests\Support\StubExchangeRates;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -42,7 +42,7 @@ final class IncomesSharesDataSetControllerTest extends WebTestCase
     private User $user;
     private Currency $currency;
     private Position $position;
-    private ExchangeRateInterface $exchangeRates;
+    private StubExchangeRates $exchangeRates;
 
     protected function setUp(): void
     {
@@ -52,15 +52,7 @@ final class IncomesSharesDataSetControllerTest extends WebTestCase
         $this->client = static::createClient();
         $this->client->disableReboot();
 
-        $this->exchangeRates = new class implements ExchangeRateInterface {
-            /** @var array<string, float> */
-            public array $rates = ['USD' => 2.0];
-
-            public function getRates(): array
-            {
-                return $this->rates;
-            }
-        };
+        $this->exchangeRates = new StubExchangeRates();
         static::getContainer()->set(WisselkoersNlExchangeRateService::class, $this->exchangeRates);
 
         $email = UserFactory::createOne()->getEmail();
