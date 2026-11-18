@@ -36,7 +36,6 @@ class CalendarController extends AbstractController
         Request $request,
         DividendCalendarRepository $calendarRepository,
         TickerRepository $tickerRepository,
-        Referer $referer,
         #[MapQueryParameter] int $page = 1,
         #[MapQueryParameter] string $sort = self::DEFAULT_SORT,
         #[MapQueryParameter] string $orderBy = 'desc'
@@ -77,12 +76,6 @@ class CalendarController extends AbstractController
         $pager->setMaxPerPage(self::ITEMS_PER_PAGE);
         $pager->setNormalizeOutOfRangePages(true);
         $pager->setCurrentPage(max(1, $page));
-
-        $referer->set('calendar_index', [
-            'page' => $pager->getCurrentPage(),
-            'orderBy' => $orderBy,
-            'sort' => $sort,
-        ]);
 
         return $this->render('calendar/index.html.twig', [
             'form' => $form,
