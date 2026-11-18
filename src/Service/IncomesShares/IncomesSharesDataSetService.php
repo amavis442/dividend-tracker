@@ -26,6 +26,7 @@ use Symfony\Component\Uid\Uuid;
  *     totalAllocation: float,
  *     totalDistribution: float,
  *     totalProfitLoss: float,
+ *     totalExpectedDistribution: float,
  *     yield: float
  * }
  */
@@ -61,7 +62,8 @@ final class IncomesSharesDataSetService
 
     /**
      * Calculates a new dataset from the entered prices/profit-loss and the
-     * current open positions; with $persist the shares and dataset are stored.
+     * current open positions. With $persist the shares and dataset are stored;
+     * without it the result also holds the expected distributions for display.
      *
      * @return CalculationResult
      */
@@ -102,18 +104,15 @@ final class IncomesSharesDataSetService
         }
 
         $this->applyTotals($dataSet, $result);
-
-        if ($persist) {
-            $this->entityManager->persist($dataSet);
-            $this->entityManager->flush();
-        }
+        $this->finish($dataSet, $result, $persist);
 
         return $result;
     }
 
     /**
-     * Recalculates an existing dataset from its stored shares; with $persist
-     * the changes are stored.
+     * Recalculates an existing dataset from its stored shares. With $persist
+     * the changes are stored; without it the result also holds the expected
+     * distributions for display.
      *
      * @return CalculationResult
      */
@@ -137,11 +136,7 @@ final class IncomesSharesDataSetService
         }
 
         $this->applyTotals($dataSet, $result);
-
-        if ($persist) {
-            $this->entityManager->persist($dataSet);
-            $this->entityManager->flush();
-        }
+        $this->finish($dataSet, $result, $persist);
 
         return $result;
     }
@@ -153,17 +148,14 @@ final class IncomesSharesDataSetService
      */
     public function rowsForDisplay(IncomesSharesDataSet $dataSet): array
     {
-        $rates = $this->exchangeRateService->getRates();
-        $usdRate = $rates['USD'] ?: 1;
-        $usdToEuro = 1 / $usdRate;
+        $usdToEuro = $this->usdToEuro();
 
         $rows = [];
         $totalExpectedDistribution = 0.0;
         foreach ($this->incomesSharesDataRepository->findByDataset($dataSet->getUuid()) as $share) {
             $ticker = $share->getTicker();
             $amount = $share->getPosition()->getAmount();
-            $nextCashAmount = $ticker->getCalendars()->first()->getCashAmount();
-            $expectedDistribution = $nextCashAmount * $amount * $usdToEuro;
+            $expectedDistribution = $this->expectedDistribution($ticker, $amount, $usdToEuro);
 
             $rows[$ticker->getIsin()] = $this->row(
                 $ticker,
@@ -225,6 +217,49 @@ final class IncomesSharesDataSetService
         $this->entityManager->flush();
 
         return $dataSet;
+    }
+
+    /**
+     * Stores the calculated dataset, or adds what is only needed to display it.
+     */
+    private function finish(IncomesSharesDataSet $dataSet, array &$result, bool $persist): void
+    {
+        if ($persist) {
+            $this->entityManager->persist($dataSet);
+            $this->entityManager->flush();
+
+            return;
+        }
+
+        $usdToEuro = $this->usdToEuro();
+        foreach ($dataSet->getShares() as $share) {
+            $ticker = $share->getTicker();
+            $isin = $ticker->getIsin();
+            $expectedDistribution = $this->expectedDistribution($ticker, $result['rows'][$isin]['amount'], $usdToEuro);
+
+            $result['rows'][$isin]['expectedDistribution'] = $expectedDistribution;
+            $result['totalExpectedDistribution'] += $expectedDistribution;
+        }
+    }
+
+    private function usdToEuro(): float
+    {
+        $rates = $this->exchangeRateService->getRates();
+
+        return 1 / ($rates['USD'] ?: 1);
+    }
+
+    /**
+     * Latest declared cash amount times the shares, in euro; 0 without a declared dividend.
+     */
+    private function expectedDistribution(Ticker $ticker, ?float $amount, float $usdToEuro): float
+    {
+        $calendar = $ticker->getCalendars()->first();
+        if (!$calendar) {
+            return 0.0;
+        }
+
+        return $calendar->getCashAmount() * $amount * $usdToEuro;
     }
 
     /**
@@ -312,6 +347,7 @@ final class IncomesSharesDataSetService
             'totalAllocation' => 0.0,
             'totalDistribution' => 0.0,
             'totalProfitLoss' => 0.0,
+            'totalExpectedDistribution' => 0.0,
             'yield' => 0.0,
         ];
     }
