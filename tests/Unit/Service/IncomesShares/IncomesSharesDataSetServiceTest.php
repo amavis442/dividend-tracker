@@ -53,6 +53,18 @@ final class IncomesSharesDataSetServiceTest extends TestCase
         self::assertSame(0.0, $result['totalExpectedDistribution']);
     }
 
+    public function testTheTotalMatchesTheTableWhenATickerIsEnteredTwice(): void
+    {
+        $ticker = $this->ticker(cashAmount: 0.5);
+        $dataSet = $this->dataSet($ticker);
+        $dataSet->getShares()->add($this->share($ticker));
+
+        $result = $this->service()->recalculate($dataSet, false);
+
+        self::assertCount(1, $result['rows']);
+        self::assertEqualsWithDelta(2.5, $result['totalExpectedDistribution'], 0.0001);
+    }
+
     public function testSavingDoesNotNeedExchangeRates(): void
     {
         $dataSet = $this->dataSet($this->ticker(cashAmount: 0.5));
@@ -97,6 +109,14 @@ final class IncomesSharesDataSetServiceTest extends TestCase
 
     private function dataSet(Ticker $ticker): IncomesSharesDataSet
     {
+        $dataSet = new IncomesSharesDataSet();
+        $dataSet->getShares()->add($this->share($ticker));
+
+        return $dataSet;
+    }
+
+    private function share(Ticker $ticker): IncomesSharesData
+    {
         $share = new IncomesSharesData();
         $share->setTicker($ticker);
         $share->setPrice(11.0);
@@ -105,9 +125,6 @@ final class IncomesSharesDataSetServiceTest extends TestCase
         $share->setAmount(10.0);
         $share->setDistributions(3.0);
 
-        $dataSet = new IncomesSharesDataSet();
-        $dataSet->getShares()->add($share);
-
-        return $dataSet;
+        return $share;
     }
 }

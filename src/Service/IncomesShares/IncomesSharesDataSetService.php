@@ -72,6 +72,7 @@ final class IncomesSharesDataSetService
         $uuid = Uuid::v7();
         $dataSet->setUuid($uuid);
 
+        $usdToEuro = $persist ? null : $this->usdToEuro();
         $result = $this->emptyResult();
         foreach ($dataSet->getShares() as $share) {
             $ticker = $share->getTicker();
@@ -90,7 +91,8 @@ final class IncomesSharesDataSetService
                 $amount,
                 $share->getPrice(),
                 $distributions,
-                $share->getProfitLoss()
+                $share->getProfitLoss(),
+                $usdToEuro
             );
 
             if ($persist) {
@@ -104,7 +106,11 @@ final class IncomesSharesDataSetService
         }
 
         $this->applyTotals($dataSet, $result);
-        $this->finish($dataSet, $result, $persist);
+
+        if ($persist) {
+            $this->entityManager->persist($dataSet);
+            $this->entityManager->flush();
+        }
 
         return $result;
     }
@@ -118,6 +124,7 @@ final class IncomesSharesDataSetService
      */
     public function recalculate(IncomesSharesDataSet $dataSet, bool $persist): array
     {
+        $usdToEuro = $persist ? null : $this->usdToEuro();
         $result = $this->emptyResult();
         foreach ($dataSet->getShares() as $share) {
             $this->addToResult(
@@ -127,7 +134,8 @@ final class IncomesSharesDataSetService
                 $share->getAmount(),
                 $share->getPrice(),
                 $share->getDistributions(),
-                $share->getProfitLoss()
+                $share->getProfitLoss(),
+                $usdToEuro
             );
 
             if ($persist) {
@@ -136,7 +144,11 @@ final class IncomesSharesDataSetService
         }
 
         $this->applyTotals($dataSet, $result);
-        $this->finish($dataSet, $result, $persist);
+
+        if ($persist) {
+            $this->entityManager->persist($dataSet);
+            $this->entityManager->flush();
+        }
 
         return $result;
     }
@@ -219,29 +231,6 @@ final class IncomesSharesDataSetService
         return $dataSet;
     }
 
-    /**
-     * Stores the calculated dataset, or adds what is only needed to display it.
-     */
-    private function finish(IncomesSharesDataSet $dataSet, array &$result, bool $persist): void
-    {
-        if ($persist) {
-            $this->entityManager->persist($dataSet);
-            $this->entityManager->flush();
-
-            return;
-        }
-
-        $usdToEuro = $this->usdToEuro();
-        foreach ($dataSet->getShares() as $share) {
-            $ticker = $share->getTicker();
-            $isin = $ticker->getIsin();
-            $expectedDistribution = $this->expectedDistribution($ticker, $result['rows'][$isin]['amount'], $usdToEuro);
-
-            $result['rows'][$isin]['expectedDistribution'] = $expectedDistribution;
-            $result['totalExpectedDistribution'] += $expectedDistribution;
-        }
-    }
-
     private function usdToEuro(): float
     {
         $rates = $this->exchangeRateService->getRates();
@@ -298,15 +287,14 @@ final class IncomesSharesDataSetService
         ?float $price,
         ?float $distributions,
         ?float $profitLoss,
+        ?float $usdToEuro,
     ): void {
-        $result['rows'][$ticker->getIsin()] = $this->row(
-            $ticker,
-            $allocation,
-            $amount,
-            $price,
-            $distributions,
-            $profitLoss
-        );
+        $row = $this->row($ticker, $allocation, $amount, $price, $distributions, $profitLoss);
+        if ($usdToEuro !== null) {
+            $row['expectedDistribution'] = $this->expectedDistribution($ticker, $amount, $usdToEuro);
+        }
+
+        $result['rows'][$ticker->getIsin()] = $row;
         $result['totalDistribution'] += $distributions;
         $result['totalAllocation'] += $allocation;
         $result['totalProfitLoss'] += $profitLoss;
@@ -321,6 +309,10 @@ final class IncomesSharesDataSetService
         if ($result['totalAllocation'] > 0) {
             $result['yield'] = ($result['totalDistribution'] / $result['totalAllocation']) * 100;
         }
+
+        $result['totalExpectedDistribution'] = (float) array_sum(
+            array_column($result['rows'], 'expectedDistribution')
+        );
 
         $dataSet->setTotalAllocation($result['totalAllocation']);
         $dataSet->setTotalDistribution($result['totalDistribution']);
