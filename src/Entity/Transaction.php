@@ -5,7 +5,6 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
 use App\Security\ApiAccess;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -25,7 +24,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
         security: 'is_granted("ROLE_USER")',
         description: 'All the transactions made by this user for a position',
         operations: [
-            new Post(securityPostDenormalize: ApiAccess::OWNER),
             new Get(security: ApiAccess::OWNER),
             new GetCollection(),
         ]

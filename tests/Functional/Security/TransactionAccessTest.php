@@ -12,7 +12,7 @@ use App\Factory\TickerFactory;
 use App\Factory\TransactionFactory;
 use App\Factory\UserFactory;
 use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -74,7 +74,7 @@ final class TransactionAccessTest extends WebTestCase
         self::assertStringNotContainsString((string) self::BOB_AMOUNT, $this->content());
     }
 
-    public function testTheApiRefusesATransactionOnAnotherUsersPosition(): void
+    public function testTheApiDoesNotCreateTransactions(): void
     {
         $this->loginAs($this->alice);
 
@@ -86,8 +86,17 @@ final class TransactionAccessTest extends WebTestCase
             'transactionDate' => '2025-02-01',
         ]);
 
-        self::assertNotContains($this->statusCode(), [200, 201]);
+        self::assertResponseStatusCodeSame(405);
         self::assertSame(1, $this->transactionCount());
+    }
+
+    public function testSearchIsNotTakenForATransactionId(): void
+    {
+        $this->loginAs($this->bob);
+
+        $this->client->request('POST', self::WEB . '/search', ['searchCriteria' => 'X']);
+
+        self::assertResponseRedirects();
     }
 
     public function testTheApiShowsOwnTransactions(): void
@@ -138,8 +147,8 @@ final class TransactionAccessTest extends WebTestCase
 
     private function transactionCount(): int
     {
-        return static::getContainer()->get(EntityManagerInterface::class)
-            ->getRepository(Transaction::class)->count([]);
+        // Counted in SQL: the user filter would hide other users' transactions.
+        return (int) static::getContainer()->get(Connection::class)->fetchOne('select count(*) from transaction');
     }
 
     private function statusCode(): int

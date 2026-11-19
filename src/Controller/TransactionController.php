@@ -211,7 +211,7 @@ class TransactionController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'transaction_show', methods: ['GET'])]
+    #[Route(path: '/{id}', name: 'transaction_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function show(#[MapEntity] Transaction $transaction): Response
     {
         $this->denyAccessUnlessGranted(OwnerVoter::OWNER, $transaction);
@@ -275,7 +275,7 @@ class TransactionController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'transaction_delete', methods: ['POST'])]
+    #[Route(path: '/{id}', name: 'transaction_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,
