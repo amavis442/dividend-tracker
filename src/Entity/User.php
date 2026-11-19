@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Security\ApiAccess;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -27,7 +28,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
                 security: 'is_granted("PUBLIC_ACCESS")',
                 processor: UserPostProcessor::class
             ),
-            new Get(),
+            new Get(security: ApiAccess::SELF_OR_ADMIN),
         ]
     )
 ]
@@ -50,7 +51,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[Groups(['user:read', 'user:write'])]
     #[ORM\Column(type: 'string', unique: true, nullable: true)]
     private ?string $apiToken = null;
 
@@ -59,9 +59,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $email;
 
     /**
-     * @var string The hashed password
+     * @var string The hashed password; it can be set but is never returned
      */
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['user:write'])]
     #[ORM\Column(type: 'string')]
     private string $password;
 

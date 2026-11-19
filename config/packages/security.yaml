@@ -1,4 +1,7 @@
 security:
+    role_hierarchy:
+        ROLE_SUPERADMIN: ROLE_ADMIN
+
     password_hashers:
         # Use native password hasher, which auto-selects and migrates the best
         # possible hashing algorithm (starting from Symfony 5.3 this is "bcrypt")

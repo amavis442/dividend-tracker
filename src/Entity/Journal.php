@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
+use App\Security\ApiAccess;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -21,12 +21,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
     denormalizationContext: ['groups' => ['journal:write']],
     security: 'is_granted("ROLE_USER")',
     operations: [
-        new Get(),
+        new Get(security: ApiAccess::OWNER),
         new GetCollection(),
         new Post(),
-        new Put(),
-        new Patch(),
-        new Delete()
+        new Patch(security: ApiAccess::OWNER),
+        new Delete(security: ApiAccess::OWNER)
     ]
 )]
 #[HasLifecycleCallbacks]
