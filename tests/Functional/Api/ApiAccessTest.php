@@ -142,6 +142,16 @@ final class ApiAccessTest extends WebTestCase
         self::assertStringNotContainsString('bob@example.test', (string) $this->client->getResponse()->getContent());
     }
 
+    public function testAnAccountCannotBeReadAnonymously(): void
+    {
+        $this->client->restart();
+
+        $this->api('GET', '/api/users/' . $this->bob);
+
+        self::assertNotContains($this->client->getResponse()->getStatusCode(), [200, 403]);
+        self::assertStringNotContainsString('bob@example.test', (string) $this->client->getResponse()->getContent());
+    }
+
     public function testPasswordsAreNeverReturned(): void
     {
         $this->loginAs($this->alice);
