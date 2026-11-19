@@ -148,7 +148,7 @@ final class ApiAccessTest extends WebTestCase
 
         $this->api('GET', '/api/users/' . $this->bob);
 
-        self::assertNotContains($this->client->getResponse()->getStatusCode(), [200, 403]);
+        self::assertContains($this->client->getResponse()->getStatusCode(), [302, 401], 'login required');
         self::assertStringNotContainsString('bob@example.test', (string) $this->client->getResponse()->getContent());
     }
 

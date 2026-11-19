@@ -9,9 +9,8 @@ namespace App\Security;
  */
 final class ApiAccess
 {
-    /** The logged-in user owns the object; compared by id, not by object state. */
-    public const OWNER = 'is_granted("ROLE_USER") and object.getUser() !== null'
-        . ' and object.getUser().getId() === user.getId()';
+    /** The logged-in user owns the object (see OwnerVoter). */
+    public const OWNER = 'is_granted("ROLE_USER") and is_granted("OWNER", object)';
 
     /** The object is the logged-in user, or the user is an administrator. */
     public const SELF_OR_ADMIN = 'is_granted("ROLE_USER")'

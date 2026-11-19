@@ -25,8 +25,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Get(security: ApiAccess::OWNER),
         new GetCollection(),
         new Post(),
-        new Put(security: ApiAccess::OWNER, securityPostDenormalize: ApiAccess::OWNER),
-        new Patch(security: ApiAccess::OWNER, securityPostDenormalize: ApiAccess::OWNER),
+        new Put(security: ApiAccess::OWNER),
+        new Patch(security: ApiAccess::OWNER),
         new Delete(security: ApiAccess::OWNER)
     ]
 )]
