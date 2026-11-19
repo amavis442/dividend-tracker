@@ -95,7 +95,7 @@ final class ApiAccessTest extends WebTestCase
         $this->api('PATCH', '/api/pies/' . $this->bobPie, ['label' => 'Changed']);
         $this->assertDenied('patch pie');
         $this->api('PUT', '/api/journals/' . $this->bobJournal, ['title' => 'Changed', 'content' => 'Changed']);
-        $this->assertDenied('put journal');
+        self::assertResponseStatusCodeSame(405);
         $this->api('PATCH', '/api/journals/' . $this->bobJournal, ['content' => 'Changed']);
         $this->assertDenied('patch journal');
         $this->api('DELETE', '/api/pies/' . $this->bobPie);
