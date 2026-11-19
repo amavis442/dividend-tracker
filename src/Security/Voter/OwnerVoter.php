@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Security\Voter;
 
 use App\Entity\User;
+use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -30,7 +31,12 @@ final class OwnerVoter extends Voter
         ?Vote $vote = null
     ): bool {
         $user = $token->getUser();
-        $owner = $subject->getUser();
+        try {
+            $owner = $subject->getUser();
+        } catch (EntityNotFoundException) {
+            // The owner is hidden by the user filter, so it is someone else.
+            return false;
+        }
 
         return $user instanceof User
             && $owner instanceof User

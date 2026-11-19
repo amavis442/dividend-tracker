@@ -25,6 +25,7 @@ use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use App\Security\Voter\OwnerVoter;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/transaction')]
 class TransactionController extends AbstractController
@@ -138,6 +139,11 @@ class TransactionController extends AbstractController
         Referer $referer,
         ExchangeRateInterface $euExchangeRateService
     ): Response {
+        if ($position === null) {
+            throw $this->createNotFoundException();
+        }
+        $this->denyAccessUnlessGranted(OwnerVoter::OWNER, $position);
+
         $transaction = new Transaction();
         $currentDate = new DateTime();
         $transaction->setTransactionDate($currentDate);
@@ -205,9 +211,11 @@ class TransactionController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'transaction_show', methods: ['GET'])]
+    #[Route(path: '/{id}', name: 'transaction_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function show(#[MapEntity] Transaction $transaction): Response
     {
+        $this->denyAccessUnlessGranted(OwnerVoter::OWNER, $transaction);
+
         return $this->render('transaction/show.html.twig', [
             'transaction' => $transaction,
         ]);
@@ -215,7 +223,7 @@ class TransactionController extends AbstractController
 
     #[
         Route(
-            path: '/{id}/edit/{closed<\d+>?0}',
+            path: '/{id<\d+>}/edit/{closed<\d+>?0}',
             name: 'transaction_edit',
             methods: ['GET', 'POST']
         )
@@ -227,6 +235,8 @@ class TransactionController extends AbstractController
         WeightedAverage $weightedAverage,
         Referer $referer
     ): Response {
+        $this->denyAccessUnlessGranted(OwnerVoter::OWNER, $transaction);
+
         if ($transaction->getUuid() == null) {
             $uuid = Uuid::v4();
             $transaction->setUuid($uuid);
@@ -265,7 +275,7 @@ class TransactionController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}', name: 'transaction_delete', methods: ['POST'])]
+    #[Route(path: '/{id}', name: 'transaction_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -273,6 +283,8 @@ class TransactionController extends AbstractController
         WeightedAverage $weightedAverage,
         Referer $referer
     ): Response {
+        $this->denyAccessUnlessGranted(OwnerVoter::OWNER, $transaction);
+
         if (
             $this->isCsrfTokenValid(
                 'delete' . $transaction->getId(),

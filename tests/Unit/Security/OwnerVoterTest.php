@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Security;
 use App\Entity\Journal;
 use App\Entity\User;
 use App\Security\Voter\OwnerVoter;
+use Doctrine\ORM\EntityNotFoundException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -27,6 +28,14 @@ final class OwnerVoterTest extends TestCase
     public function testAnObjectWithoutOwnerIsDenied(): void
     {
         self::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($this->user(1), $this->journalOf(null)));
+    }
+
+    public function testAnOwnerHiddenByTheUserFilterIsDenied(): void
+    {
+        $journal = $this->createStub(Journal::class);
+        $journal->method('getUser')->willThrowException(new EntityNotFoundException());
+
+        self::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($this->user(1), $journal));
     }
 
     public function testAnAnonymousUserIsDenied(): void
