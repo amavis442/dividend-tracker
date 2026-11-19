@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Security\ApiAccess;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -20,12 +21,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
     denormalizationContext: ['groups' => ['pie:write']],
     security: 'is_granted("ROLE_USER")',
     operations: [
-        new Get(),
+        new Get(security: ApiAccess::OWNER),
         new GetCollection(),
         new Post(),
-        new Delete(),
-        new Put(),
-        new Patch()
+        new Delete(security: ApiAccess::OWNER),
+        new Put(security: ApiAccess::OWNER, securityPostDenormalize: ApiAccess::OWNER),
+        new Patch(security: ApiAccess::OWNER, securityPostDenormalize: ApiAccess::OWNER)
     ]
 )]
 #[ORM\Table(name: 'pie')]

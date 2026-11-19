@@ -14,7 +14,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 /**
  * Enables the Doctrine user filter so every query is scoped to the logged-in user.
  */
-#[AsEventListener(event: KernelEvents::REQUEST, method: 'onKernelRequest')]
+// Runs after the firewall (priority 8) and before API Platform loads data (priority 4).
+#[AsEventListener(event: KernelEvents::REQUEST, method: 'onKernelRequest', priority: 5)]
 class OnRequestListener
 {
     public const USER_FILTER = 'user_filter';

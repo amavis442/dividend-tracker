@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Enum\PositionStatus;
+use App\Security\ApiAccess;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -23,7 +24,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         ],
         denormalizationContext: ['groups' => ['position:write']],
         security: 'is_granted("ROLE_USER")',
-        operations: [new Get(), new GetCollection()]
+        operations: [new Get(security: ApiAccess::OWNER), new GetCollection()]
     )
 ]
 #[ORM\Entity(repositoryClass: 'App\Repository\PositionRepository')]
