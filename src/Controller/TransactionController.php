@@ -223,7 +223,7 @@ class TransactionController extends AbstractController
 
     #[
         Route(
-            path: '/{id}/edit/{closed<\d+>?0}',
+            path: '/{id<\d+>}/edit/{closed<\d+>?0}',
             name: 'transaction_edit',
             methods: ['GET', 'POST']
         )

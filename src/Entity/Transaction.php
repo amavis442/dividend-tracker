@@ -20,7 +20,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
         normalizationContext: [
             'groups' => ['transaction:read', 'transaction:read:item'],
         ],
-        denormalizationContext: ['groups' => ['transaction:write']],
         security: 'is_granted("ROLE_USER")',
         description: 'All the transactions made by this user for a position',
         operations: [
