@@ -1,9 +1,24 @@
+# Cancel jobs of a branch pipeline that a newer commit made redundant;
+# keep every pipeline on the default branch.
+workflow:
+  auto_cancel:
+    on_new_commit: interruptible
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      auto_cancel:
+        on_new_commit: none
+    # Jobs use only/except; skip merge request pipelines to avoid duplicates.
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    - when: always
+
 stages:
   - analysis
   - test
   - deployment
 
 default:
+  interruptible: true
   image: phpdockerio/php:8.4-fpm
   services:
     - name: postgres:16-alpine
@@ -49,6 +64,8 @@ phpunit:
 
 deployment:
   stage: deployment
+  # A deploy must never stop halfway.
+  interruptible: false
   script:
     - php vendor/bin/dep deploy prod -vvv
   when: manual
