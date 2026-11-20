@@ -19,6 +19,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PositionRepository extends ServiceEntityRepository
 {
+    use SafeSortTrait;
     use PagerTrait;
 
     public const OPEN = 1;
@@ -222,7 +223,7 @@ class PositionRepository extends ServiceEntityRepository
             ->innerJoin('p.ticker', 't')
             ->innerJoin('t.branch', 'i')
             ->where('p.closedAt IS NOT NULL')
-            ->orderBy('p.closedAt', $sort);
+            ->orderBy('p.closedAt', self::sortDirection($sort, 'DESC'));
 
         if ($ticker && $ticker->getId()) {
             $queryBuilder->andWhere('t = :ticker');
@@ -244,7 +245,7 @@ class PositionRepository extends ServiceEntityRepository
             ->innerJoin('p.ticker', 't')
             ->innerJoin('t.branch', 'i')
             ->where('p.closedAt IS NOT NULL')
-            ->orderBy('p.closedAt', $sort);
+            ->orderBy('p.closedAt', self::sortDirection($sort, 'DESC'));
 
         if ($ticker && $ticker->getId()) {
             $queryBuilder->andWhere('t = :ticker');
@@ -384,7 +385,7 @@ class PositionRepository extends ServiceEntityRepository
             ->addSelect('tax')
             ->leftJoin('t.calendars', 'c')
             ->addSelect('c')
-            ->orderBy($sortBy, $orderBy);
+            ->orderBy($sortBy, self::sortDirection($orderBy));
 
         if ($ticker && $ticker->getId()) {
             $queryBuilder->addSelect('b');
@@ -400,7 +401,7 @@ class PositionRepository extends ServiceEntityRepository
         string $sort = 'ASC',
         string $search = ''
     ): ?array {
-        $order = 'p.' . $orderBy;
+        $order = $this->sortField($orderBy, 'p', 'id');
         if ($orderBy === 'symbol') {
             $order = 't.symbol';
         }
@@ -416,7 +417,7 @@ class PositionRepository extends ServiceEntityRepository
             ->innerJoin('p.ticker', 't')
             ->leftJoin('t.payments', 'pa')
             ->groupBy('t.symbol')
-            ->orderBy($order, $sort)
+            ->orderBy($order, self::sortDirection($sort))
             ->where('p.closed = false');
         if (!empty($search)) {
             $queryBuilder->andWhere('t.symbol LIKE :search');

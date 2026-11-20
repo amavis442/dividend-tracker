@@ -19,6 +19,7 @@ use App\Entity\Ticker;
  */
 class TransactionRepository extends ServiceEntityRepository
 {
+    use SafeSortTrait;
     use PagerTrait;
 
     public function __construct(ManagerRegistry $registry)
@@ -31,7 +32,7 @@ class TransactionRepository extends ServiceEntityRepository
         string $sort = 'ASC',
         ?Ticker $ticker = null
     ): QueryBuilder {
-        $order = 'tr.' . $orderBy;
+        $order = $this->sortField($orderBy, 'tr', 'transactionDate');
         if ($orderBy === 'symbol') {
             $order = 't.symbol';
         }
@@ -42,7 +43,7 @@ class TransactionRepository extends ServiceEntityRepository
             ->innerJoin('tr.position', 'p')
             ->innerJoin('p.ticker', 't')
             ->innerJoin('t.branch', 'i')
-            ->orderBy($order, $sort);
+            ->orderBy($order, self::sortDirection($sort));
 
         if ($ticker) {
             $queryBuilder
