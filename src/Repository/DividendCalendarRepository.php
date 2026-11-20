@@ -23,6 +23,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class DividendCalendarRepository extends ServiceEntityRepository
 {
+    use SafeSortTrait;
     use PagerTrait;
 
     public function __construct(ManagerRegistry $registry)
@@ -60,7 +61,8 @@ class DividendCalendarRepository extends ServiceEntityRepository
     ): Paginator {
         $sort = match ($sort) {
             'symbol' => 't.symbol',
-            default => 'c.' . $sort,
+            'fullname' => 't.fullname',
+            default => $this->sortField($sort, 'c', 'exDividendDate'),
         };
 
         $queryBuilder2 = $this->getEntityManager()
@@ -74,7 +76,7 @@ class DividendCalendarRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('c')
             ->select('c')
             ->innerJoin('c.ticker', 't')
-            ->orderBy($sort, $orderBy);
+            ->orderBy($sort, self::sortDirection($orderBy, 'DESC'));
 
         $queryBuilder->where(
             $queryBuilder->expr()->in('t.id', $queryBuilder2->getDQL())
@@ -100,7 +102,7 @@ class DividendCalendarRepository extends ServiceEntityRepository
         $sort = match ($sort) {
             'symbol' => 't.symbol',
             'fullname' => 't.fullname',
-            default => 'c.' . $sort,
+            default => $this->sortField($sort, 'c', 'exDividendDate'),
         };
 
         $queryBuilder2 = $this->getEntityManager()
@@ -114,7 +116,7 @@ class DividendCalendarRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('c')
             ->select('c')
             ->innerJoin('c.ticker', 't')
-            ->orderBy($sort, $orderBy)
+            ->orderBy($sort, self::sortDirection($orderBy, 'DESC'))
             ->addOrderBy('c.id', 'DESC');
 
         $queryBuilder->where(

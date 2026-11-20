@@ -2,9 +2,10 @@
 
 namespace App\Repository;
 
-use Doctrine\ORM\QueryBuilder;
+use App\Entity\Branch;
 use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
@@ -16,6 +17,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
  */
 class TickerRepository extends ServiceEntityRepository
 {
+    use SafeSortTrait;
     use PagerTrait;
 
     public function __construct(ManagerRegistry $registry)
@@ -30,7 +32,7 @@ class TickerRepository extends ServiceEntityRepository
         string $sort = "ASC",
         ?Ticker $ticker = null
     ): Paginator {
-        $order = "t." . $orderBy;
+        $order = $this->sortField($orderBy, 't', 'symbol');
         // Create our query
         $queryBuilder = $this->createQueryBuilder("t")
             ->select("t")
@@ -39,7 +41,7 @@ class TickerRepository extends ServiceEntityRepository
             ->leftJoin("t.dividendMonths", "d")
             ->leftJoin("t.payments", "pa")
             ->groupBy("t.id")
-            ->orderBy($order, $sort);
+            ->orderBy($order, self::sortDirection($sort));
 
         if ($ticker && $ticker->getId()) {
             $queryBuilder->where("t = :ticker");
@@ -58,7 +60,7 @@ class TickerRepository extends ServiceEntityRepository
         string $orderBy = "ASC",
         ?Ticker $ticker = null
     ): QueryBuilder {
-        $sort = "t." . $sort;
+        $sort = $this->sortField($sort, 't', 'symbol');
         // Create our query
         $queryBuilder = $this->createQueryBuilder("t")
             ->select("t")
@@ -67,7 +69,7 @@ class TickerRepository extends ServiceEntityRepository
             ->leftJoin("t.dividendMonths", "d")
             ->leftJoin("t.payments", "pa")
             ->groupBy("t.id")
-            ->orderBy($sort, $orderBy);
+            ->orderBy($sort, self::sortDirection($orderBy));
 
         if ($ticker && $ticker->getId()) {
             $queryBuilder->where("t = :ticker");
@@ -85,15 +87,11 @@ class TickerRepository extends ServiceEntityRepository
         string $sort = "ASC",
         string $search = ""
     ): Paginator {
-        [$orderTable, $orderColumn] = explode(".", $orderBy);
+        [$orderTable, $orderColumn] = explode(".", $orderBy, 2) + [1 => ""];
 
-        $order = "t." . $orderColumn;
-        if ($orderTable == "ticker") {
-            $order = "t." . $orderColumn;
-        }
-        if ($orderTable == "branch") {
-            $order = "i." . $orderColumn;
-        }
+        $order = $orderTable === "branch"
+            ? $this->sortField($orderColumn, "i", "label", Branch::class)
+            : $this->sortField($orderColumn, "t", "symbol");
 
         // Create our query
         $queryBuilder = $this->createQueryBuilder("t", "t")
@@ -105,7 +103,7 @@ class TickerRepository extends ServiceEntityRepository
             ->join("t.positions", "p")
             ->where("p.closed = false")
             ->groupBy("t.id")
-            ->orderBy($order, $sort);
+            ->orderBy($order, self::sortDirection($sort));
 
         if (!empty($search)) {
             $queryBuilder->andWhere(

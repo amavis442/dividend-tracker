@@ -19,6 +19,7 @@ use Doctrine\ORM\QueryBuilder;
  */
 class ResearchRepository extends ServiceEntityRepository
 {
+    use SafeSortTrait;
     use PagerTrait;
 
     public function __construct(ManagerRegistry $registry)
@@ -61,14 +62,14 @@ class ResearchRepository extends ServiceEntityRepository
 
         $sort = match ($sort) {
             'symbol' => 't.symbol',
-            default => 'r.' . $sort,
+            default => $this->sortField($sort, 'r', 'id'),
         };
 
         // Create our query
         $queryBuilder = $this->createQueryBuilder('r')
             ->select('r')
             ->innerJoin('r.ticker', 't')
-            ->orderBy($sort, $orderBy);
+            ->orderBy($sort, self::sortDirection($orderBy));
 
         if ($ticker && $ticker->getId()) {
             $queryBuilder->andWhere('t = :ticker');
@@ -82,9 +83,11 @@ class ResearchRepository extends ServiceEntityRepository
         string $order = 'r.id',
         string $sort = 'ASC',
     ): QueryBuilder {
+        $field = $this->sortField((string) preg_replace('/^r\./', '', $order), 'r', 'id');
+
         return $this->createQueryBuilder('r')
             ->join('r.ticker', 't')
-            ->orderBy($order, $sort)
+            ->orderBy($field, self::sortDirection($sort))
             ->where('t = :ticker')
             ->setParameter('ticker', $ticker->getId());
     }

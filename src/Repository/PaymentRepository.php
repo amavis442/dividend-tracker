@@ -26,6 +26,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PaymentRepository extends ServiceEntityRepository
 {
+    use SafeSortTrait;
     use PagerTrait;
 
     public function __construct(ManagerRegistry $registry)
@@ -57,7 +58,7 @@ class PaymentRepository extends ServiceEntityRepository
         ?string $startDate = null,
         ?string $endDate = null
     ): Paginator {
-        $order = 'p.' . $orderBy;
+        $order = $this->sortField($orderBy, 'p', 'payDate');
         if ($orderBy === 'symbol') {
             $order = 't.symbol';
         }
@@ -69,7 +70,7 @@ class PaymentRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('p')
             ->join('p.ticker', 't')
             ->leftJoin('p.calendar', 'c')
-            ->orderBy($order, $sort);
+            ->orderBy($order, self::sortDirection($sort, 'DESC'));
 
         if ($startDate !== null) {
             $this->setDateRange(
@@ -100,13 +101,13 @@ class PaymentRepository extends ServiceEntityRepository
         $sort = match ($sort) {
             'symbol' => 't.symbol',
             'exDividendDate' => 'c.exDividendDate',
-            default => 'p.' . $sort,
+            default => $this->sortField($sort, 'p', 'payDate'),
         };
 
         // Create our query
         $queryBuilder = $this->createQueryBuilder('p')
             ->leftJoin('p.calendar', 'c')
-            ->orderBy($sort, $orderBy);
+            ->orderBy($sort, self::sortDirection($orderBy, 'DESC'));
 
         if ($startDate !== null && $endDate != null) {
             $this->setDateRange(
