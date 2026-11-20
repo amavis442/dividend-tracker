@@ -25,7 +25,7 @@
                         <twig:Table:Tr>
                             <twig:Table:ThRow>{{ 'Cash amount'|trans }}</twig:Table:ThRow>
                             <twig:Table:Td>
-                                {{ (calendar.currency ? calendar.currency.sign : '$')|raw }}{{ (calendar.cashAmount)|format_number({"fraction_digit": 2}) }}
+                                {{ (calendar.currency ? calendar.currency.sign : '$')|currency_sign }}{{ (calendar.cashAmount)|format_number({"fraction_digit": 2}) }}
                             </twig:Table:Td>
                         </twig:Table:Tr>
                         <twig:Table:Tr>

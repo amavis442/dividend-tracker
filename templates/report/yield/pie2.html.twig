@@ -192,7 +192,7 @@
                                                     {{ 'Last dividend'|trans }}:
                                                     {% if item.last_paid_calendar %}
                                                         {% set paidCurrency = item.last_paid_calendar.currency ?? item.ticker.currency %}
-                                                        {{ (paidCurrency ? (paidCurrency.sign ?: paidCurrency.symbol) : '$')|raw }}{{ (item.last_paid_calendar.adjustedCashAmount)|format_number({"fraction_digit": 2}) }}
+                                                        {{ (paidCurrency ? (paidCurrency.sign ?: paidCurrency.symbol) : '$')|currency_sign }}{{ (item.last_paid_calendar.adjustedCashAmount)|format_number({"fraction_digit": 2}) }}
                                                     {% else %}
                                                         -
                                                     {% endif %}

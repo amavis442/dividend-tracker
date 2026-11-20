@@ -35,12 +35,12 @@
                             </twig:Table:Tr>
                             <twig:Table:Tr>
                                 <th>Price</th>
-                                <twig:Table:Td>{{ transaction.currency.sign|raw }}{{ (transaction.price)|format_number({"fraction_digit": 2}) }}</twig:Table:Td>
+                                <twig:Table:Td>{{ transaction.currency.sign|currency_sign }}{{ (transaction.price)|format_number({"fraction_digit": 2}) }}</twig:Table:Td>
                             </twig:Table:Tr>
                             <twig:Table:Tr>
                                 <th>Allocation</th>
                                 <twig:Table:Td>
-                                    {{ transaction.allocationCurrency.sign|raw }}{{ (transaction.allocation)|format_number({"fraction_digit": 2}) }}
+                                    {{ transaction.allocationCurrency.sign|currency_sign }}{{ (transaction.allocation)|format_number({"fraction_digit": 2}) }}
                                 </twig:Table:Td>
                             </twig:Table:Tr>
                         </tbody>

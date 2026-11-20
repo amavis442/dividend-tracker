@@ -54,7 +54,7 @@
                                     {{ currency.description }}
                                 </twig:Table:Td>
                                 <twig:Table:Td>
-                                    {{ currency.sign|raw }}
+                                    {{ currency.sign|currency_sign }}
                                 </twig:Table:Td>
                                 <twig:Table:Td>
                                     <twig:ButtonGroup show_link="{{ path('currency_show', { id: currency.id }) }}"

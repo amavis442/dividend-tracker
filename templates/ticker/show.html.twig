@@ -62,7 +62,7 @@
                                 <twig:Table:Td class="max-w-min">
                                     <twig:Card title="{{ ticker.symbol }}" title_header_variant="h2" class="w-full">
                                         <div class="mb-4 border-b border-gray-400">
-                                            {{ ticker.description|replace({"<p": "<p class=\"text-pretty\""}) |raw }}
+                                            {{ ticker.description|sanitize_html('app.rich_text')|replace({"<p": "<p class=\"text-pretty\""})|raw }}
                                         </div>
                                         <div class="mb-2">
                                             <twig:Button tag="a" href="{{ path('ticker_edit', {'id': ticker.id}) }}">
@@ -87,7 +87,7 @@
                                 {% for research in ticker.researches %}
                                     <div class="mb-2">
                                         <twig:Card title="{{ research.title }}" title_header_variant="h3" class="w-full">
-                                            <div class="mb-4 border-b border-gray-400">{{ research.info|raw }}</div>
+                                            <div class="mb-4 border-b border-gray-400">{{ research.info|sanitize_html('app.rich_text') }}</div>
                                             {% if research.attachments %}
                                                 <div>
                                                     {% for doc in research.attachments %}

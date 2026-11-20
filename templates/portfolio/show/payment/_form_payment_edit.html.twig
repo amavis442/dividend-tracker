@@ -47,7 +47,7 @@
                             {{ payment.amount|format_number({"fraction_digit": 7}) }}
                         </twig:Table:Td>
                         <twig:Table:Td>
-                            {{ (payment.currency ? payment.currency.sign : '$')|raw }}{{ payment.dividend|format_number({"fraction_digit": 2}) }}
+                            {{ (payment.currency ? payment.currency.sign : '$')|currency_sign }}{{ payment.dividend|format_number({"fraction_digit": 2}) }}
                         </twig:Table:Td>
                         <twig:Table:Td>
                             {{ payment.dividendType }}

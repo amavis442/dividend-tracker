@@ -176,7 +176,7 @@
 
                                         {% if position.divDate %}
                                             <twig:Badge class="block">
-                                                {{ position.cashCurrency.sign|raw }}
+                                                {{ position.cashCurrency.sign|currency_sign }}
                                                 {{ position.cashAmount|format_number({"fraction_digit": 4}) }}
                                             </twig:Badge>
                                             <twig:Badge variant="secondary" class="flex mt-1">

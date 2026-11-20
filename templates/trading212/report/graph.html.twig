@@ -170,7 +170,7 @@
                             <twig:Table:Td>
                                 {% set currentCalendar = instrument.calendars[('now'|date('Ym'))] ?? null %}
                                 {% set currentCurrency = currentCalendar ? (currentCalendar.currency ?? instrument.ticker.currency) : null %}
-                                {{ (currentCurrency ? (currentCurrency.sign ?: currentCurrency.symbol) : sign)|raw }}{{ instrument.currentDividendPerShare|number_format(4) }}
+                                {{ (currentCurrency ? (currentCurrency.sign ?: currentCurrency.symbol) : sign)|currency_sign }}{{ instrument.currentDividendPerShare|number_format(4) }}
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 <div class="flex" {{ stimulus_controller("tooltip") }} data-tooltip-placement-value="right">
@@ -195,7 +195,7 @@
                                                                         <ul>
                                                                             <li>#{{ ckey }}</li>
                                                                             <li>
-                                                                                <span class="font-semibold">{{ calendar.paymentDate|format_datetime('long', 'none', locale: 'nl') }}:</span> {% set calendarCurrency = calendar.currency ?? instrument.ticker.currency %}{{ (calendarCurrency ? (calendarCurrency.sign ?: calendarCurrency.symbol) : '$')|raw }}{{ calendar.adjustedCashAmount }}
+                                                                                <span class="font-semibold">{{ calendar.paymentDate|format_datetime('long', 'none', locale: 'nl') }}:</span> {% set calendarCurrency = calendar.currency ?? instrument.ticker.currency %}{{ (calendarCurrency ? (calendarCurrency.sign ?: calendarCurrency.symbol) : '$')|currency_sign }}{{ calendar.adjustedCashAmount }}
                                                                             </li>
                                                                             <li class="font-bold mb-2">
                                                                                 {{'estimated payout'|trans}} &euro;
@@ -227,7 +227,7 @@
                                 {{ instrument.currentYearlyYield|number_format(2) }}%
                             </twig:Table:Td>
                             <twig:Table:Td>
-                                {{ sign|raw }}{{ instrument.avgDividendPerShare|number_format(2) }}
+                                {{ sign|currency_sign }}{{ instrument.avgDividendPerShare|number_format(2) }}
                             </twig:Table:Td>
                             <twig:Table:Td>
                                 &euro;{{ instrument.avgExpectedDividend|number_format(2) }}

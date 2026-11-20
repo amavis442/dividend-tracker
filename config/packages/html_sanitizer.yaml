@@ -1,0 +1,9 @@
+framework:
+    html_sanitizer:
+        sanitizers:
+            # Rich text from the editor (journals, research, ticker descriptions):
+            # formatting and links stay, scripts, styles and event handlers go.
+            app.rich_text:
+                allow_safe_elements: true
+                allowed_link_schemes: ['http', 'https', 'mailto']
+                allowed_media_schemes: ['http', 'https', 'data']

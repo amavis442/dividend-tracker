@@ -190,7 +190,7 @@
                                                 <twig:ListGroupItem>
                                                     {{ 'Last dividend'|trans }}:
                                                     {% if item.lastDividend > 0 %}
-                                                        {{ item.lastDividendCurrency|raw }}{{ (item.lastDividend)|format_number({"fraction_digit": 2}) }}
+                                                        {{ item.lastDividendCurrency|currency_sign }}{{ (item.lastDividend)|format_number({"fraction_digit": 2}) }}
                                                     {% else %}
                                                         -
                                                     {% endif %}
