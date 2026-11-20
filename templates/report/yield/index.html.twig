@@ -54,7 +54,7 @@
 						</td>
 						<td>&euro;{{ (item.avgPrice)|format_number({fraction_digit: 2}) }}</td>
 						<td>
-							{% if item.lastDividend > 0 %}{{ item.lastDividendCurrency }}{{ (item.lastDividend)|format_number({fraction_digit: 2}) }}{% else %}-
+							{% if item.lastDividend > 0 %}{{ item.lastDividendCurrency|currency_sign }}{{ (item.lastDividend)|format_number({fraction_digit: 2}) }}{% else %}-
 							{% endif %}
 						</td>
 						<td>
@@ -65,7 +65,7 @@
 							{% endif %}
 						</td>
 						<td>
-							{% if item.payout > 0 %}{{ item.payoutCurrency }}{{ (item.payout)|format_number({fraction_digit: 2}) }}{% else %}-
+							{% if item.payout > 0 %}{{ item.payoutCurrency|currency_sign }}{{ (item.payout)|format_number({fraction_digit: 2}) }}{% else %}-
 							{% endif %}
 						</td>
 						<td>

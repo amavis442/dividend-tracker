@@ -2,8 +2,17 @@ framework:
     html_sanitizer:
         sanitizers:
             # Rich text from the editor (journals, research, ticker descriptions):
-            # formatting and links stay, scripts, styles and event handlers go.
+            # formatting and links stay, scripts and event handlers go.
             app.rich_text:
                 allow_safe_elements: true
+                allow_elements:
+                    font: ['color', 'face', 'size', 'style']
+                allow_attributes:
+                    style: ['a', 'b', 'div', 'figure', 'font', 'h1', 'h2', 'h3', 'h4', 'img', 'li', 'mark', 'p', 'span', 'table', 'td', 'th', 'tr']
+                    class: ['blockquote', 'figure', 'h1', 'h2', 'h3', 'h4', 'img', 'mark', 'p', 'span', 'table']
                 allowed_link_schemes: ['http', 'https', 'mailto']
                 allowed_media_schemes: ['http', 'https', 'data']
+                allow_relative_links: true
+                allow_relative_medias: true
+                # Stored entries reach about 200 KB; the default would cut them at 20 KB.
+                max_input_length: 2000000

@@ -51,6 +51,27 @@ final class RichTextOutputTest extends WebTestCase
         $this->assertSanitized();
     }
 
+    public function testLongAndFormattedTextIsKept(): void
+    {
+        $long = '<p><span style="font-size:18px">Styled</span></p>' . str_repeat('<p>Filler text.</p>', 2000)
+            . '<p><a href="/nl/dashboard/portfolio/">Last paragraph</a></p>';
+
+        $this->client->request(
+            'POST',
+            '/api/journals',
+            server: ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'],
+            content: json_encode(['title' => 'Long', 'content' => $long], JSON_THROW_ON_ERROR)
+        );
+        self::assertResponseStatusCodeSame(201);
+        $id = basename((string) $this->client->getResponse()->headers->get('Location'));
+
+        $this->client->request('GET', '/nl/dashboard/journal/' . $id);
+
+        $content = (string) $this->client->getResponse()->getContent();
+        self::assertStringContainsString('style="font-size:18px"', $content);
+        self::assertStringContainsString('href="/nl/dashboard/portfolio/">Last paragraph', $content);
+    }
+
     public function testTickerDescriptionIsSanitized(): void
     {
         $ticker = TickerFactory::createOne(['description' => self::MALICIOUS]);
