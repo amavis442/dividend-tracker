@@ -41,12 +41,14 @@
             </div>
             <div class="border border-gray-200 rounded-lg p-2">
                 <div class="w-full pr-3 py-2 mt-2 mb-2">
+                    {% if is_granted('ROLE_ADMIN') %}
                     <twig:Button tag="a"
                                  class="btn btn-primary"
                                  href="{{ path("calendar_create") }}"
                                  data-turbo-target="_top">
                         <i class="fas fa-plus"></i>
                     </twig:Button>
+                    {% endif %}
                 </div>
                 <turbo-frame id="calendar-results" target="_top">
                 <twig:Table:Table class="max-w-min min-w-full mb-4">
@@ -185,8 +187,8 @@
                                                 <div class="arrow" data-tooltip-target="tooltipArrow"></div>
                                             </div>
                                         </div>
+                                        {% if is_granted('ROLE_ADMIN') %}
                                         <div class="inline-block" data-controller="tooltip">
-                                            {% if is_granted('ROLE_ADMIN') %}
                                             <a href="{{ path('calendar_edit', { id: calendar.id }) }}"
                                                data-turbo-frame="_top"
                                                data-tooltip-target="element"
@@ -194,12 +196,12 @@
                                                class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
                                                 <i class="far fa-edit"></i>
                                             </a>
-                                            {% endif %}
                                             <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
                                                 {{ 'Edit calendar'|trans }}
                                                 <div class="arrow" data-tooltip-target="tooltipArrow"></div>
                                             </div>
                                         </div>
+                                        {% endif %}
                                     </div>
                                 </twig:Table:Td>
                             </twig:Table:Tr>

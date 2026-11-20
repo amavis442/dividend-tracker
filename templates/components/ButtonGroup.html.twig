@@ -4,7 +4,7 @@
            data-turbo-frame="_top"
            data-tooltip-target="element"
            data-action="mouseenter->tooltip#show mouseleave->tooltip#hide"
-           class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+           class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 {{ edit_link|default('') ? 'rounded-s-lg' : 'rounded-lg' }} hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
             <i class="fas fa-book-open"></i>
         </a>
         <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
@@ -12,6 +12,7 @@
             <div class="arrow" data-tooltip-target="tooltipArrow"></div>
         </div>
     </div>
+    {% if edit_link|default('') %}
     <div class="inline-block" data-controller="tooltip">
         <a href="{{ edit_link }}"
            data-turbo-frame="_top"
@@ -25,4 +26,5 @@
             <div class="arrow" data-tooltip-target="tooltipArrow"></div>
         </div>
     </div>
+    {% endif %}
 </div>

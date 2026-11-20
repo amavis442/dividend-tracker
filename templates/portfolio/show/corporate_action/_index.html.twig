@@ -74,8 +74,8 @@
                                             <div class="arrow" data-tooltip-target="tooltipArrow"></div>
                                         </div>
                                     </div>
+                                    {% if is_granted('ROLE_ADMIN') %}
                                     <div class="inline-block" data-controller="tooltip">
-                                        {% if is_granted('ROLE_ADMIN') %}
                                         <a href="{{ path('app_corporate_action_edit', {'id': corporate_action.id}) }}"
                                            data-turbo-frame="_top"
                                            data-tooltip-target="element"
@@ -83,12 +83,12 @@
                                            class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
                                             <i class="far fa-edit"></i>
                                         </a>
-                                        {% endif %}
                                         <div class="tooltip" role="tooltip" data-tooltip-target="tooltip">
                                             {{ 'Edit corporate action'|trans }}
                                             <div class="arrow" data-tooltip-target="tooltipArrow"></div>
                                         </div>
                                     </div>
+                                    {% endif %}
                                 </div>
                             </twig:Table:Td>
                         </twig:Table:Tr>
