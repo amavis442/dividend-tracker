@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Repository;
 
 /**
- * Turns sort values from requests into safe DQL: only mapped fields of the
- * entity and ASC/DESC pass, anything else falls back to a default.
+ * Turns sort values from requests into safe DQL: only mapped, non-text fields
+ * of the entity and ASC/DESC pass, anything else falls back to a default.
  */
 trait SafeSortTrait
 {
@@ -19,7 +19,11 @@ trait SafeSortTrait
             ? $this->getClassMetadata()
             : $this->getEntityManager()->getClassMetadata($entity);
 
-        return $alias . '.' . ($metadata->hasField($field) ? $field : $default);
+        // Long text columns are not sortable: sorting them is slow and never useful.
+        $sortable = $metadata->hasField($field)
+            && !in_array($metadata->getTypeOfField($field), ['text', 'blob', 'json'], true);
+
+        return $alias . '.' . ($sortable ? $field : $default);
     }
 
     private static function sortDirection(string $direction, string $default = 'ASC'): string

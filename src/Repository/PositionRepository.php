@@ -401,10 +401,12 @@ class PositionRepository extends ServiceEntityRepository
         string $sort = 'ASC',
         string $search = ''
     ): ?array {
-        $order = $this->sortField($orderBy, 'p', 'id');
-        if ($orderBy === 'symbol') {
-            $order = 't.symbol';
-        }
+        // The query is grouped by symbol, so only the symbol and the aggregates can be sorted on.
+        $order = in_array(
+            $orderBy,
+            ['totalPositions', 'sumAllocation', 'sumAmount', 'avgPrice', 'sumDividend'],
+            true
+        ) ? $orderBy : 't.symbol';
         $queryBuilder = $this->createQueryBuilder('p')
             ->select([
                 't.symbol',

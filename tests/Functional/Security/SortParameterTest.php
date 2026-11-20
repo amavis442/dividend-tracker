@@ -14,8 +14,9 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
 /**
- * Unknown sort fields and directions fall back to a default instead of
- * reaching the query.
+ * Every list page keeps working with unknown sort fields and directions.
+ * Some pages already filter these values in the controller; the repository
+ * check itself is covered by SafeSortQueryTest.
  */
 #[Group('security')]
 final class SortParameterTest extends WebTestCase
