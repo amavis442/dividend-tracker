@@ -5,6 +5,10 @@
 {% block body %}
     <h1>Register</h1>
 
+    {% for notice in app.flashes('notice') %}
+        <div class="mb-2 rounded-lg bg-green-100 p-3 text-green-800" role="status">{{ notice|trans }}</div>
+    {% endfor %}
+
     {{ form_start(registrationForm) }}
         {{ form_row(registrationForm.email) }}
         {{ form_row(registrationForm.plainPassword) }}

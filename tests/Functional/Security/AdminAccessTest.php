@@ -78,6 +78,7 @@ final class AdminAccessTest extends WebTestCase
             ['GET', self::NL . '/portfolio/show/corporate/action/create/' . $this->ids[$who . 'Position']],
             ['GET', self::NL . '/research/create/' . $this->ids['ticker']],
             ['GET', self::NL . '/trading212/incomesshares/create'],
+            ['GET', self::NL . '/monthly/summary/new'],
             ['GET', self::NL . '/portfolio/create_dividend/' . $this->ids['ticker']],
             ['POST', self::NL . '/portfolio/delete_dividend/' . $this->ids['calendar'] . '/' . $this->ids[$who . 'Position']],
         ];
@@ -152,6 +153,25 @@ final class AdminAccessTest extends WebTestCase
         $this->loginAs('admin');
         $this->postUser('by-admin@example.test');
         self::assertResponseStatusCodeSame(201);
+    }
+
+    public function testAnAdminSeesTheInviteLinkAndAConfirmation(): void
+    {
+        $this->loginAs('admin');
+
+        $crawler = $this->client->request('GET', self::NL . '/register');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('a[href$="/nl/dashboard/register"]');
+
+        $form = $crawler->selectButton('Register')->form();
+        $form['registration_form[email]'] = 'invited@example.test';
+        $form['registration_form[plainPassword]'] = 'a-long-password';
+        $form['registration_form[agreeTerms]']->tick();
+        $this->client->submit($form);
+        self::assertResponseRedirects();
+        $this->client->followRedirect();
+
+        self::assertSelectorTextContains('[role="status"]', 'Account created.');
     }
 
     private function postUser(string $email): void
