@@ -256,7 +256,8 @@ class YieldsService
         $currency = DividendCalendars::currency($calendar);
         $sign = $currency?->getSign() ?: $currency?->getSymbol() ?: '$';
 
-        return html_entity_decode($sign, ENT_QUOTES | ENT_HTML5);
+        // Printed with the currency_sign filter, which decodes and escapes it.
+        return $sign;
     }
 
     /**

@@ -59,7 +59,7 @@
                         </div>
                         <div class="mb-4 flex flex-col p-4">
                             <div class="normal-case mb-4 border-b border-gray-400">
-                                <div class="w-full mb-4">{{ journal.content|sanitize_html('app.rich_text') }}</div>
+                                <div class="w-full mb-4">{{ (journal.content ?? '')|sanitize_html('app.rich_text') }}</div>
                             </div>
                             <div class="inline-flex" role="group">
                                 <div class="inline-block" data-controller="tooltip">

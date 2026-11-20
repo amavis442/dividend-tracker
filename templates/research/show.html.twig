@@ -28,7 +28,7 @@
                                     Info
                                 </twig:Table:ThRow>
                                 <twig:Table:Td>
-                                    <div class="break-normal overflow-hidden">{{ research.info|replace({"\\n":'', "\\r":''})|sanitize_html('app.rich_text') }}</div>
+                                    <div class="break-normal overflow-hidden">{{ (research.info ?? '')|replace({"\\n":'', "\\r":''})|sanitize_html('app.rich_text') }}</div>
                                 </twig:Table:Td>
                             </twig:Table:Tr>
                             <twig:Table:Tr>

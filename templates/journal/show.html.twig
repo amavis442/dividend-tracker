@@ -32,7 +32,7 @@
                                     {{ 'Content'|trans }}
                                 </twig:Table:ThRow>
                                 <twig:Table:Td>
-                                    {{ journal.content|sanitize_html('app.rich_text') }}
+                                    {{ (journal.content ?? '')|sanitize_html('app.rich_text') }}
                                 </twig:Table:Td>
                             </twig:Table:Tr>
                             <twig:Table:Tr>

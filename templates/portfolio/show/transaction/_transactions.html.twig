@@ -8,7 +8,7 @@
 
 <div class="flex mb-4">
 	<twig:Alert variant="black" class="text-right">
-		{{ 'Total investment'|trans }}: <strong class="font-sans">{{ position.allocationCurrency.Sign|currency_sign }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}</strong>
+		{{ 'Total investment'|trans }}: <strong class="font-sans">{{ (position.allocationCurrency ? position.allocationCurrency.sign : '$')|currency_sign }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}</strong>
 	</twig:Alert>
 </div>
 
@@ -112,7 +112,7 @@
 						<twig:Table:Td>{{ currentAmount }}<br/>
 							@
 							{{ (transaction.currency ? transaction.currency.sign : '$')|currency_sign }}{{ transaction.avgprice|format_number({fraction_digit: 2}) }}</twig:Table:Td>
-						<twig:Table:Td>{{ (transaction.allocationCurrency ? position.allocationCurrency.sign : '$')|currency_sign }}{{ transaction.allocation|format_number({fraction_digit: 2}) }}</twig:Table:Td>
+						<twig:Table:Td>{{ (transaction.allocationCurrency ? transaction.allocationCurrency.sign : '$')|currency_sign }}{{ transaction.allocation|format_number({fraction_digit: 2}) }}</twig:Table:Td>
 						<twig:Table:Td>&euro;{{ (transaction.stampduty + transaction.fxFee + transaction.finraFee + transaction.transactionFee)|format_number({fraction_digit: 2}) }}</twig:Table:Td>
 						<twig:Table:Td>&euro;{{ transaction.netOrderValue|format_number({fraction_digit: 2}) }}</twig:Table:Td>
 						<twig:Table:Td>

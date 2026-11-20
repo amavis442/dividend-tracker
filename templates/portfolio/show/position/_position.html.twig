@@ -20,7 +20,7 @@
         </twig:Table:Td>
         <twig:Table:Td>{{ position.adjustedAmount|format_number({ fraction_digit: 7 }) }}</twig:Table:Td>
         <twig:Table:Td>{{ (position.currency ? position.currency.sign : '$')|currency_sign }}{{ position.adjustedAveragePrice|format_number({ fraction_digit: 2 }) }}</twig:Table:Td>
-        <twig:Table:Td>{{ position.allocationCurrency.Sign|currency_sign }}{{ position.allocation|format_number({ fraction_digit: 2 }) }}</twig:Table:Td>
+        <twig:Table:Td>{{ (position.allocationCurrency ? position.allocationCurrency.sign : '$')|currency_sign }}{{ position.allocation|format_number({ fraction_digit: 2 }) }}</twig:Table:Td>
         <twig:Table:Td>
           <div class="flex">
 					  <twig:Badge variant="{{ position.profit > 0 ? "success" : "danger" }}">

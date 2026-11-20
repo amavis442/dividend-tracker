@@ -20,7 +20,8 @@ final class RichTextOutputTest extends WebTestCase
     use Factories;
     use ResetDatabase;
 
-    private const MALICIOUS = '<p><strong>Kept</strong></p><script>alert("x")</script><img src="x" onerror="alert(1)">';
+    private const MALICIOUS = '<p><strong>Kept</strong></p><script>alert("x")</script><img src="x" onerror="alert(1)">'
+        . '<a href="https://example.test" style="position:fixed;inset:0;z-index:9999" class="fixed inset-0">Overlay</a>';
 
     private KernelBrowser $client;
 
@@ -88,5 +89,16 @@ final class RichTextOutputTest extends WebTestCase
         self::assertStringContainsString('<strong>Kept</strong>', $content);
         self::assertStringNotContainsString('alert("x")', $content);
         self::assertStringNotContainsString('onerror', $content);
+        self::assertStringNotContainsString('position:fixed', $content);
+        self::assertStringNotContainsString('class="fixed inset-0"', $content);
+    }
+
+    public function testATickerWithoutDescriptionRenders(): void
+    {
+        $ticker = TickerFactory::createOne(['description' => null]);
+
+        $this->client->request('GET', '/nl/dashboard/admin/ticker/' . $ticker->getId());
+
+        self::assertResponseIsSuccessful();
     }
 }
