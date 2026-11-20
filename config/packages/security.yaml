@@ -59,9 +59,9 @@ security:
         - { path: ^/api/jsonlogin$, roles: PUBLIC_ACCESS }
         - { path: ^/(prices$|stock_prices/), roles: ROLE_USER }
         - { path: ^/dashboard/portfolio/admin, roles: ROLE_ADMIN }
-        - { path: ^/(nl|en)/dashboard/admin, roles: ROLE_ADMIN }
+        - { path: '^/[a-z]{2}/dashboard/admin', roles: ROLE_ADMIN }
         # Accounts are created by invitation: only an admin can register a user.
-        - { path: ^/(nl|en)/dashboard/register, roles: ROLE_ADMIN }
+        - { path: '^/[a-z]{2}/dashboard/register', roles: ROLE_ADMIN }
         - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/(nl|en)/dashboard, roles: IS_AUTHENTICATED_FULLY }
         # require the user to fully login to change password

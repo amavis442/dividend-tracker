@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[
     Route(
@@ -49,6 +50,7 @@ final class IncomesSharesDataSetController extends AbstractController
     }
 
     #[Route('/create', name: 'app_incomes_shares_data_set_create')]
+    #[IsGranted('ROLE_ADMIN')]
     public function create(Request $request, IncomesSharesDataSetService $dataSetService): Response
     {
         try {
@@ -100,6 +102,7 @@ final class IncomesSharesDataSetController extends AbstractController
             methods: ['GET', 'POST']
         )
     ]
+    #[IsGranted('ROLE_ADMIN')]
     public function new(
         Request $request,
         EntityManagerInterface $entityManager
@@ -174,6 +177,7 @@ final class IncomesSharesDataSetController extends AbstractController
             methods: ['POST', 'GET']
         )
     ]
+    #[IsGranted('ROLE_ADMIN')]
     public function uploadFiles(
         Request $request,
         IncomesSharesCsvParser $csvParser,
@@ -222,6 +226,7 @@ final class IncomesSharesDataSetController extends AbstractController
             methods: ['GET', 'POST']
         )
     ]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(
         Request $request,
         #[MapEntity] IncomesSharesDataSet $incomesSharesDataSet,
@@ -252,6 +257,7 @@ final class IncomesSharesDataSetController extends AbstractController
             methods: ['POST']
         )
     ]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(
         Request $request,
         #[MapEntity] IncomesSharesDataSet $incomesSharesDataSet,

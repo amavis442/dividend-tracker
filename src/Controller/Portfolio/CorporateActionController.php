@@ -135,7 +135,7 @@ class CorporateActionController extends AbstractController
         }
 
         return $this->redirectToRoute('portfolio_list_corporate_action', [
-            'id' => $position->getId(),
+            'position' => $position->getId(),
             'page' => 1,
         ]);
     }

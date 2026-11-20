@@ -10,11 +10,13 @@
                         <strong>{{ t.symbol }}:</strong>
                     </div>
                     <div class="mb-4">
+                        {% if is_granted('ROLE_ADMIN') %}
                         <twig:Button tag="a"
                                      variant="secondary"
                                      href="{{ path('calendar_create', {'ticker': t.id}) }}">
                             <i class="far fa-calendar-alt"></i>
                         </twig:Button>
+                        {% endif %}
                     </div>
                 </div>
             </twig:ListGroupItem>

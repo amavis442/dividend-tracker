@@ -22,8 +22,10 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/admin/globalx')]
+#[IsGranted('ROLE_ADMIN')]
 class GlobalXImportController extends AbstractController
 {
     private const SESSION_GLOBALX_IMPORT_RESULT_KEY = 'import_globalx_csv_result';

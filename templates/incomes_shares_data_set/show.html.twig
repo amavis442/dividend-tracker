@@ -25,7 +25,9 @@
                            href="{{ path("app_incomes_shares_data_set_index") }}">
                             <i class="fas fa-angle-double-left"></i> {{ 'back to list'|trans }}
                         </a>
+                        {% if is_granted('ROLE_ADMIN') %}
                         {{ include("incomes_shares_data_set/_delete_form.html.twig") }}
+                        {% endif %}
                     </div>
                 </div>
             </div>
