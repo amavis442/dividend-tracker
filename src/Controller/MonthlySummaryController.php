@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
@@ -27,6 +28,7 @@ final class MonthlySummaryController extends AbstractController
     }
 
     #[Route('/new', name: 'app_monthly_summary_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $monthlySummary = new MonthlySummary();
@@ -58,6 +60,7 @@ final class MonthlySummaryController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_monthly_summary_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(Request $request, #[MapEntity] MonthlySummary $monthlySummary, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(MonthlySummaryType::class, $monthlySummary);
@@ -76,6 +79,7 @@ final class MonthlySummaryController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_monthly_summary_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, #[MapEntity] MonthlySummary $monthlySummary, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete' . $monthlySummary->getId(), $request->getPayload()->getString('_token'))) {

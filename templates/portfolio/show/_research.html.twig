@@ -8,6 +8,7 @@
         </div>
         <div class="normal-case">{{ (ticker.description ?? '')|sanitize_html('app.rich_text') }}</div>
         <hr class="mt-2 mb-4">
+        {% if is_granted('ROLE_ADMIN') %}
         <div class="mt-2">
             <twig:Button tag="a"
                          href="{{ path('ticker_edit', {'id': ticker.id}) }}"
@@ -15,6 +16,7 @@
                 <i class="far fa-edit"></i>
             </twig:Button>
         </div>
+        {% endif %}
     </div>
     <div>
         {% for research in pager %}
@@ -46,11 +48,13 @@
                         </div>
                         <hr class="mt-2 mb-4">
                         <div class="mb-4">
+                            {% if is_granted('ROLE_ADMIN') %}
                             <twig:Button tag="a"
                                          href="{{ path('research_edit', {'id': research.id}) }}"
                                          data-turbo-frame="_top">
                                 <i class="far fa-edit"></i>
                             </twig:Button>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="flex w-full bg-gray-100 rounded-b-lg p-4">
@@ -66,6 +70,7 @@
         {% endfor %}
     </div>
     <div class="flex mt-2" data-controller="tooltip">
+        {% if is_granted('ROLE_ADMIN') %}
         <twig:Button tag="a"
                      href="{{ path('research_new', {'ticker': ticker.id}) }}"
                      data-turbo-frame="_top"
@@ -77,6 +82,7 @@
                 <div class="arrow" data-tooltip-target="tooltipArrow"></div>
             </div>
         </twig:Button>
+        {% endif %}
     </div>
 </div>
 </turbo-frame>

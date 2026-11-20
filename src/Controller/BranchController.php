@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
@@ -46,6 +47,7 @@ class BranchController extends AbstractController
     }
 
     #[Route('/create', name: 'branch_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function create(
         Request $request,
         BranchRepository $branchRepository,
@@ -83,6 +85,7 @@ class BranchController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'branch_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -111,6 +114,7 @@ class BranchController extends AbstractController
     }
 
     #[Route('/delete/{id}', name: 'branch_delete', methods: ['POST', 'DELETE'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,

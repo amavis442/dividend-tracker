@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Service\FileUploader;
 use App\Service\Referer;
 use Doctrine\ORM\EntityManagerInterface;
@@ -116,6 +117,7 @@ class ResearchController extends AbstractController
             methods: ['GET', 'POST']
         )
     ]
+    #[IsGranted('ROLE_ADMIN')]
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -174,6 +176,7 @@ class ResearchController extends AbstractController
             methods: ['GET', 'POST']
         )
     ]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -219,6 +222,7 @@ class ResearchController extends AbstractController
             methods: ['POST', 'DELETE']
         )
     ]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -257,6 +261,7 @@ class ResearchController extends AbstractController
             name: 'research_delete_attachment'
         )
     ]
+    #[IsGranted('ROLE_ADMIN')]
     public function deleteAttachment(
         #[MapEntity] Attachment $attachment,
         Request $request,

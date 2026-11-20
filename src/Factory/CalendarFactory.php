@@ -33,7 +33,6 @@ final class CalendarFactory extends PersistentObjectFactory
     {
         return [
             'cashAmount' => self::faker()->randomFloat(),
-            'createdAt' => self::faker()->dateTime(),
             'exDividendDate' => self::faker()->dateTime(),
             'paymentDate' => self::faker()->dateTime(),
             'recordDate' => self::faker()->dateTime(),

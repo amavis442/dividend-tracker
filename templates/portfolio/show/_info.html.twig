@@ -4,9 +4,11 @@
 		<twig:Table:Tr>
 			<twig:Table:ThRow>
 				{{ 'Instrument'|trans }}
+				{% if is_granted('ROLE_ADMIN') %}
 				<a href="{{ path('ticker_edit', {'id': ticker.id}) }}" data-toggle="tooltip" data-placement="top" title="{{ 'Edit ticker / months'|trans }}" data-turbo-frame="_top">
 					<i class="far fa-edit"></i>
 				</a>
+				{% endif %}
 			</twig:Table:ThRow>
 			<twig:Table:Td>
 				<strong>

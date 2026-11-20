@@ -41,7 +41,7 @@ final class CorporateActionControllerTest extends WebTestCase
 			CorporateAction::class
 		);
 
-		$userFactoryResult = UserFactory::createOne(['email' => '[EMAIL]']);
+		$userFactoryResult = UserFactory::createOne(['email' => '[EMAIL]', 'roles' => ['ROLE_USER', 'ROLE_ADMIN']]);
 		$this->manager->flush();  // flush so repository lookup works
 
 		$user = $userFactoryResult;

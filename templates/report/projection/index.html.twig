@@ -89,13 +89,17 @@
 													</a>
 													{% endif %}
 													{% if not position.calendar %}
+													{% if is_granted('ROLE_ADMIN') %}
 													<a class="btn btn-secondary" href="{{ path('calendar_create', {'ticker': ticker.id }) }}" data-toggle="tooltip" data-placement="top" title="add dividend date">
 														<i class="far fa-calendar-alt"></i>
 													</a>
+													{% endif %}
 													{% else %}
+													{% if is_granted('ROLE_ADMIN') %}
 													<a class="btn btn-secondary" href="{{ path('calendar_edit', {'id': position.calendar.id }) }}" data-toggle="tooltip" data-placement="top" title="edit dividend date">
 														<i class="far fa-edit"></i>
 													</a>
+													{% endif %}
 													{% endif %}
 												</div>
 											</div>

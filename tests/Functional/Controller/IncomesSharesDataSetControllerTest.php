@@ -55,7 +55,7 @@ final class IncomesSharesDataSetControllerTest extends WebTestCase
         $this->exchangeRates = new StubExchangeRates();
         static::getContainer()->set(WisselkoersNlExchangeRateService::class, $this->exchangeRates);
 
-        $email = UserFactory::createOne()->getEmail();
+        $email = UserFactory::createOne(['roles' => ['ROLE_USER', 'ROLE_ADMIN']])->getEmail();
         $user = static::getContainer()->get(UserRepository::class)->findOneBy(['email' => $email]);
         self::assertInstanceOf(User::class, $user);
         $this->user = $user;

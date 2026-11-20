@@ -28,7 +28,8 @@ final class RichTextOutputTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $email = UserFactory::createOne()->getEmail();
+        // Ticker pages are admin pages.
+        $email = UserFactory::createOne(['roles' => ['ROLE_USER', 'ROLE_ADMIN']])->getEmail();
         $user = static::getContainer()->get(UserRepository::class)->findOneBy(['email' => $email]);
         self::assertInstanceOf(User::class, $user);
         $this->client->loginUser($user);

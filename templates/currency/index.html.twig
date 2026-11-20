@@ -17,9 +17,11 @@
             </div>
             <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
                 <div class="w-full pr-3 py-2 mb-4">
+                    {% if is_granted('ROLE_ADMIN') %}
                     <twig:Button tag="a" href="{{ path("currency_new") }}">
                         <i class="fas fa-plus"></i>
                     </twig:Button>
+                    {% endif %}
                 </div>
                 <twig:Table:Table>
                     <twig:Table:THead>
@@ -59,7 +61,7 @@
                                 <twig:Table:Td>
                                     <twig:ButtonGroup show_link="{{ path('currency_show', { id: currency.id }) }}"
                                                       show_link_text=" {{ 'show currency'|trans }}"
-                                                      edit_link="{{ path('currency_edit', { id: currency.id }) }}"
+                                                      edit_link="{{ is_granted('ROLE_ADMIN') ? path('currency_edit', { id: currency.id }) : '' }}"
                                                       edit_link_text="{{ 'Edit currency'|trans }}" />
                                 </twig:Table:Td>
                             </twig:Table:Tr>

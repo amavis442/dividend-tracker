@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -87,6 +88,7 @@ class CalendarController extends AbstractController
     }
 
     #[Route('/create/{ticker?}', name: 'calendar_create', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -129,6 +131,7 @@ class CalendarController extends AbstractController
             methods: ['GET', 'POST']
         )
     ]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -152,6 +155,7 @@ class CalendarController extends AbstractController
     }
 
     #[Route('/delete/{id}', name: 'calendar_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,

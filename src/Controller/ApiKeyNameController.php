@@ -13,9 +13,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route('/{_locale<%app.supported_locales%>}/dashboard/admin/apikeys')]
+#[IsGranted('ROLE_ADMIN')]
 final class ApiKeyNameController extends AbstractController
 {
     #[Route(name: 'app_api_key_name_index', methods: ['GET'])]
