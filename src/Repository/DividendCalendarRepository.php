@@ -61,6 +61,7 @@ class DividendCalendarRepository extends ServiceEntityRepository
     ): Paginator {
         $sort = match ($sort) {
             'symbol' => 't.symbol',
+            'fullname' => 't.fullname',
             default => $this->sortField($sort, 'c', 'exDividendDate'),
         };
 

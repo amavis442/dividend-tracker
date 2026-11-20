@@ -2,10 +2,10 @@
 
 namespace App\Repository;
 
-use Doctrine\ORM\QueryBuilder;
 use App\Entity\Branch;
 use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
