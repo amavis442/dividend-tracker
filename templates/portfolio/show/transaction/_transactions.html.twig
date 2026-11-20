@@ -8,7 +8,7 @@
 
 <div class="flex mb-4">
 	<twig:Alert variant="black" class="text-right">
-		{{ 'Total investment'|trans }}: <strong class="font-sans">{{ position.allocationCurrency.Sign|raw }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}</strong>
+		{{ 'Total investment'|trans }}: <strong class="font-sans">{{ (position.allocationCurrency ? position.allocationCurrency.sign : '$')|currency_sign }}{{ (position.allocation)|format_number({fraction_digit: 2}) }}</strong>
 	</twig:Alert>
 </div>
 
@@ -108,17 +108,17 @@
 						</twig:Table:Td>
 						<twig:Table:Td>{{ transaction.transactionDate|date("d-m-Y") }}</twig:Table:Td>
 						<twig:Table:Td>{{ transaction.amount|format_number({fraction_digit: 7}) }}</twig:Table:Td>
-						<twig:Table:Td>{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ transaction.price|format_number({fraction_digit: 2}) }}</twig:Table:Td>
+						<twig:Table:Td>{{ (transaction.currency ? transaction.currency.sign : '$')|currency_sign }}{{ transaction.price|format_number({fraction_digit: 2}) }}</twig:Table:Td>
 						<twig:Table:Td>{{ currentAmount }}<br/>
 							@
-							{{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ transaction.avgprice|format_number({fraction_digit: 2}) }}</twig:Table:Td>
-						<twig:Table:Td>{{ (transaction.allocationCurrency ? position.allocationCurrency.sign : '$')|raw }}{{ transaction.allocation|format_number({fraction_digit: 2}) }}</twig:Table:Td>
+							{{ (transaction.currency ? transaction.currency.sign : '$')|currency_sign }}{{ transaction.avgprice|format_number({fraction_digit: 2}) }}</twig:Table:Td>
+						<twig:Table:Td>{{ (transaction.allocationCurrency ? transaction.allocationCurrency.sign : '$')|currency_sign }}{{ transaction.allocation|format_number({fraction_digit: 2}) }}</twig:Table:Td>
 						<twig:Table:Td>&euro;{{ (transaction.stampduty + transaction.fxFee + transaction.finraFee + transaction.transactionFee)|format_number({fraction_digit: 2}) }}</twig:Table:Td>
 						<twig:Table:Td>&euro;{{ transaction.netOrderValue|format_number({fraction_digit: 2}) }}</twig:Table:Td>
 						<twig:Table:Td>
 							<div class="flex">
 								<twig:Badge variant="{{ transaction.profit > 0 ? "success" : "danger" }}">
-									{{ (transaction.currency ? transaction.currency.sign : '$')|raw }} {{ transaction.profit|format_number({fraction_digit: 2}) }}
+									{{ (transaction.currency ? transaction.currency.sign : '$')|currency_sign }} {{ transaction.profit|format_number({fraction_digit: 2}) }}
 								</twig:Badge>
 							</div>
 						</twig:Table:Td>

@@ -158,7 +158,7 @@
                                         {% endif %}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
-                                        {{ item.currency.sign }}{{ item.cash.all_shares.year.gross|format_number({"fraction_digit": 2}) }}
+                                        {{ item.currency.sign|currency_sign }}{{ item.cash.all_shares.year.gross|format_number({"fraction_digit": 2}) }}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
                                         <span data-html="true" title="{{ 'Exchangerate'|trans }}: {{ item.exchange_rate }}
@@ -192,7 +192,7 @@
                                                     {{ 'Last dividend'|trans }}:
                                                     {% if item.last_paid_calendar %}
                                                         {% set paidCurrency = item.last_paid_calendar.currency ?? item.ticker.currency %}
-                                                        {{ (paidCurrency ? (paidCurrency.sign ?: paidCurrency.symbol) : '$')|raw }}{{ (item.last_paid_calendar.adjustedCashAmount)|format_number({"fraction_digit": 2}) }}
+                                                        {{ (paidCurrency ? (paidCurrency.sign ?: paidCurrency.symbol) : '$')|currency_sign }}{{ (item.last_paid_calendar.adjustedCashAmount)|format_number({"fraction_digit": 2}) }}
                                                     {% else %}
                                                         -
                                                     {% endif %}

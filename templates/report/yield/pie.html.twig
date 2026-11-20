@@ -148,7 +148,7 @@
                                     </twig:Table:Td>
                                     <twig:Table:Td>
                                         {% if item.payout > 0 %}
-                                            {{ item.payoutCurrency }}{{ (item.payout)|format_number({"fraction_digit": 2}) }}
+                                            {{ item.payoutCurrency|currency_sign }}{{ (item.payout)|format_number({"fraction_digit": 2}) }}
                                         {% else %}
                                             -
                                         {% endif %}
@@ -190,7 +190,7 @@
                                                 <twig:ListGroupItem>
                                                     {{ 'Last dividend'|trans }}:
                                                     {% if item.lastDividend > 0 %}
-                                                        {{ item.lastDividendCurrency|raw }}{{ (item.lastDividend)|format_number({"fraction_digit": 2}) }}
+                                                        {{ item.lastDividendCurrency|currency_sign }}{{ (item.lastDividend)|format_number({"fraction_digit": 2}) }}
                                                     {% else %}
                                                         -
                                                     {% endif %}

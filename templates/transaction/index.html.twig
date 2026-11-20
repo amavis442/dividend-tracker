@@ -106,10 +106,10 @@
                                         {{ transaction.amount|format_number({"fraction_digit": 7}) }}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
-                                        {{ (transaction.currency ? transaction.currency.sign : '$')|raw }}{{ transaction.price|format_number({"fraction_digit": 2}) }}
+                                        {{ (transaction.currency ? transaction.currency.sign : '$')|currency_sign }}{{ transaction.price|format_number({"fraction_digit": 2}) }}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
-                                        {{ (transaction.allocationCurrency ? transaction.allocationCurrency.sign : '$')|raw }}{{ transaction.allocation|format_number({"fraction_digit": 2}) }}
+                                        {{ (transaction.allocationCurrency ? transaction.allocationCurrency.sign : '$')|currency_sign }}{{ transaction.allocation|format_number({"fraction_digit": 2}) }}
                                     </twig:Table:Td>
                                     <twig:Table:Td>
                                         {{ transaction.pie ? transaction.pie.label : '-' }}

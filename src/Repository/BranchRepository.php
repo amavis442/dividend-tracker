@@ -18,6 +18,9 @@ class BranchRepository extends ServiceEntityRepository
 {
     use PagerTrait;
 
+    /** The chart data is printed inside a script tag. */
+    private const SCRIPT_SAFE_JSON = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Branch::class);
@@ -101,8 +104,8 @@ class BranchRepository extends ServiceEntityRepository
                 $positionData[] = $position['positionAllocationPercentage'];
                 $positionLabels[] = $position['positionSymbol'];
             }
-            $sector['chartdata']['data'] = json_encode($positionData);
-            $sector['chartdata']['labels'] = json_encode($positionLabels);
+            $sector['chartdata']['data'] = json_encode($positionData, self::SCRIPT_SAFE_JSON);
+            $sector['chartdata']['labels'] = json_encode($positionLabels, self::SCRIPT_SAFE_JSON);
         }
 
 

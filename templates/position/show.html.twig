@@ -25,11 +25,11 @@
                             </twig:Table:Tr>
                             <twig:Table:Tr>
                                 <twig:Table:ThRow>Average price</twig:Table:ThRow>
-                                <twig:Table:Td>{{ position.currency.sign|raw }}{{ (position.price)|format_number({"fraction_digit": 2}) }}</twig:Table:Td>
+                                <twig:Table:Td>{{ position.currency.sign|currency_sign }}{{ (position.price)|format_number({"fraction_digit": 2}) }}</twig:Table:Td>
                             </twig:Table:Tr>
                             <twig:Table:Tr>
                                 <twig:Table:ThRow>Allocation</twig:Table:ThRow>
-                                <twig:Table:Td>{{ position.allocationCurrency.sign|raw }}{{ (position.allocation)|format_number({"fraction_digit": 2}) }}</twig:Table:Td>
+                                <twig:Table:Td>{{ (position.allocationCurrency ? position.allocationCurrency.sign : '$')|currency_sign }}{{ (position.allocation)|format_number({"fraction_digit": 2}) }}</twig:Table:Td>
                             </twig:Table:Tr>
                             <twig:Table:Tr>
                                 <twig:Table:ThRow>Status</twig:Table:ThRow>
