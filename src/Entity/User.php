@@ -25,7 +25,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         security: 'is_granted("ROLE_USER")',
         operations: [
             new Post(
-                security: 'is_granted("PUBLIC_ACCESS")',
+                security: 'is_granted("ROLE_ADMIN")',
                 processor: UserPostProcessor::class
             ),
             new Get(security: ApiAccess::SELF_OR_ADMIN),

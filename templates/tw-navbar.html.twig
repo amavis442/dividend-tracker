@@ -45,6 +45,7 @@
                                    tabindex="-1"
                                    id="admin-menu-item-2"><i class="fas fa-search-plus pr-2"></i> {{ 'Research on Tickers'|trans }}</a>
                                 <div class="border border-solid h-0 bg-[##e5e7eb] "></div>
+                                {% if is_granted('ROLE_ADMIN') %}
                                 <a href="{{ url('ticker_index', parameters = [], schemeRelative = false) }}"
                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
                                    role="menuitem"
@@ -55,6 +56,7 @@
                                    role="menuitem"
                                    tabindex="-1"
                                    id="admin-menu-item-1"><i class="fas fa-ticket-alt pr-2"></i> Ticker Alternative symbols</a>
+                                {% endif %}
                                 <div class="border border-solid h-0 bg-[##e5e7eb] "></div>
                                 <a href="{{ url('pie_index', parameters = [], schemeRelative = false) }}"
                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
@@ -68,11 +70,13 @@
                                    tabindex="-1"
                                    id="admin-menu-item-4"><i class="fas fa-file-import pr-2"></i> {{ 'Import csv'|trans }}</a>
                                 <div class="border border-solid h-0 bg-[##e5e7eb] "></div>
+                                {% if is_granted('ROLE_ADMIN') %}
                                 <a href="{{ url('globalx_import', parameters = [], schemeRelative = false) }}"
                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
                                    role="menuitem"
                                    tabindex="-1"
                                    id="admin-menu-item-4a"><i class="fas fa-file-import pr-2"></i> {{ 'Globalx Import csv'|trans }}</a>
+                                {% endif %}
                                 <div class="border border-solid h-0 bg-[##e5e7eb] "></div>
                                 <a href="{{ url('journal_index', parameters = [], schemeRelative = false) }}"
                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
@@ -97,11 +101,13 @@
                                    tabindex="-1"
                                    id="admin-menu-item-8"><i class="fas fa-percent pr-2"></i> {{ 'Taxtarifs'|trans }}</a>
                                 <div class="border border-solid h-0 bg-[##e5e7eb] "></div>
+                                {% if is_granted('ROLE_ADMIN') %}
                                 <a href="{{ url('app_api_key_name_index', parameters = [], schemeRelative = false) }}"
                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
                                    role="menuitem"
                                    tabindex="-1"
                                    id="admin-menu-item-9"><i class="fa-solid fa-key pr-2"></i> {{ 'Api keys'|trans }}</a>
+                                {% endif %}
                             </div>
                         </div>
                         <!-- Portfolio -->

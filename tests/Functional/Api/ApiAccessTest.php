@@ -160,6 +160,7 @@ final class ApiAccessTest extends WebTestCase
         $this->assertNoSecrets();
 
         $this->client->restart();
+        $this->loginAs(UserFactory::createOne(['roles' => ['ROLE_USER', 'ROLE_ADMIN']])->getId());
         $this->api('POST', '/api/users', ['email' => 'new@example.test', 'password' => 'A-long-passphrase-1']);
         self::assertResponseStatusCodeSame(201);
         $this->assertNoSecrets();

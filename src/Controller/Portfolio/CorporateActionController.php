@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /** @psalm-suppress PropertyNotSetInConstructor */
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/portfolio')]
@@ -78,6 +79,7 @@ class CorporateActionController extends AbstractController
             methods: ['GET', 'POST']
         )
     ]
+    #[IsGranted('ROLE_ADMIN')]
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -114,6 +116,7 @@ class CorporateActionController extends AbstractController
             methods: ['POST']
         )
     ]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,

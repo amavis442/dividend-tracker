@@ -8,6 +8,7 @@
         </div>
         <div class="normal-case">{{ (ticker.description ?? '')|sanitize_html('app.rich_text') }}</div>
         <hr class="mt-2 mb-4">
+        {% if is_granted('ROLE_ADMIN') %}
         <div class="mt-2">
             <twig:Button tag="a"
                          href="{{ path('ticker_edit', {'id': ticker.id}) }}"
@@ -15,6 +16,7 @@
                 <i class="far fa-edit"></i>
             </twig:Button>
         </div>
+        {% endif %}
     </div>
     <div>
         {% for research in pager %}

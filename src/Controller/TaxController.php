@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
@@ -24,6 +25,7 @@ class TaxController extends AbstractController
     }
 
     #[Route(path: '/create', name: 'tax_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $tax = new Tax();
@@ -52,6 +54,7 @@ class TaxController extends AbstractController
     }
 
     #[Route(path: '/{id}/edit', name: 'tax_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(Request $request, EntityManagerInterface $entityManager, #[MapEntity] Tax $tax): Response
     {
         $form = $this->createForm(TaxType::class, $tax);
@@ -69,6 +72,7 @@ class TaxController extends AbstractController
     }
 
     #[Route(path: '/delete/{id}', name: 'tax_delete', methods: ['POST', 'DELETE'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, EntityManagerInterface $entityManager, #[MapEntity] Tax $tax): Response
     {
         if ($this->isCsrfTokenValid('delete' . $tax->getId(), $request->request->get('_token'))) {

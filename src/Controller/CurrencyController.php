@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 #[Route(path: '/{_locale<%app.supported_locales%>}/dashboard/currency')]
@@ -29,6 +30,7 @@ class CurrencyController extends AbstractController
     }
 
     #[Route(path: '/create', name: 'currency_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -68,6 +70,7 @@ class CurrencyController extends AbstractController
             methods: ['GET', 'POST']
         )
     ]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -95,6 +98,7 @@ class CurrencyController extends AbstractController
             methods: ['POST', 'DELETE']
         )
     ]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(
         Request $request,
         EntityManagerInterface $entityManager,
