@@ -11,7 +11,6 @@ parameters:
     app.supported_locales: 'en|nl'
     dividend.financial_modeling_prep_api_key: '%env(FINANCIALMODELINGPREP_API_KEY)%'
     dividend.massive_api_key: '%env(MASSIVE_API_KEY)%'
-    app.incomesshares: '%env(INCOMESSHARES)%'
 
 services:
     # default configuration for services in *this* file

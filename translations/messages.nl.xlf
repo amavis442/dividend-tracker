@@ -1369,10 +1369,6 @@
         <source>Edit research</source>
         <target>__Edit research</target>
       </trans-unit>
-      <trans-unit id="incomesSharesPositionsChanged" resname="Your open positions have changed. Check the values and submit again.">
-        <source>Your open positions have changed. Check the values and submit again.</source>
-        <target>Je open posities zijn gewijzigd. Controleer de waarden en verstuur opnieuw.</target>
-      </trans-unit>
     </body>
   </file>
 </xliff>
