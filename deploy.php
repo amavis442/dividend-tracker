@@ -8,8 +8,10 @@ require 'contrib/cachetool.php';
 // Config
 
 set('application', 'dividend');
-set('repository', 'git@gitlab.com:amavis442/dividend.git');
-set('git_tty', true);
+// The repository is public: the server fetches over HTTPS and needs no GitLab key,
+// so deploys work from GitLab CI as well as from a workstation.
+set('repository', 'https://gitlab.com/amavis442/dividend.git');
+set('git_tty', false);
 set('keep_releases', 5);
 set('writable_mode', 'acl');
 set('allow_anonymous_stats', false);

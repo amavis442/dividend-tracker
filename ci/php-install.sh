@@ -9,6 +9,7 @@ apt-get update \
 && apt-get -y --no-install-recommends install \
         curl \
         git \
+        openssh-client \
         php8.4-bcmath \
         php8.4-bz2 \
 		php8.4-cli \
