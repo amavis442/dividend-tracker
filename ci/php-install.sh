@@ -24,12 +24,12 @@ apt-get update \
 		php8.4-memcached \
 		php8.4-oauth \
 		php8.4-opcache \
+        php8.4-pcov \
         php8.4-pgsql \
 		php8.4-pspell \
 		php8.4-readline \
         php8.4-redis \
 		php8.4-uuid \
-        php8.4-xdebug \
 		php8.4-xml \
 		php8.4-xmlrpc \
         php8.4-xsl \

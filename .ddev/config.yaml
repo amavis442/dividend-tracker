@@ -12,6 +12,8 @@ database:
 use_dns_when_possible: true
 composer_version: "2"
 web_environment: []
+# PCOV collects code coverage for PHPUnit; Xdebug stays off (ddev xdebug on for step debugging).
+webimage_extra_packages: [php8.4-pcov]
 corepack_enable: false
 timezone: Europe/Amsterdam
 
