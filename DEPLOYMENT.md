@@ -111,6 +111,14 @@ Tick them off per environment (acceptance, production) once done.
 
 ---
 
+## Release with #99: instrument table on production
+
+No manual step. The migration creates the `instrument` table and `position.instrument_id` where
+they are missing (production) and does nothing where they already exist (dev). Until it has run,
+pages that load positions fail with "column p0_.instrument_id does not exist".
+
+---
+
 ## Release with #77: login throttling, password rules, encrypted API keys
 
 **Before the deploy**
