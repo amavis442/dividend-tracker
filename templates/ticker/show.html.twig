@@ -91,7 +91,7 @@
                                             {% if research.attachments %}
                                                 <div>
                                                     {% for doc in research.attachments %}
-                                                        <a href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}"
+                                                        <a href="{{ path('research_attachment_download', {id: doc.id}) }}"
                                                            target='_blank'>
                                                             <i class="fa fa-download"></i>
                                                         {{ doc.label }}</a>

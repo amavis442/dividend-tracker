@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Form;
 
 use App\Entity\Attachment;
+use App\Validator\ResearchAttachment;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -27,6 +28,7 @@ class AttachmentType extends AbstractType
             ->add('attachmentFile', FileType::class, [
                 'required' => false,
                 'label' => true,
+                'constraints' => [new ResearchAttachment()],
             ]);
     }
 

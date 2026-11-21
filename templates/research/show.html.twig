@@ -40,7 +40,7 @@
                                         <p>
                                             {% for doc in research.attachments %}
                                                 <twig:Button tag="a"
-                                                             href="{{ asset('uploads/documents/' ~ doc.attachmentName) }}"
+                                                             href="{{ path('research_attachment_download', {id: doc.id}) }}"
                                                              target='_blank'>
                                                     <i class="fa fa-download"></i>
                                                     {{ doc.label }}

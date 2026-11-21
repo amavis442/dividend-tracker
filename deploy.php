@@ -24,7 +24,7 @@ set('bin/cachetool', function () {
 
 // Shared files/dirs between deploys
 set('shared_files', ['.env.local']);
-set('shared_dirs', ['public/uploads','var/log','var/cache']);
+set('shared_dirs', ['public/uploads','var/uploads','var/log','var/cache']);
 
 // Hosts
 host('acceptance')

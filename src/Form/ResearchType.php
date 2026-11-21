@@ -3,7 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Research;
-use App\Form\AttachmentType;
+use App\Validator\ResearchAttachment;
 use App\Form\DataTransformer\TickerToIdTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -45,6 +46,7 @@ class ResearchType extends AbstractType
                 'label' => false,
                 'multiple' => true,
                 'mapped' => false,
+                'constraints' => [new All([new ResearchAttachment()])],
                 //'attr' => ['style' => 'display:none'],
             ]);
 
