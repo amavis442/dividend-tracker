@@ -45,6 +45,8 @@ when@prod:
     doctrine:
         orm:
             auto_mapping: false
+    # Cache pools are framework configuration, not Doctrine configuration.
+    framework:
         cache:
             pools:
                 doctrine.result_cache_pool:
