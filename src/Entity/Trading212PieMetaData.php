@@ -70,6 +70,11 @@ class Trading212PieMetaData
     #[ORM\ManyToOne(inversedBy: 'trading212PieMetaData')]
     private ?Pie $pie = null;
 
+    /** The owner of the Trading212 account the pie data was fetched for. */
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     #[
         ORM\Column(
             type: 'decimal',
@@ -268,6 +273,18 @@ class Trading212PieMetaData
     public function setPie(?Pie $pie): static
     {
         $this->pie = $pie;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

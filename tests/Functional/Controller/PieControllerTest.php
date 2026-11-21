@@ -24,6 +24,8 @@ final class PieControllerTest extends WebTestCase
 
     private KernelBrowser $client;
     private Connection $connection;
+    private int $userId;
+    private int $otherUserId;
 
     protected function setUp(): void
     {
@@ -31,6 +33,8 @@ final class PieControllerTest extends WebTestCase
         $this->connection = static::getContainer()->get(Connection::class);
 
         $userId = UserFactory::createOne(['email' => 'pie@example.test'])->getId();
+        $this->userId = $userId;
+        $this->otherUserId = UserFactory::createOne(['email' => 'other-pie@example.test'])->getId();
         $user = static::getContainer()->get(UserRepository::class)->find($userId);
         self::assertInstanceOf(User::class, $user);
         $this->client->loginUser($user);
@@ -38,7 +42,8 @@ final class PieControllerTest extends WebTestCase
 
     public function testAPieCanBeCreatedThroughTheWebForm(): void
     {
-        $this->insertMetaData();
+        $this->insertMetaData($this->userId);
+        $this->insertMetaData($this->otherUserId);
 
         $crawler = $this->client->request('GET', '/nl/dashboard/pie/create');
         self::assertResponseIsSuccessful();
@@ -54,7 +59,12 @@ final class PieControllerTest extends WebTestCase
         self::assertNotFalse($pieId);
         self::assertSame(
             ['pie_id' => (int) $pieId, 'pie_name' => 'Web pie'],
-            $this->metaDataLink()
+            $this->metaDataLink($this->userId)
+        );
+        self::assertSame(
+            ['pie_id' => null, 'pie_name' => null],
+            $this->metaDataLink($this->otherUserId),
+            "another user's Trading212 data is not linked to this pie"
         );
     }
 
@@ -71,25 +81,25 @@ final class PieControllerTest extends WebTestCase
         self::assertSame(1, (int) $this->connection->fetchOne("select count(*) from pie where label = 'Api pie'"));
     }
 
-    private function insertMetaData(): void
+    private function insertMetaData(int $userId): void
     {
         $this->connection->executeStatement(
             "insert into trading212_pie_meta_data
-                (id, trading212_pie_id, price_avg_invested_value, price_avg_value,
+                (id, trading212_pie_id, user_id, price_avg_invested_value, price_avg_value,
                  raw, created_at, gained, reinvested, in_cash)
-             values (nextval('trading212_pie_meta_data_id_seq'), ?, 0, 0, '[]', now(), 0, 0, 0)",
-            [self::TRADING212_PIE_ID]
+             values (nextval('trading212_pie_meta_data_id_seq'), ?, ?, 0, 0, '[]', now(), 0, 0, 0)",
+            [self::TRADING212_PIE_ID, $userId]
         );
     }
 
     /**
      * @return array<string, mixed>|false
      */
-    private function metaDataLink(): array|false
+    private function metaDataLink(int $userId): array|false
     {
         return $this->connection->fetchAssociative(
-            'select pie_id, pie_name from trading212_pie_meta_data where trading212_pie_id = ?',
-            [self::TRADING212_PIE_ID]
+            'select pie_id, pie_name from trading212_pie_meta_data where trading212_pie_id = ? and user_id = ?',
+            [self::TRADING212_PIE_ID, $userId]
         );
     }
 }

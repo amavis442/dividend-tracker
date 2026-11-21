@@ -5,6 +5,7 @@ namespace App\Command\Trading212;
 use App\Entity\TickerAlternativeSymbol;
 use App\Entity\Trading212PieMetaData;
 use App\Entity\Trading212PieInstrument;
+use App\Entity\User;
 use App\Repository\ApiKeyRepository;
 use App\Repository\PieRepository;
 use App\Repository\Trading212PieMetaDataRepository;
@@ -25,6 +26,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 ]
 class PieCommand extends Command
 {
+    /** The user whose Trading212 API key is used; the fetched data belongs to them. */
+    private ?User $owner = null;
+
     public function __construct(
         private readonly PieService $pieService,
         protected ApiKeyRepository $apiKeyRepository,
@@ -43,6 +47,7 @@ class PieCommand extends Command
          */
         $apiKey = $this->apiKeyRepository->findByApiKeyName('Trading212');
         $this->pieService->setApiKey($apiKey->getApiKey());
+        $this->owner = $apiKey->getUser();
     }
 
     protected function configure(): void
@@ -75,16 +80,19 @@ class PieCommand extends Command
 
     protected function processMetaData(): array
     {
+        $owner = $this->owner;
         $data = $this->pieService->getPies();
 
         $metaDataPieIds = [];
         foreach ($data as $metaData) {
             $trading212PieMetaData = new Trading212PieMetaData();
             $trading212PieMetaData->setTrading212PieId($metaData['id']);
+            $trading212PieMetaData->setUser($owner);
             $metaDataPieIds[] = $metaData['id'];
 
             $pie = $this->pieRepository->findOneBy([
                 'trading212PieId' => $metaData['id'],
+                'user' => $owner,
             ]);
             if ($pie) {
                 $trading212PieMetaData->setPieName($pie->getLabel());
@@ -123,12 +131,13 @@ class PieCommand extends Command
         $settings = $data['settings'];
         $trading212_pie_id = $settings['id'];
         $trading212_pie_name = $settings['name'];
+        $owner = $this->owner;
 
         /**
          * $var \App\Entity\Trading212PieMetaData
          */
         $trading212PieMetaData = $this->trading212PieMetaDataRepository->findOneBy(
-            ['trading212PieId' => $trading212_pie_id],
+            ['trading212PieId' => $trading212_pie_id, 'user' => $owner],
             ['createdAt' => 'DESC']
         );
 
