@@ -164,3 +164,7 @@ services:
     #App\Serializer\AdminGroupsContextBuilder:
     #    decorates: 'api_platform.serializer.context_builder'
     #    arguments: ['@App\Serializer\AdminGroupsContextBuilder.inner']
+
+    # Fetched in Kernel::boot() for the encrypted_string Doctrine type.
+    App\Security\SecretBox:
+        public: true

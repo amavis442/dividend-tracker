@@ -158,7 +158,7 @@ final class AdminAccessTest extends WebTestCase
 
         $form = $crawler->selectButton('Register')->form();
         $form['registration_form[email]'] = 'invited@example.test';
-        $form['registration_form[plainPassword]'] = 'a-long-password';
+        $form['registration_form[plainPassword]'] = 'Correct-Horse-Battery-9';
         $form['registration_form[agreeTerms]']->tick();
         $this->client->submit($form);
         self::assertResponseRedirects();
@@ -173,7 +173,7 @@ final class AdminAccessTest extends WebTestCase
             'POST',
             '/api/users',
             server: ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'],
-            content: json_encode(['email' => $email, 'password' => 'a-long-password'], JSON_THROW_ON_ERROR)
+            content: json_encode(['email' => $email, 'password' => 'Correct-Horse-Battery-9'], JSON_THROW_ON_ERROR)
         );
     }
 

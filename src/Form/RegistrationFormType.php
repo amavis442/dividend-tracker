@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Form;
 
 use App\Entity\User;
+use App\Validator\StrongPassword;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -22,16 +23,7 @@ class RegistrationFormType extends AbstractType
                 // instead of being set onto the object directly,
                 // this is read and encoded in the controller
                 'mapped' => false,
-                'constraints' => [
-                    new Assert\NotBlank(
-                        message: 'Please enter a password',
-                    ),
-                    new Assert\Length(
-                        min: 6,
-                        max: 40,
-                        minMessage: 'Your password should be at least {{ limit }} characters',
-                    ),
-                ],
+                'constraints' => [new StrongPassword()],
             ])
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,

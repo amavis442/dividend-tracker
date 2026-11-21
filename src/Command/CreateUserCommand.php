@@ -40,8 +40,9 @@ class CreateUserCommand extends Command
         });
         $questionEmail->setValidator(function ($answer) use ($userManager): string {
             $answer = trim($answer);
-            if ((int) strlen($answer) < 3 || $answer == '') {
-                throw new \RuntimeException('Email to short or not present.');
+            $errors = $userManager->emailErrors($answer);
+            if ($errors !== []) {
+                throw new \RuntimeException(implode(' ', $errors));
             }
 
             if ($userManager->isUserDuplicate($answer)) {
@@ -59,6 +60,15 @@ class CreateUserCommand extends Command
             // $value can be null here
             return $value ? trim($value) : '';
         });
+        $questionPassword->setValidator(function (string $answer) use ($userManager): string {
+            $errors = $userManager->passwordErrors($answer);
+            if ($errors !== []) {
+                throw new \RuntimeException(implode(' ', $errors));
+            }
+
+            return $answer;
+        });
+        $questionPassword->setMaxAttempts(3);
         $password = $helper->ask($input, $output, $questionPassword);
 
         $questionPasswordRepeat = new Question('Password repeat: ');
