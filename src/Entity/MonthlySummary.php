@@ -19,6 +19,10 @@ class MonthlySummary
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     #[ORM\Column(type: Types::DATE_MUTABLE, name: 'ac_date')]
     private ?\DateTimeInterface $acDate = null;
 
@@ -299,6 +303,18 @@ class MonthlySummary
     public function setUuid(Uuid $uuid): static
     {
         $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

@@ -46,6 +46,8 @@ class GetPiesCommand extends Command
          */
         $apiKey = $this->apiKeyRepository->findByApiKeyName('Trading212');
         $this->pieService->setApiKey($apiKey->getApiKey());
+        // The fetched data belongs to the owner of the API key.
+        $owner = $apiKey->getUser();
 
         $io = new SymfonyStyle($input, $output);
         $data = $this->pieService->getPies();
@@ -53,9 +55,11 @@ class GetPiesCommand extends Command
         foreach ($data as $metaData) {
             $trading212PieMetaData = new Trading212PieMetaData();
             $trading212PieMetaData->setTrading212PieId($metaData['id']);
+            $trading212PieMetaData->setUser($owner);
 
             $pie = $this->pieRepository->findOneBy([
                 'trading212PieId' => $metaData['id'],
+                'user' => $owner,
             ]);
             if ($pie) {
                 $trading212PieMetaData->setPieName($pie->getLabel());

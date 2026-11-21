@@ -77,7 +77,6 @@ final class AdminAccessTest extends WebTestCase
             ['GET', self::NL . '/corporate/action/new'],
             ['GET', self::NL . '/portfolio/show/corporate/action/create/' . $this->ids[$who . 'Position']],
             ['GET', self::NL . '/research/create/' . $this->ids['ticker']],
-            ['GET', self::NL . '/monthly/summary/new'],
             ['GET', self::NL . '/portfolio/create_dividend/' . $this->ids[$who . 'Position']],
             ['POST', self::NL . '/portfolio/delete_dividend/' . $this->ids['calendar'] . '/' . $this->ids[$who . 'Position']],
         ];

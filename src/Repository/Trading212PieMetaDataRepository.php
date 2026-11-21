@@ -93,7 +93,10 @@ class Trading212PieMetaDataRepository extends ServiceEntityRepository
             ->set('t.pieName', ':label')
             ->where('t.trading212PieId = :trading212PieId')
             ->andWhere('t.pie is null')
+            // Only link the pie owner's own Trading212 data.
+            ->andWhere('t.user = :user')
             ->setParameter(':trading212PieId', $pie->getTrading212PieId())
+            ->setParameter('user', $pie->getUser())
             ->setParameter('label', $pie->getLabel())
             ->setParameter('pieID', $pie->getId())
             ->getQuery();

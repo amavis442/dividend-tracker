@@ -2,14 +2,17 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ImportFilesRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 
+/**
+ * Records which CSV files a user has imported, so a file is not imported twice.
+ */
 #[HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: ImportFilesRepository::class)]
+#[ORM\UniqueConstraint(name: 'import_files_owner_name', columns: ['owner_id', 'name'])]
 class ImportFiles
 {
     #[ORM\Id]
@@ -17,13 +20,14 @@ class ImportFiles
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, unique: true)]
+    #[ORM\Column(length: 255)]
     private ?string $name = null;
 
     #[ORM\Column]
     private \DateTimeImmutable $created_at;
 
     #[ORM\ManyToOne(inversedBy: 'importFiles')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
     #[ORM\PrePersist]
