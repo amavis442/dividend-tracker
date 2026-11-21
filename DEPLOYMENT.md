@@ -24,40 +24,80 @@ the deploys under *Operate → Environments*.
 
 The jobs log in as `deployer` on 192.168.2.49 with a key pair used only by GitLab CI.
 
-1. Create the key pair on your workstation (no passphrase, CI cannot type one):
+**Where and as whom?** Create the key pair on your own workstation (for example WSL), as
+yourself. Not as `gitlab-runner` and not on the runner machine: the runner uses the Docker
+executor, so every job starts in a fresh container that cannot see any files of the runner
+machine. The key reaches the job only through the GitLab CI/CD variable; `ci/deploy.sh` writes it
+to `~/.ssh` inside the container, which is thrown away after the job.
+
+| What | Ends up |
+|---|---|
+| Private key (`dividend-ci-deploy`) | only in GitLab, variable `DEPLOY_SSH_PRIVATE_KEY` |
+| Public key (`dividend-ci-deploy.pub`) | on 192.168.2.49 in `~deployer/.ssh/authorized_keys` |
+| Host key of the server | in GitLab, variable `DEPLOY_SSH_KNOWN_HOSTS` |
+
+1. Create the key pair in a temporary directory (no passphrase, CI cannot type one):
 
    ```bash
+   mkdir -p ~/tmp-ci-key && cd ~/tmp-ci-key
    ssh-keygen -t ed25519 -N '' -C 'gitlab-ci dividend deploy' -f ./dividend-ci-deploy
    ```
 
-2. Allow it on the server:
+2. Install the public key for `deployer` on the server, depending on how you log in there:
+
+   - If you can log in as `deployer`:
+
+     ```bash
+     ssh-copy-id -i ./dividend-ci-deploy.pub deployer@192.168.2.49
+     ```
+
+   - If you log in as your own user with sudo:
+
+     ```bash
+     scp ./dividend-ci-deploy.pub <your-user>@192.168.2.49:/tmp/
+     # then, on the server:
+     sudo sh -c 'cat /tmp/dividend-ci-deploy.pub >> ~deployer/.ssh/authorized_keys' && rm /tmp/dividend-ci-deploy.pub
+     ```
+
+3. Test the key; this must print `ok` without asking for a password:
 
    ```bash
-   ssh-copy-id -i ./dividend-ci-deploy.pub deployer@192.168.2.49
+   ssh -i ./dividend-ci-deploy -o IdentitiesOnly=yes deployer@192.168.2.49 'echo ok'
    ```
 
-3. Collect the server's host key, so CI verifies it connects to the right machine:
+4. Collect the server's host key, so CI verifies it connects to the right machine:
 
    ```bash
    ssh-keyscan -t ed25519,rsa 192.168.2.49 > ./dividend-known-hosts
    ```
 
-4. In GitLab: *Settings → CI/CD → Variables → Add variable*, twice:
+5. In GitLab: *Settings → CI/CD → Variables → Add variable*, once for each:
 
-   | Key | Type | Value | Flags |
-   |---|---|---|---|
-   | `DEPLOY_SSH_PRIVATE_KEY` | File | contents of `dividend-ci-deploy` (the private key, ending with a newline) | Protected |
-   | `DEPLOY_SSH_KNOWN_HOSTS` | File | contents of `dividend-known-hosts` | Protected |
+   | Key | Value (whole file, including the BEGIN/END lines) |
+   |---|---|
+   | `DEPLOY_SSH_PRIVATE_KEY` | `cat ./dividend-ci-deploy` |
+   | `DEPLOY_SSH_KNOWN_HOSTS` | `cat ./dividend-known-hosts` |
 
-   GitLab cannot mask a multi-line value; the deploy script never prints it.
+   Settings for both: **Type** *File*, **Environments** *All*, **Visibility** *Visible*,
+   **Protect variable** on, **Expand variable reference** off.
 
-   *Protected* means the variables only reach pipelines on protected branches. `main` must be a
-   protected branch (*Settings → Repository → Protected branches*), which it is by default.
+   GitLab cannot mask a multi-line value ("cannot contain whitespace characters"), so choose
+   *Visible*. That is safe enough here: *Protected* keeps the variable away from other branches,
+   with type *File* the variable only holds a path to a temporary file, and `ci/deploy.sh` never
+   prints the contents. `main` must be a protected branch (*Settings → Repository → Protected
+   branches*), which it is by default.
 
-5. Delete the local copies of the private key once it is stored in GitLab
-   (`rm dividend-ci-deploy`), or keep it only in your password manager.
+6. Remove the temporary directory, so the private key only exists in GitLab:
 
-To revoke CI access, remove the key's line from `~deployer/.ssh/authorized_keys` on the server.
+   ```bash
+   cd ~ && rm -rf ~/tmp-ci-key
+   ```
+
+To revoke CI access, remove the key's line (comment `gitlab-ci dividend deploy`) from
+`~deployer/.ssh/authorized_keys` on the server.
+
+The runner machine must be able to reach 192.168.2.49 over SSH. If a deploy job times out while
+connecting, check that first.
 
 ### First deploy after switching to GitLab
 
