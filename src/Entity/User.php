@@ -14,6 +14,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator\StrongPassword;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -26,7 +28,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
         operations: [
             new Post(
                 security: 'is_granted("ROLE_ADMIN")',
-                processor: UserPostProcessor::class
+                processor: UserPostProcessor::class,
+                // The plain password is validated before UserPostProcessor hashes it.
+                validationContext: ['groups' => ['Default', self::VALIDATE_NEW_PASSWORD]]
             ),
             new Get(security: ApiAccess::SELF_OR_ADMIN),
         ]
@@ -45,6 +49,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     public const ROLES = ['user', 'admin', 'superadmin'];
+    /** Validation group for a plain password set through the API. */
+    public const VALIDATE_NEW_PASSWORD = 'user:new-password';
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
@@ -56,6 +62,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(['user:read', 'user:write'])]
     #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Email]
+    #[Assert\Length(max: 180)]
     private string $email;
 
     /**
@@ -63,6 +72,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[Groups(['user:write'])]
     #[ORM\Column(type: 'string')]
+    #[StrongPassword(groups: [self::VALIDATE_NEW_PASSWORD])]
     private string $password;
 
     //#[Groups(['user:read', 'user:write'])]

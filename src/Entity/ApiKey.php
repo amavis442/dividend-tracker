@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Doctrine\Type\EncryptedStringType;
 use App\Repository\ApiKeyRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -19,7 +20,8 @@ class ApiKey
     #[ORM\ManyToOne(inversedBy: 'apikeys')]
     private ?User $user = null;
 
-    #[ORM\Column(length: 255)]
+    /** Stored encrypted, see EncryptedStringType. */
+    #[ORM\Column(type: EncryptedStringType::NAME, length: 512)]
     private ?string $apiKey = null;
 
     #[ORM\Column]

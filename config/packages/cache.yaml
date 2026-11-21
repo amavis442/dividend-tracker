@@ -19,6 +19,9 @@ framework:
 
         # Namespaced pools use the above "app" backend by default
         pools:
+            # Login throttling state; kept on disk so it also works without Redis.
+            cache.rate_limiter:
+                adapter: cache.adapter.filesystem
             my_custom_pool:
                 adapter: cache.adapter.redis
                 provider: 'redis://localhost:6379'
