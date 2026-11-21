@@ -18,9 +18,6 @@ class BranchRepository extends ServiceEntityRepository
 {
     use PagerTrait;
 
-    /** The chart data is printed inside a script tag. */
-    private const SCRIPT_SAFE_JSON = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Branch::class);
@@ -53,73 +50,5 @@ class BranchRepository extends ServiceEntityRepository
             ->select('SUM(i.assetAllocation)')
             ->getQuery()
             ->getSingleScalarResult();
-    }
-
-    public function getAllocationPerSector(): array
-    {
-        $result = $this->createQueryBuilder('s')
-            ->select('s, t, p')
-            ->innerJoin('s.tickers', 't')
-            ->innerJoin('t.positions', 'p')
-            ->where('p.closed = false')
-            ->getQuery()
-            ->getArrayResult();
-
-        $output = [];
-        $totalAllocation = 0;
-        foreach ($result as $sector) {
-            if (!isset($output[$sector['label']])) {
-                $output[$sector['label']] = [
-                    'sectorTargetAllocation' => round($sector['assetAllocation'] / 100, 2),
-                    'sectorAllocation' => 0,
-                    'sectorPositions' => []
-                ];
-            }
-            $sectorAllocation = 0;
-            foreach ($sector['tickers'] as $ticker) {
-                $positionData = [];
-                $positionData['positionSymbol'] = $ticker['symbol'];
-                $positionData['positionLabel'] = $ticker['fullname'];
-                $positionData['positionAmount'] = 0;
-                $positionData['positionAllocation'] = 0;
-                $positionData['positionProfit'] = 0;
-                foreach ($ticker['positions'] as $position) {
-                    $positionData['positionAmount'] += $position['amount'];
-                    $positionData['positionAllocation'] += $position['allocation'];
-                    $positionData['positionProfit'] += $position['profit'];
-                    $sectorAllocation += $position['allocation'];
-                    $totalAllocation += $position['allocation'];
-                }
-                $output[$sector['label']]['sectorPositions'][] = $positionData;
-                $output[$sector['label']]['sectorAllocation'] = $sectorAllocation;
-            }
-        }
-
-        foreach ($output as &$sector) {
-            $sector['sectorAllocationPercentage'] = round(($sector['sectorAllocation'] / $totalAllocation) * 100, 2);
-            $positionData = [];
-            $positionLabels = [];
-            foreach ($sector['sectorPositions'] as &$position) {
-                $position['positionAllocationPercentage'] = round(($position['positionAllocation'] / $sector['sectorAllocation']) * 100, 2);
-                $positionData[] = $position['positionAllocationPercentage'];
-                $positionLabels[] = $position['positionSymbol'];
-            }
-            $sector['chartdata']['data'] = json_encode($positionData, self::SCRIPT_SAFE_JSON);
-            $sector['chartdata']['labels'] = json_encode($positionLabels, self::SCRIPT_SAFE_JSON);
-        }
-
-
-        uasort($output, function (array $a, array $b): int {
-            $a1 = $a['sectorTargetAllocation'];
-            $b1 = $b['sectorTargetAllocation'];
-
-            if ($a1 == $b1) {
-                return 0;
-            }
-            return ($a1 > $b1) ? -1 : 1;
-        });
-
-        //ksort($output);
-        return $output;
     }
 }

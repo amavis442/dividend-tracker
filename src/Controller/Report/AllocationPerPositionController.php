@@ -2,10 +2,10 @@
 
 namespace App\Controller\Report;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity\Portfolio;
 use App\Helper\Colors;
-use App\Model\AllocationModel;
 use App\Repository\PortfolioRepository;
 use App\Repository\PositionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,12 +22,18 @@ class AllocationPerPositionController extends AbstractController
 
     #[Route(path: '/allocation/position', name: 'report_allocation_position')]
     public function index(
+        Request $request,
         PositionRepository $positionRepository,
         ChartBuilderInterface $chartBuilder,
         CacheInterface $pool
     ): Response {
         $colors = Colors::COLORS;
-        $result = $pool->get('allocation_per_position_report', function (
+        $cacheKey = AllocationController::cacheKey(
+            'allocation_per_position_report',
+            $this->getUser(),
+            $request->getLocale()
+        );
+        $result = $pool->get($cacheKey, function (
             ItemInterface $item
         ) use (
             $positionRepository,
@@ -44,10 +50,9 @@ class AllocationPerPositionController extends AbstractController
             $index = 0;
             foreach ($positions as $position) {
                 $labels[] = $position->getTicker()->getFullname();
-                $percentage = round(
-                    ($position->getAllocation() / $allocated) * 100,
-                    2
-                );
+                $percentage = $allocated > 0
+                    ? round(($position->getAllocation() / $allocated) * 100, 2)
+                    : 0.0;
                 $data[] = $percentage;
                 $backgroundColor[] = $colors[$index];
                 $index++;

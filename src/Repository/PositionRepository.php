@@ -548,34 +548,6 @@ class PositionRepository extends ServiceEntityRepository
         return $output;
     }
 
-    public function getAllocationDataPerSector(): array
-    {
-        return $this->createQueryBuilder('p')
-            ->select([
-                'b.id',
-                'b.label as industry',
-                'SUM(p.amount) amount',
-                'p.price',
-                'SUM(p.allocation) allocation',
-            ])
-            ->join('p.ticker', 't')
-            ->join('t.branch', 'b')
-            ->where('p.closed = false')
-            ->groupBy('t.branch')
-            ->getQuery()
-            ->getArrayResult();
-    }
-
-    public function getAllocationDataPerPosition(): array
-    {
-        return $this->createQueryBuilder('p')
-            ->select(['t.symbol', 'p.allocation'])
-            ->innerJoin('p.ticker', 't')
-            ->where('p.closed = false')
-            ->getQuery()
-            ->getArrayResult();
-    }
-
     public function getForCalendarView(): mixed
     {
         return $this->createQueryBuilder('p')

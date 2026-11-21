@@ -24,7 +24,7 @@
         {{ calendar.paymentDate|format_date('medium') }}
 
         <twig:Badge variant="danger" class="p-2 block">
-           {{ calendar.currency.sign|currency_sign }}
+           {{ (calendar.currency ? calendar.currency.sign : '$')|currency_sign }}
           {{ calendar.cashAmount }}
         </twig:Badge>
       </li>
