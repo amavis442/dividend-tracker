@@ -29,6 +29,9 @@ services:
             - '../src/Form/Model/'
             - '../src/Kernel.php'
             - '../src/Tests/'
+            # Need dev dependencies (Foundry, Faker, fixtures bundle); registered under when@dev/when@test.
+            - '../src/Factory/'
+            - '../src/DataFixtures/'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -148,12 +151,6 @@ services:
         tags:
             - { name: doctrine.event_listener, event: prePersist }
 
-    # Needed to autowire the first argument of the constructor for custom Faker providers
-    Faker\Generator: ~
-
-    App\Factory\Provider\ISINProvider:
-        tags: ['foundry.faker_provider']
-
     #Pagerfanta\Twig\Extension\PagerfantaExtension:
     #    tags: ['twig.extension']
 
@@ -168,3 +165,25 @@ services:
     # Fetched in Kernel::boot() for the encrypted_string Doctrine type.
     App\Security\SecretBox:
         public: true
+
+# Factories, fixtures and the Faker provider use dev dependencies (Foundry, Faker,
+# DoctrineFixturesBundle), which deploys do not install (composer install --no-dev).
+when@dev: &dev_only_services
+    services:
+        _defaults:
+            autowire: true
+            autoconfigure: true
+
+        App\Factory\:
+            resource: '../src/Factory/'
+
+        App\DataFixtures\:
+            resource: '../src/DataFixtures/'
+
+        # Needed to autowire the first argument of the constructor for custom Faker providers
+        Faker\Generator: ~
+
+        App\Factory\Provider\ISINProvider:
+            tags: ['foundry.faker_provider']
+
+when@test: *dev_only_services
