@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'Closed positions'|trans }}{% endblock %}
+{% block body %}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div id="header" class="px-3 py-2 w-full">
+                <twig:Head>
+                    {{ 'Closed positions'|trans }}
+                </twig:Head>
+            </div>
+            <section class="flex items-center gap-2 mb-6 bg-gray-200 shadow-md rounded-lg p-6">
+                {{ form_start(autoCompleteForm, {
+                    'action': path('closed_position_index'),
+                    'attr': {
+                        'autocomplete': 'off',
+                        'class': 'flex w-full justify-center',
+                        'data-turbo-frame': 'closed_position_results'
+                    }
+                }) }}
+                    {{ form_errors(autoCompleteForm) }}
+                    <div class="w-1/2 px-2">
+                        <select placeholder="{{ 'Select a ticker'|trans }}" name="{{ field_name(autoCompleteForm.ticker) }}" {{ stimulus_controller('symfony/ux-autocomplete/autocomplete', {
+                            url: path('ux_entity_autocomplete', { alias: 'ticker' })
+                        }) }}>
+                        </select>
+                    </div>
+                    <div>
+                        <twig:Button title="{{ 'Search ticker'|trans }}">
+                            <i class="fas fa-search"></i>
+                        </twig:Button>
+                    </div>
+                {{ form_end(autoCompleteForm) }}
+            </section>
+            <section>
+                <turbo-frame id="closed_position_results">
+                <twig:Table:Table class="max-w-min min-w-full">
+                    <thead>
+                        <tr>
+                            <twig:Table:ThCol>
+                                <a href="{{ path('closed_position_index', { page: thisPage ? thisPage : 1, sort: sort|lower == 'asc' ? 'desc' : 'asc' }) }}">{{ 'Closed at'|trans }}</a>
+                            </twig:Table:ThCol>
+                            <twig:Table:ThCol>Ticker</twig:Table:ThCol>
+                            <twig:Table:ThCol>{{ 'Name'|trans }}</twig:Table:ThCol>
+                            <twig:Table:ThCol>{{ 'Industry'|trans }}</twig:Table:ThCol>
+                            <twig:Table:ThCol>{{ 'Profit / Loss'|trans }}</twig:Table:ThCol>
+                            <twig:Table:ThCol>{{ 'Actions'|trans }}</twig:Table:ThCol>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for position in pager %}
+                            <twig:Table:Tr>
+                                <twig:Table:Td>
+                                    {{ position.closedAt ? position.closedAt|date('d-m-Y') : '' }}
+                                </twig:Table:Td>
+                                <twig:Table:Td>{{ position.ticker.symbol }}</twig:Table:Td>
+                                <twig:Table:Td>{{ position.ticker.fullname }}</twig:Table:Td>
+                                <twig:Table:Td>{{ position.ticker.branch ? position.ticker.branch.label : '' }}</twig:Table:Td>
+                                <twig:Table:Td>
+                                    <twig:Badge variant="{{ position.profit > 0 ? 'success' : 'danger' }}">
+                                        &euro;{{ (position.profit ?? 0)|format_number({"fraction_digit": 2}) }}
+                                    </twig:Badge>
+                                </twig:Table:Td>
+                                <twig:Table:Td>
+                                    <div class="inline-flex rounded-md shadow-sm" role="group">
+                                        <a href="{{ path('closed_position_show', { id: position.id }) }}"
+                                           data-turbo-frame="_top"
+                                           title="{{ 'Show position'|trans }}"
+                                           aria-label="{{ 'Show position'|trans }}"
+                                           class="rounded-s-lg px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                            <i class="fas fa-book-open" aria-hidden="true"></i>
+                                        </a>
+                                        <a href="{{ path('payment_new', { position: position.id }) }}"
+                                           data-turbo-frame="_top"
+                                           title="{{ 'add dividend payment'|trans }}"
+                                           aria-label="{{ 'add dividend payment'|trans }}"
+                                           class="rounded-e-lg px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                            <i class="far fa-money-bill-alt" aria-hidden="true"></i>
+                                        </a>
+                                    </div>
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        {% else %}
+                            <twig:Table:Tr>
+                                <twig:Table:Td colspan="6">
+                                    {{ 'no records found'|trans }}
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        {% endfor %}
+                    </tbody>
+                </twig:Table:Table>
+                <div class="mt-2">{{ pagerfanta(pager) }}</div>
+                </turbo-frame>
+            </section>
+        </div>
+    </div>
+{% endblock %}

@@ -93,7 +93,6 @@ class ClosedPositionController extends AbstractController
             'thisPage' => $page,
             'sort' => $sort,
             'routeName' => 'closed_position_index',
-            'searchPath' => 'closed_position_search',
             'autoCompleteForm' => $form,
         ]);
     }

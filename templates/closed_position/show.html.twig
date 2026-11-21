@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'Closed position'|trans }} {{ position.ticker.symbol }}{% endblock %}
+{% block body %}
+    <div class="w-full flex flex-col">
+        <div class="flex flex-col md:container mx-auto px-4">
+            <div class="flex flex-col border border-gray-300 rounded-lg mb-2 mt-2 p-2">
+                <twig:Card title="{{ 'Closed position'|trans }}: {{ position.ticker.fullname }}" class="w-1/2 mx-auto min-w-max h-min">
+                    <twig:Table:Table class="max-w-min min-w-full mb-4">
+                        <tbody>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>Ticker</twig:Table:ThRow>
+                                <twig:Table:Td>{{ position.ticker.symbol }}</twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>{{ 'Name'|trans }}</twig:Table:ThRow>
+                                <twig:Table:Td>{{ position.ticker.fullname }}</twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>{{ 'Industry'|trans }}</twig:Table:ThRow>
+                                <twig:Table:Td>{{ position.ticker.branch ? position.ticker.branch.label : '' }}</twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>{{ 'Closed at'|trans }}</twig:Table:ThRow>
+                                <twig:Table:Td>{{ position.closedAt ? position.closedAt|date('d-m-Y') : '' }}</twig:Table:Td>
+                            </twig:Table:Tr>
+                            <twig:Table:Tr>
+                                <twig:Table:ThRow>{{ 'Profit / Loss'|trans }}</twig:Table:ThRow>
+                                <twig:Table:Td>
+                                    <twig:Badge variant="{{ position.profit > 0 ? 'success' : 'danger' }}">
+                                        &euro;{{ (position.profit ?? 0)|format_number({"fraction_digit": 2}) }}
+                                    </twig:Badge>
+                                </twig:Table:Td>
+                            </twig:Table:Tr>
+                        </tbody>
+                    </twig:Table:Table>
+                    <h3 class="text-lg font-semibold mb-2">{{ 'Transactions'|trans }}</h3>
+                    <twig:Table:Table class="max-w-min min-w-full mb-4">
+                        <thead>
+                            <tr>
+                                <twig:Table:ThCol>{{ 'Date'|trans }}</twig:Table:ThCol>
+                                <twig:Table:ThCol>{{ 'Side'|trans }}</twig:Table:ThCol>
+                                <twig:Table:ThCol>{{ 'Amount'|trans }}</twig:Table:ThCol>
+                                <twig:Table:ThCol>{{ 'Price'|trans }}</twig:Table:ThCol>
+                                <twig:Table:ThCol>{{ 'Total'|trans }}</twig:Table:ThCol>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in position.transactions %}
+                                <twig:Table:Tr>
+                                    <twig:Table:Td>{{ transaction.transactionDate ? transaction.transactionDate|date('d-m-Y') : '' }}</twig:Table:Td>
+                                    <twig:Table:Td>{{ (transaction.side == constant('App\\Entity\\Transaction::SELL') ? 'Sell' : 'Buy')|trans }}</twig:Table:Td>
+                                    <twig:Table:Td>{{ transaction.amount|format_number({"fraction_digit": 2}) }}</twig:Table:Td>
+                                    <twig:Table:Td>{{ (transaction.currency ? transaction.currency.sign : '$')|currency_sign }}{{ transaction.price|format_number({"fraction_digit": 2}) }}</twig:Table:Td>
+                                    <twig:Table:Td>&euro;{{ transaction.total|format_number({"fraction_digit": 2}) }}</twig:Table:Td>
+                                </twig:Table:Tr>
+                            {% else %}
+                                <twig:Table:Tr>
+                                    <twig:Table:Td colspan="5">{{ 'no records found'|trans }}</twig:Table:Td>
+                                </twig:Table:Tr>
+                            {% endfor %}
+                        </tbody>
+                    </twig:Table:Table>
+                    <div class="w-full pr-3 py-2 mt-2">
+                        <div class="inline-flex rounded-md shadow-sm" role="group">
+                            <a href="{{ path('closed_position_index') }}" class="rounded-s-lg px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                <i class="fas fa-angle-double-left" aria-hidden="true"></i>
+                                {{ 'back to list'|trans }}
+                            </a>
+                            <a href="{{ path('closed_position_edit', { id: position.id }) }}"
+                               title="{{ 'Edit position'|trans }}"
+                               aria-label="{{ 'Edit position'|trans }}"
+                               class="rounded-e-lg px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+                                <i class="far fa-edit" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                </twig:Card>
+            </div>
+        </div>
+    </div>
+{% endblock %}
