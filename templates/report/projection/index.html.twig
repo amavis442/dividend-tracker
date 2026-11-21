@@ -70,7 +70,7 @@
 											{% endif %}
 										</td>
 										<td>{{ position.amount }}</td>
-										<td> {% if position.calendar %} {{ position.calendar.currency.sign|currency_sign }}{% endif %}{{ position.dividend }} </td>
+										<td> {% if position.calendar %} {{ (position.calendar.currency ? position.calendar.currency.sign : '$')|currency_sign }}{% endif %}{{ position.dividend }} </td>
 										<td>&euro;{{ position.estimatedPayment }} / &euro;{{ payment ? payment : '0' }}</td>
 										<td>
 											<span class="badge badge-warning">{{ position.exdividend }}</span>
