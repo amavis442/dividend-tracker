@@ -41,6 +41,12 @@ php bin/console doctrine:migrations:migrate
 php bin/console doctrine:fixtures:load
 ```
 
+### Deploying
+
+Deploys run with Deployer (`deploy.php`). Some releases need a one-time step on the server,
+such as setting `APP_ENCRYPTION_KEY` or running a conversion command: see
+[DEPLOYMENT.md](DEPLOYMENT.md) before every deploy.
+
 ---
 
 ## 🖥️ Usage
