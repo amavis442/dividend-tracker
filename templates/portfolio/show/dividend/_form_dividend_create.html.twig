@@ -1,7 +1,7 @@
 <twig:Table:Tr>
 <turbo-frame id="add-dividend">
 {{ form_start(form, {
-  action: path('portfolio_calendar_new', {ticker: ticker.id, position: position.id}),
+  action: path('portfolio_calendar_new', {position: position.id}),
   method: 'POST',
   attr:{
     'data-turbo-frame': 'portfolio_tab_results'

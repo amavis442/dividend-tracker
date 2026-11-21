@@ -5,7 +5,6 @@ namespace App\Controller\Portfolio;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Entity\Calendar;
 use App\Entity\Position;
-use App\Entity\Ticker;
 use App\Form\CalendarType;
 use App\Repository\PaymentRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -88,7 +87,7 @@ class DividendController extends AbstractController
 
     #[
         Route(
-            path: '/create_dividend/{ticker?}',
+            path: '/create_dividend/{position}',
             name: 'portfolio_calendar_new',
             methods: ['GET', 'POST']
         )
@@ -97,13 +96,11 @@ class DividendController extends AbstractController
     public function createDividend(
         Request $request,
         EntityManagerInterface $entityManager,
-        ?Ticker $ticker,
-        #[MapEntity] ?Position $position
+        #[MapEntity] Position $position
     ): RedirectResponse|Response {
+        $ticker = $position->getTicker();
         $calendar = new Calendar();
-        if ($ticker != null) {
-            $calendar->setTicker($ticker);
-        }
+        $calendar->setTicker($ticker);
         $form = $this->createForm(CalendarType::class, $calendar);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

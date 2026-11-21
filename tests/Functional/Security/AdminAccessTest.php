@@ -79,7 +79,7 @@ final class AdminAccessTest extends WebTestCase
             ['GET', self::NL . '/research/create/' . $this->ids['ticker']],
             ['GET', self::NL . '/trading212/incomesshares/create'],
             ['GET', self::NL . '/monthly/summary/new'],
-            ['GET', self::NL . '/portfolio/create_dividend/' . $this->ids['ticker']],
+            ['GET', self::NL . '/portfolio/create_dividend/' . $this->ids[$who . 'Position']],
             ['POST', self::NL . '/portfolio/delete_dividend/' . $this->ids['calendar'] . '/' . $this->ids[$who . 'Position']],
         ];
     }
@@ -115,12 +115,7 @@ final class AdminAccessTest extends WebTestCase
         $this->loginAs('admin');
 
         foreach ($this->adminOnlyPages('admin') as [$method, $path]) {
-            // These form fragments fail to render on their own (see #83).
-            if (
-                $method !== 'GET'
-                || str_contains($path, '/corporate/action/create/')
-                || str_contains($path, '/create_dividend/')
-            ) {
+            if ($method !== 'GET') {
                 continue;
             }
             $this->client->request($method, $path);
