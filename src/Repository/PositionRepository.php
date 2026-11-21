@@ -385,11 +385,11 @@ class PositionRepository extends ServiceEntityRepository
             ->addSelect('tax')
             ->leftJoin('t.calendars', 'c')
             ->addSelect('c')
+            ->leftJoin('t.branch', 'i')
+            ->addSelect('i')
             ->orderBy($sortBy, self::sortDirection($orderBy));
 
         if ($ticker && $ticker->getId()) {
-            $queryBuilder->addSelect('b');
-            $queryBuilder->innerJoin('t.branch', 'b');
             $queryBuilder->andWhere('t = :ticker');
             $queryBuilder->setParameter('ticker', $ticker->getId());
         }

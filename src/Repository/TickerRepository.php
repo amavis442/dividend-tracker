@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\Branch;
 use App\Entity\Ticker;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -78,50 +77,6 @@ class TickerRepository extends ServiceEntityRepository
         }
 
         return $queryBuilder;
-    }
-
-    public function getCurrent(
-        int $page = 1,
-        int $limit = 10,
-        string $orderBy = "branch.label",
-        string $sort = "ASC",
-        string $search = ""
-    ): Paginator {
-        [$orderTable, $orderColumn] = explode(".", $orderBy, 2) + [1 => ""];
-
-        $order = $orderTable === "branch"
-            ? $this->sortField($orderColumn, "i", "label", Branch::class)
-            : $this->sortField($orderColumn, "t", "symbol");
-
-        // Create our query
-        $queryBuilder = $this->createQueryBuilder("t", "t")
-            ->select("t")
-            ->addSelect("i.label")
-            ->addSelect("p.amount as units")
-            ->addSelect("p.allocation as invested")
-            ->join("t.branch", "i")
-            ->join("t.positions", "p")
-            ->where("p.closed = false")
-            ->groupBy("t.id")
-            ->orderBy($order, self::sortDirection($sort));
-
-        if (!empty($search)) {
-            $queryBuilder->andWhere(
-                $queryBuilder
-                    ->expr()
-                    ->orX(
-                        "t.symbol LIKE :search",
-                        "i.label LIKE :search",
-                        "t.fullname LIKE :search"
-                    )
-            );
-            $queryBuilder->groupBy("t.symbol");
-            $queryBuilder->setParameter("search", $search . "%");
-        }
-        $query = $queryBuilder->getQuery();
-
-        $paginator = $this->paginate($query, $page, $limit);
-        return $paginator;
     }
 
     public function getActiveUnits(Ticker $ticker): int
