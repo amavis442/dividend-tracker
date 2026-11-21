@@ -31,6 +31,7 @@
             <tbody>
                 <twig:Table:Tr>
                     <twig:Table:Td>
+                        {{ form_widget(form.ticker, {attr:{'class':'hidden'}}) }}
                         {{ form_widget(form.type, {'attr':{'class':'p-2 mb-4 border rounded-lg inline-flex items-center '}}) }}
                     </twig:Table:Td>
                     <twig:Table:Td>
@@ -42,7 +43,7 @@
                         {{ form_widget(form.ratio, {'attr':{'class':'p-2 mb-4 border rounded-lg inline-flex items-center '}}) }}
                     </twig:Table:Td>
                     <twig:Table:Td>
-                        {{ form_widget(form.position, {'attr':{'class':'p-2 mb-4 border rounded-lg inline-flex items-center '}}) }}
+                        -
                     </twig:Table:Td>
                     <twig:Table:Td>
                         <div class="flex" data-controller="tooltip">

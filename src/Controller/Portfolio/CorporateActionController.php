@@ -83,12 +83,10 @@ class CorporateActionController extends AbstractController
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
-        #[MapEntity] ?Position $position
+        #[MapEntity] Position $position
     ): Response {
         $corporateAction = new CorporateAction();
-        if ($position) {
-            $corporateAction->setTicker($position->getTicker());
-        }
+        $corporateAction->setTicker($position->getTicker());
 
         $form = $this->createForm(CorporateActionType::class, $corporateAction);
         $form->handleRequest($request);

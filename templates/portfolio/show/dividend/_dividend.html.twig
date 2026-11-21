@@ -2,7 +2,7 @@
 <div class="flex justify-end mb-4">
     {% if is_granted('ROLE_ADMIN') %}
     <twig:Button tag="a"
-                 href="{{ path('portfolio_calendar_new', { ticker: ticker.id, position: position.id }) }}"
+                 href="{{ path('portfolio_calendar_new', { position: position.id }) }}"
                  data-turbo-frame="add-dividend">
         <i class="fas fa-plus"></i>
     </twig:Button>
