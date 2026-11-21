@@ -7,7 +7,7 @@ the following, so these need no manual step:
 - code update (over HTTPS from the public GitLab repository), `composer install`, `cache:clear`
 - `doctrine:migrations:migrate` (task `database:migrate`)
 - `tailwind:build` and `asset-map:compile`
-- shared between releases: `.env.local`, `public/uploads`, `var/uploads`, `var/log`, `var/cache`
+- shared between releases: `.env.local`, `public/uploads`, `var/uploads`, `var/log` (each release has its own `var/cache`)
 
 ## Deploying from GitLab
 
