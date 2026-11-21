@@ -4,26 +4,18 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
-use Doctrine\ORM\Event\PostUpdateEventArgs;
-use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
-use Doctrine\ORM\Events;
 use App\Entity\Pie;
 use App\Repository\Trading212PieMetaDataRepository;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
+use Doctrine\ORM\Event\PostPersistEventArgs;
+use Doctrine\ORM\Event\PostUpdateEventArgs;
+use Doctrine\ORM\Events;
 
-#[
-    AsEntityListener(
-        event: Events::postUpdate,
-        method: 'postUpdate',
-        entity: Pie::class
-    )
-]
-#[
-    AsEntityListener(
-        event: Events::postPersist,
-        method: 'postUpdate',
-        entity: Pie::class
-    )
-]
+/**
+ * Links Trading212 pie metadata to a pie once it has an id.
+ */
+#[AsEntityListener(event: Events::postPersist, method: 'postPersist', entity: Pie::class)]
+#[AsEntityListener(event: Events::postUpdate, method: 'postUpdate', entity: Pie::class)]
 final class PieListener
 {
     public function __construct(
@@ -31,11 +23,13 @@ final class PieListener
     ) {
     }
 
+    public function postPersist(Pie $pie, PostPersistEventArgs $event): void
+    {
+        $this->trading212PieMetaDataRepository->updatePie($pie);
+    }
 
-    public function postUpdate(
-        Pie $pie,
-        PostUpdateEventArgs $event
-    ): void {
+    public function postUpdate(Pie $pie, PostUpdateEventArgs $event): void
+    {
         $this->trading212PieMetaDataRepository->updatePie($pie);
     }
 }
