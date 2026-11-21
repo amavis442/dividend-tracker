@@ -17,11 +17,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Service\FileUploader;
+use App\Validator\ResearchAttachment;
 use App\Service\Referer;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
@@ -255,6 +258,38 @@ class ResearchController extends AbstractController
         return $this->redirectToRoute('research_index');
     }
 
+    /**
+     * Attachments are stored outside public/, so every download goes through
+     * the firewall. Research is shared: every logged-in user may read it.
+     */
+    #[
+        Route(
+            path: '/attachment/{id}',
+            name: 'research_attachment_download',
+            requirements: ['id' => '\d+'],
+            methods: ['GET']
+        )
+    ]
+    public function downloadAttachment(#[MapEntity] Attachment $attachment): BinaryFileResponse
+    {
+        $path = $this->attachmentPath($attachment);
+        if (!is_file($path)) {
+            throw $this->createNotFoundException('Attachment file not found.');
+        }
+
+        $response = new BinaryFileResponse($path);
+        $mimeType = (string) $response->getFile()->getMimeType();
+        $inline = in_array($mimeType, ResearchAttachment::INLINE_MIME_TYPES, true);
+        $response->headers->set('Content-Type', $inline ? $mimeType : 'application/octet-stream');
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        $response->setContentDisposition(
+            $inline ? ResponseHeaderBag::DISPOSITION_INLINE : ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            basename($path)
+        );
+
+        return $response;
+    }
+
     #[
         Route(
             path: '/attachment/delete/{id}',
@@ -275,17 +310,23 @@ class ResearchController extends AbstractController
                 $data['_token']
             )
         ) {
-            $name = $attachment->getAttachmentName();
-            // On supprime le fichier
-            unlink($this->getParameter('documents_directory') . '/' . $name);
+            $path = $this->attachmentPath($attachment);
+            if (is_file($path)) {
+                unlink($path);
+            }
 
             $entityManager->remove($attachment);
             $entityManager->flush();
 
-            // On répond en json
             return new JsonResponse(['success' => 1]);
         } else {
             return new JsonResponse(['error' => 'Token Invalide'], 400);
         }
+    }
+
+    private function attachmentPath(Attachment $attachment): string
+    {
+        // The stored name is generated on upload; basename() keeps it inside the directory.
+        return $this->getParameter('documents_directory') . '/' . basename($attachment->getAttachmentName());
     }
 }

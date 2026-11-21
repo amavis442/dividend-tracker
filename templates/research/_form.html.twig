@@ -14,7 +14,7 @@
 
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div class="col-sm-4">
-                    <a href="{{ asset('uploads/documents/' ~ attachment.attachmentName) }}" target="_blank">
+                    <a href="{{ path('research_attachment_download', {id: attachment.id}) }}" target="_blank">
                         {{ attachment.attachmentName }}
                     </a>
                 </div>
