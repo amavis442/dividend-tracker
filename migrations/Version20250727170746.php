@@ -54,8 +54,6 @@ final class Version20250727170746 extends AbstractMigration
             FROM trading212_pie_meta_data
             GROUP BY trading212_pie_id, (EXTRACT(month FROM created_at)), (EXTRACT(year FROM created_at));'
         );
-
-        $this->addSql('ALTER TABLE public.trading212_yield OWNER TO dividend;');
     }
 
     public function down(Schema $schema): void
